@@ -4,22 +4,25 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import boundariesData from "../data/boundaries.json";
 import landData from "../data/land.json";
 
+// A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
+// hand-tinted cartography (brick, verdigris, indigo, ochre) rather than generic
+// bright web-primary colors. Each hue stays distinguishable at small marker sizes.
 const CATEGORY_COLORS = {
-  war: "#b3261e",
-  treaty: "#1e6b4f",
-  political: "#3d5a99",
-  uprising: "#c77c1e",
-  migration: "#7a4fa3",
-  diplomatic: "#2a8fa3",
-  economic: "#8a7a1e",
-  terrorism: "#5a1e1e",
+  war: "#a13f2e",        // brick red
+  treaty: "#4c7a63",     // verdigris green
+  political: "#455d80",  // muted indigo
+  uprising: "#c99a45",   // antique gold
+  migration: "#7d5a7d",  // dusty plum
+  diplomatic: "#3f7d84", // muted teal
+  economic: "#8c7a3f",   // olive mustard
+  terrorism: "#6b3140",  // deep oxblood
 };
 
 const CATEGORY_COLOR_EXPRESSION = [
   "match",
   ["get", "category"],
   ...Object.entries(CATEGORY_COLORS).flatMap(([k, v]) => [k, v]),
-  "#666666",
+  "#6b6151",
 ];
 
 // Territory names in boundaries.json sometimes carry a parenthetical
@@ -195,7 +198,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
           id: "boundaries-fill",
           type: "fill",
           source: "boundaries",
-          paint: { "fill-color": "#c77c1e", "fill-opacity": 0.06 },
+          paint: { "fill-color": "#8a6f45", "fill-opacity": 0.08 },
         },
         "coastline"
       );
@@ -205,7 +208,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
         type: "line",
         source: "boundaries",
         paint: {
-          "line-color": ["case", ["!=", ["get", "disputed"], null], "#c77c1e", "#8a8f96"],
+          "line-color": ["case", ["!=", ["get", "disputed"], null], "#c99a45", "#8a7a5f"],
           "line-width": 1.2,
           "line-dasharray": ["case", ["!=", ["get", "disputed"], null], ["literal", [2, 2]], ["literal", [1, 0]]],
         },
@@ -254,10 +257,10 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
         source: "events",
         filter: ["has", "point_count"],
         paint: {
-          "circle-color": "#6a7076",
+          "circle-color": "#5c4d38",
           "circle-radius": ["step", ["get", "point_count"], 14, 5, 18, 15, 24],
           "circle-stroke-width": 2,
-          "circle-stroke-color": "rgba(255,255,255,0.85)",
+          "circle-stroke-color": "rgba(236,226,201,0.85)",
         },
       });
 
@@ -270,7 +273,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
           "text-field": ["get", "point_count_abbreviated"],
           "text-size": 12,
         },
-        paint: { "text-color": "#fff" },
+        paint: { "text-color": "#ece2c9" },
       });
 
       map.addLayer({
@@ -282,7 +285,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
           "circle-color": CATEGORY_COLOR_EXPRESSION,
           "circle-radius": 6,
           "circle-stroke-width": 2,
-          "circle-stroke-color": "rgba(255,255,255,0.85)",
+          "circle-stroke-color": "rgba(236,226,201,0.85)",
         },
       });
 
