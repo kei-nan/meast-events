@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Map as MaplibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import boundariesData from "../data/boundaries.json";
+import landData from "../data/land.json";
 
 const CATEGORY_COLORS = {
   war: "#b3261e",
@@ -78,6 +79,27 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
       for (const layerId of MODERN_BORDER_LAYERS) {
         map.setLayoutProperty(layerId, "visibility", "none");
       }
+
+      // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
+      // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth 1:50m land
+      // polygons - pure physical geography with no political information at all, so it
+      // can't reintroduce modern-border anachronisms the way the demo style's
+      // "coastline" layer did. Kept subtle and placed below our own boundaries/events
+      // layers so it reads as background context, not the focal layer.
+      map.addSource("land", {
+        type: "geojson",
+        data: landData,
+      });
+
+      map.addLayer(
+        {
+          id: "land-fill",
+          type: "fill",
+          source: "land",
+          paint: { "fill-color": "#e4ded0", "fill-opacity": 0.65 },
+        },
+        "coastline"
+      );
 
       map.addSource("boundaries", {
         type: "geojson",
