@@ -2,6 +2,26 @@
   box-sizing: border-box;
 }
 
+:root {
+  /* "Historical atlas" palette - warm ink-on-parchment tones, not cold navy/gray */
+  --bg-0: #1d1a15;      /* deepest surface - map frame / app root */
+  --bg-1: #262019;      /* panels - detail sidebar, timeline, footer */
+  --bg-2: #2d2721;      /* header, slightly raised surface */
+  --border: #453a2b;    /* warm muted brown-grey */
+  --border-soft: #382f24;
+
+  --text-primary: #ece2c9;   /* parchment cream */
+  --text-secondary: #b6a888; /* muted tan */
+  --text-tertiary: #8b7e63;  /* dim, for fine print */
+
+  --accent: #c99a45;        /* antique gold - primary accent ink */
+  --accent-strong: #ddb35f; /* lighter gold for hover/highlight */
+  --link: #7badb0;          /* faded teal-blue, like old map ink */
+
+  --font-serif: "Spectral", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
 body {
   margin: 0;
 }
