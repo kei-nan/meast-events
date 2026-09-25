@@ -3,14 +3,17 @@
 // Nothing in here is auto-generated - it's hand-authored and cited, and it's the only
 // place ingest-boundaries.js consults besides the raw CShapes download itself.
 //
-// Two kinds of entry:
+// Four kinds of entry:
 //
 //   "split" - a one-directional rename/status progression over an entity's lifetime
 //     (a mandate becoming independent, an empire being renamed). `phases` is an
-//     ordered list of {until, name, status?}; the first phase where year < until
-//     applies. Falls through to the default name (CShapes' own name, parenthetical
-//     stripped) if no phase matches - so this only needs to list the *historical*
-//     names, not the current one.
+//     ordered list of {until, name, status?, geometry?}; the first phase where
+//     year < until applies. Falls through to the default name (CShapes' own name,
+//     parenthetical stripped) and default (raw CShapes) geometry if no phase matches
+//     - so this only needs to list the *historical* names/shapes, not the current
+//     ones. `geometry` is optional and only needed when the shape itself changed, not
+//     just the name (see Turkey/Hatay below) - it references a key in
+//     data/corrections-geometry.json (see scripts/extract-correction-geometry.js).
 //
 //   "flag" - a bounded [fromYear, toYear] window attaching a note/status/source to
 //     an existing entity, optionally with a temporary display name (e.g. a military
@@ -18,6 +21,10 @@
 //     (from a "split" entry or the default) applies unchanged. Doesn't require the
 //     window to align with any underlying CShapes date boundary - the ingest script
 //     splits the geometry's date range as needed.
+//
+//   "add" - an entirely new feature with no CShapes counterpart at all: not derived
+//     from filtering/splitting any raw CShapes record, just its own name/dates/
+//     geometry/status. `geometry` references a key in data/corrections-geometry.json.
 //
 // Every entry with historical content must cite a source. Nothing here should be
 // taken on my (the model's) say-so alone without a citation a reader can check.
@@ -27,8 +34,20 @@ export const CORRECTIONS = [
   {
     type: "split",
     target: "Turkey (Ottoman Empire)",
-    phases: [{ until: 1923, name: "Ottoman Empire" }],
-    note: "The Ottoman Empire was formally abolished and the Republic of Turkey proclaimed on 29 October 1923.",
+    phases: [
+      { until: 1923, name: "Ottoman Empire" },
+      // CShapes' Turkey polygon already includes Hatay (the Sanjak of Alexandretta),
+      // but France didn't cede it from Syria until 1939 - see the "add" entry for
+      // Hatay below for the 1923-1939 period. geometry: "turkeyPre1939" is Turkey's
+      // CShapes shape with Hatay subtracted (computed via polygon difference against
+      // modern Hatay Province as an approximation of the historical Sanjak boundary).
+      { until: 1939, name: "Turkey", geometry: "turkeyPre1939" },
+    ],
+    note:
+      "The Ottoman Empire was formally abolished and the Republic of Turkey proclaimed " +
+      "on 29 October 1923. Separately: this shape excludes Hatay/Alexandretta until " +
+      "1939 (see the Hatay entry below) - CShapes' own polygon incorrectly included it " +
+      "from 1923.",
     source: "https://en.wikipedia.org/wiki/Republic_of_Turkey_(1923%E2%80%93present)",
   },
   {
@@ -126,5 +145,67 @@ export const CORRECTIONS = [
       "province. The annexation was rejected by the UN Security Council and reversed by " +
       "the US-led coalition in the Gulf War; Kuwait City was liberated 26-28 February 1991.",
     source: "https://en.wikipedia.org/wiki/Iraqi_invasion_of_Kuwait",
+  },
+
+  // --- Additions: territories with no CShapes counterpart at all ---
+  {
+    type: "add",
+    name: "Sanjak of Alexandretta (Hatay)",
+    start_year: 1923,
+    end_year: 1938,
+    status: "mandate",
+    geometry: "hatay",
+    note:
+      "An autonomous sanjak within the French Mandate for Syria, its status formalized " +
+      "by a 1937 League of Nations agreement; briefly the separatist \"Hatay State\" from " +
+      "September 1938 before Turkey annexed it in June 1939 following a referendum " +
+      "widely regarded internationally as rigged. Geometry approximated using the " +
+      "modern boundary of Turkey's Hatay Province (Natural Earth), which may not " +
+      "exactly match the historical Sanjak/State boundary.",
+    source: "https://en.wikipedia.org/wiki/Hatay_State",
+  },
+  {
+    type: "add",
+    name: "West Bank (Jordanian military administration)",
+    start_year: 1948,
+    end_year: 1949,
+    status: "occupied-administered",
+    geometry: "westBank",
+    note:
+      "Held by Jordan's Arab Legion after the 1948 Arab-Israeli War, before formal " +
+      "annexation in 1950 (see the next entry). Geometry follows the 1949 Armistice " +
+      "(\"Green\") Line, using its modern representation (Natural Earth), which has not " +
+      "moved since.",
+    source: "https://en.wikipedia.org/wiki/1949_Armistice_Agreements",
+  },
+  {
+    type: "add",
+    name: "West Bank (annexed by Jordan)",
+    start_year: 1950,
+    end_year: 1967,
+    status: "annexed-unrecognized",
+    geometry: "westBank",
+    note:
+      "Jordan formally annexed the West Bank on 24 April 1950, extending citizenship to " +
+      "Palestinians there. Recognized only by the UK and Pakistan. Held until lost to " +
+      "Israel in the 1967 Six-Day War (see Israel's occupied-territory-included flag).",
+    source: "https://en.wikipedia.org/wiki/Jordanian_annexation_of_the_West_Bank",
+  },
+  {
+    type: "add",
+    name: "Gaza Strip (Egyptian military administration)",
+    start_year: 1948,
+    end_year: 1967,
+    status: "occupied-administered",
+    geometry: "gaza",
+    note:
+      "Held by Egypt after the 1948 Arab-Israeli War under military administration - " +
+      "never annexed, unlike Jordan's West Bank. The Arab League-backed \"All-Palestine " +
+      "Government\" was nominally based in Gaza from September 1948 but held little real " +
+      "power and was dissolved by Nasser in 1959. Held until lost to Israel in the 1967 " +
+      "Six-Day War (see Israel's occupied-territory-included flag). Geometry follows the " +
+      "1949 Armistice Line, using its modern representation (Natural Earth), which has " +
+      "not moved since.",
+    source: "https://en.wikipedia.org/wiki/All-Palestine_Government",
   },
 ];

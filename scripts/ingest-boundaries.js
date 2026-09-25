@@ -68,6 +68,7 @@ function resolveProperties(cntry_name, intervalStartYear) {
   let status = null;
   let note = null;
   let source = CSHAPES_CITATION;
+  let geometryKey = null;
 
   const split = CORRECTIONS.find((c) => c.type === "split" && c.target === cntry_name);
   const phase = split?.phases.find((p) => intervalStartYear < p.until);
@@ -75,7 +76,10 @@ function resolveProperties(cntry_name, intervalStartYear) {
     name = phase.name;
     status = phase.status ?? null;
     note = split.note;
-    source = `${CSHAPES_CITATION} geometry, renamed per ${split.source}`;
+    source = phase.geometry
+      ? `Geometry corrected per ${split.source} (see data/corrections-geometry.json); ${CSHAPES_CITATION} for the rest`
+      : `${CSHAPES_CITATION} geometry, renamed per ${split.source}`;
+    geometryKey = phase.geometry ?? null;
   }
 
   const flag = CORRECTIONS.find(
@@ -92,14 +96,16 @@ function resolveProperties(cntry_name, intervalStartYear) {
     source = `${CSHAPES_CITATION} geometry; ${flag.source}`;
   }
 
-  return { name, status, note, source };
+  return { name, status, note, source, geometryKey };
 }
 
 async function main() {
   const sourcePath = new URL("../data/raw/cshapes-2.0.geojson", import.meta.url);
+  const geometryPath = new URL("../data/corrections-geometry.json", import.meta.url);
   const outPath = new URL("../data/boundaries.json", import.meta.url);
 
   const raw = JSON.parse(await readFile(sourcePath, "utf-8"));
+  const correctionsGeometry = JSON.parse(await readFile(geometryPath, "utf-8"));
   const filtered = raw.features.filter(
     (f) => REGION_ENTITIES.includes(f.properties.cntry_name) && f.properties.gweyear >= 1900
   );
@@ -131,9 +137,26 @@ async function main() {
           source: props.source,
           note: props.note,
         },
-        geometry: f.geometry,
+        geometry: props.geometryKey ? correctionsGeometry[props.geometryKey] : f.geometry,
       });
     }
+  }
+
+  // "add" entries have no CShapes counterpart at all - append them directly.
+  for (const c of CORRECTIONS) {
+    if (c.type !== "add") continue;
+    features.push({
+      type: "Feature",
+      properties: {
+        name: c.name,
+        start_year: c.start_year,
+        end_year: c.end_year,
+        status: c.status,
+        source: `Not in CShapes; ${c.source}`,
+        note: c.note,
+      },
+      geometry: correctionsGeometry[c.geometry],
+    });
   }
 
   const out = {
