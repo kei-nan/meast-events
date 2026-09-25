@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Map as MaplibreMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import boundariesData from "../data/boundaries.json";
-import landData from "../data/land.json";
+import useDebouncedValue from "../hooks/useDebouncedValue";
+import { decadeFloor, loadBoundaryDecade, loadLand, prefetchBoundaryDecade } from "../lib/dataClient";
+import { MIN_YEAR, MAX_YEAR } from "./Timeline";
 
 // A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
 // hand-tinted cartography (brick, verdigris, indigo, ochre) rather than generic
@@ -54,10 +55,15 @@ function toGeoJSON(events) {
   };
 }
 
-function boundariesForYear(year) {
+// `features` is whatever decade chunk covers `year` (see the boundary-loading
+// effects in MapView below) - a decade chunk can contain features that are only
+// active for *part* of that decade (a short-lived phase, a flag window), so this
+// still needs to filter down to the exact year, same as when the app had the
+// whole boundaries.json in memory.
+function boundariesForYear(year, features) {
   return {
     type: "FeatureCollection",
-    features: boundariesData.features.filter(
+    features: features.filter(
       (f) => f.properties.start_year <= year && year <= f.properties.end_year
     ),
   };
@@ -110,10 +116,10 @@ function labelAnchor(geometry) {
 // A separate point source (one feature per territory, at a single anchor
 // point) so the boundaries-label layer never renders duplicate labels for
 // multi-part territories - see labelAnchor() above.
-function boundaryLabelsForYear(year) {
+function boundaryLabelsForYear(year, features) {
   return {
     type: "FeatureCollection",
-    features: boundariesData.features
+    features: features
       .filter((f) => f.properties.start_year <= year && year <= f.properties.end_year)
       .map((f) => {
         const anchor = labelAnchor(f.geometry);
@@ -137,6 +143,18 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
   const yearRef = useRef(year);
   const [mapReady, setMapReady] = useState(false);
 
+  // Boundary decade chunks are fetched on demand and cached forever here -
+  // scrubbing the timeline back over an already-visited decade never re-fetches
+  // it. `boundaryVersion` just forces a re-render when the (mutable) cache gets
+  // a new entry, since map.getSource().setData() below is an imperative escape
+  // hatch React doesn't know to react to on its own.
+  const boundaryCacheRef = useRef(new Map()); // decade -> features[]
+  const [boundaryVersion, setBoundaryVersion] = useState(0);
+  // Only the settled year triggers a new fetch; boundariesForYear/labels below
+  // still run against the live `year` for instant filtering of whatever decade
+  // is already cached, so scrubbing within a loaded decade has zero lag.
+  const debouncedYear = useDebouncedValue(year, 150);
+
   eventsRef.current = events;
   yearRef.current = year;
 
@@ -150,10 +168,21 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
     mapRef.current = map;
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only
 
-    map.on("load", () => {
+    map.on("load", async () => {
       for (const layerId of MODERN_BORDER_LAYERS) {
         map.setLayoutProperty(layerId, "visibility", "none");
       }
+
+      // Land silhouette and the boundary decade covering the initial year are
+      // both needed for a correct first paint, so fetch them in parallel and
+      // wait on both before building the map's own sources/layers - this
+      // avoids a flash of an empty map that then pops in borders a moment later.
+      const initialDecade = decadeFloor(yearRef.current);
+      const [initialLand, initialBoundaries] = await Promise.all([
+        loadLand(),
+        loadBoundaryDecade(initialDecade),
+      ]);
+      boundaryCacheRef.current.set(initialDecade, initialBoundaries.features);
 
       // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
       // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth 1:50m land
@@ -163,7 +192,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
       // layers so it reads as background context, not the focal layer.
       map.addSource("land", {
         type: "geojson",
-        data: landData,
+        data: initialLand,
       });
 
       map.addLayer(
@@ -178,7 +207,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
 
       map.addSource("boundaries", {
         type: "geojson",
-        data: boundariesForYear(yearRef.current),
+        data: boundariesForYear(yearRef.current, initialBoundaries.features),
       });
 
       map.addLayer(
@@ -204,7 +233,7 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
 
       map.addSource("boundary-labels", {
         type: "geojson",
-        data: boundaryLabelsForYear(yearRef.current),
+        data: boundaryLabelsForYear(yearRef.current, initialBoundaries.features),
       });
 
       map.addLayer({
@@ -302,11 +331,39 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
     mapRef.current.getSource("events")?.setData(toGeoJSON(events));
   }, [events, mapReady]);
 
+  // Fetch trigger: only fires when the *settled* year lands in a decade that
+  // isn't cached yet. Also opportunistically warms the neighboring decades, so
+  // crossing a decade boundary while scrubbing usually finds data already there.
+  useEffect(() => {
+    const decade = decadeFloor(debouncedYear);
+    if (!boundaryCacheRef.current.has(decade)) {
+      loadBoundaryDecade(decade).then((fc) => {
+        boundaryCacheRef.current.set(decade, fc.features);
+        setBoundaryVersion((v) => v + 1);
+      });
+    }
+    const prevDecade = decade - 10;
+    const nextDecade = decade + 10;
+    if (prevDecade >= decadeFloor(MIN_YEAR) && !boundaryCacheRef.current.has(prevDecade)) {
+      prefetchBoundaryDecade(prevDecade);
+    }
+    if (nextDecade <= decadeFloor(MAX_YEAR) && !boundaryCacheRef.current.has(nextDecade)) {
+      prefetchBoundaryDecade(nextDecade);
+    }
+  }, [debouncedYear]);
+
+  // Apply trigger: runs against the live (non-debounced) `year` so that once a
+  // decade is cached, filtering/rendering it is instant with no debounce lag.
+  // Until the target decade arrives, the map simply keeps showing whatever was
+  // rendered last rather than clearing to empty.
   useEffect(() => {
     if (!mapReady) return;
-    mapRef.current.getSource("boundaries")?.setData(boundariesForYear(year));
-    mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year));
-  }, [year, mapReady]);
+    const decade = decadeFloor(year);
+    const features = boundaryCacheRef.current.get(decade);
+    if (!features) return;
+    mapRef.current.getSource("boundaries")?.setData(boundariesForYear(year, features));
+    mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year, features));
+  }, [year, boundaryVersion, mapReady]);
 
   useEffect(() => {
     if (!mapReady) return;

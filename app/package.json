@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "split-data": "node scripts/split-data.mjs",
+    "predev": "node scripts/split-data.mjs",
+    "prebuild": "node scripts/split-data.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
