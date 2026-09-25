@@ -1,9 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { Map as MaplibreMap } from "maplibre-gl";
+import { Map as MaplibreMap, setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
+// Not used directly - imported so Vite includes this file in the production
+// bundle as a real asset (see the comment below and vite.config.js).
+import "maplibre-gl/dist/maplibre-gl-shared.mjs?url";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import { decadeFloor, loadBoundaryDecade, loadLand, prefetchBoundaryDecade } from "../lib/dataClient";
 import { MIN_YEAR, MAX_YEAR } from "./Timeline";
+
+// MapLibre GL resolves its worker script relative to its own module URL at
+// runtime (via a dynamic import.meta.url template), which Vite's static
+// asset analyzer can't follow - so in a production build the worker file
+// never gets copied into dist/ and the map silently fails to render (no
+// thrown error - the failure happens inside the Worker, which doesn't
+// bubble up as a page-level exception). This only matters for the built
+// app - Vite's dev server can already resolve maplibre-gl's own worker URL
+// straight out of node_modules, so leave dev mode alone and only override
+// the built app, where we explicitly ship the worker (and the shared chunk
+// it imports, see vite.config.js) as unhashed static assets.
+if (import.meta.env.PROD) {
+  setWorkerUrl(maplibreWorkerUrl);
+}
 
 // A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
 // hand-tinted cartography (brick, verdigris, indigo, ochre) rather than generic
