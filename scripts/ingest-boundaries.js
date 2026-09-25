@@ -1,10 +1,19 @@
 // Filters the CShapes 2.0 dataset (data/raw/cshapes-2.0.geojson, downloaded separately
 // from https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson) down to our region and
-// 1900-present, producing data/boundaries.json for the map's time-driven border layer.
+// 1900-present, then applies our own corrections (scripts/boundary-corrections.js) to
+// produce data/boundaries.json for the map's time-driven border layer.
 //
 // CShapes 2.0 by Schvitz et al., ETH Zurich - CC BY-NC-SA 4.0. Non-commercial use only;
 // see https://icr.ethz.ch/data/cshapes/ before any commercial reuse of this project.
+//
+// data/raw/cshapes-2.0.geojson is untouched upstream data and should never be hand-edited.
+// Every historical correction/addition this project makes lives in boundary-corrections.js
+// instead, and is carried through to every output feature's `source`/`status`/`note`
+// properties, so the generated file is self-documenting about what came from where.
 import { readFile, writeFile } from "node:fs/promises";
+import { CORRECTIONS } from "./boundary-corrections.js";
+
+const CSHAPES_CITATION = "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)";
 
 const REGION_ENTITIES = [
   "Turkey (Ottoman Empire)",
@@ -26,23 +35,64 @@ const REGION_ENTITIES = [
   "Oman",
 ];
 
-// Known cases where a CShapes polygon reflects de facto administration rather than
-// internationally recognized sovereignty. Flagged so the UI can render these borders
-// distinctly instead of presenting them with the same certainty as settled borders.
-const DISPUTED_NOTES = [
-  {
-    cntry_name: "Israel",
-    fromYear: 1967,
-    toYear: 2019,
-    note:
-      "This shape includes territory occupied in the 1967 Six-Day War (West Bank, Golan Heights, and until 1979 Sinai and Gaza). Israeli sovereignty over the West Bank and Golan Heights is not internationally recognized.",
-  },
-];
+function defaultName(cntry_name) {
+  const openParen = cntry_name.indexOf(" (");
+  return openParen >= 0 ? cntry_name.slice(0, openParen) : cntry_name;
+}
 
-function findDisputedNote(cntry_name, gwsyear) {
-  return DISPUTED_NOTES.find(
-    (d) => d.cntry_name === cntry_name && gwsyear >= d.fromYear && gwsyear <= d.toYear
+// Every year strictly between startYear and endYear where either a split-phase
+// boundary or a flag window edge falls - these are where we need to cut the raw
+// CShapes feature into separate output features.
+function cutPoints(cntry_name, startYear, endYear) {
+  const cuts = new Set();
+  for (const c of CORRECTIONS) {
+    if (c.target !== cntry_name) continue;
+    if (c.type === "split") {
+      for (const phase of c.phases) {
+        if (phase.until > startYear && phase.until < endYear) cuts.add(phase.until);
+      }
+    } else if (c.type === "flag") {
+      if (c.fromYear > startYear && c.fromYear < endYear) cuts.add(c.fromYear);
+      if (c.toYear + 1 > startYear && c.toYear + 1 < endYear) cuts.add(c.toYear + 1);
+    }
+  }
+  return [...cuts].sort((a, b) => a - b);
+}
+
+// Resolves name/status/note/source for one sub-interval, using its start year to
+// decide which split-phase and/or flag (if any) applies. Flags win over splits over
+// the untouched default, and combine where they don't overlap (e.g. a flag's note
+// doesn't erase a split's name unless the flag also specifies its own name).
+function resolveProperties(cntry_name, intervalStartYear) {
+  let name = defaultName(cntry_name);
+  let status = null;
+  let note = null;
+  let source = CSHAPES_CITATION;
+
+  const split = CORRECTIONS.find((c) => c.type === "split" && c.target === cntry_name);
+  const phase = split?.phases.find((p) => intervalStartYear < p.until);
+  if (phase) {
+    name = phase.name;
+    status = phase.status ?? null;
+    note = split.note;
+    source = `${CSHAPES_CITATION} geometry, renamed per ${split.source}`;
+  }
+
+  const flag = CORRECTIONS.find(
+    (c) =>
+      c.type === "flag" &&
+      c.target === cntry_name &&
+      intervalStartYear >= c.fromYear &&
+      intervalStartYear <= c.toYear
   );
+  if (flag) {
+    if (flag.name) name = flag.name;
+    status = flag.status;
+    note = flag.note;
+    source = `${CSHAPES_CITATION} geometry; ${flag.source}`;
+  }
+
+  return { name, status, note, source };
 }
 
 async function main() {
@@ -54,37 +104,55 @@ async function main() {
     (f) => REGION_ENTITIES.includes(f.properties.cntry_name) && f.properties.gweyear >= 1900
   );
 
-  const features = filtered.map((f) => {
+  const features = [];
+  for (const f of filtered) {
     const p = f.properties;
-    const disputed = findDisputedNote(p.cntry_name, p.gwsyear);
-    return {
-      type: "Feature",
-      properties: {
-        name: p.cntry_name,
-        start_year: p.gwsyear,
-        // CShapes ends in 2019; treat each country's last record as still current,
-        // since none of these recognized sovereign borders have changed since.
-        end_year: p.gweyear >= 2019 ? 9999 : p.gweyear,
-        disputed: disputed ? disputed.note : null,
-      },
-      geometry: f.geometry,
-    };
-  });
+    const cntry_name = p.cntry_name;
+    const startYear = p.gwsyear;
+    // CShapes ends in 2019; treat each country's last record as still current, since
+    // none of these recognized sovereign borders have changed since (corrections that
+    // extend into the present, like Israel's, rely on this too).
+    const endYear = p.gweyear >= 2019 ? 9999 : p.gweyear;
+
+    const cuts = cutPoints(cntry_name, startYear, endYear);
+    const boundaries = [startYear, ...cuts, endYear];
+
+    for (let i = 0; i < boundaries.length - 1; i++) {
+      const segStart = boundaries[i];
+      const segEnd = i === boundaries.length - 2 ? endYear : boundaries[i + 1] - 1;
+      const props = resolveProperties(cntry_name, segStart);
+      features.push({
+        type: "Feature",
+        properties: {
+          name: props.name,
+          start_year: segStart,
+          end_year: segEnd,
+          status: props.status,
+          source: props.source,
+          note: props.note,
+        },
+        geometry: f.geometry,
+      });
+    }
+  }
 
   const out = {
     type: "FeatureCollection",
-    source: "CShapes 2.0 (Schvitz et al., ETH Zurich), CC BY-NC-SA 4.0, https://icr.ethz.ch/data/cshapes/",
+    source:
+      `Derived from ${CSHAPES_CITATION} with corrections and additions by this project - ` +
+      "see each feature's `source`/`note` properties, and scripts/boundary-corrections.js " +
+      "for the full list of changes with citations.",
     features,
   };
 
   await writeFile(outPath, JSON.stringify(out));
   console.log(`Wrote ${features.length} boundary features to data/boundaries.json`);
 
-  const byName = {};
-  for (const f of features) {
-    byName[f.properties.name] = (byName[f.properties.name] ?? 0) + 1;
+  const modified = features.filter((f) => f.properties.note);
+  console.log(`${modified.length} features carry a correction:`);
+  for (const f of modified) {
+    console.log(`  ${f.properties.name} (${f.properties.start_year}-${f.properties.end_year})${f.properties.status ? ` [${f.properties.status}]` : ""}`);
   }
-  console.log(byName);
 }
 
 main();

@@ -63,12 +63,15 @@ export default function App() {
         eventCountsByYear={eventCountsByYear}
       />
       <footer className="app-footer">
-        Event summaries from Wikipedia (CC BY-SA 4.0). Borders from{" "}
+        Event summaries from Wikipedia (CC BY-SA 4.0). Borders adapted from{" "}
         <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
           CShapes 2.0
         </a>{" "}
-        (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0) — non-commercial use only. Dashed
-        borders mark territory whose sovereignty is internationally disputed.
+        (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0) — non-commercial use only —{" "}
+        <strong>with corrections and additions by this project</strong>; every changed
+        or added shape cites its own source (see <code>scripts/boundary-corrections.js</code>).
+        Dashed borders mark territory under a mandate, occupation, unrecognized
+        annexation, or a since-resolved sovereignty dispute.
       </footer>
     </div>
   );

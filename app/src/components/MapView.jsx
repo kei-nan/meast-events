@@ -25,24 +25,10 @@ const CATEGORY_COLOR_EXPRESSION = [
   "#6b6151",
 ];
 
-// Territory names in boundaries.json sometimes carry a parenthetical
-// qualifier, e.g. "Turkey (Ottoman Empire)" or "Iran (Persia)". A few of
-// these shapes span the entire dataset under one unchanging name even though
-// the real-world entity was renamed partway through (the Ottoman Empire
-// became Turkey in 1923; Persia became Iran in 1935) - so which half of the
-// name is period-appropriate depends on the selected year, not just on the
-// feature. Everything else can just drop the parenthetical.
-const HISTORICAL_NAME_OVERRIDES = {
-  "Turkey (Ottoman Empire)": { until: 1923, name: "Ottoman Empire" },
-  "Iran (Persia)": { until: 1935, name: "Persia" },
-};
-
-function displayName(name, year) {
-  const override = HISTORICAL_NAME_OVERRIDES[name];
-  if (override && year < override.until) return override.name;
-  const openParen = name.indexOf(" (");
-  return openParen >= 0 ? name.slice(0, openParen) : name;
-}
+// Period-correct naming (Ottoman Empire -> Turkey, mandate-era names, etc.) is now
+// resolved at ingest time - see scripts/boundary-corrections.js - so boundaries.json's
+// `name` property is already the right one to show for whatever year a feature is
+// active. This component doesn't need its own historical knowledge.
 
 // The demo basemap's own political layers show today's borders regardless of the
 // timeline position - hide them so our own year-driven boundary layer is the only
@@ -132,9 +118,11 @@ function boundaryLabelsForYear(year) {
       .map((f) => {
         const anchor = labelAnchor(f.geometry);
         if (!anchor) return null;
+        // f.properties.name is already the period-appropriate display name - see
+        // scripts/boundary-corrections.js.
         return {
           type: "Feature",
-          properties: { name: displayName(f.properties.name, year) },
+          properties: { name: f.properties.name },
           geometry: { type: "Point", coordinates: anchor },
         };
       })
@@ -208,9 +196,9 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
         type: "line",
         source: "boundaries",
         paint: {
-          "line-color": ["case", ["!=", ["get", "disputed"], null], "#c99a45", "#8a7a5f"],
+          "line-color": ["case", ["!=", ["get", "status"], null], "#c99a45", "#8a7a5f"],
           "line-width": 1.2,
-          "line-dasharray": ["case", ["!=", ["get", "disputed"], null], ["literal", [2, 2]], ["literal", [1, 0]]],
+          "line-dasharray": ["case", ["!=", ["get", "status"], null], ["literal", [2, 2]], ["literal", [1, 0]]],
         },
       });
 
@@ -224,8 +212,8 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
         type: "symbol",
         source: "boundary-labels",
         layout: {
-          // boundary-labels' "name" property is already resolved to the
-          // period-appropriate display name - see displayName() above.
+          // boundary-labels' "name" property is already the period-appropriate
+          // display name, resolved at ingest time.
           "text-field": ["get", "name"],
           "text-font": ["Open Sans Semibold"],
           "text-size": ["interpolate", ["linear"], ["zoom"], 2, 9, 5, 13, 8, 16],
