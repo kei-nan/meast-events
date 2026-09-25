@@ -133,6 +133,42 @@ export const CORRECTIONS = [
       "reflects the final ruling; this window marks when it was still unsettled.",
     source: "https://en.wikipedia.org/wiki/Hawar_Islands_dispute",
   },
+  // CShapes has no notion of either Uqair Protocol neutral zone: it hands each zone's two
+  // eventual halves to their modern owners for the whole 20th century. The zones are added
+  // as their own features further down; these flags mark the polygons that wrongly include
+  // them in the meantime. Iraq deliberately gets no such flag even though its polygon has
+  // the same problem: a flag's note replaces a split's note for the same years, and an
+  // Iraq flag spanning 1922-1981 would wipe out the mandate/kingdom/republic note above
+  // for exactly the period that note explains. The Saudi-Iraqi zone's own entry names Iraq
+  // instead.
+  {
+    type: "flag",
+    target: "Saudi Arabia",
+    fromYear: 1922,
+    toYear: 1981,
+    status: "shared-sovereignty-included",
+    note:
+      "This shape includes both Uqair Protocol neutral zones, which Saudi Arabia did not " +
+      "hold alone while they existed: the Saudi-Kuwaiti zone (shared with Kuwait until " +
+      "1969) and the Saudi-Iraqi zone (shared with Iraq until 1981). Saudi Arabia took " +
+      "roughly half of each on partition, and this polygon reflects those later " +
+      "settlements throughout. Both zones are also drawn as separate features for the " +
+      "years they existed - see the two entries below.",
+    source: "https://en.wikipedia.org/wiki/Uqair_Protocol_of_1922",
+  },
+  {
+    type: "flag",
+    target: "Kuwait",
+    fromYear: 1922,
+    toYear: 1969,
+    status: "shared-sovereignty-included",
+    note:
+      "This shape includes the northern half of the Saudi-Kuwaiti neutral zone, which " +
+      "Kuwait shared equally with Najd/Saudi Arabia from the 1922 Uqair Protocol until " +
+      "the zone was partitioned in 1965-69, rather than holding outright. The zone is " +
+      "also drawn as a separate feature for those years - see the entry below.",
+    source: "https://en.wikipedia.org/wiki/Uqair_Protocol_of_1922",
+  },
   {
     type: "flag",
     target: "Kuwait",
@@ -207,5 +243,59 @@ export const CORRECTIONS = [
       "1949 Armistice Line, using its modern representation (Natural Earth), which has " +
       "not moved since.",
     source: "https://en.wikipedia.org/wiki/All-Palestine_Government",
+  },
+  {
+    type: "add",
+    name: "Saudi-Kuwaiti Neutral Zone",
+    start_year: 1922,
+    end_year: 1969,
+    status: "shared-sovereignty",
+    geometry: "saudiKuwaitiNeutralZone",
+    note:
+      "Created by the Uqair Protocol of 2 December 1922, which left this strip between " +
+      "Kuwait and Najd undivided because the bedouin tribes who watered there moved freely " +
+      "across it: \"in this territory the Government of Najd and Kuwait will share equal " +
+      "rights until ... a further agreement is made\". No such agreement came for almost " +
+      "40 years; oil concessions were granted separately by each side in 1948/49 (Aminoil " +
+      "by Kuwait, Pacific Western/Getty by Saudi Arabia) and worked jointly. The two " +
+      "governments agreed to partition it on 7 July 1965 (in force 25 July 1966), and the " +
+      "dividing line surveyed by the Pacific Aero Survey Company took effect with the " +
+      "exchange of instruments at Kuwait on 18 December 1969. Partition ended the shared " +
+      "sovereignty but not the shared oil: the area is still the \"Divided Zone\", each " +
+      "half administered by its own state but the petroleum revenue of the whole shared " +
+      "equally. Geometry digitized here from the boundary descriptions themselves - the " +
+      "1913 Anglo-Ottoman 40-mile arc on the north, Wadi ash Shaq on the west, the line " +
+      "through 'Ayn al 'Abd on the south, the Gulf coast on the east - because no open " +
+      "dataset maps the zone; see scripts/extract-correction-geometry.js for each " +
+      "coordinate's source and for the cross-checks it is verified against. It comes out " +
+      "at about 4,800 km2 of land against the ~5,700-5,770 km2 usually quoted, a gap this " +
+      "project has not been able to account for.",
+    source: "https://library.law.fsu.edu/Digital-Collections/LimitsinSeas/pdf/ibs103.pdf",
+  },
+  {
+    type: "add",
+    name: "Saudi-Iraqi Neutral Zone",
+    start_year: 1922,
+    end_year: 1981,
+    status: "shared-sovereignty",
+    geometry: "saudiIraqiNeutralZone",
+    note:
+      "The larger of the two zones the Uqair Protocol of 2 December 1922 left undivided, " +
+      "created by the same logic as the Saudi-Kuwaiti one and defined in the same document: " +
+      "\"The area delimited by the points enumerated above ... will remain neutral and " +
+      "common to the two Governments of Iraq and Najd who will enjoy equal rights in it " +
+      "for all purposes.\" Neither side could fortify the wells, and tribes of both watered " +
+      "there freely; an agreement of 19 May 1938 set up its joint administration. Saudi " +
+      "and Iraqi delegations agreed at Riyadh on 2 July 1975 to bisect it, the northern " +
+      "half to Iraq and the southern to Saudi Arabia, and that division was carried out by " +
+      "the International Frontier Treaty signed at Baghdad on 26 December 1981, in force " +
+      "24 February 1982. The treaty was only registered with the UN in 1991, and the U.S. " +
+      "State Department stopped drawing the zone on official maps in 1992. Geometry " +
+      "digitized here as the straight-sided quadrilateral Uqair describes (the Wadi " +
+      "al-Aujah/Al-Batin junction, the Al-Wuqubah wells, Bir Ansab and Al-Amghar), from " +
+      "the coordinates the delimitation documents give for those points; see " +
+      "scripts/extract-correction-geometry.js for each coordinate's source and for the " +
+      "cross-checks it is verified against.",
+    source: "https://treaties.un.org/doc/Publication/UNTS/volume%201638/english.pdf",
   },
 ];
