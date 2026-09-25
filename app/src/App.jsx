@@ -5,6 +5,7 @@ import EventDetail from "./components/EventDetail";
 import useDebouncedValue from "./hooks/useDebouncedValue";
 import {
   decadesInRange,
+  fetchEvents,
   loadEventDecade,
   loadEventsIndex,
   prefetchEventDecade,
@@ -12,6 +13,7 @@ import {
 import "./App.css";
 
 const RANGE_DEBOUNCE_MS = 150;
+const SEARCH_DEBOUNCE_MS = 300;
 
 function eventYearRange(e) {
   const start = Number(e.date_start.slice(0, 4));
@@ -97,7 +99,58 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startYear, endYear, eventsVersion]);
 
+  // Full-text search: a capability the old static-chunk pipeline couldn't
+  // offer at all (it had no way to query across the whole dataset by text,
+  // only by which decade files happened to be fetched). Backed directly by
+  // RediSearch via fetchEvents({ q }) - searches the entire timeline
+  // regardless of the range slider, and overrides the range-based event set
+  // while a query is active.
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, SEARCH_DEBOUNCE_MS);
+  const [searchResultIds, setSearchResultIds] = useState(null); // null = no active search
+
+  useEffect(() => {
+    const trimmed = debouncedSearchQuery.trim();
+    if (!trimmed) {
+      setSearchResultIds(null);
+      return;
+    }
+    let cancelled = false;
+    fetchEvents({ q: trimmed }).then(({ events }) => {
+      if (cancelled) return;
+      let changed = false;
+      for (const event of events) {
+        if (!eventsByIdRef.current.has(event.id)) {
+          eventsByIdRef.current.set(event.id, event);
+          changed = true;
+        }
+      }
+      if (changed) setEventsVersion((v) => v + 1);
+      setSearchResultIds(events.map((e) => e.id));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedSearchQuery]);
+
+  // Live, server-filtered count of events in the map's current viewport -
+  // the other capability static files couldn't support (viewport/bbox
+  // queries). Reported up by MapView after each pan/zoom settles; see the
+  // moveend handling there. Purely informational (doesn't change what's
+  // rendered - MapLibre already only draws in-viewport points - it
+  // demonstrates that the *server* can now do this filtering too, which
+  // matters once the dataset is much larger than 114 events).
+  const [viewportEventCount, setViewportEventCount] = useState(null);
+
   const selectedEvent = eventsByIdRef.current.get(selectedEventId) ?? null;
+
+  const displayedEvents = useMemo(() => {
+    if (searchResultIds === null) return visibleEvents;
+    return searchResultIds
+      .map((id) => eventsByIdRef.current.get(id))
+      .filter(Boolean);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleEvents, searchResultIds, eventsVersion]);
 
   function handleChangeRange(nextStart, nextEnd) {
     setStartYear(nextStart);
@@ -109,13 +162,33 @@ export default function App() {
       <header className="app-header">
         <h1>Middle East, 1900–present</h1>
         <p>A map and timeline of major regional events, sourced from Wikipedia.</p>
+        <div className="app-search">
+          <input
+            type="search"
+            placeholder="Search events (full text, whole timeline)…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search events"
+          />
+          {searchResultIds !== null && (
+            <span className="app-search-count">
+              {searchResultIds.length} result{searchResultIds.length === 1 ? "" : "s"}
+            </span>
+          )}
+          {viewportEventCount !== null && (
+            <span className="app-viewport-count">{viewportEventCount} events in current map view</span>
+          )}
+        </div>
       </header>
       <div className="app-body">
         <MapView
-          events={visibleEvents}
+          events={displayedEvents}
           year={endYear}
+          startYear={startYear}
+          endYear={endYear}
           onSelectEvent={setSelectedEventId}
           selectedEventId={selectedEventId}
+          onViewportEventCount={setViewportEventCount}
         />
         <EventDetail event={selectedEvent} onClose={() => setSelectedEventId(null)} />
       </div>

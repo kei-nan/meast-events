@@ -37,6 +37,32 @@ html, body, #root {
   color: var(--text-secondary);
 }
 
+.app-search {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-search input[type="search"] {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-1);
+  color: var(--text-primary);
+  width: 280px;
+  max-width: 100%;
+}
+
+.app-search-count,
+.app-viewport-count {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
 .app-body {
   flex: 1;
   display: flex;

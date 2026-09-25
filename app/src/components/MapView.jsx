@@ -6,7 +6,13 @@ import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 // bundle as a real asset (see the comment below and vite.config.js).
 import "maplibre-gl/dist/maplibre-gl-shared.mjs?url";
 import useDebouncedValue from "../hooks/useDebouncedValue";
-import { decadeFloor, loadBoundaryDecade, loadLand, prefetchBoundaryDecade } from "../lib/dataClient";
+import {
+  decadeFloor,
+  fetchEvents,
+  loadBoundaryDecade,
+  loadLand,
+  prefetchBoundaryDecade,
+} from "../lib/dataClient";
 import { MIN_YEAR, MAX_YEAR } from "./Timeline";
 
 // MapLibre GL resolves its worker script relative to its own module URL at
@@ -154,7 +160,15 @@ function boundaryLabelsForYear(year, features) {
   };
 }
 
-export default function MapView({ events, year, onSelectEvent, selectedEventId }) {
+export default function MapView({
+  events,
+  year,
+  startYear,
+  endYear,
+  onSelectEvent,
+  selectedEventId,
+  onViewportEventCount,
+}) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const eventsRef = useRef(events);
@@ -172,6 +186,10 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
   // still run against the live `year` for instant filtering of whatever decade
   // is already cached, so scrubbing within a loaded decade has zero lag.
   const debouncedYear = useDebouncedValue(year, 150);
+  // Debounced separately (not reusing App.jsx's own debounce) since this
+  // drives a live, uncached viewport query rather than the decade-chunk cache.
+  const debouncedStartYear = useDebouncedValue(startYear, 200);
+  const debouncedEndYear = useDebouncedValue(endYear, 200);
 
   eventsRef.current = events;
   yearRef.current = year;
@@ -382,6 +400,46 @@ export default function MapView({ events, year, onSelectEvent, selectedEventId }
     mapRef.current.getSource("boundaries")?.setData(boundariesForYear(year, features));
     mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year, features));
   }, [year, boundaryVersion, mapReady]);
+
+  // Map-viewport-based loading: a live, server-filtered count of events
+  // within the current map bounds (and year range), queried directly from
+  // the API on every pan/zoom - the capability decade-chunked static files
+  // fundamentally couldn't offer (a chunk has no idea what's in view, only
+  // what decade it belongs to). This doesn't change what's rendered (MapLibre
+  // already only draws in-viewport points), it's a demonstration/readout
+  // (see the count in App.jsx's header) that the *server* can now do
+  // viewport-scoped queries too - the same query path a future "only load
+  // events near the viewport" optimization would use once the dataset is
+  // much larger than 114 curated events.
+  useEffect(() => {
+    if (!mapReady || !onViewportEventCount) return;
+    const map = mapRef.current;
+    let timeoutId;
+
+    function queryViewport() {
+      const bounds = map.getBounds();
+      fetchEvents({
+        start: debouncedStartYear,
+        end: debouncedEndYear,
+        bbox: [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()],
+      })
+        .then(({ total }) => onViewportEventCount(total))
+        .catch(() => {});
+    }
+
+    function handleMoveEnd() {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(queryViewport, 200);
+    }
+
+    map.on("moveend", handleMoveEnd);
+    queryViewport(); // initial count for the current view/range
+
+    return () => {
+      clearTimeout(timeoutId);
+      map.off("moveend", handleMoveEnd);
+    };
+  }, [mapReady, debouncedStartYear, debouncedEndYear, onViewportEventCount]);
 
   useEffect(() => {
     if (!mapReady) return;
