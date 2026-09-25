@@ -152,7 +152,7 @@ async function main() {
         start_year: c.start_year,
         end_year: c.end_year,
         status: c.status,
-        source: `Not in CShapes; ${c.source}`,
+        source: `Not in CShapes; ${c.source}${c.geometry_source ? `; ${c.geometry_source}` : ""}`,
         note: c.note,
       },
       geometry: correctionsGeometry[c.geometry],
