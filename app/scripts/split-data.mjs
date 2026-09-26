@@ -68,6 +68,27 @@ function hasRealCoordinates(event) {
   );
 }
 
+// Only the fields the app shows. category = coarse group (colour/filter);
+// category_label = the Wikidata class label, shown as-is in the detail panel.
+function publicEvent(e) {
+  const out = {
+    id: e.id,
+    title: e.title,
+    date_start: e.date_start,
+    date_end: e.date_end,
+    countries: e.countries,
+    category: e.category_group || e.category,
+    wikidata_qid: e.wikidata_qid,
+    wikipedia_url: e.wikipedia_url,
+    extract: e.extract,
+    coordinates: e.coordinates,
+    coordinate_source: e.coordinate_source,
+    location_quality: locationQuality(e),
+  };
+  if (e.category_group && e.category !== e.category_group) out.category_label = e.category;
+  return out;
+}
+
 function locationQuality(event) {
   return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
 }
@@ -113,7 +134,7 @@ async function splitBoundaries() {
 
 async function splitEvents() {
   const allEvents = JSON.parse(await readFile(EVENTS_FILE, "utf8"));
-  const events = allEvents.filter(hasRealCoordinates).map((e) => ({ ...e, location_quality: locationQuality(e) }));
+  const events = allEvents.filter(hasRealCoordinates).map(publicEvent);
   const skipped = allEvents.length - events.length;
 
   function yearRange(e) {

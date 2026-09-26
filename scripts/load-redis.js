@@ -194,7 +194,9 @@ async function loadEvents(client) {
         title: event.title,
         extract: event.extract || "",
         snippet: makeSnippet(event.extract),
-        category: event.category || "",
+        // category = coarse group (colour/filter); category_label = Wikidata class label shown as-is
+        category: event.category_group || event.category || "",
+        category_label: event.category_group ? event.category || "" : "",
         countries: (event.countries || []).join(","),
         location_quality: locationQuality(event),
         start_year: String(startYear),

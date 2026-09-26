@@ -33,7 +33,7 @@ export default function FilterBar({
   return (
     <div className="sp-filters">
       <fieldset className="sp-fieldset">
-        <legend>Wikidata class</legend>
+        <legend>Category</legend>
         <div className="sp-chips">
           {categoryList.map((c) => (
             <button

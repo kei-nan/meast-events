@@ -55,7 +55,7 @@ export default function EventDetail({ event, onBack }) {
         {copied && <span className="event-detail-copied" aria-hidden="true">Link copied</span>}
       </div>
       {event.category && (
-        <span className="event-detail-category">Wikidata class: {event.category}</span>
+        <span className="event-detail-category">Wikidata class: {event.category_label || event.category}</span>
       )}
       <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
         {event.title}

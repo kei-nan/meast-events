@@ -257,6 +257,7 @@ const LITE_FIELDS = [
   "date_end",
   "countries",
   "category",
+  "category_label",
   "lon",
   "lat",
   "location_quality",
@@ -277,6 +278,7 @@ function hashToEvent(v, fields = "full") {
     date_end: v.date_end || null,
     countries: v.countries ? v.countries.split(",").filter(Boolean) : [],
     category: v.category || null,
+    category_label: v.category_label || null,
   };
   if (fields === "lite") {
     event.snippet = v.snippet !== undefined ? v.snippet : makeSnippet(v.extract);

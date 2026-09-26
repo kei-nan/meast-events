@@ -224,7 +224,7 @@ test("hashToEvent: lite vs full, snippet, location_quality", () => {
   assert.equal(Array.from(makeSnippet("😀".repeat(200))).length, 160); // never splits a surrogate pair
   const v = { id: "1", title: "T", extract: long, lon: "1", lat: "2", location_quality: "approximate", wikipedia_url: "u" };
   const lite = hashToEvent(v, "lite");
-  assert.deepEqual(Object.keys(lite), ["id", "title", "date_start", "date_end", "countries", "category", "snippet", "location_quality", "coordinates"]);
+  assert.deepEqual(Object.keys(lite), ["id", "title", "date_start", "date_end", "countries", "category", "category_label", "snippet", "location_quality", "coordinates"]);
   assert.equal(lite.snippet.length, 160);
   assert.equal(hashToEvent({ ...v, snippet: "pre" }, "lite").snippet, "pre");
   const full = hashToEvent(v);
