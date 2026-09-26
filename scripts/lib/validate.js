@@ -23,7 +23,7 @@ export function isRealDate(s) {
 // (curated) mode so CI stays green; any NEW duplicate still fails.
 //   Q2429253: curated "Islamic State of Iraq and the Levant" (2013) and "Islamic State"
 //   (2014) are two seed titles that resolve to the same Wikipedia article.
-export const KNOWN_DUPLICATE_QIDS = new Set(["Q2429253"]);
+export const KNOWN_DUPLICATE_QIDS = new Set([]);
 
 export function validateEvents(events, { name = "events", lenient = false } = {}) {
   const errors = [];

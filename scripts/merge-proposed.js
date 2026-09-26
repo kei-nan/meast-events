@@ -22,7 +22,12 @@ const proposedUrl = new URL("../data/events.proposed.json", import.meta.url);
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
 
 const curated = await read(curatedUrl);
-const proposed = await read(proposedUrl);
+const exclusionsUrl = new URL("../data/proposed-exclusions.json", import.meta.url);
+const exclusions = await read(exclusionsUrl).catch(() => []);
+const excludedIds = new Set(exclusions.map((x) => x.id));
+// Reviewed duplicates (data/proposed-exclusions.json, each with a stated reason) are left out.
+const proposed = (await read(proposedUrl)).filter((e) => !excludedIds.has(e.id));
+console.log(`Excluded by review (data/proposed-exclusions.json): ${excludedIds.size}`);
 
 const pv = validateEvents(proposed, { name: "events.proposed" });
 if (pv.errors.length) {

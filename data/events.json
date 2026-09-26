@@ -1917,28 +1917,6 @@
     "needs_manual_coordinates": false
   },
   {
-    "id": "islamic-state-of-iraq-and-the-levant",
-    "title": "Islamic State of Iraq and the Levant",
-    "date_start": "2013-04-08",
-    "date_end": null,
-    "countries": [
-      "Iraq",
-      "Syria",
-      "regional"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:29:50.101Z",
-    "wikidata_qid": "Q2429253",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Islamic_State",
-    "extract": "The Islamic State (IS), also known as the Islamic State of Iraq and the Levant (ISIL), the Islamic State of Iraq and Syria (ISIS), and by its Arabic acronym Da'esh, is a transnational Salafi jihadist militant organisation and internationally unrecognised quasi-state. IS occupied a significant amount of territory in Iraq and Syria during the Syrian Civil War and U.S. Troop Withdrawal after the Iraq War. In 2014 the group proclaimed itself to be a worldwide caliphate and claimed religious and political authority over all Muslims worldwide, a claim not accepted by the vast majority of Muslims. It is designated as a terrorist organisation by the United Nations, making it subject to binding counterterrorism sanctions in every UN member state, including all Muslim countries.",
-    "coordinates": {
-      "lat": 33.3152,
-      "lon": 44.3661
-    },
-    "coordinate_source": "country-fallback:Iraq",
-    "needs_manual_coordinates": false
-  },
-  {
     "id": "islamic-state",
     "title": "Islamic State",
     "date_start": "2014-06-29",

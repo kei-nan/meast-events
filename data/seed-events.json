@@ -93,7 +93,6 @@
   {"wikipedia_title": "Yemeni Revolution", "date_start": "2011-01-27", "date_end": "2012-02-27", "countries": ["Yemen"], "category": "uprising"},
   {"wikipedia_title": "Bahraini uprising", "date_start": "2011-02-14", "date_end": null, "countries": ["Bahrain"], "category": "uprising"},
   {"wikipedia_title": "Egyptian crisis (2011–2014)", "date_start": "2012-06-30", "date_end": "2014-06-08", "countries": ["Egypt"], "category": "political"},
-  {"wikipedia_title": "Islamic State of Iraq and the Levant", "date_start": "2013-04-08", "date_end": null, "countries": ["Iraq", "Syria", "regional"], "category": "political"},
   {"wikipedia_title": "Islamic State", "date_start": "2014-06-29", "date_end": null, "countries": ["Iraq", "Syria"], "category": "political"},
   {"wikipedia_title": "Yemeni civil war (2014–present)", "date_start": "2014-09-16", "date_end": null, "countries": ["Yemen"], "category": "war"},
   {"wikipedia_title": "Saudi Arabian–led intervention in Yemen", "date_start": "2015-03-26", "date_end": null, "countries": ["Yemen", "Saudi Arabia"], "category": "war"},
