@@ -1,250 +1,167 @@
-// Resolves a filtered batch of data/event-candidates.json (Wikidata-driven
-// discovery output) against Wikipedia + Wikidata, the same way scripts/ingest.js
-// resolves data/seed-events.json - producing data/enriched-candidates.json in the
-// same schema as data/events.json, PLUS quality-control metadata (needs_review,
-// review_reasons) so a human can triage before anything gets merged into the real
-// curated files.
+// Resolves the discovery candidates (data/event-candidates.json) against Wikipedia +
+// Wikidata and produces:
+//   data/enriched-candidates.json      every candidate in the batch, with review flags and an
+//                                      `exclusion_reason` for those NOT proposed
+//   data/events.proposed.json          the events that meet the objective inclusion rule AND
+//                                      have real coordinates (Wikipedia coordinates or Wikidata
+//                                      P625) - see docs/DATA_POLICY.md. NEVER merged automatically.
+//   data/missing-coordinates-report.md curated + candidate events that lack a precise location
 //
-// This is deliberately a sibling of ingest.js, not a replacement: it reuses the
-// same fetch/fallback logic (summary -> Wikidata P625 -> country centroid), but
-// adapts the input shape. Candidates already carry a wikidata_qid, so unlike
-// ingest.js (title-only), this script can cross-check the QID the title actually
-// resolves to against the QID Wikidata search produced, and it also does a
-// heuristic sanity check of date_start/date_end against the years mentioned in
-// the resolved Wikipedia extract - the earlier discovery pass found at least one
-// candidate ("Iraqi invasion of Kuwait") carrying a flatly wrong date straight
-// from Wikidata (2009 instead of 1990), so this script does not blindly
-// propagate candidate dates forward without a sanity check.
+// PRINCIPLE: minimal interference with Wikipedia/Wikidata data. Titles, extracts, dates,
+// countries and labels are copied AS-IS. Automated checks only FLAG (review_reasons) - they never
+// overwrite, drop or "fix" anything. The only events left out of the proposed file are those that
+// cannot be shown on a map (no real coordinates), have no Wikipedia summary/extract, or whose own
+// source dates are internally impossible (date_end before date_start) - each is listed with its
+// reason in enriched-candidates.json and summarised in the run output.
 //
-// Wikimedia asks automated clients to identify themselves in the User-Agent.
+// CLI:
+//   --limit=N            only process the first N selected candidates (bounded run)
+//   --classes=a,b        only candidates whose Wikidata classes include one of these labels
+//   --reuse              reuse already-enriched entries (same QID, enrich_version current)
+//                        from the existing data/enriched-candidates.json instead of refetching
+//   --no-report          skip data/missing-coordinates-report.md (it costs ~1 request per
+//                        curated event lacking precise coordinates)
+//   --out-suffix=.test   write *.test.json variants instead of the real output files
 import { readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { sleep } from "./lib/http.js";
+import { countryFallbackCoordinates } from "./lib/geo.js";
+import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES } from "./lib/event-classes.js";
+import {
+  fetchSummary,
+  fetchEntity,
+  fetchCategories,
+  fetchLabels,
+  datePrecisionFor,
+  yearsIn,
+} from "./lib/wiki.js";
+import {
+  MAX_COUNTRIES_BEFORE_FLAG,
+  categoryYears,
+  dateFlags,
+  coordinateFlag,
+  duplicateHints,
+} from "./lib/flags.js";
+import { validateEvents } from "./lib/validate.js";
 
-const USER_AGENT =
-  "AtlasWiki/0.1 (event-enrichment pass; contact: jonkeinan@gmail.com)";
+const ENRICH_VERSION = 2;
 const REQUEST_DELAY_MS = 300;
+const argVal = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=").slice(1).join("=");
+const flag = (n) => process.argv.includes(`--${n}`);
+const LIMIT = argVal("limit") ? Number(argVal("limit")) : null;
+const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
+const SUFFIX = argVal("out-suffix") ?? "";
 
-// --- Filtering bar for this enrichment pass -------------------------------
-//
-// The raw candidate set has 2,360 entries; 1,070 carry notable_enough: true
-// (sitelinks >= 5, per the discovery agent's own threshold), and 48 of those
-// are already_curated (already represented in seed-events.json) and are
-// excluded here regardless.
-//
-// The discovery agent's own spot-check flagged that sitelinks >= 5 still let
-// through borderline/too-granular items (minor skirmishes, single-context
-// political footnotes). Rather than guess at a per-category cutoff, this pass
-// raises the bar to sitelinks >= 10 - roughly the median of the notable_enough
-// set - which cuts 1,022 eligible candidates down to 441. That's a "solid,
-// well-verified batch" per the task brief rather than a rushed run over
-// everything, and it biases toward events with broader multi-language
-// encyclopedic coverage, which correlates (imperfectly, but usably) with
-// genuine historical significance rather than granularity of coverage on a
-// single Wikipedia.
-const MIN_SITELINKS = 10;
+const path = (name) => new URL(`../data/${name}`, import.meta.url);
+const outName = (base, ext) => `${base}${SUFFIX}.${ext}`;
 
-// Same fallback marker table as ingest.js, extended with Oman (present in the
-// candidate set's countries arrays - e.g. multi-country entries like "World
-// War II" - but missing from ingest.js's original table, which was built only
-// from the initial seed list's country coverage).
-const COUNTRY_CAPITALS = {
-  Turkey: { lat: 39.9334, lon: 32.8597 },
-  Iran: { lat: 35.6892, lon: 51.389 },
-  Iraq: { lat: 33.3152, lon: 44.3661 },
-  Syria: { lat: 33.5138, lon: 36.2765 },
-  Lebanon: { lat: 33.8938, lon: 35.5018 },
-  Jordan: { lat: 31.9454, lon: 35.9284 },
-  "Israel/Palestine": { lat: 31.7683, lon: 35.2137 },
-  Egypt: { lat: 30.0444, lon: 31.2357 },
-  "Saudi Arabia": { lat: 24.7136, lon: 46.6753 },
-  Yemen: { lat: 15.3694, lon: 44.191 },
-  Kuwait: { lat: 29.3759, lon: 47.9774 },
-  Bahrain: { lat: 26.2285, lon: 50.586 },
-  Qatar: { lat: 25.2854, lon: 51.531 },
-  UAE: { lat: 24.4539, lon: 54.3773 },
-  Oman: { lat: 23.5859, lon: 58.4059 },
-};
-
-function countryFallbackCoordinates(countries) {
-  const country = countries?.find((c) => COUNTRY_CAPITALS[c]);
-  return country ? { ...COUNTRY_CAPITALS[country], approximate_for: country } : null;
-}
-
-// No hand-placed overrides are known to be needed for this batch yet (unlike
-// ingest.js's seed list, nothing here has been spot-checked closely enough to
-// justify one) - left as an empty hook so a human reviewer can add entries
-// here the same way ingest.js does, if QC turns any up.
-const MANUAL_OVERRIDES = {};
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+const CLASS_GROUP = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
 function slugify(title) {
   return title
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
 
-async function fetchSummary(title) {
-  const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
-  const res = await fetch(url, {
-    headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
-  });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function fetchWikidataCoordinates(qid) {
-  const url = `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`;
-  const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
-  if (!res.ok) return null;
-  const data = await res.json();
-  const value = data.entities?.[qid]?.claims?.P625?.[0]?.mainsnak?.datavalue?.value;
-  if (!value) return null;
-  return { lat: value.latitude, lon: value.longitude };
-}
-
-// Heuristic date sanity check: pull every plausible 4-digit year out of the
-// Wikipedia extract text and compare against the year(s) Wikidata gave us for
-// this candidate. Not proof of correctness (a short extract may simply omit
-// the year, or a "founded in X, this battle in Y" extract mentions several
-// unrelated years) - just a signal that something might be off, worth a
-// human's second look rather than blind propagation.
-function extractYears(text) {
-  if (!text) return [];
-  const matches = text.match(/\b(1[0-9]{3}|20[0-9]{2})\b/g);
-  return matches ? [...new Set(matches.map(Number))] : [];
-}
-
-function yearOf(dateStr) {
-  if (!dateStr) return null;
-  const m = /^(-?\d{1,4})/.exec(dateStr);
-  return m ? Number(m[1]) : null;
-}
-
 async function resolveCandidate(candidate, index, total) {
   const label = `[${index + 1}/${total}] ${candidate.wikipedia_title}`;
-  const reviewReasons = [];
-
+  const classes = candidate.wikidata_classes ?? [];
   const base = {
-    id: slugify(candidate.wikipedia_title),
+    id: slugify(candidate.wikipedia_title) || candidate.wikidata_qid.toLowerCase(),
     title: candidate.wikipedia_title,
     date_start: candidate.date_start,
     date_end: candidate.date_end,
     countries: candidate.countries,
-    category: candidate.category,
+    // Category is Wikidata's own class label (first class the item was found under).
+    category: classes[0] ?? candidate.category,
+    category_group: CLASS_GROUP[classes[0]] ?? candidate.category,
+    wikidata_classes: classes,
     retrieved_at: new Date().toISOString(),
     source_qid: candidate.wikidata_qid,
     sitelinks: candidate.sitelinks,
     wikidata_description: candidate.wikidata_description ?? null,
+    enrich_version: ENRICH_VERSION,
   };
-
-  // Data-quality check independent of any network call: a candidate whose
-  // date_end predates its date_start is internally inconsistent straight out
-  // of the raw Wikidata pull (this is exactly the shape of error the
-  // discovery agent's spot-check found - e.g. a "2009" start date paired with
-  // a plausible "1990" end date for the Iraqi invasion of Kuwait). Flag it,
-  // don't silently swap or drop - we can't tell which side is wrong without a
-  // human (or a deeper source check).
-  if (candidate.date_end && candidate.date_start && candidate.date_end < candidate.date_start) {
-    reviewReasons.push(
-      `date_order_invalid: date_end (${candidate.date_end}) precedes date_start (${candidate.date_start}) in source Wikidata`
-    );
-  }
-
-  // Wikidata encodes "year-only precision" dates as January 1st of that year.
-  // A batch-wide scan found ~11% of candidates carry a "-01-01" date_start;
-  // most of those are legitimately low-precision (fine for a map at this
-  // scale), but a few are flatly wrong years wearing the same mask (e.g. a
-  // candidate for the "2025-2026 Iranian protests" carrying "2020-01-01").
-  // The year-mismatch check below catches the flatly-wrong-year cases; this
-  // flag exists for the remainder - correct year, fake day-precision - so a
-  // human can decide whether the exact date matters enough to look up.
-  if (/-01-01$/.test(candidate.date_start ?? "")) {
-    reviewReasons.push(
-      `low_precision_date: date_start (${candidate.date_start}) has the shape of a Wikidata year-only placeholder, not a verified exact date`
-    );
-  }
+  const reasons = [];
 
   const summary = await fetchSummary(candidate.wikipedia_title);
+  await sleep(REQUEST_DELAY_MS);
   if (!summary) {
-    console.log(`${label} -> FAILED (no Wikipedia summary found)`);
+    console.log(`${label} -> FAILED (no Wikipedia summary)`);
     return {
-      ...base,
-      wikidata_qid: candidate.wikidata_qid,
-      wikipedia_url: null,
-      extract: null,
-      coordinates: null,
-      coordinate_source: null,
-      needs_manual_coordinates: true,
-      needs_review: true,
-      review_reasons: [...reviewReasons, "summary_not_found"],
-      error: "summary_not_found",
+      ...base, wikidata_qid: candidate.wikidata_qid, wikipedia_url: null, extract: null,
+      coordinates: null, coordinate_source: null, needs_manual_coordinates: true,
+      needs_review: true, review_reasons: ["summary_not_found"], error: "summary_not_found",
+      exclusion_reason: "no_wikipedia_summary",
     };
   }
 
   const resolvedQid = summary.wikibase_item ?? null;
-  if (resolvedQid && candidate.wikidata_qid && resolvedQid !== candidate.wikidata_qid) {
-    reviewReasons.push(
-      `qid_mismatch: title resolved to ${resolvedQid}, candidate was discovered under ${candidate.wikidata_qid} (possible redirect/disambiguation - verify title still matches the intended event)`
+  if (resolvedQid && resolvedQid !== candidate.wikidata_qid) {
+    reasons.push(
+      `qid_mismatch: title resolved to ${resolvedQid}, candidate was discovered under ${candidate.wikidata_qid} (possible redirect/disambiguation)`
     );
   }
 
-  let coordinates = summary.coordinates
-    ? { lat: summary.coordinates.lat, lon: summary.coordinates.lon }
-    : null;
+  const entity = await fetchEntity(candidate.wikidata_qid);
+  await sleep(REQUEST_DELAY_MS);
+  const cats = await fetchCategories(candidate.wikipedia_title);
+  await sleep(REQUEST_DELAY_MS);
+
+  let coordinates = summary.coordinates ? { lat: summary.coordinates.lat, lon: summary.coordinates.lon } : null;
   let coordinateSource = coordinates ? "wikipedia" : null;
-
-  const qidForLookup = resolvedQid ?? candidate.wikidata_qid;
-  if (!coordinates && qidForLookup) {
+  if (!coordinates && entity?.coordinates) {
+    coordinates = entity.coordinates;
+    coordinateSource = "wikidata";
+  }
+  if (!coordinates && resolvedQid && resolvedQid !== candidate.wikidata_qid) {
+    const other = await fetchEntity(resolvedQid);
     await sleep(REQUEST_DELAY_MS);
-    coordinates = await fetchWikidataCoordinates(qidForLookup);
-    if (coordinates) coordinateSource = "wikidata";
+    if (other?.coordinates) {
+      coordinates = other.coordinates;
+      coordinateSource = "wikidata";
+    }
   }
-
-  if (!coordinates && MANUAL_OVERRIDES[candidate.wikipedia_title]) {
-    const override = MANUAL_OVERRIDES[candidate.wikipedia_title];
-    coordinates = { lat: override.lat, lon: override.lon };
-    coordinateSource = "manual-override";
-  }
-
+  const hasRealCoordinates = Boolean(coordinates);
   if (!coordinates) {
-    const fallback = countryFallbackCoordinates(candidate.countries);
-    if (fallback) {
-      coordinates = { lat: fallback.lat, lon: fallback.lon };
-      coordinateSource = `country-fallback:${fallback.approximate_for}`;
+    const fb = countryFallbackCoordinates(candidate.countries);
+    if (fb) {
+      coordinates = { lat: fb.lat, lon: fb.lon };
+      coordinateSource = `country-fallback:${fb.approximate_for}`;
     }
   }
 
-  // Date sanity check against the resolved extract text. Checked independently
-  // for start and end year - NOT "either one shows up" - because most
-  // candidates have no date_end (single-day events) and treating a missing
-  // end date as automatically "satisfied" would silently exempt exactly the
-  // majority-case candidates from ever having their (always-present)
-  // date_start checked. +/-1 year tolerance absorbs "began in late 1990s
-  // Wikidata year vs. extract says 1991" style boundary slop without masking
-  // a genuinely wrong year like the "2020" vs "2025" case this check found
-  // during dry-run QC (a protest movement candidate whose Wikidata date_start
-  // was four years off from its own Wikipedia extract).
-  const extractYearsFound = extractYears(summary.extract);
-  const startYear = yearOf(candidate.date_start);
-  const endYear = yearOf(candidate.date_end);
-  const withinTolerance = (y) => extractYearsFound.some((ey) => Math.abs(ey - y) <= 1);
-  if (extractYearsFound.length > 0 && startYear !== null && !withinTolerance(startYear)) {
-    reviewReasons.push(
-      `date_year_mismatch: candidate date_start year (${startYear}) not found (within 1 year) in Wikipedia extract, which mentions [${extractYearsFound.join(", ")}]`
-    );
-  } else if (extractYearsFound.length > 0 && endYear !== null && !withinTolerance(endYear)) {
-    reviewReasons.push(
-      `date_end_year_mismatch: candidate date_end year (${endYear}) not found (within 1 year) in Wikipedia extract, which mentions [${extractYearsFound.join(", ")}]`
+  const precision = datePrecisionFor(entity, candidate.date_start);
+  if (precision && precision.code < 9) {
+    reasons.push(`date_precision_coarse: Wikidata records the date only to ${precision.name} precision`);
+  }
+
+  reasons.push(
+    ...dateFlags({
+      dateStart: candidate.date_start,
+      dateEnd: candidate.date_end,
+      extractYears: yearsIn(summary.extract),
+      catYears: categoryYears(cats),
+    })
+  );
+
+  if (hasRealCoordinates) {
+    const cf = coordinateFlag(coordinates, candidate.countries);
+    if (cf) reasons.push(cf);
+  }
+  if ((candidate.countries?.length ?? 0) > MAX_COUNTRIES_BEFORE_FLAG) {
+    reasons.push(
+      `many_countries: ${candidate.countries.length} countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)`
     );
   }
 
-  const needsReview = reviewReasons.length > 0;
+  const partOfQids = entity?.partOf ?? [];
   console.log(
-    `${label} -> ok${coordinates ? ` (${coordinateSource})` : " (NO COORDINATES)"}${
-      needsReview ? ` [NEEDS REVIEW: ${reviewReasons.map((r) => r.split(":")[0]).join(", ")}]` : ""
+    `${label} -> ok (${coordinateSource ?? "no coordinates"}${precision ? `, date ${precision.name}` : ""})${
+      reasons.length ? ` [${reasons.map((r) => r.split(":")[0]).join(", ")}]` : ""
     }`
   );
 
@@ -256,68 +173,212 @@ async function resolveCandidate(candidate, index, total) {
     extract: summary.extract ?? null,
     coordinates,
     coordinate_source: coordinateSource,
-    needs_manual_coordinates: !coordinates,
-    needs_review: needsReview,
-    review_reasons: reviewReasons,
+    location_quality: hasRealCoordinates ? "precise" : "approximate",
+    needs_manual_coordinates: !hasRealCoordinates,
+    date_precision: precision?.name ?? null,
+    _part_of_qids: partOfQids,
+    _review: reasons,
   };
 }
 
+function exclusionReason(r) {
+  if (r.error) return "no_wikipedia_summary";
+  if (!r.extract || !r.extract.trim()) return "empty_extract";
+  if (r._review.some((x) => x.startsWith("date_order_invalid"))) return "date_order_invalid";
+  if (!r.coordinates) return "no_coordinates";
+  if (String(r.coordinate_source).startsWith("country-fallback")) return "country_fallback_only";
+  return null;
+}
+
+async function loadJson(name, fallback = []) {
+  const p = path(name);
+  return existsSync(p) ? JSON.parse(await readFile(p, "utf-8")) : fallback;
+}
+
+const mdEscape = (s) => String(s ?? "").replace(/\|/g, "\\|");
+
+async function writeMissingReport({ curated, enriched, generatedAt }) {
+  const wikiLink = (url, title) => (url ? `[${mdEscape(title)}](${url})` : mdEscape(title));
+  const wdLink = (q) => (q ? `[${q}](https://www.wikidata.org/wiki/${q})` : "-");
+  const fallbackLabel = (e) =>
+    e.coordinates ? `pin at ${String(e.coordinate_source).replace("country-fallback:", "")} capital (approximate)` : "no location";
+
+  // Curated events without a precise location.
+  const curatedMissing = curated.filter(
+    (e) => !e.coordinates || String(e.coordinate_source ?? "").startsWith("country-fallback")
+  );
+  console.log(`Missing-coordinates report: fetching sitelinks for ${curatedMissing.length} curated events...`);
+  const rowsCurated = [];
+  for (const e of curatedMissing) {
+    let sitelinks = null;
+    if (e.wikidata_qid) {
+      const ent = await fetchEntity(e.wikidata_qid).catch(() => null);
+      sitelinks = ent?.sitelinks ?? null;
+      await sleep(REQUEST_DELAY_MS);
+    }
+    rowsCurated.push({ e, sitelinks });
+  }
+  rowsCurated.sort((a, b) => (b.sitelinks ?? -1) - (a.sitelinks ?? -1));
+
+  const candMissing = enriched
+    .filter((r) => ["country_fallback_only", "no_coordinates"].includes(r.exclusion_reason))
+    .sort((a, b) => (b.sitelinks ?? 0) - (a.sitelinks ?? 0));
+
+  const table = (rows) =>
+    [
+      "| # | Event | Date | Sitelinks | Current fallback | Wikipedia | Wikidata |",
+      "|---|---|---|---|---|---|---|",
+      ...rows.map(
+        (r, i) =>
+          `| ${i + 1} | ${mdEscape(r.title)} | ${r.date_start ?? ""} | ${r.sitelinks ?? "?"} | ${fallbackLabel(r)} | ${
+            r.wikipedia_url ? `[article](${r.wikipedia_url})` : "-"
+          } | ${wdLink(r.wikidata_qid)} |`
+      ),
+    ].join("\n");
+
+  const md = `# Events without a precise location
+
+Generated ${generatedAt} by \`node scripts/enrich-candidates.js\`.
+
+These events have **no coordinates on Wikipedia or Wikidata**, so atlas.wiki can only pin them at a
+country-capital fallback (labelled "approximate location") or not at all. Candidate events in the second
+table are **excluded from \`data/events.proposed.json\`** for that reason.
+
+The fix belongs upstream: if you know the real location of an event, you can add a coordinate location
+(property **P625**) to its Wikidata item (linked below) with a reference. This pipeline never invents
+coordinates and never edits Wikipedia or Wikidata. Rows are sorted by significance = number of Wikimedia
+sitelinks (the same objective signal used for inclusion; it is a proxy, see docs/DATA_POLICY.md).
+
+## 1. Curated events (data/events.json) lacking a precise location - ${rowsCurated.length}
+
+${table(rowsCurated.map(({ e, sitelinks }) => ({ ...e, sitelinks })))}
+
+## 2. Discovered candidates (sitelinks >= ${INCLUSION_MIN_SITELINKS}) excluded from the proposal for lack of a real location - ${candMissing.length}
+
+${table(candMissing)}
+`;
+  await writeFile(path(outName("missing-coordinates-report", "md")), md);
+  return { curated: rowsCurated.length, candidates: candMissing.length };
+}
+
 async function main() {
-  const candidatesPath = new URL("../data/event-candidates.json", import.meta.url);
-  const outPath = new URL("../data/enriched-candidates.json", import.meta.url);
-
-  const allCandidates = JSON.parse(await readFile(candidatesPath, "utf-8"));
-  const batch = allCandidates.filter(
-    (c) => c.notable_enough && !c.already_curated && c.sitelinks >= MIN_SITELINKS
+  const allCandidates = await loadJson("event-candidates.json");
+  let batch = allCandidates.filter(
+    (c) => c.has_en_wikipedia && c.sitelinks >= INCLUSION_MIN_SITELINKS && !c.already_curated
   );
-
+  if (ONLY_CLASSES) batch = batch.filter((c) => (c.wikidata_classes ?? []).some((l) => ONLY_CLASSES.includes(l)));
+  if (LIMIT) batch = batch.slice(0, LIMIT);
   console.log(
-    `Loaded ${allCandidates.length} raw candidates; ${batch.length} selected for this batch ` +
-      `(notable_enough && !already_curated && sitelinks >= ${MIN_SITELINKS}).\n`
+    `Loaded ${allCandidates.length} candidates; ${batch.length} selected (English article, sitelinks >= ${INCLUSION_MIN_SITELINKS}, not already curated${
+      ONLY_CLASSES ? `, classes: ${ONLY_CLASSES.join("/")}` : ""
+    }${LIMIT ? `, limit ${LIMIT}` : ""}).\n`
   );
+
+  const cache = new Map();
+  if (flag("reuse")) {
+    for (const r of await loadJson("enriched-candidates.json")) {
+      if (r.enrich_version === ENRICH_VERSION && r._review) cache.set(r.wikidata_qid, r);
+    }
+    console.log(`Reuse: ${cache.size} cached enriched entries available.`);
+  }
 
   const results = [];
   for (let i = 0; i < batch.length; i++) {
+    const cached = cache.get(batch[i].wikidata_qid);
+    if (cached) {
+      results.push(cached);
+      continue;
+    }
     try {
       results.push(await resolveCandidate(batch[i], i, batch.length));
     } catch (err) {
       console.log(`[${i + 1}/${batch.length}] ${batch[i].wikipedia_title} -> FAILED (${err.message})`);
       results.push({
-        id: slugify(batch[i].wikipedia_title),
-        title: batch[i].wikipedia_title,
-        date_start: batch[i].date_start,
-        date_end: batch[i].date_end,
-        countries: batch[i].countries,
-        category: batch[i].category,
-        source_qid: batch[i].wikidata_qid,
-        sitelinks: batch[i].sitelinks,
-        wikidata_qid: batch[i].wikidata_qid,
-        wikipedia_url: null,
-        extract: null,
-        coordinates: null,
-        coordinate_source: null,
-        needs_manual_coordinates: true,
-        needs_review: true,
-        review_reasons: ["exception: " + err.message],
-        error: err.message,
+        id: slugify(batch[i].wikipedia_title) || batch[i].wikidata_qid.toLowerCase(),
+        title: batch[i].wikipedia_title, date_start: batch[i].date_start, date_end: batch[i].date_end,
+        countries: batch[i].countries, category: (batch[i].wikidata_classes ?? [])[0] ?? batch[i].category,
+        source_qid: batch[i].wikidata_qid, wikidata_qid: batch[i].wikidata_qid, sitelinks: batch[i].sitelinks,
+        wikipedia_url: null, extract: null, coordinates: null, coordinate_source: null,
+        needs_manual_coordinates: true, error: err.message, enrich_version: ENRICH_VERSION,
+        _review: ["exception: " + err.message], _part_of_qids: [], exclusion_reason: "fetch_error",
       });
     }
-    await sleep(REQUEST_DELAY_MS);
   }
 
-  await writeFile(outPath, JSON.stringify(results, null, 2));
+  // ---- unique ids (never rename silently: suffix with the QID on a clash) ----
+  const curated = await loadJson("events.json");
+  const takenIds = new Set(curated.map((e) => e.id));
+  for (const r of results) {
+    if (takenIds.has(r.id)) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
+    takenIds.add(r.id);
+  }
 
-  const failed = results.filter((r) => r.error).length;
-  const okNoReview = results.filter((r) => !r.error && !r.needs_review).length;
-  const needsReview = results.filter((r) => !r.error && r.needs_review).length;
-  const missingCoords = results.filter((r) => !r.error && r.needs_manual_coordinates).length;
+  // ---- part-of labels ----
+  const labels = await fetchLabels([...new Set(results.flatMap((r) => r._part_of_qids ?? []))]);
+  for (const r of results) {
+    r.part_of = (r._part_of_qids ?? []).map((q) => ({ qid: q, label: labels[q] ?? null }));
+    r._review = r._review.filter((x) => !x.startsWith("part_of:"));
+    for (const p of r.part_of) {
+      r._review.push(
+        `part_of: Wikidata (P361) lists this event as part of "${p.label ?? p.qid}" (${p.qid}); it may overlap with that larger event`
+      );
+    }
+  }
 
-  console.log(`\nDone. Total in batch: ${batch.length}`);
-  console.log(`  Resolved cleanly (no flags): ${okNoReview}`);
-  console.log(`  Resolved but flagged for review: ${needsReview}`);
-  console.log(`  Failed (no Wikipedia summary / exception): ${failed}`);
-  console.log(`  Missing coordinates (any status): ${missingCoords}`);
-  console.log(`Output written to data/enriched-candidates.json`);
+  // ---- duplicate hints (hints only; nothing is dropped) ----
+  const pool = [
+    ...curated.map((e) => ({
+      ...e, precise: e.coordinates && !String(e.coordinate_source ?? "").startsWith("country-fallback"),
+    })),
+    ...results.map((r) => ({ ...r, precise: r.location_quality === "precise" })),
+  ];
+  const hints = duplicateHints(pool, new Set(results.map((r) => r.id)));
+  for (const r of results) {
+    r.possible_duplicates = hints.get(r.id) ?? [];
+    r._review = r._review.filter((x) => !x.startsWith("possible_duplicate"));
+    for (const h of r.possible_duplicates) {
+      r._review.push(`possible_duplicate: possible duplicate of "${h.title}" (${h.id}) - ${h.reason}`);
+    }
+  }
+
+  // ---- finalise ----
+  for (const r of results) {
+    r.review_reasons = r._review;
+    r.needs_review = r.review_reasons.length > 0;
+    if (!r.error) r.exclusion_reason = exclusionReason(r);
+  }
+  const strip = ({ _review, _part_of_qids, ...rest }) => rest;
+  const persist = results.map((r) => ({ ...strip(r), _review: r._review, _part_of_qids: r._part_of_qids }));
+
+  const proposed = results
+    .filter((r) => !r.exclusion_reason)
+    .map((r) => {
+      const { exclusion_reason, error, _review, _part_of_qids, source_qid, enrich_version, wikidata_description, ...ev } = r;
+      return { ...ev, wikidata_description };
+    })
+    .sort((a, b) => a.date_start.localeCompare(b.date_start));
+
+  const { errors } = validateEvents(proposed, { name: "events.proposed" });
+  if (errors.length) console.warn(`WARNING: proposed set failed validation:\n  ${errors.slice(0, 20).join("\n  ")}`);
+
+  await writeFile(path(outName("enriched-candidates", "json")), JSON.stringify(persist, null, 2));
+  await writeFile(path(outName("events.proposed", "json")), JSON.stringify(proposed, null, 2));
+
+  let report = null;
+  if (!flag("no-report")) {
+    report = await writeMissingReport({ curated, enriched: results, generatedAt: new Date().toISOString() });
+  }
+
+  const byReason = {};
+  for (const r of results) if (r.exclusion_reason) byReason[r.exclusion_reason] = (byReason[r.exclusion_reason] ?? 0) + 1;
+  const flagCounts = {};
+  for (const p of proposed) for (const x of p.review_reasons) flagCounts[x.split(":")[0]] = (flagCounts[x.split(":")[0]] ?? 0) + 1;
+  console.log(`\nDone. Enriched ${results.length} candidates.`);
+  console.log(`  Proposed (real coordinates, valid): ${proposed.length}   (${proposed.filter((p) => p.needs_review).length} carry review flags)`);
+  console.log(`  Excluded: ${results.length - proposed.length}`, byReason);
+  console.log(`  Flags on proposed events:`, flagCounts);
+  if (report) console.log(`  Missing-coordinates report: ${report.curated} curated, ${report.candidates} candidates`);
+  console.log(`Wrote data/${outName("events.proposed", "json")} and data/${outName("enriched-candidates", "json")}`);
 }
 
 main();
