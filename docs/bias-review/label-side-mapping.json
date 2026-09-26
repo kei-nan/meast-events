@@ -1,0 +1,86 @@
+{
+ "I_STATE": {
+  "massacre": [
+   "Balad al-Shaykh massacre",
+   "Al-Dawayima massacre",
+   "Eilabun massacre",
+   "Qibya massacre",
+   "Kafr Qasim massacre",
+   "Khan Yunis massacre",
+   "Hula massacre",
+   "Qana massacre",
+   "Killing of Hind Rajab",
+   "Flour Massacre",
+   "World Central Kitchen aid convoy attack",
+   "Tel al-Sultan attack",
+   "Rafah paramedic massacre"
+  ],
+  "military operation": [
+   "Operation Pleshet",
+   "1966 attack on Samu",
+   "2004 Israeli operation in Rafah",
+   "2004 Israeli operation in the northern Gaza Strip",
+   "2006 Israeli operation in Beit Hanoun",
+   "2012 Gaza War",
+   "July 2023 Jenin incursion",
+   "Al-Shifa Hospital siege",
+   "Israeli attack on Doha",
+   "Killing of Yahya Sinwar"
+  ],
+  "war crime": [
+   "Church of Saint Porphyrius airstrike"
+  ],
+  "terrorist attack": [
+   "Semiramis Hotel bombing",
+   "King David Hotel bombing",
+   "Bahr El-Baqar primary school bombing"
+  ],
+  "population transfer": [
+   "Palestinian expulsion from Lydda and Ramle"
+  ],
+  "assassination": [
+   "Assassination of Saleh al-Arouri",
+   "Israeli airstrike on the Iranian consulate in Damascus",
+   "Assassination of Ismail Haniyeh",
+   "2024 Hezbollah headquarters strike",
+   "Assassination of Ali Khamenei",
+   "Assassination of Ali Larijani"
+  ]
+ },
+ "P_NONSTATE": {
+  "massacre": [
+   "Haifa Oil Refinery massacre",
+   "Hadassah medical convoy massacre",
+   "Kfar Etzion massacre",
+   "Lod Airport massacre",
+   "Kiryat Shmona massacre",
+   "Ma'alot massacre",
+   "2014 Jerusalem synagogue attack",
+   "October 7 attacks",
+   "Nova music festival massacre",
+   "Kfar Aza massacre",
+   "Be'eri massacre",
+   "Netiv HaAsara massacre",
+   "Nir Oz attack",
+   "Alumim massacre",
+   "Nirim attack",
+   "Kissufim massacre",
+   "Holit attack"
+  ],
+  "terrorist attack": [
+   "Avivim school bus bombing",
+   "Coastal road massacre",
+   "2014 kidnapping and murders of Israeli teenagers",
+   "June 2016 Tel Aviv shooting",
+   "2017 Jerusalem truck attack",
+   "2023 Neve Yaakov shooting"
+  ],
+  "aircraft hijacking": [
+   "Dawson's Field hijackings",
+   "Sabena Flight 571"
+  ],
+  "military operation": [
+   "July 2024 Houthi–Israel attacks"
+  ]
+ }
+}

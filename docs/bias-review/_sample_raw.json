@@ -1,0 +1,797 @@
+[
+ {
+  "id": "operation-abstention",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "Operation Abstention",
+  "category": "military operation",
+  "date_start": "1941-02-28",
+  "countries": [
+   "Turkey",
+   "Egypt",
+   "Israel/Palestine",
+   "Lebanon",
+   "Syria"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Operation_Abstention",
+  "extract": "Operation Abstention was the code name of a British invasion of the Italian island of Kastelorizo (Castellorizo) off the Turkish Aegean coast, during the Second World War. The goal was to establish a motor torpedo-boat base to challenge Italian naval and air supremacy on the Greek Dodecanese islands. The British landings were opposed by Italian land, air and naval forces, which forced the British troops to re-embark amidst some confusion and led to recriminations between the British commanders for underestimating the Italians."
+ },
+ {
+  "id": "king-david-hotel-bombing",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "King David Hotel bombing",
+  "category": "terrorist attack",
+  "date_start": "1946-07-22",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/King_David_Hotel_bombing",
+  "extract": "The British administrative headquarters for Mandatory Palestine, housed in the southern wing of the King David Hotel in Jerusalem, were bombed in a terrorist attack on 22 July 1946, by the militant right-wing Zionist underground organization Irgun during the Jewish insurgency. Ninety-one people of various nationalities were killed, including Arabs, Britons and Jews, and 46 were injured."
+ },
+ {
+  "id": "1936-39-arab-revolt-in-palestine",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "1936–39 Arab revolt in Palestine",
+  "category": "uprising",
+  "date_start": "1936-04-19",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/1936%E2%80%931939_Arab_revolt_in_Palestine",
+  "extract": "A popular uprising by Palestinian Arabs in Mandatory Palestine against the British administration, known as the Great Revolt, and later the Great Palestinian Revolt or the Palestinian Revolution, lasted from 1936 until 1939. The movement sought independence from British colonial rule and the end of British support for Zionism, including Jewish immigration and land sales to Jews."
+ },
+ {
+  "id": "italo-turkish-war",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "Italo-Turkish War",
+  "category": "war",
+  "date_start": "1911-09-29",
+  "countries": [
+   "Turkey"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Italo-Turkish_War",
+  "extract": "The Italo-Turkish War, also known as the Turco-Italian War, was fought between the Kingdom of Italy and the Ottoman Empire from 29 September 1911 to 18 October 1912. As a result of this conflict, Italy captured coastal areas of the Ottoman Tripolitania Vilayet, of which the main sub-provinces were Fezzan, Cyrenaica, and Tripoli itself. These territories became the colonies of Italian Tripolitania and Cyrenaica, which would later merge into Italian Libya."
+ },
+ {
+  "id": "national-pact",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "National Pact",
+  "category": "political",
+  "date_start": "1943-11-22",
+  "countries": [
+   "Lebanon"
+  ],
+  "url": "https://en.wikipedia.org/wiki/National_Pact",
+  "extract": "The National Pact is an unwritten agreement that laid the foundation of Lebanon as a multiconfessional state following negotiations between the Shia, Sunni, Maronite, and Druze leaderships. Enacted in the summer of 1943, the National Pact was formed by President Bechara El Khoury and Prime Minister Riad Al Solh. Mainly centered around the interests of political elites, the Maronite elite served as a voice for the Christian population of Lebanon, while the Sunni elite represented the voice of the Muslim population. The pact also established Lebanon's independence from France."
+ },
+ {
+  "id": "first-battle-of-gaza",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "First Battle of Gaza",
+  "category": "battle",
+  "date_start": "1917-03-26",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/First_Battle_of_Gaza",
+  "extract": "The First Battle of Gaza was fought on 26 March 1917 during the first attempt by the Egyptian Expeditionary Force (EEF), which was a British Empire military formation, formed on 10 March 1916 under the command of General Archibald Murray from the Mediterranean Expeditionary Force and the Force in Egypt (1914–15), at the beginning of the Sinai and Palestine Campaign of the First World War. Fighting took place in and around the town of Gaza on the Mediterranean coast when infantry and mounted infantry from the Desert Column, a component of the Eastern Force, attacked the town. Late in the afternoon, on the verge of capturing Gaza, the Desert Column was withdrawn due to concerns about the approaching darkness and large Ottoman reinforcements. This British defeat was followed a few weeks later by the even more emphatic defeat of the Eastern Force at the Second Battle of Gaza in April 1917."
+ },
+ {
+  "id": "armistice-of-mudanya",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "Armistice of Mudanya",
+  "category": "treaty",
+  "date_start": "1922-10-11",
+  "countries": [
+   "Turkey"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Armistice_of_Mudanya",
+  "extract": "The Armistice of Mudanya was an agreement between Turkey and Italy, France, and Britain, signed in the town of Mudanya, in the province of Bursa, on 11 October 1922. The Kingdom of Greece acceded to the armistice on 14 October 1922."
+ },
+ {
+  "id": "united-nations-partition-plan-for-palestine",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "United Nations Partition Plan for Palestine",
+  "category": "diplomatic",
+  "date_start": "1947-11-29",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/United_Nations_Partition_Plan_for_Palestine",
+  "extract": "The United Nations Partition Plan for Palestine was a proposal developed by the United Nations for the future government of Mandatory Palestine following the termination of the British Mandate. Drafted by the UN Special Committee on Palestine (UNSCOP) on 3 September 1947, the Plan was adopted by the UN General Assembly on 29 November 1947 as Resolution 181 (II). The resolution recommended the partition of Mandatory Palestine into independent but economically linked Arab and Jewish states, together with an extraterritorial \"Special International Regime\" for the city of Jerusalem and its surroundings."
+ },
+ {
+  "id": "simele-massacre",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "Simele massacre",
+  "category": "massacre",
+  "date_start": "1933-08-01",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Simele_massacre",
+  "extract": "The Simele massacre, also known as the Assyrian affair, was a massacre committed by the Kingdom of Iraq under the leadership of Kurdish army general Bakr Sidqi. The massacre was committed in August 1933 against the Assyrian population of Iraq in and around the village of Simele."
+ },
+ {
+  "id": "operation-skorpion",
+  "era": "<1948",
+  "contested_pool": true,
+  "title": "Operation Skorpion",
+  "category": "military operation",
+  "date_start": "1941-05-27",
+  "countries": [
+   "Egypt"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Operation_Skorpion",
+  "extract": "Operation Skorpion from 26 to 27 May 1941, was a military operation during the Western Desert Campaign of the Second World War. The operation was conducted by Axis forces under the command of Colonel Maximilian von Herff and resisted by British forces under Lieutenant-General William \"Strafer\" Gott. A counter-attack was made on British positions at Halfaya Pass in north-western Egypt, which had been captured during Operation Brevity (15–16 May). Unternehmen Skorpion was the second offensive operation commanded by Rommel in Africa."
+ },
+ {
+  "id": "treaty-of-s-vres",
+  "era": "<1948",
+  "contested_pool": false,
+  "title": "Treaty of Sèvres",
+  "category": "treaty",
+  "date_start": "1920-08-10",
+  "countries": [
+   "Turkey"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Treaty_of_S%C3%A8vres",
+  "extract": "The Treaty of Sèvres was a 1920 treaty signed between some of the Allies of World War I and the Ottoman Empire, but not ratified. The treaty would have required the cession of large parts of Ottoman territory to France, the United Kingdom, Greece, and Italy, as well as creating large occupation zones within the Ottoman Empire. It was one of a series of treaties that the Central Powers signed with the Allied Powers after their defeat in World War I. Hostilities had already ended with the Armistice of Mudros."
+ },
+ {
+  "id": "operation-excess",
+  "era": "<1948",
+  "contested_pool": false,
+  "title": "Operation Excess",
+  "category": "military operation",
+  "date_start": "1941-01-10",
+  "countries": [
+   "Turkey",
+   "Egypt",
+   "Israel/Palestine",
+   "Lebanon",
+   "Syria"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Operation_Excess",
+  "extract": "Operation Excess was a series of British supply convoys to Malta, Alexandria and Greece in January 1941. The operation was the first to encounter Luftwaffe anti-shipping aircraft over the Mediterranean Sea and all the convoyed freighters reached their destinations. The destroyer Gallant was disabled by Italian mines and Axis bombers severely damaged the cruiser Southampton and the aircraft carrier Illustrious."
+ },
+ {
+  "id": "mcmahon-hussein-correspondence",
+  "era": "<1948",
+  "contested_pool": false,
+  "title": "McMahon–Hussein Correspondence",
+  "category": "diplomatic",
+  "date_start": "1915-07-14",
+  "countries": [
+   "regional"
+  ],
+  "url": "https://en.wikipedia.org/wiki/McMahon%E2%80%93Hussein_correspondence",
+  "extract": "The McMahon–Hussein correspondence is a series of letters that were exchanged during World War I, in which the government of the United Kingdom agreed to recognize Arab independence in a large region after the war in exchange for the Sharif of Mecca launching the Arab Revolt against the Ottoman Empire. The correspondence had a significant influence on Middle Eastern history during and after the war; a dispute over Palestine continued thereafter."
+ },
+ {
+  "id": "iraqi-revolt-against-the-british",
+  "era": "<1948",
+  "contested_pool": false,
+  "title": "Iraqi revolt against the British",
+  "category": "uprising",
+  "date_start": "1920-05-30",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Iraqi_Revolt",
+  "extract": "The Iraqi Revolt of 1920, also known as the Iraqi War of Independence or Great Iraqi Revolution began in Baghdad in the summer of 1920 with mass demonstrations by Iraqis, including protests by embittered officers from the old Ottoman Army, against the British who published the new land ownership and the burial taxes at Najaf. The revolt gained momentum when it spread to the middle and lower Euphrates."
+ },
+ {
+  "id": "battle-of-ardahan",
+  "era": "<1948",
+  "contested_pool": false,
+  "title": "Battle of Ardahan",
+  "category": "battle",
+  "date_start": "1914-12-25",
+  "countries": [
+   "Turkey"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Battle_of_Ardahan",
+  "extract": "The Battle of Ardahan was fought between 25 December 1914 and 18 January 1915 and was an Ottoman military operation commanded by German Lt. Col. Stange to capture the city of Ardahan and cut the Russian link to Sarikamish–Kars line, supporting the Battle of Sarikamish. By 3 January 1915, Vorontsov-Dashkov achieved a decisive victory over the Ottoman forces at Ardahan."
+ },
+ {
+  "id": "palestinian-expulsion-from-lydda-and-ramle",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "Palestinian expulsion from Lydda and Ramle",
+  "category": "population transfer",
+  "date_start": "1948-07-01",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Palestinian_expulsion_from_Lydda_and_Ramle",
+  "extract": "In July 1948, during the 1948 Palestine war, the Palestinian towns of Lydda and Ramle were captured by the Israel Defense Forces and their residents were violently expelled. The expulsions occurred as part of the broader 1948 Palestinian expulsions and the Nakba. Hundreds of Palestinians were killed in multiple mass killings, including the Lydda massacre, and in what is sometimes known as the Lydda death march. The two Arab towns, lying outside the area designated for a Jewish state in the UN Partition Plan of 1947, and inside the area set aside for an Arab state in Palestine, were subsequently incorporated into the new State of Israel and repopulated with Jewish immigrants. After their conquest the towns were given Hebrew names of Lod and Ramla."
+ },
+ {
+  "id": "sabena-flight-571",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "Sabena Flight 571",
+  "category": "aircraft hijacking",
+  "date_start": "1972-05-08",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Sabena_Flight_571",
+  "extract": "Sabena Flight 571 was a scheduled passenger flight from Brussels to Tel Aviv via Vienna, operated by the Belgian national airline, Sabena. On 8 May 1972, a Boeing 707 passenger aircraft operating that service, captained by British pilot Reginald Levy, DFC, was hijacked by four members of the Black September Organization, a Palestinian terrorist group."
+ },
+ {
+  "id": "karantina-massacre",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "Karantina massacre",
+  "category": "massacre",
+  "date_start": "1976-01-18",
+  "countries": [
+   "Lebanon"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Karantina_massacre",
+  "extract": "The Karantina massacre took place on 18 January 1976, early in the Lebanese Civil War. La Quarantine, known in Arabic as \"Karantina\", was a Muslim-inhabited district in mostly Christian East Beirut controlled by forces of the Palestine Liberation Organization (PLO) and the Lebanese National Movement (LNM), and inhabited by Palestinians, Kurds, Armenians, Syrians, and Lebanese Muslims. The fighting and subsequent killings also involved an old Quarantine area near the port and nearby \"Maslakh\" quarter."
+ },
+ {
+  "id": "1982-lebanon-war",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "1982 Lebanon War",
+  "category": "war",
+  "date_start": "1982-06-06",
+  "countries": [
+   "Lebanon",
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/1982_Lebanon_War",
+  "extract": "The 1982 Lebanon War, also called the Second Israeli invasion of Lebanon, began on 6 June 1982, when Israel invaded southern Lebanon. The invasion followed a series of attacks and counter-attacks between the Palestine Liberation Organization (PLO) operating in southern Lebanon and the Israel Defense Forces (IDF), which had caused civilian casualties on both sides of the border. The Israeli military operation, codenamed Operation Peace for Galilee, was launched after gunmen from the Abu Nidal Organization attempted to assassinate Shlomo Argov, Israel's ambassador to the United Kingdom. Israeli prime minister Menachem Begin blamed the PLO, using the incident as a casus belli. It was the second invasion of Lebanon by Israel, following the 1978 South Lebanon conflict."
+ },
+ {
+  "id": "1973-oil-crisis",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "1973 oil crisis",
+  "category": "economic",
+  "date_start": "1973-10-17",
+  "countries": [
+   "Saudi Arabia",
+   "regional"
+  ],
+  "url": "https://en.wikipedia.org/wiki/1973_oil_crisis",
+  "extract": "In October 1973, the Organization of Arab Petroleum Exporting Countries (OAPEC) announced that it was implementing a total oil embargo against countries that had supported Israel at any point during the 1973 Yom Kippur War, which began after Egypt and Syria launched a large-scale surprise attack in an ultimately unsuccessful attempt to recover the territories that they had lost to Israel during the 1967 Six-Day War."
+ },
+ {
+  "id": "iranian-revolution",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "Iranian Revolution",
+  "category": "uprising",
+  "date_start": "1978-01-07",
+  "countries": [
+   "Iran"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Iranian_Revolution",
+  "extract": "The Iranian Revolution, also known as the Islamic Revolution, culminated in the overthrow of the Pahlavi dynasty in 1979. The revolution led to the replacement of the Imperial State of Iran by the Islamic Republic of Iran, as the monarchical government of Shah Mohammad Reza Pahlavi was superseded by Ruhollah Khomeini, an Islamist cleric who had headed one of the rebel factions, and became the country’s supreme leader.The ousting of Mohammad Reza Pahlavi, the last Shah of Iran, formally marked the end of Iran's historical monarchy."
+ },
+ {
+  "id": "ramsar-convention",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "Ramsar Convention",
+  "category": "treaty",
+  "date_start": "1971-02-02",
+  "countries": [
+   "Iran"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Ramsar_Convention",
+  "extract": "The Ramsar Convention on Wetlands of International Importance Especially as Waterfowl Habitat is an international treaty for the conservation and sustainable use of Ramsar sites (wetlands). It is also known as the Convention on Wetlands. It is named after the city of Ramsar in Iran, where the convention was signed in 1971."
+ },
+ {
+  "id": "1983-beirut-barracks-bombings",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "1983 Beirut barracks bombings",
+  "category": "terrorism",
+  "date_start": "1983-10-23",
+  "countries": [
+   "Lebanon"
+  ],
+  "url": "https://en.wikipedia.org/wiki/1983_Beirut_barracks_bombings",
+  "extract": "On October 23, 1983, two truck bombs were detonated at buildings in Beirut, Lebanon, housing American and French service members of the Multinational Force in Lebanon (MNF), a military peacekeeping operation during the Lebanese Civil War. The attack killed 307 people: 241 U.S. and 58 French military personnel, six civilians and two of the attackers."
+ },
+ {
+  "id": "assassination-of-anwar-sadat",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "Assassination of Anwar Sadat",
+  "category": "assassination",
+  "date_start": "1981-10-06",
+  "countries": [
+   "Egypt"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Assassination_of_Anwar_Sadat",
+  "extract": "On 6 October 1981, Anwar Sadat, the president of Egypt, was assassinated during the annual victory parade held in Cairo to celebrate the victory over Israel in the Yom Kippur War, during which the Egyptian Army had crossed the Suez Canal at the beginning of the war. The assassination was undertaken by members of the Egyptian Islamic Jihad. Although the motive has been debated, Sadat's assassination likely stemmed from communist, socialist, and Islamist groups opposed to Sadat's peace initiative with Israel and the United States relating to the Camp David Accords."
+ },
+ {
+  "id": "1966-attack-on-samu",
+  "era": "1948-1990",
+  "contested_pool": true,
+  "title": "1966 attack on Samu",
+  "category": "military operation",
+  "date_start": "1966-11-13",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/1966_attack_on_Samu",
+  "extract": "The 1966 attack on Samu, codenamed by Israel as Operation Shredder, was a large cross-border assault on 13 November 1966 by the Israeli military on the Jordanian-controlled West Bank village of Samu. It was the largest Israeli military operation since the 1956 Suez Crisis and is considered to have been a contributing factor to the outbreak of the Six-Day War in 1967."
+ },
+ {
+  "id": "khartoum-resolution",
+  "era": "1948-1990",
+  "contested_pool": false,
+  "title": "Khartoum Resolution",
+  "category": "diplomatic",
+  "date_start": "1967-08-29",
+  "countries": [
+   "regional"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Khartoum_Resolution",
+  "extract": "The Khartoum Resolution of 1 September 1967 was issued at the conclusion of the 1967 Arab League summit, which was convened in Khartoum, the capital of Sudan, in late August 1967. It was convened in the aftermath of the Six-Day War and was attended by leaders of eight Arab states. The declaration issued at its conclusion is famous for containing what became known as the \"Three Noes\" or \"The Three Noes of Khartoum\". The resolution guided Arab policy toward Israel until the Yom Kippur War."
+ },
+ {
+  "id": "1968-iraqi-coup-d-tat",
+  "era": "1948-1990",
+  "contested_pool": false,
+  "title": "1968 Iraqi coup d'état",
+  "category": "political",
+  "date_start": "1968-07-17",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/17_July_Revolution",
+  "extract": "The 17 July Revolution was a bloodless coup in Iraq in 1968 led by Ahmed Hassan al-Bakr, Abd ar-Razzaq an-Naif, and Abd ar-Rahman al-Dawud that ousted President Abdul Rahman Arif and Prime Minister Tahir Yahya and brought the Iraqi Regional Branch of the Arab Socialist Ba'ath Party to power. Ba'athists involved in the coup as well as the subsequent purge of the moderate faction led by Naif included Hardan al-Tikriti, Salih Mahdi Ammash, and Saddam Hussein, the future President of Iraq. The coup was primarily directed against Yahya, an outspoken Nasserist who exploited the political crisis created by the June 1967 Six-Day War to push Arif's moderate government to nationalize the Western-owned Iraq Petroleum Company (IPC) in order to use Iraq's \"oil as a weapon in the battle against Israel.\" Full nationalization of the IPC did not occur until 1972, under the Ba'athist administration. In the aftermath of the coup, the new Iraqi government consolidated power by denouncing alleged American and Israeli machinations, publicly executing 14 people including 9 Iraqi Jews on fabricated espionage charges amidst a broader purge, and working to expand Iraq's traditionally close relations with the Soviet Union."
+ },
+ {
+  "id": "grand-mosque-seizure",
+  "era": "1948-1990",
+  "contested_pool": false,
+  "title": "Grand Mosque seizure",
+  "category": "terrorism",
+  "date_start": "1979-11-20",
+  "countries": [
+   "Saudi Arabia"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Grand_Mosque_seizure",
+  "extract": "The Grand Mosque seizure took place between 20 November and 4 December 1979 at the Grand Mosque of Mecca in Mecca, Saudi Arabia, the holiest site in Islam. The attack was carried out by up to 600 militants led by Juhayman al-Otaybi, a Saudi Islamist opposed to the monarchy, belonging to the Otaibah tribe. The insurgents identified themselves as \"al-Ikhwan\", referencing the Arabian militia that had played a role in the early formation of the Saudi state in the early 20th century. Scholars refer to them as Juhayman's Ikhwan."
+ },
+ {
+  "id": "14-july-revolution",
+  "era": "1948-1990",
+  "contested_pool": false,
+  "title": "14 July Revolution",
+  "category": "uprising",
+  "date_start": "1958-07-14",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/14_July_Revolution",
+  "extract": "The 14 July Revolution, also known as the 1958 Iraqi military coup, was a military coup that took place on 14 July 1958 in Iraq, resulting in the toppling of King Faisal II and the overthrow of the Hashemite-led Kingdom of Iraq. The Iraqi Republic established in its wake ended the Hashemite Arab Federation between Iraq and Jordan that had been established just six months earlier."
+ },
+ {
+  "id": "north-yemen-civil-war",
+  "era": "1948-1990",
+  "contested_pool": false,
+  "title": "North Yemen Civil War",
+  "category": "war",
+  "date_start": "1962-09-26",
+  "countries": [
+   "Yemen"
+  ],
+  "url": "https://en.wikipedia.org/wiki/North_Yemen_civil_war",
+  "extract": "The North Yemen civil war, also known in Yemen as the 26 September Revolution, was a civil war fought in North Yemen from 1962 to 1970 between partisans of the Mutawakkilite Kingdom and supporters of the Yemen Arab Republic. The war began with a coup d'état carried out in 1962 by revolutionary republicans led by the army under the command of Abdullah al-Sallal. He dethroned the newly crowned King and Imam Muhammad al-Badr and declared Yemen a republic under his presidency. His government abolished slavery in Yemen. The Imam escaped to the Saudi Arabian border where he rallied popular support from northern Zaydi tribes to retake power, and the conflict rapidly escalated to a full-scale civil war."
+ },
+ {
+  "id": "oslo-accords",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Oslo Accords",
+  "category": "treaty",
+  "date_start": "1993-09-13",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Oslo_Accords",
+  "extract": "The Oslo Accords are a pair of interim agreements between Israel and the Palestine Liberation Organization (PLO): the Oslo I Accord, signed in Washington, D.C., in 1993; and the Oslo II Accord, signed in Taba, Egypt, in 1995. They marked the start of the Oslo process, a peace process aimed at achieving a peace treaty based on Resolution 242 and Resolution 338 of the United Nations Security Council. The Oslo process began after secret negotiations in Oslo, Norway, resulting in both the recognition of Israel by the PLO and the recognition by Israel of the PLO as the representative of the Palestinian people and as a partner in bilateral negotiations."
+ },
+ {
+  "id": "gaza-war-2008-09",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Gaza War (2008–09)",
+  "category": "war",
+  "date_start": "2008-12-27",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Gaza_War_(2008%E2%80%932009)",
+  "extract": "The Gaza War, also known as the First Gaza War, Operation Cast Lead, or the Gaza Massacre, and referred to as the Battle of al-Furqan by Hamas, was a three-week armed conflict between Gaza Strip Palestinian paramilitary groups and the Israel Defense Forces (IDF) that began on 27 December 2008 and ended on 18 January 2009 with a unilateral ceasefire. The conflict resulted in 1,166–1,417 Palestinian and 13 Israeli deaths. Over 46,000 homes were destroyed in Gaza, making more than 100,000 people homeless."
+ },
+ {
+  "id": "battle-of-jenin-2002",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Battle of Jenin (2002)",
+  "category": "battle",
+  "date_start": "2002-01-01",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Battle_of_Jenin_(2002)",
+  "extract": "The Battle of Jenin, took place in the Jenin refugee camp in the Israeli-occupied West Bank on April 1–11, 2002. The Israeli military invaded the camp, and other areas under the administration of the Palestinian Authority, during the Second Intifada, as part of Operation Defensive Shield."
+ },
+ {
+  "id": "assassination-of-rafic-hariri",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Assassination of Rafic Hariri",
+  "category": "assassination",
+  "date_start": "2005-02-14",
+  "countries": [
+   "Lebanon"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Assassination_of_Rafic_Hariri",
+  "extract": "On 14 February 2005, former Prime Minister of Lebanon Rafic Hariri was assassinated along with 21 others in an explosion in Beirut, Lebanon. Explosives equivalent to around 1,000 kilograms of TNT were detonated as his motorcade drove near the St. George Hotel. Among the dead were several of Hariri's bodyguards and former Minister of Economy and Trade Bassel Fleihan."
+ },
+ {
+  "id": "israeli-withdrawal-from-lebanon",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Israeli withdrawal from Lebanon",
+  "category": "political",
+  "date_start": "2000-05-24",
+  "countries": [
+   "Lebanon",
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/South_Lebanon_conflict_(1985%E2%80%932000)",
+  "extract": "The South Lebanon conflict was an armed conflict that took place in Israeli-occupied southern Lebanon from 1982 or 1985 until Israel's withdrawal in 2000. Hezbollah, along with other Shia Muslim and left-wing guerrillas, fought against Israel and its ally, the Catholic Christian-dominated South Lebanon Army (SLA). The SLA was supported militarily and logistically by the Israel Defense Forces (IDF) and operated under the jurisdiction of the Israeli-backed South Lebanon provisional administration, which succeeded the earlier Israeli-backed Free Lebanon State. Israel officially names the conflict the Security Zone in Lebanon Campaign and deems it to have begun on 30 September 1982, after the end of its \"Operation Peace for Galilee\". It can also be seen as an extension of the Lebanese Civil War (1975–1990)."
+ },
+ {
+  "id": "cedar-revolution",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Cedar Revolution",
+  "category": "uprising",
+  "date_start": "2005-02-14",
+  "countries": [
+   "Lebanon"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Cedar_Revolution",
+  "extract": "The Cedar Revolution, known in Lebanon as the Independence intifada, was a chain of demonstrations in Lebanon triggered by the assassination of former Lebanese Prime Minister Rafic Hariri. The popular movement was remarkable for its avoidance of violence, peaceful approach, and its total reliance on methods of civil resistance."
+ },
+ {
+  "id": "operation-viking-hammer",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Operation Viking Hammer",
+  "category": "military operation",
+  "date_start": "2003-03-01",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Operation_Viking_Hammer",
+  "extract": "Operation Viking Hammer was an unconventional warfare operation during the Iraq War which took place in northern Iraq, commonly known as Iraqi Kurdistan. The goal of the operation was to eliminate Ansar al-Islam and dismantle the Islamic Emirate of Kurdistan. Ansar al-Islam was established by former Al-Qaeda members in 2001 as a Kurdish Salafist movement that imposed a strict application of Sharia in villages it controlled."
+ },
+ {
+  "id": "siege-of-the-church-of-the-nativity",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Siege of the Church of the Nativity",
+  "category": "siege",
+  "date_start": "2002-04-02",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Siege_of_the_Church_of_the_Nativity",
+  "extract": "From 2 April to 10 May 2002, the Church of the Nativity in Bethlehem in the West Bank was besieged by the Israel Defense Forces (IDF), targeting suspected Palestinian militants who had taken shelter in the church."
+ },
+ {
+  "id": "2005-sharm-el-sheikh-bombings",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "2005 Sharm El Sheikh bombings",
+  "category": "terrorist attack",
+  "date_start": "2005-07-23",
+  "countries": [
+   "Egypt"
+  ],
+  "url": "https://en.wikipedia.org/wiki/2005_Sharm_El_Sheikh_bombings",
+  "extract": "The 2005 Sharm El Sheikh bombings were committed by Islamist group Abdullah Azzam Brigades on 23 July 2005 in the Egyptian resort city of Sharm El Sheikh, at the southern tip of the Sinai Peninsula. Eighty-eight people were killed by the three bombings, the majority of them Egyptians, and over 200 were injured, making the attack the deadliest terrorist action in the history of Egypt, until it was surpassed by the 2017 Sinai mosque attack."
+ },
+ {
+  "id": "qana-massacre",
+  "era": "1991-2010",
+  "contested_pool": true,
+  "title": "Qana massacre",
+  "category": "massacre",
+  "date_start": "1996-04-18",
+  "countries": [
+   "Lebanon"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Qana_massacre",
+  "extract": "The Qana massacre took place on April 18, 1996, near Qana, a village in then Israeli-occupied Southern Lebanon, when the Israeli military fired artillery shells at a United Nations compound, which was sheltering around 800 Lebanese civilians, killing 106 and injuring around 116. Four Fijian United Nations Interim Force in Lebanon soldiers were also seriously injured."
+ },
+ {
+  "id": "iraqi-insurgency-2003-2011",
+  "era": "1991-2010",
+  "contested_pool": false,
+  "title": "Iraqi insurgency (2003–2011)",
+  "category": "rebellion",
+  "date_start": "2003-01-01",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Iraqi_insurgency_(2003%E2%80%932011)",
+  "extract": "The Iraqi insurgency lasted from 2003 until 2011, beginning shortly after the 2003 American invasion deposed longtime leader Saddam Hussein, and lasting until the end of the Iraq War and U.S. withdrawal in 2011. It was followed by a renewed insurgency."
+ },
+ {
+  "id": "abu-ghraib-torture-and-prisoner-abuse",
+  "era": "1991-2010",
+  "contested_pool": false,
+  "title": "Abu Ghraib torture and prisoner abuse",
+  "category": "war crime",
+  "date_start": "2004-04-01",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Abu_Ghraib_torture_and_prisoner_abuse",
+  "extract": "During the early stages of the Iraq War, members of the United States Army and the Central Intelligence Agency committed a series of human rights violations and war crimes against detainees in Abu Ghraib prison in Iraq. These abuses included physical abuse, sexual humiliation, physical and psychological torture, and rape, as well as the killing of Manadel al-Jamadi and the desecration of his body. The abuses came to public attention with the publication of photographs by CBS News in April 2004, causing shock and outrage and receiving widespread condemnation within the United States and internationally."
+ },
+ {
+  "id": "nisour-square-massacre",
+  "era": "1991-2010",
+  "contested_pool": false,
+  "title": "Nisour Square massacre",
+  "category": "massacre",
+  "date_start": "2007-09-16",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Nisour_Square_massacre",
+  "extract": "The Nisour Square massacre occurred on September 16, 2007, when employees of Blackwater Security Consulting, which was a private military company contracted by the United States government to provide security services in Iraq, shot at Iraqi civilians, killing 17 and injuring 20 in Nisour Square, Baghdad, while escorting a U.S. embassy convoy. The killings outraged Iraqis and strained relations between Iraq and the United States. In 2014, four Blackwater employees were tried and convicted in U.S. federal court; one of murder, and the other three of manslaughter and firearms charges. In 2020, all four convicted were pardoned by President Donald Trump. United Nations experts said the pardons \"violate U.S. obligations under international law and more broadly undermine humanitarian law and human rights at a global level\"."
+ },
+ {
+  "id": "battle-off-the-coast-of-abkhazia",
+  "era": "1991-2010",
+  "contested_pool": false,
+  "title": "Battle off the coast of Abkhazia",
+  "category": "battle",
+  "date_start": "2008-08-09",
+  "countries": [
+   "Turkey"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Battle_off_the_coast_of_Abkhazia",
+  "extract": "The Battle off the coast of Abkhazia was a supposed naval engagement between warships of the Russian Black Sea Fleet and Georgian patrol boats during the Russo-Georgian War."
+ },
+ {
+  "id": "arab-spring",
+  "era": "1991-2010",
+  "contested_pool": false,
+  "title": "Arab Spring",
+  "category": "uprising",
+  "date_start": "2010-12-18",
+  "countries": [
+   "regional"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Arab_Spring",
+  "extract": "The Arab Spring was a series of pro-democracy anti-government protests, uprisings, and armed rebellions that spread across much of the Arab world in the early 2010s. It began in Tunisia in response to the death of Mohamed Bouazizi by self-immolation. From Tunisia, the protests initially spread to five other countries: Libya, Egypt, Yemen, Syria and Bahrain. The rulers deposed include: Zine El Abidine Ben Ali of Tunisia, Muammar Gaddafi of Libya, and Hosni Mubarak of Egypt, all in 2011; and Ali Abdullah Saleh of Yemen in 2012. Major uprisings and social violence occurred, including riots, civil wars, or insurgencies. Sustained street demonstrations took place in Morocco, Iraq, Algeria, Lebanon, Jordan, Kuwait, Oman and Sudan. Minor protests took place in Djibouti, Mauritania, Palestine, Saudi Arabia and the Western Sahara. A major slogan of the demonstrators in the Arab world is ash-shaʻb yurīd isqāṭ an-niẓām!."
+ },
+ {
+  "id": "battle-of-aleppo-2012-2016",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Battle of Aleppo (2012–2016)",
+  "category": "war",
+  "date_start": "2012-07-19",
+  "countries": [
+   "Syria"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Battle_of_Aleppo_(2012%E2%80%932016)",
+  "extract": "The Battle of Aleppo was a major military confrontation in Aleppo, the largest city in Syria by urban area, between the Syrian opposition militias against the Ba'athist Syrian government and army, supported by Russia, Iran, Hezbollah and other Shia militant groups backed by the IRGC, and other pro-government Syrian and Palestinian militias, and against the Kurdish-majority People's Protection Units (YPG). The battle began on 19 July 2012 and was part of the Syrian civil war. A stalemate that had been in place for four years finally ended in July 2016, when Ba'athist government troops closed the rebels' last supply line into Aleppo with the support of Russian airstrikes. In response, rebel forces launched unsuccessful counteroffensives in September and October that failed to break the government's siege of the rebel-held eastern half of the city; in November, government forces, allied with Russia and bolstered by YPG forces, embarked on a decisive campaign that resulted in the recapture of all of Aleppo by December 2016. The Syrian government victory was widely seen as a turning point in the civil war."
+ },
+ {
+  "id": "assassination-of-ali-khamenei",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Assassination of Ali Khamenei",
+  "category": "assassination",
+  "date_start": "2026-02-28",
+  "countries": [
+   "Iran"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Assassination_of_Ali_Khamenei",
+  "extract": "On 28 February 2026, Ali Khamenei, the supreme leader of Iran, was assassinated in Tehran as part of a series of Israeli airstrikes aimed at high-ranking Iranian officials. Khamenei's death was confirmed by the Iranian government on 1 March. His death occurred as part of a wider joint operation by Israel and the United States using strategic locations intelligence from the US's Central Intelligence Agency to determine the whereabouts of several leaders. Satellite imagery suggested that Khamenei's residence in the city was severely damaged during the attack."
+ },
+ {
+  "id": "sinai-insurgency",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Sinai insurgency",
+  "category": "rebellion",
+  "date_start": "2011-02-05",
+  "countries": [
+   "Egypt"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Sinai_insurgency",
+  "extract": "The Sinai insurgency was an insurgency campaign in the Sinai Peninsula of Egypt launched by Islamist militants against Egyptian security forces, which also included attacks on civilians. The insurgency began during the Egyptian Crisis, during which the longtime Egyptian president Hosni Mubarak was overthrown in the 2011 Egyptian revolution."
+ },
+ {
+  "id": "ahvaz-military-parade-attack",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Ahvaz military parade attack",
+  "category": "terrorist attack",
+  "date_start": "2018-09-21",
+  "countries": [
+   "Iran"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Ahvaz_military_parade_attack",
+  "extract": "On 22 September 2018, a military parade was attacked by gunmen in the southwestern Iranian city of Ahvaz. The shooters killed 25 people, including soldiers of the Islamic Revolutionary Guard Corps (IRGC) and civilian bystanders. It was the deadliest terrorist attack in Iran since the Chabahar suicide bombing in December 2010."
+ },
+ {
+  "id": "tel-al-sultan-attack",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Tel al-Sultan attack",
+  "category": "massacre",
+  "date_start": "2024-05-26",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Tel_al-Sultan_attack",
+  "extract": "On 26 May 2024, the Israeli Air Force bombed a displacement camp in Tel al-Sultan, Rafah. The attack, which set the camp on fire, killed between 45 and 50 Palestinians and injured more than 200. Sometimes referred to as the Rafah tent massacre or as the Tent Massacre, it was the deadliest incident of the Rafah offensive."
+ },
+ {
+  "id": "battle-of-idlib-2015",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Battle of Idlib (2015)",
+  "category": "battle",
+  "date_start": "2015-03-28",
+  "countries": [
+   "Syria"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Battle_of_Idlib_(2015)",
+  "extract": "The Battle of Idlib was a military operation in the Idlib Governorate, during the Syrian civil war, conducted by rebels against Syrian government forces defending Idlib city."
+ },
+ {
+  "id": "fall-of-the-assad-regime",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Fall of the Assad regime",
+  "category": "political",
+  "date_start": "2024-11-27",
+  "countries": [
+   "Syria"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Fall_of_the_Assad_regime",
+  "extract": "On 8 December 2024, the Assad regime in Syria collapsed during a major offensive by opposition forces. The offensive was spearheaded by Hay'at Tahrir al-Sham (HTS), the Syrian National Army (SNA), and the Southern Operations Room (SOR), as part of the Syrian civil war that began with the Syrian revolution in 2011. The capture of Syria's capital, Damascus, marked the end of the Assad family's rule, which had governed Syria as a totalitarian hereditary dictatorship since Hafez al-Assad assumed power in 1971 after a successful coup d'état."
+ },
+ {
+  "id": "yemeni-revolution",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Yemeni Revolution",
+  "category": "uprising",
+  "date_start": "2011-01-27",
+  "countries": [
+   "Yemen"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Yemeni_revolution",
+  "extract": "The Yemeni revolution, also known as the Yemeni intifada, was a series of major anti-government protests and armed uprisings that raged through Yemen from January 2011 to February 2012. It occurred concurrently with the Arab Spring that broke out throughout the Middle East and North Africa in 2011. In its early phase, protests in Yemen were initially against unemployment, economic conditions, corruption, and the authoritarian regime led by President Ali Abdullah Saleh as well as against the government's proposals to modify Yemen's constitution. The protesters' demands then escalated to calls for the resignation of Yemeni president Ali Abdullah Saleh. Mass defections from the military, as well as from Saleh's government, effectively rendered much of the country outside of the government's control, and protesters vowed to defy its authority."
+ },
+ {
+  "id": "church-of-saint-porphyrius-airstrike",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Church of Saint Porphyrius airstrike",
+  "category": "war crime",
+  "date_start": "2023-10-19",
+  "countries": [
+   "Israel/Palestine"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Church_of_Saint_Porphyrius_airstrike",
+  "extract": "On 19 October 2023, during the Gaza war, a building in the compound of the Church of Saint Porphyrius, a Greek Orthodox church in Gaza City, was destroyed during an Israeli airstrike, killing 18 Palestinian civilians and injuring between 12 and \"at least 20\". Some 450 Palestinian residents of the Gaza Strip, mainly Christians, had been sheltering in the compound. The church building itself was not damaged."
+ },
+ {
+  "id": "abraham-accords",
+  "era": "2011+",
+  "contested_pool": true,
+  "title": "Abraham Accords",
+  "category": "treaty",
+  "date_start": "2020-09-15",
+  "countries": [
+   "Israel/Palestine",
+   "UAE",
+   "Bahrain"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Abraham_Accords",
+  "extract": "The Abraham Accords are a set of agreements that established diplomatic normalization between Israel and several Arab states, beginning with the United Arab Emirates and Bahrain. Announced in August and September 2020 and signed in Washington, D.C. on September 15, 2020, the Accords were mediated by the United States under President Donald Trump. The UAE and Bahrain became the first Arab countries to formally recognize Israel since Jordan in 1994. In the months that followed, Sudan and Morocco also agreed to normalize relations with Israel, although Sudan's agreement remains unratified as of 2024. In July 2025, it was reported that the second Trump administration was seeking to expand the Accords to include Syria, Lebanon, and Saudi Arabia, and in November, it was announced that Kazakhstan agreed to join. In December 2025, Benjamin Netanyahu expanded the accords on his own initiative after Israel recognized Somaliland as an independent country, with Somaliland pledging to join the accords."
+ },
+ {
+  "id": "sinjar-massacre",
+  "era": "2011+",
+  "contested_pool": false,
+  "title": "Sinjar massacre",
+  "category": "massacre",
+  "date_start": "2014-08-01",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Sinjar_massacre",
+  "extract": "The Sinjar massacre marked the beginning of the genocide of Yazidis by ISIL, the killing and abduction of thousands of Yazidi men, women and children. It took place in August 2014 in Sinjar city and Sinjar District in Iraq's Nineveh Governorate and was perpetrated by the Islamic State of Iraq and the Levant (ISIL). The massacre began after the Peshmerga abandoned Sinjar without warning, after which ISIL attacked and captured Sinjar and neighboring towns on 3 August, during its Northern Iraq offensive."
+ },
+ {
+  "id": "fall-of-mosul",
+  "era": "2011+",
+  "contested_pool": false,
+  "title": "Fall of Mosul",
+  "category": "military operation",
+  "date_start": "2014-06-04",
+  "countries": [
+   "Iraq"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Fall_of_Mosul",
+  "extract": "The fall of Mosul refers to a historical event in Iraq, occurring between 4 and 10 June 2014, when Islamic State of Iraq and the Levant (ISIL) and allied insurgents captured the city of Mosul from the Iraqi Army. The ISIL forces were initially led by Abu Abdulrahman al-Bilawi, while the Iraqi army's forces were led by Lieutenant General Mahdi al-Gharrawi."
+ },
+ {
+  "id": "saudi-arabian-led-intervention-in-yemen",
+  "era": "2011+",
+  "contested_pool": false,
+  "title": "Saudi Arabian–led intervention in Yemen",
+  "category": "war",
+  "date_start": "2015-03-26",
+  "countries": [
+   "Yemen",
+   "Saudi Arabia"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Saudi-led_intervention_in_the_Yemeni_civil_war",
+  "extract": "On 26 March 2015, Saudi Arabia, leading a coalition of nine countries from West Asia and North Africa, staged a military intervention in Yemen at the request of Yemeni president Abdrabbuh Mansur Hadi, who had been ousted from the capital, Sanaa, in September 2014 by Houthi insurgents during the Yemeni civil war. Efforts by the United Nations (UN) to facilitate a power sharing arrangement under a new transitional government collapsed, leading to escalating conflict between government forces, Houthi rebels, and other armed groups, which culminated in Hadi fleeing to Saudi Arabia shortly before it began military operations in the country."
+ },
+ {
+  "id": "istanbul-convention",
+  "era": "2011+",
+  "contested_pool": false,
+  "title": "Istanbul Convention",
+  "category": "treaty",
+  "date_start": "2011-05-11",
+  "countries": [
+   "Turkey"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Istanbul_Convention",
+  "extract": "The Council of Europe Convention on Preventing and Combating Violence Against Women and Domestic Violence, better known as the Istanbul Convention, is a human rights treaty of the Council of Europe opposing violence against women and domestic violence which was opened for signature on 11 May 2011, in Istanbul, Turkey. The convention aims at prevention of violence, victim protection and to end the impunity of perpetrators."
+ },
+ {
+  "id": "houthi-insurgency",
+  "era": "2011+",
+  "contested_pool": false,
+  "title": "Houthi insurgency",
+  "category": "rebellion",
+  "date_start": "2015-02-06",
+  "countries": [
+   "Saudi Arabia",
+   "Yemen"
+  ],
+  "url": "https://en.wikipedia.org/wiki/Houthi_insurgency",
+  "extract": "The Houthi insurgency, also known as the Sa'dah Wars, was a military rebellion pitting Zaidi Shia Houthis that began in northern Yemen and has since escalated into a full-scale civil war. The conflict was sparked in 2004 by the government's attempt to arrest Hussein al-Houthi, a Zaidi religious leader of the Houthis and a former parliamentarian on whose head the government had placed a $55,000 bounty."
+ }
+]

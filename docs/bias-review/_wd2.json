@@ -1,0 +1,189 @@
+{
+ "Armenian Genocide": {
+  "our_category": "political",
+  "matches_event_classes_via_P31_P279star": [
+   "population transfer",
+   "genocide"
+  ],
+  "stored_wikidata_classes": null
+ },
+ "Al-Anfal campaign": {
+  "our_category": "political",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation"
+  ],
+  "stored_wikidata_classes": null
+ },
+ "Bahr El-Baqar primary school bombing": {
+  "our_category": "terrorist attack",
+  "matches_event_classes_via_P31_P279star": [
+   "terrorist attack"
+  ],
+  "stored_wikidata_classes": [
+   "terrorist attack"
+  ]
+ },
+ "2022 Al-Aqsa clashes": {
+  "our_category": "terrorist attack",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation",
+   "terrorist attack"
+  ],
+  "stored_wikidata_classes": [
+   "terrorist attack"
+  ]
+ },
+ "Fall of Mosul": {
+  "our_category": "military operation",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation"
+  ],
+  "stored_wikidata_classes": [
+   "military operation"
+  ]
+ },
+ "Operation Euphrates Shield": {
+  "our_category": "military operation",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation"
+  ],
+  "stored_wikidata_classes": [
+   "military operation"
+  ]
+ },
+ "Operation Olive Branch": {
+  "our_category": "battle",
+  "matches_event_classes_via_P31_P279star": [
+   "battle",
+   "military operation"
+  ],
+  "stored_wikidata_classes": [
+   "battle",
+   "military operation"
+  ]
+ },
+ "Tel al-Sultan attack": {
+  "our_category": "massacre",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation",
+   "massacre"
+  ],
+  "stored_wikidata_classes": [
+   "massacre"
+  ]
+ },
+ "Coastal road massacre": {
+  "our_category": "terrorist attack",
+  "matches_event_classes_via_P31_P279star": [
+   "hostage taking",
+   "terrorist attack"
+  ],
+  "stored_wikidata_classes": [
+   "terrorist attack",
+   "hostage taking"
+  ]
+ },
+ "Ma'alot massacre": {
+  "our_category": "massacre",
+  "matches_event_classes_via_P31_P279star": [
+   "massacre"
+  ],
+  "stored_wikidata_classes": [
+   "massacre"
+  ]
+ },
+ "Avivim school bus bombing": {
+  "our_category": "terrorist attack",
+  "matches_event_classes_via_P31_P279star": [
+   "terrorist attack"
+  ],
+  "stored_wikidata_classes": [
+   "terrorist attack"
+  ]
+ },
+ "Qibya massacre": {
+  "our_category": "massacre",
+  "matches_event_classes_via_P31_P279star": [
+   "massacre"
+  ],
+  "stored_wikidata_classes": [
+   "massacre"
+  ]
+ },
+ "1966 attack on Samu": {
+  "our_category": "military operation",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation"
+  ],
+  "stored_wikidata_classes": [
+   "military operation"
+  ]
+ },
+ "Killing of Yahya Sinwar": {
+  "our_category": "military operation",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation"
+  ],
+  "stored_wikidata_classes": [
+   "military operation"
+  ]
+ },
+ "1983 Beirut barracks bombings": {
+  "our_category": "terrorism",
+  "matches_event_classes_via_P31_P279star": [
+   "terrorist attack"
+  ],
+  "stored_wikidata_classes": null
+ },
+ "Sinjar massacre": {
+  "our_category": "massacre",
+  "matches_event_classes_via_P31_P279star": [
+   "massacre"
+  ],
+  "stored_wikidata_classes": [
+   "massacre"
+  ]
+ },
+ "Church of Saint Porphyrius airstrike": {
+  "our_category": "war crime",
+  "matches_event_classes_via_P31_P279star": [
+   "war crime",
+   "military operation"
+  ],
+  "stored_wikidata_classes": [
+   "war crime"
+  ]
+ },
+ "October 7 attacks": {
+  "our_category": "massacre",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation",
+   "terrorist attack",
+   "massacre"
+  ],
+  "stored_wikidata_classes": [
+   "massacre",
+   "terrorist attack"
+  ]
+ },
+ "King David Hotel bombing": {
+  "our_category": "terrorist attack",
+  "matches_event_classes_via_P31_P279star": [
+   "military operation",
+   "terrorist attack"
+  ],
+  "stored_wikidata_classes": [
+   "terrorist attack",
+   "military operation"
+  ]
+ },
+ "Cinema Rex fire": {
+  "our_category": "massacre",
+  "matches_event_classes_via_P31_P279star": [
+   "massacre"
+  ],
+  "stored_wikidata_classes": [
+   "massacre"
+  ]
+ }
+}
