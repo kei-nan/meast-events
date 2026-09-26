@@ -1,0 +1,18 @@
+The data in this directory (and its copies under app/public/data/ and
+app/src/data/) is licensed separately from the source code.
+
+Border data (boundaries.json, corrections-geometry.json) derives from
+CShapes 2.0 (Schvitz et al.) and is therefore distributed under
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+(CC BY-NC-SA 4.0):
+
+    https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+Non-commercial use only. Attribution required. Adaptations must be shared
+under the same license. Modifications are described per feature in the
+`source`, `status` and `note` fields, and in scripts/boundary-corrections.js.
+
+Event text (extracts) comes from Wikipedia and remains under CC BY-SA 4.0
+with attribution to the article authors; see NOTICE at the repository root.
+
+Full credits: ../NOTICE

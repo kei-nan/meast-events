@@ -1,0 +1,19 @@
+atlas.wiki - third-party data credits
+
+Source code: GNU Affero General Public License v3.0 (see LICENSE).
+Data (data/): see data/LICENSE. Non-commercial use only.
+
+- CShapes 2.0 - historical country borders. Schvitz, G., et al. (2022).
+  CC BY-NC-SA 4.0. https://icr.ethz.ch/data/cshapes/
+  Modified in this project: splits, flags and additions listed in
+  scripts/boundary-corrections.js, each cited per feature.
+- UN OCHA / HDX "Oslo Agreement" Areas A/B/C (West Bank). Distributed under
+  the legacy HumanitarianResponse.info terms: non-commercial use with
+  credit to UN OCHA. Carried in each feature's `geometry_source`.
+- Natural Earth - public domain. https://www.naturalearthdata.com/
+- GeoNames - CC BY 4.0. https://www.geonames.org/
+- Wikipedia / Wikidata - event titles, extracts and metadata. Text is
+  CC BY-SA 4.0, credited to Wikipedia contributors; each event links to its
+  source article. Wikidata is CC0.
+- U.S. Department of State, Office of the Geographer (International
+  Boundary Study documents) - cited as sources in border corrections.
