@@ -25,3 +25,13 @@ Event objects gain `location_quality: "precise"|"approximate"`.
 - Work only in your own worktree/branch; own only the files listed in your task; do not touch others'.
 - Never read/print/commit real Redis credentials; no `git push`; never broad-kill processes (exact PIDs only); Windows: use `npm.cmd`/`npx.cmd` in PowerShell, prefer Bash tool.
 - Report honestly what you verified vs. could not; leave changes COMMITTED on your branch.
+
+## Addendum: bias-review fixes (data shape v2.1) - supersedes conflicting lines above
+Source reports: docs/bias-review/*.md. The user approved: full lead text, all Wikidata classes shown as-is, data-bug fixes, scheduled extract refresh with "as of" date, an "About the data" page publishing the selection funnel, date-order errors flagged instead of dropped, DATA_POLICY wording fix, and events WITHOUT coordinates included (not dropped).
+Event fields (curated and proposed, and API/static output):
+- `extract`: the FULL lead section of the English Wikipedia article as plain text (not just the first paragraph); `extract_retrieved_at` (ISO date). `snippet` stays first 160 chars.
+- `wikidata_classes`: string[] of ALL Wikidata class labels found for the item, in Wikidata's order; shown as-is in the UI ("Wikidata classes: a, b"). `category` remains the coarse colour/filter group (our own grouping - the UI labels it "Category (our grouping)"); `category_label` is deprecated and removed.
+- `location_quality`: "precise" | "approximate" (capital fallback pin, unchanged) | "none" (no coordinates; `coordinates: null`, NO map marker, never invent a location).
+- Events with `location_quality: "none"` ARE indexed/served/searchable/listed (list tag "No map location"), excluded from bbox/area queries (no lon/lat) and from map markers. `precise=1` still means precise only.
+- `date_flags`: string[] (e.g. "date_order_invalid: Wikidata start after end"); such events are kept and shown with a visible note "Date unverified: <reason>", dates displayed as Wikidata gives them.
+- Static chunks: keep coordinate-less events in decade chunks too.
