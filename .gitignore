@@ -12,6 +12,7 @@ server/.env
 # wrangler's local dev state (miniflare SQLite caches, bundled temp output)
 # and its equivalent of a real Redis Cloud connection string.
 worker/.wrangler/
+app/.wrangler/
 worker/.dev.vars
 
 # Large raw source dump for boundary data - regenerate via scripts/ingest-boundaries.js
@@ -22,3 +23,8 @@ data/raw/
 .dry-run/
 
 .claude/
+
+# Local scratch: throw-away wrangler configs / Playwright scripts / dev-server logs
+.scratch/
+wpd-*.log
+preview-*.log

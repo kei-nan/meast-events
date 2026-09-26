@@ -5,6 +5,7 @@
 # Local Docker default (redis/redis-stack-server on :6379).
 REDIS_URL=redis://localhost:6379
 
-# Optional: restrict CORS to one origin (scheme + host, no trailing slash).
-# Unset = open CORS. For local frontend dev this would be the Vite origin.
-# ALLOWED_ORIGIN=http://localhost:5173
+# Optional: comma-separated exact CORS origins (scheme + host[:port], no
+# trailing slash). Unset/blank = built-in defaults (production frontend +
+# localhost:5173/4173/8794), NOT open. "*" opens it to every origin.
+# ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000

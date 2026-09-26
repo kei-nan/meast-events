@@ -116,9 +116,17 @@ test("boundaryDocToFeature preserves shape and unicode", () => {
 });
 
 test("matchOrigin / corsHeaders", () => {
-  assert.equal(matchOrigin(undefined, "https://a.example"), "*"); // unset -> allow all
-  assert.equal(matchOrigin("", undefined), "*");
-  assert.deepEqual(corsHeaders(undefined, "https://a.example"), { "Access-Control-Allow-Origin": "*" });
+  // unset/blank -> built-in defaults (production origin + localhost), never "*"
+  const prod = "https://atlas-wiki.middle-wiki.workers.dev";
+  assert.equal(matchOrigin(undefined, prod), prod);
+  assert.equal(matchOrigin("  ", "http://localhost:5173"), "http://localhost:5173");
+  assert.equal(matchOrigin(undefined, "https://a.example"), null);
+  assert.equal(matchOrigin("", undefined), null);
+  assert.deepEqual(corsHeaders(undefined, "https://a.example"), { Vary: "Origin" });
+  assert.deepEqual(corsHeaders(undefined, prod), { "Access-Control-Allow-Origin": prod, Vary: "Origin" });
+  // explicit "*" opt-in
+  assert.equal(matchOrigin("*", "https://a.example"), "*");
+  assert.deepEqual(corsHeaders("*", "https://a.example"), { "Access-Control-Allow-Origin": "*" });
   const allowed = "https://a.example, https://b.example/";
   assert.equal(matchOrigin(allowed, "https://a.example"), "https://a.example");
   assert.equal(matchOrigin(allowed, "https://b.example"), "https://b.example");

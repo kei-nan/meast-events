@@ -28,6 +28,10 @@ import {
   boundaryDocToFeatureJson,
   corsHeaders,
   eventsResponse,
+  etagFor,
+  ifNoneMatchHits,
+  makeIsolateGuard,
+  MAX_URL_LENGTH,
 } from "./logic.js";
 
 // idx:events / idx:boundaries are ALIASES that scripts/load-redis.js repoints
@@ -48,8 +52,37 @@ class ConfigError extends Error {}
 // operations" (developers.cloudflare.com/workers/runtime-apis/cache/) and do
 // not promise it on plain *.workers.dev, which is the expected first
 // deployment. These headers are honored by browsers regardless.
-const CACHE_OK = "public, max-age=300, stale-while-revalidate=86400";
+//
+// Data changes only on a manual reload, so browsers may reuse it: events 5 min
+// fresh, boundaries (large, rarely changing) 1 h, both then served stale for a
+// day while revalidating in the background (revalidation is an ETag 304).
+// s-maxage mirrors max-age for any shared cache in front (none is configured).
+const CACHE_EVENTS = "public, max-age=300, s-maxage=300, stale-while-revalidate=86400";
+const CACHE_BOUNDARIES = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400";
 const NO_STORE = "no-store";
+
+// Abuse guards (see docs/SECURITY.md). The Rate Limiting binding (RATE_LIMITER,
+// optional - absent in local dev/tests) counts per Cloudflare location; the
+// in-isolate guard is a cheap extra brake for one client hammering one isolate.
+// NOTE: a request rejected here has still been invoked, so it still counts
+// toward the daily Workers request quota - these protect Redis and CPU, not the quota.
+const isolateGuard = makeIsolateGuard({ limit: 240, windowMs: 60_000 });
+const clientKey = (request) => request.headers.get("CF-Connecting-IP") || "unknown";
+
+async function tooManyRequests(request, env) {
+  const key = clientKey(request);
+  let limited = isolateGuard(key);
+  if (!limited && env.RATE_LIMITER) {
+    try {
+      limited = !(await env.RATE_LIMITER.limit({ key })).success;
+    } catch (err) {
+      console.error("RATE_LIMITER failed (allowing request):", err); // fail open
+    }
+  }
+  return limited
+    ? json({ error: "too many requests" }, request, env, { status: 429, headers: { "Retry-After": "10" } })
+    : null;
+}
 
 // --- Redis connection ---------------------------------------------------
 //
@@ -108,6 +141,16 @@ async function withRedis(env, fn) {
 
 // --- responses ----------------------------------------------------------
 
+// Allowed CORS origins: ALLOWED_ORIGINS (or legacy ALLOWED_ORIGIN); blank = built-in defaults.
+const allowedOrigins = (env) => env.ALLOWED_ORIGINS || env.ALLOWED_ORIGIN;
+
+// Sent on every response. CORP is "cross-origin" on purpose: the data is public
+// and meant to be fetched by the frontend from another origin (see docs/SECURITY.md).
+const BASE_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "Cross-Origin-Resource-Policy": "cross-origin",
+};
+
 function json(body, request, env, { status = 200, cache = NO_STORE, headers = {} } = {}) {
   // A string body is already-serialized JSON (see handleBoundaries).
   return new Response(typeof body === "string" ? body : JSON.stringify(body), {
@@ -115,10 +158,30 @@ function json(body, request, env, { status = 200, cache = NO_STORE, headers = {}
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": status >= 200 && status < 300 ? cache : NO_STORE,
-      ...corsHeaders(env.ALLOWED_ORIGIN, request.headers.get("Origin")),
+      ...BASE_HEADERS,
+      ...corsHeaders(allowedOrigins(env), request.headers.get("Origin")),
       ...headers,
     },
   });
+}
+
+// Successful data response with a weak ETag; If-None-Match hit -> bodyless 304.
+// (Saves bandwidth, not the Redis query: the body must be built to be hashed.)
+async function dataJson(body, request, env, cache) {
+  const text = typeof body === "string" ? body : JSON.stringify(body);
+  const etag = await etagFor(text);
+  if (ifNoneMatchHits(request.headers.get("If-None-Match"), etag)) {
+    return new Response(null, {
+      status: 304,
+      headers: {
+        ETag: etag,
+        "Cache-Control": cache,
+        ...BASE_HEADERS,
+        ...corsHeaders(allowedOrigins(env), request.headers.get("Origin")),
+      },
+    });
+  }
+  return json(text, request, env, { cache, headers: { ETag: etag } });
 }
 
 // Maps a thrown error to [status, clientBody]. Detail goes to the log only.
@@ -158,7 +221,7 @@ async function handleEvents(request, env, searchParams) {
     args.push("LIMIT", String(req.offset), String(req.limit));
     const reply = await withRedis(env, (redis) => redis.send(...args));
     const result = parseFtSearchWithFields(reply);
-    return json(
+    return await dataJson(
       eventsResponse(
         result.total,
         result.documents.map((d) => d.value),
@@ -166,7 +229,7 @@ async function handleEvents(request, env, searchParams) {
       ),
       request,
       env,
-      { cache: CACHE_OK }
+      CACHE_EVENTS
     );
   } catch (err) {
     return errorResponse(err, request, env);
@@ -187,9 +250,12 @@ async function handleBoundaries(request, env, searchParams) {
     const features = parseFtSearchWithFields(reply)
       .documents.map((d) => boundaryDocToFeatureJson(d.value["$"]))
       .filter(Boolean);
-    return json(`{"type":"FeatureCollection","features":[${features.join(",")}]}`, request, env, {
-      cache: CACHE_OK,
-    });
+    return await dataJson(
+      `{"type":"FeatureCollection","features":[${features.join(",")}]}`,
+      request,
+      env,
+      CACHE_BOUNDARIES
+    );
   } catch (err) {
     return errorResponse(err, request, env);
   }
@@ -206,9 +272,14 @@ export default {
           "Access-Control-Allow-Methods": ALLOWED_METHODS,
           "Access-Control-Allow-Headers": "*",
           "Access-Control-Max-Age": "86400",
-          ...corsHeaders(env.ALLOWED_ORIGIN, request.headers.get("Origin")),
+          ...BASE_HEADERS,
+          ...corsHeaders(allowedOrigins(env), request.headers.get("Origin")),
         },
       });
+    }
+
+    if (request.url.length > MAX_URL_LENGTH) {
+      return json({ error: "URI too long" }, request, env, { status: 414 });
     }
 
     const route =
@@ -227,6 +298,9 @@ export default {
         headers: { Allow: ALLOWED_METHODS },
       });
     }
+
+    const limited = await tooManyRequests(request, env);
+    if (limited) return limited;
 
     return route(request, env, searchParams);
   },

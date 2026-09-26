@@ -13,14 +13,17 @@
 // worker/src/ (the Cloudflare Worker port) - keep the two in sync.
 //   invalid input -> 400; Redis/upstream failure -> 502 (generic message,
 //   detail logged); unknown route -> 404; non-GET/HEAD/OPTIONS -> 405 + Allow.
-// Optional env ALLOWED_ORIGIN: comma-separated exact origins; unset = allow all.
+// Optional env ALLOWED_ORIGINS: comma-separated exact origins ("*" = any);
+// unset = production frontend + localhost dev origins (see SHARED CORS below).
+// Express adds weak ETags / answers If-None-Match with 304 by itself.
 
 import express from "express";
 import { createClient } from "redis";
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 const PORT = process.env.PORT || 3001;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+// ALLOWED_ORIGINS (legacy name ALLOWED_ORIGIN also read); blank = built-in defaults.
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN;
 
 // idx:events / idx:boundaries are ALIASES that scripts/load-redis.js repoints
 // (FT.ALIASUPDATE) at a freshly built index, so reloads never interrupt the API.
@@ -28,7 +31,8 @@ const EVENTS_INDEX = "idx:events";
 const BOUNDARIES_INDEX = "idx:boundaries";
 
 const ALLOWED_METHODS = "GET, HEAD, OPTIONS";
-const CACHE_OK = "public, max-age=300, stale-while-revalidate=86400";
+const CACHE_EVENTS = "public, max-age=300, s-maxage=300, stale-while-revalidate=86400";
+const CACHE_BOUNDARIES = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400";
 
 const client = createClient({ url: REDIS_URL });
 client.on("error", (err) => console.error("Redis client error:", err));
@@ -321,22 +325,53 @@ function eventsResponse(total, documents, req) {
 }
 // END SHARED LOGIC
 
-// Origin matching: ALLOWED_ORIGIN unset -> "*"; otherwise reflect the request
-// Origin only when it exactly matches an entry, else no ACAO header.
+// BEGIN SHARED CORS
+// Browser-only protection: a disallowed Origin just gets no
+// Access-Control-Allow-Origin header, so other sites' scripts cannot READ
+// responses. It does nothing against curl/bots (they send no Origin, or any
+// Origin they like) and does not stop requests from being made or counted
+// against the Workers request quota. See docs/SECURITY.md.
+//
+// Default (env var unset/blank): the production frontend + local dev origins.
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://atlas-wiki.middle-wiki.workers.dev",
+  "http://localhost:5173", // vite dev
+  "http://127.0.0.1:5173",
+  "http://localhost:4173", // vite preview
+  "http://127.0.0.1:4173",
+  "http://localhost:8794", // wrangler dev (static assets)
+  "http://127.0.0.1:8794",
+];
+
+// allowed: env.ALLOWED_ORIGINS (comma-separated exact origins; "*" = open) or
+// unset/blank = DEFAULT_ALLOWED_ORIGINS.
+// Returns "*", the origin to reflect, or null (no header).
 function matchOrigin(allowed, requestOrigin) {
-  if (allowed === undefined || String(allowed).trim() === "") return "*";
+  const configured = allowed === undefined || allowed === null || String(allowed).trim() === "" ? null : String(allowed);
+  const list =
+    configured === null
+      ? DEFAULT_ALLOWED_ORIGINS
+      : configured
+          .split(",")
+          .map((s) => s.trim().replace(/\/$/, ""))
+          .filter(Boolean);
+  if (list.includes("*")) return "*";
   if (!requestOrigin) return null;
-  const list = String(allowed)
-    .split(",")
-    .map((s) => s.trim().replace(/\/$/, ""))
-    .filter(Boolean);
   return list.includes(requestOrigin) ? requestOrigin : null;
 }
 
+function corsHeaders(allowed, requestOrigin) {
+  const headers = {};
+  const origin = matchOrigin(allowed, requestOrigin);
+  if (origin) headers["Access-Control-Allow-Origin"] = origin;
+  if (origin !== "*") headers["Vary"] = "Origin";
+  return headers;
+}
+// END SHARED CORS
+
 app.use((req, res, next) => {
-  const origin = matchOrigin(ALLOWED_ORIGIN, req.get("Origin"));
-  if (origin) res.set("Access-Control-Allow-Origin", origin);
-  if (origin !== "*") res.vary("Origin");
+  res.set({ "X-Content-Type-Options": "nosniff", "Cross-Origin-Resource-Policy": "cross-origin" });
+  res.set(corsHeaders(ALLOWED_ORIGIN, req.get("Origin")));
   if (req.method === "OPTIONS") {
     res.set({
       "Access-Control-Allow-Methods": ALLOWED_METHODS,
@@ -387,7 +422,7 @@ app.get("/api/events", async (req, res) => {
 
     const result = await client.ft.search(EVENTS_INDEX, request.query, options);
 
-    res.set("Cache-Control", CACHE_OK).json(
+    res.set("Cache-Control", CACHE_EVENTS).json(
       eventsResponse(
         result.total,
         result.documents.map((d) => d.value),
@@ -454,7 +489,7 @@ app.get("/api/boundaries", async (req, res) => {
         geometry: d.geometry,
       }));
 
-    res.set("Cache-Control", CACHE_OK).json({ type: "FeatureCollection", features });
+    res.set("Cache-Control", CACHE_BOUNDARIES).json({ type: "FeatureCollection", features });
   } catch (err) {
     sendError(res, err);
   }

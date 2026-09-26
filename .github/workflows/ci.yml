@@ -11,6 +11,10 @@ on:
   pull_request:
     branches: [main]
 
+# Least privilege: no job needs to write to the repo or PRs.
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build app/
@@ -33,6 +37,11 @@ jobs:
       - name: Lint
         working-directory: app
         run: npm run lint
+
+      # Pure-logic unit tests for the frontend (ranking, geo, URL state, ...).
+      # No dependencies: node's built-in test runner, run from the repo root.
+      - name: Unit tests (app/src/lib)
+        run: node --test app/src/lib/*.test.js
 
       - name: Build
         working-directory: app
@@ -83,3 +92,34 @@ jobs:
       # data/events.json and data/events.proposed.json. No dependencies, no network.
       - name: Validate events
         run: node scripts/validate-events.js
+
+  audit:
+    name: Dependency audit (${{ matrix.dir }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: [".", app, worker, server]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # BLOCKING for what ships/runs in production: runtime dependencies only
+      # (--omit=dev), high or critical advisories only. `npm audit` reads the
+      # lockfile and asks the registry; no install needed.
+      - name: npm audit (production deps, high+, blocking)
+        working-directory: ${{ matrix.dir }}
+        run: npm audit --omit=dev --audit-level=high
+
+      # REPORT-ONLY for build tooling (vite, wrangler, ...): a new advisory in a
+      # dev tool should show up in the log and in Dependabot PRs but must not
+      # block unrelated pull requests. continue-on-error keeps the job green.
+      - name: npm audit (all deps, report only)
+        working-directory: ${{ matrix.dir }}
+        continue-on-error: true
+        run: npm audit --audit-level=high

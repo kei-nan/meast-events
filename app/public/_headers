@@ -1,0 +1,47 @@
+# Response headers for the static-assets Worker "atlas-wiki" (app/wrangler.jsonc).
+# Copied to dist/ by Vite; Workers parses it and does not serve it as an asset.
+# Docs: https://developers.cloudflare.com/workers/static-assets/headers/
+# Limits: 100 rules, 2,000 chars/line, ONE splat per URL pattern (a pattern with
+# two splats is silently ignored). All matching rules are merged; a header
+# repeated across rules is comma-joined unless the later rule detaches it first
+# with "! Header-Name" (used below to REPLACE Cache-Control rather than append).
+#
+# If you add an API/custom domain, update connect-src below - the CSP is an
+# allow-list and a blocked request only shows up as a console violation.
+
+# --- every response ---------------------------------------------------------
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://atlaswiki-api.middle-wiki.workers.dev https://demotiles.maplibre.org; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+
+# --- caching ----------------------------------------------------------------
+# /assets/*: Vite content-hashes everything EXCEPT the two MapLibre worker files
+# (vite.config.js UNHASHED_ASSET_NAMES: maplibre-gl-worker.mjs and
+# maplibre-gl-shared.mjs, whose names the worker imports at runtime). Those must
+# never be immutable or a MapLibre upgrade would be served stale for a year, so
+# the default here is a short revalidating cache and only hashed names opt in.
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/assets/index-*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+# /data/*: the static dataset. Un-hashed names (events/1900.json, land.json ...)
+# change on every data regeneration, so cache moderately and revalidate in the
+# background: events/meta.json, ids.json, index.json, events/full/*.json, the
+# decade chunks events/19xx.json, boundaries/*.json, land.json,
+# selection-funnel.json. The ONE content-hashed data file is
+# events/all.<12-hex-content-hash>.json (app/scripts/split-data.mjs): the hash
+# in the name is the cache key, so it is immutable. If more hashed names are
+# added, give them a distinctive prefix and add a rule like this one (a pattern
+# may contain only one splat, so the match is "prefix.*").
+/data/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/data/events/all.*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
