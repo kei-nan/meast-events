@@ -1,9 +1,20 @@
 # Deployment
 
-This is a static site (`app/` builds to `app/dist/` via Vite - no backend, no
-database, no server-side code). It can be hosted anywhere that serves static
-files. These instructions use **Cloudflare Pages**, the recommended host -
-see "Why Cloudflare Pages" below for the reasoning and alternatives.
+This app now has **three pieces** to deploy, in this order (each depends on
+the one before it):
+
+1. **Redis Cloud** - the database (events + boundaries, RediSearch/RedisJSON).
+2. **The API server** (`server/`) - a small Express app that queries Redis
+   and serves it to the frontend over HTTP. Needs somewhere that runs a
+   persistent Node process - a static host won't do.
+3. **The frontend** (`app/`) - the static Vite build. Needs to know the API
+   server's URL at *build* time (Vite bakes `VITE_API_URL` in when it builds,
+   it isn't read at runtime in the browser).
+
+If you deployed this before the Redis backend existed: that old setup (no
+backend, no env vars) no longer reflects what's in the repo. The static-file
+data pipeline (`app/scripts/split-data.mjs`) still exists as a fallback, but
+isn't what the app uses by default anymore - see `server/README.md`.
 
 ## Before you start: the license constraint
 
@@ -17,118 +28,114 @@ This project's map borders derive from [CShapes 2.0](https://icr.ethz.ch/data/cs
 - The attribution in the footer (`app/src/App.jsx`) must stay visible - don't
   remove or bury it.
 
-If anyone ever wants to monetize this project, the borders (and the Wikipedia
-event summaries, CC BY-SA 4.0) would need to be re-licensed or replaced
-first. Free/non-commercial hosting (as below) keeps the project compliant
-without anyone having to think about it.
+Free/non-commercial hosting (as below) keeps the project compliant without
+anyone having to think about it.
 
-## What's already done for you
+## Part 1: Redis Cloud (~5 minutes)
 
-- The app builds cleanly (`npm run build` in `app/`) and has been verified
-  with a real headless-browser check of the production build (not just the
-  dev server) - the map, timeline, and event panel all render and are
-  interactive with zero console errors.
-- `.github/workflows/ci.yml` builds and lints the app on every push and pull
-  request, so a broken commit gets caught before it ever reaches main.
-- No host-specific config file is needed - see "Why no `wrangler.toml`"
-  below. Cloudflare Pages auto-detects this as a Vite app once you point it
-  at the `app/` directory (one field in its setup screen).
-- `app/.nvmrc` and `app/package.json`'s `engines` field pin the Node version
-  this app needs (Vite 8 requires Node ^20.19 or >=22.12) so the host's build
-  environment doesn't silently pick an older Node and fail.
+1. Sign up at [redis.io/cloud](https://redis.io/cloud/) - free, no credit
+   card required.
+2. Create a new database on the **free tier** (30MB). RediSearch and
+   RedisJSON are included by default on the free tier - no extra
+   configuration needed (confirmed from Redis's own docs: a free database
+   "comes with all the Redis Open Source features, including Redis Search
+   and JSON").
+3. From the database's **Connect** page, copy the connection string. It
+   looks like:
+   ```
+   redis://default:<password>@<host>.cloud.redislabs.com:<port>
+   ```
+   Keep this somewhere safe - you'll paste it into two places below. Never
+   commit it to git (see `server/.env.example` / `.gitignore`).
+4. Load the data into it from your own machine, once:
+   ```bash
+   REDIS_URL="redis://default:<password>@<host>.cloud.redislabs.com:<port>" \
+     node scripts/load-redis.js
+   ```
+   Re-run this any time `data/events.json` or `data/boundaries.json` change
+   - it's idempotent (drops and rebuilds both indexes each run). Current
+   dataset uses ~8MB, comfortably inside the 30MB free tier with room to
+   grow 3-4x before trimming would be needed.
 
-## What you need to do (one-time setup, ~5 minutes)
+## Part 2: the API server, on Render (~5 minutes)
 
-1. **Push this repo to GitHub** if it isn't already there (Cloudflare Pages
-   deploys from a GitHub - or GitLab - repo).
-2. **Create a free Cloudflare account** at [cloudflare.com](https://dash.cloudflare.com/sign-up)
-   if you don't have one.
-3. In the Cloudflare dashboard, go to **Workers & Pages -> Create -> Pages ->
-   Connect to Git**, and authorize/select this repository.
-4. In the build configuration screen, set:
+**Why Render:** it's the only one of the three usual free-tier options
+(Render, Railway, Fly.io) that's still genuinely free with no credit card as
+of this writing - Railway's free tier is now just ~$1 of credit (a few
+hours' runtime), and Fly.io requires a credit card and no longer offers a
+free tier to new accounts. Render's real tradeoff: **the free tier sleeps
+after 15 minutes of inactivity**, and the next request pays a 30-50 second
+cold-start wake-up cost. For a low-traffic project that's a fair trade for
+$0/month; if that cold start becomes a real problem, Render's paid tier
+($7/mo, always-on) or adapting the API to Cloudflare Workers (same account
+as the frontend, no cold start, but requires rewriting `server/index.js` to
+Workers' request-handler model - not done in this repo) are the next steps.
+
+1. Push this repo to GitHub if it isn't already there.
+2. Sign up at [render.com](https://render.com) (no credit card needed for
+   the free tier).
+3. **New -> Web Service -> Connect** this repository.
+4. Configure:
+   - **Root Directory:** `server`
+   - **Runtime:** Node
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Instance Type:** Free
+5. Under **Environment Variables**, add:
+   - `REDIS_URL` = the connection string from Part 1.
+   - (`PORT` doesn't need to be set - Render provides its own and Express
+     already reads `process.env.PORT`... note: `server/index.js` currently
+     defaults to `3001` if `PORT` is unset. Render sets `PORT` itself, and
+     the server already reads `process.env.PORT`, so this works
+     automatically - no action needed.)
+6. Deploy. Render gives you a URL like `https://your-service.onrender.com`.
+7. Verify it: `curl https://your-service.onrender.com/api/health` should
+   return `{"ok":true,"redis":"PONG"}` (allow for the cold-start delay on
+   the first request).
+
+## Part 3: the frontend, on Cloudflare Pages (~5 minutes)
+
+1. In the Cloudflare dashboard: **Workers & Pages -> Create -> Pages ->
+   Connect to Git**, select this repository.
+2. Build configuration:
    - **Framework preset:** Vite
    - **Root directory:** `app`
-   - **Build command:** `npm run build` (Cloudflare should fill this in from
-     the Vite preset)
+   - **Build command:** `npm run build`
    - **Build output directory:** `dist`
-   - Leave everything else default - no environment variables are required.
-5. Click **Save and Deploy**. First build takes a minute or two; Cloudflare
-   gives you a `*.pages.dev` URL immediately.
-6. **(Optional) Custom domain:** in the Pages project's **Custom domains**
-   tab, add your domain and follow the DNS instructions (trivial if the
-   domain is already on Cloudflare DNS; otherwise it's a CNAME record). Free
-   on Cloudflare's plan - no upgrade needed.
+3. **This is the part that changed from the static-only setup:** under
+   **Environment variables**, add:
+   - `VITE_API_URL` = the Render URL from Part 2 (e.g.
+     `https://your-service.onrender.com`).
+   This has to be set before the build runs, since Vite substitutes
+   `import.meta.env.VITE_API_URL` into the JS at build time - setting it
+   later and just re-deploying without a fresh build won't pick it up.
+4. **Save and Deploy.**
 
-That's it. From here on:
+From here on, every push to `main` rebuilds and redeploys the frontend
+automatically (Cloudflare) - the API server on Render redeploys on push too,
+independently. `.github/workflows/ci.yml` build-checks the frontend on every
+push/PR as a safety net.
 
-- **Every push to `main`** triggers a new production deploy automatically.
-- **Every pull request** gets its own preview URL automatically, so you can
-  see changes live before merging.
-- The GitHub Actions build-check (step above) runs independently and will
-  show a red X on a PR if the build breaks - it doesn't block Cloudflare's
-  deploy by itself, but it's the signal to hold off merging.
+## Verifying the full deploy worked
 
-## Why Cloudflare Pages
+Open the Cloudflare Pages URL and confirm, in order:
 
-Compared against Vercel, Netlify, and GitHub Pages for this specific app
-(static Vite build, likely-spiky/unpredictable traffic if it gets shared
-publicly, must stay free/non-commercial):
+1. **The map renders** with country shapes and event markers (not a blank
+   pale-blue box - see `app/src/components/MapView.jsx`'s comments on the
+   MapLibre-worker production bug if you ever see that).
+2. **Open the browser's network tab** and confirm requests are going to your
+   Render URL (`/api/events`, `/api/boundaries`), not `localhost` - if you
+   see failed requests to `localhost:3001`, `VITE_API_URL` wasn't set before
+   the Cloudflare build ran; fix it and trigger a fresh deploy.
+3. **The first load might be slow** (~30-50s) if the Render API had gone to
+   sleep - this is expected on the free tier, not a bug.
+4. Clicking an event marker opens its detail panel; the search box returns
+   results; panning the map updates the "N events in current map view"
+   counter.
+5. The footer's attribution and non-commercial notice are visible.
 
-| | Cloudflare Pages | Vercel | Netlify | GitHub Pages |
-|---|---|---|---|---|
-| Connect GitHub repo, auto-deploy on push | Yes, one click | Yes, one click | Yes, one click | No native build step - needs a GitHub Actions workflow to build and push to a `gh-pages` branch |
-| Custom domain on free tier | Yes | Yes | Yes | Yes (via `CNAME` file) |
-| Zero-config for a standard Vite app | Yes, auto-detected | Yes, auto-detected | Yes, auto-detected | N/A - not a build platform, just a file host |
-| Bandwidth limit (free tier) | **Unlimited** | 100 GB/mo (Hobby), then throttled | 100 GB/mo, then throttled | ~100 GB/mo soft cap, unofficial/unenforced precisely |
-| Build minutes (free tier) | 500 builds/mo | ~6,000 min/mo | 300 min/mo | N/A (Actions has its own free minutes budget) |
-| PR preview deploys | Yes | Yes | Yes | Not built-in |
+## Cost summary
 
-The deciding factor is **bandwidth**: if this site ever gets shared widely
-(a history/current-events map is exactly the kind of thing that can spike on
-social media), Cloudflare's free tier has no bandwidth ceiling to hit or
-scaling-protection pause to worry about. Vercel and Netlify are both
-excellent and would work fine at normal traffic levels - either is a
-reasonable fallback if Cloudflare doesn't suit you for some reason - but
-their free-tier bandwidth caps are the one scenario where a popular history
-site could actually hit a wall. GitHub Pages is free and fine for bandwidth,
-but it isn't a build platform - you'd be maintaining a separate Actions
-workflow just to produce and push the `dist/` output, which duplicates what
-Cloudflare/Vercel/Netlify give you for free out of the box.
-
-None of the four require paying anything or push you toward an ad-supported
-tier - all are compatible with the project's non-commercial constraint.
-
-### Why no `wrangler.toml`
-
-Cloudflare's `wrangler.toml` config file is for **Workers** (and Pages
-Functions / advanced Pages features like custom headers, redirects, or
-server-side logic). This app has none of that - it's a plain static build
-with a single route. Cloudflare Pages auto-detects Vite projects and needs
-only the four fields entered in the dashboard during setup (framework, root
-directory, build command, output directory). Adding a `wrangler.toml` here
-would be configuring for capabilities the app doesn't use.
-
-## If you deploy somewhere else instead
-
-The build is entirely standard (`cd app && npm ci && npm run build`, output
-in `app/dist/`), so any static host works. The main things to configure on
-any host:
-
-- **Root/base directory:** `app` (the site is in a subdirectory, not the
-  repo root).
-- **Build command:** `npm run build`
-- **Output directory:** `dist`
-- **Node version:** 22 (or anything satisfying `^20.19.0 || >=22.12.0` - see
-  `app/.nvmrc`)
-
-## Verifying a deploy worked
-
-After the first deploy, open the URL the host gives you and confirm:
-
-- The map renders with country shapes and event markers (not a blank pale
-  blue box - if you ever see that, the MapLibre worker script likely isn't
-  being served correctly; see the comments in
-  `app/src/components/MapView.jsx` and `app/vite.config.js` for why that
-  matters and how it's handled).
-- Clicking an event marker opens its detail panel.
-- The footer's attribution and non-commercial notice are visible.
+Everything above is **$0/month**: Redis Cloud free tier, Render free tier
+(with the cold-start caveat), Cloudflare Pages free tier (unlimited
+bandwidth). No credit card is required anywhere in this path.
