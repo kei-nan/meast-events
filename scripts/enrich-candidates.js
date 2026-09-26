@@ -350,6 +350,7 @@ async function main() {
     if (!r.error) r.location_quality = r.coordinates ? "precise" : "none";
     if (!r.error) r.needs_manual_coordinates = !r.coordinates;
   }
+  const batchByQid = new Map(batch.map((c) => [c.wikidata_qid, c]));
   const okResults = results.filter((r) => !r.error && r.wikipedia_url);
   const ctx = await buildContext(okResults, {
     candidates: allCandidates,
@@ -359,6 +360,13 @@ ${m}      `),
   });
   console.log();
   for (const r of okResults) {
+    // Always start from Wikidata/discovery's own date and recompute date flags, so re-runs (--reuse) are idempotent.
+    const src = batchByQid.get(r.wikidata_qid);
+    if (src) {
+      r.date_start = src.date_start;
+      r.date_end = src.date_end;
+    }
+    delete r.date_flags;
     r.review_reasons = r._review;
     // events already merged into the curated file keep the dates as merged (no source reconciliation here)
     finalizeEvent(r, { ...ctx, reconcileDates: !curatedQids.has(r.wikidata_qid) });

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T17:49:12.900Z",
+  "generated_at": "2026-09-26T17:50:14.556Z",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [

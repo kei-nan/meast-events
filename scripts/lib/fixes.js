@@ -78,7 +78,8 @@ export function reconcileStartDate(candidateStart, entity) {
   const p585 = entity.p585?.[0];
   const p580 = entity.p580?.[0];
   const p582 = entity.p582?.[0];
-  if (!p585 || !p580 || p585.time !== candidateStart) return null;
+  const norm = (t) => String(t ?? "").replace(/-00(?=-|$)/g, "-01"); // the pipeline stores Wikidata "1940-00-00" as 1940-01-01
+  if (!p585 || !p580 || norm(p585.time) !== norm(candidateStart)) return null;
   const coarse = p585.precision < 9 && p580.precision >= 9;
   const isEnd = p582 && p585.time === p582.time && p580.time !== p585.time;
   if (!coarse && !isEnd) return null;

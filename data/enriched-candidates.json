@@ -376,7 +376,7 @@
   {
     "id": "2025-2026-iranian-protests",
     "title": "2025–2026 Iranian protests",
-    "date_start": "2020-01-01",
+    "date_start": "2025-12-28",
     "date_end": null,
     "countries": [
       "Iran"
@@ -418,7 +418,7 @@
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "date_flags": [
-      "date_start_year_not_in_lead: start year 2020 (2020-01-01) is not within 1 year of any year in the Wikipedia lead [2025, 2026, 1979]"
+      "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2025-12-28"
     ],
     "_review": [
       "date_precision_coarse: Wikidata records the date only to decade precision",
@@ -718,7 +718,7 @@
   {
     "id": "1948-arab-israeli-war",
     "title": "1948 Arab–Israeli War",
-    "date_start": "1940-01-01",
+    "date_start": "1948-05-15",
     "date_end": "1949-03-10",
     "countries": [
       "Israel/Palestine",
@@ -760,7 +760,7 @@
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "date_flags": [
-      "date_start_year_not_in_lead: start year 1940 (1940-01-01) is not within 1 year of any year in the Wikipedia lead [1948, 1949, 1947, 1917, 1920]"
+      "date_source_adjusted: Wikidata P585 1940-00-00 is only decade-or-coarser precision; used P580 start time 1948-05-15"
     ],
     "_review": [
       "date_precision_coarse: Wikidata records the date only to decade precision",
@@ -3562,7 +3562,7 @@
   {
     "id": "2024-lebanon-war",
     "title": "2024 Lebanon war",
-    "date_start": "2020-01-01",
+    "date_start": "2024-10-01",
     "date_end": "2024-11-27",
     "countries": [
       "Israel/Palestine",
@@ -3615,7 +3615,7 @@
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "date_flags": [
-      "date_start_year_not_in_lead: start year 2020 (2020-01-01) is not within 1 year of any year in the Wikipedia lead [2024, 1978, 1701, 2025]"
+      "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2024-10-01"
     ],
     "_review": [
       "date_precision_coarse: Wikidata records the date only to decade precision",
@@ -4969,15 +4969,15 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event",
-      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)"
+      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event"
     ],
     "needs_review": true,
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "_review": [
-      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event",
-      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)"
+      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event"
     ],
     "_part_of_qids": [
       "Q214451"
@@ -8142,17 +8142,17 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
+      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Mali War\" (Q2946372); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event",
-      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)"
+      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event"
     ],
     "needs_review": true,
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "_review": [
+      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Mali War\" (Q2946372); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event",
-      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)"
+      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event"
     ],
     "_part_of_qids": [
       "Q2946372",
@@ -18693,15 +18693,15 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event",
-      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)"
+      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event"
     ],
     "needs_review": true,
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "_review": [
-      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event",
-      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)"
+      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event"
     ],
     "_part_of_qids": [
       "Q620735"
@@ -19248,19 +19248,19 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
+      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"War against the Islamic State\" (Q17507684); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event",
-      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)"
+      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event"
     ],
     "needs_review": true,
     "exclusion_reason": null,
     "extract_retrieved_at": "2026-09-26",
     "_review": [
+      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"War against the Islamic State\" (Q17507684); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event",
-      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)"
+      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event"
     ],
     "_part_of_qids": [
       "Q185729",

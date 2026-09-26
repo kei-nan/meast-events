@@ -3628,51 +3628,6 @@
     "wikidata_description": "1939–1945 global conflict"
   },
   {
-    "id": "1948-arab-israeli-war",
-    "title": "1948 Arab–Israeli War",
-    "date_start": "1940-01-01",
-    "date_end": "1949-03-10",
-    "countries": [
-      "Israel/Palestine",
-      "Jordan",
-      "Lebanon",
-      "Egypt"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "war"
-    ],
-    "retrieved_at": "2026-09-26T13:07:56.602Z",
-    "sitelinks": 50,
-    "wikidata_qid": "Q49092",
-    "resolved_qid": "Q49092",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/1948_Arab%E2%80%93Israeli_War",
-    "extract": "The 1948 Arab–Israeli War (15 May 1948 – 10 March 1949), also known as the First Arab–Israeli War, followed the civil war in Mandatory Palestine (29 November 1947 – 14 May 1948) as the second and final stage of the 1948 Palestine war. The civil war became a war of separate states with the Israeli Declaration of Independence on 14 May 1948, the end of the British Mandate for Palestine at midnight, and the entry of a military coalition of Arab states into the territory of Mandatory Palestine the following morning. The war formally ended with the 1949 Armistice Agreements which established the Green Line.\n\nSince the 1917 Balfour Declaration and the 1920 creation of the British Mandate of Palestine, and in the context of Zionism and the mass migration of European Jews to Palestine, there had been tension and conflict between Arabs, Jews, and the British in Palestine. On 29 November 1947, the United Nations General Assembly voted in favor of the United Nations Partition Plan for Palestine, proposing to divide the territory into an Arab state, a Jewish state, and an internationally\n\nadministered corpus separatum for the cities of Jerusalem and Bethlehem. The land allocated to the\n\nArab State included about 43% of Mandatory Palestine. The land allocated to the Jewish State,\n\nwho constituted a third of the population, was 56% of Mandatory Palestine. While Jewish leaders\n\nin Palestine supported the plan, leaders of the Palestinian Arab community and in the broader\n\nArab world did not. The following day, the conflict escalated into a civil war with attacks by Palestinian militias and mobs on Jewish areas. As the two communities battled, the British withdrew.\n\nIn April 1948, Zionist forces launched an offensive codenamed Plan Dalet, during which they conquered and depopulated cities, villages, and territories in Mandatory Palestine in preparation for the establishment of a Jewish state. Just before the expiration of the British Mandate for Palestine, Zionist leaders announced the Israeli Declaration of Independence on 14 May 1948. The following morning, Egypt, Transjordan, Syria, and expeditionary forces from Iraq launched an invasion into Palestine, taking control of the Arab areas and attacking Israeli forces and settlements. The 10 months of fighting took place mostly on the territory of the British Mandate and in the Sinai Peninsula and southern Lebanon, interrupted by several truce periods.\n\nBy the end of the war, the State of Israel controlled about 78% of the former territory of Mandatory Palestine: all of the area that the UN had proposed for a Jewish state, as well as almost 60% of the area proposed for an Arab state, including Jaffa, Lydda and Ramla (Ramle) area, Upper Galilee, some parts of the Negev, the west coast as far as Gaza City, and a wide strip along the Tel Aviv–Jerusalem road. Israel also took control of West Jerusalem, which was meant to be part of an international zone for Jerusalem and its environs. Transjordan took control of East Jerusalem and what became known as the West Bank, annexing it the following year. The territory known today as the Gaza Strip was occupied by Egypt.\n\nExpulsions of Palestinians, which had begun during the civil war, continued during the Arab-Israeli war. Hundreds of Palestinians were killed in multiple massacres, such as occurred in the expulsions from Lydda and Ramla. These events are known today as the Nakba (Arabic for \"the catastrophe\") and were the beginning of the Palestinian refugee problem. A similar number of Jews migrated, fled, or were expelled from Arab states in the three years following the war, 260,000 of whom went to Israel.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "decade",
-    "part_of": [
-      {
-        "qid": "Q49097",
-        "label": "1948 Palestine war"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "date_precision_coarse: Wikidata records the date only to decade precision",
-      "part_of: Wikidata (P361) lists this event as part of \"1948 Palestine war\" (Q49097); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 1940 (1940-01-01) is not within 1 year of any year in the Wikipedia lead [1948, 1949, 1947, 1917, 1920]"
-    ],
-    "wikidata_description": "second and final stage of the 1947–1949 Palestine war"
-  },
-  {
     "id": "battle-of-the-espero-convoy",
     "title": "Battle of the Espero Convoy",
     "date_start": "1940-06-28",
@@ -5176,6 +5131,51 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "event in the Israeli War of Independence"
+  },
+  {
+    "id": "1948-arab-israeli-war",
+    "title": "1948 Arab–Israeli War",
+    "date_start": "1948-05-15",
+    "date_end": "1949-03-10",
+    "countries": [
+      "Israel/Palestine",
+      "Jordan",
+      "Lebanon",
+      "Egypt"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "war"
+    ],
+    "retrieved_at": "2026-09-26T13:07:56.602Z",
+    "sitelinks": 50,
+    "wikidata_qid": "Q49092",
+    "resolved_qid": "Q49092",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/1948_Arab%E2%80%93Israeli_War",
+    "extract": "The 1948 Arab–Israeli War (15 May 1948 – 10 March 1949), also known as the First Arab–Israeli War, followed the civil war in Mandatory Palestine (29 November 1947 – 14 May 1948) as the second and final stage of the 1948 Palestine war. The civil war became a war of separate states with the Israeli Declaration of Independence on 14 May 1948, the end of the British Mandate for Palestine at midnight, and the entry of a military coalition of Arab states into the territory of Mandatory Palestine the following morning. The war formally ended with the 1949 Armistice Agreements which established the Green Line.\n\nSince the 1917 Balfour Declaration and the 1920 creation of the British Mandate of Palestine, and in the context of Zionism and the mass migration of European Jews to Palestine, there had been tension and conflict between Arabs, Jews, and the British in Palestine. On 29 November 1947, the United Nations General Assembly voted in favor of the United Nations Partition Plan for Palestine, proposing to divide the territory into an Arab state, a Jewish state, and an internationally\n\nadministered corpus separatum for the cities of Jerusalem and Bethlehem. The land allocated to the\n\nArab State included about 43% of Mandatory Palestine. The land allocated to the Jewish State,\n\nwho constituted a third of the population, was 56% of Mandatory Palestine. While Jewish leaders\n\nin Palestine supported the plan, leaders of the Palestinian Arab community and in the broader\n\nArab world did not. The following day, the conflict escalated into a civil war with attacks by Palestinian militias and mobs on Jewish areas. As the two communities battled, the British withdrew.\n\nIn April 1948, Zionist forces launched an offensive codenamed Plan Dalet, during which they conquered and depopulated cities, villages, and territories in Mandatory Palestine in preparation for the establishment of a Jewish state. Just before the expiration of the British Mandate for Palestine, Zionist leaders announced the Israeli Declaration of Independence on 14 May 1948. The following morning, Egypt, Transjordan, Syria, and expeditionary forces from Iraq launched an invasion into Palestine, taking control of the Arab areas and attacking Israeli forces and settlements. The 10 months of fighting took place mostly on the territory of the British Mandate and in the Sinai Peninsula and southern Lebanon, interrupted by several truce periods.\n\nBy the end of the war, the State of Israel controlled about 78% of the former territory of Mandatory Palestine: all of the area that the UN had proposed for a Jewish state, as well as almost 60% of the area proposed for an Arab state, including Jaffa, Lydda and Ramla (Ramle) area, Upper Galilee, some parts of the Negev, the west coast as far as Gaza City, and a wide strip along the Tel Aviv–Jerusalem road. Israel also took control of West Jerusalem, which was meant to be part of an international zone for Jerusalem and its environs. Transjordan took control of East Jerusalem and what became known as the West Bank, annexing it the following year. The territory known today as the Gaza Strip was occupied by Egypt.\n\nExpulsions of Palestinians, which had begun during the civil war, continued during the Arab-Israeli war. Hundreds of Palestinians were killed in multiple massacres, such as occurred in the expulsions from Lydda and Ramla. These events are known today as the Nakba (Arabic for \"the catastrophe\") and were the beginning of the Palestinian refugee problem. A similar number of Jews migrated, fled, or were expelled from Arab states in the three years following the war, 260,000 of whom went to Israel.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "decade",
+    "part_of": [
+      {
+        "qid": "Q49097",
+        "label": "1948 Palestine war"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "date_precision_coarse: Wikidata records the date only to decade precision",
+      "part_of: Wikidata (P361) lists this event as part of \"1948 Palestine war\" (Q49097); it may overlap with that larger event"
+    ],
+    "needs_review": true,
+    "extract_retrieved_at": "2026-09-26",
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1940-00-00 is only decade-or-coarser precision; used P580 start time 1948-05-15"
+    ],
+    "wikidata_description": "second and final stage of the 1947–1949 Palestine war"
   },
   {
     "id": "battles-of-latrun-1948",
@@ -11539,8 +11539,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event",
-      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)"
+      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -11579,8 +11579,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event",
-      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)"
+      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -12075,10 +12075,10 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
+      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"War against the Islamic State\" (Q17507684); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event",
-      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)"
+      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -13504,9 +13504,9 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
+      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Mali War\" (Q2946372); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event",
-      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)"
+      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -15931,107 +15931,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2019 military operation of the Syrian civil war"
-  },
-  {
-    "id": "2025-2026-iranian-protests",
-    "title": "2025–2026 Iranian protests",
-    "date_start": "2020-01-01",
-    "date_end": null,
-    "countries": [
-      "Iran"
-    ],
-    "category": "uprising",
-    "category_group": "uprising",
-    "wikidata_classes": [
-      "demonstration",
-      "rebellion",
-      "protest"
-    ],
-    "retrieved_at": "2026-09-26T13:07:44.135Z",
-    "sitelinks": 65,
-    "wikidata_qid": "Q137612545",
-    "resolved_qid": "Q137612545",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/2025%E2%80%932026_Iranian_protests",
-    "extract": "The 2025–2026 Iranian protests were a series of nationwide demonstrations against the government of Iran that began on 28 December 2025 amid a deepening economic crisis. The unrest followed a sharp depreciation of the Iranian rial, rising inflation, and widespread shortages linked to international sanctions and government mismanagement. This event has been the largest uprising in Iran since the 1979 Islamic Revolution, spreading to more than 200 cities across the country. The ensuing crackdown, reportedly carried out under orders by Ali Khamenei and senior officials to use live fire on protesters, resulted in massacres that left thousands of protesters dead.\n\nInitially sparked by frustration over record-high inflation, food prices, and currency depreciation, the protests quickly evolved into a broader movement demanding an end to the Islamic government. Beginning with the bazaari (shopkeepers and merchants) in Tehran's Grand Bazaar and later university students, the demonstrations soon spread to other major cities and small settlements. Protesters chanted anti-government slogans.\n\nAlthough largely leaderless, the protests escalated on 8 January following a call for unified protests by Reza Pahlavi, the son of Iran's last shah. On 8 January, 1.5 million protesters took to the streets of Tehran and, by 9 January, 5 million people were protesting nationwide according to an unnamed European diplomat citing intelligence. Pahlavi has called for a peaceful transition and a referendum to determine Iran's future political system. The Iranian government has cut off Internet access and telephone services in an attempt to prevent protesters from organising. It has accused the United States and Israel of fuelling the protests.\n\nBy 9 January, millions had taken to the streets in protests across all 31 provinces. Amid the internet blackout, Iranian security forces escalated their use of live ammunition against demonstrators. Hospitals in Tehran and Shiraz were reported to be overwhelmed by injured protesters, many suffering gunshot wounds. Iran's foreign ministry spokesperson confirmed that security forces had fired on protesters, raising international concern over human rights. Thousands were also arrested during the violent crackdown. Despite the blackout, on 10 January 2026, The Guardian documented multiple reports of security forces opening fire on demonstrations, with one eyewitness stating they saw \"hundreds of bodies\" across Tehran.\n\nBy late January, Time, The Guardian and Iran International, citing local health officials, reported estimates that between 30,000 and 36,500 protesters were killed during 8–9 January. As of 5 February 2026, the US-based Human Rights Activists News Agency (HRANA) had confirmed and documented 7,015 deaths, including at least 6,508 protesters, with 11,744 additional cases under review. The Iranian government had reported 3,117 deaths, while local health officials said the total death toll could be as high as 30,000.\n\nOn 11 February, President Pezeshkian apologized to the nation for the massacres. On 21 February, a second major wave of student‑led protests erupted at the start of the new academic semester across several Iranian universities. Demonstrations included sit‑ins and campus protests. The renewed unrest coincided with forty‑day memorials for those killed in earlier protests and featured chants against Ali Khamenei as well as calls for Reza Pahlavi to replace him. During the unrest, a student at the Iran University of Science and Technology in Tehran died, Iranian state media attributed the death to a \"sudden health incident\". Protests continued over the following days, with demonstrations from 23 to 25 February adopting the Lion and Sun flag and featuring anti‑government chants. University authorities and security forces declared the protests \"illegal\", conducted searches of student dormitories, and arrested suspected participants, while Basij members and other security forces attacked protesters at several universities.\n\nFollowing the escalation of the 2026 Iran war and strikes on government and military targets, protests continued across Iran despite renewed internet shutdowns and heavy security deployments. Demonstrations took the form of nightly rooftop chants from residential buildings, with videos showing security forces firing towards people chanting from windows. The assassination of Ali Khamenei marked a turning point, with gatherings and celebrations in several areas despite violent crackdowns. After the government announced Mojtaba Khamenei as the new supreme leader on 8 March, protesters chanted \"Death to Mojtaba\" in residential neighborhoods. Opposition figure Reza Pahlavi later urged Iranians to remain in their homes while continuing rooftop chants as a sign of unity, while the Islamic Revolutionary Guard Corps threatened a wider crackdown. During Chaharshanbe Suri celebrations ahead of Nowruz, many Iranians defied official restrictions and gathered in the streets, prompting security forces to disperse crowds with gunfire.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "decade",
-    "part_of": [
-      {
-        "qid": "Q136338700",
-        "label": "Asian Spring"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "date_precision_coarse: Wikidata records the date only to decade precision",
-      "category_year_mismatch: Wikipedia year categories mention [2025, 2026, 2023] but none is within 1 year of 2020",
-      "part_of: Wikidata (P361) lists this event as part of \"Asian Spring\" (Q136338700); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 2020 (2020-01-01) is not within 1 year of any year in the Wikipedia lead [2025, 2026, 1979]"
-    ],
-    "wikidata_description": "2025–2026 protests against the Islamic Republic"
-  },
-  {
-    "id": "2024-lebanon-war",
-    "title": "2024 Lebanon war",
-    "date_start": "2020-01-01",
-    "date_end": "2024-11-27",
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "invasion",
-      "maneuver",
-      "war"
-    ],
-    "retrieved_at": "2026-09-26T13:09:37.007Z",
-    "sitelinks": 28,
-    "wikidata_qid": "Q130388076",
-    "resolved_qid": "Q130388076",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/2024_Lebanon_war",
-    "extract": "A war between Israel and Hezbollah took place in Lebanon during 2024 amid the Middle Eastern crisis. The war began in September 2024 following nearly 12 months of conflict between Israel and Hezbollah, when the former initiated major attacks in Lebanon including an attack on pagers and electronic devices, the assassination of Hezbollah leader Hassan Nasrallah, and an aerial bombing campaign throughout the country. The war escalated on 1 October, when Israel crossed the Blue Line in its sixth invasion of Lebanon since 1978. On 26 November, Israel and Lebanon signed a ceasefire agreement, mediated by France and the United States. The ceasefire went into effect on 27 November, though some attacks continued as part of the broader conflict.\n\nHostilities between Hezbollah and Israel erupted shortly after Hamas' October 7 attack on Israel, when Hezbollah joined the conflict in support of Hamas, launching rockets into northern Israel and the Israeli-occupied Golan Heights. Cross borders attacks resulted in a large number of displaced people on both sides of the border. Prior to the war, Israel had requested that Hezbollah implement United Nations Security Council Resolution 1701 (UNSCR 1701) and withdraw its forces north of the Litani River. Hezbollah vowed to keep fighting until Israel halted its operations in Gaza. Diplomatic efforts from the United States and France proved ineffective in resolving the conflict by 18 September.\n\nAfterwards, Israel commenced attacks throughout Lebanon throughout the rest of the month. The attacks saw heavy casualties, killing over 800 Lebanese people in one week in late September. Israel stated that it had been operating to remove the threat that Hezbollah's military capabilities was posing. At the start of the invasion in October, the Lebanese Armed Forces (LAF) withdrew from parts of the Blue Line. On 27 November, the ceasefire agreement came into effect. Israel has reported 56 of its soldiers and 2,762 Hezbollah militants killed in the invasion, while the Lebanese government has reported Israel killing 2,720 people in Lebanon, mostly civilians.\n\nUnder the ceasefire agreement, Israeli forces were to withdraw from Lebanon by 26 January 2025, but Israel refused to do so, leading to a new deadline of Israeli withdrawal by 18 February 2025. Israel did not fully withdraw by the new deadline, as it withdrew troops from Lebanese villages but kept Israeli forces maintaining five military outposts on highlands in Southern Lebanon.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "decade",
-    "part_of": [
-      {
-        "qid": "Q122974556",
-        "label": "Hezbollah–Israel conflict (2023–present)"
-      },
-      {
-        "qid": "Q130354504",
-        "label": "September 2024 Israeli attacks against Lebanon"
-      },
-      {
-        "qid": "Q122974556",
-        "label": "Hezbollah–Israel conflict (2023–present)"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "date_precision_coarse: Wikidata records the date only to decade precision",
-      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"September 2024 Israeli attacks against Lebanon\" (Q130354504); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 2020 (2020-01-01) is not within 1 year of any year in the Wikipedia lead [2024, 1978, 1701, 2025]"
-    ],
-    "wikidata_description": "military conflict between Lebanese organisation Hezbollah and the IDF"
   },
   {
     "id": "operation-spring-shield",
@@ -18786,6 +18685,62 @@
     "wikidata_description": "Israeli airstrike in Beirut, Lebanon on 27 Sept. 2024"
   },
   {
+    "id": "2024-lebanon-war",
+    "title": "2024 Lebanon war",
+    "date_start": "2024-10-01",
+    "date_end": "2024-11-27",
+    "countries": [
+      "Israel/Palestine",
+      "Lebanon",
+      "Syria"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "invasion",
+      "maneuver",
+      "war"
+    ],
+    "retrieved_at": "2026-09-26T13:09:37.007Z",
+    "sitelinks": 28,
+    "wikidata_qid": "Q130388076",
+    "resolved_qid": "Q130388076",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/2024_Lebanon_war",
+    "extract": "A war between Israel and Hezbollah took place in Lebanon during 2024 amid the Middle Eastern crisis. The war began in September 2024 following nearly 12 months of conflict between Israel and Hezbollah, when the former initiated major attacks in Lebanon including an attack on pagers and electronic devices, the assassination of Hezbollah leader Hassan Nasrallah, and an aerial bombing campaign throughout the country. The war escalated on 1 October, when Israel crossed the Blue Line in its sixth invasion of Lebanon since 1978. On 26 November, Israel and Lebanon signed a ceasefire agreement, mediated by France and the United States. The ceasefire went into effect on 27 November, though some attacks continued as part of the broader conflict.\n\nHostilities between Hezbollah and Israel erupted shortly after Hamas' October 7 attack on Israel, when Hezbollah joined the conflict in support of Hamas, launching rockets into northern Israel and the Israeli-occupied Golan Heights. Cross borders attacks resulted in a large number of displaced people on both sides of the border. Prior to the war, Israel had requested that Hezbollah implement United Nations Security Council Resolution 1701 (UNSCR 1701) and withdraw its forces north of the Litani River. Hezbollah vowed to keep fighting until Israel halted its operations in Gaza. Diplomatic efforts from the United States and France proved ineffective in resolving the conflict by 18 September.\n\nAfterwards, Israel commenced attacks throughout Lebanon throughout the rest of the month. The attacks saw heavy casualties, killing over 800 Lebanese people in one week in late September. Israel stated that it had been operating to remove the threat that Hezbollah's military capabilities was posing. At the start of the invasion in October, the Lebanese Armed Forces (LAF) withdrew from parts of the Blue Line. On 27 November, the ceasefire agreement came into effect. Israel has reported 56 of its soldiers and 2,762 Hezbollah militants killed in the invasion, while the Lebanese government has reported Israel killing 2,720 people in Lebanon, mostly civilians.\n\nUnder the ceasefire agreement, Israeli forces were to withdraw from Lebanon by 26 January 2025, but Israel refused to do so, leading to a new deadline of Israeli withdrawal by 18 February 2025. Israel did not fully withdraw by the new deadline, as it withdrew troops from Lebanese villages but kept Israeli forces maintaining five military outposts on highlands in Southern Lebanon.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "decade",
+    "part_of": [
+      {
+        "qid": "Q122974556",
+        "label": "Hezbollah–Israel conflict (2023–present)"
+      },
+      {
+        "qid": "Q130354504",
+        "label": "September 2024 Israeli attacks against Lebanon"
+      },
+      {
+        "qid": "Q122974556",
+        "label": "Hezbollah–Israel conflict (2023–present)"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "date_precision_coarse: Wikidata records the date only to decade precision",
+      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"September 2024 Israeli attacks against Lebanon\" (Q130354504); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event"
+    ],
+    "needs_review": true,
+    "extract_retrieved_at": "2026-09-26",
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2024-10-01"
+    ],
+    "wikidata_description": "military conflict between Lebanese organisation Hezbollah and the IDF"
+  },
+  {
     "id": "killing-of-yahya-sinwar",
     "title": "Killing of Yahya Sinwar",
     "date_start": "2024-10-16",
@@ -19520,6 +19475,51 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "diplomatic meeting in Sharm El Sheikh, Egypt"
+  },
+  {
+    "id": "2025-2026-iranian-protests",
+    "title": "2025–2026 Iranian protests",
+    "date_start": "2025-12-28",
+    "date_end": null,
+    "countries": [
+      "Iran"
+    ],
+    "category": "uprising",
+    "category_group": "uprising",
+    "wikidata_classes": [
+      "demonstration",
+      "rebellion",
+      "protest"
+    ],
+    "retrieved_at": "2026-09-26T13:07:44.135Z",
+    "sitelinks": 65,
+    "wikidata_qid": "Q137612545",
+    "resolved_qid": "Q137612545",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/2025%E2%80%932026_Iranian_protests",
+    "extract": "The 2025–2026 Iranian protests were a series of nationwide demonstrations against the government of Iran that began on 28 December 2025 amid a deepening economic crisis. The unrest followed a sharp depreciation of the Iranian rial, rising inflation, and widespread shortages linked to international sanctions and government mismanagement. This event has been the largest uprising in Iran since the 1979 Islamic Revolution, spreading to more than 200 cities across the country. The ensuing crackdown, reportedly carried out under orders by Ali Khamenei and senior officials to use live fire on protesters, resulted in massacres that left thousands of protesters dead.\n\nInitially sparked by frustration over record-high inflation, food prices, and currency depreciation, the protests quickly evolved into a broader movement demanding an end to the Islamic government. Beginning with the bazaari (shopkeepers and merchants) in Tehran's Grand Bazaar and later university students, the demonstrations soon spread to other major cities and small settlements. Protesters chanted anti-government slogans.\n\nAlthough largely leaderless, the protests escalated on 8 January following a call for unified protests by Reza Pahlavi, the son of Iran's last shah. On 8 January, 1.5 million protesters took to the streets of Tehran and, by 9 January, 5 million people were protesting nationwide according to an unnamed European diplomat citing intelligence. Pahlavi has called for a peaceful transition and a referendum to determine Iran's future political system. The Iranian government has cut off Internet access and telephone services in an attempt to prevent protesters from organising. It has accused the United States and Israel of fuelling the protests.\n\nBy 9 January, millions had taken to the streets in protests across all 31 provinces. Amid the internet blackout, Iranian security forces escalated their use of live ammunition against demonstrators. Hospitals in Tehran and Shiraz were reported to be overwhelmed by injured protesters, many suffering gunshot wounds. Iran's foreign ministry spokesperson confirmed that security forces had fired on protesters, raising international concern over human rights. Thousands were also arrested during the violent crackdown. Despite the blackout, on 10 January 2026, The Guardian documented multiple reports of security forces opening fire on demonstrations, with one eyewitness stating they saw \"hundreds of bodies\" across Tehran.\n\nBy late January, Time, The Guardian and Iran International, citing local health officials, reported estimates that between 30,000 and 36,500 protesters were killed during 8–9 January. As of 5 February 2026, the US-based Human Rights Activists News Agency (HRANA) had confirmed and documented 7,015 deaths, including at least 6,508 protesters, with 11,744 additional cases under review. The Iranian government had reported 3,117 deaths, while local health officials said the total death toll could be as high as 30,000.\n\nOn 11 February, President Pezeshkian apologized to the nation for the massacres. On 21 February, a second major wave of student‑led protests erupted at the start of the new academic semester across several Iranian universities. Demonstrations included sit‑ins and campus protests. The renewed unrest coincided with forty‑day memorials for those killed in earlier protests and featured chants against Ali Khamenei as well as calls for Reza Pahlavi to replace him. During the unrest, a student at the Iran University of Science and Technology in Tehran died, Iranian state media attributed the death to a \"sudden health incident\". Protests continued over the following days, with demonstrations from 23 to 25 February adopting the Lion and Sun flag and featuring anti‑government chants. University authorities and security forces declared the protests \"illegal\", conducted searches of student dormitories, and arrested suspected participants, while Basij members and other security forces attacked protesters at several universities.\n\nFollowing the escalation of the 2026 Iran war and strikes on government and military targets, protests continued across Iran despite renewed internet shutdowns and heavy security deployments. Demonstrations took the form of nightly rooftop chants from residential buildings, with videos showing security forces firing towards people chanting from windows. The assassination of Ali Khamenei marked a turning point, with gatherings and celebrations in several areas despite violent crackdowns. After the government announced Mojtaba Khamenei as the new supreme leader on 8 March, protesters chanted \"Death to Mojtaba\" in residential neighborhoods. Opposition figure Reza Pahlavi later urged Iranians to remain in their homes while continuing rooftop chants as a sign of unity, while the Islamic Revolutionary Guard Corps threatened a wider crackdown. During Chaharshanbe Suri celebrations ahead of Nowruz, many Iranians defied official restrictions and gathered in the streets, prompting security forces to disperse crowds with gunfire.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "decade",
+    "part_of": [
+      {
+        "qid": "Q136338700",
+        "label": "Asian Spring"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "date_precision_coarse: Wikidata records the date only to decade precision",
+      "category_year_mismatch: Wikipedia year categories mention [2025, 2026, 2023] but none is within 1 year of 2020",
+      "part_of: Wikidata (P361) lists this event as part of \"Asian Spring\" (Q136338700); it may overlap with that larger event"
+    ],
+    "needs_review": true,
+    "extract_retrieved_at": "2026-09-26",
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2025-12-28"
+    ],
+    "wikidata_description": "2025–2026 protests against the Islamic Republic"
   },
   {
     "id": "2025-2026-iran-massacres",
