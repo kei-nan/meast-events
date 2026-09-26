@@ -147,7 +147,10 @@ export default function AboutData({ onClose }) {
     const d = ref.current;
     // No close() in cleanup: it would fire onClose (and un-open the page) when
     // StrictMode re-runs this effect. Unmounting removes the dialog anyway.
-    if (d && !d.open) d.showModal();
+    if (d && !d.open) {
+      d.showModal();
+      d.querySelector("button")?.focus(); // start on Close, not the dialog element itself
+    }
   }, []);
 
   useEffect(() => {
@@ -177,7 +180,7 @@ export default function AboutData({ onClose }) {
       <div className="about-inner">
         <div className="about-head">
           <h2 id="about-title">About the data</h2>
-          <button type="button" className="sp-btn" onClick={() => ref.current?.close()}>
+          <button type="button" className="sp-btn" aria-label="Close About the data" onClick={() => ref.current?.close()}>
             Close
           </button>
         </div>
@@ -234,7 +237,7 @@ export default function AboutData({ onClose }) {
         </ul>
         <p>
           A missing event says nothing about whether it happened. The full analysis is in the{" "}
-          <a href={`${REPO}/blob/main/docs/bias-review/dataset-coverage.md`} target="_blank" rel="noreferrer">
+          <a href={`${REPO}/blob/main/docs/bias-review/dataset-coverage.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             dataset coverage review
           </a>
           .
@@ -250,7 +253,7 @@ export default function AboutData({ onClose }) {
         <h3>Report a problem</h3>
         <p>
           Wrong date, missing event, or a mistake in a text? Please{" "}
-          <a href={`${REPO}/issues`} target="_blank" rel="noreferrer">open an issue</a>. Errors in article text
+          <a href={`${REPO}/issues`} target="_blank" rel="noreferrer" title="Opens in a new tab">open an issue</a>. Errors in article text
           are best fixed on Wikipedia or Wikidata itself; the next data refresh picks the fix up.
         </p>
 
@@ -259,9 +262,9 @@ export default function AboutData({ onClose }) {
           Source code: AGPL-3.0. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
           link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0), so the data is for
           non-commercial use. Details:{" "}
-          <a href={`${REPO}/blob/main/docs/DATA_POLICY.md`} target="_blank" rel="noreferrer">data policy</a>,{" "}
-          <a href={`${REPO}/blob/main/NOTICE`} target="_blank" rel="noreferrer">NOTICE</a>,{" "}
-          <a href={`${REPO}/blob/main/data/LICENSE`} target="_blank" rel="noreferrer">data license</a>.
+          <a href={`${REPO}/blob/main/docs/DATA_POLICY.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">data policy</a>,{" "}
+          <a href={`${REPO}/blob/main/NOTICE`} target="_blank" rel="noreferrer" title="Opens in a new tab">NOTICE</a>,{" "}
+          <a href={`${REPO}/blob/main/data/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">data license</a>.
         </p>
       </div>
     </dialog>
