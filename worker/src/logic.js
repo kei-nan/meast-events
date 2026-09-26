@@ -14,6 +14,9 @@ const MAX_OFFSET = 10000;
 const MAX_LIST_ITEMS = 20;
 const MAX_LIST_ITEM_LENGTH = 80;
 const SNIPPET_LENGTH = 160;
+// A full lead is up to ~10 KB: 1000 of them measured 18 ms of CPU (limit on Workers Free: 10 ms),
+// 100 measured ~2 ms (worker/test/bench.mjs). fields=full is therefore capped.
+const MAX_FULL_LIMIT = 100;
 
 // Invalid client input -> HTTP 400 with this (safe to show) message.
 export class ClientError extends Error {}
@@ -193,10 +196,11 @@ export function buildEventsRequest(searchParams) {
   if (tc) clauses.push(tc);
 
   const sort = parseEnum("sort", searchParams.get("sort") ?? undefined, ["date", "relevance"]) ?? (tc ? "relevance" : "date");
-  const limit = parseIntParam("limit", searchParams.get("limit") ?? undefined, { min: 1, max: MAX_LIMIT, fallback: MAX_LIMIT });
   const offset = parseIntParam("offset", searchParams.get("offset") ?? undefined, { min: 0, max: MAX_OFFSET, fallback: 0 });
   // Default is lite: a full lead is up to ~10 KB, so an unqualified query for 1000 events must stay small.
   const fields = parseEnum("fields", searchParams.get("fields") ?? undefined, ["lite", "full"]) ?? "lite";
+  const maxLimit = fields === "full" ? MAX_FULL_LIMIT : MAX_LIMIT;
+  const limit = parseIntParam("limit", searchParams.get("limit") ?? undefined, { min: 1, max: maxLimit, fallback: maxLimit });
   return {
     query: clauses.join(" "),
     sortBy: sort === "date" ? "start_year" : null,

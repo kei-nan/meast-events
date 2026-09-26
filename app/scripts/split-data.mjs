@@ -174,6 +174,10 @@ async function splitEvents() {
     fullBuckets[fullBucket(e.id)][e.id] = {
       extract: e.extract ?? "",
       extract_retrieved_at: e.extract_retrieved_at ?? null,
+      // Also here (they are in the chunks too): lite API records lack them, and
+      // the detail view merges this file over whichever record it has.
+      wikidata_classes: strings(e.wikidata_classes),
+      date_flags: strings(e.date_flags),
     };
   }
   let fullTotal = 0;

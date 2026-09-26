@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchEvents } from "../lib/dataClient";
 import useDebouncedValue from "./useDebouncedValue";
 
-const BBOX_SETTLE_MS = 400;
+const BBOX_SETTLE_MS = 800;
 
 function inBounds(e, [w, s, east, n]) {
   return e.coordinates && e.coordinates.lon >= w && e.coordinates.lon <= east &&

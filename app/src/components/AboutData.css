@@ -29,6 +29,20 @@
   margin-top: -8px;
   z-index: 1;
 }
+.about-dialog .sp-btn {
+  color: #2b2418;
+  background: #fff;
+  border: 1px solid #5c4d38;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+.about-dialog .sp-btn:focus-visible,
+.about-dialog a:focus-visible {
+  outline: 2px solid #1f4d80;
+  outline-offset: 2px;
+}
 .about-head h2 {
   margin: 0;
   font-size: 1.35rem;

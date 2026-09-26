@@ -203,6 +203,9 @@ test("buildEventsRequest: new params", () => {
 test("buildEventsRequest: validation", () => {
   bad(() => buildEventsRequest(sp({ limit: "0" })), /limit must be between 1 and 1000/);
   bad(() => buildEventsRequest(sp({ limit: "1001" })), /limit must be between/);
+  bad(() => buildEventsRequest(sp({ fields: "full", limit: "101" })), /limit must be between 1 and 100/);
+  assert.equal(buildEventsRequest(sp({ fields: "full" })).limit, 100);
+  assert.equal(buildEventsRequest(sp({ fields: "full", limit: "100" })).limit, 100);
   bad(() => buildEventsRequest(sp({ limit: "-1" })), /limit must be a non-negative integer/);
   bad(() => buildEventsRequest(sp({ limit: "1.5" })), /limit must be/);
   bad(() => buildEventsRequest(sp({ offset: "10001" })), /offset must be between/);

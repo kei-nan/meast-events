@@ -3,8 +3,14 @@
 // replies of 113 (real dataset size), 500 and 1000 events, in fields=full and
 // fields=lite form, plus the boundaries replies.
 //
-// The 500/1000-event replies are SYNTHESISED in memory (no Redis, no
-// credentials needed): realistic multi-byte text, ~600-char extracts.
+// The replies are SYNTHESISED in memory (no Redis, no credentials needed):
+// realistic multi-byte text. Data shape v2.1 has FULL LEAD extracts: sizes are
+// spread from ~0.6 KB to 10 KB (every 50th event is 10 KB, the rest average
+// ~2-3 KB), plus wikidata_classes / date_flags JSON and coordinate-less events.
+// RECOMMENDATION (see the results printed by this script): the client always
+// asks fields=lite (the API default), which stays flat no matter how long the
+// leads are; fields=full is for a few events at a time (the app loads the full
+// lead from a static bucket file instead).
 // If a local redis-stack is reachable (REDIS_HOST/REDIS_PORT, default
 // localhost:6390) the real events/boundaries replies are captured and timed too.
 //
@@ -31,7 +37,8 @@ const bulk = (s) => {
 const WORDS = "revolution treaty Ottoman Mandate Jerusalem coup d'état campaign Anglo-Iraqi diplomatic uprising economic crisis Saudi Arabia Ba'ath Party résistance Qatar independence—declared".split(" ");
 function extract(i) {
   const out = [];
-  for (let n = 0; n < 90; n++) out.push(WORDS[(i * 7 + n * 13) % WORDS.length]);
+  const words = i % 50 === 0 ? 1500 : 90 + ((i * 37) % 420); // ~10 KB max full lead
+  for (let n = 0; n < words; n++) out.push(WORDS[(i * 7 + n * 13) % WORDS.length]);
   return out.join(" ") + ".";
 }
 function syntheticReply(count, lite) {
@@ -44,8 +51,11 @@ function syntheticReply(count, lite) {
       extract: ex,
       snippet: makeSnippet(ex),
       category: ["war", "treaty", "political"][i % 3],
+      wikidata_classes: JSON.stringify(["battle", "military operation", "event"].slice(0, 1 + (i % 3))),
+      date_flags: i % 40 === 0 ? JSON.stringify(["date_order_invalid: Wikidata start after end"]) : "[]",
+      extract_retrieved_at: "2026-09-20",
       countries: ["Saudi Arabia", "Israel/Palestine", "Iraq"].slice(0, 1 + (i % 3)).join(","),
-      location_quality: i % 4 ? "approximate" : "precise",
+      location_quality: i % 9 === 0 ? "none" : i % 4 ? "approximate" : "precise",
       start_year: String(1900 + (i % 120)),
       end_year: String(1900 + (i % 120)),
       lon: String(30 + (i % 20) + 0.123456),
@@ -57,7 +67,8 @@ function syntheticReply(count, lite) {
       coordinate_source: i % 4 ? "country-fallback:Iraq" : "wikidata",
       location: "0,0",
     };
-    const keys = lite ? LITE_FIELDS : Object.keys(all);
+    if (all.location_quality === "none") { delete all.lon; delete all.lat; delete all.location; }
+    const keys = (lite ? LITE_FIELDS : Object.keys(all)).filter((k) => k in all);
     parts.push(bulk(`ev:x:${all.id}`));
     parts.push(Buffer.from(`*${keys.length * 2}\r\n`));
     for (const k of keys) parts.push(bulk(k), bulk(all[k]));
@@ -106,7 +117,7 @@ const shapeB = (r) =>
   `{"type":"FeatureCollection","features":[${parseFtSearchWithFields(r).documents.map((d) => boundaryDocToFeatureJson(d.value["$"])).filter(Boolean).join(",")}]}`;
 
 console.log(`Workers Free CPU limit: ${FREE_LIMIT_MS} ms/request (parse+shape+stringify only; excludes TLS/socket CPU)\n`);
-for (const n of [500, 1000]) {
+for (const n of [100, 500, 1000]) {
   for (const fields of ["full", "lite"]) {
     run(`synthetic events x${n} fields=${fields}`, syntheticReply(n, fields === "lite"), shapeEvents(fields));
   }

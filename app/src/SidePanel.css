@@ -53,6 +53,10 @@
   color: var(--text-secondary);
 }
 
+.sp-area-hint {
+  font-size: 0.8rem;
+}
+
 /* ---------- Focus ---------- */
 
 .side-panel button:focus-visible,
