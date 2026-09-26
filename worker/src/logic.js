@@ -327,15 +327,38 @@ export function boundaryDocToFeature(raw) {
 
 // --- CORS -----------------------------------------------------------------
 
-// allowed: env.ALLOWED_ORIGIN (comma-separated exact origins) or unset.
-// Returns "*" (unset -> allow all), the origin to reflect, or null (no header).
+// BEGIN SHARED CORS
+// Browser-only protection: a disallowed Origin just gets no
+// Access-Control-Allow-Origin header, so other sites' scripts cannot READ
+// responses. It does nothing against curl/bots (they send no Origin, or any
+// Origin they like) and does not stop requests from being made or counted
+// against the Workers request quota. See docs/SECURITY.md.
+//
+// Default (env var unset/blank): the production frontend + local dev origins.
+export const DEFAULT_ALLOWED_ORIGINS = [
+  "https://atlas-wiki.middle-wiki.workers.dev",
+  "http://localhost:5173", // vite dev
+  "http://127.0.0.1:5173",
+  "http://localhost:4173", // vite preview
+  "http://127.0.0.1:4173",
+  "http://localhost:8794", // wrangler dev (static assets)
+  "http://127.0.0.1:8794",
+];
+
+// allowed: env.ALLOWED_ORIGINS (comma-separated exact origins; "*" = open) or
+// unset/blank = DEFAULT_ALLOWED_ORIGINS.
+// Returns "*", the origin to reflect, or null (no header).
 export function matchOrigin(allowed, requestOrigin) {
-  if (allowed === undefined || allowed === null || String(allowed).trim() === "") return "*";
+  const configured = allowed === undefined || allowed === null || String(allowed).trim() === "" ? null : String(allowed);
+  const list =
+    configured === null
+      ? DEFAULT_ALLOWED_ORIGINS
+      : configured
+          .split(",")
+          .map((s) => s.trim().replace(/\/$/, ""))
+          .filter(Boolean);
+  if (list.includes("*")) return "*";
   if (!requestOrigin) return null;
-  const list = String(allowed)
-    .split(",")
-    .map((s) => s.trim().replace(/\/$/, ""))
-    .filter(Boolean);
   return list.includes(requestOrigin) ? requestOrigin : null;
 }
 
@@ -345,6 +368,44 @@ export function corsHeaders(allowed, requestOrigin) {
   if (origin) headers["Access-Control-Allow-Origin"] = origin;
   if (origin !== "*") headers["Vary"] = "Origin";
   return headers;
+}
+// END SHARED CORS
+
+// --- HTTP caching / abuse guards (worker only) ------------------------------
+
+// Weak ETag over the response body (SHA-1 via WebCrypto, native and fast).
+export async function etagFor(body) {
+  const digest = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(body));
+  let hex = "";
+  for (const b of new Uint8Array(digest).subarray(0, 10)) hex += b.toString(16).padStart(2, "0");
+  return `W/"${hex}"`;
+}
+
+// If-None-Match (RFC 9110 weak comparison): "*" or any listed tag equal to etag.
+export function ifNoneMatchHits(header, etag) {
+  if (!header) return false;
+  const strip = (t) => t.trim().replace(/^W\//, "");
+  if (header.trim() === "*") return true;
+  return header.split(",").some((t) => strip(t) === strip(etag));
+}
+
+export const MAX_URL_LENGTH = 2048;
+
+// Cheap per-isolate fixed-window counter. State is per isolate (not global) and
+// resets when the isolate is evicted, so it is only a brake on absurd bursts
+// from one client, not accounting. Returns true if the request is over budget.
+export function makeIsolateGuard({ limit, windowMs, maxKeys = 500 }) {
+  let map = new Map();
+  return function over(key, now = Date.now()) {
+    let e = map.get(key);
+    if (!e || now - e.start >= windowMs) {
+      if (!e && map.size >= maxKeys) map = new Map(); // bound memory: drop everything
+      e = { start: now, count: 0 };
+      map.set(key, e);
+    }
+    e.count += 1;
+    return e.count > limit;
+  };
 }
 
 // Same result as JSON.stringify(boundaryDocToFeature(raw)) but without parsing

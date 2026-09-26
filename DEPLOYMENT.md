@@ -129,29 +129,42 @@ Every push to `main` then rebuilds the frontend automatically.
 `.github/workflows/ci.yml` build-checks the frontend and dry-run-bundles the
 Worker on every push/PR (it deploys nothing).
 
-## The ordering problem: `ALLOWED_ORIGIN`
+## CORS: `ALLOWED_ORIGINS` (safe by default)
 
-The Worker can restrict CORS to one origin via the optional, non-secret
-`ALLOWED_ORIGIN` variable (unset = any origin allowed). But the Pages URL isn't known until Pages
-has been deployed, and Pages needs the Worker URL first. Resolution:
+The API only lets browsers read responses from an allow-list of origins. When
+`ALLOWED_ORIGINS` is unset the built-in default applies: the production
+frontend `https://atlas-wiki.middle-wiki.workers.dev` plus local dev origins
+(`http://localhost` / `127.0.0.1` on ports 5173, 4173, 8794). So the current
+deployment needs no configuration.
 
-1. Deploy the Worker (`ALLOWED_ORIGIN` unset).
-2. Deploy Pages with `VITE_API_URL` = the Worker URL.
-3. Set `ALLOWED_ORIGIN` on the Worker to the exact Pages origin
-   (`https://<project>.pages.dev`, scheme + host, no trailing slash). Do it
-   in `worker/wrangler.jsonc` by uncommenting the `vars` block:
-   ```jsonc
-   "vars": { "ALLOWED_ORIGIN": "https://<project>.pages.dev" }
-   ```
-4. `npx wrangler deploy` again.
+To change it (custom domain, different frontend URL, preview deploys), set
+the comma-separated exact origins (scheme + host[:port], no trailing slash)
+in `worker/wrangler.jsonc` and redeploy:
 
-Set it in `wrangler.jsonc`, not only in the dashboard: Cloudflare's docs say
-that if you change variables in the dashboard, "Wrangler will override them
-the next time you deploy" unless `keep_vars` is set.
+```jsonc
+"vars": { "ALLOWED_ORIGINS": "https://atlas-wiki.middle-wiki.workers.dev,https://atlas.wiki" }
+```
 
-The app works fine with `ALLOWED_ORIGIN` unset (open CORS); it's a hardening
-step. If you later add a custom domain to Pages, add it too / update the
-value.
+`"*"` opens it to every origin; a blank value means the defaults, not open.
+The old name `ALLOWED_ORIGIN` is still read. Set it in `wrangler.jsonc`, not
+only in the dashboard: Cloudflare's docs say that if you change variables in
+the dashboard, "Wrangler will override them the next time you deploy" unless
+`keep_vars` is set.
+
+**CORS is browser-only.** `curl` and bots are unaffected and still count
+against the daily request quota. See [docs/SECURITY.md](docs/SECURITY.md) for
+rate limiting (`RATE_LIMITER` binding, deployed by `wrangler deploy`), what it
+can and cannot protect, and what to click in the dashboard.
+
+## Frontend headers (`app/public/_headers`)
+
+The static-assets Worker `atlas-wiki` serves `dist/_headers` (copied from
+`app/public/_headers` by Vite): a CSP, `nosniff`, `X-Frame-Options`,
+`Referrer-Policy`, and cache rules (immutable for hashed files, 1 h +
+stale-while-revalidate for the dataset and the unhashed MapLibre worker
+files). If you point the frontend at a different API host, add it to
+`connect-src` in that file, or the browser will block the calls. Details and
+the verification notes: [docs/SECURITY.md](docs/SECURITY.md#3-static-site-headers-apppublic_headers).
 
 ## If the API is down or `VITE_API_URL` is unset
 
@@ -216,7 +229,9 @@ pages (fetched 2026-09-26; re-check them, limits change):
 | Symptom | Likely cause / fix |
 |---|---|
 | Blank pale-blue map, no country shapes | MapLibre worker asset bug in production builds; see the comments in `app/src/components/MapView.jsx` (the worker file is shipped explicitly). Rebuild after any MapLibre upgrade. |
-| Browser console: CORS error | `ALLOWED_ORIGIN` doesn't exactly match the Pages origin (scheme, host, no trailing slash, and preview deploys use different hostnames). Fix it, redeploy the Worker; or unset it to allow any origin. |
+| Browser console: CORS error | The page's origin isn't in `ALLOWED_ORIGINS` (or the built-in default): exact match on scheme, host and port, no trailing slash; preview deploys use different hostnames. Add it, redeploy the Worker. |
+| Browser console: "Content Security Policy" violation | `app/public/_headers` doesn't allow that host; add it to the right directive and redeploy the frontend. |
+| API returns 429 | Per-client rate limit (120 req/60 s per IP per location, or the per-isolate guard). Wait 10 s; raise `ratelimits.simple.limit` in `worker/wrangler.jsonc` if legitimate. |
 | Requests go to `localhost` | `VITE_API_URL` wasn't set when Pages built. Set it and trigger a new Pages deploy. |
 | 503 "service not configured" | The `REDIS_URL` secret isn't set. Run `npx wrangler secret put REDIS_URL`. |
 | 502/503 upstream error | Redis unreachable or wrong password/host/port: re-check the connection string, that the DB is running in the Redis Cloud console, and that you didn't paste a `rediss://` URL for a DB with TLS off (or vice versa). `npx wrangler tail` shows the underlying error. |
@@ -295,9 +310,13 @@ browser or the repo. Keep `server/.env` and `worker/.dev.vars` out of git
 
 - **Reload data:** update `data/*.json`, then `npm run load-redis` from the
   repo root (idempotent, uses `server/.env`).
-- **Rotate the Redis password:** create a new password/user in the Redis
-  Cloud console, then `cd worker && npx wrangler secret put REDIS_URL` with
-  the new string (this creates a new version and deploys it), then
-  `npx wrangler deploy` if you also changed config, and finally update
-  `server/.env`. Remove the old credential in Redis Cloud once
-  `/api/health` is OK.
+- **Rotate the Redis password** (recommended once now: the current one
+  appeared in a tool log; then periodically). Full steps with verification in
+  [docs/SECURITY.md section 5](docs/SECURITY.md#5-rotate-the-redis-password-do-this-once-now).
+  Short version: change the default-user password in the Redis Cloud console
+  (database -> Configuration -> Security), immediately run
+  `cd worker && npx wrangler secret put REDIS_URL` with the new URL, update
+  `server/.env` and `worker/.dev.vars`, check `/api/health`, and confirm the
+  old password is rejected.
+- **Monitoring and incident runbook** (quota 1027, CPU 1102, Redis down):
+  [docs/SECURITY.md sections 7-8](docs/SECURITY.md#7-monitoring-and-alerts).
