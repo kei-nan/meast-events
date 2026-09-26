@@ -63,6 +63,39 @@ html, body, #root {
   color: var(--text-tertiary);
 }
 
+.app-loading,
+.app-notice {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.app-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-loading-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border);
+  border-top-color: var(--text-tertiary);
+  border-radius: 50%;
+  animation: app-spin 0.8s linear infinite;
+}
+
+@keyframes app-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.app-notice {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
 .app-body {
   flex: 1;
   display: flex;
