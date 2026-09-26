@@ -1,0 +1,103 @@
+# DRAFT: FOR HUMAN REVIEW BEFORE SUBMITTING. Not submitted anywhere. QuickStatements V1: Qid<TAB>P625<TAB>@lat/lon<TAB>S854<TAB>"source url"
+# Coordinates are copied from the place item named in comments (its own Wikidata P625). Remove all comment lines (starting with #) before pasting into QuickStatements.
+# See docs/wikidata-coordinate-suggestions.md for confidence notes and skipped items.
+# Treaty of Lausanne -> Lausanne (Q807); nearest town (city centroid; treaty signed in Lausanne)
+Q193258	P625	@46.533333/6.633333	S854	"https://www.wikidata.org/wiki/Q807"
+# Treaty of Sèvres -> Sèvres (Q206493); nearest town (commune centroid; signed at Sevres)
+Q182515	P625	@48.823056/2.210833	S854	"https://www.wikidata.org/wiki/Q206493"
+# Camp David Accords -> Camp David (Q309202); exact site (Camp David retreat, where negotiated; signing was at the White House)
+Q309204	P625	@39.648333/-77.463611	S854	"https://www.wikidata.org/wiki/Q309202"
+# Abraham Accords -> Washington, D.C. (Q61); nearest town (Washington, D.C. centroid; ceremony at the White House)
+Q99495661	P625	@38.895/-77.036667	S854	"https://www.wikidata.org/wiki/Q61"
+# Egypt–Israel peace treaty -> White House (Q35525); exact site (White House, signing venue)
+Q1129412	P625	@38.897778/-77.036667	S854	"https://www.wikidata.org/wiki/Q35525"
+# Israel–Jordan peace treaty -> Wadi Araba Crossing (Q2559756); exact site (Wadi Araba border crossing, signing venue)
+Q620988	P625	@29.575/34.978056	S854	"https://www.wikidata.org/wiki/Q2559756"
+# Execution of Saddam Hussein -> Camp Justice (Q5027295); exact site (Camp Justice, Kadhimiya; Wikidata P276 also lists Kadhimiya)
+Q1193136	P625	@33.382/44.353	S854	"https://www.wikidata.org/wiki/Q5027295"
+# United States–Taliban deal -> Doha (Q3861); nearest town (Doha centroid)
+Q107354956	P625	@25.286111/51.529444	S854	"https://www.wikidata.org/wiki/Q3861"
+# Black Sea Grain Initiative -> Dolmabahçe Palace (Q274141); exact site (Dolmabahce Palace, Istanbul; P276 also lists Istanbul)
+Q113295397	P625	@41.039444/29.001667	S854	"https://www.wikidata.org/wiki/Q274141"
+# Balkan Pact (1953) -> Ankara (Q3640); nearest town (Ankara centroid)
+Q805061	P625	@39.93576/32.83869	S854	"https://www.wikidata.org/wiki/Q3640"
+# Treaty of Ankara (1921) -> Ankara (Q3640); nearest town (Ankara centroid)
+Q2358950	P625	@39.93576/32.83869	S854	"https://www.wikidata.org/wiki/Q3640"
+# Treaty of Constantinople (1913) -> Constantinople (Q16869); nearest town (Constantinople/Istanbul historic centroid)
+Q269606	P625	@41.01224/28.976018	S854	"https://www.wikidata.org/wiki/Q16869"
+# Treaty of Saadabad -> Tehran (Q3616); nearest town (Tehran centroid; signed at Saadabad Palace, Tehran)
+Q537143	P625	@35.688889/51.389722	S854	"https://www.wikidata.org/wiki/Q3616"
+# Armistice of Erzincan -> Erzincan (Q136217); nearest town (Erzincan centroid)
+Q28048694	P625	@39.746389/39.491389	S854	"https://www.wikidata.org/wiki/Q136217"
+# Gaza peace summit -> Sharm el-Sheikh (Q644); nearest town (Sharm el-Sheikh centroid)
+Q136486580	P625	@27.851944/34.305	S854	"https://www.wikidata.org/wiki/Q644"
+# Ankara Agreement -> Ankara (Q3640); nearest town (Ankara centroid)
+Q745136	P625	@39.93576/32.83869	S854	"https://www.wikidata.org/wiki/Q3640"
+# Treaty of Jeddah (1927) -> Jeddah (Q374365); nearest town (Jeddah centroid)
+Q17035545	P625	@21.529167/39.161111	S854	"https://www.wikidata.org/wiki/Q374365"
+# Treaty of Darin -> Tarout Island (Q3134340); approximate (Tarout Island; Darin is on it)
+Q7837031	P625	@26.566667/50.066667	S854	"https://www.wikidata.org/wiki/Q3134340"
+# Uqair Protocol of 1922 -> Uqair (Q3546517); exact site (Uqair)
+Q94635	P625	@25.6431/50.2144	S854	"https://www.wikidata.org/wiki/Q3546517"
+# Trebizond Peace Conference -> Trabzon (Q45301); nearest town (Trabzon centroid)
+Q3686593	P625	@41.005/39.7225	S854	"https://www.wikidata.org/wiki/Q45301"
+# Zurich Protocols -> Zurich (Q72); nearest town (Zurich centroid; Wikipedia: signed in Zurich)
+Q20512994	P625	@47.374444/8.541111	S854	"https://www.wikidata.org/wiki/Q72"
+# Black Friday (1978) -> Tehran (Q3616); approximate (Tehran centroid; the massacre was at Jaleh Square)
+Q1899132	P625	@35.688889/51.389722	S854	"https://www.wikidata.org/wiki/Q3616"
+# Battle of Sderot -> Sderot (Q123196); nearest town (Sderot centroid)
+Q122972407	P625	@31.525/34.596944	S854	"https://www.wikidata.org/wiki/Q123196"
+# Battle of Aqaba -> Aqaba (Q180522); nearest town (Aqaba centroid)
+Q2081944	P625	@29.532222/35.006111	S854	"https://www.wikidata.org/wiki/Q180522"
+# Battle of Re'im -> Re'im (Q2916652); exact site (Re'im kibbutz)
+Q122971969	P625	@31.386097/34.460297	S854	"https://www.wikidata.org/wiki/Q2916652"
+# Battle of Mecca (1916) -> Mecca (Q5806); nearest town (Mecca centroid)
+Q2089020	P625	@21.4225/39.826111	S854	"https://www.wikidata.org/wiki/Q5806"
+# Battle of Dumlupınar -> Dumlupınar (Q3041195); nearest town (Dumlupinar village)
+Q2445317	P625	@38.854364/29.977641	S854	"https://www.wikidata.org/wiki/Q3041195"
+# Attempted assassination of Abdul Hamid II -> Yıldız Hamidi Mosque (Q1573438); exact site (Yildiz Hamidiye Mosque)
+Q3845560	P625	@41.049411/29.009936	S854	"https://www.wikidata.org/wiki/Q1573438"
+# Nuseirat rescue and massacre -> Nuseirat Camp (Q2918829); approximate (Nuseirat refugee camp centroid)
+Q126416493	P625	@31.45/34.391694	S854	"https://www.wikidata.org/wiki/Q2918829"
+# Mahshahr massacre -> Mahshahr (Q605244); nearest town (Mahshahr centroid)
+Q77513637	P625	@30.556667/49.188611	S854	"https://www.wikidata.org/wiki/Q605244"
+# Kidnapping and killing of the Bibas family -> Nir Oz (Q1011560); nearest town (Nir Oz kibbutz)
+Q123907413	P625	@31.310197/34.402097	S854	"https://www.wikidata.org/wiki/Q1011560"
+# Turkish capture of Smyrna -> İzmir (Q35997); nearest town (Izmir centroid)
+Q12813016	P625	@38.41273/27.13838	S854	"https://www.wikidata.org/wiki/Q35997"
+# 1920 capture of Damascus -> Damascus (Q3766); nearest town (Damascus centroid)
+Q7509962	P625	@33.513056/36.291944	S854	"https://www.wikidata.org/wiki/Q3766"
+# Maraş massacre -> Kahramanmaraş (Q134703); nearest town (Kahramanmaras centroid)
+Q2096206	P625	@37.5875/36.945278	S854	"https://www.wikidata.org/wiki/Q134703"
+# 1959 Mosul uprising -> Mosul (Q83317); nearest town (Mosul centroid; uprising in the city)
+Q12203911	P625	@36.341667/43.129167	S854	"https://www.wikidata.org/wiki/Q83317"
+# 2003 Nasiriyah bombing -> Nasiriyah (Q38811); nearest town (Nasiriyah centroid)
+Q3629102	P625	@31.043889/46.2575	S854	"https://www.wikidata.org/wiki/Q38811"
+# British Airways Flight 149 -> Kuwait International Airport (Q527157); exact site (Kuwait International Airport)
+Q3296462	P625	@29.226778/47.979972	S854	"https://www.wikidata.org/wiki/Q527157"
+# Battle of Tel Hai -> Tel Hai (Q2094886); exact site (Tel Hai)
+Q4872527	P625	@33.235/35.578333	S854	"https://www.wikidata.org/wiki/Q2094886"
+# Battle of Karbala (2003) -> Karbala (Q199909); nearest town (Karbala centroid)
+Q4178089	P625	@32.616667/44.033333	S854	"https://www.wikidata.org/wiki/Q199909"
+# Battle of Samarra (2004) -> Samarra (Q170047); nearest town (Samarra centroid)
+Q4087318	P625	@34.1959/43.88568	S854	"https://www.wikidata.org/wiki/Q170047"
+# Battle of Riyadh -> Riyadh (Q3692); nearest town (Riyadh centroid)
+Q2943187	P625	@24.65/46.71	S854	"https://www.wikidata.org/wiki/Q3692"
+# 1981 Iranian Prime Minister's office bombing -> Tehran (Q3616); approximate (Tehran centroid; bomb at PM office)
+Q5936879	P625	@35.688889/51.389722	S854	"https://www.wikidata.org/wiki/Q3616"
+# Haft-e Tir bombing -> Tehran (Q3616); approximate (Tehran centroid; bomb at IRP headquarters)
+Q5638475	P625	@35.688889/51.389722	S854	"https://www.wikidata.org/wiki/Q3616"
+# Fall of Aden (2026) -> Aden (Q131694); nearest town (Aden centroid)
+Q137757212	P625	@12.8/45.033333	S854	"https://www.wikidata.org/wiki/Q131694"
+# 20 September 2024 Beirut attack -> Haret Hreik (Q915829); nearest town (Haret Hreik, Beirut suburb)
+Q130331542	P625	@33.85/35.516667	S854	"https://www.wikidata.org/wiki/Q915829"
+# 20 Hunchakian gallows -> Beyazıt Square (Q6043077); exact site (Beyazit Square)
+Q7711827	P625	@41.010519/28.9677	S854	"https://www.wikidata.org/wiki/Q6043077"
+# Goharshad Mosque rebellion -> Goharshad Mosque (Q2393680); exact site (Goharshad Mosque)
+Q11161771	P625	@36.2875/59.614722	S854	"https://www.wikidata.org/wiki/Q2393680"
+# August 2025 Israeli attack on Sanaa -> Sanaa (Q2471); nearest town (Sanaa centroid)
+Q136001786	P625	@15.35/44.2	S854	"https://www.wikidata.org/wiki/Q2471"
+# Aleppo offensive (November–December 2016) -> Aleppo (Q41183); nearest town (Aleppo centroid; city battle)
+Q27894014	P625	@36.2/37.16	S854	"https://www.wikidata.org/wiki/Q41183"
+# Menemen massacre -> Menemen (Q2152404); nearest town (Menemen; Wikipedia: massacre in the town of Menemen)
+Q4809060	P625	@38.603611/27.078056	S854	"https://www.wikidata.org/wiki/Q2152404"
