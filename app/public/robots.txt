@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://atlas-wiki.middle-wiki.workers.dev/sitemap.xml

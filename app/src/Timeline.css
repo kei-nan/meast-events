@@ -1,0 +1,284 @@
+.timeline {
+  --tl-thumb: 28px;
+  --tl-h: 40px;
+  padding: 10px 22px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-1);
+}
+
+.timeline-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.timeline-year {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.timeline-play,
+.timeline-preset {
+  min-height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.timeline-play {
+  flex: none;
+  min-width: 96px;
+}
+
+.timeline-play:hover,
+.timeline-preset:hover {
+  border-color: var(--accent);
+}
+
+.timeline-preset[aria-pressed="true"],
+.timeline-play[aria-pressed="true"] {
+  color: #1d1a15;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.timeline-play:focus-visible,
+.timeline-preset:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.timeline-help {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.timeline-presets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: 55%;
+}
+
+.timeline-density {
+  display: flex;
+  align-items: flex-end;
+  height: 20px;
+  gap: 1px;
+  margin-bottom: 4px;
+}
+
+.timeline-tick {
+  flex: 1;
+  background: var(--border);
+  min-height: 2px;
+}
+
+.timeline-tick--active {
+  background: var(--accent);
+}
+
+.timeline-range {
+  position: relative;
+  height: var(--tl-h);
+  margin-top: 18px; /* room for the value bubble */
+}
+
+.timeline-track,
+.timeline-track-fill {
+  position: absolute;
+  top: calc(var(--tl-h) / 2 - 1px);
+  height: 2px;
+}
+
+.timeline-track {
+  left: calc(var(--tl-thumb) / 2);
+  right: calc(var(--tl-thumb) / 2);
+  background: var(--border);
+}
+
+.timeline-track-fill {
+  left: calc(var(--tl-thumb) / 2 + (100% - var(--tl-thumb)) * var(--tl-start));
+  right: calc(var(--tl-thumb) / 2 + (100% - var(--tl-thumb)) * (1 - var(--tl-end)));
+  background: var(--accent);
+}
+
+.timeline-bubble {
+  position: absolute;
+  top: -22px;
+  left: calc(var(--tl-thumb) / 2 + (100% - var(--tl-thumb)) * var(--tl-pos));
+  transform: translateX(-50%);
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #1d1a15;
+  background: var(--accent-strong);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.timeline-slider {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: var(--tl-h);
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.timeline-slider::-webkit-slider-runnable-track {
+  background: transparent;
+  height: var(--tl-h);
+}
+
+.timeline-slider::-moz-range-track {
+  background: transparent;
+  height: var(--tl-h);
+}
+
+/* Thumb box is the touch target; the visible dot is drawn inside it. */
+.timeline-slider::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--tl-thumb);
+  height: var(--tl-thumb);
+  margin-top: calc((var(--tl-h) - var(--tl-thumb)) / 2);
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, transparent 9.5px);
+  cursor: pointer;
+}
+
+.timeline-slider::-moz-range-thumb {
+  pointer-events: auto;
+  width: var(--tl-thumb);
+  height: var(--tl-thumb);
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, transparent 9.5px);
+  cursor: pointer;
+}
+
+.timeline-slider:focus-visible {
+  outline: none;
+}
+
+.timeline-slider:focus-visible::-webkit-slider-thumb {
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 11px, transparent 11.5px);
+}
+
+.timeline-slider:focus-visible::-moz-range-thumb {
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 11px, transparent 11.5px);
+}
+
+.timeline-slider--start {
+  z-index: 2;
+}
+
+.timeline-slider--end {
+  z-index: 3;
+}
+
+.timeline-slider--top {
+  z-index: 4;
+}
+
+.timeline-bounds {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+@media (pointer: coarse) {
+  .timeline {
+    --tl-thumb: 44px;
+    --tl-h: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline {
+    --tl-thumb: 44px;
+    --tl-h: 44px;
+    padding: 8px 14px 10px;
+  }
+
+  .timeline-year {
+    font-size: 1.15rem;
+  }
+
+  .timeline-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .timeline-title {
+    align-items: flex-start;
+  }
+
+  .timeline-help {
+    text-align: left;
+    font-size: 0.8rem;
+  }
+
+  /* Presets scroll sideways inside their own row instead of stacking into many rows. */
+  .timeline-presets {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    max-width: none;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .timeline-preset {
+    flex: none;
+  }
+
+  .timeline-bounds span:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
