@@ -5,6 +5,7 @@ const QID_RE = /^Q[1-9][0-9]*$/;
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 export const MIN_YEAR = 1000;
 export const MAX_YEAR = 3000;
+export const LOCATION_QUALITIES = ["precise", "approximate", "none"];
 
 export function isRealDate(s) {
   const m = DATE_RE.exec(s);
@@ -57,10 +58,17 @@ export function validateEvents(events, { name = "events", lenient = false } = {}
     } else warnings.push(`${name}[${i}] ${e.id}: no wikidata_qid`);
 
     if (!isRealDate(e.date_start)) err(i, e, `date_start invalid (${JSON.stringify(e.date_start)})`);
+    if (e.date_flags != null && (!Array.isArray(e.date_flags) || e.date_flags.some((f) => typeof f !== "string" || !f))) {
+      err(i, e, "date_flags must be an array of non-empty strings");
+    }
     if (e.date_end != null) {
       if (!isRealDate(e.date_end)) err(i, e, `date_end invalid (${JSON.stringify(e.date_end)})`);
       else if (isRealDate(e.date_start) && e.date_end < e.date_start) {
-        err(i, e, `date_end (${e.date_end}) precedes date_start (${e.date_start})`);
+        // v2.1: Wikidata's own date-order errors are kept and flagged, not dropped. The order problem is
+        // only tolerated (as a warning) when date_flags carries a date_order_invalid reason explaining it.
+        const explained = Array.isArray(e.date_flags) && e.date_flags.some((f) => String(f).startsWith("date_order_invalid"));
+        if (explained) warnings.push(`${name}[${i}] ${e.id}: date_end (${e.date_end}) precedes date_start (${e.date_start}) - flagged in date_flags`);
+        else err(i, e, `date_end (${e.date_end}) precedes date_start (${e.date_start}) and date_flags has no date_order_invalid reason`);
       }
     }
 
@@ -71,9 +79,25 @@ export function validateEvents(events, { name = "events", lenient = false } = {}
 
     if (typeof e.extract !== "string" || !e.extract.trim()) err(i, e, "extract missing/empty");
 
-    if (e.coordinates == null) {
-      if (lenient) warnings.push(`${name}[${i}] ${e.id}: coordinates null (needs manual coordinates)`);
-      else err(i, e, "coordinates missing");
+    // v2.1 shape fields
+    if (!Array.isArray(e.wikidata_classes) || e.wikidata_classes.some((c) => typeof c !== "string" || !c)) {
+      err(i, e, "wikidata_classes must be an array of non-empty strings");
+    }
+    if (typeof e.extract_retrieved_at !== "string" || !/^\d{4}-\d{2}-\d{2}/.test(e.extract_retrieved_at)) {
+      err(i, e, "extract_retrieved_at must be an ISO date");
+    }
+    if ("category_label" in e) err(i, e, "category_label is deprecated and must not be present");
+    if (e.location_quality != null && !LOCATION_QUALITIES.includes(e.location_quality)) {
+      err(i, e, `location_quality must be one of ${LOCATION_QUALITIES.join("|")} (got ${JSON.stringify(e.location_quality)})`);
+    }
+
+    // Coordinates are required only when location_quality != "none". "none" means no real location:
+    // coordinates must then be null (never invented).
+    if (e.location_quality === "none") {
+      if (e.coordinates != null) err(i, e, 'location_quality "none" requires coordinates: null');
+    } else if (e.coordinates == null) {
+      if (lenient) warnings.push(`${name}[${i}] ${e.id}: coordinates null but location_quality is not "none"`);
+      else err(i, e, 'coordinates missing (set location_quality "none" for events without a known location)');
     } else {
       const { lat, lon } = e.coordinates;
       if (typeof lat !== "number" || typeof lon !== "number" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
