@@ -54,76 +54,29 @@
 // dropped, so a human reviewer can override the cutoff by eye rather than trust it
 // blindly.
 import { readFile, writeFile } from "node:fs/promises";
+import { sleep } from "./lib/http.js";
+import { runSparql, qidFromUri } from "./lib/wdqs.js";
+import {
+  ALL_COUNTRY_QIDS,
+  QID_TO_COUNTRY,
+  EVENT_CLASSES,
+  INCLUSION_MIN_SITELINKS,
+} from "./lib/event-classes.js";
 
-const USER_AGENT = "AtlasWiki/0.1 (prototype; contact: jonkeinan@gmail.com)";
-// query.wikidata.org/sparql is the current recommended public endpoint for
-// programmatic use (it fronts the same backend as the .../bigdata/namespace/wdq/sparql
-// path referenced in older docs; Wikimedia's own examples and client libraries as of
-// 2025 point at this URL). POST is used instead of GET because some of the queries
-// below are close to URL length limits and POST is what WDQS itself recommends for
-// scripted/repeated use.
-const ENDPOINT = "https://query.wikidata.org/sparql";
+// Countries, event classes and the sitelink threshold live in scripts/lib/event-classes.js
+// (shared with the enrichment step and docs/DATA_POLICY.md). Every class QID there was
+// verified against WDQS.
+//
+// CLI:
+//   --classes=Q188055,Q135010   query only these classes (bounded run) and MERGE the result
+//                               into the existing data/event-candidates.json instead of
+//                               overwriting it. Without --classes all classes are queried and
+//                               the file is rewritten.
+//   --min-sitelinks=N           notable_enough threshold (default: the policy value, 10)
+const argVal = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
+const MIN_SITELINKS = Number(argVal("min-sitelinks") ?? INCLUSION_MIN_SITELINKS);
+const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
 const REQUEST_DELAY_MS = 1500; // WDQS etiquette: no rapid-fire/parallel querying.
-const MIN_SITELINKS = Number(process.argv.find((a) => a.startsWith("--min-sitelinks="))?.split("=")[1] ?? 5);
-
-// Countries this project tracks (matches ingest.js's COUNTRY_CAPITALS / the region
-// ingest-boundaries.js filters to), mapped to the Wikidata QID(s) that resolve to
-// each one. Israel/Palestine needs several QIDs because Wikidata models it as
-// distinct items across history (the British Mandate, modern Israel, the State of
-// Palestine, the West Bank, the Gaza Strip) where this project's seed data uses one
-// combined bucket - see data/seed-events.json's own "Israel/Palestine" convention.
-const COUNTRIES = {
-  Turkey: ["Q43"],
-  Iran: ["Q794"],
-  Iraq: ["Q796"],
-  Syria: ["Q858"],
-  Lebanon: ["Q822"],
-  Jordan: ["Q810"],
-  "Israel/Palestine": ["Q801", "Q219060", "Q193714", "Q36678", "Q39760"],
-  Egypt: ["Q79"],
-  "Saudi Arabia": ["Q851"],
-  Yemen: ["Q805"],
-  Kuwait: ["Q817"],
-  Bahrain: ["Q398"],
-  Qatar: ["Q846"],
-  UAE: ["Q878"],
-  // Not in ingest.js's COUNTRY_CAPITALS fallback table (a pre-existing gap - no seed
-  // event has needed it yet). Included here per this project's tracked-country list;
-  // if this script surfaces an Oman candidate that gets promoted, ingest.js will need
-  // an Oman entry added to COUNTRY_CAPITALS or it'll come out with no coordinates.
-  Oman: ["Q842"],
-};
-
-const QID_TO_COUNTRY = Object.fromEntries(
-  Object.entries(COUNTRIES).flatMap(([name, qids]) => qids.map((q) => [q, name]))
-);
-const ALL_COUNTRY_QIDS = Object.values(COUNTRIES).flat();
-
-// Wikidata event classes queried, and the seed-events.json `category` each is
-// assumed to map to. Chosen to roughly cover this project's category vocabulary (war,
-// political, treaty, diplomatic, uprising, migration, terrorism, economic) - there
-// isn't one clean Wikidata class for "diplomatic" (conferences, communiques,
-// declarations are modeled inconsistently) or "economic" (an oil crisis isn't
-// instance-of any one tidy thing), so this pipeline systematically under-finds those
-// two categories. See LIMITATIONS at the bottom.
-const EVENT_CLASSES = [
-  { qid: "Q178561", label: "battle", category: "war" },
-  { qid: "Q198", label: "war", category: "war" },
-  { qid: "Q645883", label: "military operation", category: "war" },
-  { qid: "Q131569", label: "treaty", category: "treaty" },
-  { qid: "Q45382", label: "coup d'état", category: "political" },
-  { qid: "Q3882219", label: "assassination", category: "political" },
-  { qid: "Q41397", label: "genocide", category: "political" },
-  { qid: "Q3199915", label: "massacre", category: "political" },
-  { qid: "Q2223653", label: "terrorist attack", category: "terrorism" },
-  { qid: "Q10931", label: "revolution", category: "uprising" },
-  { qid: "Q124734", label: "rebellion", category: "uprising" },
-  { qid: "Q15589476", label: "population transfer", category: "migration" },
-];
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function buildQuery(classQid, { transitive = true } = {}) {
   const countryValues = ALL_COUNTRY_QIDS.map((q) => `wd:${q}`).join(" ");
@@ -167,23 +120,6 @@ ORDER BY DESC(?nSitelinks)
 `;
 }
 
-async function runQuery(query) {
-  const res = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      "User-Agent": USER_AGENT,
-      Accept: "application/sparql-results+json",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `query=${encodeURIComponent(query)}`,
-  });
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} ${res.statusText}`);
-  }
-  const data = await res.json();
-  return data.results.bindings;
-}
-
 // Some classes' subclass trees are just too large for the P31/P279* transitive
 // expansion to finish inside WDQS's server-side timeout - "military operation"
 // (Q645883) 504'd consistently during development even though every other class
@@ -194,17 +130,13 @@ async function runQuery(query) {
 // far better than zero results for that class.
 async function runQueryWithFallback(classQid) {
   try {
-    return { rows: await runQuery(buildQuery(classQid, { transitive: true })), usedFallback: false };
+    return { rows: await runSparql(buildQuery(classQid, { transitive: true })), usedFallback: false };
   } catch (err) {
     if (!/504|timeout|Gateway/i.test(err.message)) throw err;
     console.log(`    (P279* transitive query failed: ${err.message} - retrying with direct P31 only)`);
-    const rows = await runQuery(buildQuery(classQid, { transitive: false }));
+    const rows = await runSparql(buildQuery(classQid, { transitive: false }));
     return { rows, usedFallback: true };
   }
-}
-
-function qidFromUri(uri) {
-  return uri.replace("http://www.wikidata.org/entity/", "");
 }
 
 function toDateString(iso) {
@@ -245,10 +177,19 @@ async function loadExistingTitlesAndQids() {
 
 async function main() {
   const byQid = new Map();
+  const outPath = new URL("../data/event-candidates.json", import.meta.url);
+  const classes = ONLY_CLASSES ? EVENT_CLASSES.filter((c) => ONLY_CLASSES.includes(c.qid)) : EVENT_CLASSES;
+  if (ONLY_CLASSES) {
+    const unknown = ONLY_CLASSES.filter((q) => !EVENT_CLASSES.some((c) => c.qid === q));
+    if (unknown.length) throw new Error(`--classes contains QIDs not in EVENT_CLASSES: ${unknown.join(", ")}`);
+    // Bounded run: keep everything already discovered and merge the new rows into it.
+    for (const c of JSON.parse(await readFile(outPath, "utf-8"))) byQid.set(c.wikidata_qid, c);
+    console.log(`Bounded run over ${classes.length} class(es); merging into ${byQid.size} existing candidates.`);
+  }
 
-  for (let i = 0; i < EVENT_CLASSES.length; i++) {
-    const cls = EVENT_CLASSES[i];
-    process.stdout.write(`[${i + 1}/${EVENT_CLASSES.length}] querying "${cls.label}" (wd:${cls.qid})... `);
+  for (let i = 0; i < classes.length; i++) {
+    const cls = classes[i];
+    process.stdout.write(`[${i + 1}/${classes.length}] querying "${cls.label}" (wd:${cls.qid})... `);
     let rows, usedFallback;
     try {
       ({ rows, usedFallback } = await runQueryWithFallback(cls.qid));
@@ -291,7 +232,7 @@ async function main() {
       }
     }
 
-    if (i < EVENT_CLASSES.length - 1) await sleep(REQUEST_DELAY_MS);
+    if (i < classes.length - 1) await sleep(REQUEST_DELAY_MS);
   }
 
   const { titles: existingTitles, qids: existingQids } = await loadExistingTitlesAndQids();
@@ -306,7 +247,6 @@ async function main() {
 
   all.sort((a, b) => b.sitelinks - a.sitelinks);
 
-  const outPath = new URL("../data/event-candidates.json", import.meta.url);
   await writeFile(outPath, JSON.stringify(all, null, 2));
 
   const noEnwiki = all.filter((c) => !c.has_en_wikipedia).length;

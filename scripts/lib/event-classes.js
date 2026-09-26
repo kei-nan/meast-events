@@ -1,0 +1,69 @@
+// Single source of truth for the Wikidata event classes and tracked countries used by
+// the discovery pipeline. Every QID was verified against Wikidata (label check +
+// instance counts in the tracked region) - see docs/DATA_POLICY.md.
+//
+// `category` is the coarse legacy grouping (kept on proposed events as
+// `category_group`, only for map colours). The user-facing `category` of a proposed
+// event is the Wikidata class label (`label`) - a pass-through of Wikidata's own
+// classification, not an editorial label.
+
+export const COUNTRIES = {
+  Turkey: ["Q43"],
+  Iran: ["Q794"],
+  Iraq: ["Q796"],
+  Syria: ["Q858"],
+  Lebanon: ["Q822"],
+  Jordan: ["Q810"],
+  "Israel/Palestine": ["Q801", "Q219060", "Q193714", "Q36678", "Q39760"],
+  Egypt: ["Q79"],
+  "Saudi Arabia": ["Q851"],
+  Yemen: ["Q805"],
+  Kuwait: ["Q817"],
+  Bahrain: ["Q398"],
+  Qatar: ["Q846"],
+  UAE: ["Q878"],
+  Oman: ["Q842"],
+};
+
+export const QID_TO_COUNTRY = Object.fromEntries(
+  Object.entries(COUNTRIES).flatMap(([name, qids]) => qids.map((q) => [q, name]))
+);
+export const ALL_COUNTRY_QIDS = Object.values(COUNTRIES).flat();
+
+export const ORIGINAL_EVENT_CLASSES = [
+  { qid: "Q178561", label: "battle", category: "war" },
+  { qid: "Q198", label: "war", category: "war" },
+  { qid: "Q645883", label: "military operation", category: "war" },
+  { qid: "Q131569", label: "treaty", category: "treaty" },
+  { qid: "Q45382", label: "coup d'état", category: "political" },
+  { qid: "Q3882219", label: "assassination", category: "political" },
+  { qid: "Q41397", label: "genocide", category: "political" },
+  { qid: "Q3199915", label: "massacre", category: "political" },
+  { qid: "Q2223653", label: "terrorist attack", category: "terrorism" },
+  { qid: "Q10931", label: "revolution", category: "uprising" },
+  { qid: "Q124734", label: "rebellion", category: "uprising" },
+  { qid: "Q15589476", label: "population transfer", category: "migration" },
+];
+
+// Added to close the diplomatic/economic gap. Each QID was checked in WDQS (English label
+// matches, and the class has dated in-region instances) on 2026-09-26; see DATA_POLICY.md
+// for the instance counts. "embargo" and "nationalization" are kept because they were
+// asked for even though WDQS shows 0 and 0 in-region instances with >=10 sitelinks.
+export const NEW_EVENT_CLASSES = [
+  { qid: "Q188055", label: "siege", category: "war" },
+  { qid: "Q135010", label: "war crime", category: "political" },
+  { qid: "Q1371150", label: "hostage taking", category: "terrorism" },
+  { qid: "Q898712", label: "aircraft hijacking", category: "terrorism" },
+  { qid: "Q208383", label: "ceasefire", category: "diplomatic" },
+  { qid: "Q107706", label: "armistice", category: "treaty" },
+  { qid: "Q7157512", label: "peace conference", category: "diplomatic" },
+  { qid: "Q989265", label: "embargo", category: "economic" },
+  { qid: "Q178564", label: "nationalization", category: "economic" },
+  { qid: "Q1464916", label: "declaration of independence", category: "political" },
+  { qid: "Q43109", label: "referendum", category: "political" },
+];
+
+// Objective inclusion threshold: Wikidata sitelinks (number of Wikimedia-project pages).
+export const INCLUSION_MIN_SITELINKS = 10;
+
+export const EVENT_CLASSES = [...ORIGINAL_EVENT_CLASSES, ...NEW_EVENT_CLASSES];
