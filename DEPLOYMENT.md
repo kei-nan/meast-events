@@ -132,8 +132,7 @@ Worker on every push/PR (it deploys nothing).
 ## The ordering problem: `ALLOWED_ORIGIN`
 
 The Worker can restrict CORS to one origin via the optional, non-secret
-`ALLOWED_ORIGIN` variable (once the API hardening change is merged; until
-then the API allows any origin). But the Pages URL isn't known until Pages
+`ALLOWED_ORIGIN` variable (unset = any origin allowed). But the Pages URL isn't known until Pages
 has been deployed, and Pages needs the Worker URL first. Resolution:
 
 1. Deploy the Worker (`ALLOWED_ORIGIN` unset).
@@ -156,14 +155,11 @@ value.
 
 ## If the API is down or `VITE_API_URL` is unset
 
-Currently the frontend falls back to `http://localhost:3001` when
-`VITE_API_URL` is unset (`app/src/lib/dataClient.js`), so a production build
-made without it will fail every API request from visitors' browsers. The
-frontend is being changed so that a production build without `VITE_API_URL`
-runs in a static mode, and so that it falls back to a built-in static
-dataset if the API is unreachable; this document will need updating with the
-exact behavior once that lands. Until you've confirmed that in the merged
-code, treat "`VITE_API_URL` set correctly before the Pages build" as required.
+If `VITE_API_URL` is unset at build time, the app runs in static mode: events,
+boundaries and search all come from the bundled dataset, with no API calls. If
+the API is set but unreachable or slower than 8 s, the app falls back to the
+same built-in dataset, shows a notice, and retries every 20 s. Set
+`VITE_API_URL` before the Pages build to get live (Redis-backed) data.
 
 ## Verifying the full deploy
 
@@ -222,7 +218,7 @@ pages (fetched 2026-09-26; re-check them, limits change):
 | Blank pale-blue map, no country shapes | MapLibre worker asset bug in production builds; see the comments in `app/src/components/MapView.jsx` (the worker file is shipped explicitly). Rebuild after any MapLibre upgrade. |
 | Browser console: CORS error | `ALLOWED_ORIGIN` doesn't exactly match the Pages origin (scheme, host, no trailing slash, and preview deploys use different hostnames). Fix it, redeploy the Worker; or unset it to allow any origin. |
 | Requests go to `localhost` | `VITE_API_URL` wasn't set when Pages built. Set it and trigger a new Pages deploy. |
-| 503 "service not configured" | Once the hardening change is merged: the `REDIS_URL` secret isn't set. Run `npx wrangler secret put REDIS_URL`. (Before it lands, a missing secret silently falls back to `redis://localhost:6379` and you'll see 5xx upstream errors.) |
+| 503 "service not configured" | The `REDIS_URL` secret isn't set. Run `npx wrangler secret put REDIS_URL`. |
 | 502/503 upstream error | Redis unreachable or wrong password/host/port: re-check the connection string, that the DB is running in the Redis Cloud console, and that you didn't paste a `rediss://` URL for a DB with TLS off (or vice versa). `npx wrangler tail` shows the underlying error. |
 | Cloudflare **error 1102** | Worker exceeded CPU/memory limit (10 ms CPU on Free). See the limits section; consider the paid plan. |
 | Cloudflare **error 1027** | Daily 100,000-request cap reached; resets at midnight UTC. |

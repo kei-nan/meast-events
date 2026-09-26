@@ -56,6 +56,10 @@ jobs:
         working-directory: worker
         run: npm ci
 
+      - name: Unit tests
+        working-directory: worker
+        run: npm test
+
       # --dry-run bundles the Worker (cloudflare:sockets import, nodejs_compat)
       # exactly as `wrangler deploy` would, but uploads nothing and needs no
       # Cloudflare credentials.
