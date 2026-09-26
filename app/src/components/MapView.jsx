@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Map as MaplibreMap, setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
@@ -19,6 +19,13 @@ import {
   oppositeCorner,
   pointFeature,
 } from "./mapLayers";
+import { BORDER_STYLE, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
+import {
+  BoundaryPopup,
+  BordersList,
+  MapLegend,
+  MapNotices,
+} from "./MapUi";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import {
   decadeFloor,
@@ -115,7 +122,7 @@ function labelAnchor(geometry) {
     const { area, centroid } = ringAreaAndCentroid(outerRing);
     if (!best || area > best.area) best = { area, centroid };
   }
-  return best?.centroid ?? null;
+  return best ?? null;
 }
 
 // A separate point source (one feature per territory, at a single anchor
@@ -127,13 +134,21 @@ function boundaryLabelsForYear(year, features) {
     features: features
       .filter((f) => f.properties.start_year <= year && year <= f.properties.end_year)
       .map((f) => {
-        const anchor = labelAnchor(f.geometry);
-        if (!anchor) return null;
+        const best = labelAnchor(f.geometry);
+        if (!best) return null;
+        const anchor = best.centroid;
         // f.properties.name is already the period-appropriate display name - see
         // scripts/boundary-corrections.js.
         return {
           type: "Feature",
-          properties: { name: f.properties.name },
+          // area (deg^2 of the largest part) drives placement priority and size:
+          // big states are placed first and printed larger, so small neighbours
+          // can't squeeze them out (Iraq, Saudi Arabia).
+          properties: {
+            name: f.properties.name,
+            area: best.area,
+            big: Math.min(1, Math.sqrt(best.area) / 20),
+          },
           geometry: { type: "Point", coordinates: anchor },
         };
       })
@@ -164,27 +179,25 @@ function applyInteractivity(map, mode, hasArea) {
   map.getCanvas().style.cursor = drawing ? "crosshair" : "";
 }
 
-const ctrlStyle = {
-  position: "absolute",
-  top: 10,
-  left: 10,
-  zIndex: 2,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  gap: 6,
-};
-const btnStyle = (active) => ({
-  font: "600 13px/1 system-ui, sans-serif",
-  padding: "8px 11px",
-  minHeight: 36,
-  cursor: "pointer",
-  border: "2px solid #5c4d38",
-  borderRadius: 6,
-  color: active ? "#f4f1ea" : "#3a3020",
-  background: active ? "#5c4d38" : "#f4f1ea",
-  boxShadow: "0 1px 4px rgba(0,0,0,0.35)",
-});
+// Default view: the Middle East. Shared by the initial view and "Reset view".
+const DEFAULT_BOUNDS = [
+  [8, 6],
+  [72, 50],
+];
+const RETRY_DELAY_MS = 1500;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// One automatic retry with backoff. onFirstFail lets the UI show a notice
+// while the retry is pending.
+async function withRetry(fn, onFirstFail) {
+  try {
+    return await fn();
+  } catch (err) {
+    onFirstFail?.(err);
+    await sleep(RETRY_DELAY_MS);
+    return fn();
+  }
+}
 
 export default function MapView({
   events,
@@ -200,6 +213,7 @@ export default function MapView({
   onViewportChange,
   onViewportBounds,
   onSelectEvent,
+  eventsLoading = false,
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -219,6 +233,13 @@ export default function MapView({
   // hatch React doesn't know to react to on its own.
   const boundaryCacheRef = useRef(new Map()); // decade -> features[]
   const [boundaryVersion, setBoundaryVersion] = useState(0);
+  // {decade|"land", phase: "retrying"|"final"} while a load is failing.
+  const [borderError, setBorderError] = useState(null);
+  const [displayedYear, setDisplayedYear] = useState(null);
+  const [borderPopup, setBorderPopup] = useState(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  const [hintOpen, setHintOpen] = useState(() => !readHintDismissed());
+  const landFailedRef = useRef(false);
   // Only the settled year triggers a new fetch; boundariesForYear/labels below
   // still run against the live `year` for instant filtering of whatever decade
   // is already cached, so scrubbing within a loaded decade has zero lag.
@@ -237,12 +258,55 @@ export default function MapView({
     onViewport: onViewportChange ?? onViewportBounds,
   };
 
+  // Fetch one boundary decade into the cache: one automatic retry with backoff,
+  // a visible notice while failing, never throws. Resolves true when cached.
+  const fetchDecade = useCallback(async (decade) => {
+    const cache = boundaryCacheRef.current;
+    if (cache.has(decade)) return true;
+    try {
+      const fc = await withRetry(
+        () => loadBoundaryDecade(decade),
+        () => setBorderError({ decade, phase: "retrying" })
+      );
+      cache.set(decade, fc.features);
+      setBorderError((e) => (e && e.decade === decade ? null : e));
+      setBoundaryVersion((v) => v + 1);
+      return true;
+    } catch {
+      setBorderError({ decade, phase: "final" });
+      return false;
+    }
+  }, []);
+
+  const fetchLand = useCallback(async () => {
+    try {
+      const land = await withRetry(loadLand, () => setBorderError({ decade: "land", phase: "retrying" }));
+      landFailedRef.current = false;
+      setBorderError((e) => (e && e.decade === "land" ? null : e));
+      return land;
+    } catch {
+      landFailedRef.current = true;
+      setBorderError({ decade: "land", phase: "final" });
+      return null;
+    }
+  }, []);
+
+  const retryBorders = useCallback(async () => {
+    const decade = decadeFloor(yearRef.current);
+    setBorderError({ decade, phase: "retrying" });
+    if (landFailedRef.current) {
+      const land = await fetchLand();
+      if (land) mapRef.current?.getSource("land")?.setData(land);
+    }
+    await fetchDecade(decade);
+  }, [fetchDecade, fetchLand]);
+
   useEffect(() => {
     const map = new MaplibreMap({
       container: containerRef.current,
       style: "https://demotiles.maplibre.org/style.json",
-      center: [40, 29],
-      zoom: 3.2,
+      bounds: DEFAULT_BOUNDS,
+      fitBoundsOptions: { padding: 20 },
     });
     mapRef.current = map;
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only
@@ -252,16 +316,36 @@ export default function MapView({
         map.setLayoutProperty(layerId, "visibility", "none");
       }
 
+      // The demo style repeats "Tropic of Cancer"/"Equator" along each line every
+      // ~250px. Label each line once (huge spacing), smaller and subtle.
+      try {
+        map.setLayoutProperty("geolines-label", "symbol-spacing", 100000);
+        map.setLayoutProperty("geolines-label", "text-size", 10);
+        map.setPaintProperty("geolines-label", "text-opacity", 0.55);
+      } catch {
+        // Style without that layer: nothing to tone down.
+      }
+
       // Land silhouette and the boundary decade covering the initial year are
       // both needed for a correct first paint, so fetch them in parallel and
       // wait on both before building the map's own sources/layers - this
       // avoids a flash of an empty map that then pops in borders a moment later.
+      // A failed fetch (after one automatic retry) no longer blocks the map: the
+      // layers are still built (empty) and the notice's Retry button fills them.
       const initialDecade = decadeFloor(yearRef.current);
-      const [initialLand, initialBoundaries] = await Promise.all([
-        loadLand(),
-        loadBoundaryDecade(initialDecade),
+      // Each is raced against a short timeout so a failing fetch (which retries
+      // after a backoff) never holds the whole map hostage: layers are built with
+      // whatever has arrived and late data is applied by the effects/callback below.
+      const landPromise = fetchLand().then((l) => {
+        if (l) map.getSource("land")?.setData(l);
+        return l;
+      });
+      const [landResult] = await Promise.all([
+        Promise.race([landPromise, sleep(1200).then(() => null)]),
+        Promise.race([fetchDecade(initialDecade), sleep(1200)]),
       ]);
-      boundaryCacheRef.current.set(initialDecade, initialBoundaries.features);
+      const initialLand = landResult ?? EMPTY_FC;
+      const initialBoundaries = { features: boundaryCacheRef.current.get(initialDecade) ?? [] };
 
       // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
       // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth 1:50m land
@@ -304,39 +388,22 @@ export default function MapView({
         type: "line",
         source: "boundaries",
         paint: {
-          "line-color": ["case", ["!=", ["get", "status"], null], "#c99a45", "#8a7a5f"],
-          "line-width": 1.2,
-          "line-dasharray": ["case", ["!=", ["get", "status"], null], ["literal", [2, 2]], ["literal", [1, 0]]],
+          // Solid = source-dated geometry; dashed + darker amber + thicker = a
+          // status flag (mandate/occupation/annexation/dispute). See BORDER_STYLE.
+          "line-color": ["case", ["!=", ["get", "status"], null], BORDER_STYLE.flagged.color, BORDER_STYLE.solid.color],
+          "line-width": ["case", ["!=", ["get", "status"], null], BORDER_STYLE.flagged.width, BORDER_STYLE.solid.width],
+          "line-dasharray": [
+            "case",
+            ["!=", ["get", "status"], null],
+            ["literal", BORDER_STYLE.flagged.dash],
+            ["literal", [1, 0]],
+          ],
         },
       });
 
       map.addSource("boundary-labels", {
         type: "geojson",
         data: boundaryLabelsForYear(yearRef.current, initialBoundaries.features),
-      });
-
-      map.addLayer({
-        id: "boundaries-label",
-        type: "symbol",
-        source: "boundary-labels",
-        layout: {
-          // boundary-labels' "name" property is already the period-appropriate
-          // display name, resolved at ingest time.
-          "text-field": ["get", "name"],
-          "text-font": ["Open Sans Semibold"],
-          "text-size": ["interpolate", ["linear"], ["zoom"], 2, 9, 5, 13, 8, 16],
-          "text-max-width": 8,
-          "text-padding": 4,
-          "symbol-placement": "point",
-          "text-allow-overlap": false,
-          "text-ignore-placement": false,
-        },
-        paint: {
-          "text-color": "#f4f1ea",
-          "text-halo-color": "rgba(15,17,20,0.85)",
-          "text-halo-width": 1.3,
-          "text-halo-blur": 0.3,
-        },
       });
 
       // User-drawn search area: sits under the event markers so they stay clickable.
@@ -393,6 +460,44 @@ export default function MapView({
         paint: POINT_PAINT,
       });
 
+      // Country labels sit ABOVE the event markers (below only hover/selection) so
+      // markers never hide a state's name. Placement priority = state size (bigger
+      // first) and big states print larger.
+      map.addLayer({
+        id: "boundaries-label",
+        type: "symbol",
+        source: "boundary-labels",
+        layout: {
+          // boundary-labels' "name" property is already the period-appropriate
+          // display name, resolved at ingest time.
+          "text-field": ["get", "name"],
+          "text-font": ["Open Sans Semibold"],
+          "text-size": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            2,
+            ["+", 8, ["*", 3, ["get", "big"]]],
+            5,
+            ["+", 11, ["*", 6, ["get", "big"]]],
+            8,
+            ["+", 14, ["*", 8, ["get", "big"]]],
+          ],
+          "symbol-sort-key": ["-", 0, ["get", "area"]],
+          "text-max-width": 7,
+          "text-padding": 2,
+          "symbol-placement": "point",
+          "text-allow-overlap": false,
+          "text-ignore-placement": false,
+        },
+        paint: {
+          "text-color": "#f4f1ea",
+          "text-halo-color": "rgba(15,17,20,0.9)",
+          "text-halo-width": 1.6,
+          "text-halo-blur": 0.3,
+        },
+      });
+
       // Hover and selection live in their own (unclustered) sources so the
       // highlighted event is visible even while its marker sits inside a cluster.
       map.addSource("hover", { type: "geojson", data: EMPTY_FC });
@@ -405,6 +510,33 @@ export default function MapView({
           "circle-color": "rgba(255,255,255,0)",
           "circle-stroke-width": 3,
           "circle-stroke-color": "#1b1b1b",
+        },
+      });
+
+      // Pointer feedback: a ring on whichever cluster/dot is under the cursor, and a
+      // short-lived flash on a clicked cluster (which then zooms in).
+      map.addSource("pointer-hover", { type: "geojson", data: EMPTY_FC });
+      map.addLayer({
+        id: "pointer-hover",
+        type: "circle",
+        source: "pointer-hover",
+        paint: {
+          "circle-radius": ["get", "r"],
+          "circle-color": "rgba(255,210,90,0.18)",
+          "circle-stroke-width": 3,
+          "circle-stroke-color": "#ffd25a",
+        },
+      });
+      map.addSource("cluster-flash", { type: "geojson", data: EMPTY_FC });
+      map.addLayer({
+        id: "cluster-flash",
+        type: "circle",
+        source: "cluster-flash",
+        paint: {
+          "circle-radius": ["get", "r"],
+          "circle-color": "rgba(255,210,90,0.4)",
+          "circle-stroke-width": 3,
+          "circle-stroke-color": "#ffffff",
         },
       });
 
@@ -494,12 +626,40 @@ export default function MapView({
         map.on("mouseleave", layer, pointerCursor(false));
       }
 
+      const clusterRadius = (count) => (count >= 15 ? 24 : count >= 5 ? 18 : 14);
+      const ringFor = (f, extra) => ({
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: { r: (f.properties.point_count ? clusterRadius(f.properties.point_count) : 6) + extra },
+            geometry: f.geometry,
+          },
+        ],
+      });
+      // Hover state for clusters and dots: a gold ring around whatever is under the pointer.
+      let hoverKey = null;
+      const setHoverRing = (f) => {
+        const key = f ? (f.properties.cluster_id ?? f.properties.id) : null;
+        if (key === hoverKey) return;
+        hoverKey = key;
+        map.getSource("pointer-hover")?.setData(f ? ringFor(f, 5) : EMPTY_FC);
+      };
+      map.on("mousemove", (e) => {
+        if (propsRef.current.areaMode !== "off" || draggingRef.current) return setHoverRing(null);
+        setHoverRing(map.queryRenderedFeatures(e.point, { layers: ["clusters", "unclustered-point"] })[0] ?? null);
+      });
+      map.getCanvas().addEventListener("mouseleave", () => setHoverRing(null));
+
       const clickable = () => propsRef.current.areaMode === "off" && !suppressClickRef.current;
 
       map.on("click", "clusters", async (e) => {
         if (!clickable()) return;
         const feature = e.features[0];
         const center = feature.geometry.coordinates;
+        // Visible click feedback: flash the cluster while the map zooms into it.
+        map.getSource("cluster-flash")?.setData(ringFor(feature, 8));
+        setTimeout(() => map.getSource("cluster-flash")?.setData(EMPTY_FC), 550);
         let zoom = map.getZoom() + 2;
         try {
           const expansion = await map.getSource("events").getClusterExpansionZoom(feature.properties.cluster_id);
@@ -515,6 +675,17 @@ export default function MapView({
       };
       map.on("click", "unclustered-point", selectFromLayer);
       map.on("click", "selected-point", selectFromLayer);
+
+      // Click on a border polygon (not on a marker): show its status/note/source.
+      map.on("click", (e) => {
+        if (!clickable()) return;
+        const onMarker = map.queryRenderedFeatures(e.point, {
+          layers: ["clusters", "unclustered-point", "selected-point"],
+        });
+        if (onMarker.length) return;
+        const hits = map.queryRenderedFeatures(e.point, { layers: ["boundaries-fill"] });
+        setBorderPopup(hits.length ? { point: [e.point.x, e.point.y], items: uniqueBoundaries(hits) } : null);
+      });
 
       setMapReady(true);
     });
@@ -533,12 +704,7 @@ export default function MapView({
   // crossing a decade boundary while scrubbing usually finds data already there.
   useEffect(() => {
     const decade = decadeFloor(debouncedYear);
-    if (!boundaryCacheRef.current.has(decade)) {
-      loadBoundaryDecade(decade).then((fc) => {
-        boundaryCacheRef.current.set(decade, fc.features);
-        setBoundaryVersion((v) => v + 1);
-      });
-    }
+    if (!boundaryCacheRef.current.has(decade)) fetchDecade(decade);
     const prevDecade = decade - 10;
     const nextDecade = decade + 10;
     if (prevDecade >= decadeFloor(MIN_YEAR) && !boundaryCacheRef.current.has(prevDecade)) {
@@ -547,7 +713,7 @@ export default function MapView({
     if (nextDecade <= decadeFloor(MAX_YEAR) && !boundaryCacheRef.current.has(nextDecade)) {
       prefetchBoundaryDecade(nextDecade);
     }
-  }, [debouncedYear]);
+  }, [debouncedYear, fetchDecade]);
 
   // Apply trigger: runs against the live (non-debounced) `year` so that once a
   // decade is cached, filtering/rendering it is instant with no debounce lag.
@@ -560,7 +726,44 @@ export default function MapView({
     if (!features) return;
     mapRef.current.getSource("boundaries")?.setData(boundariesForYear(year, features));
     mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year, features));
+    setDisplayedYear(year);
   }, [year, boundaryVersion, mapReady]);
+
+  // Container size (for popup placement) and popup housekeeping.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  useEffect(() => {
+    if (areaMode !== "off") setBorderPopup(null);
+  }, [areaMode]);
+
+  const decadeCached = boundaryCacheRef.current.has(decadeFloor(year));
+  // Borders drawn for the current year (for the keyboard-reachable list).
+  const yearBorders = useMemo(() => {
+    const feats = boundaryCacheRef.current.get(decadeFloor(year));
+    if (!feats) return [];
+    return uniqueBoundaries(boundariesForYear(year, feats).features);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, boundaryVersion]);
+  const shownBorderYear = decadeCached ? year : displayedYear;
+  const relevantError =
+    borderError && (borderError.decade === "land" || borderError.decade === decadeFloor(year))
+      ? borderError.phase
+      : null;
+  const resetView = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.fitBounds(DEFAULT_BOUNDS, { padding: 20, duration: reducedMotion() ? 0 : 600 });
+  };
+  const closePopup = useCallback(() => setBorderPopup(null), []);
+  const dismissHint = () => {
+    setHintOpen(false);
+    writeHintDismissed();
+  };
 
   // Reports the settled viewport ([west, south, east, north]) after each
   // pan/zoom so the parent can count events in view (server bbox query, or
@@ -776,28 +979,21 @@ export default function MapView({
   return (
     <div className="map-view" style={{ position: "relative" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
-      <div style={ctrlStyle} role="group" aria-label="Search area tools">
-        <button
-          type="button"
-          style={btnStyle(areaMode === "rect")}
-          aria-pressed={areaMode === "rect"}
-          onClick={() => toggle("rect")}
-        >
-          {"▭"} Draw rectangle
+      <div className="mu-ctrl-left" role="group" aria-label="Search area tools">
+        <button type="button" className="mu-btn" aria-pressed={areaMode === "rect"} onClick={() => toggle("rect")}>
+          {"\u25ad"} Draw rectangle
         </button>
-        <button
-          type="button"
-          style={btnStyle(areaMode === "circle")}
-          aria-pressed={areaMode === "circle"}
-          onClick={() => toggle("circle")}
-        >
-          {"◯"} Draw circle
+        <button type="button" className="mu-btn" aria-pressed={areaMode === "circle"} onClick={() => toggle("circle")}>
+          {"\u25ef"} Draw circle
         </button>
         {area && (
-          <button type="button" style={btnStyle(false)} onClick={() => onAreaChange?.(null)}>
+          <button type="button" className="mu-btn" onClick={() => onAreaChange?.(null)}>
             Clear area
           </button>
         )}
+        <button type="button" className="mu-btn" onClick={resetView}>
+          {"\u21ba"} Reset view
+        </button>
         {hint && (
           <div
             role="status"
@@ -815,6 +1011,24 @@ export default function MapView({
           </div>
         )}
       </div>
+      <div className="mu-ctrl-right">
+        {shownBorderYear != null && (
+          <div className="mu-badge" aria-label={`Borders as of ${shownBorderYear}`}>
+            Borders as of {shownBorderYear}
+            {!decadeCached && <span className="mu-badge-sub"> (updating to {year})</span>}
+          </div>
+        )}
+        <BordersList year={year} items={yearBorders} />
+        <MapNotices
+          loading={eventsLoading || !mapReady || !decadeCached}
+          borderError={relevantError}
+          onRetry={retryBorders}
+          hint={hintOpen}
+          onDismissHint={dismissHint}
+        />
+      </div>
+      <MapLegend />
+      {borderPopup && <BoundaryPopup popup={borderPopup} onClose={closePopup} width={size.w} height={size.h} />}
     </div>
   );
 }
