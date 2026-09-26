@@ -1,18 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_ENABLED, fetchEvents, loadStaticEvents } from "../lib/dataClient";
+import {
+  API_ENABLED,
+  fetchAllPages,
+  loadStaticEvents,
+  normalizeEvents,
+} from "../lib/dataClient";
 
 const RETRY_MS = 20000;
+const MAX_RANGE_PAGES = 20;
 
 // Owns the accumulated event store (every event ever loaded, never evicted, so
 // revisiting a range is instant) and fills it for the settled [start,end]
-// range with ONE API request per range. Ranges already covered by a previous
-// successful fetch are served from the store without a request. If the API
-// fails or times out, the range is filled from the static chunks instead and
-// `degraded` turns on; the next range change (or a periodic retry) tries the
-// API again and clears it on success.
+// range. The API caps a response at 1000 events, so a range is paged with
+// `offset` until the server reports it complete; if that cannot be achieved
+// (page cap, a failing page, an API without paging) the WHOLE range is filled
+// from the static chunks instead - a range is never silently half-loaded.
+// Ranges completed by the API are remembered and served from the store.
+// If the API fails or times out `degraded` turns on; the next range change (or
+// the periodic retry) tries the API again and clears it on success.
 //
 // The store is a ref-held Map (mutating it doesn't re-render), so `version`
 // changes whenever it gains entries - use it as a dependency for derived data.
+// A "lite" record (no `extract`) is upgraded when a full one arrives.
 export default function useRangeEvents(startYear, endYear) {
   const storeRef = useRef(new Map());
   const fetchedRangesRef = useRef([]); // [lo, hi] pairs the API has fully answered
@@ -24,8 +33,9 @@ export default function useRangeEvents(startYear, endYear) {
 
   const addEvents = useCallback((events) => {
     let changed = false;
-    for (const event of events) {
-      if (!storeRef.current.has(event.id)) {
+    for (const event of normalizeEvents(events)) {
+      const existing = storeRef.current.get(event.id);
+      if (!existing || (existing.extract === undefined && event.extract !== undefined)) {
         storeRef.current.set(event.id, event);
         changed = true;
       }
@@ -36,6 +46,7 @@ export default function useRangeEvents(startYear, endYear) {
   useEffect(() => {
     const lo = Math.min(startYear, endYear);
     const hi = Math.max(startYear, endYear);
+    const controller = new AbortController();
     let cancelled = false;
 
     const covered =
@@ -48,7 +59,11 @@ export default function useRangeEvents(startYear, endYear) {
 
     setLoading(true);
     const source = API_ENABLED
-      ? fetchEvents({ start: lo, end: hi }).then(({ events }) => {
+      ? fetchAllPages(
+          { start: lo, end: hi, fields: "lite" },
+          { signal: controller.signal, maxPages: MAX_RANGE_PAGES }
+        ).then(({ events, truncated }) => {
+          if (truncated) throw Object.assign(new Error("range incomplete"), { outage: false });
           fetchedRangesRef.current.push([lo, hi]);
           if (!cancelled) setDegraded(false);
           return events;
@@ -57,20 +72,23 @@ export default function useRangeEvents(startYear, endYear) {
 
     source
       .catch((err) => {
-        if (!API_ENABLED) throw err;
-        if (!cancelled) setDegraded(true);
+        if (!API_ENABLED || err.aborted) throw err;
+        if (err.outage !== false && !cancelled) setDegraded(true);
         return loadStaticEvents(lo, hi);
       })
       .then((events) => {
         addEvents(events);
       })
-      .catch((err) => console.warn("Could not load events", err))
+      .catch((err) => {
+        if (!err.aborted) console.warn("Could not load events", err);
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, [startYear, endYear, retryTick, addEvents]);
 
