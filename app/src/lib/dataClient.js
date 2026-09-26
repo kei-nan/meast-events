@@ -5,15 +5,18 @@
 //    They need no query flexibility, so a CDN serves them; they never touch
 //    the API. Every response is cached in memory for the life of the page
 //    and concurrent callers share one in-flight request.
-//  - Events are queried from the Redis-backed API (../../../server) with one
-//    request per settled year range, plus live full-text search and viewport
-//    counts. If VITE_API_URL is unset the app runs in pure static mode, and
-//    if the API is down/slow callers fall back to the static event chunks
-//    (see loadStaticEvents / searchStaticEvents).
+//  - Events: the WHOLE lite set is one static, content-hashed file
+//    (events/all.<hash>.json, see loadAllLite). The app loads it once and does
+//    range, viewport, category/country, drawn-area and title/snippet matching
+//    locally, so a default page load makes ZERO API calls.
+//  - The Redis-backed API (../../../server) is used only for free-text search
+//    (q: full lead text + ranking). If VITE_API_URL is unset or the API is
+//    down/slow, search falls back to local title+snippet matching.
 
 import { eventCoords } from "./geo.js";
 import { matchesFilters } from "./ranking.js";
 import { fullBucket } from "./fullBucket.js";
+import { DATA_VERSION } from "./dataVersion.js";
 
 export const DECADE_SIZE = 10;
 
@@ -44,7 +47,7 @@ const inFlight = new Map(); // url -> Promise<data>, so concurrent callers share
 // A caller-initiated abort rejects with err.aborted === true and NOT as an
 // outage; a timeout, network failure or 5xx is err.outage === true; a 4xx is
 // a bad request and says nothing about availability.
-function fetchJSON(url, { timeoutMs, signal } = {}) {
+function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
   const controller = timeoutMs || signal ? new AbortController() : null;
   const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
   const onAbort = () => controller.abort();
@@ -52,7 +55,10 @@ function fetchJSON(url, { timeoutMs, signal } = {}) {
     if (signal.aborted) controller.abort();
     else signal.addEventListener("abort", onAbort, { once: true });
   }
-  return fetch(url, controller ? { signal: controller.signal } : undefined)
+  const init = {};
+  if (controller) init.signal = controller.signal;
+  if (cache) init.cache = cache;
+  return fetch(url, controller || cache ? init : undefined)
     .then((res) => {
       if (!res.ok) {
         const err = new Error(`Failed to load ${url}: ${res.status}`);
@@ -72,9 +78,9 @@ function fetchJSON(url, { timeoutMs, signal } = {}) {
     });
 }
 
-function fetchJSONCached(url, { timeoutMs } = {}) {
+function fetchJSONCached(url, { timeoutMs, cache } = {}) {
   if (!inFlight.has(url)) {
-    const promise = fetchJSON(url, { timeoutMs });
+    const promise = fetchJSON(url, { timeoutMs, cache });
     // A failed fetch shouldn't be cached forever - let a later retry try again.
     promise.catch(() => inFlight.delete(url));
     inFlight.set(url, promise);
@@ -215,30 +221,50 @@ export async function loadStaticEvents(startYear, endYear) {
   return [...byId.values()];
 }
 
-// Every event in the built-in dataset, regardless of year (events outside the
-// timeline window live in the edge chunks and are included).
-let allStaticPromise = null;
-export function loadAllStaticEvents() {
-  if (!allStaticPromise) {
-    allStaticPromise = fetchJSONCached(dataUrl("events/meta.json"))
-      .then(({ decades }) => Promise.all(decades.map(loadEventDecade)))
-      .then((chunks) => {
-        const byId = new Map();
-        for (const chunk of chunks) for (const e of normalizeEvents(chunk)) byId.set(e.id, e);
-        return [...byId.values()];
-      });
-    allStaticPromise.catch(() => {
-      allStaticPromise = null;
+// Every event in the built-in dataset (lite records), regardless of year, in
+// ONE static request: events/all.<DATA_VERSION>.json. The hash in the name makes
+// it safe to cache immutably. If that exact file is missing (a stale bundle
+// against newer data, or a dev checkout with an old split) the current name is
+// read from events/meta.json (fetched no-cache) and, failing that, the decade
+// chunks are merged. Concurrent/repeat callers share one load.
+let allLitePromise = null;
+export function loadAllLite() {
+  if (!allLitePromise) {
+    const parse = (chunk) => {
+      if (!Array.isArray(chunk)) throw new Error("events file is not an array");
+      return normalizeEvents(chunk);
+    };
+    allLitePromise = fetchJSONCached(dataUrl(`events/all.${DATA_VERSION}.json`))
+      .then(parse)
+      .catch(() =>
+        fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache" })
+          .then(({ allFile }) => fetchJSONCached(dataUrl(`events/${allFile}`)))
+          .then(parse)
+      )
+      .catch(() =>
+        fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache" })
+          .then(({ decades }) => Promise.all(decades.map(loadEventDecade)))
+          .then((chunks) => {
+            const byId = new Map();
+            for (const chunk of chunks) for (const e of normalizeEvents(chunk)) byId.set(e.id, e);
+            return [...byId.values()];
+          })
+      );
+    allLitePromise.catch(() => {
+      allLitePromise = null;
     });
   }
-  return allStaticPromise;
+  return allLitePromise;
 }
+
+// Kept for callers that want the full static set (same data as loadAllLite).
+export const loadAllStaticEvents = loadAllLite;
 
 // Offline stand-in for the API: same tokenised, diacritic-insensitive
 // matching (see lib/ranking.js) plus the area/category/country filters,
 // across the whole built-in dataset. Unranked - callers rank with rankEvents.
 export async function searchStaticEvents({ q = "", area = null, categories = [], countries = [] } = {}) {
-  const all = await loadAllStaticEvents();
+  const all = await loadAllLite();
   return all.filter((e) => matchesFilters(e, { q, area, categories, countries }));
 }
 

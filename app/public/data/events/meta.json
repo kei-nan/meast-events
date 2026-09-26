@@ -1,1 +1,1 @@
-{"decadeSize":10,"decades":[1900,1910,1920,1930,1940,1950,1960,1970,1980,1990,2000,2010,2020],"minYear":1900,"maxYear":2026,"totalEvents":594,"withoutLocation":198,"fullBuckets":64,"maxChunkBytes":75188,"maxFullBytes":28954}
+{"decadeSize":10,"decades":[1900,1910,1920,1930,1940,1950,1960,1970,1980,1990,2000,2010,2020],"minYear":1900,"maxYear":2026,"version":"c7900c26cd5d","allFile":"all.c7900c26cd5d.json","allBytes":360349,"totalEvents":594,"withoutLocation":198,"fullBuckets":64,"maxChunkBytes":75188,"maxFullBytes":28954}

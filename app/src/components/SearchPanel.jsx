@@ -50,6 +50,8 @@ export default function SearchPanel({
   results,
   total,
   source,
+  eventsLoading = false,
+  interim = false,
   selectedEvent,
   viewCount,
   range,
@@ -132,7 +134,10 @@ export default function SearchPanel({
       : null;
 
   let statusText;
-  if (loading && results.length === 0) statusText = "Searching…";
+  if (eventsLoading) statusText = "Loading events…";
+  else if (loading && interim && results.length > 0)
+    statusText = `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`;
+  else if (loading && results.length === 0) statusText = "Searching…";
   else if (!searching) statusText = `${total} event${total === 1 ? "" : "s"} in the selected years`;
   else if (total === 0) statusText = "0 results";
   else
@@ -235,7 +240,16 @@ export default function SearchPanel({
           </p>
 
           <div ref={listWrapRef}>
-            {total === 0 && !loading && results.length === 0 ? (
+            {eventsLoading ? (
+              <ul className="sp-list" aria-hidden="true" data-testid="results-skeleton">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <li key={i} style={{ padding: "10px 8px", opacity: 1 - i * 0.12 }}>
+                    <div style={{ height: 14, width: `${70 - (i % 3) * 12}%`, background: "var(--border)", borderRadius: 3 }} />
+                    <div style={{ height: 10, width: "40%", background: "var(--border-soft)", borderRadius: 3, marginTop: 8 }} />
+                  </li>
+                ))}
+              </ul>
+            ) : total === 0 && !loading && results.length === 0 ? (
               <div className="sp-empty">
                 <p>
                   {query.trim()

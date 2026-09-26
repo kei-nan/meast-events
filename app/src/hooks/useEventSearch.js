@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
-import { fetchAllPages, searchStaticEvents } from "../lib/dataClient";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { API_ENABLED, fetchAllPages } from "../lib/dataClient";
 import { eventCoords, inArea } from "../lib/geo";
+import { localSearch } from "../lib/localSearch";
 import { MIN_QUERY_LENGTH, rankEvents } from "../lib/ranking";
 import useDebouncedValue from "./useDebouncedValue";
 
 const SEARCH_DEBOUNCE_MS = 300;
-const INTERIM_STATIC_MS = 1500;
 const MAX_SEARCH_PAGES = 5;
 
 const IDLE = {
@@ -15,8 +15,8 @@ const IDLE = {
   truncated: false,
   source: null,
   interim: false,
+  textSearch: false,
 };
-const LOADING = { ...IDLE, status: "loading" };
 
 // Text shorter than MIN_QUERY_LENGTH counts as no text.
 function effectiveQ(q) {
@@ -32,25 +32,40 @@ function paramsKey(q, area, categories, countries) {
 // timeline (the year scope is applied by the caller, so toggling it needs no
 // refetch and both "N results" and "M in selected years" are exact).
 //
+// WHAT NEEDS THE API: only free-text search (q), because it matches the full
+// lead text and ranks server-side. Everything else - category/country filters
+// and drawn-area queries (bbox + circle trim, precise-only rule) - is computed
+// locally from the in-memory store (`storeRef`, filled from static data), so it
+// is instant and works with the API down or absent.
+//
 //   status: 'idle'    nothing to search (no text >= 2 chars, no filters)
-//           'loading' a query for the CURRENT inputs is in flight; `results`
-//                     holds only interim static results for that same query
-//                     (source 'static', interim true) - never a previous query's
-//           'ready' | 'error'
+//           'loading' the store is still loading, or a q request for the CURRENT
+//                     inputs is in flight; `results` then holds INSTANT LOCAL
+//                     title/snippet matches for that same query (interim true)
+//           'ready'
 //   results: ranked events with coordinates (circle areas trimmed by haversine)
 //   total / truncated: server total when the answer was incomplete
-//   source: 'api' (API) | 'static' (offline dataset)
+//   source: 'api' (full-text answer) | 'local' (filters/area only, exact) |
+//           'static' (q answered locally because the API is unavailable/absent:
+//           titles and summaries only)
 //
-// Each new query aborts the previous request (AbortController). While the live
-// answer is pending past ~1.5s an interim static answer is shown.
+// A new q aborts the previous request (AbortController). If the q request fails
+// `onOutage()` is called and local matches become the answer; while `degraded`
+// the API is not tried again for each keystroke, only when `probeTick` changes
+// (App bumps it every 20 s), and `onRecovered()` fires when a probe succeeds.
 export default function useEventSearch({
   query,
   area = null,
   categories,
   countries,
-  live,
+  storeRef,
+  version,
+  ready,
+  degraded,
+  probeTick,
   addEvents,
   onOutage,
+  onRecovered,
 }) {
   const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS);
   const catsKey = (categories ?? []).join("\u0000");
@@ -63,99 +78,89 @@ export default function useEventSearch({
   const currentKey = paramsKey(q, area, cats, cs);
   const settledKey = paramsKey(effectiveQ(debouncedQuery), area, cats, cs);
 
-  const [state, setState] = useState({ key: null, ...IDLE });
+  // Instant local answer for the current inputs (not debounced).
+  const local = useMemo(
+    () => (ready && active ? localSearch([...storeRef.current.values()], { q, area, categories: cats, countries: cs }) : []),
+    // version signals that the (mutable) store has new entries.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ready, active, q, area, cats, cs, version]
+  );
+
+  // Latest API answer: {key, status: 'ready'|'failed', ...}
+  const [api, setApi] = useState({ key: null });
+  const degradedRef = useRef(degraded);
+  degradedRef.current = degraded;
+  const handledProbeRef = useRef(probeTick);
 
   useEffect(() => {
+    const isProbe = probeTick !== handledProbeRef.current;
+    handledProbeRef.current = probeTick;
     const [sq, sArea, sCats, sCountries] = JSON.parse(settledKey);
-    if (!(sq || sArea || sCats.length || sCountries.length)) return;
+    if (!sq || !API_ENABLED || !ready) return;
+    if (degradedRef.current && !isProbe) return;
     const controller = new AbortController();
-    const filters = { q: sq, area: sArea, categories: sCats, countries: sCountries };
-    let finished = false;
-    let timer = null;
 
-    const finish = (events, { total, truncated, source }) => {
-      if (controller.signal.aborted) return;
-      finished = true;
-      // Coordinate-less events stay in text/filter results; a drawn area excludes them.
-      const trimmed = sArea
-        ? events.filter((e) => {
-            const c = eventCoords(e);
-            return c && e.location_quality !== "approximate" && inArea(c, sArea);
-          })
-        : events;
-      const results = rankEvents(trimmed, sq);
-      addEvents(results);
-      setState({
-        key: settledKey,
-        status: "ready",
-        results,
-        total: truncated ? Math.max(total, results.length) : results.length,
-        truncated,
-        source,
-        interim: false,
+    fetchAllPages(
+      {
+        q: sq,
+        bbox: sArea?.bbox,
+        category: sCats,
+        country: sCountries,
+        precise: sArea ? 1 : undefined,
+        sort: "relevance",
+        fields: "lite",
+      },
+      { signal: controller.signal, maxPages: MAX_SEARCH_PAGES }
+    )
+      .then((res) => {
+        if (controller.signal.aborted) return;
+        // Coordinate-less events stay in text/filter results; a drawn area excludes them.
+        const trimmed = sArea
+          ? res.events.filter((e) => {
+              const c = eventCoords(e);
+              return c && e.location_quality !== "approximate" && inArea(c, sArea);
+            })
+          : res.events;
+        const results = rankEvents(trimmed, sq);
+        addEvents(results);
+        onRecovered();
+        setApi({
+          key: settledKey,
+          status: "ready",
+          results,
+          total: res.truncated ? Math.max(res.total, results.length) : results.length,
+          truncated: res.truncated,
+        });
+      })
+      .catch((err) => {
+        if (err.aborted || controller.signal.aborted) return;
+        if (err.outage !== false) onOutage();
+        setApi({ key: settledKey, status: "failed" });
       });
-    };
 
-    const fail = () => {
-      if (controller.signal.aborted) return;
-      finished = true;
-      setState({ key: settledKey, ...IDLE, status: "error" });
-    };
-
-    const runStatic = () =>
-      searchStaticEvents(filters).then((events) =>
-        finish(events, { total: events.length, truncated: false, source: "static" })
-      );
-
-    if (!live) {
-      runStatic().catch(fail);
-    } else {
-      timer = setTimeout(() => {
-        searchStaticEvents(filters)
-          .then((events) => {
-            if (finished || controller.signal.aborted) return;
-            const results = rankEvents(events, sq);
-            setState({
-              key: settledKey,
-              status: "loading",
-              results,
-              total: results.length,
-              truncated: false,
-              source: "static",
-              interim: true,
-            });
-          })
-          .catch(() => {});
-      }, INTERIM_STATIC_MS);
-
-      fetchAllPages(
-        {
-          q: sq || undefined,
-          bbox: sArea?.bbox,
-          category: sCats,
-          country: sCountries,
-          precise: sArea ? 1 : undefined,
-          sort: sq ? "relevance" : "date",
-          fields: "lite",
-        },
-        { signal: controller.signal, maxPages: MAX_SEARCH_PAGES }
-      )
-        .then((res) => finish(res.events, { total: res.total, truncated: res.truncated, source: "api" }))
-        .catch((err) => {
-          if (err.aborted || controller.signal.aborted) return;
-          if (err.outage) onOutage();
-          return runStatic();
-        })
-        .catch(fail);
-    }
-
-    return () => {
-      controller.abort();
-      clearTimeout(timer);
-    };
-  }, [settledKey, live, addEvents, onOutage]);
+    return () => controller.abort();
+  }, [settledKey, probeTick, ready, addEvents, onOutage, onRecovered]);
 
   if (!active) return IDLE;
-  if (state.key !== currentKey) return LOADING;
-  return state;
+  if (!ready) return { ...IDLE, status: "loading", textSearch: Boolean(q) };
+
+  const localState = (source) => ({
+    status: "ready",
+    results: local,
+    total: local.length,
+    truncated: false,
+    source,
+    interim: false,
+    textSearch: Boolean(q),
+  });
+
+  if (!q) return localState("local");
+  if (api.key === currentKey && api.status === "ready") {
+    return { ...IDLE, ...api, source: "api", textSearch: true };
+  }
+  if (!API_ENABLED || degraded || (api.key === currentKey && api.status === "failed")) {
+    return localState("static");
+  }
+  // API answer pending: show the instant local matches meanwhile.
+  return { ...localState("api"), status: "loading", interim: true };
 }

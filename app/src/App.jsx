@@ -3,25 +3,22 @@ import MapView from "./components/MapView";
 import SearchPanel from "./components/SearchPanel.jsx";
 import AboutData from "./components/AboutData.jsx";
 import Timeline, { MIN_YEAR, MAX_YEAR } from "./components/Timeline";
-import useDebouncedValue from "./hooks/useDebouncedValue";
-import useRangeEvents from "./hooks/useRangeEvents";
+import useAllEvents from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
-import useViewportCount from "./hooks/useViewportCount";
 import useUrlState from "./hooks/useUrlState";
 import {
-  API_ENABLED,
   eventOverlapsRange,
   eventYearRange,
   loadEventById,
-  loadEventsIndex,
   loadFullLead,
 } from "./lib/dataClient";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
+import { countInBbox } from "./lib/localSearch";
 import { rankEvents } from "./lib/ranking";
 import { parseUrlState } from "./lib/urlState";
 import "./App.css";
 
-const RANGE_DEBOUNCE_MS = 150;
+const RETRY_MS = 20000;
 const DEEP_LINK_PAD_YEARS = 5;
 
 const clampYear = (y) => Math.min(MAX_YEAR, Math.max(MIN_YEAR, y));
@@ -51,31 +48,22 @@ export default function App() {
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
 
-  // Per-year event counts for the timeline density chart: a small precomputed
-  // static index covering the whole MIN_YEAR-MAX_YEAR span, loaded once.
-  const [eventCountsByYear, setEventCountsByYear] = useState({});
-  useEffect(() => {
-    let cancelled = false;
-    loadEventsIndex()
-      .then((counts) => {
-        if (!cancelled) setEventCountsByYear(counts);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // The whole lite event set is loaded ONCE from static data (no API call);
+  // range, viewport, filter and area queries are all computed from this store.
+  const { storeRef, version, addEvents, loading: eventsLoading, error: eventsError } = useAllEvents();
 
-  // Only the settled range triggers loading; the slider itself still updates
-  // the range (and therefore the UI) on every input event.
-  const debouncedStartYear = useDebouncedValue(startYear, RANGE_DEBOUNCE_MS);
-  const debouncedEndYear = useDebouncedValue(endYear, RANGE_DEBOUNCE_MS);
-  const { storeRef, version, addEvents, loading, degraded, setDegraded } = useRangeEvents(
-    debouncedStartYear,
-    debouncedEndYear
-  );
-  const live = API_ENABLED && !degraded;
-  const markOutage = useCallback(() => setDegraded(true), [setDegraded]);
+  // Full-text search is the only thing that needs the API. `degraded` means a
+  // search request failed: matching is then local (titles + summaries only) and
+  // the API is re-probed every 20 s until it answers again.
+  const [degraded, setDegraded] = useState(false);
+  const [probeTick, setProbeTick] = useState(0);
+  const markOutage = useCallback(() => setDegraded(true), []);
+  const markRecovered = useCallback(() => setDegraded(false), []);
+  useEffect(() => {
+    if (!degraded) return;
+    const id = setInterval(() => setProbeTick((t) => t + 1), RETRY_MS);
+    return () => clearInterval(id);
+  }, [degraded]);
 
   const visibleEvents = useMemo(
     () =>
@@ -86,7 +74,31 @@ export default function App() {
     [startYear, endYear, version]
   );
 
-  const search = useEventSearch({ query, area, categories, countries, live, addEvents, onOutage: markOutage });
+  // Per-year event counts for the timeline density chart, from the store.
+  const eventCountsByYear = useMemo(() => {
+    const counts = {};
+    for (const e of storeRef.current.values()) {
+      const y = eventYearRange(e)[0];
+      counts[y] = (counts[y] ?? 0) + 1;
+    }
+    return counts;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [version]);
+
+  const search = useEventSearch({
+    query,
+    area,
+    categories,
+    countries,
+    storeRef,
+    version,
+    ready: !eventsLoading,
+    degraded,
+    probeTick,
+    addEvents,
+    onOutage: markOutage,
+    onRecovered: markRecovered,
+  });
 
   // Results are always computed over the whole timeline; scope only decides
   // which of them are listed/highlighted, and both counts stay visible so
@@ -123,14 +135,11 @@ export default function App() {
   );
 
   const handleViewportChange = useCallback((bounds) => setViewportBbox(normalizeBounds(bounds)), []);
-  const viewportEventCount = useViewportCount({
-    bbox: viewportBbox,
-    startYear: debouncedStartYear,
-    endYear: debouncedEndYear,
-    live,
-    rangeEvents: visibleEvents,
-    onOutage: markOutage,
-  });
+  // "N events on the map in the current view": local, no request.
+  const viewportEventCount = useMemo(
+    () => (eventsLoading ? null : countInBbox(visibleEvents, viewportBbox)),
+    [eventsLoading, visibleEvents, viewportBbox]
+  );
 
   const selectedEventRaw = selectedEventId ? (storeRef.current.get(selectedEventId) ?? null) : null;
 
@@ -218,7 +227,7 @@ export default function App() {
   // store with its full record, and (for links) move the range + focus it.
   const triedRef = useRef(new Set());
   useEffect(() => {
-    if (!selectedEventId) return;
+    if (!selectedEventId || eventsLoading) return; // wait for the store: no ids.json/chunk requests on a deep link
     const ev = storeRef.current.get(selectedEventId);
     if (ev && pendingFocusRef.current === selectedEventId) {
       pendingFocusRef.current = null;
@@ -245,7 +254,7 @@ export default function App() {
         })
         .catch(() => {});
     }
-  }, [selectedEventId, version, addEvents, storeRef]);
+  }, [selectedEventId, version, eventsLoading, addEvents, storeRef]);
 
   // Back/forward: re-apply the parsed URL to every piece of state.
   const handleNavigate = useCallback((parsed) => {
@@ -297,15 +306,20 @@ export default function App() {
               {viewportEventCount.toLocaleString("en-US")} {viewportEventCount === 1 ? "event" : "events"} on the map in the current view
             </span>
           )}
-          {loading && (
+          {eventsLoading && (
             <span className="app-loading" role="status">
               <span className="app-loading-spinner" aria-hidden="true" />
               Loading events…
             </span>
           )}
-          {degraded && (
+          {eventsError && !eventsLoading && (
             <span className="app-notice" role="status">
-              Live search is unavailable - showing the built-in dataset
+              Events could not be loaded - retrying
+            </span>
+          )}
+          {degraded && search.textSearch && (
+            <span className="app-notice" role="status">
+              Full-text search is unavailable - matching titles and summaries only
             </span>
           )}
           {notFound && (
@@ -319,6 +333,7 @@ export default function App() {
         <MapView
           events={mapEvents}
           matchIds={matchIds}
+          eventsLoading={eventsLoading}
           year={endYear}
           selectedEventId={selectedEventId}
           hoverId={hoverId}
@@ -338,7 +353,8 @@ export default function App() {
           status={search.status}
           results={panelResults}
           total={panelTotal}
-          source={search.source ?? (live ? "api" : "static")}
+          source={search.source ?? "api"}
+          eventsLoading={eventsLoading}
           selectedEvent={selectedEvent}
           viewCount={viewportEventCount}
           range={[startYear, endYear]}
@@ -377,7 +393,15 @@ export default function App() {
         </a>{" "}
         (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0) — non-commercial use only —{" "}
         <strong>with corrections and additions by this project</strong>; every changed
-        or added shape cites its own source (see <code>scripts/boundary-corrections.js</code>).
+        or added shape cites its own source (
+        <a
+          href="https://github.com/kei-nan/atlas-wiki/blob/main/scripts/boundary-corrections.js"
+          target="_blank"
+          rel="noreferrer"
+        >
+          see the corrections list
+        </a>
+        ).
         Dashed borders mark territory under a mandate, occupation, unrecognized
         annexation, or a since-resolved sovereignty dispute.
       </footer>
