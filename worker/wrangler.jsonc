@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "confrontation-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-26",
+  "compatibility_flags": ["nodejs_compat"],
+  // Local-dev default only - matches server/.env.example's default. Real
+  // deployments should set REDIS_URL as a `wrangler secret put REDIS_URL`
+  // (never committed here), the same way the Express server reads it from
+  // an env var rather than a checked-in value.
+  "vars": {
+    "REDIS_URL": "redis://localhost:6379"
+  }
+}

@@ -9,6 +9,11 @@ dist/
 server/.env
 .env.local
 
+# wrangler's local dev state (miniflare SQLite caches, bundled temp output)
+# and its equivalent of a real Redis Cloud connection string.
+worker/.wrangler/
+worker/.dev.vars
+
 # Large raw source dump for boundary data - regenerate via scripts/ingest-boundaries.js
 # after downloading https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson into data/raw/
 data/raw/
