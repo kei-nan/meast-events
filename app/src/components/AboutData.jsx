@@ -192,7 +192,7 @@ export default function AboutData({ onClose }) {
           <li>Wikidata classes it as one of a fixed list of event types (battle, siege, referendum and so on).</li>
           <li>It is located in one of the tracked countries or territories.</li>
           <li>It has a date from 1900 onward.</li>
-          <li>Its Wikidata item links to at least 10 Wikipedia language editions, and English Wikipedia has an article.</li>
+          <li>Its Wikidata item has at least 10 links to Wikimedia sites (Wikipedia language editions and sister projects such as Wikisource or Commons), and English Wikipedia has an article.</li>
         </ul>
         <p>
           Events without coordinates are still listed and searchable, tagged “No map location”; they get no map
@@ -208,7 +208,7 @@ export default function AboutData({ onClose }) {
         </p>
         <ul>
           <li>
-            <strong>Language-edition counts favour European-language coverage.</strong> The 10-edition threshold
+            <strong>Language-edition counts favour European-language coverage.</strong> The 10-link threshold
             counts how many Wikipedia communities wrote about an event, not how important it is. Events with
             many translations pass; events covered mainly in regional languages (for example Arabic, Hebrew,
             Turkish or Persian) can fall below the threshold.
