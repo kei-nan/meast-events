@@ -15,7 +15,7 @@ export default function useViewportCount({ bbox, startYear, endYear, live, range
   useEffect(() => {
     if (!live || !bbox) return;
     let cancelled = false;
-    fetchEvents({ start: startYear, end: endYear, bbox })
+    fetchEvents({ start: startYear, end: endYear, bbox, limit: 1, fields: "lite" })
       .then(({ total }) => {
         if (!cancelled) setLiveCount(total);
       })

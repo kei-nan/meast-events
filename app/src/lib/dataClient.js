@@ -11,6 +11,9 @@
 //    if the API is down/slow callers fall back to the static event chunks
 //    (see loadStaticEvents / searchStaticEvents).
 
+import { eventCoords } from "./geo.js";
+import { matchesFilters } from "./ranking.js";
+
 export const DECADE_SIZE = 10;
 
 export function decadeFloor(year) {
@@ -36,26 +39,41 @@ const API_TIMEOUT_MS = 8000;
 
 const inFlight = new Map(); // url -> Promise<data>, so concurrent callers share one fetch
 
+// One fetch, optionally cancellable (`signal`) and time-limited (`timeoutMs`).
+// A caller-initiated abort rejects with err.aborted === true and NOT as an
+// outage; a timeout, network failure or 5xx is err.outage === true; a 4xx is
+// a bad request and says nothing about availability.
+function fetchJSON(url, { timeoutMs, signal } = {}) {
+  const controller = timeoutMs || signal ? new AbortController() : null;
+  const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
+  const onAbort = () => controller.abort();
+  if (signal) {
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener("abort", onAbort, { once: true });
+  }
+  return fetch(url, controller ? { signal: controller.signal } : undefined)
+    .then((res) => {
+      if (!res.ok) {
+        const err = new Error(`Failed to load ${url}: ${res.status}`);
+        err.outage = res.status >= 500;
+        throw err;
+      }
+      return res.json();
+    })
+    .catch((err) => {
+      if (signal?.aborted) err.aborted = true;
+      else if (err.outage === undefined) err.outage = true;
+      throw err;
+    })
+    .finally(() => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onAbort);
+    });
+}
+
 function fetchJSONCached(url, { timeoutMs } = {}) {
   if (!inFlight.has(url)) {
-    const controller = timeoutMs ? new AbortController() : null;
-    const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
-    const promise = fetch(url, controller ? { signal: controller.signal } : undefined)
-      .then((res) => {
-        if (!res.ok) {
-          const err = new Error(`Failed to load ${url}: ${res.status}`);
-          err.outage = res.status >= 500;
-          throw err;
-        }
-        return res.json();
-      })
-      .catch((err) => {
-        // Network failure, timeout/abort or a 5xx all mean "API unavailable";
-        // a 4xx is a bad request and says nothing about availability.
-        if (err.outage === undefined) err.outage = true;
-        throw err;
-      })
-      .finally(() => clearTimeout(timer));
+    const promise = fetchJSON(url, { timeoutMs });
     // A failed fetch shouldn't be cached forever - let a later retry try again.
     promise.catch(() => inFlight.delete(url));
     inFlight.set(url, promise);
@@ -102,7 +120,8 @@ export function prefetchBoundaryDecade(decade) {
   loadBoundaryDecade(decade).catch(() => {});
 }
 
-function eventYearRange(e) {
+
+export function eventYearRange(e) {
   const start = Number(e.date_start.slice(0, 4));
   const end = e.date_end ? Number(e.date_end.slice(0, 4)) : start;
   return [start, end];
@@ -113,38 +132,151 @@ export function eventOverlapsRange(e, startYear, endYear) {
   return s <= endYear && en >= startYear;
 }
 
+// Canonical event shape for everything downstream. Returns null for events
+// without usable coordinates (they are never shown or indexed). Fields are
+// only ever ADDED when missing (location_quality, snippet), never rewritten:
+// titles, dates, countries and extracts stay exactly as the source gave them.
+export function normalizeEvent(e) {
+  if (!e || !e.id || !e.date_start || !eventCoords(e)) return null;
+  const out = e;
+  if (!out.location_quality) {
+    out.location_quality = String(out.coordinate_source ?? "").startsWith("country-fallback")
+      ? "approximate"
+      : "precise";
+  }
+  if (out.snippet === undefined && typeof out.extract === "string") {
+    out.snippet = out.extract.slice(0, 160);
+  }
+  return out;
+}
+
+export function normalizeEvents(events) {
+  const out = [];
+  for (const e of events) {
+    const n = normalizeEvent(e);
+    if (n) out.push(n);
+  }
+  return out;
+}
+
 // Built-in dataset, filtered client-side to a year range. Chunks overlap
 // (an event spanning decades is in each), so dedupe by id.
 export async function loadStaticEvents(startYear, endYear) {
   const chunks = await Promise.all(decadesInRange(startYear, endYear).map(loadEventDecade));
   const byId = new Map();
   for (const chunk of chunks) {
-    for (const e of chunk) {
+    for (const e of normalizeEvents(chunk)) {
       if (eventOverlapsRange(e, startYear, endYear)) byId.set(e.id, e);
     }
   }
   return [...byId.values()];
 }
 
-// Client-side stand-in for full-text search: case-insensitive substring over
-// title + extract, across the whole built-in dataset.
-export async function searchStaticEvents(query) {
-  const needle = query.toLowerCase();
-  const { minYear, maxYear } = await fetchJSONCached(dataUrl("events/meta.json"));
-  const all = await loadStaticEvents(minYear, maxYear);
-  return all.filter((e) => `${e.title} ${e.extract ?? ""}`.toLowerCase().includes(needle));
+// Every event in the built-in dataset, regardless of year (events outside the
+// timeline window live in the edge chunks and are included).
+let allStaticPromise = null;
+export function loadAllStaticEvents() {
+  if (!allStaticPromise) {
+    allStaticPromise = fetchJSONCached(dataUrl("events/meta.json"))
+      .then(({ decades }) => Promise.all(decades.map(loadEventDecade)))
+      .then((chunks) => {
+        const byId = new Map();
+        for (const chunk of chunks) for (const e of normalizeEvents(chunk)) byId.set(e.id, e);
+        return [...byId.values()];
+      });
+    allStaticPromise.catch(() => {
+      allStaticPromise = null;
+    });
+  }
+  return allStaticPromise;
 }
 
-// Arbitrary [start,end] x bbox x full-text query against the API. Rejects
-// with err.outage === true when the API is unreachable, 5xx, or slower than
-// API_TIMEOUT_MS. `start`/`end` are optional - omit both to search the whole
-// timeline.
-export function fetchEvents({ start, end, bbox, q } = {}) {
+// Offline stand-in for the API: same tokenised, diacritic-insensitive
+// matching (see lib/ranking.js) plus the area/category/country filters,
+// across the whole built-in dataset. Unranked - callers rank with rankEvents.
+export async function searchStaticEvents({ q = "", area = null, categories = [], countries = [] } = {}) {
+  const all = await loadAllStaticEvents();
+  return all.filter((e) => matchesFilters(e, { q, area, categories, countries }));
+}
+
+// Resolve one event by id from the static data: events/ids.json maps
+// id -> decade chunk. Falls back to scanning every chunk if the map is
+// missing (older deployments). Resolves null when unknown.
+let idsPromise = null;
+export async function loadEventById(id) {
+  if (!idsPromise) {
+    idsPromise = fetchJSONCached(dataUrl("events/ids.json")).catch(() => null);
+  }
+  const ids = await idsPromise;
+  if (ids && Object.prototype.hasOwnProperty.call(ids, id)) {
+    const chunk = await loadEventDecade(ids[id]);
+    return normalizeEvents(chunk.filter((e) => e.id === id))[0] ?? null;
+  }
+  if (ids) return null;
+  return (await loadAllStaticEvents()).find((e) => e.id === id) ?? null;
+}
+
+// One page of /api/events. Rejects with err.outage === true when the API is
+// unreachable, 5xx, or slower than API_TIMEOUT_MS; err.aborted when `signal`
+// was aborted. Without `signal` identical requests share one cached fetch.
+// Response: { total, truncated, events }.
+export function fetchEvents({
+  start,
+  end,
+  bbox,
+  q,
+  category,
+  country,
+  precise,
+  sort,
+  limit,
+  offset,
+  fields,
+  signal,
+} = {}) {
   const url = apiUrl("/api/events", {
     start,
     end,
     bbox: bbox ? bbox.join(",") : undefined,
     q,
+    category: category?.length ? [].concat(category).join(",") : undefined,
+    country: country?.length ? [].concat(country).join(",") : undefined,
+    precise: precise ? 1 : undefined,
+    sort,
+    limit,
+    offset: offset || undefined,
+    fields,
   });
-  return fetchJSONCached(url, { timeoutMs: API_TIMEOUT_MS }); // { total, events }
+  const request = signal
+    ? fetchJSON(url, { timeoutMs: API_TIMEOUT_MS, signal })
+    : fetchJSONCached(url, { timeoutMs: API_TIMEOUT_MS });
+  return request.then((data) => {
+    const events = normalizeEvents(data.events ?? []);
+    const received = (data.events ?? []).length;
+    const truncated =
+      typeof data.truncated === "boolean" ? data.truncated : data.total > (offset || 0) + received;
+    return { total: data.total ?? events.length, truncated, events, received };
+  });
+}
+
+// Pages through a query with offset until the server says it is complete,
+// deduplicating by id. If a page adds nothing new (a server that ignores
+// `offset`) or maxPages is reached, stops with truncated = true so callers can
+// say so instead of silently presenting a partial list.
+export async function fetchAllPages(params, { signal, maxPages = 5, pageSize = 1000 } = {}) {
+  const byId = new Map();
+  let total = 0;
+  let truncated = false;
+  let offset = 0;
+  for (let page = 0; page < maxPages; page++) {
+    const res = await fetchEvents({ ...params, limit: pageSize, offset, signal });
+    total = res.total;
+    const before = byId.size;
+    for (const e of res.events) if (!byId.has(e.id)) byId.set(e.id, e);
+    truncated = res.truncated;
+    if (!truncated) break;
+    if (res.received === 0 || (byId.size === before && res.events.length > 0)) break;
+    offset += res.received;
+  }
+  return { total, truncated, events: [...byId.values()] };
 }

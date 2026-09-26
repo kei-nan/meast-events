@@ -1,0 +1,70 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { matchesFilters, matchesTokens, normalizeText, rankEvents, tokenize } from "./ranking.js";
+import { makeCircleArea, makeRectArea } from "./geo.js";
+
+const ev = (id, title, extra = {}) => ({
+  id,
+  title,
+  extract: "",
+  date_start: "1950-01-01",
+  countries: ["Israel"],
+  category: "war",
+  coordinates: { lon: 35, lat: 32 },
+  location_quality: "precise",
+  ...extra,
+});
+
+test("normalizeText / tokenize fold diacritics and case", () => {
+  assert.equal(normalizeText("Coup d'État"), "coup d'etat");
+  assert.deepEqual(tokenize("Anglo-Iraqi War"), ["anglo", "iraqi", "war"]);
+  assert.deepEqual(tokenize("Şırnak İstanbul"), ["sirnak", "istanbul"]);
+});
+
+test("matching: whole words, last token prefix (>=2 chars)", () => {
+  const e = ev("a", "Suez Crisis", { extract: "The Suez Canal was nationalised." });
+  assert.ok(matchesTokens(e, tokenize("suez crisis")));
+  assert.ok(matchesTokens(e, tokenize("suez cri")));
+  assert.ok(matchesTokens(e, tokenize("SUEZ canal nation")));
+  assert.ok(!matchesTokens(e, tokenize("sue crisis"))); // non-last token must be whole
+  assert.ok(!matchesTokens(e, tokenize("suez x"))); // no such word
+  assert.ok(!matchesTokens(e, tokenize("suez c"))); // 1-char last token is exact, not prefix
+  assert.ok(matchesTokens(ev("b", "Été"), tokenize("ete")));
+});
+
+test("filters: coords required, category/country/area, approximate excluded from areas", () => {
+  const e = ev("a", "X");
+  assert.ok(matchesFilters(e, {}));
+  assert.ok(!matchesFilters({ ...e, coordinates: null }, {}));
+  assert.ok(matchesFilters(e, { categories: ["war"] }));
+  assert.ok(!matchesFilters(e, { categories: ["politics"] }));
+  assert.ok(matchesFilters(e, { countries: ["Israel", "Egypt"] }));
+  assert.ok(!matchesFilters(e, { countries: ["Egypt"] }));
+  const area = makeRectArea([30, 30, 40, 40]);
+  assert.ok(matchesFilters(e, { area }));
+  assert.ok(!matchesFilters({ ...e, location_quality: "approximate" }, { area }));
+  assert.ok(matchesFilters({ ...e, location_quality: "approximate" }, {}));
+  assert.ok(!matchesFilters(e, { area: makeCircleArea([0, 0], 50) }));
+});
+
+test("rank: exact > prefix > contains > rest (server order), stable", () => {
+  const list = [
+    ev("rest1", "Something else", { extract: "war of words" }),
+    ev("contains", "The Six-Day War"),
+    ev("prefix", "War of Attrition"),
+    ev("exact", "War"),
+    ev("rest2", "Another", { extract: "war again" }),
+  ];
+  assert.deepEqual(rankEvents(list, "war").map((e) => e.id), ["exact", "prefix", "contains", "rest1", "rest2"]);
+  assert.deepEqual(rankEvents(list, "WAR").map((e) => e.id), ["exact", "prefix", "contains", "rest1", "rest2"]);
+});
+
+test("rank: no query sorts by date, stable on ties", () => {
+  const list = [
+    ev("c", "C", { date_start: "1990-05-01" }),
+    ev("a", "A", { date_start: "1948-05-15" }),
+    ev("b1", "B1", { date_start: "1967-06-05" }),
+    ev("b2", "B2", { date_start: "1967-06-05" }),
+  ];
+  assert.deepEqual(rankEvents(list, "").map((e) => e.id), ["a", "b1", "b2", "c"]);
+});
