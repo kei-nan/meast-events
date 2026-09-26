@@ -83,3 +83,12 @@ addition to indexing them).
 |-------------|---------------------------|-----------------------------------|
 | `REDIS_URL` | `redis://localhost:6379` | `scripts/load-redis.js`, `server/index.js` |
 | `PORT`      | `3001`                    | `server/index.js`                 |
+
+For local overrides, copy `server/.env.example` to `server/.env` (gitignored -
+never commit real credentials there) and edit it. `npm start`/`npm run dev`
+here, and the root `npm run load-redis`, all load it automatically via
+Node's built-in `--env-file-if-exists` flag - no `dotenv` dependency needed.
+In production, set `REDIS_URL` as a real environment variable/secret on
+whatever platform ends up running this server (the exact steps depend on
+that platform - a dashboard field, a CLI like `fly secrets set` or
+`wrangler secret put`, etc.) rather than via a committed file.

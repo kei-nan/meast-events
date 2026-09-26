@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "ingest": "node scripts/ingest.js",
-    "load-redis": "node scripts/load-redis.js"
+    "load-redis": "node --env-file-if-exists=server/.env scripts/load-redis.js"
   },
   "dependencies": {
     "redis": "^6.2.1"
