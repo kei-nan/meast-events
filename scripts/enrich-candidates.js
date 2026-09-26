@@ -2,17 +2,18 @@
 // Wikidata and produces:
 //   data/enriched-candidates.json      every candidate in the batch, with review flags and an
 //                                      `exclusion_reason` for those NOT proposed
-//   data/events.proposed.json          the events that meet the objective inclusion rule AND
-//                                      have real coordinates (Wikipedia coordinates or Wikidata
-//                                      P625) - see docs/DATA_POLICY.md. NEVER merged automatically.
+//   data/events.proposed.json          the events that meet the objective inclusion rule - see
+//                                      docs/DATA_POLICY.md. Events without real coordinates (Wikipedia
+//                                      or Wikidata P625) are INCLUDED with location_quality "none" and
+//                                      coordinates null (never invented). NEVER merged automatically.
 //   data/missing-coordinates-report.md curated + candidate events that lack a precise location
 //
 // PRINCIPLE: minimal interference with Wikipedia/Wikidata data. Titles, extracts, dates,
 // countries and labels are copied AS-IS. Automated checks only FLAG (review_reasons) - they never
 // overwrite, drop or "fix" anything. The only events left out of the proposed file are those that
-// cannot be shown on a map (no real coordinates), have no Wikipedia summary/extract, or whose own
-// source dates are internally impossible (date_end before date_start) - each is listed with its
-// reason in enriched-candidates.json and summarised in the run output.
+// have no Wikipedia summary/extract - each is listed with its reason in enriched-candidates.json.
+// Events whose Wikidata dates are contradictory (date_end before date_start) are kept, dates as
+// Wikidata gives them, with a date_flags reason.
 //
 // CLI:
 //   --limit=N            only process the first N selected candidates (bounded run)
@@ -25,7 +26,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { sleep } from "./lib/http.js";
-import { countryFallbackCoordinates } from "./lib/geo.js";
+import { buildContext } from "./lib/context.js";
+import { finalizeEvent } from "./lib/v21.js";
 import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES } from "./lib/event-classes.js";
 import {
   fetchSummary,
@@ -44,7 +46,8 @@ import {
 } from "./lib/flags.js";
 import { validateEvents } from "./lib/validate.js";
 
-const ENRICH_VERSION = 2;
+const ENRICH_VERSION = 3;
+const REUSABLE_VERSIONS = [2, 3]; // v2 entries are upgraded by the post-processing step (leads, classes, locations, flags)
 const REQUEST_DELAY_MS = 300;
 const argVal = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=").slice(1).join("=");
 const flag = (n) => process.argv.includes(`--${n}`);
@@ -125,14 +128,9 @@ async function resolveCandidate(candidate, index, total) {
       coordinateSource = "wikidata";
     }
   }
+  // v2.1: no capital-fallback pin for discovered events. No real coordinates => coordinates null and
+  // location_quality "none" (never invented); the event is still proposed.
   const hasRealCoordinates = Boolean(coordinates);
-  if (!coordinates) {
-    const fb = countryFallbackCoordinates(candidate.countries);
-    if (fb) {
-      coordinates = { lat: fb.lat, lon: fb.lon };
-      coordinateSource = `country-fallback:${fb.approximate_for}`;
-    }
-  }
 
   const precision = datePrecisionFor(entity, candidate.date_start);
   if (precision && precision.code < 9) {
@@ -173,7 +171,7 @@ async function resolveCandidate(candidate, index, total) {
     extract: summary.extract ?? null,
     coordinates,
     coordinate_source: coordinateSource,
-    location_quality: hasRealCoordinates ? "precise" : "approximate",
+    location_quality: hasRealCoordinates ? "precise" : "none",
     needs_manual_coordinates: !hasRealCoordinates,
     date_precision: precision?.name ?? null,
     _part_of_qids: partOfQids,
@@ -184,10 +182,7 @@ async function resolveCandidate(candidate, index, total) {
 function exclusionReason(r) {
   if (r.error) return "no_wikipedia_summary";
   if (!r.extract || !r.extract.trim()) return "empty_extract";
-  if (r._review.some((x) => x.startsWith("date_order_invalid"))) return "date_order_invalid";
-  if (!r.coordinates) return "no_coordinates";
-  if (String(r.coordinate_source).startsWith("country-fallback")) return "country_fallback_only";
-  return null;
+  return null; // v2.1: no-coordinate and date-order-invalid events are kept (flagged), not excluded
 }
 
 async function loadJson(name, fallback = []) {
@@ -221,7 +216,7 @@ async function writeMissingReport({ curated, enriched, generatedAt }) {
   rowsCurated.sort((a, b) => (b.sitelinks ?? -1) - (a.sitelinks ?? -1));
 
   const candMissing = enriched
-    .filter((r) => ["country_fallback_only", "no_coordinates"].includes(r.exclusion_reason))
+    .filter((r) => r.location_quality === "none")
     .sort((a, b) => (b.sitelinks ?? 0) - (a.sitelinks ?? 0));
 
   const table = (rows) =>
@@ -241,8 +236,9 @@ async function writeMissingReport({ curated, enriched, generatedAt }) {
 Generated ${generatedAt} by \`node scripts/enrich-candidates.js\`.
 
 These events have **no coordinates on Wikipedia or Wikidata**, so atlas.wiki can only pin them at a
-country-capital fallback (labelled "approximate location") or not at all. Candidate events in the second
-table are **excluded from \`data/events.proposed.json\`** for that reason.
+country-capital fallback (curated events only, labelled "approximate location") or not at all. Candidate events in
+the second table ARE included in \`data/events.proposed.json\` with \`location_quality: "none"\` and
+\`coordinates: null\` (listed and searchable, but no map marker; a location is never invented).
 
 The fix belongs upstream: if you know the real location of an event, you can add a coordinate location
 (property **P625**) to its Wikidata item (linked below) with a reference. This pipeline never invents
@@ -253,7 +249,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 
 ${table(rowsCurated.map(({ e, sitelinks }) => ({ ...e, sitelinks })))}
 
-## 2. Discovered candidates (sitelinks >= ${INCLUSION_MIN_SITELINKS}) excluded from the proposal for lack of a real location - ${candMissing.length}
+## 2. Discovered candidates (sitelinks >= ${INCLUSION_MIN_SITELINKS}) proposed with location_quality "none" (no real location) - ${candMissing.length}
 
 ${table(candMissing)}
 `;
@@ -277,7 +273,7 @@ async function main() {
   const cache = new Map();
   if (flag("reuse")) {
     for (const r of await loadJson("enriched-candidates.json")) {
-      if (r.enrich_version === ENRICH_VERSION && r._review) cache.set(r.wikidata_qid, r);
+      if (REUSABLE_VERSIONS.includes(r.enrich_version) && r._review) cache.set(r.wikidata_qid, r);
     }
     console.log(`Reuse: ${cache.size} cached enriched entries available.`);
   }
@@ -307,10 +303,13 @@ async function main() {
 
   // ---- unique ids (never rename silently: suffix with the QID on a clash) ----
   const curated = await loadJson("events.json");
-  const takenIds = new Set(curated.map((e) => e.id));
+  // An id already held by the SAME Wikidata item (already merged into the curated file) is kept as is (ids are
+  // stable); only a clash with a different item is disambiguated with the QID.
+  const takenIds = new Map(curated.map((e) => [e.id, e.wikidata_qid]));
+  const curatedQids = new Set(curated.map((e) => e.wikidata_qid));
   for (const r of results) {
-    if (takenIds.has(r.id)) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
-    takenIds.add(r.id);
+    if (takenIds.has(r.id) && takenIds.get(r.id) !== r.wikidata_qid) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
+    takenIds.set(r.id, r.wikidata_qid);
   }
 
   // ---- part-of labels ----
@@ -327,7 +326,7 @@ async function main() {
 
   // ---- duplicate hints (hints only; nothing is dropped) ----
   const pool = [
-    ...curated.map((e) => ({
+    ...curated.filter((e) => !results.some((r) => r.wikidata_qid === e.wikidata_qid)).map((e) => ({
       ...e, precise: e.coordinates && !String(e.coordinate_source ?? "").startsWith("country-fallback"),
     })),
     ...results.map((r) => ({ ...r, precise: r.location_quality === "precise" })),
@@ -341,10 +340,35 @@ async function main() {
     }
   }
 
+  // ---- v2.1: real-coordinates-only locations, full lead, all Wikidata classes, flags ----
+  for (const r of results) {
+    // entries cached by an older version carry a capital-fallback pin: it is not a real location
+    if (String(r.coordinate_source ?? "").startsWith("country-fallback")) {
+      r.coordinates = null;
+      r.coordinate_source = null;
+    }
+    if (!r.error) r.location_quality = r.coordinates ? "precise" : "none";
+    if (!r.error) r.needs_manual_coordinates = !r.coordinates;
+  }
+  const okResults = results.filter((r) => !r.error && r.wikipedia_url);
+  const ctx = await buildContext(okResults, {
+    candidates: allCandidates,
+    reconcileDates: true,
+    log: (m) => process.stdout.write(`
+${m}      `),
+  });
+  console.log();
+  for (const r of okResults) {
+    r.review_reasons = r._review;
+    // events already merged into the curated file keep the dates as merged (no source reconciliation here)
+    finalizeEvent(r, { ...ctx, reconcileDates: !curatedQids.has(r.wikidata_qid) });
+    r._review = r.review_reasons;
+  }
+
   // ---- finalise ----
   for (const r of results) {
     r.review_reasons = r._review;
-    r.needs_review = r.review_reasons.length > 0;
+    r.needs_review = r.review_reasons.length > 0 || (r.date_flags?.length ?? 0) > 0;
     if (!r.error) r.exclusion_reason = exclusionReason(r);
   }
   const strip = ({ _review, _part_of_qids, ...rest }) => rest;
