@@ -80,9 +80,12 @@ export default function ResultsList({
                 {ev.snippet && (
                   <span className="sp-row-snippet">{highlight(ev.snippet, query)}</span>
                 )}
-                {(outside || ev.location_quality === "approximate") && (
+                {(outside || ev.location_quality === "approximate" || ev.location_quality === "none") && (
                   <span className="sp-tags">
                     {outside && <span className="sp-tag">outside selected years</span>}
+                    {ev.location_quality === "none" && (
+                      <span className="sp-tag sp-tag--nomap">No map location</span>
+                    )}
                     {ev.location_quality === "approximate" && (
                       <span className="sp-tag">approximate location</span>
                     )}

@@ -169,6 +169,17 @@ html, body, #root {
   color: var(--link);
 }
 
+.app-footer-link {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .app-header {
     padding: 10px 14px;

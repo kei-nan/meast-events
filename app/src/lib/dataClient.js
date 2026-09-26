@@ -13,6 +13,7 @@
 
 import { eventCoords } from "./geo.js";
 import { matchesFilters } from "./ranking.js";
+import { fullBucket } from "./fullBucket.js";
 
 export const DECADE_SIZE = 10;
 
@@ -81,6 +82,44 @@ function fetchJSONCached(url, { timeoutMs } = {}) {
   return inFlight.get(url);
 }
 
+// Cancellable fetch that de-duplicates identical concurrent requests: callers
+// with the same URL share ONE network request, which is only aborted once every
+// caller has aborted (on a 0 ms delay, so a synchronous unmount/remount - React
+// StrictMode's double effect run, or a re-render that re-issues the same query -
+// re-joins the request instead of cancelling and repeating it).
+const sharedFetches = new Map(); // url -> {controller, promise, subs, timer}
+function fetchJSONShared(url, { timeoutMs, signal }) {
+  let s = sharedFetches.get(url);
+  if (!s) {
+    const controller = new AbortController();
+    s = { controller, subs: 0, timer: null };
+    const entry = s;
+    s.promise = fetchJSON(url, { timeoutMs, signal: controller.signal }).finally(() => {
+      if (sharedFetches.get(url) === entry) sharedFetches.delete(url);
+    });
+    sharedFetches.set(url, s);
+  }
+  const entry = s;
+  clearTimeout(entry.timer);
+  entry.subs++;
+  return new Promise((resolve, reject) => {
+    const onAbort = () => {
+      entry.subs--;
+      reject(Object.assign(new Error("aborted"), { aborted: true }));
+      if (entry.subs === 0) {
+        entry.timer = setTimeout(() => {
+          if (entry.subs !== 0) return;
+          if (sharedFetches.get(url) === entry) sharedFetches.delete(url);
+          entry.controller.abort();
+        }, 0);
+      }
+    };
+    if (signal.aborted) return onAbort();
+    signal.addEventListener("abort", onAbort, { once: true });
+    entry.promise.then(resolve, reject).finally(() => signal.removeEventListener("abort", onAbort));
+  });
+}
+
 function apiUrl(path, params = {}) {
   const url = new URL(path, API_URL);
   for (const [key, value] of Object.entries(params)) {
@@ -132,14 +171,18 @@ export function eventOverlapsRange(e, startYear, endYear) {
   return s <= endYear && en >= startYear;
 }
 
-// Canonical event shape for everything downstream. Returns null for events
-// without usable coordinates (they are never shown or indexed). Fields are
-// only ever ADDED when missing (location_quality, snippet), never rewritten:
-// titles, dates, countries and extracts stay exactly as the source gave them.
+// Canonical event shape for everything downstream. Events without usable
+// coordinates are KEPT (location_quality "none", coordinates null): they are
+// listed and searchable but never get a map marker. Fields are only ever ADDED
+// when missing (location_quality, snippet), never rewritten: titles, dates,
+// countries and extracts stay exactly as the source gave them.
 export function normalizeEvent(e) {
-  if (!e || !e.id || !e.date_start || !eventCoords(e)) return null;
+  if (!e || !e.id || !e.date_start) return null;
   const out = e;
-  if (!out.location_quality) {
+  if (!eventCoords(out)) {
+    out.coordinates = null;
+    out.location_quality = "none";
+  } else if (!out.location_quality || out.location_quality === "none") {
     out.location_quality = String(out.coordinate_source ?? "").startsWith("country-fallback")
       ? "approximate"
       : "precise";
@@ -216,6 +259,20 @@ export async function loadEventById(id) {
   return (await loadAllStaticEvents()).find((e) => e.id === id) ?? null;
 }
 
+// data/selection-funnel.json as published by the data pipeline (About page).
+export function loadSelectionFunnel() {
+  return fetchJSONCached(dataUrl("selection-funnel.json"));
+}
+
+// The full lead of one event: {extract, extract_retrieved_at}. Lives in a small
+// static bucket file (events/full/<bucket>.json, see lib/fullBucket.js) that is
+// fetched only when an event is opened - lists never download full leads.
+// Resolves null if the id is not in its bucket; rejects if the file is unreachable.
+export async function loadFullLead(id) {
+  const bucket = await fetchJSONCached(dataUrl(`events/full/${fullBucket(id)}.json`));
+  return Object.prototype.hasOwnProperty.call(bucket, id) ? bucket[id] : null;
+}
+
 // One page of /api/events. Rejects with err.outage === true when the API is
 // unreachable, 5xx, or slower than API_TIMEOUT_MS; err.aborted when `signal`
 // was aborted. Without `signal` identical requests share one cached fetch.
@@ -248,7 +305,7 @@ export function fetchEvents({
     fields,
   });
   const request = signal
-    ? fetchJSON(url, { timeoutMs: API_TIMEOUT_MS, signal })
+    ? fetchJSONShared(url, { timeoutMs: API_TIMEOUT_MS, signal })
     : fetchJSONCached(url, { timeoutMs: API_TIMEOUT_MS });
   return request.then((data) => {
     const events = normalizeEvents(data.events ?? []);

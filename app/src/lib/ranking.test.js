@@ -32,10 +32,13 @@ test("matching: whole words, last token prefix (>=2 chars)", () => {
   assert.ok(matchesTokens(ev("b", "Été"), tokenize("ete")));
 });
 
-test("filters: coords required, category/country/area, approximate excluded from areas", () => {
+test("filters: coordinate-less events match text but never areas; category/country/area, approximate excluded from areas", () => {
   const e = ev("a", "X");
   assert.ok(matchesFilters(e, {}));
-  assert.ok(!matchesFilters({ ...e, coordinates: null }, {}));
+  const none = { ...e, coordinates: null, location_quality: "none" };
+  assert.ok(matchesFilters(none, {}));
+  assert.ok(matchesFilters(none, { categories: ["war"] }));
+  assert.ok(!matchesFilters(none, { area: makeRectArea([-180, -90, 180, 90]) }));
   assert.ok(matchesFilters(e, { categories: ["war"] }));
   assert.ok(!matchesFilters(e, { categories: ["politics"] }));
   assert.ok(matchesFilters(e, { countries: ["Israel", "Egypt"] }));

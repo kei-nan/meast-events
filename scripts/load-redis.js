@@ -21,10 +21,10 @@
 //   title, extract          TEXT   - full-text search (title weighted higher)
 //   category                TAG    - exact-match filter (war/treaty/political/...)
 //   countries               TAG    - exact-match filter, comma-separated
-//   location_quality        TAG    - "approximate" iff coordinate_source starts
-//                                    with "country-fallback" (pin at the
-//                                    capital), else "precise"; the API's
-//                                    precise=1 filters on it
+//   location_quality        TAG    - "precise" | "approximate" (pin at a capital) |
+//                                    "none" (no coordinates); taken from the event
+//                                    (data shape v2.1), derived when absent; the
+//                                    API's precise=1 filters on it
 //   start_year, end_year    NUMERIC SORTABLE - year-range overlap queries
 //   lon, lat                NUMERIC SORTABLE - rectangular bbox queries
 //                                    (RediSearch's GEO field only supports
@@ -32,11 +32,14 @@
 //                                    NUMERIC range queries on lon/lat)
 //   location                GEO    - kept for radius-style queries
 //   id, date_start, date_end, wikipedia_url, wikidata_qid, coordinate_source,
-//   snippet (first 160 chars of extract, for fields=lite)
+//   extract_retrieved_at, snippet (first 160 chars of extract, for fields=lite),
+//   wikidata_classes / date_flags (JSON-array text; the API parses them)
 //                            stored but not indexed (retrieval only)
 //
-// Events WITHOUT real numeric coordinates are neither indexed nor loaded (the
-// skipped count is logged): there is nothing to place on a map.
+// Events WITHOUT real numeric coordinates ARE loaded (location_quality "none"):
+// they get NO lon/lat/location fields, so bbox/area queries (NUMERIC ranges on
+// lon/lat) can never match them, and precise=1 excludes them. They stay
+// searchable by text, category and country.
 //
 // Boundaries (JSON, prefix "bd:<stamp>:"): polygons, filtered by year only:
 //   $.name, $.note          TEXT
@@ -52,7 +55,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = path.join(__dirname, "..", "data");
+// ATLAS_DATA_DIR overrides where events.json / boundaries.json are read from
+// (e.g. a scratch copy for local testing).
+const DATA_DIR = process.env.ATLAS_DATA_DIR ? path.resolve(process.env.ATLAS_DATA_DIR) : path.join(__dirname, "..", "data");
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
@@ -74,8 +79,12 @@ const STAMP = Date.now().toString(36); // names this run's new index + key prefi
 const BATCH = 200;
 
 function locationQuality(event) {
+  if (!hasRealCoordinates(event)) return "none";
+  if (event.location_quality === "precise" || event.location_quality === "approximate") return event.location_quality;
   return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
 }
+
+const stringList = (v) => JSON.stringify(Array.isArray(v) ? v.filter((x) => typeof x === "string") : []);
 
 function hasRealCoordinates(event) {
   const c = event.coordinates;
@@ -164,8 +173,7 @@ async function inBatches(items, fn) {
 
 async function loadEvents(client) {
   const raw = JSON.parse(await readFile(path.join(DATA_DIR, "events.json"), "utf8"));
-  const events = raw.filter(hasRealCoordinates);
-  const skipped = raw.length - events.length;
+  const events = raw;
   const prefix = `ev:${STAMP}:`;
 
   await buildAndSwap(client, EVENTS_ALIAS, async (index) => {
@@ -189,14 +197,18 @@ async function loadEvents(client) {
 
     await inBatches(events, (event) => {
       const [startYear, endYear] = yearRange(event.date_start, event.date_end);
+      const located = hasRealCoordinates(event);
       return client.hSet(`${prefix}${event.id}`, {
         id: event.id,
         title: event.title,
         extract: event.extract || "",
         snippet: makeSnippet(event.extract),
-        // category = coarse group (colour/filter); category_label = Wikidata class label shown as-is
+        // category = our coarse group (colour/filter). The Wikidata class labels
+        // are wikidata_classes, shown as-is. (category_group: pre-v2.1 data only.)
         category: event.category_group || event.category || "",
-        category_label: event.category_group ? event.category || "" : "",
+        wikidata_classes: stringList(event.wikidata_classes),
+        date_flags: stringList(event.date_flags),
+        extract_retrieved_at: event.extract_retrieved_at || "",
         countries: (event.countries || []).join(","),
         location_quality: locationQuality(event),
         start_year: String(startYear),
@@ -206,9 +218,13 @@ async function loadEvents(client) {
         wikipedia_url: event.wikipedia_url || "",
         wikidata_qid: event.wikidata_qid || "",
         coordinate_source: event.coordinate_source || "",
-        lon: String(event.coordinates.lon),
-        lat: String(event.coordinates.lat),
-        location: `${event.coordinates.lon},${event.coordinates.lat}`,
+        ...(located
+          ? {
+              lon: String(event.coordinates.lon),
+              lat: String(event.coordinates.lat),
+              location: `${event.coordinates.lon},${event.coordinates.lat}`,
+            }
+          : {}),
       });
     });
 
@@ -216,10 +232,10 @@ async function loadEvents(client) {
     if (n !== events.length) throw new Error(`index ${index} holds ${n} docs, expected ${events.length}; alias not switched`);
   });
 
-  const approx = events.filter((e) => locationQuality(e) === "approximate").length;
+  const q = (k) => events.filter((e) => locationQuality(e) === k).length;
   console.log(
-    `Loaded ${events.length} events (${approx} approximate, ${events.length - approx} precise); ` +
-      `skipped ${skipped} without coordinates`
+    `Loaded ${events.length} events (${q("precise")} precise, ${q("approximate")} approximate, ` +
+      `${q("none")} without coordinates)`
   );
 }
 

@@ -192,8 +192,9 @@ test("buildEventsRequest: new params", () => {
   assert.equal(d.sortBy, "start_year"); // no q -> date
   assert.equal(d.limit, 1000);
   assert.equal(d.offset, 0);
-  assert.equal(d.fields, "full");
-  assert.equal(d.returnFields, null);
+  assert.equal(d.fields, "lite"); // full leads are opt-in
+  assert.ok(d.returnFields.includes("snippet") && !d.returnFields.includes("extract"));
+  assert.equal(buildEventsRequest(sp({ fields: "full" })).returnFields, null); // null = every stored field
   assert.equal(buildEventsRequest(sp({ q: "x", sort: "date" })).sortBy, "start_year");
   assert.equal(buildEventsRequest(sp({ sort: "relevance" })).sortBy, null);
   assert.equal(buildEventsRequest(sp({ precise: "0" })).query.includes("location_quality"), false);
@@ -224,7 +225,7 @@ test("hashToEvent: lite vs full, snippet, location_quality", () => {
   assert.equal(Array.from(makeSnippet("😀".repeat(200))).length, 160); // never splits a surrogate pair
   const v = { id: "1", title: "T", extract: long, lon: "1", lat: "2", location_quality: "approximate", wikipedia_url: "u" };
   const lite = hashToEvent(v, "lite");
-  assert.deepEqual(Object.keys(lite), ["id", "title", "date_start", "date_end", "countries", "category", "category_label", "snippet", "location_quality", "coordinates"]);
+  assert.deepEqual(Object.keys(lite), ["id", "title", "date_start", "date_end", "countries", "category", "snippet", "location_quality", "coordinates"]);
   assert.equal(lite.snippet.length, 160);
   assert.equal(hashToEvent({ ...v, snippet: "pre" }, "lite").snippet, "pre");
   const full = hashToEvent(v);
@@ -233,6 +234,38 @@ test("hashToEvent: lite vs full, snippet, location_quality", () => {
   assert.equal(full.wikipedia_url, "u");
   assert.equal("snippet" in full, false);
   assert.equal(hashToEvent({ id: "2", title: "x" }).location_quality, "precise");
+  assert.equal("category_label" in full, false);
+});
+
+test("hashToEvent: v2.1 fields (full), coordinate-less events", () => {
+  const v = {
+    id: "n1",
+    title: "No place",
+    extract: "Full lead.",
+    extract_retrieved_at: "2026-09-20",
+    wikidata_classes: JSON.stringify(["battle", "siege, of a city"]),
+    date_flags: JSON.stringify(["date_order_invalid: Wikidata start after end"]),
+    location_quality: "none",
+  };
+  const full = hashToEvent(v);
+  assert.equal(full.coordinates, null);
+  assert.equal(full.location_quality, "none");
+  assert.equal(full.extract_retrieved_at, "2026-09-20");
+  assert.deepEqual(full.wikidata_classes, ["battle", "siege, of a city"]);
+  assert.deepEqual(full.date_flags, ["date_order_invalid: Wikidata start after end"]);
+  const lite = hashToEvent(v, "lite");
+  assert.equal(lite.coordinates, null);
+  assert.equal("wikidata_classes" in lite, false);
+  assert.deepEqual(hashToEvent({ id: "x", title: "y", wikidata_classes: "not json", date_flags: "{}" }).wikidata_classes, []);
+  assert.deepEqual(hashToEvent({ id: "x", title: "y" }).date_flags, []);
+  assert.equal(hashToEvent({ id: "x", title: "y" }).extract_retrieved_at, null);
+});
+
+test("bbox / precise clauses exclude coordinate-less events by construction", () => {
+  // Events with location_quality "none" have no lon/lat fields, so a NUMERIC range on them cannot match.
+  const q = buildEventsQuery(sp({ bbox: "0,0,10,10" }));
+  assert.ok(q.includes("@lon:[0 10] @lat:[0 10]"));
+  assert.ok(buildEventsQuery(sp({ precise: "1" })).includes("@location_quality:{precise}"));
 });
 
 test("eventsResponse: truncated flag", () => {

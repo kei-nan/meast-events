@@ -195,7 +195,8 @@ export function buildEventsRequest(searchParams) {
   const sort = parseEnum("sort", searchParams.get("sort") ?? undefined, ["date", "relevance"]) ?? (tc ? "relevance" : "date");
   const limit = parseIntParam("limit", searchParams.get("limit") ?? undefined, { min: 1, max: MAX_LIMIT, fallback: MAX_LIMIT });
   const offset = parseIntParam("offset", searchParams.get("offset") ?? undefined, { min: 0, max: MAX_OFFSET, fallback: 0 });
-  const fields = parseEnum("fields", searchParams.get("fields") ?? undefined, ["lite", "full"]) ?? "full";
+  // Default is lite: a full lead is up to ~10 KB, so an unqualified query for 1000 events must stay small.
+  const fields = parseEnum("fields", searchParams.get("fields") ?? undefined, ["lite", "full"]) ?? "lite";
   return {
     query: clauses.join(" "),
     sortBy: sort === "date" ? "start_year" : null,
@@ -221,7 +222,6 @@ export const LITE_FIELDS = [
   "date_end",
   "countries",
   "category",
-  "category_label",
   "lon",
   "lat",
   "location_quality",
@@ -234,6 +234,17 @@ export function makeSnippet(extract) {
   return extract.length <= SNIPPET_LENGTH ? extract : Array.from(extract).slice(0, SNIPPET_LENGTH).join("");
 }
 
+// Stored JSON-array text -> string[] (never throws; anything malformed -> []).
+export function parseStringList(s) {
+  if (!s) return [];
+  try {
+    const a = JSON.parse(s);
+    return Array.isArray(a) ? a.filter((x) => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
 export function hashToEvent(v, fields = "full") {
   const event = {
     id: v.id,
@@ -241,13 +252,15 @@ export function hashToEvent(v, fields = "full") {
     date_start: v.date_start || null,
     date_end: v.date_end || null,
     countries: v.countries ? v.countries.split(",").filter(Boolean) : [],
-    category: v.category || null,
-    category_label: v.category_label || null,
+    category: v.category || null, // our coarse grouping (colour/filter)
   };
   if (fields === "lite") {
     event.snippet = v.snippet !== undefined ? v.snippet : makeSnippet(v.extract);
   } else {
     event.extract = v.extract || "";
+    event.extract_retrieved_at = v.extract_retrieved_at || null;
+    event.wikidata_classes = parseStringList(v.wikidata_classes);
+    event.date_flags = parseStringList(v.date_flags);
     event.wikipedia_url = v.wikipedia_url || null;
     event.wikidata_qid = v.wikidata_qid || null;
     event.coordinate_source = v.coordinate_source || null;

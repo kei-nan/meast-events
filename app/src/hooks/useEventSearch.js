@@ -76,8 +76,13 @@ export default function useEventSearch({
     const finish = (events, { total, truncated, source }) => {
       if (controller.signal.aborted) return;
       finished = true;
-      const located = events.filter((e) => eventCoords(e));
-      const trimmed = sArea ? located.filter((e) => inArea(eventCoords(e), sArea)) : located;
+      // Coordinate-less events stay in text/filter results; a drawn area excludes them.
+      const trimmed = sArea
+        ? events.filter((e) => {
+            const c = eventCoords(e);
+            return c && e.location_quality !== "approximate" && inArea(c, sArea);
+          })
+        : events;
       const results = rankEvents(trimmed, sq);
       addEvents(results);
       setState({

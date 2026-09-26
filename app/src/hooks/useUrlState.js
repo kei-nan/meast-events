@@ -14,7 +14,7 @@ const REPLACE_DEBOUNCE_MS = 400;
 // state: {q, categories, countries, startYear, endYear, scope, area, eventId}
 export default function useUrlState(state, onNavigate) {
   const serialized = serializeUrlState(state);
-  const { eventId } = state;
+  const { eventId, about } = state;
   const lastRef = useRef(typeof window === "undefined" ? "" : window.location.search);
   const navigateRef = useRef(onNavigate);
   useEffect(() => {
@@ -23,7 +23,8 @@ export default function useUrlState(state, onNavigate) {
 
   useEffect(() => {
     if (serialized === lastRef.current) return;
-    const eventChanged = parseUrlState(lastRef.current).eventId !== eventId;
+    const prev = parseUrlState(lastRef.current);
+    const eventChanged = prev.eventId !== eventId || prev.about !== Boolean(about);
     const write = () => {
       const url = `${window.location.pathname}${serialized}${window.location.hash}`;
       window.history[eventChanged ? "pushState" : "replaceState"](null, "", url);
@@ -35,7 +36,7 @@ export default function useUrlState(state, onNavigate) {
     }
     const timer = setTimeout(write, REPLACE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [serialized, eventId]);
+  }, [serialized, eventId, about]);
 
   useEffect(() => {
     const onPop = () => {

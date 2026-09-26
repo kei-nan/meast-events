@@ -14,7 +14,14 @@ test("defaults serialize to empty and parse back to defaults", () => {
     scope: "all",
     area: null,
     eventId: null,
+    about: false,
   });
+});
+
+test("about=1 round trips", () => {
+  assert.equal(parseUrlState("?about=1").about, true);
+  assert.equal(parseUrlState("?about=yes").about, false);
+  assert.equal(serializeUrlState({ ...base, about: true }), "?about=1");
 });
 
 test("round trip of a full state", () => {

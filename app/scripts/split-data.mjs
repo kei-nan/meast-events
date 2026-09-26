@@ -8,14 +8,26 @@
 // directly during development. Safe to re-run any time the inputs change -
 // it fully regenerates public/data/ (override the output dir with SPLIT_OUT_DIR).
 //
-// Events without real numeric coordinates are dropped (they are never shown),
-// every kept event gets a derived location_quality ("approximate" iff
-// coordinate_source starts with "country-fallback", else "precise"), and
-// events/ids.json maps event id -> the decade chunk that holds it (for deep
-// links), using the first decade of the event's span.
+// Events without real numeric coordinates are KEPT (data shape v2.1): they get
+// location_quality "none" and coordinates null, and simply never become map
+// markers. Every event carries location_quality ("none" | "approximate" iff
+// coordinate_source starts with "country-fallback" | "precise"; an explicit
+// value in the data wins). events/ids.json maps event id -> the decade chunk
+// that holds it (for deep links), using the first decade of the event's span.
 //
-// Chunk sizes are bounded: the build fails if any single events chunk exceeds
-// MAX_CHUNK_BYTES (raise it deliberately, or chunk the time range finer).
+// FULL LEADS ARE NOT IN THE DECADE CHUNKS. A full lead is up to ~10 KB, and the
+// lite list must never download them. Decade chunks carry a 160-char snippet
+// (no `extract`); the full lead + extract_retrieved_at live in
+// events/full/<bucket>.json ({id: {extract, extract_retrieved_at}}), 64 buckets
+// chosen by a hash of the id (src/lib/fullBucket.js, shared with the client),
+// fetched lazily when an event is opened. Offline text search therefore matches
+// title + snippet only.
+//
+// Sizes are bounded: the build fails if any events chunk exceeds MAX_CHUNK_BYTES
+// (default 1 MB) or any full file exceeds MAX_FULL_BYTES (default 1 MB).
+//
+// data/selection-funnel.json (written by the data pipeline) is copied to
+// public/data/ for the "About the data" page; missing is a warning, not an error.
 //
 // Keep MIN_YEAR/MAX_YEAR here in sync with src/components/Timeline.jsx - they
 // bound which decade chunks are ever requested by the app, so a feature/event
@@ -23,14 +35,21 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { FULL_BUCKETS, fullBucket } from "../src/lib/fullBucket.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.join(__dirname, "..", "src", "data"); // boundaries.json, land.json
-const EVENTS_FILE = path.join(__dirname, "..", "..", "data", "events.json"); // repo-root source of truth
+// ATLAS_DATA_DIR overrides the repo-root data/ (e.g. a scratch copy for tests).
+const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR
+  ? path.resolve(process.env.ATLAS_DATA_DIR)
+  : path.join(__dirname, "..", "..", "data");
+const EVENTS_FILE = path.join(ROOT_DATA_DIR, "events.json"); // repo-root source of truth
 const OUT_DIR = process.env.SPLIT_OUT_DIR
   ? path.resolve(process.env.SPLIT_OUT_DIR)
   : path.join(__dirname, "..", "public", "data");
-const MAX_CHUNK_BYTES = Number(process.env.MAX_CHUNK_BYTES) || 2 * 1024 * 1024;
+const MAX_CHUNK_BYTES = Number(process.env.MAX_CHUNK_BYTES) || 1024 * 1024;
+const MAX_FULL_BYTES = Number(process.env.MAX_FULL_BYTES) || 1024 * 1024;
+const SNIPPET_LENGTH = 160;
 
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2026;
@@ -68,29 +87,41 @@ function hasRealCoordinates(event) {
   );
 }
 
-// Only the fields the app shows. category = coarse group (colour/filter);
-// category_label = the Wikidata class label, shown as-is in the detail panel.
+// First 160 characters (code points, never splitting a surrogate pair).
+function makeSnippet(extract) {
+  if (!extract) return "";
+  return extract.length <= SNIPPET_LENGTH ? extract : Array.from(extract).slice(0, SNIPPET_LENGTH).join("");
+}
+
+function locationQuality(event) {
+  if (!hasRealCoordinates(event)) return "none";
+  if (event.location_quality === "precise" || event.location_quality === "approximate") return event.location_quality;
+  return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
+}
+
+const strings = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === "string") : []);
+
+// Only the fields the lists and map need (no full lead). category = our coarse
+// grouping (colour/filter; category_group is the pre-v2.1 spelling);
+// wikidata_classes are Wikidata's own labels, shown as-is.
 function publicEvent(e) {
-  const out = {
+  const quality = locationQuality(e);
+  return {
     id: e.id,
     title: e.title,
     date_start: e.date_start,
     date_end: e.date_end,
     countries: e.countries,
     category: e.category_group || e.category,
+    wikidata_classes: strings(e.wikidata_classes),
+    date_flags: strings(e.date_flags),
     wikidata_qid: e.wikidata_qid,
     wikipedia_url: e.wikipedia_url,
-    extract: e.extract,
-    coordinates: e.coordinates,
+    snippet: makeSnippet(e.extract),
+    coordinates: quality === "none" ? null : e.coordinates,
     coordinate_source: e.coordinate_source,
-    location_quality: locationQuality(e),
+    location_quality: quality,
   };
-  if (e.category_group && e.category !== e.category_group) out.category_label = e.category;
-  return out;
-}
-
-function locationQuality(event) {
-  return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
 }
 
 async function writeJSON(filePath, data) {
@@ -134,8 +165,28 @@ async function splitBoundaries() {
 
 async function splitEvents() {
   const allEvents = JSON.parse(await readFile(EVENTS_FILE, "utf8"));
-  const events = allEvents.filter(hasRealCoordinates).map(publicEvent);
-  const skipped = allEvents.length - events.length;
+  const events = allEvents.map(publicEvent);
+  const noLocation = events.filter((e) => e.location_quality === "none").length;
+
+  // Full leads, bucketed by id hash (see header comment).
+  const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
+  for (const e of allEvents) {
+    fullBuckets[fullBucket(e.id)][e.id] = {
+      extract: e.extract ?? "",
+      extract_retrieved_at: e.extract_retrieved_at ?? null,
+    };
+  }
+  let fullTotal = 0;
+  let fullMax = 0;
+  for (let i = 0; i < FULL_BUCKETS; i++) {
+    const bytes = Buffer.byteLength(JSON.stringify(fullBuckets[i]));
+    if (bytes > MAX_FULL_BYTES) {
+      throw new Error(`events/full/${i}.json is ${bytes} bytes (limit ${MAX_FULL_BYTES}); raise MAX_FULL_BYTES or use more buckets`);
+    }
+    await writeJSON(path.join(OUT_DIR, "events", "full", `${i}.json`), fullBuckets[i]);
+    fullTotal += bytes;
+    fullMax = Math.max(fullMax, bytes);
+  }
 
   function yearRange(e) {
     const start = Number(e.date_start.slice(0, 4));
@@ -186,12 +237,16 @@ async function splitEvents() {
     minYear: MIN_YEAR,
     maxYear: MAX_YEAR,
     totalEvents: events.length,
+    withoutLocation: noLocation,
+    fullBuckets: FULL_BUCKETS,
     maxChunkBytes: maxBytes,
+    maxFullBytes: fullMax,
   });
 
   console.log(
-    `events: ${events.length} events (${skipped} without coordinates skipped) -> ${byDecade.size} decade chunks, ` +
-      `${(totalBytes / 1024).toFixed(0)}KB total, largest chunk ${(maxBytes / 1024).toFixed(0)}KB, ` +
+    `events: ${events.length} events (${noLocation} without coordinates, kept) -> ${byDecade.size} decade chunks, ` +
+      `${(totalBytes / 1024).toFixed(0)}KB total, largest chunk ${(maxBytes / 1024).toFixed(0)}KB; ` +
+      `full leads: ${FULL_BUCKETS} files, ${(fullTotal / 1024).toFixed(0)}KB total, largest ${(fullMax / 1024).toFixed(0)}KB; ` +
       `${Object.keys(ids).length} ids (source was ${((await readFile(EVENTS_FILE)).length / 1024).toFixed(0)}KB)`
   );
 }
@@ -202,11 +257,25 @@ async function copyLand() {
   console.log("land: copied as a single static asset (no time dimension to chunk by)");
 }
 
+async function copyFunnel() {
+  const src = path.join(ROOT_DATA_DIR, "selection-funnel.json");
+  let raw;
+  try {
+    raw = JSON.parse(await readFile(src, "utf8"));
+  } catch (err) {
+    console.warn(`selection-funnel.json: not copied (${err.code ?? err.message}); the About page will say the funnel is unavailable`);
+    return;
+  }
+  await writeJSON(path.join(OUT_DIR, "selection-funnel.json"), raw);
+  console.log("selection-funnel.json: copied for the About the data page");
+}
+
 async function main() {
   await rm(OUT_DIR, { recursive: true, force: true });
   await splitBoundaries();
   await splitEvents();
   await copyLand();
+  await copyFunnel();
   console.log(`\nWrote chunked data to ${path.relative(process.cwd(), OUT_DIR)}`);
 }
 

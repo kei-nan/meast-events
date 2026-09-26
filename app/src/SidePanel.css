@@ -500,9 +500,30 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail-extract {
-  font-size: 0.92rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.65;
   color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.event-detail-extract p {
+  margin: 0 0 0.85em;
+  max-width: 68ch;
+}
+
+.event-detail-classes,
+.event-detail-asof {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px;
+}
+
+.event-detail-asof {
+  margin-top: 10px;
+}
+
+.sp-tag--nomap {
+  border-style: dashed;
 }
 
 .event-detail-note {
