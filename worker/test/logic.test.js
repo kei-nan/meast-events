@@ -5,6 +5,13 @@ import {
   boundaryDocToFeature,
   buildBoundariesQuery,
   buildEventsQuery,
+  buildEventsRequest,
+  escapeTagValue,
+  eventsResponse,
+  makeSnippet,
+  queryTokens,
+  tagClause,
+  textClause,
   corsHeaders,
   escapeRediSearchTerm,
   hashToEvent,
@@ -55,7 +62,7 @@ test("buildEventsQuery", () => {
   assert.equal(buildEventsQuery(sp({})), "@start_year:[-inf +inf] @end_year:[-inf +inf]");
   assert.equal(
     buildEventsQuery(sp({ start: "1945", end: "1950", bbox: "32,28,38,35", q: "coup d'état" })),
-    "@start_year:[-inf 1950] @end_year:[1945 +inf] @lon:[32 38] @lat:[28 35] @title|extract:(coup d\\'état)"
+    "@start_year:[-inf 1950] @end_year:[1945 +inf] @lon:[32 38] @lat:[28 35] @title|extract:(coup d état*)"
   );
   bad(() => buildEventsQuery(sp({ start: "1950", end: "1945" })), /start must not exceed end/);
   bad(() => buildEventsQuery(sp({ start: "abc" })), /start must be/);
@@ -141,4 +148,99 @@ test("boundaryDocToFeatureJson equals stringify(boundaryDocToFeature) (fast path
   }
   assert.equal(boundaryDocToFeatureJson(null), null);
   assert.equal(boundaryDocToFeatureJson("null"), null);
+});
+
+test("escapeTagValue / tagClause: spaces, slashes and punctuation are escaped", () => {
+  assert.equal(escapeTagValue("Saudi Arabia"), "Saudi\\ Arabia");
+  assert.equal(escapeTagValue("Israel/Palestine"), "Israel\\/Palestine");
+  assert.equal(escapeTagValue("Côte d'Ivoire"), "Côte\\ d\\'Ivoire");
+  assert.equal(escapeTagValue("a-b|c}{d"), "a\\-b\\|c\\}\\{d");
+  assert.equal(escapeTagValue("snake_case9"), "snake_case9");
+  assert.equal(escapeTagValue("ישר"), "ישר"); // non-ASCII untouched
+  assert.equal(tagClause("countries", ["Saudi Arabia", "Israel/Palestine"]), "@countries:{Saudi\\ Arabia|Israel\\/Palestine}");
+  assert.equal(tagClause("category", []), null);
+});
+
+test("textClause: word split + prefix on last token (>= 2 chars)", () => {
+  assert.deepEqual(queryTokens("Anglo-Iraqi War"), ["Anglo", "Iraqi", "War"]);
+  assert.equal(textClause("Anglo-Iraqi War"), "@title|extract:(Anglo Iraqi War*)");
+  assert.equal(textClause("revolution"), "@title|extract:(revolution*)");
+  assert.equal(textClause("iraq r"), "@title|extract:(iraq r)"); // 1-char last token: exact
+  assert.equal(textClause("r"), "@title|extract:(r)");
+  assert.equal(textClause("café"), "@title|extract:(café*)");
+  assert.equal(textClause("a/b"), "@title|extract:(a\\/b*)"); // non-separator punctuation stays literal
+  assert.equal(textClause("*"), null);
+  assert.equal(textClause("iraq* -war"), "@title|extract:(iraq war*)"); // user cannot inject wildcard/NOT
+  assert.equal(textClause("(@x) {y}"), "@title|extract:(x y)");
+});
+
+test("buildEventsRequest: new params", () => {
+  const r = buildEventsRequest(
+    sp({ category: "war, treaty", country: "Saudi Arabia,Israel/Palestine", precise: "1", q: "iraq", limit: "20", offset: "40", fields: "lite" })
+  );
+  assert.equal(
+    r.query,
+    "@start_year:[-inf +inf] @end_year:[-inf +inf] @category:{war|treaty} @countries:{Saudi\\ Arabia|Israel\\/Palestine} @location_quality:{precise} @title|extract:(iraq*)"
+  );
+  assert.equal(r.sortBy, null); // q present -> relevance by default
+  assert.equal(r.limit, 20);
+  assert.equal(r.offset, 40);
+  assert.equal(r.fields, "lite");
+  assert.deepEqual(r.returnFields.slice(-2), ["location_quality", "snippet"]);
+
+  const d = buildEventsRequest(sp({}));
+  assert.equal(d.sortBy, "start_year"); // no q -> date
+  assert.equal(d.limit, 1000);
+  assert.equal(d.offset, 0);
+  assert.equal(d.fields, "full");
+  assert.equal(d.returnFields, null);
+  assert.equal(buildEventsRequest(sp({ q: "x", sort: "date" })).sortBy, "start_year");
+  assert.equal(buildEventsRequest(sp({ sort: "relevance" })).sortBy, null);
+  assert.equal(buildEventsRequest(sp({ precise: "0" })).query.includes("location_quality"), false);
+});
+
+test("buildEventsRequest: validation", () => {
+  bad(() => buildEventsRequest(sp({ limit: "0" })), /limit must be between 1 and 1000/);
+  bad(() => buildEventsRequest(sp({ limit: "1001" })), /limit must be between/);
+  bad(() => buildEventsRequest(sp({ limit: "-1" })), /limit must be a non-negative integer/);
+  bad(() => buildEventsRequest(sp({ limit: "1.5" })), /limit must be/);
+  bad(() => buildEventsRequest(sp({ offset: "10001" })), /offset must be between/);
+  bad(() => buildEventsRequest(sp({ sort: "name" })), /sort must be one of/);
+  bad(() => buildEventsRequest(sp({ fields: "all" })), /fields must be one of/);
+  bad(() => buildEventsRequest(sp({ precise: "yes" })), /precise must be 1 or 0/);
+  bad(() => buildEventsRequest(sp({ country: "x".repeat(81) })), /country items must be/);
+  bad(() => buildEventsRequest(sp({ category: Array.from({ length: 21 }, (_, i) => "c" + i).join(",") })), /at most 20/);
+  // empty list items are ignored, not errors
+  assert.equal(buildEventsQuery(sp({ category: ",," })), "@start_year:[-inf +inf] @end_year:[-inf +inf]");
+  // injection attempts stay inside the TAG braces
+  assert.ok(buildEventsQuery(sp({ category: "war}|@title:{x" })).endsWith("@category:{war\\}\\|\\@title\\:\\{x}"));
+});
+
+test("hashToEvent: lite vs full, snippet, location_quality", () => {
+  const long = "é".repeat(200);
+  assert.equal(makeSnippet(long).length, 160);
+  assert.equal(makeSnippet("short"), "short");
+  assert.equal(makeSnippet(""), "");
+  assert.equal(Array.from(makeSnippet("😀".repeat(200))).length, 160); // never splits a surrogate pair
+  const v = { id: "1", title: "T", extract: long, lon: "1", lat: "2", location_quality: "approximate", wikipedia_url: "u" };
+  const lite = hashToEvent(v, "lite");
+  assert.deepEqual(Object.keys(lite), ["id", "title", "date_start", "date_end", "countries", "category", "snippet", "location_quality", "coordinates"]);
+  assert.equal(lite.snippet.length, 160);
+  assert.equal(hashToEvent({ ...v, snippet: "pre" }, "lite").snippet, "pre");
+  const full = hashToEvent(v);
+  assert.equal(full.extract, long);
+  assert.equal(full.location_quality, "approximate");
+  assert.equal(full.wikipedia_url, "u");
+  assert.equal("snippet" in full, false);
+  assert.equal(hashToEvent({ id: "2", title: "x" }).location_quality, "precise");
+});
+
+test("eventsResponse: truncated flag", () => {
+  const docs = [{ id: "a", title: "A" }, { id: "b", title: "B" }];
+  const r = (total, offset) => eventsResponse(total, docs, { fields: "full", offset }).truncated;
+  assert.equal(r(2, 0), false);
+  assert.equal(r(3, 0), true);
+  assert.equal(r(12, 10), false);
+  assert.equal(r(13, 10), true);
+  assert.equal(eventsResponse(0, [], { fields: "lite", offset: 0 }).truncated, false);
 });

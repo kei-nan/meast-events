@@ -7,7 +7,7 @@
 // Node net sockets, unavailable here).
 //
 // Endpoints (identical to server/index.js):
-//   GET /api/events?start=<year>&end=<year>&bbox=<minLon,minLat,maxLon,maxLat>&q=<text>
+//   GET /api/events?start&end&bbox&q&category&country&precise&sort&limit&offset&fields (see docs/design-contract.md)
 //   GET /api/boundaries?year=<year>  (also start/end range, see server/index.js)
 //   GET /api/health
 //
@@ -24,12 +24,14 @@ import { parseFtSearchWithFields } from "./resp-codec.js";
 import {
   ClientError,
   buildBoundariesQuery,
-  buildEventsQuery,
+  buildEventsRequest,
   boundaryDocToFeatureJson,
   corsHeaders,
-  hashToEvent,
+  eventsResponse,
 } from "./logic.js";
 
+// idx:events / idx:boundaries are ALIASES that scripts/load-redis.js repoints
+// (FT.ALIASUPDATE) at a freshly built index, so reloads never interrupt the API.
 const EVENTS_INDEX = "idx:events";
 const BOUNDARIES_INDEX = "idx:boundaries";
 const REDIS_TIMEOUT_MS = 8000; // whole connect+auth+query budget per request
@@ -149,13 +151,19 @@ async function handleHealth(request, env) {
 
 async function handleEvents(request, env, searchParams) {
   try {
-    const query = buildEventsQuery(searchParams);
-    const reply = await withRedis(env, (redis) =>
-      redis.send("FT.SEARCH", EVENTS_INDEX, query, "LIMIT", "0", "1000")
-    );
+    const req = buildEventsRequest(searchParams);
+    const args = ["FT.SEARCH", EVENTS_INDEX, req.query];
+    if (req.sortBy) args.push("SORTBY", req.sortBy, "ASC");
+    if (req.returnFields) args.push("RETURN", String(req.returnFields.length), ...req.returnFields);
+    args.push("LIMIT", String(req.offset), String(req.limit));
+    const reply = await withRedis(env, (redis) => redis.send(...args));
     const result = parseFtSearchWithFields(reply);
     return json(
-      { total: result.total, events: result.documents.map((d) => hashToEvent(d.value)) },
+      eventsResponse(
+        result.total,
+        result.documents.map((d) => d.value),
+        req
+      ),
       request,
       env,
       { cache: CACHE_OK }

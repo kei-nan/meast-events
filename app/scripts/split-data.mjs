@@ -1,10 +1,21 @@
-// Splits the monolithic src/data/{boundaries,events}.json into small per-decade
+// Splits the monolithic boundaries (src/data/boundaries.json) and the curated
+// events (../data/events.json at the repo root - the single source of truth;
+// the app/src/data/events.json copy is no longer read) into small per-decade
 // chunks under public/data/, so the app can fetch() only the time range it
 // currently needs instead of bundling ~2MB of JSON into the JS bundle.
 //
 // Run via `npm run build` (wired in as a "prebuild" step) or `node scripts/split-data.mjs`
-// directly during development. Safe to re-run any time src/data/*.json changes -
-// it fully regenerates public/data/.
+// directly during development. Safe to re-run any time the inputs change -
+// it fully regenerates public/data/ (override the output dir with SPLIT_OUT_DIR).
+//
+// Events without real numeric coordinates are dropped (they are never shown),
+// every kept event gets a derived location_quality ("approximate" iff
+// coordinate_source starts with "country-fallback", else "precise"), and
+// events/ids.json maps event id -> the decade chunk that holds it (for deep
+// links), using the first decade of the event's span.
+//
+// Chunk sizes are bounded: the build fails if any single events chunk exceeds
+// MAX_CHUNK_BYTES (raise it deliberately, or chunk the time range finer).
 //
 // Keep MIN_YEAR/MAX_YEAR here in sync with src/components/Timeline.jsx - they
 // bound which decade chunks are ever requested by the app, so a feature/event
@@ -14,8 +25,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SRC_DIR = path.join(__dirname, "..", "src", "data");
-const OUT_DIR = path.join(__dirname, "..", "public", "data");
+const SRC_DIR = path.join(__dirname, "..", "src", "data"); // boundaries.json, land.json
+const EVENTS_FILE = path.join(__dirname, "..", "..", "data", "events.json"); // repo-root source of truth
+const OUT_DIR = process.env.SPLIT_OUT_DIR
+  ? path.resolve(process.env.SPLIT_OUT_DIR)
+  : path.join(__dirname, "..", "public", "data");
+const MAX_CHUNK_BYTES = Number(process.env.MAX_CHUNK_BYTES) || 2 * 1024 * 1024;
 
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2026;
@@ -42,6 +57,19 @@ function decadesFor(startYear, endYear) {
   // dataset, but fall back to the nearest edge chunk rather than dropping data).
   if (decades.length === 0) decades.push(s <= MIN_DECADE ? MIN_DECADE : MAX_DECADE);
   return decades;
+}
+
+function hasRealCoordinates(event) {
+  const c = event.coordinates;
+  return (
+    !!c &&
+    typeof c.lon === "number" && Number.isFinite(c.lon) && Math.abs(c.lon) <= 180 &&
+    typeof c.lat === "number" && Number.isFinite(c.lat) && Math.abs(c.lat) <= 90
+  );
+}
+
+function locationQuality(event) {
+  return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
 }
 
 async function writeJSON(filePath, data) {
@@ -84,7 +112,9 @@ async function splitBoundaries() {
 }
 
 async function splitEvents() {
-  const events = JSON.parse(await readFile(path.join(SRC_DIR, "events.json"), "utf8"));
+  const allEvents = JSON.parse(await readFile(EVENTS_FILE, "utf8"));
+  const events = allEvents.filter(hasRealCoordinates).map((e) => ({ ...e, location_quality: locationQuality(e) }));
+  const skipped = allEvents.length - events.length;
 
   function yearRange(e) {
     const start = Number(e.date_start.slice(0, 4));
@@ -94,21 +124,35 @@ async function splitEvents() {
 
   const byDecade = new Map();
   const countsByYear = {};
+  const ids = {};
   for (const event of events) {
     const [start, end] = yearRange(event);
     countsByYear[start] = (countsByYear[start] ?? 0) + 1;
-    for (const decade of decadesFor(start, end)) {
+    const decades = decadesFor(start, end);
+    ids[event.id] = decades[0];
+    for (const decade of decades) {
       if (!byDecade.has(decade)) byDecade.set(decade, []);
       byDecade.get(decade).push(event);
     }
   }
 
   let totalBytes = 0;
+  let maxBytes = 0;
   for (const [decade, decadeEvents] of byDecade) {
     const filePath = path.join(OUT_DIR, "events", `${decade}.json`);
+    const bytes = Buffer.byteLength(JSON.stringify(decadeEvents));
+    if (bytes > MAX_CHUNK_BYTES) {
+      throw new Error(
+        `events chunk ${decade}.json is ${bytes} bytes (limit ${MAX_CHUNK_BYTES}); raise MAX_CHUNK_BYTES or chunk finer`
+      );
+    }
     await writeJSON(filePath, decadeEvents);
-    totalBytes += JSON.stringify(decadeEvents).length;
+    totalBytes += bytes;
+    maxBytes = Math.max(maxBytes, bytes);
   }
+
+  // id -> decade chunk, for deep links (?e=<id>) without scanning every chunk.
+  await writeJSON(path.join(OUT_DIR, "events", "ids.json"), ids);
 
   // Tiny, always-loaded index: per-year event counts for the timeline density
   // chart, which needs to show density across the *entire* MIN_YEAR-MAX_YEAR
@@ -121,13 +165,13 @@ async function splitEvents() {
     minYear: MIN_YEAR,
     maxYear: MAX_YEAR,
     totalEvents: events.length,
+    maxChunkBytes: maxBytes,
   });
 
   console.log(
-    `events: ${events.length} events -> ${byDecade.size} decade chunks, ` +
-      `${(totalBytes / 1024).toFixed(0)}KB total (source was ${(
-        (await readFile(path.join(SRC_DIR, "events.json"))).length / 1024
-      ).toFixed(0)}KB)`
+    `events: ${events.length} events (${skipped} without coordinates skipped) -> ${byDecade.size} decade chunks, ` +
+      `${(totalBytes / 1024).toFixed(0)}KB total, largest chunk ${(maxBytes / 1024).toFixed(0)}KB, ` +
+      `${Object.keys(ids).length} ids (source was ${((await readFile(EVENTS_FILE)).length / 1024).toFixed(0)}KB)`
   );
 }
 

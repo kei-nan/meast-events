@@ -173,3 +173,9 @@ Same variable, same meaning as the Express version:
 | `REDIS_URL` | `redis://localhost:6379` | `.dev.vars` (local, gitignored) / `wrangler secret put REDIS_URL` (real deploy, never committed) |
 
 Nothing here has been deployed by this repo's tooling. `wrangler dev` (local emulator) is what was verified, plus a plain-TCP run against a Redis Cloud free database. The TLS path (`rediss://`) is untested against a real TLS Redis. For a real deploy see [`../DEPLOYMENT.md`](../DEPLOYMENT.md).
+
+## Search API v2 (see docs/design-contract.md)
+
+`GET /api/events` also takes `category`, `country` (comma lists, TAG-matched with their own escaper), `precise=1`, `sort=date|relevance`, `limit`/`offset` (response carries `truncated`), `fields=lite|full`, and prefix-matches the last `q` token (>= 2 chars). `server/index.js` carries a verbatim copy of the shared logic block in `src/logic.js` (`test/parity.test.js` fails on drift). The API queries `idx:events` / `idx:boundaries` as aliases; `scripts/load-redis.js` builds a new index and switches the alias atomically.
+
+CPU: Workers Free allows 10 ms CPU per request. `node test/bench.mjs` (synthetic 500/1000-event replies, no credentials) shows fields=full at 500 events already touching that budget on a cold isolate, so clients should use `fields=lite` and page with `limit`.

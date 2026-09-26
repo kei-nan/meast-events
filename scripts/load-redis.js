@@ -4,57 +4,47 @@
 // Run with: node scripts/load-redis.js
 // Reads REDIS_URL (defaults to redis://localhost:6379).
 //
-// Idempotent: FT.DROPINDEX ... DD deletes the index *and* every document
-// under its keyspace prefix, so re-running this script always starts from a
-// clean slate for both event: and boundary: keys rather than accumulating
-// stale/duplicate documents across runs.
+// Non-destructive for the live API: each run builds a NEW index under a NEW key
+// prefix (idx:events:<stamp> over ev:<stamp>:*, idx:boundaries:<stamp> over
+// bd:<stamp>:*), sanity-checks it, then points the alias the API queries
+// (idx:events / idx:boundaries) at it with FT.ALIASUPDATE - an atomic switch -
+// and only then drops the previous index (DD: together with its documents).
+// If the load fails, the half-built index is dropped and the alias is left
+// untouched.
+// One-time migration: a legacy REAL index called idx:events / idx:boundaries
+// (from older versions of this script) occupies the alias name; it is dropped
+// (DD) at that moment, a brief gap on the first run only.
 //
 // --- Schema design ---
 //
-// Events (HASH, prefix "event:"): the same shape already validated earlier
-// this session against the 113-event curated set.
+// Events (HASH, prefix "ev:<stamp>:"):
 //   title, extract          TEXT   - full-text search (title weighted higher)
 //   category                TAG    - exact-match filter (war/treaty/political/...)
-//   countries                TAG    - exact-match filter, comma-separated
+//   countries               TAG    - exact-match filter, comma-separated
+//   location_quality        TAG    - "approximate" iff coordinate_source starts
+//                                    with "country-fallback" (pin at the
+//                                    capital), else "precise"; the API's
+//                                    precise=1 filters on it
 //   start_year, end_year    NUMERIC SORTABLE - year-range overlap queries
 //   lon, lat                NUMERIC SORTABLE - rectangular bbox queries
 //                                    (RediSearch's GEO field only supports
-//                                    radius queries via GEOFILTER, not
-//                                    axis-aligned bounding boxes - see note
-//                                    below - so bbox filtering is done with
-//                                    plain NUMERIC range queries on lon/lat
-//                                    instead)
-//   location                 GEO    - kept too, for radius-style queries
-//                                    ("within N km of point X"), which is
-//                                    exactly what was validated earlier this
-//                                    session (250km of Jerusalem). Redundant
-//                                    with lon/lat but cheap, and each field
-//                                    serves a different query shape.
-//   id, date_start, date_end, wikipedia_url, wikidata_qid, coordinate_source
+//                                    radius queries, so bbox uses plain
+//                                    NUMERIC range queries on lon/lat)
+//   location                GEO    - kept for radius-style queries
+//   id, date_start, date_end, wikipedia_url, wikidata_qid, coordinate_source,
+//   snippet (first 160 chars of extract, for fields=lite)
 //                            stored but not indexed (retrieval only)
 //
-// Events with no coordinates (needs_manual_coordinates or missing lat/lon)
-// simply omit lon/lat/location - RediSearch just won't match them on a geo
-// or bbox filter, which is correct (there's nothing to place on a map).
+// Events WITHOUT real numeric coordinates are neither indexed nor loaded (the
+// skipped count is logged): there is nothing to place on a map.
 //
-// Boundaries (JSON, prefix "boundary:"): boundaries are polygons/multipolygons,
-// not points, and RediSearch's GEO field is point-only (RediSearch does have
-// a newer GEOSHAPE field for real polygon WITHIN/CONTAINS queries, but that's
-// more machinery than this app needs right now - nothing in the current UI
-// does spatial boundary queries, it only filters boundaries by year, exactly
-// like the existing boundariesForYear() in MapView.jsx). So:
-//   $.name                  TEXT   - full-text search on territory name
-//   $.note                  TEXT   - full-text search on historical note
-//   $.status                TAG    - exact-match filter (mandate/occupied/...)
-//   $.start_year, $.end_year NUMERIC SORTABLE - year-range queries, same
-//                                    semantics as boundariesForYear()
-// The full GeoJSON geometry (and source/note text) is stored as a RedisJSON
-// document rather than forced into search fields, since it's never a search
-// *criterion* - it's just payload the client needs back once a boundary has
-// matched the year filter. The API does FT.SEARCH for matching ids (cheap,
-// indexed), then JSON.GET/JSON.MGET for the full documents (retrieval, not
-// search) - simpler and more robust than trying to get RediSearch to return
-// a nested JSON path through node-redis's RETURN handling.
+// Boundaries (JSON, prefix "bd:<stamp>:"): polygons, filtered by year only:
+//   $.name, $.note          TEXT
+//   $.status                TAG
+//   $.start_year, $.end_year NUMERIC SORTABLE - same semantics as
+//                                    boundariesForYear() in MapView.jsx
+// The full GeoJSON geometry stays in the RedisJSON document; the API fetches it
+// with FT.SEARCH ... RETURN 1 $.
 
 import { createClient, SCHEMA_FIELD_TYPE } from "redis";
 import { readFile } from "node:fs/promises";
@@ -76,10 +66,31 @@ function describeRedisTarget(url) {
   }
 }
 
-const EVENTS_INDEX = "idx:events";
-const EVENTS_PREFIX = "event:";
-const BOUNDARIES_INDEX = "idx:boundaries";
-const BOUNDARIES_PREFIX = "boundary:";
+// The API queries these two names as ALIASES (see swapAlias).
+const EVENTS_ALIAS = "idx:events";
+const BOUNDARIES_ALIAS = "idx:boundaries";
+const SNIPPET_LENGTH = 160;
+const STAMP = Date.now().toString(36); // names this run's new index + key prefix
+const BATCH = 200;
+
+function locationQuality(event) {
+  return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
+}
+
+function hasRealCoordinates(event) {
+  const c = event.coordinates;
+  return (
+    !!c &&
+    typeof c.lon === "number" && Number.isFinite(c.lon) && Math.abs(c.lon) <= 180 &&
+    typeof c.lat === "number" && Number.isFinite(c.lat) && Math.abs(c.lat) <= 90
+  );
+}
+
+// First 160 characters (code points, never splitting a surrogate pair).
+function makeSnippet(extract) {
+  if (!extract) return "";
+  return extract.length <= SNIPPET_LENGTH ? extract : Array.from(extract).slice(0, SNIPPET_LENGTH).join("");
+}
 
 function yearRange(dateStart, dateEnd) {
   const start = Number(dateStart.slice(0, 4));
@@ -89,8 +100,7 @@ function yearRange(dateStart, dateEnd) {
 
 // Slugify a boundary's name into a stable-ish id. Boundaries.json has no
 // explicit id field, and multiple entries can share a name across different
-// year ranges (e.g. "Persia" 1886-1934 vs some other span), so the id also
-// includes start_year to stay unique.
+// year ranges, so the id also includes start_year to stay unique.
 function boundaryId(feature, index) {
   const slug = (feature.properties.name || "boundary")
     .toLowerCase()
@@ -99,100 +109,154 @@ function boundaryId(feature, index) {
   return `${slug}-${feature.properties.start_year}-${index}`;
 }
 
+// Older RediSearch says "Unknown index name"; newer versions (e.g. the ones
+// Redis Cloud runs) say "SEARCH_INDEX_NOT_FOUND Index not found".
+const isMissingIndex = (err) => /unknown index|index not found|no such index/i.test(err.message);
+
 async function dropIndexIfExists(client, indexName) {
   try {
     await client.ft.dropIndex(indexName, { DD: true });
-    console.log(`Dropped existing index ${indexName} (and its documents)`);
+    console.log(`Dropped index ${indexName} (and its documents)`);
   } catch (err) {
-    // Older RediSearch says "Unknown index name"; newer versions (e.g. the
-    // ones Redis Cloud runs) say "SEARCH_INDEX_NOT_FOUND Index not found".
-    if (!/unknown index|index not found|no such index/i.test(err.message)) throw err;
+    if (!isMissingIndex(err)) throw err;
+  }
+}
+
+async function docCount(client, indexName) {
+  return (await client.ft.search(indexName, "*", { LIMIT: { from: 0, size: 0 } })).total;
+}
+
+// Points `alias` at `newIndex` (atomic), then drops every older versioned
+// index of that alias.
+async function swapAlias(client, alias, newIndex) {
+  try {
+    await client.ft.aliasUpdate(alias, newIndex);
+  } catch (err) {
+    // The alias name is occupied by a legacy real index: drop it, then add.
+    console.log(`${alias} is a legacy real index (${String(err.message).trim()}); dropping it - one-time brief gap`);
+    await dropIndexIfExists(client, alias);
+    await client.ft.aliasAdd(alias, newIndex);
+  }
+  console.log(`Alias ${alias} -> ${newIndex}`);
+  const versioned = new RegExp(`^${alias}:[0-9a-z]+$`);
+  for (const name of await client.ft._list()) {
+    if (name !== newIndex && versioned.test(name)) await dropIndexIfExists(client, name);
+  }
+}
+
+// Runs build(indexName) into a fresh index; on failure removes the partial one.
+async function buildAndSwap(client, alias, build) {
+  const index = `${alias}:${STAMP}`;
+  try {
+    await build(index);
+  } catch (err) {
+    await dropIndexIfExists(client, index).catch(() => {});
+    throw err;
+  }
+  await swapAlias(client, alias, index);
+}
+
+async function inBatches(items, fn) {
+  for (let i = 0; i < items.length; i += BATCH) {
+    await Promise.all(items.slice(i, i + BATCH).map(fn)); // node-redis pipelines these
   }
 }
 
 async function loadEvents(client) {
   const raw = JSON.parse(await readFile(path.join(DATA_DIR, "events.json"), "utf8"));
+  const events = raw.filter(hasRealCoordinates);
+  const skipped = raw.length - events.length;
+  const prefix = `ev:${STAMP}:`;
 
-  await dropIndexIfExists(client, EVENTS_INDEX);
+  await buildAndSwap(client, EVENTS_ALIAS, async (index) => {
+    await client.ft.create(
+      index,
+      {
+        title: { type: SCHEMA_FIELD_TYPE.TEXT, WEIGHT: 5 },
+        extract: { type: SCHEMA_FIELD_TYPE.TEXT },
+        category: { type: SCHEMA_FIELD_TYPE.TAG },
+        countries: { type: SCHEMA_FIELD_TYPE.TAG, SEPARATOR: "," },
+        location_quality: { type: SCHEMA_FIELD_TYPE.TAG },
+        start_year: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
+        end_year: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
+        lon: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
+        lat: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
+        location: { type: SCHEMA_FIELD_TYPE.GEO },
+      },
+      { ON: "HASH", PREFIX: prefix }
+    );
+    console.log(`Created index ${index} (prefix ${prefix})`);
 
-  await client.ft.create(
-    EVENTS_INDEX,
-    {
-      title: { type: SCHEMA_FIELD_TYPE.TEXT, WEIGHT: 5 },
-      extract: { type: SCHEMA_FIELD_TYPE.TEXT },
-      category: { type: SCHEMA_FIELD_TYPE.TAG },
-      countries: { type: SCHEMA_FIELD_TYPE.TAG, SEPARATOR: "," },
-      start_year: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
-      end_year: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
-      lon: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
-      lat: { type: SCHEMA_FIELD_TYPE.NUMERIC, SORTABLE: true },
-      location: { type: SCHEMA_FIELD_TYPE.GEO },
-    },
-    { ON: "HASH", PREFIX: EVENTS_PREFIX }
+    await inBatches(events, (event) => {
+      const [startYear, endYear] = yearRange(event.date_start, event.date_end);
+      return client.hSet(`${prefix}${event.id}`, {
+        id: event.id,
+        title: event.title,
+        extract: event.extract || "",
+        snippet: makeSnippet(event.extract),
+        category: event.category || "",
+        countries: (event.countries || []).join(","),
+        location_quality: locationQuality(event),
+        start_year: String(startYear),
+        end_year: String(endYear),
+        date_start: event.date_start || "",
+        date_end: event.date_end || "",
+        wikipedia_url: event.wikipedia_url || "",
+        wikidata_qid: event.wikidata_qid || "",
+        coordinate_source: event.coordinate_source || "",
+        lon: String(event.coordinates.lon),
+        lat: String(event.coordinates.lat),
+        location: `${event.coordinates.lon},${event.coordinates.lat}`,
+      });
+    });
+
+    const n = await docCount(client, index);
+    if (n !== events.length) throw new Error(`index ${index} holds ${n} docs, expected ${events.length}; alias not switched`);
+  });
+
+  const approx = events.filter((e) => locationQuality(e) === "approximate").length;
+  console.log(
+    `Loaded ${events.length} events (${approx} approximate, ${events.length - approx} precise); ` +
+      `skipped ${skipped} without coordinates`
   );
-  console.log(`Created index ${EVENTS_INDEX}`);
-
-  let withCoords = 0;
-  for (const event of raw) {
-    const [startYear, endYear] = yearRange(event.date_start, event.date_end);
-    const hash = {
-      id: event.id,
-      title: event.title,
-      extract: event.extract || "",
-      category: event.category || "",
-      countries: (event.countries || []).join(","),
-      start_year: String(startYear),
-      end_year: String(endYear),
-      date_start: event.date_start || "",
-      date_end: event.date_end || "",
-      wikipedia_url: event.wikipedia_url || "",
-      wikidata_qid: event.wikidata_qid || "",
-      coordinate_source: event.coordinate_source || "",
-    };
-    if (event.coordinates && Number.isFinite(event.coordinates.lon) && Number.isFinite(event.coordinates.lat)) {
-      hash.lon = String(event.coordinates.lon);
-      hash.lat = String(event.coordinates.lat);
-      hash.location = `${event.coordinates.lon},${event.coordinates.lat}`;
-      withCoords++;
-    }
-    await client.hSet(`${EVENTS_PREFIX}${event.id}`, hash);
-  }
-
-  console.log(`Loaded ${raw.length} events (${withCoords} with coordinates)`);
 }
 
 async function loadBoundaries(client) {
   const raw = JSON.parse(await readFile(path.join(DATA_DIR, "boundaries.json"), "utf8"));
+  const prefix = `bd:${STAMP}:`;
 
-  await dropIndexIfExists(client, BOUNDARIES_INDEX);
+  await buildAndSwap(client, BOUNDARIES_ALIAS, async (index) => {
+    await client.ft.create(
+      index,
+      {
+        "$.name": { type: SCHEMA_FIELD_TYPE.TEXT, AS: "name" },
+        "$.note": { type: SCHEMA_FIELD_TYPE.TEXT, AS: "note" },
+        "$.status": { type: SCHEMA_FIELD_TYPE.TAG, AS: "status" },
+        "$.start_year": { type: SCHEMA_FIELD_TYPE.NUMERIC, AS: "start_year", SORTABLE: true },
+        "$.end_year": { type: SCHEMA_FIELD_TYPE.NUMERIC, AS: "end_year", SORTABLE: true },
+      },
+      { ON: "JSON", PREFIX: prefix }
+    );
+    console.log(`Created index ${index} (prefix ${prefix})`);
 
-  await client.ft.create(
-    BOUNDARIES_INDEX,
-    {
-      "$.name": { type: SCHEMA_FIELD_TYPE.TEXT, AS: "name" },
-      "$.note": { type: SCHEMA_FIELD_TYPE.TEXT, AS: "note" },
-      "$.status": { type: SCHEMA_FIELD_TYPE.TAG, AS: "status" },
-      "$.start_year": { type: SCHEMA_FIELD_TYPE.NUMERIC, AS: "start_year", SORTABLE: true },
-      "$.end_year": { type: SCHEMA_FIELD_TYPE.NUMERIC, AS: "end_year", SORTABLE: true },
-    },
-    { ON: "JSON", PREFIX: BOUNDARIES_PREFIX }
-  );
-  console.log(`Created index ${BOUNDARIES_INDEX}`);
+    await inBatches(raw.features.map((feature, i) => [feature, i]), ([feature, i]) => {
+      const id = boundaryId(feature, i);
+      return client.json.set(`${prefix}${id}`, "$", {
+        name: feature.properties.name,
+        start_year: feature.properties.start_year,
+        end_year: feature.properties.end_year,
+        status: feature.properties.status,
+        source: feature.properties.source || "",
+        note: feature.properties.note || "",
+        geometry: feature.geometry,
+      });
+    });
 
-  let i = 0;
-  for (const feature of raw.features) {
-    const id = boundaryId(feature, i++);
-    const doc = {
-      name: feature.properties.name,
-      start_year: feature.properties.start_year,
-      end_year: feature.properties.end_year,
-      status: feature.properties.status,
-      source: feature.properties.source || "",
-      note: feature.properties.note || "",
-      geometry: feature.geometry,
-    };
-    await client.json.set(`${BOUNDARIES_PREFIX}${id}`, "$", doc);
-  }
+    const n = await docCount(client, index);
+    if (n !== raw.features.length) {
+      throw new Error(`index ${index} holds ${n} docs, expected ${raw.features.length}; alias not switched`);
+    }
+  });
 
   console.log(`Loaded ${raw.features.length} boundaries`);
 }
