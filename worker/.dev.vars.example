@@ -1,0 +1,10 @@
+# Copy to worker/.dev.vars (gitignored) for `wrangler dev`. This file is only
+# read locally by wrangler dev; it is never uploaded by `wrangler deploy`.
+# In production REDIS_URL is a secret: `npx wrangler secret put REDIS_URL`.
+
+# Local Docker default (redis/redis-stack-server on :6379).
+REDIS_URL=redis://localhost:6379
+
+# Optional: restrict CORS to one origin (scheme + host, no trailing slash).
+# Unset = open CORS. For local frontend dev this would be the Vite origin.
+# ALLOWED_ORIGIN=http://localhost:5173

@@ -3,12 +3,30 @@
   "name": "confrontation-api",
   "main": "src/index.js",
   "compatibility_date": "2026-09-26",
+  // Required: src/resp.js opens the Redis connection via `cloudflare:sockets`,
+  // and the Node-compat flag is what the bundle was verified with.
   "compatibility_flags": ["nodejs_compat"],
-  // Local-dev default only - matches server/.env.example's default. Real
-  // deployments should set REDIS_URL as a `wrangler secret put REDIS_URL`
-  // (never committed here), the same way the Express server reads it from
-  // an env var rather than a checked-in value.
-  "vars": {
-    "REDIS_URL": "redis://localhost:6379"
-  }
+
+  // Keeps the default https://<name>.<account-subdomain>.workers.dev URL,
+  // which is the URL the frontend's VITE_API_URL points at.
+  "workers_dev": true,
+
+  // Persist request logs / exceptions in the dashboard (Workers Logs) so
+  // Redis-unreachable (502/503) and CPU-limit (1102) failures can be diagnosed
+  // after the fact. Free plan has a daily log-event cap; fine for this app.
+  "observability": { "enabled": true },
+
+  // REDIS_URL is deliberately NOT declared here. It contains a password, so it
+  // must be a secret:   npx wrangler secret put REDIS_URL
+  // (Do not put it in "vars": vars are plaintext, committed, and re-applied on
+  // every `wrangler deploy` - a var with the same name as a secret makes
+  // `wrangler secret put` fail and would overwrite the dashboard value on
+  // each deploy.) For local dev, copy .dev.vars.example to .dev.vars.
+  //
+  // Non-secret settings go here. ALLOWED_ORIGIN is optional hardening: the
+  // exact origin of the Pages site that may call this API (scheme + host, no
+  // trailing slash). Leave unset until the Pages URL is known - the API then
+  // allows any origin. Uncomment and redeploy after the Pages deploy:
+  //
+  // "vars": { "ALLOWED_ORIGIN": "https://your-project.pages.dev" }
 }

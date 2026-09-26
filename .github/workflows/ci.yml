@@ -37,3 +37,28 @@ jobs:
       - name: Build
         working-directory: app
         run: npm run build
+
+  worker:
+    name: Bundle worker/ (dry run)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci
+
+      # --dry-run bundles the Worker (cloudflare:sockets import, nodejs_compat)
+      # exactly as `wrangler deploy` would, but uploads nothing and needs no
+      # Cloudflare credentials.
+      - name: Bundle (deploy dry run)
+        working-directory: worker
+        run: npx wrangler deploy --dry-run --outdir=.dry-run

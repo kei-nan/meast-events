@@ -7,6 +7,10 @@ instead of a persistent Node host (Render), avoiding Render free tier's
 cold-start sleep, on the same Cloudflare account the frontend (Pages) already
 uses.
 
+**Deploying:** see [`../DEPLOYMENT.md`](../DEPLOYMENT.md) (Redis Cloud, then
+`wrangler secret put REDIS_URL`, `wrangler deploy`, then Pages).
+`npx wrangler deploy --dry-run --outdir=.dry-run` bundles without deploying.
+
 `../server/index.js` is left in place, unmodified, as a working
 fallback/reference — this is an alternative deployment target, not a
 replacement.
@@ -124,8 +128,7 @@ npm install --ignore-scripts        # redis-on-workers isn't a dependency here,
 npx wrangler dev                    # local Workers emulator on :8787
 ```
 
-`wrangler.jsonc` sets `REDIS_URL` to `redis://localhost:6379` as a local-dev
-default var, matching `server/index.js`'s own default. The task brief
+Locally, `REDIS_URL` comes from `worker/.dev.vars` (copy `.dev.vars.example`; gitignored; `redis://localhost:6379` matches `server/index.js`'s own default). It is intentionally not in `wrangler.jsonc`. The task brief
 flagged Workers' local TCP socket emulation as having had rough edges
 reaching `localhost` specifically, suggesting `127.0.0.1` as a fallback if
 so — tested both directly against this `wrangler dev` + Docker setup and saw
@@ -167,9 +170,6 @@ Same variable, same meaning as the Express version:
 
 | Variable    | Default (local dev)      | Set via                                    |
 |-------------|---------------------------|---------------------------------------------|
-| `REDIS_URL` | `redis://127.0.0.1:6379` | `wrangler.jsonc`'s `vars` (local) / `wrangler secret put REDIS_URL` (real deploy, never committed) |
+| `REDIS_URL` | `redis://localhost:6379` | `.dev.vars` (local, gitignored) / `wrangler secret put REDIS_URL` (real deploy, never committed) |
 
-Not deployed anywhere as part of this work — `wrangler dev` (local emulator)
-only. See the task/PR notes for what a real `wrangler deploy` would still
-need (a Cloudflare account, `wrangler secret put REDIS_URL` pointing at the
-same Redis Cloud instance `server/README.md` describes).
+Nothing here has been deployed by this repo's tooling. `wrangler dev` (local emulator) is what was verified, plus a plain-TCP run against a Redis Cloud free database. The TLS path (`rediss://`) is untested against a real TLS Redis. For a real deploy see [`../DEPLOYMENT.md`](../DEPLOYMENT.md).
