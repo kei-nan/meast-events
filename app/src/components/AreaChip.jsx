@@ -1,6 +1,8 @@
 /**
- * Area row: the active-area chip (removable), the "Select area" mode group and
- * the "Only in current map view" toggle. Pure presentational.
+ * Area row: shows the active area (removable) and the "Only in current map
+ * view" toggle. The area itself is drawn with the map's own buttons (the one
+ * control set); this row only displays and clears the same `area` state.
+ * Pure presentational.
  */
 function describeArea(area) {
   if (!area) return null;
@@ -11,16 +13,9 @@ function describeArea(area) {
   return "Area: rectangle";
 }
 
-const MODES = [
-  { id: "rect", label: "Rectangle" },
-  { id: "circle", label: "Circle" },
-  { id: "off", label: "Off" },
-];
-
 export default function AreaChip({
   area,
   areaMode,
-  onAreaModeChange,
   onAreaChange,
   inView,
   onInViewChange,
@@ -30,7 +25,7 @@ export default function AreaChip({
   return (
     <div className="sp-area">
       <div className="sp-area-row">
-        {label && (
+        {label ? (
           <span className="sp-chip sp-chip--area">
             <span>{label}</span>
             <button
@@ -42,23 +37,13 @@ export default function AreaChip({
               <span aria-hidden="true">×</span>
             </button>
           </span>
-        )}
-        <div className="sp-seg" role="group" aria-label="Select area on the map">
-          <span className="sp-seg-label" aria-hidden="true">
-            Select area
+        ) : (
+          <span className="sp-muted sp-area-hint">
+            {areaMode === "off"
+              ? "No area selected. Use the draw buttons on the map to search an area."
+              : "Drawing an area on the map…"}
           </span>
-          {MODES.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              className="sp-seg-btn"
-              aria-pressed={areaMode === m.id}
-              onClick={() => onAreaModeChange?.(m.id)}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
+        )}
       </div>
       <label className="sp-check">
         <input
@@ -69,7 +54,10 @@ export default function AreaChip({
         <span>
           Only in current map view
           {typeof viewCount === "number" && (
-            <span className="sp-muted"> ({viewCount} in view)</span>
+            <span className="sp-muted">
+              {" "}
+              ({viewCount.toLocaleString("en-US")} {viewCount === 1 ? "event" : "events"} in view)
+            </span>
           )}
         </span>
       </label>

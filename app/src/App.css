@@ -37,6 +37,17 @@ html, body, #root {
   color: var(--text-secondary);
 }
 
+/* One reserved line, so the count/loading text appearing never resizes the map. */
+.app-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  min-height: 1.5em;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 .timeline {
   padding: 10px 22px 16px;
   border-top: 1px solid var(--border);
@@ -167,6 +178,17 @@ html, body, #root {
 
 .app-footer a {
   color: var(--link);
+}
+
+.app-footer-link {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {

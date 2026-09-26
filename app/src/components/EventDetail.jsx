@@ -5,7 +5,9 @@ function historyUrl(wikipediaUrl) {
 }
 
 /**
- * Selected-event view. Wikipedia's title/extract are rendered as-is.
+ * Selected-event view. Wikipedia's title/lead and Wikidata's class labels are
+ * rendered as-is. `event.leadStatus` is "loading"/"error" while only the
+ * snippet is available (the full lead is fetched lazily by the app).
  * `onBack` returns to the results list (the panel restores focus to the row).
  */
 export default function EventDetail({ event, onBack }) {
@@ -27,9 +29,13 @@ export default function EventDetail({ event, onBack }) {
       ? `${event.date_start.slice(0, 4)}–${event.date_end.slice(0, 4)}`
       : event.date_start.slice(0, 4);
 
-  const approximate =
-    event.location_quality === "approximate" ||
-    event.coordinate_source?.startsWith("country-fallback");
+  const quality =
+    event.location_quality ??
+    (event.coordinate_source?.startsWith("country-fallback") ? "approximate" : "precise");
+  const classes = (event.wikidata_classes ?? []).filter(Boolean);
+  const flags = (event.date_flags ?? []).filter(Boolean);
+  const paragraphs = (event.extract ?? "").split(/\n+/).filter((p) => p.trim());
+  const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
 
   async function copyLink() {
     try {
@@ -55,7 +61,7 @@ export default function EventDetail({ event, onBack }) {
         {copied && <span className="event-detail-copied" aria-hidden="true">Link copied</span>}
       </div>
       {event.category && (
-        <span className="event-detail-category">Wikidata class: {event.category_label || event.category}</span>
+        <span className="event-detail-category">Category (our grouping): {event.category}</span>
       )}
       <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
         {event.title}
@@ -63,11 +69,44 @@ export default function EventDetail({ event, onBack }) {
       <p className="event-detail-meta">
         {yearRange} · {(event.countries ?? []).join(", ")}
       </p>
-      <p className="event-detail-extract">{event.extract ?? "No summary available."}</p>
-      {approximate && (
+      {classes.length > 0 && (
+        <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>
+      )}
+      {flags.length > 0 && (
+        <p className="event-detail-note" role="note">
+          Date unverified: {flags.join("; ")}. Dates are shown as Wikidata gives them.
+        </p>
+      )}
+      <div className="event-detail-extract">
+        {paragraphs.length ? (
+          paragraphs.map((p, i) => <p key={i}>{p}</p>)
+        ) : (
+          <p>No summary available.</p>
+        )}
+      </div>
+      {event.leadStatus === "loading" && (
+        <p className="event-detail-note" role="status">
+          Loading the full text…
+        </p>
+      )}
+      {event.leadStatus === "error" && (
+        <p className="event-detail-note" role="status">
+          The full text could not be loaded; only the opening is shown. Read the whole article on Wikipedia.
+        </p>
+      )}
+      {retrieved && (
+        <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
+      )}
+      {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its
           marker is placed at a national capital. It is left out of drawn-area searches.
+        </p>
+      )}
+      {quality === "none" && (
+        <p className="event-detail-note">
+          No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
+          marker on the map and is left out of drawn-area searches.
         </p>
       )}
       {event.wikipedia_url && (
@@ -95,7 +134,7 @@ export default function EventDetail({ event, onBack }) {
         ) : (
           " by Wikipedia contributors"
         )}
-        . Extracts may be shortened from the original article.
+        . Classes are Wikidata&apos;s labels (CC0).
       </p>
     </article>
   );

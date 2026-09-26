@@ -41,13 +41,15 @@ export function matchesTokens(event, tokens) {
 
 export function matchesFilters(event, { q = "", area = null, categories = [], countries = [] } = {}) {
   const coords = eventCoords(event);
-  if (!coords) return false;
+  // Coordinate-less events (location_quality "none") match text/category/country
+  // but can never be inside a drawn area.
+  if (area && !coords) return false;
   if (!matchesTokens(event, tokenize(q))) return false;
   if (categories.length && !categories.includes(event.category)) return false;
   if (countries.length && !(event.countries ?? []).some((c) => countries.includes(c))) return false;
   if (area) {
     // Approximate (capital-pin) locations are excluded from drawn-area searches.
-    if (event.location_quality === "approximate") return false;
+    if (event.location_quality === "approximate" || event.location_quality === "none") return false;
     if (!inArea(coords, area)) return false;
   }
   return true;
