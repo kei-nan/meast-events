@@ -15,102 +15,39 @@
 // ./resp.js's top comment for why this hand-rolls RESP2 instead of using the
 // existing `redis-on-workers` package (github.com/kane50613/redis-on-workers) -
 // short version: that package's generic send()/sendRaw() commands *would*
-// carry FT.SEARCH/JSON.MGET (no command allowlist), but its decoder hangs on
+// carry FT.SEARCH (no command allowlist), but its decoder hangs on
 // any bulk string containing multi-byte UTF-8, which this dataset's text is
 // full of.
 
 import { RedisConnection } from "./resp.js";
+import { parseFtSearchWithFields } from "./resp-codec.js";
+import {
+  ClientError,
+  buildBoundariesQuery,
+  buildEventsQuery,
+  boundaryDocToFeatureJson,
+  corsHeaders,
+  hashToEvent,
+} from "./logic.js";
 
 const EVENTS_INDEX = "idx:events";
 const BOUNDARIES_INDEX = "idx:boundaries";
+const REDIS_TIMEOUT_MS = 8000; // whole connect+auth+query budget per request
+const ALLOWED_METHODS = "GET, HEAD, OPTIONS";
 
-// --- helpers copied unchanged from server/index.js --------------------------
-// (query-building/escaping logic is data-shape logic, not transport logic -
-// nothing here needed to change for the Workers port.)
+// Missing/invalid deployment configuration -> 503 "service not configured".
+class ConfigError extends Error {}
 
-function escapeRediSearchTerm(text) {
-  return text.replace(/[,.<>{}[\]"':;!@#$%^&*()\-+=~|\\/]/g, "\\$&");
-}
-
-function yearRangeClause(start, end) {
-  const lo = start !== undefined && start !== "" ? Number(start) : null;
-  const hi = end !== undefined && end !== "" ? Number(end) : null;
-  const hiClamp = Number.isFinite(hi) ? hi : "+inf";
-  const loClamp = Number.isFinite(lo) ? lo : "-inf";
-  return `@start_year:[-inf ${hiClamp}] @end_year:[${loClamp} +inf]`;
-}
-
-function bboxClause(bbox) {
-  if (!bbox) return null;
-  const parts = bbox.split(",").map(Number);
-  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) {
-    throw new Error("bbox must be minLon,minLat,maxLon,maxLat");
-  }
-  const [minLon, minLat, maxLon, maxLat] = parts;
-  return `@lon:[${minLon} ${maxLon}] @lat:[${minLat} ${maxLat}]`;
-}
-
-function textClause(q) {
-  if (!q) return null;
-  const escaped = escapeRediSearchTerm(q.trim());
-  if (!escaped) return null;
-  return `@title|extract:(${escaped})`;
-}
-
-function hashToEvent(v) {
-  const event = {
-    id: v.id,
-    title: v.title,
-    date_start: v.date_start || null,
-    date_end: v.date_end || null,
-    countries: v.countries ? v.countries.split(",").filter(Boolean) : [],
-    category: v.category || null,
-    extract: v.extract || "",
-    wikipedia_url: v.wikipedia_url || null,
-    wikidata_qid: v.wikidata_qid || null,
-    coordinate_source: v.coordinate_source || null,
-  };
-  if (v.lon !== undefined && v.lat !== undefined) {
-    event.coordinates = { lon: Number(v.lon), lat: Number(v.lat) };
-  } else {
-    event.coordinates = null;
-  }
-  return event;
-}
-
-// --- RESP reply shaping ------------------------------------------------
+// Data only changes when someone re-runs scripts/load-redis.js, so successful
+// data responses are cacheable by browsers/CDNs. Errors and health: no-store.
 //
-// ./resp.js's RedisConnection.send() is a *generic* RESP2 command sender
-// (no ft.search()/json.mGet() convenience methods the way node-redis has),
-// so FT.SEARCH/JSON.MGET replies come back as plain decoded RESP2 values
-// (numbers, strings, nested arrays, null), and we do the same reply-shape
-// parsing node-redis's client would normally do internally.
-//
-// FT.SEARCH with default (no RETURN) reply shape, confirmed against a real
-// redis-stack instance with `redis-cli --no-raw`:
-//   [ total, key1, [field1, value1, field2, value2, ...], key2, [...], ... ]
-// FT.SEARCH with `RETURN 0` (no fields) reply shape:
-//   [ total, key1, key2, ... ]   (no nested per-doc arrays at all)
-function parseFtSearchWithFields(reply) {
-  const total = reply[0];
-  const documents = [];
-  for (let i = 1; i < reply.length; i += 2) {
-    const id = reply[i];
-    const fields = reply[i + 1] || [];
-    const value = {};
-    for (let j = 0; j < fields.length; j += 2) {
-      value[fields[j]] = fields[j + 1];
-    }
-    documents.push({ id, value });
-  }
-  return { total, documents };
-}
-
-function parseFtSearchIdsOnly(reply) {
-  const total = reply[0];
-  const ids = reply.slice(1);
-  return { total, ids };
-}
+// Cache API (caches.default) deliberately NOT used: Cloudflare's docs say
+// "Workers deployed to custom domains have access to functional `cache`
+// operations" (developers.cloudflare.com/workers/runtime-apis/cache/) and do
+// not promise it on plain *.workers.dev, which is the expected first
+// deployment. These headers are honored by browsers regardless.
+const CACHE_OK = "public, max-age=300, stale-while-revalidate=86400";
+const NO_STORE = "no-store";
 
 // --- Redis connection ---------------------------------------------------
 //
@@ -138,152 +75,151 @@ function parseFtSearchIdsOnly(reply) {
 // not a correctness problem; a production version wanting a pooled
 // connection across requests would need a Durable Object to own the socket
 // and serialize access to it, which is out of scope for this port.
+//
+// Round trips per request (after the TCP/TLS handshake): 1 for every
+// endpoint - AUTH is pipelined with the query, and boundaries fetch whole
+// documents in the same FT.SEARCH (RETURN 1 $) instead of ids + JSON.MGET.
 async function withRedis(env, fn) {
-  const redis = new RedisConnection(env.REDIS_URL || "redis://localhost:6379");
+  if (!env.REDIS_URL) throw new ConfigError("REDIS_URL is not set");
+  let redis;
   try {
-    return await fn(redis);
+    redis = new RedisConnection(env.REDIS_URL);
+  } catch {
+    throw new ConfigError("REDIS_URL is not a valid URL"); // never echo the URL (has the password)
+  }
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error(`Redis request timed out after ${REDIS_TIMEOUT_MS}ms`)),
+      REDIS_TIMEOUT_MS
+    );
+  });
+  const work = fn(redis);
+  work.catch(() => {}); // if the timeout wins, don't leave an unhandled rejection
+  try {
+    return await Promise.race([work, timeout]);
   } finally {
+    clearTimeout(timer);
     redis.close();
   }
 }
 
-// --- CORS -----------------------------------------------------------------
-// Express's `cors()` middleware defaults to allow-all-origins with a
-// reflected set of methods/headers. Replicated by hand here since Workers
-// has no middleware layer - just headers added to every Response.
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-  "Access-Control-Allow-Headers": "*",
-};
+// --- responses ----------------------------------------------------------
 
-function json(body, init = {}) {
-  return new Response(JSON.stringify(body), {
-    ...init,
+function json(body, request, env, { status = 200, cache = NO_STORE, headers = {} } = {}) {
+  // A string body is already-serialized JSON (see handleBoundaries).
+  return new Response(typeof body === "string" ? body : JSON.stringify(body), {
+    status,
     headers: {
       "Content-Type": "application/json",
-      ...CORS_HEADERS,
-      ...(init.headers || {}),
+      "Cache-Control": status >= 200 && status < 300 ? cache : NO_STORE,
+      ...corsHeaders(env.ALLOWED_ORIGIN, request.headers.get("Origin")),
+      ...headers,
     },
   });
 }
 
-// --- routes ------------------------------------------------------------
-// Same three endpoints/response shapes as server/index.js, ported from
-// Express `app.get(path, handler)` to `if (pathname === path)` dispatch.
+// Maps a thrown error to [status, clientBody]. Detail goes to the log only.
+function classify(err) {
+  if (err instanceof ClientError) return [400, { error: err.message }];
+  if (err instanceof ConfigError) {
+    console.error("Service not configured:", err.message);
+    return [503, { error: "service not configured" }];
+  }
+  console.error("Upstream Redis failure:", err);
+  return [502, { error: "upstream service unavailable" }];
+}
 
-async function handleHealth(env) {
+function errorResponse(err, request, env) {
+  const [status, body] = classify(err);
+  return json(body, request, env, { status });
+}
+
+// --- routes ------------------------------------------------------------
+
+async function handleHealth(request, env) {
   try {
     const pong = await withRedis(env, (redis) => redis.send("PING"));
-    return json({ ok: true, redis: pong });
+    return json({ ok: true, redis: pong }, request, env);
   } catch (err) {
-    return json({ ok: false, error: err.message }, { status: 503 });
+    const [status, body] = classify(err);
+    return json({ ok: false, ...body }, request, env, { status: status === 502 ? 503 : status });
   }
 }
 
-async function handleEvents(env, searchParams) {
+async function handleEvents(request, env, searchParams) {
   try {
-    const start = searchParams.get("start") ?? undefined;
-    const end = searchParams.get("end") ?? undefined;
-    const bbox = searchParams.get("bbox") ?? undefined;
-    const q = searchParams.get("q") ?? undefined;
-
-    const clauses = [yearRangeClause(start, end)];
-    const bboxClauseStr = bboxClause(bbox);
-    if (bboxClauseStr) clauses.push(bboxClauseStr);
-    const textClauseStr = textClause(q);
-    if (textClauseStr) clauses.push(textClauseStr);
-
-    const query = clauses.join(" ");
+    const query = buildEventsQuery(searchParams);
     const reply = await withRedis(env, (redis) =>
       redis.send("FT.SEARCH", EVENTS_INDEX, query, "LIMIT", "0", "1000")
     );
     const result = parseFtSearchWithFields(reply);
-
-    return json({
-      total: result.total,
-      events: result.documents.map((d) => hashToEvent(d.value)),
-    });
+    return json(
+      { total: result.total, events: result.documents.map((d) => hashToEvent(d.value)) },
+      request,
+      env,
+      { cache: CACHE_OK }
+    );
   } catch (err) {
-    console.error(err);
-    return json({ error: err.message }, { status: 400 });
+    return errorResponse(err, request, env);
   }
 }
 
-async function handleBoundaries(env, searchParams) {
+async function handleBoundaries(request, env, searchParams) {
   try {
-    const yearParam = searchParams.get("year");
-    const startParam = searchParams.get("start");
-    const endParam = searchParams.get("end");
-
-    let lo, hi;
-    if (yearParam !== null && yearParam !== "") {
-      lo = hi = Number(yearParam);
-    } else if (startParam !== null && endParam !== null) {
-      lo = Number(startParam);
-      hi = Number(endParam);
-    } else {
-      return json({ error: "year (or start & end) is required" }, { status: 400 });
-    }
-    if (!Number.isFinite(lo) || !Number.isFinite(hi)) {
-      return json({ error: "year/start/end must be numeric" }, { status: 400 });
-    }
-    if (lo > hi) [lo, hi] = [hi, lo];
-
-    const query = `@start_year:[-inf ${hi}] @end_year:[${lo} +inf]`;
-
-    const features = await withRedis(env, async (redis) => {
-      const reply = await redis.send(
-        "FT.SEARCH",
-        BOUNDARIES_INDEX,
-        query,
-        "LIMIT",
-        "0",
-        "1000",
-        "RETURN",
-        "0"
-      );
-      const result = parseFtSearchIdsOnly(reply);
-      if (result.total === 0) return [];
-
-      const mgetReply = await redis.send("JSON.MGET", ...result.ids, "$");
-      return mgetReply
-        .map((raw) => (raw == null ? null : JSON.parse(raw)))
-        .map((d) => (Array.isArray(d) ? d[0] : d))
-        .filter(Boolean)
-        .map((d) => ({
-          type: "Feature",
-          properties: {
-            name: d.name,
-            start_year: d.start_year,
-            end_year: d.end_year,
-            status: d.status,
-            source: d.source,
-            note: d.note,
-          },
-          geometry: d.geometry,
-        }));
+    const query = buildBoundariesQuery(searchParams);
+    // One round trip: `RETURN 1 $` on the ON JSON index returns each whole
+    // document as a string under the field "$" (verified on redis-stack),
+    // replacing the old RETURN 0 + JSON.MGET pair.
+    const reply = await withRedis(env, (redis) =>
+      redis.send("FT.SEARCH", BOUNDARIES_INDEX, query, "LIMIT", "0", "1000", "RETURN", "1", "$")
+    );
+    // Geometry text is spliced through without a parse/stringify round trip
+    // (boundaryDocToFeatureJson) - the dominant CPU cost for big responses.
+    const features = parseFtSearchWithFields(reply)
+      .documents.map((d) => boundaryDocToFeatureJson(d.value["$"]))
+      .filter(Boolean);
+    return json(`{"type":"FeatureCollection","features":[${features.join(",")}]}`, request, env, {
+      cache: CACHE_OK,
     });
-
-    return json({ type: "FeatureCollection", features });
   } catch (err) {
-    console.error(err);
-    return json({ error: err.message }, { status: 400 });
+    return errorResponse(err, request, env);
   }
 }
 
 export default {
   async fetch(request, env, ctx) {
-    if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
-    }
-
     const { pathname, searchParams } = new URL(request.url);
 
-    if (pathname === "/api/health") return handleHealth(env);
-    if (pathname === "/api/events") return handleEvents(env, searchParams);
-    if (pathname === "/api/boundaries") return handleBoundaries(env, searchParams);
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          "Access-Control-Allow-Methods": ALLOWED_METHODS,
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Max-Age": "86400",
+          ...corsHeaders(env.ALLOWED_ORIGIN, request.headers.get("Origin")),
+        },
+      });
+    }
 
-    return json({ error: "not found" }, { status: 404 });
+    const route =
+      pathname === "/api/health"
+        ? handleHealth
+        : pathname === "/api/events"
+          ? handleEvents
+          : pathname === "/api/boundaries"
+            ? handleBoundaries
+            : null;
+    if (!route) return json({ error: "not found" }, request, env, { status: 404 });
+
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      return json({ error: "method not allowed" }, request, env, {
+        status: 405,
+        headers: { Allow: ALLOWED_METHODS },
+      });
+    }
+
+    return route(request, env, searchParams);
   },
 };

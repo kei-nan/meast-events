@@ -8,16 +8,28 @@
 //   GET /api/events?start=<year>&end=<year>&bbox=<minLon,minLat,maxLon,maxLat>&q=<text>
 //   GET /api/boundaries?year=<year>
 //   GET /api/health
+//
+// Validation, error semantics, CORS and cache headers intentionally match
+// worker/src/ (the Cloudflare Worker port) - keep the two in sync.
+//   invalid input -> 400; Redis/upstream failure -> 502 (generic message,
+//   detail logged); unknown route -> 404; non-GET/HEAD/OPTIONS -> 405 + Allow.
+// Optional env ALLOWED_ORIGIN: comma-separated exact origins; unset = allow all.
 
 import express from "express";
-import cors from "cors";
 import { createClient } from "redis";
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 const PORT = process.env.PORT || 3001;
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
 
 const EVENTS_INDEX = "idx:events";
 const BOUNDARIES_INDEX = "idx:boundaries";
+
+const MIN_YEAR = 1000;
+const MAX_YEAR = 3000;
+const MAX_Q_LENGTH = 100;
+const ALLOWED_METHODS = "GET, HEAD, OPTIONS";
+const CACHE_OK = "public, max-age=300, stale-while-revalidate=86400";
 
 const client = createClient({ url: REDIS_URL });
 client.on("error", (err) => console.error("Redis client error:", err));
@@ -27,9 +39,56 @@ await client.connect();
 console.log(`Connected to Redis at ${new URL(REDIS_URL).protocol}//${new URL(REDIS_URL).host}`);
 
 const app = express();
-app.use(cors());
 
 // --- helpers ---------------------------------------------------------------
+
+// Invalid client input -> HTTP 400 with this (safe to show) message.
+class ClientError extends Error {}
+
+// Absent/empty -> undefined; otherwise must be an integer in [MIN_YEAR, MAX_YEAR].
+function parseYear(name, value) {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (typeof value !== "string" || !/^-?\d{1,6}$/.test(value)) {
+    throw new ClientError(`${name} must be an integer year`);
+  }
+  const n = Number(value);
+  if (n < MIN_YEAR || n > MAX_YEAR) {
+    throw new ClientError(`${name} must be between ${MIN_YEAR} and ${MAX_YEAR}`);
+  }
+  return n;
+}
+
+// Latitude must be within [-90,90]. Longitude is clamped into [-180,180]
+// rather than rejected: MapLibre's getBounds() reports lon beyond +/-180 when
+// zoomed out far enough to show repeated world copies, and the frontend sends
+// those verbatim. (|lon| > 720 is still rejected as garbage.)
+function parseBbox(bbox) {
+  if (bbox === undefined || bbox === null || bbox === "") return null;
+  if (typeof bbox !== "string") throw new ClientError("bbox must be minLon,minLat,maxLon,maxLat (numbers)");
+  const parts = bbox.split(",").map((s) => (s.trim() === "" ? NaN : Number(s)));
+  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) {
+    throw new ClientError("bbox must be minLon,minLat,maxLon,maxLat (numbers)");
+  }
+  let [minLon, minLat, maxLon, maxLat] = parts;
+  if (Math.abs(minLon) > 720 || Math.abs(maxLon) > 720) {
+    throw new ClientError("bbox longitude must be within [-180,180]");
+  }
+  if (minLat < -90 || minLat > 90 || maxLat < -90 || maxLat > 90) {
+    throw new ClientError("bbox latitude must be within [-90,90]");
+  }
+  if (minLon > maxLon || minLat > maxLat) throw new ClientError("bbox min must not exceed max");
+  minLon = Math.max(-180, Math.min(180, minLon));
+  maxLon = Math.max(-180, Math.min(180, maxLon));
+  return [minLon, minLat, maxLon, maxLat];
+}
+
+function parseQ(q) {
+  if (q === undefined || q === null) return undefined;
+  if (typeof q !== "string") throw new ClientError("q must be a string");
+  const t = q.trim();
+  if (t.length > MAX_Q_LENGTH) throw new ClientError(`q must be at most ${MAX_Q_LENGTH} characters`);
+  return t || undefined;
+}
 
 // Escapes RediSearch's query-syntax special characters inside a raw user
 // search term so arbitrary input (e.g. "coup d'état", "Anglo-Iraqi War")
@@ -39,35 +98,28 @@ function escapeRediSearchTerm(text) {
   return text.replace(/[,.<>{}[\]"':;!@#$%^&*()\-+=~|\\/]/g, "\\$&");
 }
 
-function yearRangeClause(start, end) {
-  const lo = start !== undefined && start !== "" ? Number(start) : null;
-  const hi = end !== undefined && end !== "" ? Number(end) : null;
-  const hiClamp = Number.isFinite(hi) ? hi : "+inf";
-  const loClamp = Number.isFinite(lo) ? lo : "-inf";
-  // Overlap semantics, matching eventYearRange()/boundariesForYear() in the
-  // frontend: a feature is "in range" if its start is at/before the queried
-  // end AND its end is at/after the queried start.
+// Overlap semantics, matching eventYearRange()/boundariesForYear() in the
+// frontend: a feature is "in range" if its start is at/before the queried
+// end AND its end is at/after the queried start.
+function yearRangeClause(lo, hi) {
+  const hiClamp = hi === undefined ? "+inf" : hi;
+  const loClamp = lo === undefined ? "-inf" : lo;
   return `@start_year:[-inf ${hiClamp}] @end_year:[${loClamp} +inf]`;
 }
 
-function bboxClause(bbox) {
-  if (!bbox) return null;
-  const parts = bbox.split(",").map(Number);
-  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) {
-    throw new Error("bbox must be minLon,minLat,maxLon,maxLat");
-  }
-  const [minLon, minLat, maxLon, maxLat] = parts;
-  // Axis-aligned bounding box via plain NUMERIC range queries. RediSearch's
-  // GEO field type only supports radius queries (GEOFILTER lon lat radius
-  // unit), not rectangular bounds - see scripts/load-redis.js for why lon/lat
-  // are also indexed as separate SORTABLE NUMERIC fields specifically to make
-  // real bbox (viewport) queries possible.
+// Axis-aligned bounding box via plain NUMERIC range queries. RediSearch's
+// GEO field type only supports radius queries, not rectangular bounds - see
+// scripts/load-redis.js for why lon/lat are also indexed as separate
+// SORTABLE NUMERIC fields specifically to make bbox (viewport) queries possible.
+function bboxClause(bounds) {
+  if (!bounds) return null;
+  const [minLon, minLat, maxLon, maxLat] = bounds;
   return `@lon:[${minLon} ${maxLon}] @lat:[${minLat} ${maxLat}]`;
 }
 
 function textClause(q) {
   if (!q) return null;
-  const escaped = escapeRediSearchTerm(q.trim());
+  const escaped = escapeRediSearchTerm(q);
   if (!escaped) return null;
   return `@title|extract:(${escaped})`;
 }
@@ -94,44 +146,92 @@ function hashToEvent(doc) {
   return event;
 }
 
+// Origin matching: ALLOWED_ORIGIN unset -> "*"; otherwise reflect the request
+// Origin only when it exactly matches an entry, else no ACAO header.
+function matchOrigin(allowed, requestOrigin) {
+  if (allowed === undefined || String(allowed).trim() === "") return "*";
+  if (!requestOrigin) return null;
+  const list = String(allowed)
+    .split(",")
+    .map((s) => s.trim().replace(/\/$/, ""))
+    .filter(Boolean);
+  return list.includes(requestOrigin) ? requestOrigin : null;
+}
+
+app.use((req, res, next) => {
+  const origin = matchOrigin(ALLOWED_ORIGIN, req.get("Origin"));
+  if (origin) res.set("Access-Control-Allow-Origin", origin);
+  if (origin !== "*") res.vary("Origin");
+  if (req.method === "OPTIONS") {
+    res.set({
+      "Access-Control-Allow-Methods": ALLOWED_METHODS,
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Max-Age": "86400",
+    });
+    return res.status(204).end();
+  }
+  next();
+});
+
+// Any failure -> [status, generic client body]; detail is logged, never sent.
+function sendError(res, err) {
+  if (err instanceof ClientError) return res.set("Cache-Control", "no-store").status(400).json({ error: err.message });
+  console.error("Upstream Redis failure:", err);
+  return res.set("Cache-Control", "no-store").status(502).json({ error: "upstream service unavailable" });
+}
+
 // --- routes ------------------------------------------------------------
 
+const ROUTES = new Set(["/api/health", "/api/events", "/api/boundaries"]);
+app.use((req, res, next) => {
+  if (!ROUTES.has(req.path)) return res.status(404).json({ error: "not found" });
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return res.set({ Allow: ALLOWED_METHODS, "Cache-Control": "no-store" }).status(405).json({ error: "method not allowed" });
+  }
+  next();
+});
+
 app.get("/api/health", async (_req, res) => {
+  res.set("Cache-Control", "no-store");
   try {
     const pong = await client.ping();
     res.json({ ok: true, redis: pong });
   } catch (err) {
-    res.status(503).json({ ok: false, error: err.message });
+    console.error("Upstream Redis failure:", err);
+    res.status(503).json({ ok: false, error: "upstream service unavailable" });
   }
 });
 
 app.get("/api/events", async (req, res) => {
   try {
-    const { start, end, bbox, q } = req.query;
+    const { start: startRaw, end: endRaw, bbox, q } = req.query;
+    const start = parseYear("start", startRaw);
+    const end = parseYear("end", endRaw);
+    if (start !== undefined && end !== undefined && start > end) {
+      throw new ClientError("start must not exceed end");
+    }
     const clauses = [yearRangeClause(start, end)];
-    const bboxClauseStr = bboxClause(bbox);
+    const bboxClauseStr = bboxClause(parseBbox(bbox));
     if (bboxClauseStr) clauses.push(bboxClauseStr);
-    const textClauseStr = textClause(q);
+    const textClauseStr = textClause(parseQ(q));
     if (textClauseStr) clauses.push(textClauseStr);
 
-    const query = clauses.join(" ");
-    const result = await client.ft.search(EVENTS_INDEX, query, {
+    const result = await client.ft.search(EVENTS_INDEX, clauses.join(" "), {
       LIMIT: { from: 0, size: 1000 },
     });
 
-    res.json({
+    res.set("Cache-Control", CACHE_OK).json({
       total: result.total,
       events: result.documents.map(hashToEvent),
     });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
 app.get("/api/boundaries", async (req, res) => {
   try {
-    const { year, start, end } = req.query;
+    const { year: yearRaw, start: startRaw, end: endRaw } = req.query;
     // Primary contract (spec'd): a single `year`, matching boundariesForYear()
     // in MapView.jsx exactly (start_year <= year <= end_year). Also accepts a
     // `start`/`end` range as an additive convenience so the frontend can fetch
@@ -140,34 +240,36 @@ app.get("/api/boundaries", async (req, res) => {
     // pattern the old static-file pipeline used (see dataClient.js) - rather
     // than issuing one request per single-year tick while scrubbing.
     let lo, hi;
-    if (year !== undefined && year !== "") {
-      lo = hi = Number(year);
-    } else if (start !== undefined && end !== undefined) {
-      lo = Number(start);
-      hi = Number(end);
+    const year = parseYear("year", yearRaw);
+    if (year !== undefined) {
+      lo = hi = year;
+    } else if (startRaw !== undefined && startRaw !== "" && endRaw !== undefined && endRaw !== "") {
+      lo = parseYear("start", startRaw);
+      hi = parseYear("end", endRaw);
     } else {
-      return res.status(400).json({ error: "year (or start & end) is required" });
-    }
-    if (!Number.isFinite(lo) || !Number.isFinite(hi)) {
-      return res.status(400).json({ error: "year/start/end must be numeric" });
+      throw new ClientError("year (or start & end) is required");
     }
     if (lo > hi) [lo, hi] = [hi, lo];
 
     // Union semantics: any boundary active at any point within [lo, hi].
     const query = `@start_year:[-inf ${hi}] @end_year:[${lo} +inf]`;
+    // One round trip: `RETURN 1 $` on the ON JSON index returns each whole
+    // document as a string under the field "$" (instead of RETURN 0 + JSON.MGET).
     const result = await client.ft.search(BOUNDARIES_INDEX, query, {
       LIMIT: { from: 0, size: 1000 },
-      RETURN: [],
+      RETURN: ["$"],
     });
 
-    if (result.total === 0) {
-      return res.json({ type: "FeatureCollection", features: [] });
-    }
-
-    const ids = result.documents.map((d) => d.id);
-    const docs = await client.json.mGet(ids, "$");
-    const features = docs
-      .map((d) => (Array.isArray(d) ? d[0] : d))
+    const features = result.documents
+      .map((d) => {
+        // node-redis (v5) parses a `$` reply and spreads the whole document
+        // into d.value; other versions leave it as a string under "$".
+        const raw = d.value["$"];
+        if (raw === undefined) return d.value;
+        let doc = typeof raw === "string" ? JSON.parse(raw) : raw;
+        if (Array.isArray(doc)) doc = doc[0];
+        return doc;
+      })
       .filter(Boolean)
       .map((d) => ({
         type: "Feature",
@@ -182,10 +284,9 @@ app.get("/api/boundaries", async (req, res) => {
         geometry: d.geometry,
       }));
 
-    res.json({ type: "FeatureCollection", features });
+    res.set("Cache-Control", CACHE_OK).json({ type: "FeatureCollection", features });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err.message });
+    sendError(res, err);
   }
 });
 
