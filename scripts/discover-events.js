@@ -55,7 +55,7 @@
 // blindly.
 import { readFile, writeFile } from "node:fs/promises";
 
-const USER_AGENT = "ConfrontationHistoryMap/0.1 (prototype; contact: jonkeinan@gmail.com)";
+const USER_AGENT = "AtlasWiki/0.1 (prototype; contact: jonkeinan@gmail.com)";
 // query.wikidata.org/sparql is the current recommended public endpoint for
 // programmatic use (it fronts the same backend as the .../bigdata/namespace/wdq/sparql
 // path referenced in older docs; Wikimedia's own examples and client libraries as of

@@ -5,7 +5,7 @@
 // info below with your own (an email or project URL) before running this a lot.
 import { readFile, writeFile } from "node:fs/promises";
 
-const USER_AGENT = "ConfrontationHistoryMap/0.1 (prototype; contact: set-me@example.com)";
+const USER_AGENT = "AtlasWiki/0.1 (prototype; contact: set-me@example.com)";
 const REQUEST_DELAY_MS = 300;
 
 // Fallback marker for events with no precise Wikidata point (most wars, treaties,

@@ -20,7 +20,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 
 const USER_AGENT =
-  "ConfrontationHistoryMap/0.1 (event-enrichment pass; contact: jonkeinan@gmail.com)";
+  "AtlasWiki/0.1 (event-enrichment pass; contact: jonkeinan@gmail.com)";
 const REQUEST_DELAY_MS = 300;
 
 // --- Filtering bar for this enrichment pass -------------------------------
