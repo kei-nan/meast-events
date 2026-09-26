@@ -66,6 +66,16 @@ const DATA_DIR = path.join(__dirname, "..", "data");
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
+// Never log the raw URL - it contains the Redis password.
+function describeRedisTarget(url) {
+  try {
+    const u = new URL(url);
+    return `${u.protocol}//${u.host}`;
+  } catch {
+    return "<unparseable REDIS_URL>";
+  }
+}
+
 const EVENTS_INDEX = "idx:events";
 const EVENTS_PREFIX = "event:";
 const BOUNDARIES_INDEX = "idx:boundaries";
@@ -94,7 +104,9 @@ async function dropIndexIfExists(client, indexName) {
     await client.ft.dropIndex(indexName, { DD: true });
     console.log(`Dropped existing index ${indexName} (and its documents)`);
   } catch (err) {
-    if (!/unknown index/i.test(err.message)) throw err;
+    // Older RediSearch says "Unknown index name"; newer versions (e.g. the
+    // ones Redis Cloud runs) say "SEARCH_INDEX_NOT_FOUND Index not found".
+    if (!/unknown index|index not found|no such index/i.test(err.message)) throw err;
   }
 }
 
@@ -189,7 +201,7 @@ async function main() {
   const client = createClient({ url: REDIS_URL });
   client.on("error", (err) => console.error("Redis client error:", err));
   await client.connect();
-  console.log(`Connected to ${REDIS_URL}`);
+  console.log(`Connected to ${describeRedisTarget(REDIS_URL)}`);
 
   try {
     await loadEvents(client);

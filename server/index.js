@@ -22,7 +22,9 @@ const BOUNDARIES_INDEX = "idx:boundaries";
 const client = createClient({ url: REDIS_URL });
 client.on("error", (err) => console.error("Redis client error:", err));
 await client.connect();
-console.log(`Connected to Redis at ${REDIS_URL}`);
+// Log only protocol/host - the raw URL contains the Redis password, and this
+// line ends up in hosting platforms' log streams.
+console.log(`Connected to Redis at ${new URL(REDIS_URL).protocol}//${new URL(REDIS_URL).host}`);
 
 const app = express();
 app.use(cors());
