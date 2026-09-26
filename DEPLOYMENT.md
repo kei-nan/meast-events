@@ -81,13 +81,13 @@ npx wrangler deploy
   `npx wrangler deploy` first; the API just returns errors until the secret
   is set.
 - `wrangler deploy` prints the Worker URL:
-  `https://confrontation-api.<account-subdomain>.workers.dev`
+  `https://atlaswiki-api.<account-subdomain>.workers.dev`
   (the name comes from `name` in `worker/wrangler.jsonc`). Note it down.
 
 Verify:
 
 ```bash
-curl https://confrontation-api.<account-subdomain>.workers.dev/api/health
+curl https://atlaswiki-api.<account-subdomain>.workers.dev/api/health
 # {"ok":true,"redis":"PONG"}
 ```
 
@@ -115,7 +115,7 @@ exercised for this repo; manual `npx wrangler deploy` is always enough.
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
 3. Under **Environment variables** add
-   `VITE_API_URL` = `https://confrontation-api.<account-subdomain>.workers.dev`
+   `VITE_API_URL` = `https://atlaswiki-api.<account-subdomain>.workers.dev`
    (no trailing slash).
 
 **Why it's set at build time:** Vite substitutes `import.meta.env.VITE_API_URL`

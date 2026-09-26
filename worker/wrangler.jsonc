@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "confrontation-api",
+  "name": "atlaswiki-api",
   "main": "src/index.js",
   "compatibility_date": "2026-09-26",
   // Required: src/resp.js opens the Redis connection via `cloudflare:sockets`,
