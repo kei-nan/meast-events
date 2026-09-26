@@ -1,0 +1,497 @@
+{
+ "battle-of-maysalun": {
+  "score": 0,
+  "parts": {}
+ },
+ "simele-massacre": {
+  "score": 0,
+  "parts": {}
+ },
+ "urfa-resistance": {
+  "score": 2,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "fao-landing": {
+  "score": 1,
+  "parts": {
+   "assessed Stub/Start": 1
+  }
+ },
+ "1929-palestine-riots": {
+  "score": 5,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 2,
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1,
+   "cites a WP-listed deprecated/unreliable host": 1
+  }
+ },
+ "first-battle-of-el-alamein": {
+  "score": 0,
+  "parts": {}
+ },
+ "franco-syrian-war": {
+  "score": 1,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "zilan-massacre": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "battle-of-holy-apostles-monastery": {
+  "score": 1,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "pursuit-of-goeben-and-breslau": {
+  "score": 1,
+  "parts": {
+   "refs per 1000 words < 8": 1
+  }
+ },
+ "operation-skorpion": {
+  "score": 0,
+  "parts": {}
+ },
+ "sykes-picot-agreement": {
+  "score": 3,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "ottoman-entry-into-world-war-i": {
+  "score": 1,
+  "parts": {
+   "assessed Stub/Start": 1
+  }
+ },
+ "battle-of-lule-burgas": {
+  "score": 5,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "currently edit-protected": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 2,
+   "assessed Stub/Start": 1
+  }
+ },
+ "armistice-of-mudanya": {
+  "score": 2,
+  "parts": {
+   "assessed Stub/Start": 1,
+   "refs per 1000 words < 8": 1
+  }
+ },
+ "jordanian-independence": {
+  "score": 2,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "sourcing banner (more citations/unreferenced/primary)": 1
+  }
+ },
+ "iraqi-revolt-against-the-british": {
+  "score": 1,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1
+  }
+ },
+ "siege-of-medina": {
+  "score": 4,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1,
+   "assessed Stub/Start": 1,
+   "refs per 1000 words < 8": 1
+  }
+ },
+ "erzurum-offensive": {
+  "score": 0,
+  "parts": {}
+ },
+ "arab-revolt": {
+  "score": 1,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "halabja-massacre": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "united-arab-republic": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "h-3-airstrike": {
+  "score": 0,
+  "parts": {}
+ },
+ "1958-lebanon-crisis": {
+  "score": 3,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "karantina-massacre": {
+  "score": 2,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "al-dawayima-massacre": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "al-anfal-campaign": {
+  "score": 3,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "iran-hostage-crisis": {
+  "score": 3,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "contentious-topic/GS notice on talk": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "battle-of-khorramshahr-1982": {
+  "score": 0,
+  "parts": {}
+ },
+ "1983-beirut-barracks-bombings": {
+  "score": 1,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "ankara-esenboga-airport-attack": {
+  "score": 2,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "kfar-etzion-massacre": {
+  "score": 3,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "grand-mosque-seizure": {
+  "score": 1,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "siege-of-basra": {
+  "score": 0,
+  "parts": {}
+ },
+ "siege-of-abadan": {
+  "score": 1,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1
+  }
+ },
+ "saddam-hussein": {
+  "score": 7,
+  "parts": {
+   "neutrality/dispute banner or category": 3,
+   "currently edit-protected": 1,
+   "protection log >=5 events": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 2
+  }
+ },
+ "north-yemen-civil-war": {
+  "score": 0,
+  "parts": {}
+ },
+ "operation-eagle-claw": {
+  "score": 1,
+  "parts": {
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "1982-hama-massacre": {
+  "score": 0,
+  "parts": {}
+ },
+ "baghdad-pact": {
+  "score": 0,
+  "parts": {}
+ },
+ "2009-khan-el-khalili-bombing": {
+  "score": 1,
+  "parts": {
+   "assessed Stub/Start": 1
+  }
+ },
+ "battle-of-73-easting": {
+  "score": 2,
+  "parts": {
+   "citation-needed count (>=5:+1, >=10:+2)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "qana-massacre": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "operation-viking-hammer": {
+  "score": 0,
+  "parts": {}
+ },
+ "assassination-of-rafic-hariri": {
+  "score": 0,
+  "parts": {}
+ },
+ "assassination-of-hrant-dink": {
+  "score": 2,
+  "parts": {
+   "citation-needed count (>=5:+1, >=10:+2)": 1,
+   "sourcing banner (more citations/unreferenced/primary)": 1
+  }
+ },
+ "2004-sinai-bombings": {
+  "score": 3,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "arab-spring": {
+  "score": 5,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "contentious-topic/GS notice on talk": 1,
+   "protection log >=5 events": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 2
+  }
+ },
+ "siege-of-the-church-of-the-nativity": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "cedar-revolution": {
+  "score": 2,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "2005-sharm-el-sheikh-bombings": {
+  "score": 2,
+  "parts": {
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "battle-of-medina-ridge": {
+  "score": 4,
+  "parts": {
+   "neutrality/dispute banner or category": 3,
+   "refs per 1000 words < 8": 1
+  }
+ },
+ "sivas-massacre": {
+  "score": 1,
+  "parts": {
+   "assessed Stub/Start": 1
+  }
+ },
+ "iranian-green-movement": {
+  "score": 0,
+  "parts": {}
+ },
+ "first-battle-of-fallujah": {
+  "score": 5,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "protection log >=5 events": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "mahmudiyah-rape-and-murders": {
+  "score": 0,
+  "parts": {}
+ },
+ "iraqi-insurgency-2003-2011": {
+  "score": 5,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "citation-needed count (>=5:+1, >=10:+2)": 1,
+   "sourcing banner (more citations/unreferenced/primary)": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 2
+  }
+ },
+ "2010-baghdad-church-siege": {
+  "score": 0,
+  "parts": {}
+ },
+ "invasion-of-iraq": {
+  "score": 5,
+  "parts": {
+   "citation-needed count (>=5:+1, >=10:+2)": 2,
+   "protection log >=5 events": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 2
+  }
+ },
+ "execution-of-saddam-hussein": {
+  "score": 1,
+  "parts": {
+   "protection log >=5 events": 1
+  }
+ },
+ "2016-besiktas-bombings": {
+  "score": 0,
+  "parts": {}
+ },
+ "2015-kuwait-mosque-bombing": {
+  "score": 0,
+  "parts": {}
+ },
+ "majdal-shams-attack": {
+  "score": 3,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1,
+   "assessed Stub/Start": 1
+  }
+ },
+ "2015-beirut-bombings": {
+  "score": 3,
+  "parts": {
+   "citation-needed count (>=5:+1, >=10:+2)": 2,
+   "contentious-topic/GS notice on talk": 1
+  }
+ },
+ "march-2016-istanbul-bombing": {
+  "score": 1,
+  "parts": {
+   "cites a WP-listed deprecated/unreliable host": 1
+  }
+ },
+ "egyptian-crisis-2011-2014": {
+  "score": 0,
+  "parts": {}
+ },
+ "february-2016-ankara-bombing": {
+  "score": 1,
+  "parts": {
+   "assessed Stub/Start": 1
+  }
+ },
+ "israel-united-arab-emirates-normalization-agreement": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "siege-of-talkalakh-may-2011": {
+  "score": 1,
+  "parts": {
+   "assessed Stub/Start": 1
+  }
+ },
+ "2020-beirut-explosion": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "rafah-paramedic-massacre": {
+  "score": 2,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1,
+   "currently edit-protected": 1
+  }
+ },
+ "rabaa-massacre": {
+  "score": 0,
+  "parts": {}
+ },
+ "2020-aden-airport-attack": {
+  "score": 0,
+  "parts": {}
+ },
+ "yemeni-revolution": {
+  "score": 0,
+  "parts": {}
+ },
+ "battle-of-mosul-2016-2017": {
+  "score": 3,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "contentious-topic/GS notice on talk": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "killing-of-jamal-khashoggi": {
+  "score": 1,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1
+  }
+ },
+ "istanbul-nightclub-shooting": {
+  "score": 0,
+  "parts": {}
+ },
+ "united-states-withdrawal-from-the-joint-comprehensive-plan-of-action": {
+  "score": 1,
+  "parts": {
+   "contentious-topic/GS notice on talk": 1
+  }
+ },
+ "joint-comprehensive-plan-of-action": {
+  "score": 2,
+  "parts": {
+   "inline dispute/reliability tags (>=1:+1, >=5:+2)": 1,
+   "edits later reverted in 12m (>=10:+1, >=25:+2)": 1
+  }
+ },
+ "houthi-insurgency": {
+  "score": 2,
+  "parts": {
+   "citation-needed count (>=5:+1, >=10:+2)": 2
+  }
+ }
+}
