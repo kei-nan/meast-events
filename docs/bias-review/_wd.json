@@ -1,0 +1,164 @@
+{
+ "Armenian Genocide": {
+  "qid": "Q80034",
+  "our_category": "political",
+  "wikidata_P31_now": [
+   "genocide",
+   "ethnic violence",
+   "forced displacement"
+  ]
+ },
+ "Al-Anfal campaign": {
+  "qid": "Q529723",
+  "our_category": "political",
+  "wikidata_P31_now": [
+   "military campaign"
+  ]
+ },
+ "Bahr El-Baqar primary school bombing": {
+  "qid": "Q3064186",
+  "our_category": "terrorist attack",
+  "wikidata_P31_now": [
+   "bomb attack"
+  ]
+ },
+ "2022 Al-Aqsa clashes": {
+  "qid": "Q111606488",
+  "our_category": "terrorist attack",
+  "wikidata_P31_now": [
+   "offensive",
+   "attack on mosque"
+  ]
+ },
+ "Fall of Mosul": {
+  "qid": "Q18701760",
+  "our_category": "military operation",
+  "wikidata_P31_now": [
+   "military operation"
+  ]
+ },
+ "Operation Euphrates Shield": {
+  "qid": "Q26690015",
+  "our_category": "military operation",
+  "wikidata_P31_now": [
+   "military operation"
+  ]
+ },
+ "Operation Olive Branch": {
+  "qid": "Q47465940",
+  "our_category": "battle",
+  "wikidata_P31_now": [
+   "battle",
+   "military operation"
+  ]
+ },
+ "Tel al-Sultan attack": {
+  "qid": "Q126140767",
+  "our_category": "massacre",
+  "wikidata_P31_now": [
+   "airstrike",
+   "conflagration",
+   "massacre"
+  ]
+ },
+ "Coastal road massacre": {
+  "qid": "Q301448",
+  "our_category": "terrorist attack",
+  "wikidata_P31_now": [
+   "terrorist attack",
+   "bus hijacking",
+   "hostage taking",
+   "Palestinian political violence"
+  ]
+ },
+ "Ma'alot massacre": {
+  "qid": "Q1638587",
+  "our_category": "massacre",
+  "wikidata_P31_now": [
+   "massacre"
+  ]
+ },
+ "Avivim school bus bombing": {
+  "qid": "Q791186",
+  "our_category": "terrorist attack",
+  "wikidata_P31_now": [
+   "terrorist attack",
+   "Palestinian political violence"
+  ]
+ },
+ "Qibya massacre": {
+  "qid": "Q1139615",
+  "our_category": "massacre",
+  "wikidata_P31_now": [
+   "massacre",
+   "reprisal"
+  ]
+ },
+ "1966 attack on Samu": {
+  "qid": "Q2883956",
+  "our_category": "military operation",
+  "wikidata_P31_now": [
+   "military operation"
+  ]
+ },
+ "Killing of Yahya Sinwar": {
+  "qid": "Q130549291",
+  "our_category": "military operation",
+  "wikidata_P31_now": [
+   "military operation",
+   "shootout"
+  ]
+ },
+ "1983 Beirut barracks bombings": {
+  "qid": "Q518303",
+  "our_category": "terrorism",
+  "wikidata_P31_now": [
+   "suicide attack",
+   "suicide car bombing",
+   "vehicle-ramming attack"
+  ]
+ },
+ "Sinjar massacre": {
+  "qid": "Q17514354",
+  "our_category": "massacre",
+  "wikidata_P31_now": [
+   "mass murder",
+   "massacre"
+  ]
+ },
+ "Church of Saint Porphyrius airstrike": {
+  "qid": "Q123138276",
+  "our_category": "war crime",
+  "wikidata_P31_now": [
+   "airstrike",
+   "war crime"
+  ]
+ },
+ "October 7 attacks": {
+  "qid": "Q122976243",
+  "our_category": "massacre",
+  "wikidata_P31_now": [
+   "coordinated terrorist attack",
+   "massacre",
+   "offensive",
+   "military raid",
+   "border incident"
+  ]
+ },
+ "King David Hotel bombing": {
+  "qid": "Q1814446",
+  "our_category": "terrorist attack",
+  "wikidata_P31_now": [
+   "terrorist attack",
+   "military operation"
+  ]
+ },
+ "Cinema Rex fire": {
+  "qid": "Q123170",
+  "our_category": "massacre",
+  "wikidata_P31_now": [
+   "arson",
+   "massacre"
+  ]
+ }
+}
