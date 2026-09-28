@@ -1,6 +1,6 @@
 # Framing review: how we rate the Wikipedia summaries
 
-Every event on atlas.wiki shows the lead section of its English Wikipedia article, unchanged. Under that text the event page shows a **framing review**: our own short reading of whether the summary tells the story from one side. This page explains what the review is, who wrote it, and how to challenge it.
+Every event on the map shows the lead section of its English Wikipedia article, unchanged. Under that text the event page shows a **framing review**: our own short reading of whether the summary tells the story from one side. This page explains what the review is, who wrote it, and how to challenge it.
 
 ## What it is and is not
 

@@ -1,7 +1,7 @@
-# atlas.wiki data policy
+# Data policy
 
-atlas.wiki shows Wikipedia and Wikidata content **as-is**. Wikipedia has its own biases; the project's
-principle is minimal interference with it, so that any bias visible on atlas.wiki is Wikipedia's, in the open,
+This project shows Wikipedia and Wikidata content **as-is**. Wikipedia has its own biases; the project's
+principle is minimal interference with it, so that any bias visible on the site is Wikipedia's, in the open,
 rather than a second layer of ours. Concretely:
 
 - We **never rewrite** titles, extracts, dates, countries, or labels. `title`, `extract`, `date_start`, `date_end`,
@@ -12,7 +12,7 @@ rather than a second layer of ours. Concretely:
   with evidence in `docs/data-fixes.md`.
 - There is **no per-event editorial decision about content or inclusion**. What is included follows from the published rule below.
 - We never invent coordinates and never edit Wikipedia or Wikidata.
-- In addition, atlas.wiki publishes a **separately labelled framing review** of each summary (`data/framing-review.json`: a rating 0-3,
+- In addition, the project publishes a **separately labelled framing review** of each summary (`data/framing-review.json`: a rating 0-3,
   the side it leans toward, a one-line reason), produced by an AI model with the published rubric in `docs/framing-review.md`. It is our
   opinion, not Wikipedia's and not a correction. It never alters, hides or reorders the extract, it is shown for every event (including
   those where nothing was found), and readers can contest a rating; re-reviews are recorded in the file's history. This is the one

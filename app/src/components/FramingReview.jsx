@@ -44,7 +44,7 @@ export default function FramingReview({ event }) {
   return (
     <aside id="framing-review" className="framing-review" aria-labelledby="framing-review-title" tabIndex={-1}>
       <h3 id="framing-review-title">
-        Framing review <span className="framing-review-owner">by atlas.wiki, not Wikipedia</span>
+        Framing review <span className="framing-review-owner">our reading, not Wikipedia&apos;s</span>
       </h3>
       <p className="framing-review-verdict">
         <span className={`framing-review-rating framing-review-rating--${review.rating}`}>{review.rating_label}</span>

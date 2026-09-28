@@ -223,7 +223,7 @@ export default function AboutData({ onClose }) {
 
         <h3>What is on the map</h3>
         <p>
-          atlas.wiki shows Wikipedia and Wikidata content as it is. Titles, dates, countries and article text are
+          This site shows Wikipedia and Wikidata content as it is. Titles, dates, countries and article text are
           copied, not rewritten; automated checks may only add a visible note, never change or remove content.
         </p>
         <p>An event is included when all of the following hold:</p>
