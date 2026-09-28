@@ -290,6 +290,11 @@ export function loadSelectionFunnel() {
   return fetchJSONCached(dataUrl("selection-funnel.json"));
 }
 
+// Summary of our framing review (counts by rating and direction), written by split-data.
+export function loadFramingReviewSummary() {
+  return fetchJSONCached(dataUrl("framing-review.json"));
+}
+
 // The full lead of one event: {extract, extract_retrieved_at}. Lives in a small
 // static bucket file (events/full/<bucket>.json, see lib/fullBucket.js) that is
 // fetched only when an event is opened - lists never download full leads.

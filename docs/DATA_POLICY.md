@@ -10,8 +10,13 @@ rather than a second layer of ours. Concretely:
 - Automated checks only **flag** (a note in `review_reasons` or `date_flags`); they never overwrite, "correct" or
   silently drop an event on judgement of its content. The exceptions are the few individually verified fixes listed
   with evidence in `docs/data-fixes.md`.
-- There is **no per-event editorial decision**. What is included follows from the published rule below.
+- There is **no per-event editorial decision about content or inclusion**. What is included follows from the published rule below.
 - We never invent coordinates and never edit Wikipedia or Wikidata.
+- In addition, atlas.wiki publishes a **separately labelled framing review** of each summary (`data/framing-review.json`: a rating 0-3,
+  the side it leans toward, a one-line reason), produced by an AI model with the published rubric in `docs/framing-review.md`. It is our
+  opinion, not Wikipedia's and not a correction. It never alters, hides or reorders the extract, it is shown for every event (including
+  those where nothing was found), and readers can contest a rating; re-reviews are recorded in the file's history. This is the one
+  per-event judgement the project makes, and it is kept out of every Wikipedia/Wikidata field.
 
 ## What each field is
 
@@ -130,6 +135,7 @@ The funnel from 2,539 raw candidates to what is shown, with breakdowns by countr
 (recomputed from the data files by `scripts/build-selection-funnel.js`, not copied from documents) so the app's About page can render it.
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
+Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).
 
 ## Event classes
 

@@ -530,6 +530,134 @@ button.sp-chip[aria-pressed="true"] {
   border-style: dashed;
 }
 
+.event-detail {
+  --fr-0: var(--text-tertiary);
+  --fr-1: var(--accent);
+  --fr-2: #d98a4e;
+  --fr-3: #e3776c;
+}
+
+.framing-pointer {
+  margin: 0 0 12px;
+  padding: 8px 11px;
+  border-left: 3px solid var(--fr-1);
+  background: var(--bg-2);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  max-width: 68ch;
+}
+
+.framing-pointer--2 { border-left-color: var(--fr-2); }
+.framing-pointer--3 { border-left-color: var(--fr-3); }
+
+/* Background tint plus underline, so the mark still reads without colour. */
+.framing-mark {
+  color: inherit;
+  background: color-mix(in srgb, var(--fr-1) 22%, transparent);
+  text-decoration: underline wavy var(--fr-1);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  border-radius: 2px;
+  padding: 0 1px;
+  cursor: pointer;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.framing-mark--2 {
+  background: color-mix(in srgb, var(--fr-2) 24%, transparent);
+  text-decoration-color: var(--fr-2);
+}
+
+.framing-mark--3 {
+  background: color-mix(in srgb, var(--fr-3) 26%, transparent);
+  text-decoration-color: var(--fr-3);
+}
+
+.framing-mark:focus-visible,
+.framing-review:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.framing-review {
+  --fr-0: var(--text-tertiary);
+  --fr-1: var(--accent);
+  --fr-2: #d98a4e;
+  --fr-3: #e3776c;
+  margin: 16px 0;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
+
+.framing-review h3 {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.framing-review-owner {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+.framing-review p {
+  margin: 0 0 8px;
+  max-width: 68ch;
+}
+
+.framing-review-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.framing-review-rating {
+  display: inline-block;
+  padding: 2px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.framing-review-rating--0 { color: var(--fr-0); }
+.framing-review-rating--1 { color: var(--fr-1); }
+.framing-review-rating--2 { color: var(--fr-2); }
+.framing-review-rating--3 { color: var(--fr-3); }
+
+.framing-review-leans {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.framing-review-stale {
+  border-left: 2px solid var(--fr-2);
+  padding-left: 9px;
+}
+
+.framing-review .framing-review-meta {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.framing-review a {
+  font-size: inherit;
+}
+
 .event-detail-note {
   font-size: 0.8rem;
   color: var(--text-secondary);

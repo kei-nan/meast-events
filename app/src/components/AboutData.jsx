@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { loadSelectionFunnel } from "../lib/dataClient";
+import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient";
 import "./AboutData.css";
 
 const REPO = "https://github.com/kei-nan/atlas-wiki";
@@ -138,10 +138,46 @@ function Funnel({ state }) {
   );
 }
 
+function FramingCounts({ state }) {
+  if (state.status === "loading") return <p role="status">Loading the review counts…</p>;
+  if (state.status === "error") {
+    return (
+      <p className="about-unavailable" role="status">
+        Counts unavailable: the published review summary could not be loaded.
+      </p>
+    );
+  }
+  const { ratings, counts } = state.data;
+  const rows = Object.entries(ratings).map(([k, name]) => ({ label: name, count: counts.rating[k] ?? 0 }));
+  return (
+    <>
+      <BarList rows={rows} />
+      {counts.stale > 0 && (
+        <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>
+      )}
+    </>
+  );
+}
+
 /** "About the data" modal (native <dialog>: focus trap, Esc, focus restore). */
 export default function AboutData({ onClose }) {
   const ref = useRef(null);
   const [funnel, setFunnel] = useState({ status: "loading", data: null });
+  const [framing, setFraming] = useState({ status: "loading", data: null });
+
+  useEffect(() => {
+    let cancelled = false;
+    loadFramingReviewSummary()
+      .then((data) => {
+        if (!cancelled) setFraming({ status: "ready", data });
+      })
+      .catch(() => {
+        if (!cancelled) setFraming({ status: "error", data: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const d = ref.current;
@@ -241,6 +277,24 @@ export default function AboutData({ onClose }) {
             dataset coverage review
           </a>
           .
+        </p>
+
+        <h3>Framing review</h3>
+        <p>
+          Wikipedia&apos;s summaries are shown unchanged, and some of them tell an event from one side. Every event
+          therefore carries a separately boxed <strong>framing review</strong>: our own rating of whether the summary
+          leans to one side, which side, and why, in one sentence. It is an opinion, not a fact-check and not
+          Wikipedia&apos;s view. All 594 summaries were rated on 27 September 2026 by Claude, an AI model made by
+          Anthropic; a person has not checked every rating.
+        </p>
+        <FramingCounts state={framing} />
+        <p>
+          The flags are uneven: most of the higher ratings are on Israel–Palestine events, and most of those lean
+          toward the Palestinian side. The{" "}
+          <a href={`${REPO}/blob/main/docs/framing-review.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            review method
+          </a>{" "}
+          gives the scale, the full results and the limits. Each review box has a link to contest its rating.
         </p>
 
         <h3>Selection funnel</h3>

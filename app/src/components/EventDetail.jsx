@@ -1,4 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import FramingReview, { FramingPointer } from "./FramingReview.jsx";
+import { markSegments } from "../lib/highlights.js";
+
+function showReview() {
+  const box = document.getElementById("framing-review");
+  if (!box) return;
+  const smooth = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  box.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "nearest" });
+  box.focus({ preventScroll: true });
+}
 
 function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
@@ -77,9 +87,36 @@ export default function EventDetail({ event, onBack }) {
           Date unverified: {flags.join("; ")}. Dates are shown as Wikidata gives them.
         </p>
       )}
+      <FramingPointer review={event.framing_review} />
       <div className="event-detail-extract">
         {paragraphs.length ? (
-          paragraphs.map((p, i) => <p key={i}>{p}</p>)
+          paragraphs.map((p, i) => (
+            <p key={i}>
+              {markSegments(p, event.framing_review?.highlights).map((s, j) =>
+                s.flagged ? (
+                  <mark
+                    key={j}
+                    className={`framing-mark framing-mark--${event.framing_review.rating}`}
+                    tabIndex={0}
+                    role="button"
+                    aria-describedby="framing-review-reason"
+                    title="Flagged by our framing review. Select to read why."
+                    onClick={showReview}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        showReview();
+                      }
+                    }}
+                  >
+                    {s.text}
+                  </mark>
+                ) : (
+                  s.text
+                )
+              )}
+            </p>
+          ))
         ) : (
           <p>No summary available.</p>
         )}
@@ -97,6 +134,7 @@ export default function EventDetail({ event, onBack }) {
       {retrieved && (
         <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
       )}
+      <FramingReview event={event} />
       {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its
