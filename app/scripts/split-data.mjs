@@ -172,14 +172,58 @@ async function splitBoundaries() {
   );
 }
 
+// data/framing-review.json is our own reading of each summary (docs/framing-review.md).
+// It rides along with the full lead and is never merged into the Wikipedia fields.
+// `stale` is true when the stored lead is no longer the exact text that was reviewed.
+async function loadFramingReview() {
+  const file = path.join(ROOT_DATA_DIR, "framing-review.json");
+  let doc;
+  try {
+    doc = JSON.parse(await readFile(file, "utf8"));
+  } catch (err) {
+    if (err.code === "ENOENT") return null;
+    throw err;
+  }
+  return doc;
+}
+
+function framingFor(review, e) {
+  const r = review?.events?.[e.id];
+  if (!r) return null;
+  const sha1 = createHash("sha1").update(e.extract ?? "").digest("hex").slice(0, 12);
+  const stale = r.text_sha1 !== sha1;
+  return {
+    // Phrases are only marked in the exact text that was reviewed.
+    highlights: stale ? [] : (r.highlights ?? []).filter((h) => (e.extract ?? "").includes(h)),
+    rating: r.rating,
+    rating_label: review.ratings[String(r.rating)],
+    leans: r.leans ?? null,
+    reason: r.reason,
+    category_note: r.category_note ?? null,
+    data_note: r.data_note ?? null,
+    disclosure: r.disclosure ?? null,
+    reviewed_on: review.reviewed_on,
+    stale,
+  };
+}
+
 async function splitEvents() {
   const allEvents = JSON.parse(await readFile(EVENTS_FILE, "utf8"));
   const events = allEvents.map(publicEvent);
   const noLocation = events.filter((e) => e.location_quality === "none").length;
+  const review = await loadFramingReview();
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
+  const framingCounts = { rating: {}, leans: {}, stale: 0, missing: 0 };
   for (const e of allEvents) {
+    const framing = framingFor(review, e);
+    if (review && !framing) framingCounts.missing++;
+    if (framing) {
+      framingCounts.rating[framing.rating] = (framingCounts.rating[framing.rating] ?? 0) + 1;
+      if (framing.leans) framingCounts.leans[framing.leans] = (framingCounts.leans[framing.leans] ?? 0) + 1;
+      if (framing.stale) framingCounts.stale++;
+    }
     fullBuckets[fullBucket(e.id)][e.id] = {
       extract: e.extract ?? "",
       extract_retrieved_at: e.extract_retrieved_at ?? null,
@@ -187,7 +231,21 @@ async function splitEvents() {
       // the detail view merges this file over whichever record it has.
       wikidata_classes: strings(e.wikidata_classes),
       date_flags: strings(e.date_flags),
+      framing_review: framing,
     };
+  }
+  if (review) {
+    await writeJSON(path.join(OUT_DIR, "framing-review.json"), {
+      reviewer: review.reviewer,
+      reviewed_on: review.reviewed_on,
+      rubric_version: review.rubric_version,
+      ratings: review.ratings,
+      counts: framingCounts,
+    });
+    console.log(
+      `framing review: ${allEvents.length - framingCounts.missing} of ${allEvents.length} events reviewed, ` +
+        `${framingCounts.stale} with text changed since review`
+    );
   }
   let fullTotal = 0;
   let fullMax = 0;

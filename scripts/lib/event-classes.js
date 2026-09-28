@@ -37,8 +37,8 @@ export const ORIGINAL_EVENT_CLASSES = [
   { qid: "Q131569", label: "treaty", category: "treaty" },
   { qid: "Q45382", label: "coup d'état", category: "political" },
   { qid: "Q3882219", label: "assassination", category: "political" },
-  { qid: "Q41397", label: "genocide", category: "political" },
-  { qid: "Q3199915", label: "massacre", category: "political" },
+  { qid: "Q41397", label: "genocide", category: "atrocity" },
+  { qid: "Q3199915", label: "massacre", category: "atrocity" },
   { qid: "Q2223653", label: "terrorist attack", category: "terrorism" },
   { qid: "Q10931", label: "revolution", category: "uprising" },
   { qid: "Q124734", label: "rebellion", category: "uprising" },
@@ -51,7 +51,7 @@ export const ORIGINAL_EVENT_CLASSES = [
 // asked for even though WDQS shows 0 and 0 in-region instances with >=10 sitelinks.
 export const NEW_EVENT_CLASSES = [
   { qid: "Q188055", label: "siege", category: "war" },
-  { qid: "Q135010", label: "war crime", category: "political" },
+  { qid: "Q135010", label: "war crime", category: "atrocity" },
   { qid: "Q1371150", label: "hostage taking", category: "terrorism" },
   { qid: "Q898712", label: "aircraft hijacking", category: "terrorism" },
   { qid: "Q208383", label: "ceasefire", category: "diplomatic" },
@@ -67,3 +67,17 @@ export const NEW_EVENT_CLASSES = [
 export const INCLUSION_MIN_SITELINKS = 10;
 
 export const EVENT_CLASSES = [...ORIGINAL_EVENT_CLASSES, ...NEW_EVENT_CLASSES];
+
+// Groups that override whatever group an event would otherwise get, checked in this order.
+// An item Wikidata types as both a "massacre" and a "terrorist attack" is shown as terrorism,
+// whichever class discovery happened to match first, and every genocide, massacre or war crime
+// is "atrocity" rather than folded into "political". Applied the same way to every event,
+// curated or discovered; an event matching none keeps its existing group.
+export const OVERRIDING_GROUPS = ["terrorism", "atrocity"];
+
+const GROUP_OF_LABEL = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
+
+export function groupForEvent(wikidataClasses, currentGroup) {
+  const groups = new Set((wikidataClasses ?? []).map((l) => GROUP_OF_LABEL[l]).filter(Boolean));
+  return OVERRIDING_GROUPS.find((g) => groups.has(g)) ?? currentGroup;
+}

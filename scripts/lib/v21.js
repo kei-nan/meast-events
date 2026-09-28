@@ -1,6 +1,6 @@
 // Data-shape v2.1 helpers shared by enrich-candidates.js, apply-v21.js and refresh-extracts.js.
 // Nothing here rewrites Wikipedia/Wikidata content: it copies it, or FLAGS a discrepancy.
-import { EVENT_CLASSES, COUNTRIES, QID_TO_COUNTRY } from "./event-classes.js";
+import { EVENT_CLASSES, COUNTRIES, QID_TO_COUNTRY, groupForEvent } from "./event-classes.js";
 import { yearsIn, yearOf } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
 import { applyDataFix, reconcileStartDate } from "./fixes.js";
@@ -105,7 +105,7 @@ export function finalizeEvent(ev, ctx) {
 
   // 2. classes + our coarse grouping
   ev.wikidata_classes = buildWikidataClasses(entity, ctx.labels, ctx.matched.get(ev.wikidata_qid) ?? []);
-  const group = ev.category_group ?? (CLASS_GROUP[ev.category] ?? ev.category);
+  const group = groupForEvent(ev.wikidata_classes, ev.category_group ?? (CLASS_GROUP[ev.category] ?? ev.category));
   ev.category = group;
   ev.category_group = group;
   delete ev.category_label;

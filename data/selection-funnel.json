@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-26T17:50:14.556Z",
+  "generated_at": "2026-09-27T22:47:52.230Z",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
@@ -44,28 +44,28 @@
     "location_quality_none_no_map_marker": 197,
     "date_order_invalid_flagged_and_kept": 5,
     "excluded_as_redirect_duplicates_by_review": 2,
-    "already_merged_into_curated": 282,
-    "pending_merge_new_events": 200,
-    "pending_merge_new_events_without_location": 197,
+    "already_merged_into_curated": 482,
+    "pending_merge_new_events": 0,
+    "pending_merge_new_events_without_location": 0,
     "hard_excluded_no_wikipedia_summary_or_extract": 0
   },
   "shown_now": {
-    "curated_total": 394,
+    "curated_total": 594,
     "seed_events_hand_picked": 112,
     "seed_events_also_found_by_discovery": 51,
     "seed_events_not_reachable_by_discovery": 61,
-    "discovered_events_merged": 282,
+    "discovered_events_merged": 482,
     "location_quality": {
       "approximate": 80,
-      "precise": 313,
-      "none": 1
+      "precise": 316,
+      "none": 198
     },
     "seed_file_entries": 112
   },
   "sitelink_measurement": {
     "rule_uses": "sitelinks across ALL Wikimedia projects (Wikidata wikibase:sitelinks: Wikipedias + Wikisource, Wikiquote, Commons, ...)",
     "threshold": 10,
-    "candidates_measured": 2539,
+    "candidates_measured": 2538,
     "candidates_with_english_article": 1900,
     "pass_by_all_projects": 535,
     "pass_by_wikipedia_editions_only": 506,
@@ -73,7 +73,7 @@
     "pass_by_wikipedia_only_but_not_all_projects": 0,
     "median_all_projects_of_passing": 16,
     "median_wikipedia_editions_of_passing": 16,
-    "mismatch_between_discovery_sitelinks_and_fresh_count": 1
+    "mismatch_between_discovery_sitelinks_and_fresh_count": 2
   },
   "breakdowns": {
     "by_country": {
@@ -84,7 +84,7 @@
         "passed_filters": 155,
         "proposed_location_none": 50,
         "date_order_flagged": 0,
-        "in_curated": 103
+        "in_curated": 153
       },
       "Lebanon": {
         "raw": 196,
@@ -93,7 +93,7 @@
         "passed_filters": 60,
         "proposed_location_none": 19,
         "date_order_flagged": 0,
-        "in_curated": 41
+        "in_curated": 60
       },
       "Jordan": {
         "raw": 68,
@@ -102,7 +102,7 @@
         "passed_filters": 28,
         "proposed_location_none": 13,
         "date_order_flagged": 0,
-        "in_curated": 14
+        "in_curated": 27
       },
       "Turkey": {
         "raw": 320,
@@ -111,7 +111,7 @@
         "passed_filters": 112,
         "proposed_location_none": 46,
         "date_order_flagged": 1,
-        "in_curated": 66
+        "in_curated": 112
       },
       "Iran": {
         "raw": 178,
@@ -120,7 +120,7 @@
         "passed_filters": 59,
         "proposed_location_none": 33,
         "date_order_flagged": 0,
-        "in_curated": 26
+        "in_curated": 59
       },
       "Syria": {
         "raw": 372,
@@ -129,7 +129,7 @@
         "passed_filters": 87,
         "proposed_location_none": 27,
         "date_order_flagged": 1,
-        "in_curated": 59
+        "in_curated": 87
       },
       "Iraq": {
         "raw": 455,
@@ -138,7 +138,7 @@
         "passed_filters": 97,
         "proposed_location_none": 40,
         "date_order_flagged": 2,
-        "in_curated": 55
+        "in_curated": 97
       },
       "Egypt": {
         "raw": 204,
@@ -147,7 +147,7 @@
         "passed_filters": 76,
         "proposed_location_none": 23,
         "date_order_flagged": 0,
-        "in_curated": 53
+        "in_curated": 76
       },
       "Kuwait": {
         "raw": 47,
@@ -156,7 +156,7 @@
         "passed_filters": 20,
         "proposed_location_none": 12,
         "date_order_flagged": 1,
-        "in_curated": 8
+        "in_curated": 20
       },
       "Yemen": {
         "raw": 126,
@@ -165,7 +165,7 @@
         "passed_filters": 32,
         "proposed_location_none": 18,
         "date_order_flagged": 0,
-        "in_curated": 14
+        "in_curated": 32
       },
       "Saudi Arabia": {
         "raw": 91,
@@ -174,7 +174,7 @@
         "passed_filters": 35,
         "proposed_location_none": 21,
         "date_order_flagged": 0,
-        "in_curated": 14
+        "in_curated": 35
       },
       "Bahrain": {
         "raw": 34,
@@ -183,7 +183,7 @@
         "passed_filters": 17,
         "proposed_location_none": 10,
         "date_order_flagged": 0,
-        "in_curated": 7
+        "in_curated": 17
       },
       "Qatar": {
         "raw": 35,
@@ -192,7 +192,7 @@
         "passed_filters": 17,
         "proposed_location_none": 11,
         "date_order_flagged": 0,
-        "in_curated": 6
+        "in_curated": 17
       },
       "UAE": {
         "raw": 47,
@@ -201,7 +201,7 @@
         "passed_filters": 19,
         "proposed_location_none": 11,
         "date_order_flagged": 0,
-        "in_curated": 8
+        "in_curated": 19
       },
       "Oman": {
         "raw": 37,
@@ -210,7 +210,7 @@
         "passed_filters": 16,
         "proposed_location_none": 11,
         "date_order_flagged": 0,
-        "in_curated": 5
+        "in_curated": 16
       }
     },
     "by_class": {
@@ -221,7 +221,7 @@
         "passed_filters": 44,
         "proposed_location_none": 24,
         "date_order_flagged": 0,
-        "in_curated": 20
+        "in_curated": 44
       },
       "revolution": {
         "raw": 10,
@@ -230,7 +230,7 @@
         "passed_filters": 8,
         "proposed_location_none": 5,
         "date_order_flagged": 0,
-        "in_curated": 3
+        "in_curated": 8
       },
       "rebellion": {
         "raw": 107,
@@ -239,7 +239,7 @@
         "passed_filters": 33,
         "proposed_location_none": 19,
         "date_order_flagged": 0,
-        "in_curated": 14
+        "in_curated": 33
       },
       "military operation": {
         "raw": 297,
@@ -248,7 +248,7 @@
         "passed_filters": 92,
         "proposed_location_none": 54,
         "date_order_flagged": 0,
-        "in_curated": 37
+        "in_curated": 91
       },
       "genocide": {
         "raw": 18,
@@ -257,7 +257,7 @@
         "passed_filters": 6,
         "proposed_location_none": 6,
         "date_order_flagged": 0,
-        "in_curated": 0
+        "in_curated": 6
       },
       "treaty": {
         "raw": 42,
@@ -266,7 +266,7 @@
         "passed_filters": 25,
         "proposed_location_none": 18,
         "date_order_flagged": 0,
-        "in_curated": 7
+        "in_curated": 25
       },
       "coup d'état": {
         "raw": 59,
@@ -275,7 +275,7 @@
         "passed_filters": 14,
         "proposed_location_none": 10,
         "date_order_flagged": 0,
-        "in_curated": 4
+        "in_curated": 14
       },
       "massacre": {
         "raw": 496,
@@ -284,7 +284,7 @@
         "passed_filters": 65,
         "proposed_location_none": 10,
         "date_order_flagged": 0,
-        "in_curated": 54
+        "in_curated": 64
       },
       "terrorist attack": {
         "raw": 687,
@@ -293,7 +293,7 @@
         "passed_filters": 80,
         "proposed_location_none": 6,
         "date_order_flagged": 0,
-        "in_curated": 73
+        "in_curated": 79
       },
       "declaration of independence": {
         "raw": 5,
@@ -302,7 +302,7 @@
         "passed_filters": 3,
         "proposed_location_none": 1,
         "date_order_flagged": 0,
-        "in_curated": 2
+        "in_curated": 3
       },
       "hostage taking": {
         "raw": 16,
@@ -311,7 +311,7 @@
         "passed_filters": 5,
         "proposed_location_none": 1,
         "date_order_flagged": 0,
-        "in_curated": 4
+        "in_curated": 5
       },
       "battle": {
         "raw": 620,
@@ -320,7 +320,7 @@
         "passed_filters": 145,
         "proposed_location_none": 28,
         "date_order_flagged": 5,
-        "in_curated": 114
+        "in_curated": 145
       },
       "assassination": {
         "raw": 46,
@@ -329,7 +329,7 @@
         "passed_filters": 15,
         "proposed_location_none": 2,
         "date_order_flagged": 0,
-        "in_curated": 13
+        "in_curated": 15
       },
       "referendum": {
         "raw": 58,
@@ -338,7 +338,7 @@
         "passed_filters": 10,
         "proposed_location_none": 10,
         "date_order_flagged": 0,
-        "in_curated": 0
+        "in_curated": 10
       },
       "war crime": {
         "raw": 131,
@@ -347,7 +347,7 @@
         "passed_filters": 19,
         "proposed_location_none": 8,
         "date_order_flagged": 0,
-        "in_curated": 11
+        "in_curated": 19
       },
       "population transfer": {
         "raw": 22,
@@ -356,7 +356,7 @@
         "passed_filters": 6,
         "proposed_location_none": 3,
         "date_order_flagged": 0,
-        "in_curated": 3
+        "in_curated": 6
       },
       "siege": {
         "raw": 74,
@@ -365,7 +365,7 @@
         "passed_filters": 18,
         "proposed_location_none": 1,
         "date_order_flagged": 0,
-        "in_curated": 17
+        "in_curated": 18
       },
       "ceasefire": {
         "raw": 10,
@@ -374,7 +374,7 @@
         "passed_filters": 5,
         "proposed_location_none": 4,
         "date_order_flagged": 0,
-        "in_curated": 1
+        "in_curated": 5
       },
       "armistice": {
         "raw": 3,
@@ -383,7 +383,7 @@
         "passed_filters": 2,
         "proposed_location_none": 1,
         "date_order_flagged": 0,
-        "in_curated": 1
+        "in_curated": 2
       },
       "aircraft hijacking": {
         "raw": 9,
@@ -392,7 +392,7 @@
         "passed_filters": 4,
         "proposed_location_none": 1,
         "date_order_flagged": 0,
-        "in_curated": 3
+        "in_curated": 4
       },
       "peace conference": {
         "raw": 3,
@@ -401,7 +401,7 @@
         "passed_filters": 2,
         "proposed_location_none": 2,
         "date_order_flagged": 0,
-        "in_curated": 0
+        "in_curated": 2
       },
       "nationalization": {
         "raw": 2,
@@ -415,13 +415,13 @@
     },
     "by_group": {
       "war": {
-        "raw": 1015,
-        "no_english_article": 160,
+        "raw": 1013,
+        "no_english_article": 159,
         "fewer_than_min_sitelinks": 576,
-        "passed_filters": 279,
+        "passed_filters": 278,
         "proposed_location_none": 99,
         "date_order_flagged": 5,
-        "in_curated": 176
+        "in_curated": 277
       },
       "uprising": {
         "raw": 76,
@@ -430,16 +430,16 @@
         "passed_filters": 32,
         "proposed_location_none": 20,
         "date_order_flagged": 0,
-        "in_curated": 12
+        "in_curated": 32
       },
-      "political": {
-        "raw": 699,
-        "no_english_article": 280,
-        "fewer_than_min_sitelinks": 299,
-        "passed_filters": 120,
-        "proposed_location_none": 44,
+      "atrocity": {
+        "raw": 506,
+        "no_english_article": 256,
+        "fewer_than_min_sitelinks": 189,
+        "passed_filters": 61,
+        "proposed_location_none": 21,
         "date_order_flagged": 0,
-        "in_curated": 75
+        "in_curated": 61
       },
       "treaty": {
         "raw": 42,
@@ -448,25 +448,34 @@
         "passed_filters": 25,
         "proposed_location_none": 18,
         "date_order_flagged": 0,
-        "in_curated": 7
+        "in_curated": 25
+      },
+      "political": {
+        "raw": 163,
+        "no_english_article": 19,
+        "fewer_than_min_sitelinks": 103,
+        "passed_filters": 41,
+        "proposed_location_none": 23,
+        "date_order_flagged": 0,
+        "in_curated": 41
       },
       "terrorism": {
-        "raw": 674,
-        "no_english_article": 174,
-        "fewer_than_min_sitelinks": 432,
-        "passed_filters": 68,
+        "raw": 707,
+        "no_english_article": 180,
+        "fewer_than_min_sitelinks": 440,
+        "passed_filters": 87,
         "proposed_location_none": 8,
         "date_order_flagged": 0,
-        "in_curated": 60
+        "in_curated": 86
       },
       "migration": {
-        "raw": 21,
+        "raw": 20,
         "no_english_article": 6,
-        "fewer_than_min_sitelinks": 9,
+        "fewer_than_min_sitelinks": 8,
         "passed_filters": 6,
         "proposed_location_none": 3,
         "date_order_flagged": 0,
-        "in_curated": 3
+        "in_curated": 6
       },
       "diplomatic": {
         "raw": 10,
@@ -475,7 +484,7 @@
         "passed_filters": 5,
         "proposed_location_none": 5,
         "date_order_flagged": 0,
-        "in_curated": 0
+        "in_curated": 5
       },
       "economic": {
         "raw": 2,
@@ -495,7 +504,7 @@
         "passed_filters": 9,
         "proposed_location_none": 6,
         "date_order_flagged": 0,
-        "in_curated": 3
+        "in_curated": 9
       },
       "1910s": {
         "raw": 174,
@@ -504,7 +513,7 @@
         "passed_filters": 61,
         "proposed_location_none": 17,
         "date_order_flagged": 0,
-        "in_curated": 44
+        "in_curated": 61
       },
       "2020s": {
         "raw": 519,
@@ -513,7 +522,7 @@
         "passed_filters": 92,
         "proposed_location_none": 42,
         "date_order_flagged": 0,
-        "in_curated": 48
+        "in_curated": 90
       },
       "2010s": {
         "raw": 617,
@@ -522,7 +531,7 @@
         "passed_filters": 110,
         "proposed_location_none": 31,
         "date_order_flagged": 3,
-        "in_curated": 76
+        "in_curated": 110
       },
       "1990s": {
         "raw": 131,
@@ -531,7 +540,7 @@
         "passed_filters": 24,
         "proposed_location_none": 11,
         "date_order_flagged": 0,
-        "in_curated": 13
+        "in_curated": 24
       },
       "2000s": {
         "raw": 374,
@@ -540,7 +549,7 @@
         "passed_filters": 55,
         "proposed_location_none": 16,
         "date_order_flagged": 1,
-        "in_curated": 39
+        "in_curated": 55
       },
       "1960s": {
         "raw": 65,
@@ -549,7 +558,7 @@
         "passed_filters": 14,
         "proposed_location_none": 7,
         "date_order_flagged": 0,
-        "in_curated": 7
+        "in_curated": 14
       },
       "1970s": {
         "raw": 168,
@@ -558,7 +567,7 @@
         "passed_filters": 38,
         "proposed_location_none": 13,
         "date_order_flagged": 0,
-        "in_curated": 25
+        "in_curated": 38
       },
       "1980s": {
         "raw": 161,
@@ -567,7 +576,7 @@
         "passed_filters": 43,
         "proposed_location_none": 18,
         "date_order_flagged": 0,
-        "in_curated": 25
+        "in_curated": 43
       },
       "1920s": {
         "raw": 76,
@@ -576,7 +585,7 @@
         "passed_filters": 22,
         "proposed_location_none": 16,
         "date_order_flagged": 1,
-        "in_curated": 6
+        "in_curated": 22
       },
       "1940s": {
         "raw": 144,
@@ -585,7 +594,7 @@
         "passed_filters": 50,
         "proposed_location_none": 11,
         "date_order_flagged": 0,
-        "in_curated": 39
+        "in_curated": 50
       },
       "1950s": {
         "raw": 57,
@@ -594,7 +603,7 @@
         "passed_filters": 10,
         "proposed_location_none": 4,
         "date_order_flagged": 0,
-        "in_curated": 6
+        "in_curated": 10
       },
       "1900s": {
         "raw": 24,
@@ -603,7 +612,7 @@
         "passed_filters": 7,
         "proposed_location_none": 5,
         "date_order_flagged": 0,
-        "in_curated": 2
+        "in_curated": 7
       }
     },
     "notes": [

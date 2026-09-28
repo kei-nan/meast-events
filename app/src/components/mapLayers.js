@@ -13,6 +13,7 @@ export const CATEGORY_COLORS = {
   diplomatic: "#3f7d84", // muted teal
   economic: "#8c7a3f", // olive mustard
   terrorism: "#6b3140", // deep oxblood
+  atrocity: "#3d3833", // lamp black
 };
 const FALLBACK_COLOR = "#6b6151";
 

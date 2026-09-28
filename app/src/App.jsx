@@ -144,10 +144,12 @@ export default function App() {
   const selectedEventRaw = selectedEventId ? (storeRef.current.get(selectedEventId) ?? null) : null;
 
   // Full leads are fetched lazily, only for the opened event (never for lists).
-  // id -> {extract, extract_retrieved_at} | "error"
+  // id -> {extract, extract_retrieved_at, framing_review} | "error"
   const [leads, setLeads] = useState({});
   const leadRequestedRef = useRef(new Set());
-  const needsLead = Boolean(selectedEventRaw) && selectedEventRaw.extract === undefined;
+  const needsLead =
+    Boolean(selectedEventRaw) &&
+    (selectedEventRaw.extract === undefined || selectedEventRaw.framing_review === undefined);
   useEffect(() => {
     if (!needsLead || leadRequestedRef.current.has(selectedEventId)) return;
     const id = selectedEventId;
@@ -162,9 +164,12 @@ export default function App() {
 
   const selectedEvent = useMemo(() => {
     const raw = selectedEventRaw;
-    if (!raw || raw.extract !== undefined) return raw;
+    if (!raw) return raw;
     const lead = leads[raw.id];
-    if (lead && lead !== "error") return { ...raw, ...lead };
+    const full = lead && lead !== "error" ? lead : null;
+    // A record that already carries its text (API) only takes the review from the lead file.
+    if (raw.extract !== undefined) return full ? { ...raw, framing_review: full.framing_review ?? null } : raw;
+    if (full) return { ...raw, ...full };
     // Until the full lead arrives (or if it cannot be fetched) show the snippet, flagged as partial.
     return { ...raw, extract: raw.snippet ?? "", leadStatus: lead === "error" ? "error" : "loading" };
   }, [selectedEventRaw, leads]);

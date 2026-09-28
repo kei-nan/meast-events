@@ -2,10 +2,13 @@
   // The frontend, deployed as a static-assets Worker by Cloudflare Workers
   // Builds (Path: app, build: npm run build, deploy: npx wrangler deploy).
   // The API is a separate Worker, see ../worker/wrangler.jsonc.
+  // Branches other than main run `npx wrangler preview`, which needs the
+  // `previews` block; empty because the site has no bindings or secrets.
   "name": "atlas-wiki",
   "compatibility_date": "2026-09-26",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
-  }
+  },
+  "previews": {}
 }

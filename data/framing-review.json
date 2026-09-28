@@ -1,0 +1,3885 @@
+{
+  "about": "Framing review: our own reading of each Wikipedia summary, shown next to it and never merged into it. It is an opinion, not a correction and not Wikipedia's view.",
+  "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
+  "reviewed_on": "2026-09-27",
+  "rubric_version": 1,
+  "method": "docs/framing-review.md",
+  "ratings": {
+    "0": "No one-sided framing found",
+    "1": "Minor lean",
+    "2": "Leans to one side",
+    "3": "States a contested conclusion as fact"
+  },
+  "events": {
+    "14-july-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "15a5f2503261",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1912-ottoman-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "aa02383b2f36",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1919-egyptian-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a05eb5426012",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1920-capture-of-damascus": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5ffb715afaa1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1921-persian-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a520fc16aab6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1929-palestine-riots": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7da89418626e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1936-39-arab-revolt-in-palestine": {
+      "rating": 1,
+      "reason": "Arab casualties are given in detail while Jewish deaths are a vague \"up to several hundred\"; attacks on Jews are barely described.",
+      "text_sha1": "5b102cb136b7",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "up to several hundred"
+      ]
+    },
+    "1948-arab-israeli-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "820e0c43a294",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1948-palestine-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b7c215a37d7b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1948-palestinian-expulsion-and-flight": {
+      "rating": 2,
+      "reason": "States contested specifics as fact, such as a \"biological warfare programme\" of well-poisoning and typhoid \"caused by Israeli well-poisoning\". Its central point, that expulsions and fear were the main causes of flight, matches majority scholarship, and it notes that some disagree.",
+      "text_sha1": "d23aab0dda87",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "biological warfare programme",
+        "caused by Israeli well-poisoning"
+      ]
+    },
+    "1949-armistice-agreements": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "de4ce29b9e04",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1953-iranian-coup-d-tat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "32647f57a370",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1958-lebanon-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2e92d1b98cf4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1959-mosul-uprising": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "37a1ceb6a4d3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1960-turkish-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1c12406498a3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1963-syrian-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "72281a9091ab",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1966-attack-on-samu": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "aec8f26f84a5",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1966-syrian-coup-d-tat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "615ef5662e24",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1968-iraqi-coup-d-tat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "67cbde61fc7b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1970-syrian-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f2904856e117",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1971-turkish-military-memorandum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b0c277af72ac",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1973-israeli-raid-in-lebanon": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0c6cc8c8b406",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1973-oil-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1207821fad4c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1979-iranian-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "319b15d51f9d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1979-iranian-islamic-republic-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "727e616a4250",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1979-khuzestan-insurgency": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "26f50e251f22",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1980-turkish-coup-d-etat": {
+      "rating": 1,
+      "reason": "Uses ironic wording as fact: the coup was \"welcomed by some for restoring order by quickly executing 50 people and arresting 500,000\".",
+      "text_sha1": "7fe8d771aab7",
+      "text_retrieved_at": "2026-09-26",
+      "highlights": [
+        "welcomed by some for restoring order by quickly executing 50 people and arresting 500,000"
+      ]
+    },
+    "1981-iranian-prime-minister-s-office-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "45e251320755",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1982-hama-massacre": {
+      "rating": 1,
+      "reason": "Well sourced, but describes it as an \"anti-Sunni massacre\" motivated by \"sectarian animosities\" as fact.",
+      "text_sha1": "eb0582db6517",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Assad",
+      "highlights": [
+        "anti-Sunni massacre",
+        "sectarian animosities"
+      ]
+    },
+    "1982-lebanon-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f2c9400ba709",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1983-beirut-barracks-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2858a560f657",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1983-us-embassy-bombing-in-beirut": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "40a5a228683e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1989-air-battle-near-tobruk": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "73a1d1fc26f8",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the engagement was off Libya."
+    },
+    "1989-iranian-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5717e0665e6e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1991-iraqi-uprisings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3026e2a59eb1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1996-cruise-missile-strikes-on-iraq": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0d7237d6c84d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "1998-bombing-of-iraq": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "adcd393ecbf8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "20-hunchakian-gallows": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "96bbbcee3919",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "20-september-2024-beirut-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7120d1a95f91",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2003-nasiriyah-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "57bdd3a3b971",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2004-ashura-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ce84e3816da7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2004-israeli-operation-in-rafah": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1f3fc3840f72",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2004-israeli-operation-in-the-northern-gaza-strip": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c4266f7c9bfa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2004-sinai-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "23dfe208b484",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2005-amman-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9c6eec22630c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2005-sharm-el-sheikh-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2b1fc644b2e9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2006-israeli-operation-in-beit-hanoun": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "103504e50ed8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2006-lebanon-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "73c7ba35ce52",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2008-turkish-incursion-into-northern-iraq": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4c5d05d559b5",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2009-khan-el-khalili-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2e3a4c1426a9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2010-baghdad-church-siege": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3b6f53e7c1f8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2010-turkish-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9af86dfcd464",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2011-alexandria-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dcaf7a4ae5ba",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2011-bahraini-uprising": {
+      "rating": 1,
+      "reason": "The government's position is absent; the crackdown is described through quoted criticism only.",
+      "text_sha1": "0bc3706ced9e",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the opposition"
+    },
+    "2011-southern-israel-cross-border-attacks": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "58952231c521",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2012-egyptian-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dee4499a7e1a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2012-gaza-war": {
+      "rating": 0,
+      "reason": "Gives both sides' account of what started it, casualties on both sides, Western and Arab reactions, and a human-rights finding that both sides broke the laws of war.",
+      "text_sha1": "16b6ec63254a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2012-homs-offensive": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e897ffdfbfb3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2012-syrian-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8d244356dd4d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2013-egyptian-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c67b0a6e6981",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2013-reyhanl-car-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a39d45346d1b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2014-egyptian-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5b2c7c4f9129",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2014-gaza-war": {
+      "rating": 0,
+      "reason": "Places casualty estimates from the Gaza Health Ministry, the UN and Israeli officials side by side and gives both sides' war aims.",
+      "text_sha1": "b8a093b04c9e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2014-jerusalem-synagogue-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "22bb8d76f7de",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2014-kidnapping-and-murders-of-israeli-teenagers": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "41d71abe2272",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2015-2016-latakia-offensive": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "465c47c0a87f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2015-ankara-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "658da428addf",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2015-beirut-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6818ba7322b8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2015-kuwait-mosque-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8017a32a4798",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2016-ataturk-airport-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2183f5922402",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2016-besiktas-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d290c1e33ffd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2016-karrada-bombing": {
+      "rating": 1,
+      "reason": "Leads with the highest death toll (\"up to 1,000\"); most counts are around 340.",
+      "text_sha1": "42e163a1bffb",
+      "text_retrieved_at": "2026-09-26",
+      "highlights": [
+        "up to 1,000"
+      ]
+    },
+    "2016-turkish-coup-d-etat-attempt": {
+      "rating": 2,
+      "reason": "Gives extended space to the theory that the coup was staged (a \"Reichstag Fire\", its \"overall absurdity\") and uses \"Erdogan regime\" as fact. The government's case appears mainly as Erdoğan's allegation.",
+      "text_sha1": "e5365978dc46",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against the Turkish government",
+      "highlights": [
+        "Reichstag Fire",
+        "overall absurdity",
+        "Erdogan regime"
+      ]
+    },
+    "2017-aleppo-suicide-car-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e0f053bede4c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2017-jerusalem-truck-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2c10329bfc3a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2017-kurdistan-region-independence-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b362ff335d3d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2017-minya-bus-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0425048dc23a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2017-sinai-mosque-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "919dece8f2ca",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2017-tehran-attacks": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "71c7a6cc325c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2017-turkish-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6d0c8560ebed",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2019-egyptian-constitutional-referendum": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "375c19f8006c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2019-turkish-offensive-into-northeastern-syria": {
+      "rating": 0,
+      "reason": "Includes Turkey's stated reasons, the ethnic-cleansing criticism and Turkey's reply to it.",
+      "text_sha1": "3dda438e8d1f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2020-aden-airport-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "00f1664909c5",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2020-beirut-explosion": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "28b1fc478264",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"political\", a group assigned by hand when the event was added; the explosion was an industrial accident."
+    },
+    "2021-israel-palestine-crisis": {
+      "rating": 1,
+      "reason": "Describes Jerusalem Day as \"celebrating the occupation of East Jerusalem\" as fact (Israelis call it reunification). Casualties, rockets and the Hamas ultimatum are all reported.",
+      "text_sha1": "9dfbd546e35e",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "celebrating the occupation of East Jerusalem"
+      ]
+    },
+    "2022-al-aqsa-clashes": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f2236c53c4bb",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"terrorism\" because Wikidata types it as a terrorist attack and an attack on a mosque, without saying which party it means. The summary itself describes clashes between protesters and police. Our category follows Wikidata's type without judging it."
+    },
+    "2022-gaza-israel-clashes": {
+      "rating": 0,
+      "reason": "Gives the Gaza Health Ministry's toll, the IDF's claim that misfired rockets caused some deaths, the dispute over it and an independent Israeli newspaper's count.",
+      "text_sha1": "0a0c553f2203",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2022-istanbul-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "18ae514dcf1f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2022-shah-cheragh-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dbe8749527ed",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2023-gaza-war-ceasefire": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0f2446f3450f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2023-israel-hamas-war": {
+      "rating": 1,
+      "reason": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included.",
+      "text_sha1": "4e88c0844251",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "2023-neve-yaakov-shooting": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "766d67798924",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2024-hezbollah-headquarters-strike": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "235adc391a14",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2024-israel-hezbollah-conflict": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f99bb151a7aa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2024-israel-lebanon-ceasefire-agreement": {
+      "rating": 0,
+      "reason": "Documents ceasefire violations by both sides.",
+      "text_sha1": "eda2f09888fb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2024-kerman-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "74763401e3eb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2024-lebanon-electronic-device-attacks": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "25f1e5793e9c",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"terrorism\" because Wikidata types this Israeli operation as a terrorist attack (and also as counter-terrorism). The summary quotes both UN experts and commentators who called it an anti-terrorist operation. Our category follows Wikidata's type without judging it."
+    },
+    "2024-lebanon-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8ec389d376bb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2025-2026-iran-massacres": {
+      "rating": 0,
+      "reason": "Places government, human-rights and media estimates side by side, including the government's own framing.",
+      "text_sha1": "16ec5ccb7c45",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2025-2026-iranian-protests": {
+      "rating": 0,
+      "reason": "Gives the death-toll range from the government's figure to the highest estimates, each with its source.",
+      "text_sha1": "78a2186298b1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2025-gaza-strip-aid-distribution-killings": {
+      "rating": 1,
+      "reason": "Mostly attributed, with the Israeli denial included; says \"amid a famine\" before the famine was formally declared in August 2025.",
+      "text_sha1": "7300d1259c7d",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "amid a famine"
+      ]
+    },
+    "2025-massacres-of-syrian-alawites": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e464a91be43a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "2026-iran-war": {
+      "rating": 1,
+      "reason": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
+      "text_sha1": "0277f6b1df1f",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against the US and Israel",
+      "highlights": [
+        "taking Iran's oil and gas resources"
+      ]
+    },
+    "2026-minab-school-attack": {
+      "rating": 0,
+      "reason": "The attribution to the US rests on the UN, Amnesty International, and several independent news and open-source investigations.",
+      "text_sha1": "ae5d4dceb7fd",
+      "text_retrieved_at": "2026-09-26",
+      "disclosure": "This summary mentions Anthropic's Claude as part of a US military targeting system. This review was also produced by Claude, so the reviewer has a connection to the subject of this entry."
+    },
+    "31-march-incident": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "da1b9a16312c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "abolition-of-the-ottoman-caliphate": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7d4bcf94e969",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "abraham-accords": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "df8609d6a134",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "abu-ghraib-torture-and-prisoner-abuse": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2d49958204c7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "action-off-cape-passero": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "51ed5e53193b",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the action was fought off Sicily."
+    },
+    "adana-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "64958ab23bfd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "aden-emergency": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "757454136658",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "aeroflot-flight-244": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c0b51112f806",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ahvaz-military-parade-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b2d391a5301a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "al-anfal-campaign": {
+      "rating": 1,
+      "reason": "Weakens the widely accepted genocide finding with a claim about a 2007 court ruling and a sweeping statement that \"many Iraqi Arabs reject that there were any mass killings\", neither sourced.",
+      "text_sha1": "04ea53d68bcf",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against the genocide finding",
+      "highlights": [
+        "many Iraqi Arabs reject that there were any mass killings"
+      ]
+    },
+    "al-dawayima-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b2349e70b048",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "al-shifa-hospital-siege": {
+      "rating": 1,
+      "reason": "Reports Israel's and US intelligence's claims, then lists many media rebuttals; the evidence of hostages being taken into the hospital gets one line.",
+      "text_sha1": "d33341dfe326",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Israel"
+    },
+    "aleppo-offensive-november-december-2016": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c4bddab17d39",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "alumim-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b9a1f148920e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "amiriyah-shelter-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b37f2c8189a7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "anbar-campaign-2013-2014": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "606736ca8e28",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "anglo-iraqi-treaty-1930": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7d3db74d13e0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "anglo-iraqi-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d3c9f956d264",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ankara-agreement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "be8b19b6d2b7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ankara-esenboga-airport-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3225ed3a9b5b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "arab-revolt": {
+      "rating": 1,
+      "reason": "Calls the Allied conquest \"the liberation\" and states as fact that the Arab forces played only a limited role, a point historians debate.",
+      "text_sha1": "b48aa72b6a03",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British and French",
+      "highlights": [
+        "The liberation was led primarily by British and French forces"
+      ]
+    },
+    "arab-spring": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dfa334ff5a1c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "arab-winter": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "710aeb1e96b1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ararat-rebellion": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "718dfb73af92",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "armenian-genocide": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5cc096818a90",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "armistice-of-erzincan": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3e967fb59111",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "armistice-of-mudanya": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6d060d317eb7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "armistice-of-mudros": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3c59cfd017d4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-ali-khamenei": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0cb5f8a611bf",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-ali-larijani": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "40eebe07fc71",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-andrei-karlov": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9a6b83dbbc2d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-anwar-sadat": {
+      "rating": 1,
+      "reason": "Names Egyptian Islamic Jihad as the assassins but attributes the motive to \"communist, socialist, and Islamist groups\", which is confusing and unsupported.",
+      "text_sha1": "c2a9425cda99",
+      "text_retrieved_at": "2026-09-26",
+      "highlights": [
+        "communist, socialist, and Islamist groups"
+      ]
+    },
+    "assassination-of-hrant-dink": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "81380729a0e9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-ismail-haniyeh": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b06b71195c10",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-qasem-soleimani": {
+      "rating": 0,
+      "reason": "Gives the Pentagon's justification, questions about the evidence, a UN rapporteur's legal view, and Iran's and Iraq's positions.",
+      "text_sha1": "1253e05d7325",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-rafic-hariri": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4a9e6d5f6224",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-saleh-al-arouri": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2a0d2b45546e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "assassination-of-yitzhak-rabin": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "025a8408d937",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "attempted-assassination-of-abdul-hamid-ii": {
+      "rating": 1,
+      "reason": "Opens with the attackers' grievance (the Hamidian massacres) as the motive before describing the bombing that killed 26; factual, but sympathetic in emphasis.",
+      "text_sha1": "316eccb0190a",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the attackers"
+    },
+    "august-2016-gaziantep-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b8a7489fa4e0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "august-2025-israeli-attack-on-sanaa": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "42f45dd6931c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "avivim-school-bus-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1568817e786d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "baghdad-pact": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bb16cb49e474",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "bahr-el-baqar-primary-school-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2f1a0ffaafcd",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"terrorism\" because Wikidata types this Israeli air strike as a terrorist attack. The summary itself says the designation is disputed. Our category follows Wikidata's type without judging it."
+    },
+    "bahrain-israel-normalization-agreement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ae50042225f2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "balad-al-shaykh-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1cf4c9bf4002",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "balfour-declaration": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5612fe7da6b2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "balkan-pact-1953": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "915a7382cec6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "balkan-wars": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "43e572859cd1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-for-jerusalem": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "afa6005a6958",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-73-easting": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8fcdff51e710",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-al-bab": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "466649bb8088",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-al-faw-2003": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "30d3692a71b2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-alam-el-halfa": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3ac51b9de6ee",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-aleppo-2012-2016": {
+      "rating": 0,
+      "reason": "Attributes atrocities to all sides, from government barrel bombs to rebel \"hell cannons\", with UN sources.",
+      "text_sha1": "aba663c015ad",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-aleppo-2024": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b378486b5ffa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-ammunition-hill": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f474403163a9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-aqaba": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a8e009cef153",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-ardahan": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b61201859348",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-baghdad-2003": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f1838f2533fe",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-baghuz-fawqani": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0d641c3a9f92",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-baltim": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0c78f46b2cd1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-basra-1914": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "93eba15c6405",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-basra-2003": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8c1e18b54aa0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-basra-2008": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f370afe78d72",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-beersheba-1917": {
+      "rating": 1,
+      "reason": "A heroic account of the Light Horse charge from the British Empire side, with a later-added claim about the Nili spy ring's importance.",
+      "text_sha1": "04dd952e1c12",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British/ANZAC side",
+      "highlights": [
+        "The data provided by the Jewish Nili spy ring was particularly important for the conquest of Beersheba and Jerusalem."
+      ]
+    },
+    "battle-of-beirut-1912": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "90548032f14c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-bitlis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "786254ddff5b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-bulair": {
+      "rating": 1,
+      "reason": "Calls Enver Pasha's decision \"stubbornness\" without attributing the judgement.",
+      "text_sha1": "71f709dce359",
+      "text_retrieved_at": "2026-09-26",
+      "highlights": [
+        "stubbornness"
+      ]
+    },
+    "battle-of-cape-bon-1941": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2b34580fedee",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Tunisia."
+    },
+    "battle-of-cape-spada": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3061917f0c05",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Crete."
+    },
+    "battle-of-cape-spartivento": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "67462d89c60f",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Sardinia."
+    },
+    "battle-of-ctesiphon-1915": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9833ee0ba21d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-damascus-2012": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b3961ea84c2d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-dasman-palace": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4a2b9dceab58",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-dumlup-nar": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dcaff16524fa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-elli": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fea9c3cc1c8a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-erzincan-1916": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "68b7371fa1a9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-gaza-2007": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ef0ab17dab72",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-haifa-1918": {
+      "rating": 1,
+      "reason": "Says the day \"is celebrated as Haifa Day\" without saying by whom (it is an Indian Army commemoration).",
+      "text_sha1": "c9fd1cf5027d",
+      "text_retrieved_at": "2026-09-26",
+      "highlights": [
+        "is celebrated as Haifa Day"
+      ]
+    },
+    "battle-of-haifa-1948": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0591ad17b74e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-holy-apostles-monastery": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e42b4e6d74be",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-idlib-2015": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "936d8cdfdd8e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-imbros": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9716be3e97e1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-jenin-2002": {
+      "rating": 0,
+      "reason": "States that investigations found no evidence for the reported massacre, while also reporting the destruction and the blocked emergency access.",
+      "text_sha1": "387af2038ed6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-jerusalem-1917": {
+      "rating": 1,
+      "reason": "Ends on the capture as \"a great morale boost for the British Empire\" and a \"Christmas present for the British people\"; the city's residents and the Ottoman side are absent.",
+      "text_sha1": "6cd88b5f8f05",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British side",
+      "highlights": [
+        "a great morale boost for the British Empire",
+        "Christmas present for the British people"
+      ]
+    },
+    "battle-of-kara-killisse-1915": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "084638659b26",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-karameh": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d09b682e2d2a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-karbala-2003": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "04dfb543012e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-khafji": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "68d769ba4d61",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-khorramshahr-1980": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3bdcf3415f63",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-khorramshahr-1982": {
+      "rating": 1,
+      "reason": "Uses the Iranian framing \"Liberation of Khorramshahr\" (the city was Iranian territory retaken); the Iraqi side is absent.",
+      "text_sha1": "2ee6275dba02",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Iranian side",
+      "highlights": [
+        "Liberation of Khorramshahr"
+      ]
+    },
+    "battle-of-kirkuk-2017": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ceef11e0328a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-kunfuda-bay": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c437c014880a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-latakia": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "52fe4aba90b3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-lule-burgas": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "03eb07a54815",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-magdhaba": {
+      "rating": 1,
+      "reason": "Told entirely from the British Empire forces' side.",
+      "text_sha1": "f8080236ed43",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British/ANZAC side"
+    },
+    "battle-of-manzikert-1915": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a6b7c10bc45f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-marash": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "72c872213f3b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-maysalun": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "277fe953df6a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-mecca-1916": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "cd3f3318e713",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-medina-ridge": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "47d3b522b854",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-megiddo-1918": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "77d1b00bfd38",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-mersa-matruh": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7ac49b0917ef",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-mosul-2016-2017": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8ee456e981f6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-najaf-2003": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "26c838cef440",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-najaf-2004": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "82a828225300",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-nasiriyah": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7fe434cdc07e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-norfolk": {
+      "rating": 1,
+      "reason": "Superlatives from the US side; Iraqi losses appear only as counts.",
+      "text_sha1": "38460040620e",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the US side"
+    },
+    "battle-of-oltu": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "36f7ef5b3c32",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-palmyra-1941": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c42157aeb321",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-qurna": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8ae2edec7f83",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-rafa": {
+      "rating": 1,
+      "reason": "Told entirely from the British Empire forces' side.",
+      "text_sha1": "3a931726dbc9",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British/ANZAC side"
+    },
+    "battle-of-ramadi-2014-2015": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5c3bc8873234",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-raqqa-2013": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2275f04cd5a8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-raqqa-2017": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "18784a1ba04a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-ras-al-ayn-2012-13": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d9a56e697c61",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-re-im": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "05aae8cda9f7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-riyadh": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f5f87f52b7fa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-romani": {
+      "rating": 1,
+      "reason": "A long account told entirely from the British Empire forces' side; the Ottoman and German forces appear only as the enemy.",
+      "text_sha1": "88fc2d40006c",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British/ANZAC side"
+    },
+    "battle-of-samarra-2004": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2793e6e6f456",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-sarikamish": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7495913e4d0a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-sderot": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "25443c987bb6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-tel-hai": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "837178b6b7fa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-the-chinese-farm": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a6ec668b3ae1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-the-duisburg-convoy": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b10205977c16",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought in the central Mediterranean."
+    },
+    "battle-of-the-espero-convoy": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7c9a9169052f",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Crete."
+    },
+    "battle-of-the-sakarya": {
+      "rating": 1,
+      "reason": "Closes on a Turkish nationalist quotation with no counterpart view.",
+      "text_sha1": "ea298e55c03a",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Turkish side",
+      "highlights": [
+        "The retreat that started in Vienna on 13 September 1683 stopped 238 years later."
+      ]
+    },
+    "battle-of-the-tarigo-convoy": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2d6e9c684da2",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Tunisia."
+    },
+    "battle-of-umm-qasr": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f7f637af6d84",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-wadi-1916": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f5bab0f5439e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-of-zumar": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b145cee3fc47",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battle-off-the-coast-of-abkhazia": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "680a9bfdd1b5",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "Outside this map's region (Russo-Georgian War, Black Sea)."
+    },
+    "battles-of-latrun-1948": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f3e2005bc369",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "battles-of-ramadi-1917": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9d6d85aa82f4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "be-eri-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "558f0f63e094",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "black-friday-1978": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "575f836962f2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "black-sea-grain-initiative": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "87efea2ae240",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "A Russia-Ukraine grain agreement, tagged Turkey because it was signed in Istanbul."
+    },
+    "black-september-in-jordan": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "92ecc81808b8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "botroseya-church-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dd74a3fb4726",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "british-airways-flight-149": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8bd2fe24085a",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"terrorism\" because Wikidata types it as a hostage taking; the airliner and its passengers were seized by Iraqi forces during the invasion of Kuwait."
+    },
+    "camp-david-accords": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b988c2b57a51",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "camp-speicher-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "22ac1a004e66",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "canal-hotel-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d0fdcb40e769",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "capture-of-damascus-1918": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3f298bdaa466",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "capture-of-mecca-1924": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "291ecd6ab518",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "capture-of-saddam-hussein": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d998c78ec7ba",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "cedar-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "cb3f79994690",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "church-of-saint-porphyrius-airstrike": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "262f0dab48aa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "cinema-rex-fire": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "db898cff010a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "coastal-road-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "883e130d71df",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "constitutionalization-attempts-in-iran": {
+      "rating": 1,
+      "reason": "Describes the Shah's government as \"oppressive\" and the period as \"a classic example of an environment ripe for protest\" as fact, without saying who holds that view.",
+      "text_sha1": "ae2083eaf97e",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the constitutionalists",
+      "highlights": [
+        "oppressive",
+        "a classic example of an environment ripe for protest"
+      ]
+    },
+    "damour-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b07566067a26",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "dawson-s-field-hijackings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b2da08f59ade",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "defense-of-van-1915": {
+      "rating": 1,
+      "reason": "Written as a rebuttal of genocide-denial arguments rather than a description. Its conclusions match the scholarly consensus, but the tone argues rather than reports.",
+      "text_sha1": "97ab6f4a8450",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Armenian side",
+      "highlights": [
+        "the alpha and omega of the plea of 'military necessity'"
+      ]
+    },
+    "dersim-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fb03179a85b8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "dhofar-rebellion": {
+      "rating": 1,
+      "reason": "Calls it \"a revolution ... against British imperialism\" as fact and puts the government side's aim in scare quotes.",
+      "text_sha1": "10c54dbbc3ca",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Dhofar rebels",
+      "highlights": [
+        "against British imperialism"
+      ]
+    },
+    "dujail-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "44720e74e257",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "egypt-israel-peace-treaty": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2a99234f621f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "egyptian-crisis-2011-2014": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "050a8e97ded0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "egyptian-revolution-of-1952": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8cdfcaad8d55",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "egyptian-revolution-of-2011": {
+      "rating": 1,
+      "reason": "Describes Morsi's 2013 removal as \"a revolution broke out\" and never uses the word coup (the separate 2013 coup entry does).",
+      "text_sha1": "fb0f3aef3e32",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Morsi",
+      "highlights": [
+        "a revolution broke out"
+      ]
+    },
+    "eilabun-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "aac7721251b4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "emirate-of-transjordan": {
+      "rating": 1,
+      "reason": "Puts Jordan's \"uniting\" of the two banks of the Jordan in scare quotes, signalling scepticism in the article's own voice.",
+      "text_sha1": "d812c22bb1cf",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Jordan",
+      "highlights": [
+        "\"uniting\""
+      ]
+    },
+    "erzurum-offensive": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9475682fb0de",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "execution-of-saddam-hussein": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "27fa3a7d585d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fall-of-aden-2026": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "385e11d0be9e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fall-of-baghdad-1917": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2510cf11411b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fall-of-damascus-2024": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d64019dfca31",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fall-of-fallujah": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1297b48109e9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fall-of-mosul": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "54638e2e3a92",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fall-of-the-assad-regime": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "99d360154fa3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "fao-landing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fcb61eafc871",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "february-2016-ankara-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e8eb3c754cc0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "first-battle-of-al-faw": {
+      "rating": 1,
+      "reason": "Calls the operation \"one of Iran's greatest achievements\" without attribution.",
+      "text_sha1": "8840989cc7a0",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Iranian side",
+      "highlights": [
+        "one of Iran's greatest achievements"
+      ]
+    },
+    "first-battle-of-catalca": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c8667df6e95f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "first-battle-of-el-alamein": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e6b1228dfc86",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "first-battle-of-fallujah": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "03293c7ee8a0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "first-battle-of-gaza": {
+      "rating": 1,
+      "reason": "Told from the British side (\"snatched defeat from the jaws of victory\").",
+      "text_sha1": "7bb390a3c9c1",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British side",
+      "highlights": [
+        "snatched defeat from the jaws of victory"
+      ]
+    },
+    "first-battle-of-tikrit": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a51377948510",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "first-intifada": {
+      "rating": 1,
+      "reason": "States \"excessive violence in response from Israeli security forces\" as fact; it does also cover attacks, Israeli casualties and killings of alleged collaborators.",
+      "text_sha1": "1c9e528fa444",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "excessive violence in response from Israeli security forces"
+      ]
+    },
+    "first-saudi-rashidi-war-1903-1907": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "79d2273d2ad5",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "first-yemenite-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "39295328a785",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "flour-massacre": {
+      "rating": 1,
+      "reason": "Gives the Israeli, survivor and CNN accounts, but closes on one correspondent's claim of \"a broader pattern\".",
+      "text_sha1": "66812b47fcce",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "franco-syrian-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e4610ae98042",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "franco-turkish-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d6189221eb5d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "gallipoli-campaign": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4fa78c18c3e6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "gaza-genocide": {
+      "rating": 3,
+      "reason": "The opening sentence defines it as \"the ongoing, intentional, and systematic destruction of the Palestinian people ... carried out by Israel\". The finding is supported by a UN commission and genocide scholars, but Israel, the US and some scholars reject it and the International Court of Justice has not ruled. Israel's position gets one sentence near the end.",
+      "text_sha1": "f1f4213b16e1",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "the ongoing, intentional, and systematic destruction of the Palestinian people",
+        "carried out by Israel"
+      ]
+    },
+    "gaza-peace-summit": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c56776006728",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "gaza-strip-evacuations": {
+      "rating": 1,
+      "reason": "Gives the IDF's stated reason, then relies on evacuee and critic accounts, with \"forced evacuations\" as fact.",
+      "text_sha1": "69bba30e40cf",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "forced evacuations"
+      ]
+    },
+    "gaza-strip-famine": {
+      "rating": 1,
+      "reason": "Opens with the famine as \"a result of an Israeli blockade\"; other causes (looting, breakdown of order) come later as secondary.",
+      "text_sha1": "6be5bb6f6103",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "a result of an Israeli blockade"
+      ]
+    },
+    "gaza-war-2008-09": {
+      "rating": 0,
+      "reason": "Lists both sides' names for the war, both sides' account of how the ceasefire broke down, and the UN report together with its lead author's later partial retraction.",
+      "text_sha1": "b3c68953bad4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "gaza-war-hostage-crisis": {
+      "rating": 0,
+      "reason": "A factual account that includes the hostages killed by IDF friendly fire and the Palestinians killed during a rescue.",
+      "text_sha1": "ad51fe834c91",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "german-ottoman-alliance": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ca4e5375649c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ghouta-chemical-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fe2e74eddf2d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "goharshad-mosque-rebellion": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "613df7fb9eb2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "grand-mosque-seizure": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2f2cd028c9e0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "great-syrian-revolt": {
+      "rating": 1,
+      "reason": "Uses the rebels' vocabulary (\"French occupation\", \"local collaborators\") as fact.",
+      "text_sha1": "ccb859005380",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Syrian rebels",
+      "highlights": [
+        "French occupation",
+        "local collaborators"
+      ]
+    },
+    "greco-turkish-war-1919-1922": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "60d0e4ede959",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "greek-landing-at-smyrna": {
+      "rating": 2,
+      "reason": "Justifies the landing with Lloyd George's words, then calls the violence against Turkish civilians \"unsystematic\" and says the Greek command \"tried to thwart it\". The Turkish perspective is absent.",
+      "text_sha1": "83b128a8a12d",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Greek side",
+      "highlights": [
+        "unsystematic",
+        "tried to thwart it"
+      ]
+    },
+    "gulf-air-flight-771": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b75b3caad27c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "gulf-war": {
+      "rating": 1,
+      "reason": "Presents one contested study (US bombing as the main cause of Gulf War syndrome) as settled; otherwise a coalition-perspective summary.",
+      "text_sha1": "19d448906e6b",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the coalition",
+      "highlights": [
+        "were concluded to be the primary cause of Gulf War syndrome"
+      ]
+    },
+    "h-3-airstrike": {
+      "rating": 1,
+      "reason": "Calls it \"one of the most successful raids in the history of aerial warfare\" without attribution.",
+      "text_sha1": "b5120ca86d60",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Iranian side",
+      "highlights": [
+        "one of the most successful raids in the history of aerial warfare"
+      ]
+    },
+    "hadassah-medical-convoy-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9579a2bce213",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "haditha-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7ee7f73e04b9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "hafez-al-assad": {
+      "rating": 1,
+      "reason": "Gives the highest estimate of the Hama death toll (30,000) as fact; estimates range from about 10,000 to 40,000.",
+      "text_sha1": "b6c3c531834d",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Assad",
+      "highlights": [
+        "massacres of 30,000 men, women and children in Hama alone"
+      ]
+    },
+    "haft-e-tir-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "44a31e4517ba",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "haifa-oil-refinery-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5417670a30db",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "halabja-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c692fe91678c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "hamas": {
+      "rating": 2,
+      "reason": "States contested claims as fact: that Israel supported Hamas \"to prevent the creation of an independent Palestinian state\", and that Gaza was \"Israeli-occupied\" while Hamas governed it. October 7 is mentioned only by name. It does list terrorist designations and attacks on civilians.",
+      "text_sha1": "ff8b33400333",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward Hamas",
+      "highlights": [
+        "to prevent the creation of an independent Palestinian state",
+        "the Israeli-occupied Gaza Strip"
+      ]
+    },
+    "holit-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "db84b549e768",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "houla-massacre": {
+      "rating": 0,
+      "reason": "Carefully sourced to UN reports and includes the government's alternative account and the press report that supported it.",
+      "text_sha1": "a6a228d9d544",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "houthi-insurgency": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9d381b2bfb42",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The start date (2015) comes from Wikidata; the insurgency began in 2004, as the summary says."
+    },
+    "houthi-takeover-of-yemen": {
+      "rating": 2,
+      "reason": "After listing both names, calls the takeover \"a popular revolution\" as fact rather than a coup.",
+      "text_sha1": "1c897d748347",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Houthis",
+      "highlights": [
+        "a popular revolution"
+      ]
+    },
+    "hula-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a06e1146b35e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "indian-airlines-flight-814": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3c5a3769ea56",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "invasion-of-iraq": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "56dc4fd6efe4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iran-china-25-year-cooperation-program": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7ce069c81167",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iran-hostage-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "132182d53bec",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iran-iraq-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b5c146e777df",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iran-israel-proxy-conflict": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5b8f9c98a178",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iran-saudi-arabia-proxy-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4b16b806268b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iranian-green-movement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0fe0bdeae76e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iranian-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "25d35820ddfb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraq-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7c99ff63f645",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-civil-war-2006-2008": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "396a3fe16394",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-conflict": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c1cb2be4ab24",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-insurgency-2003-2011": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "038eebaa6b74",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-insurgency-2011-2013": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c30ef5174ab9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-insurgency-2017-present": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "721f7ba41e3d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-invasion-of-kuwait": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0e9c26b18d97",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The start date (2009) comes from Wikidata and is wrong; the invasion began on 2 August 1990."
+    },
+    "iraqi-kurdish-civil-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c20202df093d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-kurdish-conflict": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a84a0ab55562",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-revolt-against-the-british": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7c2f90bd884d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iraqi-turkmen-genocide": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f789ba7bc9dd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "iskandariya-suicide-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4434da0ddd2d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "islamic-state": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3ab0b3401e2d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "israel-jordan-peace-treaty": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9ae614ffb73b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "israel-united-arab-emirates-normalization-agreement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "16e2681749b9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "israeli-airstrike-on-the-iranian-consulate-in-damascus": {
+      "rating": 1,
+      "reason": "After Israel's position, argues against it in the article's own voice (\"the building was indeed a consulate\"; embassies \"frequently host military attaches\").",
+      "text_sha1": "1cbddeaca779",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Israel",
+      "highlights": [
+        "the building was indeed a consulate",
+        "frequently host military attaches"
+      ]
+    },
+    "israeli-attack-on-doha": {
+      "rating": 0,
+      "reason": "Gives Israel's stated reason and Qatar's characterisation, each attributed.",
+      "text_sha1": "90c87ba02703",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "israeli-blockade-of-the-gaza-strip-2023-present": {
+      "rating": 3,
+      "reason": "Treats \"the Gaza genocide\" as an established fact. That finding is supported by a UN commission and genocide scholars but rejected by Israel, the US and others, and the International Court of Justice has not ruled. Israel's stated reasons appear only as something criticised.",
+      "text_sha1": "76a01de62dc1",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "the Gaza genocide"
+      ]
+    },
+    "israeli-declaration-of-independence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "42bb4cafe743",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "israeli-disengagement-from-gaza": {
+      "rating": 1,
+      "reason": "Asserts that Gaza remained occupied after 2005, citing the UN and the ICJ, without mentioning that Israel and some legal scholars reject this.",
+      "text_sha1": "10b6f0f8b7f2",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "israeli-withdrawal-from-lebanon": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e10316f348b6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "istanbul-convention": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "58bf4d8a2e71",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "istanbul-nightclub-shooting": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "eadc29e6ff65",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "italo-turkish-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8b09c5e26041",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "january-2016-istanbul-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b569fbf200d7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "january-2025-gaza-war-ceasefire": {
+      "rating": 0,
+      "reason": "Reports accusations of violations by both sides and Israel's reason for resuming strikes.",
+      "text_sha1": "cc8daacfb523",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "jewish-exodus-from-the-muslim-world": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "758523c9d62a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "joint-comprehensive-plan-of-action": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "101ffb12fcec",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "jordanian-independence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bfa2a4e5dcfc",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The summary shown is the general \"History of Jordan\" article, not about the 1946 independence itself."
+    },
+    "july-2023-jenin-incursion": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f1114b8cc7a7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "july-2024-houthi-israel-attacks": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "97b4c4bf5ce9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "june-2011-jisr-ash-shughur-clashes": {
+      "rating": 0,
+      "reason": "Presents the government and opposition accounts explicitly as disputed.",
+      "text_sha1": "4d040a8ddb34",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "june-2016-istanbul-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8382cb61df18",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "june-2016-tel-aviv-shooting": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "be138553e9d8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "june-2025-israeli-strikes-on-iran": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "eaf0091cac84",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "jungle-movement-of-gilan": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bfd1f0771b5b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kafr-qasim-massacre": {
+      "rating": 1,
+      "reason": "Well sourced overall, but states the sweeping claim that \"Arab citizens were regarded by Israel as a hostile population\" as fact.",
+      "text_sha1": "546a8a2404dc",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "Arab citizens were regarded by Israel as a hostile population"
+      ]
+    },
+    "karantina-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "095a3049c3ca",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kfar-aza-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a6a0d07b5271",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kfar-etzion-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c70c158b62e9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "khan-yunis-massacre": {
+      "rating": 0,
+      "reason": "Gives the accounts of an Israeli historian, a critic citing a journalist, and the Israeli authorities side by side.",
+      "text_sha1": "59c65e9eee90",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "khartoum-resolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "752ebd00a5ad",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "khobar-towers-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7bb19d7bd644",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kidnapping-and-killing-of-the-bibas-family": {
+      "rating": 0,
+      "reason": "Gives Hamas's claim and Israel's forensic claim, and notes that Israel did not publish its evidence.",
+      "text_sha1": "b1727d862f9f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "killing-of-hind-rajab": {
+      "rating": 1,
+      "reason": "Well documented (independent investigations; the IDF later admitted firing), with one editorial touch (\"finally admitted\").",
+      "text_sha1": "18f2ac091ba7",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "finally admitted"
+      ]
+    },
+    "killing-of-jamal-khashoggi": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9b514e1567ea",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "killing-of-yahya-sinwar": {
+      "rating": 0,
+      "reason": "Gives Israeli, US and Hamas reactions and both readings of the released drone footage.",
+      "text_sha1": "8392dba1a738",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "king-david-hotel-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9050348455a7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kingdom-of-iraq": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ad3dab2505aa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kiryat-shmona-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "316794f5660c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kissufim-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1fee2f450402",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "kurdish-turkish-conflict": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1fcee1f80d07",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "landing-at-anzac-cove": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "eb56cdf2ed20",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "lebanese-civil-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "86fdd5aec3dd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "lod-airport-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "33b4cabed5ac",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "luxor-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "cf6228e58598",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ma-alot-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7ebb09a33bcf",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "madrid-conference-of-1991": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5f06273129b8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "mahmudiyah-rape-and-murders": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1a0d29d6dd60",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "mahsa-amini-protests": {
+      "rating": 0,
+      "reason": "Includes the government's view alongside the UN fact-finding mission's findings.",
+      "text_sha1": "b307a86316b1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "mahshahr-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6a9ad47563e2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "majdal-shams-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "acfd8eb20436",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "mar-elias-church-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d0918fe82685",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "maras-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "db7a8bb22517",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "march-1949-syrian-coup-d-etat": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4a6add7c2742",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "march-2012-gaza-israel-clashes": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5b3b725f1cf9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "march-2015-sanaa-mosque-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "51319c6490c8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "march-2016-ankara-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "008bdecec285",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "march-2016-istanbul-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6169e9454c00",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "march-2025-israeli-attacks-on-the-gaza-strip": {
+      "rating": 1,
+      "reason": "States Israel's position, but frames the entry around Israeli ceasefire breaches and argues who broke the ceasefire rather than describing the dispute.",
+      "text_sha1": "b6fde5f3b68c",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "march-may-2025-united-states-attacks-in-yemen": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6056c189c9b8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "may-17-agreement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5daa70cc97df",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "may-2023-gaza-israel-clashes": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0cdb6fa6939e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "may-2025-gaza-offensive": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "287ebffc81e9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "mcmahon-hussein-correspondence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d0cf70b57e83",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "mecca-joint-defence-agreement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "90d11633683d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "menemen-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "59335d1f9a0d",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The start date (1916) comes from Wikidata; the summary dates the massacre to June 1919."
+    },
+    "metrojet-flight-9268": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "58b7541c377c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "montreux-convention-regarding-the-regime-of-the-straits": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "98e4ddeacdad",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "musa-dagh-resistance": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1e48b123a5f9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nahal-oz-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "591129dc6062",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nakba": {
+      "rating": 3,
+      "reason": "The opening sentence defines the Nakba as \"the ethnic cleansing of Palestinian Arabs by Zionists\" and later states \"Israel employed biological warfare\" as fact. The Israeli view appears only as denial. Many historians use these terms, but they are contested and the summary does not attribute them.",
+      "text_sha1": "c2689347e818",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "the ethnic cleansing of Palestinian Arabs by Zionists",
+        "Israel employed biological warfare"
+      ]
+    },
+    "national-pact": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0fdf228379b6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "naval-operations-in-the-dardanelles-campaign": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ac8de184e4fd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "naval-warfare-in-the-mediterranean-during-world-war-i": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ac87f4b486cc",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "netiv-haasara-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bff7c0e67a95",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nir-oz-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "90382ece9b93",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nirim-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "38b146cb11e1",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nisour-square-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "597338f425c0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "north-yemen-civil-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1fbc8a31b4c7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "northwestern-syria-offensive-2019-2020": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1926e7ccfa84",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nova-music-festival-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "37fe53230200",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "nuseirat-rescue-and-massacre": {
+      "rating": 1,
+      "reason": "The title adopts the \"massacre\" label that the text itself attributes to \"some sources\"; the UN human rights office says both sides may have committed war crimes.",
+      "text_sha1": "59353eae5828",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "october-7-attacks": {
+      "rating": 2,
+      "reason": "Hedges the sexual-violence reports (\"Hamas officials denied\") while stating as fact that \"at least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive\", and uses \"illegal Israeli settlements\" as fact. It does note that 44 governments called the attack terrorism.",
+      "text_sha1": "f300fad67b61",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "illegal Israeli settlements",
+        "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
+      ]
+    },
+    "ofira-air-battle": {
+      "rating": 1,
+      "reason": "Relies on the Israeli account of the battle; notes that Egypt disputes it.",
+      "text_sha1": "100e54cf8426",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Israeli side",
+      "highlights": [
+        "In just under six minutes, seven Egyptian MiGs had been shot down"
+      ]
+    },
+    "operation-abstention": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b8c3b2f1c20f",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon and Syria, but the operation was in the Dodecanese islands."
+    },
+    "operation-accountability": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "434c3e7a74fa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-active-endeavour": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b61cf4a56b93",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-agreement": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bb2df2ccfd11",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-aspides": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7ce3a3dd4337",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-atalanta": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "df6f12a4d0bc",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "Outside this map's region (anti-piracy operation off Somalia)."
+    },
+    "operation-badr-1973": {
+      "rating": 1,
+      "reason": "Focuses on Egyptian success and commemorations; the Israeli counter-offensive gets one clause.",
+      "text_sha1": "3c8ae4acf898",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Egyptian side"
+    },
+    "operation-barkhane": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "15371e064773",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "Outside this map's region (French operation in the Sahel)."
+    },
+    "operation-beit-ol-moqaddas": {
+      "rating": 1,
+      "reason": "Written from the Iranian side (\"liberating Khorramshahr\", \"extremely significant events\").",
+      "text_sha1": "fa728d10b47e",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Iranian side",
+      "highlights": [
+        "liberating Khorramshahr",
+        "extremely significant events"
+      ]
+    },
+    "operation-brevity": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e5016bdd14ae",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-chammal": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f60a56cbb1e7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-claw-eagle-2": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c93bc757a872",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-compass": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "618a57b1a2f2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-crusader": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bb5f8a428f6c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-dani": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "943479419593",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-defensive-shield": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ec63b7539ae2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-eagle-claw": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "179a22c76aa8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-earnest-will": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fd0cb4b7a841",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-euphrates-shield": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ec326fc94db8",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-excess": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e46565927ec6",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the convoys ran to Malta, Alexandria and Greece."
+    },
+    "operation-fath-ol-mobin": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6dc1ccb8ed2f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-grapes-of-wrath": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9ec3c82c612b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-halberd": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "81342e1ead4f",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Syria and Turkey, but the convoy ran from Gibraltar to Malta."
+    },
+    "operation-harpoon-1942": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c63018474c92",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-hiram": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "702a6326ea9d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-horev": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a54a50630a21",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-hot-winter": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0d0c83ab4e8f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-inherent-resolve": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2e9297ee3e87",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-juniper-shield": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1654e2c33b04",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "Tagged Egypt, but the operation covers the Sahel (Mali, Niger and neighbouring countries), outside this map's region."
+    },
+    "operation-kaman-99": {
+      "rating": 1,
+      "reason": "\"The outcome was clearly successful\"; written from the Iranian Air Force's side.",
+      "text_sha1": "30c7fcf0523f",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Iranian side",
+      "highlights": [
+        "The outcome was clearly successful"
+      ]
+    },
+    "operation-magic-carpet-yemen": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c1bda22f6792",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"war\" because Wikidata types it as a military operation; it was an airlift of Yemenite Jews to Israel."
+    },
+    "operation-marg-bar-sarmachar": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "353aaed5e244",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-mersad": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bd79286f0a41",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-mole-cricket-19": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6f721de2e42b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-morvarid": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "55d1e2e13568",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-moses": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e82fd0316cbd",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"war\" because Wikidata types it as a military operation; it was an evacuation of Ethiopian Jews to Israel."
+    },
+    "operation-musketeer-1956": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "efeb84a8ceee",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-nachshon": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e7c37a1bc43c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-nasr": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d48586b314fa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-nemesis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1a590f6d9534",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Our category is \"political\" because Wikidata types this as an assassination campaign; the earlier bombing attempt on Abdul Hamid II by the same organisation is typed as a terrorist attack and shown as terrorism."
+    },
+    "operation-olive-branch": {
+      "rating": 1,
+      "reason": "Lists war crimes and arrests of critics but leaves out Turkey's stated reason (that it considers the YPG an arm of the PKK).",
+      "text_sha1": "20a48b32dd73",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Kurdish side"
+    },
+    "operation-pedestal": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0ee3bf9c534c",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the convoy ran to Malta."
+    },
+    "operation-pleshet": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "0676bcf4f1d0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-praying-mantis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4194ae1d7d2f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-prime-chance": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "05383d586349",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-prosperity-guardian": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2b884891fcd5",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-provide-comfort": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "db9590879df6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-skorpion": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "78e1a7227e6b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-southern-watch": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "42cf9744bdf7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-spring-shield": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "69dae2ce658d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-tariq-al-quds": {
+      "rating": 1,
+      "reason": "Uses the Iranian framing \"Liberation of Bostan\" and Khomeini's \"victory of victories\".",
+      "text_sha1": "ae9c95c3299b",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Iranian side",
+      "highlights": [
+        "Liberation of Bostan",
+        "victory of victories"
+      ]
+    },
+    "operation-unified-protector": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e7d503178bdc",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The country tags include Turkey, Egypt, Israel/Palestine, Lebanon and Syria, but the operation was over Libya."
+    },
+    "operation-uvda": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "93c211b3528d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-viking-hammer": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d51122785f34",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "operation-yoav": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c253fe55ee11",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "oslo-accords": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3e90964cc4e4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ottoman-entry-into-world-war-i": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "db2bbec65680",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palestine-liberation-organization": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6d2ef2a3daec",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palestinian-declaration-of-independence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "baa31ad4adfb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palestinian-expulsion-from-lydda-and-ramle": {
+      "rating": 0,
+      "reason": "Graphic but specific and sourced (the written expulsion order, named historians); the disputed death toll is given as a range.",
+      "text_sha1": "dd827bc54517",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palestinian-insurgency-in-south-lebanon": {
+      "rating": 1,
+      "reason": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency.",
+      "text_sha1": "fd4c32df25fe",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the PLO"
+    },
+    "palm-sunday-church-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "22f04a5b29b0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palmyra-offensive-december-2016": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "309240ba9afb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palmyra-offensive-march-2016": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "752380e574fa",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "palmyra-offensive-may-2015": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f71a9358a9f4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "peel-commission": {
+      "rating": 1,
+      "reason": "Gives both leaderships' positions, but ends on a single historian's reading that Zionist leaders saw partition as a step toward \"the eventual takeover of the whole of Palestine\".",
+      "text_sha1": "c91dfdbb1cf7",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "the eventual takeover of the whole of Palestine"
+      ]
+    },
+    "pursuit-of-goeben-and-breslau": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "523343ee91b2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "qahtaniyah-bombings": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "acf17722da9a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "qana-massacre": {
+      "rating": 1,
+      "reason": "Says the UN investigation \"refuted\" Israel's account and \"found that the Israeli shelling was deliberate\"; the UN report said it was \"unlikely\" to be the result of errors, a softer finding.",
+      "text_sha1": "e91cd4039239",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against Israel",
+      "highlights": [
+        "refuted",
+        "found that the Israeli shelling was deliberate"
+      ]
+    },
+    "qatar-diplomatic-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4c0eb2a642dc",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "qibya-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5ea9bb405c51",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "rabaa-massacre": {
+      "rating": 0,
+      "reason": "Gives the human-rights, government and Muslim Brotherhood death tolls side by side, and reports the retaliatory attacks on police and churches.",
+      "text_sha1": "36a39fff00c2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "rafah-paramedic-massacre": {
+      "rating": 1,
+      "reason": "Well documented (a victim's video contradicted the IDF account), with \"murdered\" used as fact.",
+      "text_sha1": "77e2af21f200",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "murdered"
+      ]
+    },
+    "raid-on-alexandria-1941": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c86c35f7599b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "ramsar-convention": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7555b93f4d10",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "red-sea-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fb3ab6b92486",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "reparations-agreement-between-israel-and-the-federal-republic-of-germany": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c22043e56847",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "rojava-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3303e001b590",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "sabena-flight-571": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c84f39687dcc",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "sabra-and-shatila-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "836c2935945b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "saddam-hussein": {
+      "rating": 1,
+      "reason": "Says the US and its allies invaded while \"falsely accusing\" Iraq of having weapons of mass destruction. No stockpiles were found, but \"falsely\" implies deliberate deception, which is debated.",
+      "text_sha1": "b422ad8e843a",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against the US",
+      "highlights": [
+        "falsely accusing"
+      ]
+    },
+    "san-remo-conference": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a5eb2afb7313",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "saudi-arabian-led-intervention-in-yemen": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "cbc010274b16",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "saudi-yemeni-war-1934": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "189581a51251",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "second-battle-of-al-faw": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fac9e330746c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "second-battle-of-el-alamein": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "10a4db2aacce",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "second-battle-of-fallujah": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f80cfd11348c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "second-battle-of-gaza": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "605633ced9bf",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "second-battle-of-inonu": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "091bd1855edc",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "second-intifada": {
+      "rating": 1,
+      "reason": "Calls Sharon's visit \"provocative\" and says Israeli security \"responded with extreme violence\" as fact; it does cover the roughly 138 suicide bombings, mainly against civilians.",
+      "text_sha1": "6029037e4d6b",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "provocative",
+        "responded with extreme violence"
+      ]
+    },
+    "seizure-of-abu-musa-and-the-greater-and-lesser-tunbs": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b9f9ccc335e6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "semiramis-hotel-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f553e4144fcc",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "september-2024-israeli-attacks-against-lebanon": {
+      "rating": 1,
+      "reason": "Details the casualties and Lebanon's \"war of extermination\" charge but leaves out Hezbollah's year of rocket fire that preceded the campaign.",
+      "text_sha1": "0642318064d1",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Lebanese side"
+    },
+    "sexual-and-gender-based-violence-in-the-october-7-attacks": {
+      "rating": 1,
+      "reason": "Hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas.",
+      "text_sha1": "ae9d07af1775",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "sheikh-said-rebellion": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "66cbc87a1342",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-abadan": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1429e9ebe4dd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-adrianople-1912-1913": {
+      "rating": 1,
+      "reason": "Told in celebratory terms from the victors' side (\"enormous military success\", \"bold night attacks\").",
+      "text_sha1": "06722df20e9d",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward Bulgaria",
+      "highlights": [
+        "enormous military success",
+        "bold night attacks"
+      ]
+    },
+    "siege-of-basra": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a8d1bb665bc2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-beirut": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "89241d9d32af",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-daraa": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "dba31e45a6cc",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-deir-ez-zor-2014-2017": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f556fd5c4ba2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-hama-2011": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7b7698a33360",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-homs": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "165d906422b3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-kobani": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b15ebb883f78",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-kut": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "cc0b5bfb0524",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-medina": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5984537d510b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-talkalakh-may-2011": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "28bdf9253822",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "siege-of-the-church-of-the-nativity": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "83f68798bf4e",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "simele-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "21237905061d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "sinai-insurgency": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3bf89bec2fd3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "sinjar-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6dbeb4c0c9cf",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "sivas-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3866c0795c90",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "six-day-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "60a1d3e96a54",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "south-yemen-insurgency": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "740bd96db9d7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "south-yemeni-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b0717985eda3",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "southern-syria-clashes-july-september-2025": {
+      "rating": 0,
+      "reason": "Reports violence by Druze, Bedouin and government forces alike.",
+      "text_sha1": "72f751e8a8ff",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "suez-crisis": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "ce9aa0aebd6c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "suruc-bombing": {
+      "rating": 1,
+      "reason": "The wording \"turning a blind eye ... as part of their collaboration with ISIL\" treats collaboration as given inside what is only an accusation.",
+      "text_sha1": "5bd109b723db",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Against the Turkish government",
+      "highlights": [
+        "turning a blind eye",
+        "as part of their collaboration with ISIL"
+      ]
+    },
+    "sykes-picot-agreement": {
+      "rating": 1,
+      "reason": "Mostly gives both the Arab and British readings of the agreement, but includes an unattributed aside that \"for obvious reasons the Zionists took the same position\".",
+      "text_sha1": "3cdaae19260a",
+      "text_retrieved_at": "2026-09-26",
+      "highlights": [
+        "for obvious reasons the Zionists took the same position"
+      ]
+    },
+    "syria-lebanon-campaign": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a61777b831e0",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "syrian-civil-war": {
+      "rating": 1,
+      "reason": "Uses \"Assad regime\" and \"revolutionaries\" as fact and describes Hay'at Tahrir al-Sham without mentioning its al-Qaeda origins.",
+      "text_sha1": "350eb8c8163e",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Syrian opposition",
+      "highlights": [
+        "Assad regime",
+        "revolutionaries"
+      ]
+    },
+    "syrian-independence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1bd8864b4044",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "The summary shown is from the article on the Second Syrian Republic, not about the 1946 independence itself."
+    },
+    "syrian-revolution": {
+      "rating": 2,
+      "reason": "Written as a victory story (\"the Syrian revolution achieved its main goal\"); the jihadist groups that led the 2024 offensive are not identified. The regime's atrocities it describes are well documented.",
+      "text_sha1": "c5cfc3c0aaef",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Syrian opposition",
+      "highlights": [
+        "the Syrian revolution achieved its main goal"
+      ]
+    },
+    "tel-al-sultan-attack": {
+      "rating": 1,
+      "reason": "Gives Israel's account and Amnesty's finding that militants were present, but the emphasis is on the \"safe zone\" and civilians burned alive.",
+      "text_sha1": "567b1b659d4c",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side"
+    },
+    "tel-al-zaatar-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "20ba5f651b9d",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "third-battle-of-fallujah": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "7b608156e676",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "third-battle-of-gaza": {
+      "rating": 1,
+      "reason": "Told entirely from the British Empire forces' side.",
+      "text_sha1": "cbee198be267",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the British side"
+    },
+    "treaty-of-ankara-1921": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "a493ff3cbdb6",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "treaty-of-constantinople-1913": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d537ad8c0a7a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "treaty-of-darin": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "504ee93834c9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "treaty-of-jeddah-1927": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "aa8c5b987e33",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "treaty-of-lausanne": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "aa26ee96586a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "treaty-of-s-vres": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "c6fa2372c9cb",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "treaty-of-saadabad": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e8a6be7d9c2b",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "trebizond-campaign": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "3f9eddcc4a82",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "trebizond-peace-conference": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "96f4bbab155f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "turkish-aerospace-industries-headquarters-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "280d29b022b2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "turkish-capture-of-smyrna": {
+      "rating": 2,
+      "reason": "Uses the Turkish name \"Liberation of İzmir\" and \"Greek occupation\", but leaves out the Great Fire of Smyrna and the killing of Greek and Armenian civilians that followed.",
+      "text_sha1": "8c86416f5d6b",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Turkish side",
+      "highlights": [
+        "Liberation of İzmir",
+        "Greek occupation"
+      ]
+    },
+    "turkish-involvement-in-the-syrian-civil-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "35c97848051a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "turkish-war-of-independence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b213247dfd46",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "twelve-day-war": {
+      "rating": 0,
+      "reason": "Gives the nuclear background, the IAEA's non-compliance finding, the condemnations and the states that supported the strikes.",
+      "text_sha1": "25a254a182f4",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "unification-of-saudi-arabia": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "f551d5482679",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "unilateral-declaration-of-egyptian-independence": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "b80fa7f83439",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "united-arab-republic": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e3c0fdddee26",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "united-nations-partition-plan-for-palestine": {
+      "rating": 1,
+      "reason": "States as fact that Ben-Gurion saw accepting the plan as \"a steppingstone to future territorial expansion\", and ends on the Palestinian exodus without mentioning the Arab states' military intervention.",
+      "text_sha1": "a863fc5a18da",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Palestinian side",
+      "highlights": [
+        "a steppingstone to future territorial expansion"
+      ]
+    },
+    "united-states-recognition-of-jerusalem-as-the-capital-of-israel": {
+      "rating": 0,
+      "reason": "Gives the US, Israeli, Palestinian, EU and UN positions and both the Gaza border deaths and Israel's justification.",
+      "text_sha1": "a341ded242a2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "united-states-taliban-deal": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "d3bbf406ae79",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "united-states-withdrawal-from-the-joint-comprehensive-plan-of-action": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "4f633c6fa921",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "uqair-protocol-of-1922": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bb26a3b2a290",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "urfa-resistance": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "653473b0e29a",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "uss-cole-bombing": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "873c2c9150bd",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "valley-of-tears": {
+      "rating": 1,
+      "reason": "Told from the Israeli side (\"although massively outnumbered, the Israeli forces managed to hold\").",
+      "text_sha1": "7e4ba5b91e90",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Israeli side",
+      "highlights": [
+        "Although massively outnumbered, the Israeli forces managed to hold their positions"
+      ]
+    },
+    "war-crimes-in-the-gaza-war": {
+      "rating": 0,
+      "reason": "Attributes war-crimes findings to both Hamas and the IDF, including arrest warrants for leaders on both sides.",
+      "text_sha1": "287f26117a7f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "war-in-iraq-2013-2017": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "bfca699689e9",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "war-in-the-sahel": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "5957a8222459",
+      "text_retrieved_at": "2026-09-26",
+      "data_note": "Outside this map's region (West Africa)."
+    },
+    "war-of-attrition": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "145a47f3b917",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "white-paper-of-1939": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9a15cc048f6f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "white-revolution": {
+      "rating": 1,
+      "reason": "Lists the reforms' benefits at length and reduces the opposition largely to clerics protecting their power.",
+      "text_sha1": "dd7f2998cc80",
+      "text_retrieved_at": "2026-09-26",
+      "leans": "Toward the Shah",
+      "category_note": "Shown as \"uprising\" because Wikidata types it as a revolution; it was a reform programme launched by the Shah."
+    },
+    "world-central-kitchen-aid-convoy-attack": {
+      "rating": 0,
+      "reason": "Includes the IDF's admissions and disciplinary action, the charity's accusation, and an Australian government report that largely supported Israel's version.",
+      "text_sha1": "7428aac424d7",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "world-war-i": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "8c708347d2ad",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "world-war-ii": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "79483f2c938c",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "yalova-peninsula-massacres": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "2af7e0eb5728",
+      "text_retrieved_at": "2026-09-26",
+      "category_note": "Shown as \"migration\" because Wikidata types it as a population transfer; the summary describes massacres of Turkish civilians."
+    },
+    "yazidi-genocide": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "1e7ef0a90dd2",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "yemeni-civil-war-1994": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "221819e54829",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "yemeni-civil-war-2014-present": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "fdb49a9e4095",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "yemeni-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "aa01754e1850",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "yom-kippur-war": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "9e618d28ab2f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "young-turk-revolution": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "13d6137c0e85",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "zikim-attack": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e7f904ffb01f",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "zilan-massacre": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "e3133ad59a53",
+      "text_retrieved_at": "2026-09-26"
+    },
+    "zurich-protocols": {
+      "rating": 0,
+      "reason": "No one-sided framing found in this summary.",
+      "text_sha1": "6c19a783d2be",
+      "text_retrieved_at": "2026-09-26"
+    }
+  }
+}
