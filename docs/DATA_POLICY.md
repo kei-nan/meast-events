@@ -45,11 +45,18 @@ or "war" that the curated file used to carry as if they were Wikidata's are gone
 
 ### Category (our grouping)
 
-`category` is **our own coarse mapping**, not Wikidata's classification, and the UI labels it "Category (our grouping)". Discovered events get the group of the
-**first event class discovery matched** (the order of the table below, which is the order of `scripts/lib/event-classes.js`); an item that is both a
-"battle" and a "military operation" is "war" either way, but one that is a "massacre" and a "terrorist attack" is "political", which is an ordering choice of ours.
-The 112 legacy events keep the group that was hand-assigned in `data/seed-events.json` (political 36, war 36, uprising 15, treaty 12, diplomatic 8, migration 2,
-terrorism 2, economic 1).
+`category` is **our own coarse mapping**, not Wikidata's classification, and the UI labels it "Category (our grouping)". It is set by one rule applied to every
+event (`groupForEvent` in `scripts/lib/event-classes.js`):
+
+1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking), the category is terrorism.
+2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime), the category is atrocity.
+3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the 112 legacy events keep the
+   group hand-assigned in `data/seed-events.json`.
+
+Before 2026-09-28 steps 1-2 did not exist: an item Wikidata types as both a "massacre" and a "terrorist attack" was shown as "political" because "massacre"
+happened to be checked first. A full review found that this ordering hid the "terrorist attack" type of 18 events, 16 of them attacks on Israelis
+(October 7 and the kibbutz and Nova attacks among them), while events typed only "terrorist attack" by Wikidata kept that label whoever the perpetrator was.
+The rule still passes Wikidata's typing through without judging it; the UI lists every Wikidata class next to our group.
 
 | Wikidata class | QID | Our group |
 |---|---|---|
@@ -61,9 +68,9 @@ terrorism 2, economic 1).
 | armistice | Q107706 | treaty |
 | coup d'état | Q45382 | political |
 | assassination | Q3882219 | political |
-| genocide | Q41397 | political |
-| massacre | Q3199915 | political |
-| war crime | Q135010 | political |
+| genocide | Q41397 | atrocity |
+| massacre | Q3199915 | atrocity |
+| war crime | Q135010 | atrocity |
 | declaration of independence | Q1464916 | political |
 | referendum | Q43109 | political |
 | terrorist attack | Q2223653 | terrorism |
@@ -133,7 +140,7 @@ before the sitelinks filter; "s>=10" is how many of those have 10+ sitelinks).
 |---|---|---|---|---|
 | battle, war, military operation, treaty, coup d'état, assassination, genocide, massacre, terrorist attack, revolution, rebellion, population transfer | (original set, see `event-classes.js`) | | | |
 | siege | Q188055 | war | 74 | 18 |
-| war crime | Q135010 | political | 131 | 19 |
+| war crime | Q135010 | atrocity | 131 | 19 |
 | hostage taking | Q1371150 | terrorism | 16 | 5 |
 | aircraft hijacking | Q898712 | terrorism | 9 | 4 |
 | ceasefire | Q208383 | diplomatic | 10 | 5 |

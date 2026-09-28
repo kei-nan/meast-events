@@ -119,7 +119,7 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
+    "category": "atrocity",
     "retrieved_at": "2026-09-13T14:28:12.657Z",
     "wikidata_qid": "Q80034",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Armenian_genocide",
@@ -136,7 +136,7 @@
       "ethnic violence",
       "forced displacement"
     ],
-    "category_group": "political",
+    "category_group": "atrocity",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate"
@@ -1870,7 +1870,7 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
+    "category": "terrorism",
     "retrieved_at": "2026-09-13T14:29:17.844Z",
     "wikidata_qid": "Q589673",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Iran_hostage_crisis",
@@ -1886,7 +1886,7 @@
       "hostage taking",
       "international crisis"
     ],
-    "category_group": "political",
+    "category_group": "terrorism",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise"
@@ -1989,7 +1989,7 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
+    "category": "atrocity",
     "retrieved_at": "2026-09-13T14:29:22.492Z",
     "wikidata_qid": "Q208199",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Sabra_and_Shatila_massacre",
@@ -2004,7 +2004,7 @@
     "wikidata_classes": [
       "massacre"
     ],
-    "category_group": "political",
+    "category_group": "atrocity",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise"
@@ -3372,8 +3372,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -5311,8 +5311,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -5345,8 +5345,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -6497,8 +6497,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "terrorist attack",
       "massacre"
@@ -6532,8 +6532,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "reprisal"
@@ -6615,8 +6615,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -6697,8 +6697,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -6857,8 +6857,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -6903,8 +6903,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "war crime",
       "massacre"
@@ -6950,8 +6950,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -6984,8 +6984,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "reprisal"
@@ -7031,8 +7031,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -7065,8 +7065,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -7427,8 +7427,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack"
@@ -7711,8 +7711,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "terrorist attack",
       "political violence",
@@ -7747,8 +7747,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -7788,8 +7788,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -7829,8 +7829,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -7919,8 +7919,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "arson",
       "massacre"
@@ -8204,8 +8204,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "mass murder",
       "massacre"
@@ -8328,8 +8328,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -8607,8 +8607,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "mass murder",
       "genocidal massacre",
@@ -8821,8 +8821,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "airstrike"
@@ -8945,8 +8945,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -8979,8 +8979,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "bombardment",
       "massacre"
@@ -9661,8 +9661,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "abuse",
       "war crime",
@@ -9915,8 +9915,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "truck bombing",
       "political murder",
@@ -10030,8 +10030,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "war crime"
@@ -10072,8 +10072,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "rape",
       "mass murder",
@@ -10221,8 +10221,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -10841,8 +10841,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -10882,8 +10882,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -11164,8 +11164,8 @@
     "countries": [
       "Egypt"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "protest",
       "massacre"
@@ -11199,8 +11199,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "chemical warfare",
       "massacre"
@@ -11323,8 +11323,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -11435,8 +11435,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "mass murder",
       "massacre"
@@ -11570,8 +11570,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "terrorist attack",
       "massacre"
@@ -12734,8 +12734,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "mass shooting",
       "terrorist attack",
@@ -13566,8 +13566,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "coordinated terrorist attack",
       "massacre",
@@ -13665,8 +13665,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "terrorist attack",
       "massacre",
@@ -13709,8 +13709,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -13753,8 +13753,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack"
@@ -13800,8 +13800,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -13843,8 +13843,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -13888,8 +13888,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -13937,8 +13937,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -13980,8 +13980,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -14023,8 +14023,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -14067,8 +14067,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "massacre",
       "terrorist attack",
@@ -14110,8 +14110,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "airstrike",
       "war crime"
@@ -14375,8 +14375,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "war crime",
       "massacre",
@@ -14428,8 +14428,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "crowd crush",
       "massacre",
@@ -14534,8 +14534,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "drone warfare",
       "war crime",
@@ -14577,8 +14577,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "airstrike",
       "conflagration",
@@ -14682,8 +14682,8 @@
       "Israel/Palestine",
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "terrorism",
+    "category_group": "terrorism",
     "wikidata_classes": [
       "missile strike",
       "massacre",
@@ -14955,8 +14955,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "war crime"
@@ -15140,8 +15140,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "airstrike",
       "massacre",
@@ -15574,8 +15574,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "execution by hanging",
       "massacre"
@@ -15708,8 +15708,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -16678,8 +16678,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "rebellion",
       "massacre"
@@ -17862,8 +17862,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -17900,8 +17900,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -17938,8 +17938,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -20571,8 +20571,8 @@
       "Syria",
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "genocide"
     ],
@@ -20646,8 +20646,8 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "genocide"
     ],
@@ -21202,8 +21202,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre"
     ],
@@ -21490,8 +21490,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "blockade",
       "siege",
@@ -21538,8 +21538,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "war crime"
     ],
@@ -21614,8 +21614,8 @@
       "Jordan",
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "kidnapping",
       "war crime",
@@ -21654,8 +21654,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "starvation",
       "war crime",
@@ -21748,8 +21748,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "genocide",
       "humanitarian crisis"
@@ -21864,8 +21864,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "kidnapping",
       "war crime"
@@ -21903,8 +21903,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "war crime",
       "sexual violence"
@@ -22224,8 +22224,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "airstrike",
       "massacre",
@@ -22447,8 +22447,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "genocide"
@@ -22550,8 +22550,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "military operation",
       "bombardment",
@@ -22633,8 +22633,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "mass shooting",
       "war crime"
@@ -22884,8 +22884,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "massacre",
       "political repression"

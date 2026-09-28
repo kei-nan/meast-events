@@ -105,6 +105,7 @@ const CATEGORY_TEXT = {
   diplomatic: "Diplomatic",
   economic: "Economic",
   terrorism: "Terrorism",
+  atrocity: "Atrocity (genocide, massacre, war crime)",
 };
 
 export function MapLegend() {

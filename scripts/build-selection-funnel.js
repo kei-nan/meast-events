@@ -7,7 +7,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { openCache } from "./lib/cache.js";
 import { fetchEntities } from "./lib/wd-entities.js";
-import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES, COUNTRIES } from "./lib/event-classes.js";
+import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES, COUNTRIES, groupForEvent } from "./lib/event-classes.js";
 
 const read = async (n) => JSON.parse(await readFile(new URL(`../data/${n}`, import.meta.url), "utf-8"));
 const candidates = await read("event-candidates.json");
@@ -137,7 +137,7 @@ const bump = (bucket, key, c) => {
 for (const c of candidates) {
   for (const k of c.countries) bump(funnel.breakdowns.by_country, k, c);
   for (const k of c.wikidata_classes ?? []) bump(funnel.breakdowns.by_class, k, c);
-  bump(funnel.breakdowns.by_group, group[(c.wikidata_classes ?? [])[0]] ?? c.category, c);
+  bump(funnel.breakdowns.by_group, groupForEvent(c.wikidata_classes, group[(c.wikidata_classes ?? [])[0]] ?? c.category), c);
   bump(funnel.breakdowns.by_decade, `${Math.floor(Number(c.date_start.slice(0, 4)) / 10) * 10}s`, c);
 }
 funnel.breakdowns.notes = [

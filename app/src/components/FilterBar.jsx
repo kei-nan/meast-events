@@ -11,6 +11,7 @@ const COLORS = MapViewModule.CATEGORY_COLORS ?? {
   diplomatic: "#3f7d84",
   economic: "#8c7a3f",
   terrorism: "#6b3140",
+  atrocity: "#3d3833",
 };
 const DEFAULT_CATEGORIES = Object.keys(COLORS);
 
