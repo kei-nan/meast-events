@@ -333,13 +333,12 @@ export const CORRECTIONS = [
     geometry: "westBankAreaA",
     geometry_source: OSLO_GEOMETRY_CREDIT,
     note:
-      "Oslo II's Area A: Palestinian Authority civil AND security control, on paper. " +
+      "Oslo II's Area A: Palestinian Authority civil and security control under the accord. " +
       "1,004 km2, 17.7% of the West Bank - the eight main Palestinian cities and their " +
       "immediate surroundings, in about fifteen disconnected blocks, plus Hebron's H1 " +
       "sector (Palestinian-controlled under the 1997 Hebron Protocol), which is merged " +
-      "into this shape. \"Full Palestinian control\" is a de jure description only: since " +
-      "Operation Defensive Shield (29 March - 10 May 2002) Israel has reoccupied and " +
-      "continued to conduct military operations inside Area A at will.",
+      "into this shape. Since Operation Defensive Shield (29 March - 10 May 2002) the " +
+      "Israeli military has also conducted operations inside Area A.",
     source: "https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord",
   },
   {
@@ -368,9 +367,8 @@ export const CORRECTIONS = [
     geometry_source: OSLO_GEOMETRY_CREDIT,
     note:
       "Oslo II's Area C: full Israeli civil and security control, administered by the " +
-      "Israeli Civil Administration. 3,453 km2, 61.0% of the West Bank - the single " +
-      "largest fact about the territory, and the one a \"West Bank = Palestinian " +
-      "Authority\" shape would hide. Oslo II committed this land to be \"gradually " +
+      "Israeli Civil Administration. 3,453 km2, 61.0% of the West Bank, the largest " +
+      "of the three areas. Oslo II committed this land to be \"gradually " +
       "transferred to Palestinian jurisdiction\"; the last transfer of any West Bank " +
       "territory to the PA was on 20 March 2000, and nothing has moved since. All Israeli " +
       "settlements are here. This shape also absorbs two categories that sit outside the " +
