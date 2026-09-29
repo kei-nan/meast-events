@@ -95,6 +95,11 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
 
 1. **Class.** Wikidata says it is an instance (`P31`, subclasses followed via `P279*`) of one of the event classes in the table above.
 2. **Place.** It is located in one of the 15 tracked countries/territories, via `P17`, or `P276`/`P131` pointing at a place that has `P17` there.
+   A place only counts when at least as many of the present-day sovereign states it lists (its `P17`) are inside the region as outside it
+   (`placeIsMostlyInRegion` in `scripts/lib/v21.js`). Seas and regions that mostly belong to other countries - the Mediterranean (6 in, 16 out), Black Sea,
+   Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
+   are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the 112 hand-picked
+   events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`, 23 events on 2026-09-29).
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**.
 5. **Basic integrity.** Wikipedia returned a summary with a non-empty extract.
@@ -164,7 +169,7 @@ general strike (Q49775), prisoner exchange (Q2001775).
 
 Each class is queried separately. WDQS answers a class query that is too expensive with HTTP 504; the script then retries once with plain `P31` (no subclass expansion)
 and logs that it did so. 429/5xx responses on the other Wikimedia APIs are retried with exponential backoff honouring `Retry-After`. Requests are sequential, delayed
-and identify themselves with the `AtlasWiki` User-Agent (`AtlasWiki/0.1 (data pipeline; contact: jonkeinan@gmail.com)`).
+and identify themselves with the `AtlasWiki` User-Agent (`AtlasWiki/0.1 (data pipeline; +https://github.com/kei-nan/atlas-wiki)`).
 
 ## Review flags (advisory only)
 

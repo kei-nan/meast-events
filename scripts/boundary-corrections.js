@@ -48,7 +48,9 @@ export const CORRECTIONS = [
     type: "split",
     target: "Turkey (Ottoman Empire)",
     phases: [
-      { until: 1923, name: "Ottoman Empire" },
+      // The Republic was proclaimed on 29 October 1923, so under the 1 July rule 1923 is
+      // still the Ottoman Empire.
+      { until: 1924, name: "Ottoman Empire" },
       // CShapes' Turkey polygon already includes Hatay (the Sanjak of Alexandretta),
       // but France didn't cede it from Syria until 1939 - see the "add" entry for
       // Hatay below for the 1923-1939 period. geometry: "turkeyPre1939" is Turkey's
@@ -96,12 +98,80 @@ export const CORRECTIONS = [
   {
     type: "split",
     target: "Iraq",
+    // Years follow the 1 July rule in ingest-boundaries.js: Faisal was crowned on
+    // 23 August 1921 and independence came on 3 October 1932, so 1921 is still the
+    // mandate and 1932 still the kingdom under mandate.
     phases: [
-      { until: 1932, name: "Kingdom of Iraq (British Mandate)", status: "mandate" },
-      { until: 1958, name: "Kingdom of Iraq" },
+      { until: 1922, name: "British Mandate of Mesopotamia", status: "mandate" },
+      { until: 1933, name: "Kingdom of Iraq (British Mandate)", status: "mandate" },
+      { until: 1959, name: "Kingdom of Iraq" }, // the monarchy fell on 14 July 1958
     ],
-    note: "British Mandate of Mesopotamia -> Kingdom of Iraq (independence 3 October 1932, still a monarchy) -> Republic (14 July Revolution, 1958).",
+    note:
+      "British Mandate of Mesopotamia -> Kingdom of Iraq under British mandate (Faisal I " +
+      "crowned 23 August 1921) -> independent Kingdom of Iraq (3 October 1932, still a " +
+      "monarchy) -> Republic (14 July Revolution, 1958).",
     source: "https://en.wikipedia.org/wiki/Kingdom_of_Iraq",
+  },
+
+  {
+    type: "split",
+    target: "Lebanon",
+    // Lebanon declared independence on 22 November 1943; CShapes starts the independent
+    // record on 22 November 1944, so the mandate phase ends with 1944's record.
+    phases: [{ until: 1944, name: "Lebanon (French Mandate)", status: "mandate" }],
+    note:
+      "State of Greater Lebanon (1920), renamed the Lebanese Republic in 1926, under the " +
+      "French Mandate for Syria and the Lebanon until independence was declared on " +
+      "22 November 1943.",
+    source: "https://en.wikipedia.org/wiki/State_of_Greater_Lebanon",
+  },
+  {
+    type: "split",
+    target: "United Arab Emirates",
+    // The UAE was formed on 2 December 1971, so 1971 is still the Trucial States.
+    phases: [{ until: 1972, name: "Trucial States" }],
+    note:
+      "The Trucial States, a group of sheikhdoms under British protection, became the " +
+      "United Arab Emirates on 2 December 1971 (Ras al-Khaimah joined in February 1972).",
+    source: "https://en.wikipedia.org/wiki/Trucial_States",
+  },
+  {
+    type: "split",
+    target: "Oman",
+    // Renamed the Sultanate of Oman in August 1970, so 1970 is still Muscat and Oman.
+    phases: [{ until: 1971, name: "Muscat and Oman" }],
+    note: "Called the Sultanate of Muscat and Oman until it was renamed the Sultanate of Oman in August 1970.",
+    source: "https://en.wikipedia.org/wiki/Muscat_and_Oman",
+  },
+  {
+    type: "split",
+    target: "Yemen (Arab Republic of Yemen)",
+    // Republic proclaimed 26 September 1962 (1962 is still the kingdom); unification with
+    // the south on 22 May 1990 (1990 is the unified Republic of Yemen, the default name).
+    phases: [
+      { until: 1963, name: "Mutawakkilite Kingdom of Yemen" },
+      { until: 1990, name: "Yemen Arab Republic" },
+    ],
+    note:
+      "North Yemen: the Mutawakkilite Kingdom (from 1918) until the 26 September 1962 " +
+      "revolution proclaimed the Yemen Arab Republic, followed by a civil war with the " +
+      "royalists until 1970. Unified with South Yemen as the Republic of Yemen on 22 May 1990.",
+    source: "https://en.wikipedia.org/wiki/Yemen_Arab_Republic",
+  },
+  {
+    type: "split",
+    target: "Yemen, People's Republic of",
+    // Independent 30 November 1967; renamed on 30 November 1970, so 1970 is still the
+    // People's Republic of South Yemen.
+    phases: [
+      { until: 1971, name: "People's Republic of South Yemen" },
+      { until: 1990, name: "People's Democratic Republic of Yemen" },
+    ],
+    note:
+      "South Yemen: independent from Britain on 30 November 1967 as the People's Republic of " +
+      "South Yemen, renamed the People's Democratic Republic of Yemen on 30 November 1970, " +
+      "unified with North Yemen on 22 May 1990.",
+    source: "https://en.wikipedia.org/wiki/South_Yemen",
   },
 
   // --- Status flags: corrections and additions to CShapes' existing geometry ---
@@ -112,15 +182,32 @@ export const CORRECTIONS = [
     toYear: 9999,
     status: "occupied-territory-included",
     note:
-      "This shape includes territory occupied in the 1967 Six-Day War. The Golan Heights " +
-      "and West Bank remain part of this polygon throughout (Israeli sovereignty over both " +
-      "is not internationally recognized). Sinai was returned to Egypt in 1979 under the " +
-      "Camp David Accords and is excluded from this shape from that year on. Gaza likewise " +
+      "This shape includes territory occupied in the 1967 Six-Day War. Israel annexed East " +
+      "Jerusalem (1980 Jerusalem Law) and the Golan Heights (1981 Golan Heights Law); the UN " +
+      "Security Council declared both null and void (Resolutions 478 and 497), and the United " +
+      "States recognized Israeli sovereignty over the Golan in March 2019. The rest of the " +
+      "West Bank was not annexed. Sinai was returned to Egypt under the 1979 peace treaty, " +
+      "in stages completed on 25 April 1982, and is excluded from this shape from 1979 on " +
+      "(CShapes' switch date); Taba followed after arbitration in 1989. Gaza likewise " +
       "remains part of this polygon throughout, even though Israel withdrew its settlements " +
       "and forces in 2005. CShapes gives us no dividing lines inside this blob, so the West " +
-      "Bank and Gaza entries further down are drawn on top of it as separate shapes; the " +
-      "Golan Heights is still undifferentiated.",
-    source: "https://en.wikipedia.org/wiki/Israeli-occupied_territories",
+      "Bank, Gaza and Golan Heights entries further down are drawn on top of it as separate " +
+      "shapes.",
+    source:
+      "https://en.wikipedia.org/wiki/Israeli-occupied_territories; " +
+      "https://en.wikipedia.org/wiki/Golan_Heights_Law; " +
+      "https://en.wikipedia.org/wiki/Israeli_occupation_of_the_Sinai_Peninsula",
+  },
+  {
+    type: "flag",
+    target: "Egypt",
+    fromYear: 1979,
+    toYear: 1981,
+    note:
+      "Sinai is drawn as Egyptian from 1979, when the Egypt-Israel peace treaty was signed " +
+      "and CShapes switches the border. Israel actually withdrew in stages that ended on " +
+      "25 April 1982; Taba was returned only in 1989, after international arbitration.",
+    source: "https://en.wikipedia.org/wiki/Israeli_occupation_of_the_Sinai_Peninsula",
   },
   {
     type: "flag",
@@ -220,12 +307,12 @@ export const CORRECTIONS = [
     start_year: 1948,
     end_year: 1949,
     status: "occupied-administered",
-    geometry: "westBank",
+    geometry: "cshapes:West Bank",
     note:
       "Held by Jordan's Arab Legion after the 1948 Arab-Israeli War, before formal " +
-      "annexation in 1950 (see the next entry). Geometry follows the 1949 Armistice " +
-      "(\"Green\") Line, using its modern representation (Natural Earth), which has not " +
-      "moved since.",
+      "annexation in 1950 (see the next entry). Geometry: CShapes 2.0's own West Bank " +
+      "record (1948-1967), which follows the 1949 Armistice (\"Green\") Line and includes " +
+      "East Jerusalem.",
     source: "https://en.wikipedia.org/wiki/1949_Armistice_Agreements",
   },
   {
@@ -234,7 +321,7 @@ export const CORRECTIONS = [
     start_year: 1950,
     end_year: 1966,
     status: "annexed-unrecognized",
-    geometry: "westBank",
+    geometry: "cshapes:West Bank",
     note:
       "Jordan formally annexed the West Bank on 24 April 1950, extending citizenship to " +
       "Palestinians there. Barely recognized: only the United Kingdom did so formally " +
@@ -267,6 +354,55 @@ export const CORRECTIONS = [
     source: "https://en.wikipedia.org/wiki/All-Palestine_Government",
   },
 
+  // --- Golan Heights and the Gulf islands ---
+  //
+  // Both sit inside another polygon or in none: Israel's CShapes shape includes the Golan
+  // from 1967, and no CShapes polygon includes Abu Musa or the Tunbs. Drawn on top, like
+  // the West Bank entries, so every occupation or annexation in the region gets its own
+  // labelled shape rather than only some.
+  {
+    type: "add",
+    name: "Golan Heights (Israeli military occupation)",
+    start_year: 1967,
+    end_year: 1981,
+    status: "occupied-administered",
+    geometry: "golan",
+    note:
+      "Captured from Syria by Israel in the Six-Day War of June 1967 and held under military " +
+      "administration until the Golan Heights Law of 14 December 1981. Shape derived from " +
+      "CShapes 2.0 (Israel's post-1967 polygon minus its 1949 lines, the West Bank and Gaza); " +
+      "it does not exclude the UN buffer zone set up in 1974, so the eastern edge is approximate.",
+    source: "https://en.wikipedia.org/wiki/Golan_Heights",
+  },
+  {
+    type: "add",
+    name: "Golan Heights (annexed by Israel)",
+    start_year: 1982,
+    end_year: 9999,
+    status: "annexed-unrecognized",
+    geometry: "golan",
+    note:
+      "Israel applied its law to the Golan Heights on 14 December 1981. UN Security Council " +
+      "Resolution 497 declared the move \"null and void and without international legal " +
+      "effect\"; the United States recognized Israeli sovereignty in March 2019, and Syria " +
+      "maintains its claim. Same approximate shape as the entry above.",
+    source: "https://en.wikipedia.org/wiki/Golan_Heights_Law",
+  },
+  {
+    type: "add",
+    name: "Abu Musa and Greater Tunb (held by Iran, claimed by the UAE)",
+    start_year: 1972,
+    end_year: 9999,
+    status: "disputed",
+    geometry: "gulfIslands",
+    geometry_source: "Island outlines from Natural Earth 10m minor islands (public domain)",
+    note:
+      "Iran took control of Abu Musa and the Greater and Lesser Tunbs on 30 November 1971, " +
+      "as British forces withdrew and days before the United Arab Emirates was formed; the " +
+      "UAE claims all three. Lesser Tunb is not drawn because no open dataset has its outline.",
+    source: "https://en.wikipedia.org/wiki/Seizure_of_Abu_Musa_and_the_Greater_and_Lesser_Tunbs",
+  },
+
   // --- West Bank after 1967 ---
   //
   // Israel's CShapes polygon swallows the West Bank whole from 1967 on (see the
@@ -279,15 +415,15 @@ export const CORRECTIONS = [
     start_year: 1967,
     end_year: 1994,
     status: "occupied-administered",
-    geometry: "westBank",
+    geometry: "cshapes:West Bank",
     note:
       "Israel captured the West Bank from Jordan on 7 June 1967 in the Six-Day War. It was " +
       "run by an Israeli military governorate until 1981, when Military Order 947 created " +
       "the Israeli Civil Administration to handle civil matters - still under, not instead " +
       "of, the military government. East Jerusalem was placed under Israeli law and " +
       "administration on 28 June 1967, a step the UN Security Council declared null and " +
-      "void; this shape includes it throughout. No part of the West Bank passed to " +
-      "Palestinian control in this period.",
+      "void; this shape (CShapes 2.0's West Bank record, 1949 Armistice Line) includes it " +
+      "throughout. No part of the West Bank passed to Palestinian control in this period.",
     source: "https://en.wikipedia.org/wiki/Israeli_occupation_of_the_West_Bank",
   },
   {
@@ -296,7 +432,7 @@ export const CORRECTIONS = [
     start_year: 1995,
     end_year: 1999,
     status: "occupied-administered",
-    geometry: "westBank",
+    geometry: "cshapes:West Bank",
     note:
       "A deliberately undifferentiated shape for the years when the Oslo map was still " +
       "moving. The 4 May 1994 Gaza-Jericho Agreement handed the PA the Jericho area only; " +

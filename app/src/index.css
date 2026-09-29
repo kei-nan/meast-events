@@ -12,7 +12,7 @@
 
   --text-primary: #ece2c9;   /* parchment cream */
   --text-secondary: #b6a888; /* muted tan */
-  --text-tertiary: #8b7e63;  /* dim, for fine print */
+  --text-tertiary: #a0927a;  /* dim, for fine print; 4.8:1 on --bg-2 (WCAG AA) */
 
   --accent: #c99a45;        /* antique gold - primary accent ink */
   --accent-strong: #ddb35f; /* lighter gold for hover/highlight */

@@ -9,5 +9,9 @@
   },
   "dependencies": {
     "redis": "^6.2.1"
+  },
+  "devDependencies": {
+    "@turf/turf": "^7.4.0",
+    "shapefile": "^0.6.6"
   }
 }

@@ -1,6 +1,6 @@
 """Independent re-query (no cache, different routes where possible) of a few numbers. Prints to stdout."""
 import json, urllib.request, urllib.parse
-UA = {'User-Agent': 'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)'}
+UA = {'User-Agent': 'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)'}
 def g(u): return json.loads(urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=60).read())
 S = {r['id']: r for r in json.load(open('docs/bias-review/signals.json', encoding='utf-8'))['results']}
 for i in ['saddam-hussein', 'battle-of-lule-burgas', '2015-beirut-bombings', 'invasion-of-iraq', 'houthi-insurgency']:

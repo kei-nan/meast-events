@@ -47,7 +47,7 @@ Files in `docs/bias-review/`: `sample.json` (the sample), `signals.json` (all ra
 
 **Data.** `data/events.json` at commit `f0f6c80` plus merge of `integration/search-v2` (394 events). All calls to the
 English Wikipedia Action API (`en.wikipedia.org/w/api.php`), REST `page/summary`, and Wikidata `wbgetentities`, with User-Agent
-`AtlasWiki/0.1 (contact: jonkeinan@gmail.com)`, sequential with >= 0.25 s spacing (about 1,000 requests). Responses cached outside the
+`AtlasWiki/0.1 (contact: contact address removed)`, sequential with >= 0.25 s spacing (about 1,000 requests). Responses cached outside the
 repo (session scratchpad). Measurement time: 2026-09-26/27. "12 months" = revisions since 2025-09-26T00:00:00Z.
 
 **Sample (script `scripts/01_sample.py`).** Python `random.Random(20260927)` (Mersenne Twister), input sorted by event id. 80 events = 4 eras x 20.

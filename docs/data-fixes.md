@@ -68,3 +68,27 @@ among the 51 seed events found by discovery, e.g. Six-Day War 4 vs 15); they are
 - Wikipedia infobox dates were checked by reading the wikitext for Olive Branch only, not for the other events.
 - The country check compares only P17/P276/P131 (one hop). Events whose Wikidata location is deeper are not testable.
 - `date_start_year_not_in_lead` compares years in prose; it can miss (a year that appears for another reason) or false-alarm (the lead gives no year for the start).
+
+## F5 - Houthi insurgency dated 2015 instead of 2004 (`houthi-insurgency`, Q255997)
+
+- Evidence (checked live 2026-09-29): Wikidata P580 (start time) = 2004-06, month precision; the stored date_start 2015-02-06 was the item's
+  P585 (point in time). The Wikipedia lead: "The conflict was sparked in 2004 by the government's attempt to arrest Hussein al-Houthi".
+  Wikipedia and Wikidata's start time agree against our record, so under the principle above it is fixed. -> `date_start: "2004-06-01"`
+  (the day is unknown; Wikidata only gives the month).
+
+## Location rule (2026-09-29): 23 events excluded, F4 superseded
+
+Not a per-event fix but a published rule (DATA_POLICY.md, inclusion rule 2): a place only lends its countries to an event when most of the
+present-day states it lists are inside the region. The Mediterranean Sea (Q4918) alone lists 22 countries in P17, so every battle placed only
+"in the Mediterranean" had been tagged Israel/Palestine, Lebanon, Syria, Turkey and Egypt. Applied to the discovered events, it removed those
+tags and left 23 events with no tracked country, which the inclusion rule excludes (listed with the reason in `data/proposed-exclusions.json`):
+
+- WWI/WWII naval actions: naval-warfare-in-the-mediterranean-during-world-war-i, pursuit-of-goeben-and-breslau, battle-of-the-espero-convoy,
+  battle-of-cape-spada, action-off-cape-passero, battle-of-cape-spartivento, operation-excess, operation-abstention, battle-of-the-tarigo-convoy,
+  operation-halberd, battle-of-the-duisburg-convoy, battle-of-cape-bon-1941, operation-harpoon-1942, operation-pedestal.
+- Libya and the Sahara/Sahel: operation-agreement (Tobruk, via "North Africa"), 1989-air-battle-near-tobruk, operation-unified-protector,
+  operation-juniper-shield, war-in-the-sahel, operation-barkhane.
+- Other: operation-active-endeavour (NATO, Mediterranean), battle-off-the-coast-of-abkhazia (Black Sea), operation-atalanta (Gulf of Aden).
+
+The four F4 events are among them: F4 had corrected their tags to their own P17 (Georgia, Somalia, France, the Sahel states), which already
+put them outside the tracked set; the validator now rejects any event without a tracked country. Their framing reviews were removed with them.

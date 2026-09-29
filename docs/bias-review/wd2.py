@@ -1,5 +1,5 @@
 import json,time,urllib.request,urllib.parse,re
-UA={'User-Agent':'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)','Accept':'application/sparql-results+json'}
+UA={'User-Agent':'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)','Accept':'application/sparql-results+json'}
 src=open('scripts/lib/event-classes.js',encoding='utf8').read()
 cls=re.findall(r'qid: "(Q\d+)", label: "([^"]+)"',src)
 lab={q:l for q,l in cls}

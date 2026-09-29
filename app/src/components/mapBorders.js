@@ -3,12 +3,8 @@
 //
 // The `note` and `source` strings in data/boundaries.json are shown AS-IS (they
 // carry the reasoning and citations); only the short machine `status` value is
-// mapped to plain language, in the ONE table below. Distinct values in
-// data/boundaries.json at time of writing (feature count): mandate 14,
-// occupied-administered 6, occupied-territory-included 2,
-// shared-sovereignty-included 3, shared-sovereignty 2, annexed-unrecognized 2,
-// disputed-then-resolved 3, autonomous-partial 3, joint-control 1,
-// de-facto-separate-administration 1, active-conflict 1, partitioned-ceasefire 1.
+// mapped to plain language, in the ONE table below. Every status value used in
+// scripts/boundary-corrections.js needs an entry here.
 export const BOUNDARY_STATUS_LABELS = {
   mandate: "Mandate territory (administered under a mandate)",
   "occupied-territory-included": "Occupied territory, included inside this border",
@@ -17,6 +13,7 @@ export const BOUNDARY_STATUS_LABELS = {
   "shared-sovereignty": "Shared sovereignty",
   "annexed-unrecognized": "Annexed; the annexation is not internationally recognised",
   "disputed-then-resolved": "Disputed border (later resolved)",
+  disputed: "Disputed: held by one state and claimed by another",
   "autonomous-partial": "Partly autonomous area",
   "joint-control": "Under joint control",
   "de-facto-separate-administration": "Separately administered in practice (de facto)",
@@ -61,7 +58,8 @@ export function uniqueBoundaries(featureList) {
 }
 
 export function yearsLabel(b) {
-  return b.start_year === b.end_year ? `${b.start_year}` : `${b.start_year}–${b.end_year}`;
+  const end = b.end_year >= 9999 ? "present" : b.end_year;
+  return b.start_year === b.end_year ? `${b.start_year}` : `${b.start_year}–${end}`;
 }
 
 // First-visit hint dismissal (localStorage may throw or be blocked).

@@ -26,5 +26,4 @@ data/raw/
 
 # Local scratch: throw-away wrangler configs / Playwright scripts / dev-server logs
 .scratch/
-wpd-*.log
-preview-*.log
+*.log

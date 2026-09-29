@@ -11,7 +11,7 @@ Every event on the map shows the lead section of its English Wikipedia article, 
 
 ## Who reviewed it
 
-All 594 summaries were read in full, in date order, on 27 September 2026 by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**. No person has checked every rating line by line. One consequence is worth stating plainly: one summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its note says so.
+All 594 summaries in the dataset at the time were read in full, in date order, on 27 September 2026 by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**. No person has checked every rating line by line. One consequence is worth stating plainly: one summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its note says so.
 
 The ratings are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
 
@@ -44,12 +44,12 @@ Separate from the framing rating, some events carry:
 
 | Rating | Events |
 |---|---|
-| No one-sided framing found | 515 |
+| No one-sided framing found | 492 |
 | Minor lean | 68 |
 | Leans to one side | 8 |
 | States a contested conclusion as fact | 3 |
 
-The flags are not evenly spread. Of the 170 events tagged Israel/Palestine, 34 are rated above 0: 28 lean toward the Palestinian side or against Israel, 1 leans toward the Israeli side, and the rest are British-side accounts of World War I battles or have no clear direction. Across the whole dataset, 2 entries lean toward the Israeli side. All three entries rated 3 (Nakba, Gaza genocide, and the Israeli blockade of the Gaza Strip since 2023) are in this group. Other recurring patterns: the World War I Sinai and Palestine battles are told from the British side, the Iran–Iraq war operations from the Iranian side, and the Syrian civil war entries as an opposition victory story.
+The flags are not evenly spread. Of the 153 events tagged Israel/Palestine, 34 are rated above 0: 28 lean toward the Palestinian side or against Israel, 1 leans toward the Israeli side, and the rest are British-side accounts of World War I battles or have no clear direction. Across the whole dataset, 2 entries lean toward the Israeli side. All three entries rated 3 (Nakba, Gaza genocide, and the Israeli blockade of the Gaza Strip since 2023) are in this group. Other recurring patterns: the World War I Sinai and Palestine battles are told from the British side, the Iran–Iraq war operations from the Iranian side, and the Syrian civil war entries as an opposition victory story.
 
 We report this imbalance because it is what the review found in the current English Wikipedia text, not because we set out to find it. Readers on every side of a conflict tend to see neutral coverage as biased against them ([Vallone, Ross & Lepper, 1985](https://en.wikipedia.org/wiki/Hostile_media_effect)), and a review is not exempt from that, so the ratings are published with their reasons for anyone to check.
 

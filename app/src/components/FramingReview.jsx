@@ -2,6 +2,8 @@
 // docs/framing-review.md). Shown for every event, including those rated 0, and
 // always boxed off from the Wikipedia text it describes.
 
+import { showReview } from "../lib/showReview.js";
+
 const REPO = "https://github.com/kei-nan/atlas-wiki";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 
@@ -29,11 +31,14 @@ export function FramingPointer({ review }) {
   else if (review.rating === 2) lead = "Our framing review found that this summary leans to one side.";
   else lead = "Our framing review found a minor lean in this summary.";
   const where = marked
-    ? "The words in question are highlighted; the review below the text explains why."
-    : "The issue is what it leaves out or how it frames the event as a whole; the review below the text explains.";
+    ? "The words in question are highlighted."
+    : "The issue is what it leaves out or how it frames the event as a whole.";
   return (
     <p className={`framing-pointer framing-pointer--${review.rating}`} role="note">
-      {lead} {where}
+      {lead} {where}{" "}
+      <button type="button" className="framing-pointer-link" onClick={showReview}>
+        Read the review
+      </button>
     </p>
   );
 }

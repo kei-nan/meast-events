@@ -294,6 +294,8 @@ button.sp-chip[aria-pressed="true"] {
   border-radius: 50%;
   flex-shrink: 0;
   border: 1px solid rgba(236, 226, 201, 0.35);
+  /* keeps near-black category colours (atrocity) visible on the dark panel */
+  box-shadow: 0 0 0 1px rgba(236, 226, 201, 0.25);
 }
 
 .sp-select {
@@ -546,6 +548,22 @@ button.sp-chip[aria-pressed="true"] {
   line-height: 1.5;
   color: var(--text-primary);
   max-width: 68ch;
+}
+
+.framing-pointer-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.framing-pointer-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 .framing-pointer--2 { border-left-color: var(--fr-2); }

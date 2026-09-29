@@ -1,14 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import FramingReview, { FramingPointer } from "./FramingReview.jsx";
+import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
-
-function showReview() {
-  const box = document.getElementById("framing-review");
-  if (!box) return;
-  const smooth = !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  box.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "nearest" });
-  box.focus({ preventScroll: true });
-}
 
 function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
@@ -108,6 +101,7 @@ export default function EventDetail({ event, onBack }) {
                         showReview();
                       }
                     }}
+                    aria-label={`Flagged phrase: ${s.text}`}
                   >
                     {s.text}
                   </mark>

@@ -1,5 +1,7 @@
 // Structural validation for event files. This checks FORMAT and internal consistency
 // only - it never judges whether an event is "right" (that would be editorial).
+import { COUNTRIES } from "./event-classes.js";
+
 const ID_RE = /^[a-z0-9-]+$/;
 const QID_RE = /^Q[1-9][0-9]*$/;
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -74,6 +76,8 @@ export function validateEvents(events, { name = "events", lenient = false } = {}
 
     if (!Array.isArray(e.countries) || e.countries.length === 0 || e.countries.some((c) => typeof c !== "string" || !c)) {
       err(i, e, "countries must be a non-empty array of strings");
+    } else if (!e.countries.some((c) => c in COUNTRIES || c === "regional")) {
+      err(i, e, `no tracked country (inclusion rule 2): ${e.countries.join(", ")}`);
     }
     if (typeof e.category !== "string" || !e.category) err(i, e, "category missing");
 

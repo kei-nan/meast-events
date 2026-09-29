@@ -1,5 +1,5 @@
 import json,time,urllib.request,urllib.parse
-UA={'User-Agent':'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)'}
+UA={'User-Agent':'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)'}
 d={e['title']:e for e in json.load(open('data/events.json',encoding='utf8'))}
 names=['Armenian Genocide','Al-Anfal campaign','Zilan massacre','Adana massacre','Halabja massacre','Defense of Van (1915)','Operation Olive Branch','Ankara Esenboğa Airport attack','Assassination of Hrant Dink','Rabaa massacre']
 def get(host,title,extra=True):

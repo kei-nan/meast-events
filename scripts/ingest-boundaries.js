@@ -35,6 +35,26 @@ const REGION_ENTITIES = [
   "Oman",
 ];
 
+// The map works in whole years, but CShapes records start and end on exact dates, so a
+// predecessor and its successor both "cover" the changeover year. Each year is given to
+// the record in force on 1 July, so exactly one record per entity is shown per year.
+// A record that spans no 1 July (the 10-day Iraq record of 1932, two Balkan-war Ottoman
+// snapshots) gets an empty range and is skipped.
+const REFERENCE_DAY = "-07-01";
+const isoDate = (y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+function activeYears(p) {
+  const start = isoDate(p.gwsyear, p.gwsmonth, p.gwsday);
+  const end = isoDate(p.gweyear, p.gwemonth, p.gweday);
+  const startYear = start <= `${p.gwsyear}${REFERENCE_DAY}` ? p.gwsyear : p.gwsyear + 1;
+  // CShapes ends in 2019; treat each country's last record as still current, since
+  // none of these recognized sovereign borders have changed since (corrections that
+  // extend into the present, like Israel's, rely on this too).
+  if (p.gweyear >= 2019) return [startYear, 9999];
+  const endYear = end >= `${p.gweyear}${REFERENCE_DAY}` ? p.gweyear : p.gweyear - 1;
+  return [startYear, endYear];
+}
+
 function defaultName(cntry_name) {
   const openParen = cntry_name.indexOf(" (");
   return openParen >= 0 ? cntry_name.slice(0, openParen) : cntry_name;
@@ -49,11 +69,11 @@ function cutPoints(cntry_name, startYear, endYear) {
     if (c.target !== cntry_name) continue;
     if (c.type === "split") {
       for (const phase of c.phases) {
-        if (phase.until > startYear && phase.until < endYear) cuts.add(phase.until);
+        if (phase.until > startYear && phase.until <= endYear) cuts.add(phase.until);
       }
     } else if (c.type === "flag") {
-      if (c.fromYear > startYear && c.fromYear < endYear) cuts.add(c.fromYear);
-      if (c.toYear + 1 > startYear && c.toYear + 1 < endYear) cuts.add(c.toYear + 1);
+      if (c.fromYear > startYear && c.fromYear <= endYear) cuts.add(c.fromYear);
+      if (c.toYear + 1 > startYear && c.toYear + 1 <= endYear) cuts.add(c.toYear + 1);
     }
   }
   return [...cuts].sort((a, b) => a - b);
@@ -114,11 +134,8 @@ async function main() {
   for (const f of filtered) {
     const p = f.properties;
     const cntry_name = p.cntry_name;
-    const startYear = p.gwsyear;
-    // CShapes ends in 2019; treat each country's last record as still current, since
-    // none of these recognized sovereign borders have changed since (corrections that
-    // extend into the present, like Israel's, rely on this too).
-    const endYear = p.gweyear >= 2019 ? 9999 : p.gweyear;
+    const [startYear, endYear] = activeYears(p);
+    if (endYear < startYear) continue;
 
     const cuts = cutPoints(cntry_name, startYear, endYear);
     const boundaries = [startYear, ...cuts, endYear];
@@ -126,6 +143,7 @@ async function main() {
     for (let i = 0; i < boundaries.length - 1; i++) {
       const segStart = boundaries[i];
       const segEnd = i === boundaries.length - 2 ? endYear : boundaries[i + 1] - 1;
+      if (segEnd < segStart) continue;
       const props = resolveProperties(cntry_name, segStart);
       features.push({
         type: "Feature",
@@ -142,9 +160,20 @@ async function main() {
     }
   }
 
-  // "add" entries have no CShapes counterpart at all - append them directly.
+  // "add" entries are territories the region filter above doesn't produce. Their geometry is
+  // either a computed shape from corrections-geometry.json or, written "cshapes:<cntry_name>",
+  // a CShapes record outside REGION_ENTITIES (e.g. its 1948-1967 "West Bank", which includes
+  // East Jerusalem).
+  const cshapesRecord = (cntry_name) => {
+    const hits = raw.features.filter((f) => f.properties.cntry_name === cntry_name);
+    if (hits.length !== 1) throw new Error(`expected one CShapes record "${cntry_name}", got ${hits.length}`);
+    return hits[0].geometry;
+  };
   for (const c of CORRECTIONS) {
     if (c.type !== "add") continue;
+    const fromCshapes = c.geometry.startsWith("cshapes:");
+    const geometry = fromCshapes ? cshapesRecord(c.geometry.slice("cshapes:".length)) : correctionsGeometry[c.geometry];
+    if (!geometry) throw new Error(`no geometry "${c.geometry}" for ${c.name}`);
     features.push({
       type: "Feature",
       properties: {
@@ -152,10 +181,12 @@ async function main() {
         start_year: c.start_year,
         end_year: c.end_year,
         status: c.status,
-        source: `Not in CShapes; ${c.source}${c.geometry_source ? `; ${c.geometry_source}` : ""}`,
+        source: fromCshapes
+          ? `${CSHAPES_CITATION} geometry (its "${c.geometry.slice("cshapes:".length)}" record); ${c.source}`
+          : `Not in CShapes; ${c.source}${c.geometry_source ? `; ${c.geometry_source}` : ""}`,
         note: c.note,
       },
-      geometry: correctionsGeometry[c.geometry],
+      geometry,
     });
   }
 

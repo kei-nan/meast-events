@@ -141,7 +141,10 @@ async function swapAlias(client, alias, newIndex) {
   try {
     await client.ft.aliasUpdate(alias, newIndex);
   } catch (err) {
-    // The alias name is occupied by a legacy real index: drop it, then add.
+    // Only a legacy real index occupying the alias name justifies dropping it. FT._LIST
+    // lists real indexes, never aliases, so any other failure (network, memory,
+    // timeout) must not delete the index the API is serving.
+    if (!(await client.ft._list()).includes(alias)) throw err;
     console.log(`${alias} is a legacy real index (${String(err.message).trim()}); dropping it - one-time brief gap`);
     await dropIndexIfExists(client, alias);
     await client.ft.aliasAdd(alias, newIndex);

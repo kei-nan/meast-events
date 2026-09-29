@@ -28,9 +28,17 @@ export async function buildContext(events, { candidates = [], reconcileDates = f
   const placeQids = [...new Set(list.flatMap((e) => [...e.p276, ...e.p131]))];
   const places = await fetchEntities(placeQids, { cache: entCache, props: LIGHT, log });
 
-  const p17Other = [...new Set(list.flatMap((e) => e.p17).filter((q) => !QID_TO_COUNTRY[q]))];
+  // Present-day sovereign states among the untracked P17 values of the items AND of their
+  // places (the location rule in v21.js weighs a place's in-region vs outside countries).
+  const placeList = [...places.values()].filter(Boolean);
+  const p17Other = [...new Set([...list, ...placeList].flatMap((e) => e.p17).filter((q) => !QID_TO_COUNTRY[q]))];
   const p17Ents = await fetchEntities(p17Other, { cache: entCache, props: LIGHT, log });
-  const sovereign = new Set(p17Other.filter((q) => (p17Ents.get(q)?.p31 ?? []).includes(SOVEREIGN_STATE)));
+  const sovereign = new Set(
+    p17Other.filter((q) => {
+      const e = p17Ents.get(q);
+      return (e?.p31 ?? []).includes(SOVEREIGN_STATE) && !e?.dissolved;
+    })
+  );
 
   const classQids = [...new Set(list.flatMap((e) => e.p31))];
   const labels = await fetchLabelsCached(classQids, { cache: labCache });
