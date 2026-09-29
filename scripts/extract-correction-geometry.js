@@ -356,6 +356,49 @@ async function main() {
   const saudiIraqiNeutralZone = turf.polygon([[...SAUDI_IRAQI_ZONE_VERTICES, SAUDI_IRAQI_ZONE_VERTICES[0]]]);
   const { zone: saudiKuwaitiNeutralZone, arc, radiusKm } = buildSaudiKuwaitiNeutralZone(land);
 
+  // --- Golan Heights: the part of Israel's post-1967 CShapes shape that is not Israel's
+  // 1949 shape, the West Bank or Gaza. Computed entirely from CShapes 2.0, so it lines up
+  // with the Israel and Syria polygons it sits between. CShapes does not cut out the 1974
+  // UN (UNDOF) buffer zone, so the eastern edge is approximate.
+  const cshapesRecord = (name, startYear) => {
+    const hits = cshapes.features.filter(
+      (f) => f.properties.cntry_name === name && (startYear === undefined || f.properties.gwsyear === startYear)
+    );
+    if (hits.length !== 1) throw new Error(`expected one CShapes record ${name} ${startYear ?? ""}, got ${hits.length}`);
+    return turf.feature(hits[0].geometry);
+  };
+  let golanDiff = cshapesRecord("Israel", 1979);
+  for (const minus of [cshapesRecord("Israel", 1948), cshapesRecord("West Bank"), cshapesRecord("Gaza")]) {
+    golanDiff = turf.difference(turf.featureCollection([golanDiff, minus]));
+  }
+  const golanParts = turf.getGeom(golanDiff).type === "Polygon"
+    ? [turf.getGeom(golanDiff).coordinates]
+    : turf.getGeom(golanDiff).coordinates;
+  const KATZRIN = [35.69, 32.99];
+  const golanRings = golanParts.find((rings) => turf.booleanPointInPolygon(turf.point(KATZRIN), turf.polygon(rings)));
+  if (!golanRings) throw new Error("Golan: no part of the CShapes difference contains Katzrin");
+  const golan = turf.polygon(golanRings);
+  console.log(`Golan Heights (CShapes difference): ${(turf.area(golan) / 1e6).toFixed(0)} km2`);
+
+  // --- Abu Musa and Greater Tunb (held by Iran since 30 November 1971, claimed by the
+  // UAE). Natural Earth 10m "minor islands" (public domain), picked by the point on each
+  // island. Lesser Tunb (~2 km2) is not in any Natural Earth layer, so it is not drawn.
+  //      curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_minor_islands.geojson -o data/raw/ne10-minor-islands.geojson
+  const minorIslands = JSON.parse(await readFile(new URL("../data/raw/ne10-minor-islands.geojson", import.meta.url), "utf-8"));
+  const islandPolygon = (label, point) => {
+    for (const f of minorIslands.features) {
+      const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
+      const hit = polys.find((rings) => turf.booleanPointInPolygon(turf.point(point), turf.polygon(rings)));
+      if (hit) return hit;
+    }
+    throw new Error(`no Natural Earth minor island contains ${label}`);
+  };
+  const gulfIslands = turf.multiPolygon([
+    islandPolygon("Abu Musa", [55.03, 25.875]),
+    islandPolygon("Greater Tunb", [55.3, 26.26]),
+  ]);
+  console.log(`Abu Musa + Greater Tunb (Natural Earth): ${(turf.area(gulfIslands) / 1e6).toFixed(1)} km2`);
+
   const out = {
     turkeyPre1939: turkeyMinusHatay.geometry,
     hatay: hatayFeature.geometry,
@@ -364,6 +407,8 @@ async function main() {
     ...osloGeometry,
     saudiIraqiNeutralZone: saudiIraqiNeutralZone.geometry,
     saudiKuwaitiNeutralZone: saudiKuwaitiNeutralZone.geometry,
+    golan: turf.truncate(golan, { precision: 5, coordinates: 2 }).geometry,
+    gulfIslands: turf.truncate(gulfIslands, { precision: 5, coordinates: 2 }).geometry,
   };
 
   await writeFile(new URL("../data/corrections-geometry.json", import.meta.url), JSON.stringify(out));
