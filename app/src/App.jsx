@@ -302,6 +302,19 @@ export default function App() {
 
   return (
     <div className="app">
+      <a
+        className="app-skip"
+        href="#sp-body"
+        onClick={(e) => {
+          const input = document.querySelector("#sp-body:not([hidden]) input");
+          if (input) {
+            e.preventDefault();
+            input.focus();
+          }
+        }}
+      >
+        Skip to search
+      </a>
       <header className="app-header">
         <h1>Middle East, 1900–present</h1>
         <p>A map and timeline of major regional events, sourced from Wikipedia.</p>
@@ -334,7 +347,7 @@ export default function App() {
           )}
         </div>
       </header>
-      <div className="app-body">
+      <main className="app-body">
         <MapView
           events={mapEvents}
           matchIds={matchIds}
@@ -379,7 +392,7 @@ export default function App() {
           hoverId={hoverId}
           selectedEventId={selectedEventId}
         />
-      </div>
+      </main>
       <Timeline
         startYear={startYear}
         endYear={endYear}

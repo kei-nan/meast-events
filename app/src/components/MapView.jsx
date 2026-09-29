@@ -65,6 +65,9 @@ const MODERN_BORDER_LAYERS = [
   "countries-label",
   "coastline",
   "crimea-fill",
+  // The Tropic/Equator lines are dashed like our own disputed-border lines, which misleads.
+  "geolines",
+  "geolines-label",
 ];
 
 // `features` is whatever decade chunk covers `year` (see the boundary-loading
@@ -314,16 +317,6 @@ export default function MapView({
     map.on("load", async () => {
       for (const layerId of MODERN_BORDER_LAYERS) {
         map.setLayoutProperty(layerId, "visibility", "none");
-      }
-
-      // The demo style repeats "Tropic of Cancer"/"Equator" along each line every
-      // ~250px. Label each line once (huge spacing), smaller and subtle.
-      try {
-        map.setLayoutProperty("geolines-label", "symbol-spacing", 100000);
-        map.setLayoutProperty("geolines-label", "text-size", 10);
-        map.setPaintProperty("geolines-label", "text-opacity", 0.55);
-      } catch {
-        // Style without that layer: nothing to tone down.
       }
 
       // Land silhouette and the boundary decade covering the initial year are

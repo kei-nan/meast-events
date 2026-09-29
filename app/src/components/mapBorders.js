@@ -61,7 +61,8 @@ export function uniqueBoundaries(featureList) {
 }
 
 export function yearsLabel(b) {
-  return b.start_year === b.end_year ? `${b.start_year}` : `${b.start_year}–${b.end_year}`;
+  const end = b.end_year >= 9999 ? "present" : b.end_year;
+  return b.start_year === b.end_year ? `${b.start_year}` : `${b.start_year}–${end}`;
 }
 
 // First-visit hint dismissal (localStorage may throw or be blocked).

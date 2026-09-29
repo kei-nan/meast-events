@@ -89,3 +89,47 @@ html, body, #root {
     padding: 8px 14px 12px;
   }
 }
+
+.app-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-loading-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: app-spin 0.9s linear infinite;
+}
+
+@keyframes app-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-spinner {
+    animation: none;
+  }
+}
+
+/* Hidden until focused, so keyboard users can skip the map controls. */
+.app-skip {
+  position: absolute;
+  left: 8px;
+  top: -40px;
+  z-index: 1000;
+  padding: 6px 12px;
+  background: var(--bg-2);
+  color: var(--text-primary);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+}
+
+.app-skip:focus {
+  top: 8px;
+}
