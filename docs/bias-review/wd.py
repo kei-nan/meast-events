@@ -1,5 +1,5 @@
 import json,time,urllib.request,urllib.parse
-UA={'User-Agent':'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)'}
+UA={'User-Agent':'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)'}
 d={e['title']:e for e in json.load(open('data/events.json',encoding='utf8'))}
 names=['Armenian Genocide','Al-Anfal campaign','Bahr El-Baqar primary school bombing','2022 Al-Aqsa clashes','Fall of Mosul','Operation Euphrates Shield','Operation Olive Branch','Tel al-Sultan attack','Coastal road massacre','Ma\'alot massacre','Avivim school bus bombing','Qibya massacre','1966 attack on Samu','Killing of Yahya Sinwar','1983 Beirut barracks bombings','Sinjar massacre','Church of Saint Porphyrius airstrike','October 7 attacks','King David Hotel bombing','Cinema Rex fire']
 def api(p):

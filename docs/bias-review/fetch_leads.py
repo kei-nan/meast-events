@@ -1,5 +1,5 @@
 import json,time,urllib.request,urllib.parse
-UA={'User-Agent':'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)'}
+UA={'User-Agent':'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)'}
 def api(host,params):
     params['format']='json';params['formatversion']='2'
     u='https://%s/w/api.php?%s'%(host,urllib.parse.urlencode(params))

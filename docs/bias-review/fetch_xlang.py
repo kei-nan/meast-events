@@ -1,5 +1,5 @@
 import json,time,urllib.request,urllib.parse
-UA={'User-Agent':'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)'}
+UA={'User-Agent':'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)'}
 s={e['title']:e for e in json.load(open('docs/bias-review/_sample_live.json',encoding='utf8'))}
 pick=['King David Hotel bombing','Palestinian expulsion from Lydda and Ramle','Battle of Jenin (2002)','Gaza War (2008–09)','Qana massacre','Tel al-Sultan attack','Ahvaz military parade attack','Assassination of Ali Khamenei','1982 Lebanon War','Sabena Flight 571']
 res={}

@@ -27,7 +27,7 @@ for i,e in enumerate(s):
       'langlinks_present':list(e['langlinks'])})
 json.dump({'meta':{'seed':20260928,'rng':'Python 3 random.Random(20260928) (Mersenne Twister); pools sorted by event id before shuffle; script docs/bias-review/sample.py',
   'design':'4 eras x 15 events; per era up to 5 from a non-contested pool, rest from contested pool (Israel/Palestine, Lebanon, Syria, Iran, Egypt, Bahrain, Kuwait as first country, or keyword in title/first 200 chars: armenian|kurd|cyprus|gulf|bahrain|hamas|gaza|intifada|palestin|israel|hezbollah|lebanon|syria|iran|egypt|turk); within each pool round-robin over Wikidata category labels in a seeded random order',
-  'fetched':'2026-09-26 via en.wikipedia.org action=query prop=extracts exintro explaintext; User-Agent AtlasWiki/0.1 (contact: jonkeinan@gmail.com); 0.5 s between requests',
+  'fetched':'2026-09-26 via en.wikipedia.org action=query prop=extracts exintro explaintext; User-Agent AtlasWiki/0.1 (contact: contact address removed); 0.5 s between requests',
   'ratings':{'none':'no concerns found','notable':'notable','look':'worth a human look'},
   'rubric':{'1':'loaded/contested label in Wikipedia voice vs attributed','2':'casualty/number claims','3':'causal/blame framing, agent, passive voice','4':'omitted perspective','5':'tone words','6':'effect of extract being shorter than live lead'},
   'caveat':'Single reviewer (an AI model with its own biases). Ratings are prompts for a human, not verdicts. Every finding quote is machine-verified as a verbatim substring of the shown extract or the live lead.'},

@@ -164,7 +164,7 @@ general strike (Q49775), prisoner exchange (Q2001775).
 
 Each class is queried separately. WDQS answers a class query that is too expensive with HTTP 504; the script then retries once with plain `P31` (no subclass expansion)
 and logs that it did so. 429/5xx responses on the other Wikimedia APIs are retried with exponential backoff honouring `Retry-After`. Requests are sequential, delayed
-and identify themselves with the `AtlasWiki` User-Agent (`AtlasWiki/0.1 (data pipeline; contact: jonkeinan@gmail.com)`).
+and identify themselves with the `AtlasWiki` User-Agent (`AtlasWiki/0.1 (data pipeline; +https://github.com/kei-nan/atlas-wiki)`).
 
 ## Review flags (advisory only)
 

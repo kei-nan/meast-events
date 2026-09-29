@@ -3,7 +3,7 @@
   "seed": 20260928,
   "rng": "Python 3 random.Random(20260928) (Mersenne Twister); pools sorted by event id before shuffle; script docs/bias-review/sample.py",
   "design": "4 eras x 15 events; per era up to 5 from a non-contested pool, rest from contested pool (Israel/Palestine, Lebanon, Syria, Iran, Egypt, Bahrain, Kuwait as first country, or keyword in title/first 200 chars: armenian|kurd|cyprus|gulf|bahrain|hamas|gaza|intifada|palestin|israel|hezbollah|lebanon|syria|iran|egypt|turk); within each pool round-robin over Wikidata category labels in a seeded random order",
-  "fetched": "2026-09-26 via en.wikipedia.org action=query prop=extracts exintro explaintext; User-Agent AtlasWiki/0.1 (contact: jonkeinan@gmail.com); 0.5 s between requests",
+  "fetched": "2026-09-26 via en.wikipedia.org action=query prop=extracts exintro explaintext; User-Agent AtlasWiki/0.1 (contact: contact address removed); 0.5 s between requests",
   "ratings": {
    "none": "no concerns found",
    "notable": "notable",

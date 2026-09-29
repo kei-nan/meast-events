@@ -2,7 +2,7 @@
 Usage: python docs/bias-review/scripts/02_fetch.py <cache_dir>   -> writes docs/bias-review/signals.json"""
 import json, os, re, sys, time, hashlib, urllib.request, urllib.parse, difflib, datetime, collections
 CACHE = sys.argv[1]; os.makedirs(CACHE, exist_ok=True)
-UA = 'AtlasWiki/0.1 (contact: jonkeinan@gmail.com)'
+UA = 'AtlasWiki/0.1 (+https://github.com/kei-nan/atlas-wiki)'
 API = 'https://en.wikipedia.org/w/api.php'
 NOW = datetime.datetime(2026, 9, 26, tzinfo=datetime.timezone.utc)
 SINCE = '2025-09-26T00:00:00Z'

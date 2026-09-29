@@ -19,7 +19,7 @@ Companion file: `docs/bias-review/sample-wording.json` (all 60 events with the s
 
 **Known sampling gap:** the seeded draw happened to include no Armenian-genocide event and no Cyprus event. The dataset has no Cyprus events at all (Cyprus is not among the 15 tracked countries). I therefore added a **separate, non-random supplementary set** of 10 Armenian, Kurdish and Egypt/Turkey items (section "Supplementary contested items"), not counted in any table.
 
-**Live lead.** English Wikipedia API `action=query&prop=extracts&exintro&explaintext&redirects`, User-Agent `AtlasWiki/0.1 (contact: jonkeinan@gmail.com)`, 0.5 s between requests, fetched 2026-09-26. "Full lead" means the API's intro extract (all paragraphs before the first heading), plain text. The Wikipedia articles can change after that date, and several (2026 events) are changing quickly.
+**Live lead.** English Wikipedia API `action=query&prop=extracts&exintro&explaintext&redirects`, User-Agent `AtlasWiki/0.1 (contact: contact address removed)`, 0.5 s between requests, fetched 2026-09-26. "Full lead" means the API's intro extract (all paragraphs before the first heading), plain text. The Wikipedia articles can change after that date, and several (2026 events) are changing quickly.
 
 **Comparison of shown extract and full lead.** I read both, then computed how much live-lead text follows the stored extract. For 3 events the stored extract and live lead differ in small wording (a date in brackets removed, an edit since retrieval), so the "material beyond the extract" figure for those is approximate (flagged in the JSON).
 
