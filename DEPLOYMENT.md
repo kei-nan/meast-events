@@ -1,15 +1,30 @@
 # Deployment
 
-Recommended path: **Redis Cloud (free) -> API on Cloudflare Workers (free
-plan) -> frontend on Cloudflare Pages (free)**. Three pieces, deployed in
-this order because each depends on the previous one:
+Current setup: **Redis Cloud (free) -> API on Cloudflare Workers (free
+plan) -> frontend as a static-assets Cloudflare Worker (free)**. Three pieces,
+deployed in this order because each depends on the previous one:
 
 1. **Redis Cloud** - the database (events + boundaries, RediSearch/RedisJSON).
 2. **The API** (`worker/`) - a Cloudflare Worker that queries Redis over a
    TCP socket (`cloudflare:sockets`) and serves it to the frontend over HTTP.
    See `worker/README.md` for how it works.
-3. **The frontend** (`app/`) - the static Vite build on Cloudflare Pages. It
-   needs the API's URL at *build* time.
+3. **The frontend** (`app/`) - the static Vite build, served by the Worker
+   `atlas-wiki` and built by Cloudflare Workers Builds on every push to `main`.
+   It needs the API's URL at *build* time.
+
+## After every merge to `main` (checklist)
+
+Only the frontend deploys itself. The other two pieces do not:
+
+| Changed | What to run | Automatic? |
+|---|---|---|
+| `app/` or the generated `app/public/data/` | nothing: Workers Builds rebuilds and deploys the site | yes |
+| `worker/` (the API) | `cd worker` then `npx wrangler deploy` (on Windows PowerShell: `npx.cmd wrangler deploy`) | **no** |
+| `data/events.json` (categories, fixes) | `npm run load-redis` from the repo root (Windows: `npm.cmd run load-redis`) | **no** |
+
+Check afterwards: `/api/health` returns `{"ok":true,"redis":"PONG"}`, and a request
+sent with an unknown `Origin` header gets no `Access-Control-Allow-Origin: *` back
+(the hardened API only answers the allow-listed origins).
 
 `server/` (Express) is the same API for a normal Node host. It is kept as an
 [alternative](#alternative-the-express-server-on-render) if you'd rather not
@@ -102,32 +117,41 @@ docs list a free-plan allowance of 3,000 build minutes/month, 1 concurrent
 build and a 20-minute build timeout
 ([limits](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/)).
 Set it up in the dashboard (Workers & Pages -> your Worker -> Settings ->
-Builds) with root directory `worker`. This is optional and has not been
-exercised for this repo; manual `npx wrangler deploy` is always enough.
+Builds) with root directory `worker`. This has not been set up for the API: until it
+is, every change under `worker/` must be deployed by hand (see the checklist above).
+A merged API change that is never deployed leaves production on the old code.
 
-## Part 3: the frontend on Cloudflare Pages (~5 minutes)
+## Part 3: the frontend as a static-assets Worker (~5 minutes)
 
-1. Cloudflare dashboard: **Workers & Pages -> Create -> Pages -> Connect to
-   Git**, select this repository.
-2. Build configuration:
-   - **Framework preset:** Vite
+The frontend is a Worker with only static assets (`app/wrangler.jsonc`: name
+`atlas-wiki`, assets from `./dist`, single-page-app fallback), built and deployed by
+Cloudflare [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/)
+from this GitHub repository.
+
+1. Cloudflare dashboard, **Workers & Pages**: create a Worker from this GitHub
+   repository (Workers Builds).
+2. Build settings:
    - **Root directory:** `app`
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-3. Under **Environment variables** add
-   `VITE_API_URL` = `https://atlaswiki-api.<account-subdomain>.workers.dev`
-   (no trailing slash).
+   - **Build command:** `npm run build` (it runs `scripts/split-data.mjs` first)
+   - **Deploy command:** `npx wrangler deploy`
+   - **Non-production branch builds:** `npx wrangler preview` (the default). It needs the
+     `previews` block in `app/wrangler.jsonc`, which is there; each branch and pull
+     request then gets its own preview URL without touching production.
+3. Add the build variable `VITE_API_URL` =
+   `https://atlaswiki-api.<account-subdomain>.workers.dev` (no trailing slash) in the
+   Worker's build settings.
 
 **Why it's set at build time:** Vite substitutes `import.meta.env.VITE_API_URL`
 into the JavaScript while building; the browser never reads an environment.
-If you change it later you must trigger a fresh build/deploy of Pages - just
-editing the variable doesn't change the already-built files.
+If you change it later, trigger a new build: editing the variable alone doesn't
+change the already-built files.
 
-4. **Save and Deploy.** Note the resulting `https://<project>.pages.dev` URL.
+The production URL is `https://atlas-wiki.<account-subdomain>.workers.dev`; a custom
+domain can be added to the same Worker in the dashboard without rebuilding.
 
-Every push to `main` then rebuilds the frontend automatically.
-`.github/workflows/ci.yml` build-checks the frontend and dry-run-bundles the
-Worker on every push/PR (it deploys nothing).
+Every push to `main` rebuilds the frontend. `.github/workflows/ci.yml` lints and
+tests the app, dry-run-bundles the API Worker and validates the data on every push
+and pull request; it deploys nothing.
 
 ## CORS: `ALLOWED_ORIGINS` (safe by default)
 
@@ -172,12 +196,12 @@ If `VITE_API_URL` is unset at build time, the app runs in static mode: events,
 boundaries and search all come from the bundled dataset, with no API calls. If
 the API is set but unreachable or slower than 8 s, the app falls back to the
 same built-in dataset, shows a notice, and retries every 20 s. Set
-`VITE_API_URL` before the Pages build to get live (Redis-backed) data.
+`VITE_API_URL` before the frontend build to get live (Redis-backed) data.
 
 ## Verifying the full deploy
 
 1. `curl .../api/health` on the Worker returns `{"ok":true,"redis":"PONG"}`.
-2. Open the Pages URL: the map renders with country shapes and markers (not
+2. Open the site URL: the map renders with country shapes and markers (not
    a blank pale-blue box - see the MapLibre worker note in
    `app/src/components/MapView.jsx`).
 3. Browser network tab: `/api/events` and `/api/boundaries` go to your
@@ -232,7 +256,7 @@ pages (fetched 2026-09-26; re-check them, limits change):
 | Browser console: CORS error | The page's origin isn't in `ALLOWED_ORIGINS` (or the built-in default): exact match on scheme, host and port, no trailing slash; preview deploys use different hostnames. Add it, redeploy the Worker. |
 | Browser console: "Content Security Policy" violation | `app/public/_headers` doesn't allow that host; add it to the right directive and redeploy the frontend. |
 | API returns 429 | Per-client rate limit (120 req/60 s per IP per location, or the per-isolate guard). Wait 10 s; raise `ratelimits.simple.limit` in `worker/wrangler.jsonc` if legitimate. |
-| Requests go to `localhost` | `VITE_API_URL` wasn't set when Pages built. Set it and trigger a new Pages deploy. |
+| Requests go to `localhost` | `VITE_API_URL` wasn't set when the frontend was built. Set it in the Worker's build settings and trigger a new build. |
 | 503 "service not configured" | The `REDIS_URL` secret isn't set. Run `npx wrangler secret put REDIS_URL`. |
 | 502/503 upstream error | Redis unreachable or wrong password/host/port: re-check the connection string, that the DB is running in the Redis Cloud console, and that you didn't paste a `rediss://` URL for a DB with TLS off (or vice versa). `npx wrangler tail` shows the underlying error. |
 | Cloudflare **error 1102** | Worker exceeded CPU/memory limit (10 ms CPU on Free). See the limits section; consider the paid plan. |
@@ -262,7 +286,7 @@ Workers is preferred. Render's paid tier ($7/mo) is always-on.
 ## Cost summary
 
 **$0/month**, no credit card: Redis Cloud free (30 MB), Workers Free (100,000
-requests/day), Pages Free. The only paid upgrades that are relevant are
+requests/day) for both the API and the static-assets frontend. The only paid upgrades that are relevant are
 Redis Cloud Essentials (for TLS, from about $5/month, see below) and
 Workers Paid if you exceed the daily cap or CPU limit.
 
