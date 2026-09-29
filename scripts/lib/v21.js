@@ -66,6 +66,41 @@ export function wikidataCountries(entity, placeEntities) {
 
 export { COUNTRIES, QID_TO_COUNTRY };
 
+// Location rule: a place (P276/P131) only lends its countries to an event when at least as
+// many of the present-day sovereign states it lists are inside the tracked region as outside
+// it. Seas and regions that mostly belong to other countries - the Mediterranean (6 in / 16
+// out), Black Sea, Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend nothing, so
+// a WWII convoy off Malta is no longer tagged Israel/Palestine, Lebanon, Syria, Turkey and Egypt.
+// Historical predecessors (Ottoman Empire, Mandatory Palestine) are not sovereign states today
+// and count on neither side.
+export function placeIsMostlyInRegion(place, sovereign) {
+  const p17 = place?.p17 ?? [];
+  const inside = p17.filter((q) => QID_TO_COUNTRY[q]).length;
+  const outside = p17.filter((q) => !QID_TO_COUNTRY[q] && sovereign.has(q)).length;
+  return outside <= inside;
+}
+
+// Tracked country tags that only a mostly-outside place supports. Only ever REMOVES tags:
+// re-deriving all tags from today's Wikidata would also add ones nobody reviewed.
+// Applies to discovered events only (they carry `sitelinks`): the 112 legacy events' tags were
+// typed by hand in seed-events.json, not derived from places, so there is nothing to undo.
+export function tagsFromOutsidePlaces(event, entity, placeEntities, sovereign) {
+  if (!entity || event.sitelinks == null) return [];
+  const supported = new Set((entity.p17 ?? []).map((q) => QID_TO_COUNTRY[q]).filter(Boolean));
+  const outsideOnly = new Set();
+  for (const pq of [...(entity.p276 ?? []), ...(entity.p131 ?? [])]) {
+    const place = placeEntities.get(pq);
+    const tags = (place?.p17 ?? []).map((q) => QID_TO_COUNTRY[q]).filter(Boolean);
+    if (placeIsMostlyInRegion(place, sovereign)) tags.forEach((t) => supported.add(t));
+    else tags.forEach((t) => outsideOnly.add(t));
+  }
+  return (event.countries ?? []).filter((c) => c in COUNTRIES && outsideOnly.has(c) && !supported.has(c));
+}
+
+// Inclusion rule 2: at least one of the 15 tracked countries/territories. "regional" is the
+// hand-assigned tag of a few legacy events that concern the whole region.
+export const hasTrackedCountry = (event) => (event.countries ?? []).some((c) => c in COUNTRIES || c === "regional");
+
 // title-vs-lead mismatch: article title (from URL) is not the record title AND record title is not in lead.
 export function normText(s) {
   return (s ?? "")
@@ -119,6 +154,13 @@ export function finalizeEvent(ev, ctx) {
       dateFlags.push(`date_source_adjusted: ${r.reason}`);
       ev.date_start = r.date_start;
     }
+  }
+  const outsideTags = tagsFromOutsidePlaces(ev, entity, ctx.places, ctx.sovereign);
+  if (outsideTags.length) {
+    ev.countries = ev.countries.filter((c) => !outsideTags.includes(c));
+    ev.review_reasons.push(
+      `country_from_outside_place_removed: ${outsideTags.join(", ")} came only from a location (sea or region) that mostly belongs to countries outside the region`
+    );
   }
   applyDataFix(ev);
 

@@ -27,7 +27,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { sleep } from "./lib/http.js";
 import { buildContext } from "./lib/context.js";
-import { finalizeEvent } from "./lib/v21.js";
+import { finalizeEvent, hasTrackedCountry } from "./lib/v21.js";
 import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES } from "./lib/event-classes.js";
 import {
   fetchSummary,
@@ -182,6 +182,7 @@ async function resolveCandidate(candidate, index, total) {
 function exclusionReason(r) {
   if (r.error) return "no_wikipedia_summary";
   if (!r.extract || !r.extract.trim()) return "empty_extract";
+  if (!hasTrackedCountry(r)) return "no_tracked_country"; // inclusion rule 2, after the location rule and fixes
   return null; // v2.1: no-coordinate and date-order-invalid events are kept (flagged), not excluded
 }
 

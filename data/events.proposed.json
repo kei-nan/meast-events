@@ -636,53 +636,6 @@
     "wikidata_description": "1914–1918 global conflict"
   },
   {
-    "id": "naval-warfare-in-the-mediterranean-during-world-war-i",
-    "title": "Naval warfare in the Mediterranean during World War I",
-    "date_start": "1914-08-01",
-    "date_end": "1918-10-01",
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:20:33.414Z",
-    "sitelinks": 10,
-    "wikidata_qid": "Q899191",
-    "resolved_qid": "Q899191",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Naval_warfare_in_the_Mediterranean_during_World_War_I",
-    "extract": "Naval warfare in the Mediterranean during World War I took place between the naval forces of the Entente and the Central Powers in the Mediterranean Sea between 1914 and 1918.",
-    "coordinates": {
-      "lat": 38,
-      "lon": 18
-    },
-    "coordinate_source": "wikidata",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "month",
-    "part_of": [
-      {
-        "qid": "Q695497",
-        "label": "naval warfare of World War I"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"naval warfare of World War I\" (Q695497); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "conflict"
-  },
-  {
     "id": "german-ottoman-alliance",
     "title": "German–Ottoman alliance",
     "date_start": "1914-08-02",
@@ -713,53 +666,6 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "bilateral relation"
-  },
-  {
-    "id": "pursuit-of-goeben-and-breslau",
-    "title": "Pursuit of Goeben and Breslau",
-    "date_start": "1914-08-04",
-    "date_end": "1914-08-10",
-    "countries": [
-      "Turkey",
-      "Egypt",
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:12:47.748Z",
-    "sitelinks": 19,
-    "wikidata_qid": "Q2053006",
-    "resolved_qid": "Q2053006",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Pursuit_of_Goeben_and_Breslau",
-    "extract": "The pursuit of Goeben and Breslau was a naval action that occurred in the Mediterranean Sea at the outbreak of the First World War when elements of the British Mediterranean Fleet attempted to intercept the German Mittelmeerdivision consisting of the battlecruiser SMS Goeben and the light cruiser SMS Breslau. The German ships evaded the British fleet and passed through the Dardanelles to reach Constantinople, where they were eventually handed over to the Ottoman Empire. Renamed Yavuz Sultan Selim and Midilli, the former Goeben and Breslau were ordered by their German commander to attack Russian positions, in doing so bringing the Ottoman Empire into the war on the side of the Central Powers.\n\nThough a bloodless \"battle,\" the failure of the British pursuit had enormous political and military ramifications. In the short term it effectively ended the careers of the two British admirals who had been in charge of the pursuit. Writing several years later, Winston Churchill—who had been First Lord of the Admiralty—expressed the opinion that by forcing Turkey into the war, Goeben had brought \"more slaughter, more misery, and more ruin than has ever before been borne within the compass of a ship.\"",
-    "coordinates": {
-      "lat": 43,
-      "lon": 15
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q361",
-        "label": "World War I"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1524 km from the nearest tagged country's reference point (Turkey, Egypt, Israel/Palestine, Lebanon, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"World War I\" (Q361); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1914 military operation"
   },
   {
     "id": "fao-landing",
@@ -3628,196 +3534,6 @@
     "wikidata_description": "1939–1945 global conflict"
   },
   {
-    "id": "battle-of-the-espero-convoy",
-    "title": "Battle of the Espero Convoy",
-    "date_start": "1940-06-28",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:17:57.223Z",
-    "sitelinks": 12,
-    "wikidata_qid": "Q2553164",
-    "resolved_qid": "Q2553164",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_the_Espero_Convoy",
-    "extract": "The Battle of the Espero Convoy (Battaglia del convoglio Espero) on 28 June 1940, was the first surface engagement between Italian and Allied warships of the Second World War. Three 36 kn (67 km/h; 41 mph) Italian destroyers made a dash from Taranto for Tobruk in Libya to transport Blackshirt (Milizia Volontaria per la Sicurezza Nazionale) anti-tank units, in case of an armoured attack from Egypt by the British.\n\nBy coincidence, the Mediterranean Fleet was at sea to conduct a destroyer anti-submarine sweep around Crete and provide cover for three Allied convoys to Egypt, one from Turkey and two from Malta. British aircraft from Malta spotted the Italian destroyers and the 7th Cruiser Squadron turned to intercept them; a running fight took place south-west of Crete, in which the destroyers were impeded by their cargoes and an adverse sea.\n\nThe Italian destroyer Espero (Captain Enrico Baroni) was sunk while covering the escape of the destroyers Zeffiro and Ostro to Benghazi; 53 of the 225 crew and passengers were rescued, three of whom later died of their wounds. The British and Australian cruisers expended a huge amount of ammunition and the Malta convoys had to be postponed until they had replenished from the eight hundred 6-inch shells in reserve. Convoy AS 1 from Turkey arrived safely by 3 July.",
-    "coordinates": {
-      "lat": 35.13787778,
-      "lon": 20.57701944
-    },
-    "coordinate_source": "wikidata",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "WWII battle between Italy and the Allies"
-  },
-  {
-    "id": "battle-of-cape-spada",
-    "title": "Battle of Cape Spada",
-    "date_start": "1940-07-19",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:13:27.925Z",
-    "sitelinks": 17,
-    "wikidata_qid": "Q1636800",
-    "resolved_qid": "Q1636800",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Cape_Spada",
-    "extract": "The Battle of Cape Spada (Battaglia di Capo Spada) was a naval battle between the Royal Navy and the Regia Marina during the Battle of the Mediterranean in the second World War. It took place during the morning of 19 July 1940 off Cape Spada, the north-western extremity of Crete.\n\nThe Italian 2ª Divisione Incrociatori (2nd Cruiser Division) comprised the fast light cruisers Giovanni delle Bande Nere and Bartolomeo Colleoni. In a meeting encounter it engaged the Royal Navy's 2nd Destroyer Flotilla and the independently sailing light cruiser HMAS Sydney and destroyer HMS Havock.\n\nDuring the battle Bartolomeo Colleoni was sunk and Giovanni delle Bande Nere damaged, with minor damage inflicted on Sydney. There were 555 survivors from Bartolomeo Colleoni but 121 men were killed. Capitano di vascello Umberto Novaro was mortally wounded and died on 23 July.",
-    "coordinates": {
-      "lat": 35.69277778,
-      "lon": 23.72055556
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1940 naval battle during the battle of the Mediterranean in Second World War"
-  },
-  {
-    "id": "action-off-cape-passero",
-    "title": "Action off Cape Passero",
-    "date_start": "1940-10-12",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:15:29.886Z",
-    "sitelinks": 14,
-    "wikidata_qid": "Q2122172",
-    "resolved_qid": "Q2122172",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Action_off_Cape_Passero",
-    "extract": "The Action off Cape Passero, was a naval engagement in the Second World War between the British light cruiser HMS Ajax, three torpedo boats and seven destroyers of the Italian Regia Marina, in the central Mediterranean, to the south-east of Sicily, on the night of 11/12 October 1940.\n\nIn Operation MB 6, the Mediterranean Fleet covered Convoy MF 3 from Alexandria to Malta and Convoy MF 4 from Malta to Alexandria. Supermarina had prepared the Strait of Sicily Device (Dispositivo del Canale di Sicilia) with torpedo boats, MAS (Motoscafo armato siluranti, torpedo-armed motorboats), minefields and submarines against ships trying to pass the Sicilian Narrows at night.\n\nThe Dispositivo was implemented on the night of 11/12 October and ships were sent to the east of Malta in case the British returned to Alexandria. Three torpedo boats and four destroyers attacked the cruiser Ajax which suffered minor damage. Two torpedo boats were sunk and several torpedo boats and destroyers were damaged.\n\nThe next morning, Artigliere, a damaged destroyer, was sunk by HMS York. Supermarina was dismayed by the superiority of the British in night-fighting against some of their best ships and crews. On 13 October, Illustrious, with escorts, detached from the Mediterranean Fleet towards the Dodecanese and its Swordfish bombed the Italian airfield on Leros.",
-    "coordinates": {
-      "lat": 36.25,
-      "lon": 15.75
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1550 km from the nearest tagged country's reference point (Israel/Palestine, Lebanon, Egypt, Turkey, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1940 naval battle during World War II"
-  },
-  {
-    "id": "battle-of-cape-spartivento",
-    "title": "Battle of Cape Spartivento",
-    "date_start": "1940-11-27",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:12:02.127Z",
-    "sitelinks": 20,
-    "wikidata_qid": "Q1541340",
-    "resolved_qid": "Q1541340",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Cape_Spartivento",
-    "extract": "The Battle of Cape Spartivento (Battaglia di Capo Teulada) was a naval battle during the Battle of the Mediterranean in the Second World War, fought between naval forces of the Royal Navy and the Italian Regia Marina on 27 November 1940.",
-    "coordinates": {
-      "lat": 38.4275,
-      "lon": 8.86583333
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q362",
-        "label": "World War II"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 2069 km from the nearest tagged country's reference point (Israel/Palestine, Lebanon, Egypt, Turkey, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"World War II\" (Q362); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1940 naval battle during the battle of the Mediterranean"
-  },
-  {
     "id": "operation-compass",
     "title": "Operation Compass",
     "date_start": "1940-12-09",
@@ -3857,157 +3573,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1940 military operation"
-  },
-  {
-    "id": "operation-excess",
-    "title": "Operation Excess",
-    "date_start": "1941-01-10",
-    "date_end": "1941-01-11",
-    "countries": [
-      "Turkey",
-      "Egypt",
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:19:46.724Z",
-    "sitelinks": 11,
-    "wikidata_qid": "Q2389095",
-    "resolved_qid": "Q2389095",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Excess",
-    "extract": "Operation Excess was a series of British supply convoys to Malta, Alexandria and Greece in January 1941. The operation was the first to encounter Luftwaffe anti-shipping aircraft over the Mediterranean Sea and all the convoyed freighters reached their destinations. The destroyer Gallant was disabled by Italian mines and Axis bombers severely damaged the cruiser Southampton and the aircraft carrier Illustrious.",
-    "coordinates": {
-      "lat": 37.5,
-      "lon": 14
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q682452",
-        "label": "Siege of Malta"
-      },
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      },
-      {
-        "qid": "Q2509505",
-        "label": "Malta Convoys"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1655 km from the nearest tagged country's reference point (Turkey, Egypt, Israel/Palestine, Lebanon, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Siege of Malta\" (Q682452); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Malta Convoys\" (Q2509505); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1941 military operation"
-  },
-  {
-    "id": "operation-abstention",
-    "title": "Operation Abstention",
-    "date_start": "1941-02-28",
-    "date_end": "1941-02-28",
-    "countries": [
-      "Turkey",
-      "Egypt",
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:21:47.583Z",
-    "sitelinks": 10,
-    "wikidata_qid": "Q599648",
-    "resolved_qid": "Q599648",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Abstention",
-    "extract": "Operation Abstention (25–28 February 1941) was the code name of a British invasion of the Italian island of Kastelorizo (Castellorizo) off the Turkish Aegean coast, during the Second World War. The goal was to establish a motor torpedo-boat base to challenge Italian naval and air supremacy on the Greek Dodecanese islands. The British landings were opposed by Italian land, air and naval forces, which forced the British troops to re-embark amidst some confusion and led to recriminations between the British commanders for underestimating the Italians.",
-    "coordinates": {
-      "lat": 36.15,
-      "lon": 29.59
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "conflict"
-  },
-  {
-    "id": "battle-of-the-tarigo-convoy",
-    "title": "Battle of the Tarigo Convoy",
-    "date_start": "1941-04-16",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:20:42.204Z",
-    "sitelinks": 10,
-    "wikidata_qid": "Q2553656",
-    "resolved_qid": "Q2553656",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_the_Tarigo_Convoy",
-    "extract": "The Battle of the Tarigo Convoy (sometimes called the Action off Sfax) was a naval battle of the Second World War, part of the Battle of the Mediterranean. The battle was fought on 16 April 1941, between four Royal Navy destroyers and three Italian destroyers of the Regia Marina that were escorting a convoy near the Kerkennah Islands off Sfax, on the Tunisian coast.\n\nControl of the sea between Italy and Libya was important to both sides to protect their convoys and attack those of their opponent. Axis convoys to North Africa supplied Italian colonists and Axis military forces. British attacks came from Malta, also dependent upon convoys for supplies.\n\nThe five ships in the convoy were sunk or run aground, along with their three destroyer escorts, one being refloated later in the year, for the loss of a British destroyer. The British success alleviated the pressure from Winston Churchill and the Admiralty in London on Admiral Andrew Cunningham to do more about Italian supply convoys.",
-    "coordinates": {
-      "lat": 35.15753611,
-      "lon": 11.51367222
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1929 km from the nearest tagged country's reference point (Israel/Palestine, Lebanon, Egypt, Turkey, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "naval battle of World War II, part of the Battle of the Mediterranean"
   },
   {
     "id": "operation-brevity",
@@ -4133,104 +3698,6 @@
     "wikidata_description": "battle in Syria during the Syria-Lebanon campaign in World War II"
   },
   {
-    "id": "operation-halberd",
-    "title": "Operation Halberd",
-    "date_start": "1941-09-27",
-    "date_end": null,
-    "countries": [
-      "Egypt",
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria",
-      "Turkey"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:17:11.578Z",
-    "sitelinks": 13,
-    "wikidata_qid": "Q3062545",
-    "resolved_qid": "Q3062545",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Halberd",
-    "extract": "Operation Halberd was a British naval operation that took place from 24 to 27 September 1941, during the Second World War. The British were attempting to deliver a convoy from Gibraltar to Malta. The convoy was escorted by several battleships and an aircraft carrier, to deter interference from the Italian surface fleet, while a close escort of cruisers and destroyers provided an anti-aircraft and anti-submarine screen.\n\nThe Italian fleet sortied after the convoy was detected but turned back after learning the strength of the escorting force. Air attacks by Italian bombers and fighters damaged several ships and forced one of the merchant vessels to be scuttled. The rest of the convoy arrived at Malta and discharged their cargo.",
-    "coordinates": {
-      "lat": 37.5167,
-      "lon": 10.7667
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      },
-      {
-        "qid": "Q2509505",
-        "label": "Malta Convoys"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1930 km from the nearest tagged country's reference point (Egypt, Israel/Palestine, Lebanon, Syria, Turkey)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Malta Convoys\" (Q2509505); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1941 world War II maintenance convoy operation"
-  },
-  {
-    "id": "battle-of-the-duisburg-convoy",
-    "title": "Battle of the Duisburg Convoy",
-    "date_start": "1941-11-09",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:17:38.731Z",
-    "sitelinks": 12,
-    "wikidata_qid": "Q3636255",
-    "resolved_qid": "Q3636255",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_the_Duisburg_Convoy",
-    "extract": "The Battle of the Duisburg Convoy (Battle of the BETA Convoy) was fought on the night of 8/9 November 1941 between an Italian convoy, its escorts and four British ships. The convoy was named BETA (Duisburg refers to the largest ship) by the Italian naval authorities and carried supplies for the Italian Army (Regio Esercito) civilian colonists and the Afrika Korps in Italian Libya.\n\nForce K of the Royal Navy, based at Malta, was sent to attack the convoy based on information gleaned from decrypts of Axis signals coded on the Enigma machine, covered by the fortuitous flight of a reconnaissance aircraft. The convoy was annihilated and the destroyer Fulmine was sunk, with no loss and almost no damage to Force K. The Maestrale-class destroyer Libeccio was sunk next day by the British submarine HMS Upholder, while picking up survivors.\n\nThe Italians were severely criticised by the German naval attaché and pressured to accept liaison officers at Supermarina (headquarters of the Regia Marina) and on its ships. Italian attempts to reduce the risk of interception by British forces, by sending individual ships, pairs and smaller convoys from several ports at once was futile, because the British were reading Italian naval codes; the next convoy was forced to return to port.",
-    "coordinates": {
-      "lat": 37.13333333,
-      "lon": 18.15
-    },
-    "coordinate_source": "wikidata",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1941 battle"
-  },
-  {
     "id": "operation-crusader",
     "title": "Operation Crusader",
     "date_start": "1941-11-18",
@@ -4270,54 +3737,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1941 military operation during the Second World War in North Africa"
-  },
-  {
-    "id": "battle-of-cape-bon-1941",
-    "title": "Battle of Cape Bon (1941)",
-    "date_start": "1941-12-13",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:14:05.626Z",
-    "sitelinks": 16,
-    "wikidata_qid": "Q714242",
-    "resolved_qid": "Q714242",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Cape_Bon_(1941)",
-    "extract": "The naval Battle of Cape Bon took place on 13 December 1941 during the Second World War, between two Italian light cruisers and a British–Dutch destroyer flotilla, off Cape Bon in Tunisia.\n\nThe Italian cruisers were making a fast run to Libya to deliver aviation fuel and other freight that was urgently needed. Three British and a Dutch destroyers of the 4th Destroyer Flotilla were on transit from Gibraltar to Alexandria to join the Mediterranean Fleet when they were diverted to attack the cruisers.\n\nThe destroyers hugged the shore, where they were invisible from the sea and ambushed the cruisers, sinking both with about 900 men killed. The four destroyers continued their voyage to Alexandria.",
-    "coordinates": {
-      "lat": 36.75,
-      "lon": 10.75
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1955 km from the nearest tagged country's reference point (Israel/Palestine, Lebanon, Egypt, Turkey, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1941 naval battle"
   },
   {
     "id": "raid-on-alexandria-1941",
@@ -4360,59 +3779,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Italian frogman raid on British warships in Alexandria in 1941"
-  },
-  {
-    "id": "operation-harpoon-1942",
-    "title": "Operation Harpoon (1942)",
-    "date_start": "1942-01-01",
-    "date_end": "1942-06-15",
-    "countries": [
-      "Lebanon",
-      "Israel/Palestine",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:14:39.698Z",
-    "sitelinks": 15,
-    "wikidata_qid": "Q10130",
-    "resolved_qid": "Q10130",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Harpoon_(1942)",
-    "extract": "Operation Harpoon (Battle of Pantelleria (Battaglia di Mezzo Giugno [Battle of mid-June]) was part of Operation Julius, two simultaneous Allied convoys sent to supply Malta in the Axis-dominated central Mediterranean Sea in mid-June 1942, during the Second World War.\n\nOperation Vigorous was a west-bound convoy from Alexandria and Operation Harpoon was an east-bound convoy from Gibraltar. Vigorous was driven back by the battle fleet of the Regia Marina after massed attacks by Axis aircraft. Two of the six ships in the Harpoon convoy completed the journey, at the cost of several Allied warships.\n\nNews of the two operations had been unwittingly revealed to the Axis by the US Military Attaché in Egypt, Colonel Bonner Fellers, who had been submitting detailed military reports on British activities to Washington. The American code was later revealed by Ultra intercepts to have been broken by Italian military intelligence (the Servizio Informazioni Militare).",
-    "coordinates": {
-      "lat": 36.2,
-      "lon": 11.63333333
-    },
-    "coordinate_source": "wikidata",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "year",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      },
-      {
-        "qid": "Q2509505",
-        "label": "Malta Convoys"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "coordinate_far_from_countries: point is 1899 km from the nearest tagged country's reference point (Lebanon, Israel/Palestine, Egypt, Turkey, Syria)",
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Malta Convoys\" (Q2509505); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1942 british operation during the second world war"
   },
   {
     "id": "battle-of-mersa-matruh",
@@ -4509,59 +3875,6 @@
     "wikidata_description": "1942 battle of the Western Desert Campaign of the Second World War"
   },
   {
-    "id": "operation-pedestal",
-    "title": "Operation Pedestal",
-    "date_start": "1942-08-03",
-    "date_end": "1942-08-15",
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "battle",
-      "naval operation",
-      "military convoy"
-    ],
-    "retrieved_at": "2026-09-26T13:10:56.147Z",
-    "sitelinks": 23,
-    "wikidata_qid": "Q1927362",
-    "resolved_qid": "Q1927362",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Pedestal",
-    "extract": "Operation Pedestal (Italian: Battaglia di Mezzo Agosto, Battle of mid-August), known in Malta as Il-Konvoj ta' Santa Marija (Santa Maria Convoy), was a British operation to carry supplies to the island of Malta in August 1942, during the Second World War. British ships, submarines and aircraft from Malta attacked Axis convoys to Libya, during the North African Campaign (1940–1943). From 1940 to 1942, the Axis conducted the Siege of Malta, with air and naval forces.\n\nDespite many losses, enough supplies were delivered by the British for the population and military forces on Malta to resist, although it ceased to be an offensive base for much of 1942. The crucial supply in Operation Pedestal was fuel, carried by Ohio, an American-owned tanker with a British crew. The convoy sailed from Britain on 3 August 1942 and passed through the Strait of Gibraltar into the Mediterranean on the night of 9/10 August 1942.\n\nThe Axis attempt to prevent the fifty ships of the convoy reaching Malta, using bombers, German E-boats, Italian MAS and MS boats, minefields and submarine ambushes, was the last sizeable Axis success in the Mediterranean. More than 500 Merchant and Royal Navy sailors and airmen were killed and only five of the fourteen merchant ships reached Grand Harbour. It was a costly but strategic victory; the arrival of Ohio justified the risks taken; its cargo of aviation fuel revitalised the Maltese air offensive against Axis shipping.\n\nSubmarines returned to Malta and Spitfire fighters flown from the aircraft carrier HMS Furious enabled a maximum effort to be made against Axis ships. Italian convoys had to detour farther away from the island, lengthening the journey and increasing the time during which air and naval attacks could be mounted. The Siege of Malta was broken by the Allied re-conquest of Egypt and Libya after the Second Battle of El Alamein (23 October – 11 November) and by Operation Torch (8–16 November) in the western Mediterranean, which enabled land-based aircraft to escort merchant ships to the island.",
-    "coordinates": {
-      "lat": 35,
-      "lon": 18
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q702176",
-        "label": "Battle of the Mediterranean"
-      },
-      {
-        "qid": "Q2509505",
-        "label": "Malta Convoys"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Battle of the Mediterranean\" (Q702176); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Malta Convoys\" (Q2509505); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "battle in the Mediterranean Sea in 1942 during WWII"
-  },
-  {
     "id": "battle-of-alam-el-halfa",
     "title": "Battle of Alam el Halfa",
     "date_start": "1942-08-30",
@@ -4601,47 +3914,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1942 battle of the Western Desert Campaign of the Second World War"
-  },
-  {
-    "id": "operation-agreement",
-    "title": "Operation Agreement",
-    "date_start": "1942-09-13",
-    "date_end": "1942-09-14",
-    "countries": [
-      "Egypt"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:16:11.915Z",
-    "sitelinks": 14,
-    "wikidata_qid": "Q1091132",
-    "resolved_qid": "Q1091132",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Agreement",
-    "extract": "Operation Agreement was a ground and amphibious operation carried out by British, Rhodesian and New Zealand forces on Axis-held Tobruk from 13 to 14 September 1942, during the Second World War. A Special Interrogation Group party, fluent in German, took part in missions behind enemy lines. Diversionary actions extended to Benghazi (Operation Bigamy), Jalo oasis (Operation Nicety) and Barce (Operation Caravan). The Tobruk raid was an Allied disaster; the British lost several hundred men killed and captured, one cruiser, two destroyers, six motor torpedo boats and dozens of small amphibious craft.",
-    "coordinates": {
-      "lat": 32.095,
-      "lon": 23.932
-    },
-    "coordinate_source": "wikidata",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q625798",
-        "label": "Western Desert campaign"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Western Desert campaign\" (Q625798); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1942 military operation"
   },
   {
     "id": "second-battle-of-el-alamein",
@@ -8956,53 +8228,6 @@
     "wikidata_description": "statement written by Mahmoud Darwish and proclaimed by Yasser Arafat"
   },
   {
-    "id": "1989-air-battle-near-tobruk",
-    "title": "1989 air battle near Tobruk",
-    "date_start": "1989-01-04",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine",
-      "Lebanon",
-      "Egypt",
-      "Turkey",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "battle",
-      "aviation accident"
-    ],
-    "retrieved_at": "2026-09-26T13:15:46.425Z",
-    "sitelinks": 14,
-    "wikidata_qid": "Q2603955",
-    "resolved_qid": "Q2603955",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/1989_air_battle_near_Tobruk",
-    "extract": "On 4 January 1989, two Grumman F-14A Tomcats of the United States Navy shot down two Libyan-operated Mikoyan-Gurevich MiG-23ML Flogger-G which the American aircrews believed were attempting to engage and attack them, as had happened eight years prior during the 1981 Gulf of Sidra incident. The engagement took place over the Mediterranean Sea, about 40 miles (64 km) north of Tobruk, Libya.",
-    "coordinates": {
-      "lat": 33.5,
-      "lon": 23.4
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q8683",
-        "label": "Cold War"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "1989 air battle between Libyan and US aircraft"
-  },
-  {
     "id": "1989-iranian-constitutional-referendum",
     "title": "1989 Iranian constitutional referendum",
     "date_start": "1989-07-28",
@@ -9879,52 +9104,6 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Al-Qaeda bombing of USS Cole"
-  },
-  {
-    "id": "operation-active-endeavour",
-    "title": "Operation Active Endeavour",
-    "date_start": "2001-10-26",
-    "date_end": "2016-11-01",
-    "countries": [
-      "Turkey",
-      "Egypt",
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:13:50.256Z",
-    "sitelinks": 17,
-    "wikidata_qid": "Q684446",
-    "resolved_qid": "Q684446",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Active_Endeavour",
-    "extract": "Operation Active Endeavour was a maritime operation of the North Atlantic Treaty Organization. It operated in the Mediterranean Sea and was designed to prevent the movement of terrorists or weapons of mass destruction. It had collateral benefits in enhanced security of shipping in general. It was one of the first military actions taken by NATO in response to an invocation of Article 5 of the North Atlantic Treaty which provides for collective defense and the first-ever operation conducted by the Alliance in direct application of the defense clause of the Treaty. In November 2016 it was replaced by the non-Article-5 Operation Sea Guardian.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q185729",
-        "label": "War on Terrorism"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 2001 (2001-10-26) is not within 1 year of any year in the Wikipedia lead [2016]"
-    ],
-    "wikidata_description": "2001 military operation"
   },
   {
     "id": "battle-of-jenin-2002",
@@ -11267,49 +10446,6 @@
     "wikidata_description": "2007 assassination of Turkish-Armenian journalist"
   },
   {
-    "id": "operation-juniper-shield",
-    "title": "Operation Juniper Shield",
-    "date_start": "2007-02-06",
-    "date_end": null,
-    "countries": [
-      "Egypt"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:21:46.040Z",
-    "sitelinks": 10,
-    "wikidata_qid": "Q2602154",
-    "resolved_qid": "Q2602154",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Juniper_Shield",
-    "extract": "Operation Juniper Shield, formerly known as Operation Enduring Freedom – Trans Sahara (OEF-TS), is the military operation conducted by the United States and partner nations in the Saharan and Sahel regions of Africa, consisting of counterterrorism efforts and policing of arms and drug trafficking across central Africa. It is part of the Global War on Terrorism (GWOT). The other OEF mission in Africa is Operation Enduring Freedom – Horn of Africa (OEF-HOA).\n\nCongress approved $500 million for the Trans-Saharan Counterterrorism Initiative (TSCTI) over six years to support countries involved in counterterrorism against alleged threats of al-Qaeda operating in African countries, primarily Algeria, Chad, Mali, Mauritania, Niger, Senegal, Nigeria, and Morocco. This program builds upon the former Pan Sahel Initiative (PSI), which concluded in December 2004 and focused on weapon and drug trafficking, as well as counterterrorism. TSCTI has both military and non-military components to it. OEF-TS is the military component of the program. Civil affairs elements include USAID educational efforts, airport security, Department of the Treasury, and State Department efforts.\n\nCanada deployed teams of less than 15 CSOR members to Mali throughout 2011 to help combat militants in the Sahara. Although the special forces will not engage in combat, they will train the Malian military in basic soldiering. Areas include communications, planning, first aid, and providing aid to the general populace.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q185729",
-        "label": "War on Terrorism"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "unverified_date: no year appears in the Wikipedia extract and category years [2022] do not confirm 2007; the Wikidata date could not be cross-checked",
-      "category_year_mismatch: Wikipedia year categories mention [2022] but none is within 1 year of 2007",
-      "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 2007 (2007-02-06) is not within 1 year of any year in the Wikipedia lead [2004, 2011]"
-    ],
-    "wikidata_description": "2007 military operation"
-  },
-  {
     "id": "qahtaniyah-bombings",
     "title": "Qahtaniyah bombings",
     "date_start": "2007-08-14",
@@ -11502,89 +10638,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "battle which began on March 25, 2008"
-  },
-  {
-    "id": "battle-off-the-coast-of-abkhazia",
-    "title": "Battle off the coast of Abkhazia",
-    "date_start": "2008-08-09",
-    "date_end": "2008-08-10",
-    "countries": [
-      "Georgia"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "naval battle",
-      "battle"
-    ],
-    "retrieved_at": "2026-09-26T13:18:42.372Z",
-    "sitelinks": 11,
-    "wikidata_qid": "Q538398",
-    "resolved_qid": "Q538398",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_off_the_coast_of_Abkhazia",
-    "extract": "The Battle off the coast of Abkhazia was a supposed naval engagement between warships of the Russian Black Sea Fleet and Georgian patrol boats during the Russo-Georgian War.",
-    "coordinates": {
-      "lat": 42.15,
-      "lon": 41.6667
-    },
-    "coordinate_source": "wikipedia",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q620735",
-        "label": "Russo-Georgian War"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "data_fix F4: was tagged Turkey only because the item's location (P276) is the Black Sea, whose own P17 includes Turkey. Wikidata P17 for the item itself = Georgia (Q230); the lead says Russian warships vs Georgian patrol boats off Abkhazia. Georgia is outside the 15 tracked countries (fields: countries; see docs/data-fixes.md)",
-      "part_of: Wikidata (P361) lists this event as part of \"Russo-Georgian War\" (Q620735); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "naval engagement during the 2008 Russo-Georgian war"
-  },
-  {
-    "id": "operation-atalanta",
-    "title": "Operation Atalanta",
-    "date_start": "2008-12-08",
-    "date_end": null,
-    "countries": [
-      "Somalia"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "European Union Naval Forces",
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:10:24.672Z",
-    "sitelinks": 26,
-    "wikidata_qid": "Q698771",
-    "resolved_qid": "Q698771",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Atalanta",
-    "extract": "Operation Atalanta, formally EUNAVFOR ATALANTA, is an ongoing European Union (EU) military operation contributing to maritime security in the West Indian Ocean and the Red Sea. Launched on 8 December 2008 as the EU’s first naval operation, it was initially established to protect World Food Programme (WFP) vessels and other vulnerable shipping, and to deter, prevent and repress piracy and armed robbery off Somalia. The operation is commanded from its Operational Headquarters in Rota, Spain, and its current mandate runs until 28 February 2027.\n\nAlthough counter-piracy and the protection of vulnerable shipping remain core tasks, Atalanta’s mandate has expanded considerably since its establishment. In 2022, its formal purpose was broadened from counter-piracy off Somalia to contributing to maritime security in the West Indian Ocean and the Red Sea. Its current mandate also covers the United Nations (UN) arms embargo on Al-Shabaab, narcotics trafficking, illegal, unreported and unregulated (IUU) fishing, and wider maritime situational awareness.\n\nAcademic assessments generally treat Atalanta as one element of the wider international response associated with the decline in Somali piracy rather than as an independent cause. Studies emphasise the interaction between naval operations, shipping-industry self-protection, prosecution arrangements and regional capacity-building, while also highlighting Atalanta’s role in EU counter-piracy capabilities and international naval coordination. Following renewed Somali piracy activity from late 2023, the operation has continued to respond to hijackings and attempted attacks in the region.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q214451",
-        "label": "piracy off the coast of Somalia"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "data_fix F4: Operation Atalanta (EU naval force off Somalia): tagged Yemen only via P276 Gulf of Aden; Wikidata P17 = Somalia (Q1045) (fields: countries; see docs/data-fixes.md)",
-      "part_of: Wikidata (P361) lists this event as part of \"piracy off the coast of Somalia\" (Q214451); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "2008 European military operation in Somalia"
   },
   {
     "id": "2009-khan-el-khalili-bombing",
@@ -12028,63 +11081,6 @@
     "wikidata_description": "Protests in Bahrain that started on February 14, 2011"
   },
   {
-    "id": "war-in-the-sahel",
-    "title": "War in the Sahel",
-    "date_start": "2011-02-15",
-    "date_end": null,
-    "countries": [
-      "Mali",
-      "Burkina Faso",
-      "Niger",
-      "Benin",
-      "Togo",
-      "Mauritania",
-      "Algeria",
-      "Ivory Coast"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "series of wars",
-      "war"
-    ],
-    "retrieved_at": "2026-09-26T13:19:00.674Z",
-    "sitelinks": 11,
-    "wikidata_qid": "Q86831539",
-    "resolved_qid": "Q86831539",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/War_in_the_Sahel",
-    "extract": "The War in the Sahel, also known synonymously as the Sahel War is a multi-sided armed conflict that has been ongoing since 2012. In particular, the intensive conflict mainly takes place in the three countries of Mali, Niger and Burkina Faso.\n\nThe conflict is generally seen to have begun during the early stages of the Mali War, which itself was seen as a spillover conflict of the Insurgency in the Maghreb. As Islamist Tuareg rebels overran Mali in 2012, a concurrent insurgency in Nigeria, led by Boko Haram, began to spread to nearby countries. By 2015, the Mali war had spread to Burkina Faso and Niger, which led to heavy fighting and humanitarian crises in both countries.\n\nThe conflict in Nigeria also reached a climax before a 2015 coalition offensive forced insurgents into remission. By 2019, the effects of the region-wide conflict began to accelerate as popular rage over government ineffectiveness led to a series of coups in Mali, Niger, Sudan, Burkina Faso, Chad and Guinea, which became known as the \"Coup Belt\".",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q185729",
-        "label": "War on Terrorism"
-      },
-      {
-        "qid": "Q17507684",
-        "label": "War against the Islamic State"
-      },
-      {
-        "qid": "Q632787",
-        "label": "Insurgency in the Maghreb"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "data_fix F4: War in the Sahel: tagged Egypt only via P276 Sahel; Wikidata P17 = Mali, Burkina Faso, Niger, Benin, Togo, Mauritania, Algeria, Ivory Coast (fields: countries; see docs/data-fixes.md)",
-      "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"War against the Islamic State\" (Q17507684); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Insurgency in the Maghreb\" (Q632787); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "series of military conflicts in the West African Sahel (mainly Mali, Burkina Faso, Niger), with spillovers in Benin, Togo, Mauritania, Algeria, Côte d'Ivoire; involves this states, Tuareg secessionists, outer international forces and Salafi jihadist"
-  },
-  {
     "id": "syrian-revolution",
     "title": "Syrian revolution",
     "date_start": "2011-03-15",
@@ -12128,50 +11124,6 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "early stage of protests in 2011"
-  },
-  {
-    "id": "operation-unified-protector",
-    "title": "Operation Unified Protector",
-    "date_start": "2011-03-23",
-    "date_end": "2011-10-31",
-    "countries": [
-      "Turkey",
-      "Egypt",
-      "Israel/Palestine",
-      "Lebanon",
-      "Syria"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:16:15.406Z",
-    "sitelinks": 14,
-    "wikidata_qid": "Q3269455",
-    "resolved_qid": "Q3269455",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Unified_Protector",
-    "extract": "Operation Unified Protector was a NATO operation in 2011 enforcing United Nations Security Council resolutions 1970 and 1973 concerning the Libyan Civil War and adopted on 26 February and 17 March 2011, respectively. These resolutions imposed sanctions on key members of the Gaddafi government and authorized NATO to implement an arms embargo, a no-fly zone and to use all means necessary, short of foreign occupation, to protect Libyan civilians and civilian populated areas.\n\nThe operation started on 23 March 2011 and gradually expanded during the following weeks, by integrating more and more elements of the multinational military intervention, which had started on 19 March in response to the same UN resolutions. As of 31 March 2011 it encompassed all international operations in Libya. NATO support was vital to the rebel victory over the forces loyal to Gaddafi. The operation officially ended on 31 October 2011, after the rebel leaders, formalized in the National Transitional Council, had declared Libya liberated on 23 October.\n\nThe operation began with a naval arms embargo, while command of the no-fly zone and the air strikes against Libyan Armed Forces remained under command of the international coalition, led by France, the United Kingdom and the United States, due to lack of consensus between NATO members. On 24 March NATO decided to take control of the no-fly zone enforcement, by integrating the air assets of the international coalition under NATO command, although the command of air strikes on ground targets remained under national authority. A few days later, on 27 March NATO decided to implement all military aspects of the UN resolution and formal transfer of command occurred at 06:00 GMT on 31 March 2011, formally ending the national operations such as the U.S.-coordinated Operation Odyssey Dawn.\n\nThe arms embargo was initially carried out using mainly ships from NATO's Standing Maritime Group 1 and Standing Mine Countermeasures Group 1 already patrolling the Mediterranean Sea at the time of the resolution, enforced with additional ships, submarines and maritime surveillance aircraft from NATO members. They were to \"monitor, report and, if needed, interdict vessels suspected of carrying illegal arms or mercenaries\". The no-fly zone was enforced by aircraft transferred to Unified Protector from the international coalition, with additional aircraft from NATO and other allied nations. The air strikes, although under central NATO command, were only conducted by aircraft of the nations agreeing to enforce this part of the UN resolution.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q210714",
-        "label": "2011 military intervention in Libya"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "many_countries: 5 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
-      "part_of: Wikidata (P361) lists this event as part of \"2011 military intervention in Libya\" (Q210714); it may overlap with that larger event",
-      "country_via_place_only: Wikidata P17 of the item is Libya; the tracked country tag comes only from the P276/P131 place"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "NATO operation during the 2011 military intervention in Libya"
   },
   {
     "id": "siege-of-daraa",
@@ -13469,50 +12421,6 @@
     "wikidata_description": "genocide committed by ISIS against Yazidis in Iraq and Syria"
   },
   {
-    "id": "operation-barkhane",
-    "title": "Operation Barkhane",
-    "date_start": "2014-08-01",
-    "date_end": "2022-11-09",
-    "countries": [
-      "France"
-    ],
-    "category": "war",
-    "category_group": "war",
-    "wikidata_classes": [
-      "military operation"
-    ],
-    "retrieved_at": "2026-09-26T13:12:21.734Z",
-    "sitelinks": 20,
-    "wikidata_qid": "Q17354007",
-    "resolved_qid": "Q17354007",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Barkhane",
-    "extract": "Operation Barkhane (French: Opération Barkhane) was a counterinsurgency operation that started on 1 August 2014 and formally ended on 9 November 2022. It was led by the French military against Islamist groups in Africa's Sahel region and consisted of a roughly 3,000-strong French force, which was permanently headquartered in N'Djamena, the capital of Chad. The operation was led in co-operation with five countries, all of which are former French colonies that span the Sahel: Burkina Faso, Chad, Mali, Mauritania and Niger. Mali was a part of the operation until August 2022. The countries are collectively referred to as the \"G5 Sahel\". The operation was named after a crescent-shaped dune type that is common in the Sahara desert.\n\nThe French military initially intervened in Mali in early 2013 as part of Operation Serval, which successfully regained the northern half of the country from Islamist groups. Operation Barkhane was intended to follow up on that success and expanded the French military's operations over a vast area of the Sahel region. The operation had the stated aim of helping the countries' governments to maintain control of their territory and preventing the region from becoming a safe haven for Islamist terrorist groups that plan to attack France and Europe.\n\nOn 24 May 2021, the 2021 Malian coup d'état was carried out by Vice President Assimi Goïta. French President Emmanuel Macron announced in June 2021 that the operation would soon end and French forces would pull out in a phased manner, due to France's inability to work with the national governments in the Sahel region. He however added that French forces would remain in the region as part of a larger international mission. The operation was later scheduled to end by the first quarter of 2022.\n\nFrance began withdrawing its troops from Mali on 17 February 2022. Macron announced that the base of Barkhane will shift to Niger. The military junta ruling Mali however asked France to withdraw without delay on 18 March, with Macron responding that they would withdraw over the next four to six months. French forces fully withdrew from Mali on 15 August. The French military stated that the operation was not ending, but being reformulated. However on 9 November, Macron announced the end of Operation Barkhane.",
-    "coordinates": null,
-    "coordinate_source": null,
-    "location_quality": "none",
-    "needs_manual_coordinates": true,
-    "date_precision": "day",
-    "part_of": [
-      {
-        "qid": "Q2946372",
-        "label": "Mali War"
-      },
-      {
-        "qid": "Q86831539",
-        "label": "War in the Sahel"
-      }
-    ],
-    "possible_duplicates": [],
-    "review_reasons": [
-      "data_fix F4: Operation Barkhane (French operation in the Sahel): tagged Egypt only via P276 Sahel; Wikidata P17 = France (Q142) (fields: countries; see docs/data-fixes.md)",
-      "part_of: Wikidata (P361) lists this event as part of \"Mali War\" (Q2946372); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"War in the Sahel\" (Q86831539); it may overlap with that larger event"
-    ],
-    "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_description": "2014 French military operation"
-  },
-  {
     "id": "iraqi-turkmen-genocide",
     "title": "Iraqi Turkmen genocide",
     "date_start": "2014-08-01",
@@ -13937,7 +12845,7 @@
   {
     "id": "houthi-insurgency",
     "title": "Houthi insurgency",
-    "date_start": "2015-02-06",
+    "date_start": "2004-06-01",
     "date_end": null,
     "countries": [
       "Saudi Arabia",
@@ -13970,8 +12878,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "category_year_mismatch: Wikipedia year categories mention [2004] but none is within 1 year of 2015",
-      "part_of: Wikidata (P361) lists this event as part of \"Yemeni crisis\" (Q15946570); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Yemeni crisis\" (Q15946570); it may overlap with that larger event",
+      "data_fix F5: Houthi insurgency: stored date_start 2015-02-06 was Wikidata P585; Wikidata P580 = 2004-06 (month precision) and the Wikipedia lead says \"The conflict was sparked in 2004\" (checked 2026-09-29). date_start = P580, day unknown (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",

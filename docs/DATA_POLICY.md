@@ -95,6 +95,11 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
 
 1. **Class.** Wikidata says it is an instance (`P31`, subclasses followed via `P279*`) of one of the event classes in the table above.
 2. **Place.** It is located in one of the 15 tracked countries/territories, via `P17`, or `P276`/`P131` pointing at a place that has `P17` there.
+   A place only counts when at least as many of the present-day sovereign states it lists (its `P17`) are inside the region as outside it
+   (`placeIsMostlyInRegion` in `scripts/lib/v21.js`). Seas and regions that mostly belong to other countries - the Mediterranean (6 in, 16 out), Black Sea,
+   Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
+   are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the 112 hand-picked
+   events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`, 23 events on 2026-09-29).
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**.
 5. **Basic integrity.** Wikipedia returned a summary with a non-empty extract.

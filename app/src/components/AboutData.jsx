@@ -284,7 +284,7 @@ export default function AboutData({ onClose }) {
           Wikipedia&apos;s summaries are shown unchanged, and some of them tell an event from one side. Every event
           therefore carries a separately boxed <strong>framing review</strong>: our own rating of whether the summary
           leans to one side, which side, and why, in one sentence. It is an opinion, not a fact-check and not
-          Wikipedia&apos;s view. All 594 summaries were rated on 27 September 2026 by Claude, an AI model made by
+          Wikipedia&apos;s view. Every summary was rated on 27 September 2026 by Claude, an AI model made by
           Anthropic; a person has not checked every rating.
         </p>
         <FramingCounts state={framing} />

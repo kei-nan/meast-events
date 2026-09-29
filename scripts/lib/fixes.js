@@ -47,6 +47,15 @@ export const DATA_FIXES = [
   },
 ];
 
+DATA_FIXES.push({
+  qid: "Q255997",
+  ref: "F5",
+  set: { date_start: "2004-06-01" },
+  note:
+    "Houthi insurgency: stored date_start 2015-02-06 was Wikidata P585; Wikidata P580 = 2004-06 (month precision) " +
+    'and the Wikipedia lead says "The conflict was sparked in 2004" (checked 2026-09-29). date_start = P580, day unknown',
+});
+
 export const FIXES_BY_QID = new Map(DATA_FIXES.map((f) => [f.qid, f]));
 
 // Applies the ledger entry for event.wikidata_qid (if any). Returns the changed field names.

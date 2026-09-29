@@ -27,6 +27,7 @@ function trim(ent) {
     p17: ids(c.P17),
     p276: ids(c.P276),
     p131: ids(c.P131),
+    dissolved: notDeprecated(c.P576).length > 0, // P576 "dissolved, abolished or demolished"
     p585: times(c.P585),
     p580: times(c.P580),
     p582: times(c.P582),

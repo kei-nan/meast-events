@@ -220,13 +220,6 @@
       "text_sha1": "40a5a228683e",
       "text_retrieved_at": "2026-09-26"
     },
-    "1989-air-battle-near-tobruk": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "73a1d1fc26f8",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the engagement was off Libya."
-    },
     "1989-iranian-constitutional-referendum": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
@@ -704,13 +697,6 @@
       "text_sha1": "2d49958204c7",
       "text_retrieved_at": "2026-09-26"
     },
-    "action-off-cape-passero": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "51ed5e53193b",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the action was fought off Sicily."
-    },
     "adana-massacre": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
@@ -1116,27 +1102,6 @@
         "stubbornness"
       ]
     },
-    "battle-of-cape-bon-1941": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "2b34580fedee",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Tunisia."
-    },
-    "battle-of-cape-spada": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "3061917f0c05",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Crete."
-    },
-    "battle-of-cape-spartivento": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "67462d89c60f",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Sardinia."
-    },
     "battle-of-ctesiphon-1915": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
@@ -1471,20 +1436,6 @@
       "text_sha1": "a6ec668b3ae1",
       "text_retrieved_at": "2026-09-26"
     },
-    "battle-of-the-duisburg-convoy": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "b10205977c16",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought in the central Mediterranean."
-    },
-    "battle-of-the-espero-convoy": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "7c9a9169052f",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Crete."
-    },
     "battle-of-the-sakarya": {
       "rating": 1,
       "reason": "Closes on a Turkish nationalist quotation with no counterpart view.",
@@ -1494,13 +1445,6 @@
       "highlights": [
         "The retreat that started in Vienna on 13 September 1683 stopped 238 years later."
       ]
-    },
-    "battle-of-the-tarigo-convoy": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "2d6e9c684da2",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the battle was fought off Tunisia."
     },
     "battle-of-umm-qasr": {
       "rating": 0,
@@ -1519,13 +1463,6 @@
       "reason": "No one-sided framing found in this summary.",
       "text_sha1": "b145cee3fc47",
       "text_retrieved_at": "2026-09-26"
-    },
-    "battle-off-the-coast-of-abkhazia": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "680a9bfdd1b5",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "Outside this map's region (Russo-Georgian War, Black Sea)."
     },
     "battles-of-latrun-1948": {
       "rating": 0,
@@ -2081,8 +2018,7 @@
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
       "text_sha1": "9d381b2bfb42",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The start date (2015) comes from Wikidata; the insurgency began in 2004, as the summary says."
+      "text_retrieved_at": "2026-09-26"
     },
     "houthi-takeover-of-yemen": {
       "rating": 2,
@@ -2685,12 +2621,6 @@
       "text_sha1": "ac8de184e4fd",
       "text_retrieved_at": "2026-09-26"
     },
-    "naval-warfare-in-the-mediterranean-during-world-war-i": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "ac87f4b486cc",
-      "text_retrieved_at": "2026-09-26"
-    },
     "netiv-haasara-massacre": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
@@ -2761,29 +2691,10 @@
         "In just under six minutes, seven Egyptian MiGs had been shot down"
       ]
     },
-    "operation-abstention": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "b8c3b2f1c20f",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon and Syria, but the operation was in the Dodecanese islands."
-    },
     "operation-accountability": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
       "text_sha1": "434c3e7a74fa",
-      "text_retrieved_at": "2026-09-26"
-    },
-    "operation-active-endeavour": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "b61cf4a56b93",
-      "text_retrieved_at": "2026-09-26"
-    },
-    "operation-agreement": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "bb2df2ccfd11",
       "text_retrieved_at": "2026-09-26"
     },
     "operation-aspides": {
@@ -2792,26 +2703,12 @@
       "text_sha1": "7ce3a3dd4337",
       "text_retrieved_at": "2026-09-26"
     },
-    "operation-atalanta": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "df6f12a4d0bc",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "Outside this map's region (anti-piracy operation off Somalia)."
-    },
     "operation-badr-1973": {
       "rating": 1,
       "reason": "Focuses on Egyptian success and commemorations; the Israeli counter-offensive gets one clause.",
       "text_sha1": "3c8ae4acf898",
       "text_retrieved_at": "2026-09-26",
       "leans": "Toward the Egyptian side"
-    },
-    "operation-barkhane": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "15371e064773",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "Outside this map's region (French operation in the Sahel)."
     },
     "operation-beit-ol-moqaddas": {
       "rating": 1,
@@ -2884,13 +2781,6 @@
       "text_sha1": "ec326fc94db8",
       "text_retrieved_at": "2026-09-26"
     },
-    "operation-excess": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "e46565927ec6",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the convoys ran to Malta, Alexandria and Greece."
-    },
     "operation-fath-ol-mobin": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
@@ -2901,19 +2791,6 @@
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
       "text_sha1": "9ec3c82c612b",
-      "text_retrieved_at": "2026-09-26"
-    },
-    "operation-halberd": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "81342e1ead4f",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Syria and Turkey, but the convoy ran from Gibraltar to Malta."
-    },
-    "operation-harpoon-1942": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "c63018474c92",
       "text_retrieved_at": "2026-09-26"
     },
     "operation-hiram": {
@@ -2939,13 +2816,6 @@
       "reason": "No one-sided framing found in this summary.",
       "text_sha1": "2e9297ee3e87",
       "text_retrieved_at": "2026-09-26"
-    },
-    "operation-juniper-shield": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "1654e2c33b04",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "Tagged Egypt, but the operation covers the Sahel (Mali, Niger and neighbouring countries), outside this map's region."
     },
     "operation-kaman-99": {
       "rating": 1,
@@ -3027,13 +2897,6 @@
       "text_retrieved_at": "2026-09-26",
       "leans": "Toward the Kurdish side"
     },
-    "operation-pedestal": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "0ee3bf9c534c",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Israel/Palestine, Lebanon, Egypt, Turkey and Syria, but the convoy ran to Malta."
-    },
     "operation-pleshet": {
       "rating": 0,
       "reason": "No one-sided framing found in this summary.",
@@ -3092,13 +2955,6 @@
         "Liberation of Bostan",
         "victory of victories"
       ]
-    },
-    "operation-unified-protector": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "e7d503178bdc",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "The country tags include Turkey, Egypt, Israel/Palestine, Lebanon and Syria, but the operation was over Libya."
     },
     "operation-uvda": {
       "rating": 0,
@@ -3188,12 +3044,6 @@
       "highlights": [
         "the eventual takeover of the whole of Palestine"
       ]
-    },
-    "pursuit-of-goeben-and-breslau": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "523343ee91b2",
-      "text_retrieved_at": "2026-09-26"
     },
     "qahtaniyah-bombings": {
       "rating": 0,
@@ -3774,13 +3624,6 @@
       "reason": "No one-sided framing found in this summary.",
       "text_sha1": "bfca699689e9",
       "text_retrieved_at": "2026-09-26"
-    },
-    "war-in-the-sahel": {
-      "rating": 0,
-      "reason": "No one-sided framing found in this summary.",
-      "text_sha1": "5957a8222459",
-      "text_retrieved_at": "2026-09-26",
-      "data_note": "Outside this map's region (West Africa)."
     },
     "war-of-attrition": {
       "rating": 0,

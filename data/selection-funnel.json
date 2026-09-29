@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-27T22:47:52.230Z",
+  "generated_at": "2026-09-29T19:27:35.569Z",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
@@ -40,25 +40,25 @@
     }
   ],
   "proposed_breakdown": {
-    "proposed_total": 484,
-    "location_quality_none_no_map_marker": 197,
+    "proposed_total": 461,
+    "location_quality_none_no_map_marker": 191,
     "date_order_invalid_flagged_and_kept": 5,
     "excluded_as_redirect_duplicates_by_review": 2,
-    "already_merged_into_curated": 482,
+    "already_merged_into_curated": 459,
     "pending_merge_new_events": 0,
     "pending_merge_new_events_without_location": 0,
     "hard_excluded_no_wikipedia_summary_or_extract": 0
   },
   "shown_now": {
-    "curated_total": 594,
+    "curated_total": 571,
     "seed_events_hand_picked": 112,
     "seed_events_also_found_by_discovery": 51,
     "seed_events_not_reachable_by_discovery": 61,
-    "discovered_events_merged": 482,
+    "discovered_events_merged": 459,
     "location_quality": {
       "approximate": 80,
-      "precise": 316,
-      "none": 198
+      "precise": 299,
+      "none": 192
     },
     "seed_file_entries": 112
   },
@@ -84,7 +84,7 @@
         "passed_filters": 155,
         "proposed_location_none": 50,
         "date_order_flagged": 0,
-        "in_curated": 153
+        "in_curated": 136
       },
       "Lebanon": {
         "raw": 196,
@@ -93,7 +93,7 @@
         "passed_filters": 60,
         "proposed_location_none": 19,
         "date_order_flagged": 0,
-        "in_curated": 60
+        "in_curated": 43
       },
       "Jordan": {
         "raw": 68,
@@ -111,7 +111,7 @@
         "passed_filters": 112,
         "proposed_location_none": 46,
         "date_order_flagged": 1,
-        "in_curated": 112
+        "in_curated": 94
       },
       "Iran": {
         "raw": 178,
@@ -129,7 +129,7 @@
         "passed_filters": 87,
         "proposed_location_none": 27,
         "date_order_flagged": 1,
-        "in_curated": 87
+        "in_curated": 70
       },
       "Iraq": {
         "raw": 455,
@@ -147,7 +147,7 @@
         "passed_filters": 76,
         "proposed_location_none": 23,
         "date_order_flagged": 0,
-        "in_curated": 76
+        "in_curated": 55
       },
       "Kuwait": {
         "raw": 47,
@@ -165,7 +165,7 @@
         "passed_filters": 32,
         "proposed_location_none": 18,
         "date_order_flagged": 0,
-        "in_curated": 32
+        "in_curated": 31
       },
       "Saudi Arabia": {
         "raw": 91,
@@ -221,7 +221,7 @@
         "passed_filters": 44,
         "proposed_location_none": 24,
         "date_order_flagged": 0,
-        "in_curated": 44
+        "in_curated": 43
       },
       "revolution": {
         "raw": 10,
@@ -248,7 +248,7 @@
         "passed_filters": 92,
         "proposed_location_none": 54,
         "date_order_flagged": 0,
-        "in_curated": 91
+        "in_curated": 81
       },
       "genocide": {
         "raw": 18,
@@ -320,7 +320,7 @@
         "passed_filters": 145,
         "proposed_location_none": 28,
         "date_order_flagged": 5,
-        "in_curated": 145
+        "in_curated": 133
       },
       "assassination": {
         "raw": 46,
@@ -421,7 +421,7 @@
         "passed_filters": 278,
         "proposed_location_none": 99,
         "date_order_flagged": 5,
-        "in_curated": 277
+        "in_curated": 254
       },
       "uprising": {
         "raw": 76,
@@ -513,7 +513,7 @@
         "passed_filters": 61,
         "proposed_location_none": 17,
         "date_order_flagged": 0,
-        "in_curated": 61
+        "in_curated": 59
       },
       "2020s": {
         "raw": 519,
@@ -531,7 +531,7 @@
         "passed_filters": 110,
         "proposed_location_none": 31,
         "date_order_flagged": 3,
-        "in_curated": 110
+        "in_curated": 107
       },
       "1990s": {
         "raw": 131,
@@ -549,7 +549,7 @@
         "passed_filters": 55,
         "proposed_location_none": 16,
         "date_order_flagged": 1,
-        "in_curated": 55
+        "in_curated": 51
       },
       "1960s": {
         "raw": 65,
@@ -576,7 +576,7 @@
         "passed_filters": 43,
         "proposed_location_none": 18,
         "date_order_flagged": 0,
-        "in_curated": 43
+        "in_curated": 42
       },
       "1920s": {
         "raw": 76,
@@ -594,7 +594,7 @@
         "passed_filters": 50,
         "proposed_location_none": 11,
         "date_order_flagged": 0,
-        "in_curated": 50
+        "in_curated": 37
       },
       "1950s": {
         "raw": 57,
