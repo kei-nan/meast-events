@@ -203,18 +203,22 @@ function framingFor(review, e) {
   const first = r.first_review ?? { found: false, note: null };
   return {
     // Two reviews with different methods, shown as two tabs on the event page.
+    // Judgement about emphasis and point of view is all in "fairness": the first review's
+    // finding, plus any note added during the later wording check.
+    fairness: {
+      found: first.found === true || !!r.fairness_note,
+      first_found: first.found === true,
+      note: first.note ?? null,
+      reviewed_on: review.first_review?.reviewed_on ?? null,
+      later_note: r.fairness_note ?? null,
+      later_on: review.reviewed_on,
+      highlights: marks(first.phrases ?? []),
+    },
     wording: {
-      found: observations.length > 0 || !!r.reviewer_note,
+      found: observations.length > 0,
       observations,
-      reviewer_note: r.reviewer_note ?? null,
       highlights: marks(observations.map((o) => o.phrase)),
       reviewed_on: review.reviewed_on,
-    },
-    fairness: {
-      found: first.found === true,
-      note: first.note ?? null,
-      highlights: marks(first.phrases ?? []),
-      reviewed_on: review.first_review?.reviewed_on ?? null,
     },
     second_look: r.second_look === true,
     category_note: r.category_note ?? null,
@@ -233,7 +237,7 @@ async function splitEvents() {
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
-  const framingCounts = { guideline: {}, with_observations: 0, with_note: 0, fairness_found: 0, second_look: 0, stale: 0, missing: 0 };
+  const framingCounts = { guideline: {}, with_observations: 0, fairness_found: 0, second_look: 0, stale: 0, missing: 0 };
   for (const e of allEvents) {
     const framing = framingFor(review, e);
     if (review && !framing) framingCounts.missing++;
@@ -241,7 +245,6 @@ async function splitEvents() {
       const w = framing.wording;
       for (const o of w.observations) framingCounts.guideline[o.guideline] = (framingCounts.guideline[o.guideline] ?? 0) + 1;
       if (w.observations.length) framingCounts.with_observations++;
-      else if (w.reviewer_note) framingCounts.with_note++;
       if (framing.fairness.found) framingCounts.fairness_found++;
       if (framing.second_look) framingCounts.second_look++;
       if (framing.stale) framingCounts.stale++;

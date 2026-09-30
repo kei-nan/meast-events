@@ -21,14 +21,15 @@ test("every observation cites a published guideline and explains itself", () => 
       assert.ok(o.guideline in review.guidelines, `${id}: unknown guideline ${o.guideline}`);
       assert.ok(typeof o.note === "string" && o.note.length > 20, `${id}: note missing or too short`);
     }
-    if (r.reviewer_note !== null) assert.ok(r.reviewer_note.length > 20, `${id}: reviewer's note too short`);
+    assert.ok(!("reviewer_note" in r), `${id}: judgement notes belong in fairness_note`);
+    if (r.fairness_note !== null) assert.ok(r.fairness_note.length > 20, `${id}: fairness note too short`);
     assert.equal(typeof r.second_look, "boolean", `${id}: second_look must be true or false`);
     const fr = r.first_review;
     assert.ok(fr && typeof fr.found === "boolean", `${id}: first_review missing`);
     if (fr.found) assert.ok(fr.note && fr.note.length > 20, `${id}: a first-review finding needs its reason`);
     if (fr.phrases) assert.ok(fr.found, `${id}: first-review highlights without a finding`);
-    const wordingFound = r.observations.length > 0 || r.reviewer_note !== null;
-    assert.equal(r.second_look, wordingFound && !fr.found, `${id}: second look is for summaries only the wording check flags`);
+    const laterFound = r.observations.length > 0 || r.fairness_note !== null;
+    assert.equal(r.second_look, laterFound && !fr.found, `${id}: second look is for summaries only the later review flags`);
   }
 });
 

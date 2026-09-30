@@ -672,6 +672,10 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
+.framing-review .fr-dated {
+  margin-bottom: 10px;
+}
+
 .framing-obs {
   margin: 0 0 10px;
   padding-left: 18px;

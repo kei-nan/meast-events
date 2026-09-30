@@ -155,15 +155,15 @@ function FramingCounts({ state }) {
     <>
       <p>
         Every summary was reviewed with two different methods, shown as two tabs on each event page.{" "}
-        <strong>Overall fairness</strong> (our first review) found an issue in {fmt(counts.fairness_found)} of{" "}
-        {fmt(total)} summaries. <strong>Wording check</strong> (against Wikipedia&apos;s guidelines) found at least one
-        wording point in {fmt(counts.with_observations)}, and a reviewer&apos;s note only in{" "}
-        {fmt(counts.with_note)} more. Wording points by guideline:
+        <strong>Overall fairness</strong> (a judgement of emphasis, balance and omissions) found an issue in{" "}
+        {fmt(counts.fairness_found)} of {fmt(total)} summaries. <strong>Wording check</strong> (against
+        Wikipedia&apos;s guidelines) found at least one wording point in {fmt(counts.with_observations)}. Wording points
+        by guideline:
       </p>
       <BarList rows={rows} />
       <p className="about-muted">
         The two methods look for different things, so they sometimes disagree. {fmt(counts.second_look)} summaries,
-        where only the wording check found something, are marked for a second look by a person.
+        where only the later review found something, are marked for a second look by a person.
       </p>
       {counts.stale > 0 && (
         <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>

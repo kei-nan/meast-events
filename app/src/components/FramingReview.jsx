@@ -1,6 +1,7 @@
 // Our two reviews of the Wikipedia summary (data/framing-review.json, docs/framing-review.md),
-// shown as two tabs above the text: the current wording check against Wikipedia's own
-// guidelines, and the first review's overall-fairness judgement. A tab is coloured when its
+// shown as two tabs above the text: the overall-fairness judgement (our first review, plus any
+// later note on emphasis or point of view) and the wording check against Wikipedia's own
+// guidelines. A tab is coloured when its
 // review found something and grey when it found nothing. Always boxed off from the text.
 
 import { useRef } from "react";
@@ -12,14 +13,15 @@ const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 function contestUrl(event, review) {
   const title = `Framing review: ${event.title}`;
   const w = review.wording;
+  const f = review.fairness;
   const body = [
     `Event: ${event.title} (${event.id})`,
     "",
+    `Overall fairness, first review: ${f.first_found ? f.note : "nothing found"}`,
+    f.later_note ? `Overall fairness, later note: ${f.later_note}` : "",
+    "",
     "Wording check:",
     ...(w.observations.length ? w.observations.map((o) => `- ${o.guideline_name}: "${o.phrase}"`) : ["- nothing found"]),
-    w.reviewer_note ? `- Reviewer's note: ${w.reviewer_note}` : "",
-    "",
-    `Overall fairness (first review): ${review.fairness.found ? review.fairness.note : "nothing found"}`,
     "",
     "Which review is wrong, and what shows it?",
     "",
@@ -31,15 +33,11 @@ const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
 function tabStatus(tab, r) {
   if (!r.found) return "Nothing found";
-  if (tab === "wording") {
-    const n = r.observations.length;
-    if (n === 0) return "Reviewer's note";
-    return plural(n, "wording point", "wording points") + (r.reviewer_note ? " + note" : "");
-  }
+  if (tab === "wording") return plural(r.observations.length, "wording point", "wording points");
   return "Issue found";
 }
 
-const TAB_NAMES = { wording: "Wording check", fairness: "Overall fairness" };
+const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };
 
 function WordingPanel({ r }) {
   return (
@@ -61,11 +59,6 @@ function WordingPanel({ r }) {
       ) : (
         <p className="fr-nothing">No wording found that Wikipedia&apos;s guidelines advise against.</p>
       )}
-      {r.reviewer_note && (
-        <p className="framing-review-note">
-          <strong>Reviewer&apos;s note</strong> (a judgement, not a guideline): {r.reviewer_note}
-        </p>
-      )}
     </>
   );
 }
@@ -75,17 +68,25 @@ function FairnessPanel({ r }) {
     <>
       <p className="fr-method">
         Judges the summary&apos;s overall fairness (emphasis, balance, omissions and contested claims), using the
-        reviewer&apos;s general knowledge. This was our first review, on {r.reviewed_on}.
+        reviewer&apos;s general knowledge. A judgement, not a rule.
       </p>
-      {r.found ? (
-        <p>
-          {r.note}
-          {r.highlights.length > 0 && " The words in question are highlighted."}
-        </p>
-      ) : (
-        <p className="fr-nothing">
-          No one-sided framing found.
-          {r.note ? ` ${r.note}` : ""}
+      <p className="fr-dated">
+        <strong>First review ({r.reviewed_on}):</strong>{" "}
+        {r.first_found ? (
+          <>
+            {r.note}
+            {r.highlights.length > 0 && " The words in question are highlighted."}
+          </>
+        ) : (
+          <span className="fr-nothing">
+            No one-sided framing found.
+            {r.note ? ` ${r.note}` : ""}
+          </span>
+        )}
+      </p>
+      {r.later_note && (
+        <p className="fr-dated">
+          <strong>Later note ({r.later_on}):</strong> {r.later_note}
         </p>
       )}
     </>

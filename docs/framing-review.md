@@ -17,7 +17,7 @@ Every summary has been reviewed twice, with two different methods that ask diffe
 - **The first review (27 September 2026)** judged each summary's overall fairness: emphasis, balance, what it leaves out, and contested claims stated as fact, using the reviewer's general knowledge. It catches one-sidedness that is not in any single word.
 - **The current review (30 September 2026)** checks only the wording, against Wikipedia's own written guidelines (Part 1 below). It is consistent and checkable, but it cannot see emphasis or omission.
 
-Both are shown on every event page, each in its own tab ("Wording check" and "Overall fairness"). A tab is coloured when its review found something and grey when it found nothing, so both results are visible at a glance. The page opens on the first tab whose review found something.
+Both are shown on every event page, each in its own tab ("Overall fairness" first, then "Wording check"). A tab is coloured when its review found something and grey when it found nothing, so both results are visible at a glance. The page opens on the first tab whose review found something.
 
 - **Where the wording check finds nothing but the first review found a problem, the first review's finding stands**; the page opens on its tab.
 - Where the wording check flags something the first review did not, the summary is marked for a second look by a person.
@@ -54,13 +54,12 @@ The lists in these guidelines are examples, not complete lists. To keep the revi
 - **Names of other events.** "During the Armenian genocide" or "the Gaza genocide" used as the name of another event is not re-judged; that label is reviewed in the other event's own entry.
 - **Vague attributions** ("it is believed", "has been described as"). Wikipedia's guideline on [unsupported attributions](https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Unsupported_attributions) is about vague sourcing rather than taking sides, and applying it would flag hundreds of ordinary sentences.
 
-## Part 2: reviewer's notes (judgement)
+## Part 2: overall fairness (judgement)
 
-Some one-sidedness is not in any single word: a battle told entirely from one army's side, or contested claims about two parties treated differently. These are covered by a **reviewer's note**, which is labelled on the page as a judgement rather than a guideline. A note written for the current review must point to something in the text itself (for example "the Iraqi side appears only as the target") and is not highlighted.
+Some one-sidedness is not in any single word: a battle told entirely from one army's side, or contested claims about two parties treated differently. All such judgement is in the **"Overall fairness"** tab, never in the wording check, and it is labelled as a judgement rather than a rule. The tab shows:
 
-## Part 3: overall fairness (the first review)
-
-The "Overall fairness" tab shows the first review's finding for every summary, in its original wording, with the words it highlighted. Unlike the wording check, the first review drew on outside knowledge (for example, which death tolls most sources give), so its findings can contain such claims. Its 0-3 scores and "leans toward" labels are not shown.
+- **The first review's finding** for every summary, in its original wording, with the words it highlighted.
+- **A later note** (9 summaries), added during the wording check when the reviewer saw one-sidedness that no guideline covers. A later note must point to something in the text itself (for example "the Iraqi side appears only as the target") and is not highlighted. Each entry is dated, so it is clear which review said what. Unlike the wording check, the first review drew on outside knowledge (for example, which death tolls most sources give), so its findings can contain such claims. Its 0-3 scores and "leans toward" labels are not shown.
 
 ## Second look
 
@@ -70,15 +69,14 @@ Where the current review flags something that the first review did not (59 summa
 
 - **The review box sits above the text**, with one tab per review. Each tab shows its status ("3 wording points", "Issue found" or "Nothing found"), coloured when something was found and grey when nothing was. It never says how biased a summary is or toward whom.
 - **The quoted words are highlighted** inside the Wikipedia text, in the colour of the selected tab: the wording check's phrases in orange, the overall fairness review's in lavender. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
-- **The wording check tab** lists each wording point with its guideline, the quoted words and a one-line note, then any reviewer's note. **The overall fairness tab** gives the first review's finding. Below the tabs come the second-look marker and any category note, data note or disclosure.
+- **The overall fairness tab** gives the first review's finding and any later note, each dated. **The wording check tab** lists each wording point with its guideline, the quoted words and a one-line note. Below the tabs come the second-look marker and any category note, data note or disclosure.
 
 ## Results
 
 | | Summaries |
 |---|---|
 | Wording check: at least one wording point | 78 |
-| Wording check: only a reviewer's note | 9 |
-| Overall fairness: issue found | 79 |
+| Overall fairness: issue found | 79 (9 of them also have a later note) |
 | Marked for a second look | 59 |
 
 | Guideline | Wording points |
