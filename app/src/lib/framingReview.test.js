@@ -23,6 +23,11 @@ test("every observation cites a published guideline and explains itself", () => 
     }
     if (r.reviewer_note !== null) assert.ok(r.reviewer_note.length > 20, `${id}: reviewer's note too short`);
     assert.equal(typeof r.second_look, "boolean", `${id}: second_look must be true or false`);
+    if (r.note_source !== undefined) {
+      assert.equal(r.note_source, "first-review", `${id}: unknown note_source`);
+      assert.ok(r.reviewer_note && r.observations.length === 0, `${id}: a first-review note only fills in where the current review found nothing`);
+    }
+    if (r.note_phrases) assert.ok(r.reviewer_note, `${id}: note phrases without a note`);
   }
 });
 
@@ -30,6 +35,7 @@ test("every quoted phrase appears word for word in the text", () => {
   const byId = Object.fromEntries(events.map((e) => [e.id, e]));
   for (const [id, r] of Object.entries(review.events)) {
     for (const o of r.observations) assert.ok(byId[id].extract.includes(o.phrase), `${id}: "${o.phrase}" not in the text`);
+    for (const p of r.note_phrases ?? []) assert.ok(byId[id].extract.includes(p), `${id}: note phrase "${p}" not in the text`);
   }
 });
 

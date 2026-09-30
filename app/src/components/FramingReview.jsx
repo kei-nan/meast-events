@@ -38,6 +38,7 @@ export function FramingPointer({ review }) {
   }
   if (review.reviewer_note) {
     parts.push(n > 0 ? "It also has a reviewer's note." : "Our framing review has a reviewer's note on how this summary tells the event.");
+    if (n === 0 && review.highlights.length) parts.push("The words in question are highlighted.");
   }
   return (
     <p className="framing-pointer" role="note">
@@ -74,15 +75,24 @@ export default function FramingReview({ event }) {
       ) : (
         <p>No wording found that Wikipedia&apos;s own neutrality and wording guidelines advise against.</p>
       )}
-      {review.reviewer_note && (
-        <p className="framing-review-note">
-          <strong>Reviewer&apos;s note</strong> (a judgement, not a guideline): {review.reviewer_note}
-        </p>
-      )}
+      {review.reviewer_note &&
+        (review.note_source === "first-review" ? (
+          <p className="framing-review-note">
+            <strong>Reviewer&apos;s note</strong> from our first review ({review.first_review_on}). That review judged
+            the summary&apos;s overall fairness (emphasis, balance, omissions and contested claims) rather than
+            checking its wording against Wikipedia&apos;s guidelines, which found nothing here. It is a judgement, not
+            a guideline: {review.reviewer_note}
+          </p>
+        ) : (
+          <p className="framing-review-note">
+            <strong>Reviewer&apos;s note</strong> (a judgement, not a guideline): {review.reviewer_note}
+          </p>
+        ))}
       {review.second_look && (
         <p className="framing-review-flag">
-          An earlier review of this summary reached a different conclusion, so it is marked for a second look by a
-          person.
+          This summary was reviewed with two different methods. Our first review ({review.first_review_on}) judged
+          overall fairness; the current one checks wording against Wikipedia&apos;s guidelines. They reached different
+          conclusions here, so it is marked for a second look by a person.
         </p>
       )}
       {review.stale && (
@@ -107,7 +117,7 @@ export default function FramingReview({ event }) {
       )}
       <p className="framing-review-meta">
         Reviewed {review.reviewed_on} by Claude, an AI model made by Anthropic, not checked line by line by a person.
-        It looks at wording only: it does not judge whether the events happened, and legal descriptions such as
+        The current review looks at wording only: it does not judge whether the events happened, and legal descriptions such as
         &ldquo;occupied&rdquo; or &ldquo;illegal&rdquo; are not assessed. The text above is shown unchanged.{" "}
         <a href={METHOD_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
           How we review

@@ -159,8 +159,10 @@ function FramingCounts({ state }) {
       </p>
       <BarList rows={rows} />
       <p className="about-muted">
-        {fmt(counts.second_look)} summaries are marked for a second look because an earlier review method reached a
-        different conclusion.
+        Every summary was reviewed with two different methods: a first review that judged overall fairness, and the
+        current check of wording against Wikipedia&apos;s guidelines. Where the current check found nothing, the first
+        review&apos;s finding is kept as a labelled note. {fmt(counts.second_look)} summaries, where only the current
+        check found something, are marked for a second look by a person.
       </p>
       {counts.stale > 0 && (
         <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>
