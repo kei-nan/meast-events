@@ -1,8 +1,7 @@
-// Merges data/events.proposed.json into the curated data/events.json (and its app copy
-// app/src/data/events.json). Run by the USER, deliberately.
+// Merges data/events.proposed.json into the curated data/events.json. Run by the USER, deliberately.
 //
 //   node scripts/merge-proposed.js                 DRY RUN (default): prints what would change, writes nothing
-//   node scripts/merge-proposed.js --apply         writes BOTH data/events.json and app/src/data/events.json
+//   node scripts/merge-proposed.js --apply         writes data/events.json
 //   node scripts/merge-proposed.js --skip-duplicate-hints
 //                                                  leave out proposed events that carry a possible_duplicates hint
 //                                                  (by default they are merged with the hint kept as a review note)
@@ -16,7 +15,6 @@ const APPLY = process.argv.includes("--apply");
 const SKIP_DUP = process.argv.includes("--skip-duplicate-hints");
 
 const curatedUrl = new URL("../data/events.json", import.meta.url);
-const appUrl = new URL("../app/src/data/events.json", import.meta.url);
 const proposedUrl = new URL("../data/events.proposed.json", import.meta.url);
 
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
@@ -51,13 +49,6 @@ if (mv.errors.length) {
   process.exit(1);
 }
 
-let appInSync = null;
-try {
-  appInSync = JSON.stringify(await read(appUrl)) === JSON.stringify(curated);
-} catch {
-  appInSync = false;
-}
-
 const byCat = {};
 for (const e of incoming) byCat[e.category] = (byCat[e.category] ?? 0) + 1;
 
@@ -70,13 +61,10 @@ console.log(`  with possible-duplicate hints:   ${dupHinted.length}${SKIP_DUP ? 
 console.log(`  with any review flag:            ${incoming.filter((e) => e.needs_review).length}`);
 console.log(`  would add:                       ${incoming.length}  -> total ${merged.length}`);
 console.log(`  by category:`, byCat);
-console.log(`  app/src/data/events.json currently identical to data/events.json: ${appInSync}`);
 
 if (!APPLY) {
-  console.log(`\nDry run only - nothing was written. Re-run with --apply to write both copies.`);
+  console.log(`\nDry run only - nothing was written. Re-run with --apply to write it.`);
 } else {
-  const text = JSON.stringify(merged, null, 2) + "\n";
-  await writeFile(curatedUrl, text);
-  await writeFile(appUrl, text);
-  console.log(`\nWrote data/events.json and app/src/data/events.json (${merged.length} events).`);
+  await writeFile(curatedUrl, JSON.stringify(merged, null, 2) + "\n");
+  console.log(`\nWrote data/events.json (${merged.length} events).`);
 }

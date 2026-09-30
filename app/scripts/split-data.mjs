@@ -1,6 +1,5 @@
-// Splits the monolithic boundaries (src/data/boundaries.json) and the curated
-// events (../data/events.json at the repo root - the single source of truth;
-// the app/src/data/events.json copy is no longer read) into small per-decade
+// Splits the monolithic boundaries and the curated events (both in data/ at the
+// repo root, the single source of truth) into small per-decade
 // chunks under public/data/, so the app can fetch() only the time range it
 // currently needs instead of bundling ~2MB of JSON into the JS bundle.
 //
@@ -47,12 +46,13 @@ import { fileURLToPath } from "node:url";
 import { FULL_BUCKETS, fullBucket } from "../src/lib/fullBucket.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SRC_DIR = path.join(__dirname, "..", "src", "data"); // boundaries.json, land.json
+const SRC_DIR = path.join(__dirname, "..", "src", "data"); // land.json
 // ATLAS_DATA_DIR overrides the repo-root data/ (e.g. a scratch copy for tests).
 const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR
   ? path.resolve(process.env.ATLAS_DATA_DIR)
   : path.join(__dirname, "..", "..", "data");
 const EVENTS_FILE = path.join(ROOT_DATA_DIR, "events.json"); // repo-root source of truth
+const BOUNDARIES_FILE = path.join(ROOT_DATA_DIR, "boundaries.json");
 const OUT_DIR = process.env.SPLIT_OUT_DIR
   ? path.resolve(process.env.SPLIT_OUT_DIR)
   : path.join(__dirname, "..", "public", "data");
@@ -139,7 +139,7 @@ async function writeJSON(filePath, data) {
 }
 
 async function splitBoundaries() {
-  const raw = JSON.parse(await readFile(path.join(SRC_DIR, "boundaries.json"), "utf8"));
+  const raw = JSON.parse(await readFile(BOUNDARIES_FILE, "utf8"));
   const byDecade = new Map();
   for (const feature of raw.features) {
     const { start_year, end_year } = feature.properties;
@@ -167,7 +167,7 @@ async function splitBoundaries() {
   console.log(
     `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks, ` +
       `${(totalBytes / 1024).toFixed(0)}KB total (source was ${(
-        (await readFile(path.join(SRC_DIR, "boundaries.json"))).length / 1024
+        (await readFile(BOUNDARIES_FILE)).length / 1024
       ).toFixed(0)}KB)`
   );
 }

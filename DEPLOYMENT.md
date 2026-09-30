@@ -18,7 +18,7 @@ Only the frontend deploys itself. The other two pieces do not:
 
 | Changed | What to run | Automatic? |
 |---|---|---|
-| `app/` or the generated `app/public/data/` | nothing: Workers Builds rebuilds and deploys the site | yes |
+| `app/`, or any file in `data/` that the site shows (the build regenerates `app/public/data/` from it) | nothing: Workers Builds rebuilds and deploys the site | yes |
 | `worker/` (the API) | `cd worker` then `npx wrangler deploy` (on Windows PowerShell: `npx.cmd wrangler deploy`) | **no** |
 | `data/events.json` (categories, fixes) | `npm run load-redis` from the repo root (Windows: `npm.cmd run load-redis`) | **no** |
 

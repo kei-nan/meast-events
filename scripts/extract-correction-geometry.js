@@ -61,6 +61,7 @@
 //    1969 partition line really does bisect the reconstructed Saudi-Kuwaiti zone), and are
 //    printed on every run so the reconstruction stays falsifiable.
 import { readFile, writeFile } from "node:fs/promises";
+import { stringifyKeyPerLine } from "./lib/json-lines.js";
 import * as turf from "@turf/turf";
 import * as shapefile from "shapefile";
 
@@ -411,7 +412,7 @@ async function main() {
     gulfIslands: turf.truncate(gulfIslands, { precision: 5, coordinates: 2 }).geometry,
   };
 
-  await writeFile(new URL("../data/corrections-geometry.json", import.meta.url), JSON.stringify(out));
+  await writeFile(new URL("../data/corrections-geometry.json", import.meta.url), stringifyKeyPerLine(out));
   console.log("Wrote data/corrections-geometry.json:", Object.keys(out));
   reportNeutralZoneChecks({
     saudiIraqi: saudiIraqiNeutralZone,
