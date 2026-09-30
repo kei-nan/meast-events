@@ -162,7 +162,7 @@ immutable for a year. The two unhashed MapLibre worker files
 (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
 fall under `/assets/*` = 1 h + `stale-while-revalidate`, never immutable.
 `/data/events/all.*` (content-hashed) is immutable; everything else under
-`/data/*` (`meta.json`, `ids.json`, `index.json`, `full/*.json`, decade
+`/data/*` (`meta.json`, `ids.json`, `full/*.json`, decade
 chunks, `boundaries/*.json`, `land.json`, `selection-funnel.json`) is 1 h +
 `stale-while-revalidate=86400`. HTML keeps Cloudflare's default
 (`max-age=0, must-revalidate`) so a deploy is picked up immediately. If a

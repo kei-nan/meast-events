@@ -278,11 +278,9 @@ async function splitEvents() {
   }
 
   const byDecade = new Map();
-  const countsByYear = {};
   const ids = {};
   for (const event of events) {
     const [start, end] = yearRange(event);
-    countsByYear[start] = (countsByYear[start] ?? 0) + 1;
     const decades = decadesFor(start, end);
     ids[event.id] = decades[0];
     for (const decade of decades) {
@@ -323,11 +321,6 @@ async function splitEvents() {
 
   // id -> decade chunk, for deep links (?e=<id>) without scanning every chunk.
   await writeJSON(path.join(OUT_DIR, "events", "ids.json"), ids);
-
-  // Tiny, always-loaded index: per-year event counts for the timeline density
-  // chart, which needs to show density across the *entire* MIN_YEAR-MAX_YEAR
-  // span regardless of which decade chunks happen to be loaded right now.
-  await writeJSON(path.join(OUT_DIR, "events", "index.json"), countsByYear);
 
   await writeJSON(path.join(OUT_DIR, "events", "meta.json"), {
     decadeSize: DECADE_SIZE,

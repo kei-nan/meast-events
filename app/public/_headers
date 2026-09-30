@@ -32,7 +32,7 @@
 
 # /data/*: the static dataset. Un-hashed names (events/1900.json, land.json ...)
 # change on every data regeneration, so cache moderately and revalidate in the
-# background: events/meta.json, ids.json, index.json, events/full/*.json, the
+# background: events/meta.json, ids.json, events/full/*.json, the
 # decade chunks events/19xx.json, boundaries/*.json, land.json,
 # selection-funnel.json. The ONE content-hashed data file is
 # events/all.<12-hex-content-hash>.json (app/scripts/split-data.mjs): the hash
