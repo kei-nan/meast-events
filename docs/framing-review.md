@@ -16,7 +16,7 @@ Every summary gets two reviews, kept separate:
 - **Overall fairness**: our **judgement** of what no word list can catch, such as emphasis, a story told only from one side, what the summary leaves out, or contested claims stated as fact. It is one short finding (or "nothing found").
 - **Wording check**: where the summary's wording departs from one of **Wikipedia's own neutrality and wording guidelines**. Each wording point names the guideline and links to it, so anyone can check whether it was applied fairly.
 
-The two are independent checks, so both may point to the same words. Each is kept concise: one current finding per type, without a history of earlier drafts.
+The two are independent checks, so both may point to the same words. Each shows only its current result, without a history of earlier drafts.
 
 ## Wording check
 
