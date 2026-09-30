@@ -114,8 +114,12 @@
       "text_sha1": "b48aa72b6a03",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Calls the Allied conquest \"the liberation\" and states as fact that the Arab forces played only a limited role, a point historians debate.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "The liberation was led primarily by British and French forces"
+      ]
     },
     "balfour-declaration": {
       "text_sha1": "5612fe7da6b2",
@@ -135,8 +139,13 @@
       "text_sha1": "6cd88b5f8f05",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Ends on the capture as \"a great morale boost for the British Empire\" and a \"Christmas present for the British people\"; the city's residents and the Ottoman side are absent.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "a great morale boost for the British Empire",
+        "Christmas present for the British people"
+      ]
     },
     "armistice-of-mudros": {
       "text_sha1": "3c59cfd017d4",
@@ -218,8 +227,13 @@
       "text_sha1": "ccb859005380",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Uses the rebels' vocabulary (\"French occupation\", \"local collaborators\") as fact.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "French occupation",
+        "local collaborators"
+      ]
     },
     "1929-palestine-riots": {
       "text_sha1": "7da89418626e",
@@ -246,15 +260,23 @@
       "text_sha1": "5b102cb136b7",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Arab casualties are given in detail while Jewish deaths are a vague \"up to several hundred\"; attacks on Jews are barely described.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "up to several hundred"
+      ]
     },
     "peel-commission": {
       "text_sha1": "c91dfdbb1cf7",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Gives both leaderships' positions, but ends on a single historian's reading that Zionist leaders saw partition as a step toward \"the eventual takeover of the whole of Palestine\".",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "the eventual takeover of the whole of Palestine"
+      ]
     },
     "white-paper-of-1939": {
       "text_sha1": "9a15cc048f6f",
@@ -304,8 +326,12 @@
       "text_sha1": "a863fc5a18da",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "States as fact that Ben-Gurion saw accepting the plan as \"a steppingstone to future territorial expansion\", and ends on the Palestinian exodus without mentioning the Arab states' military intervention.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "a steppingstone to future territorial expansion"
+      ]
     },
     "1948-palestine-war": {
       "text_sha1": "b7c215a37d7b",
@@ -468,8 +494,12 @@
       "text_sha1": "b6c3c531834d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Gives the highest estimate of the Hama death toll (30,000) as fact; estimates range from about 10,000 to 40,000.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "massacres of 30,000 men, women and children in Hama alone"
+      ]
     },
     "yom-kippur-war": {
       "text_sha1": "9e618d28ab2f",
@@ -531,8 +561,12 @@
       "text_sha1": "b422ad8e843a",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Says the US and its allies invaded while \"falsely accusing\" Iraq of having weapons of mass destruction. No stockpiles were found, but \"falsely\" implies deliberate deception, which is debated.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "falsely accusing"
+      ]
     },
     "iran-iraq-war": {
       "text_sha1": "b5c146e777df",
@@ -579,22 +613,35 @@
       "text_sha1": "ff8b33400333",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "States contested claims as fact: that Israel supported Hamas \"to prevent the creation of an independent Palestinian state\", and that Gaza was \"Israeli-occupied\" while Hamas governed it. October 7 is mentioned only by name. It does list terrorist designations and attacks on civilians.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "to prevent the creation of an independent Palestinian state",
+        "the Israeli-occupied Gaza Strip"
+      ]
     },
     "al-anfal-campaign": {
       "text_sha1": "04ea53d68bcf",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Weakens the widely accepted genocide finding with a claim about a 2007 court ruling and a sweeping statement that \"many Iraqi Arabs reject that there were any mass killings\", neither sourced.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "many Iraqi Arabs reject that there were any mass killings"
+      ]
     },
     "gulf-war": {
       "text_sha1": "19d448906e6b",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Presents one contested study (US bombing as the main cause of Gulf War syndrome) as settled; otherwise a coalition-perspective summary.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "were concluded to be the primary cause of Gulf War syndrome"
+      ]
     },
     "madrid-conference-of-1991": {
       "text_sha1": "5f06273129b8",
@@ -634,8 +681,13 @@
       "text_sha1": "6029037e4d6b",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Calls Sharon's visit \"provocative\" and says Israeli security \"responded with extreme violence\" as fact; it does cover the roughly 138 suicide bombings, mainly against civilians.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "provocative",
+        "responded with extreme violence"
+      ]
     },
     "israeli-withdrawal-from-lebanon": {
       "text_sha1": "e10316f348b6",
@@ -681,8 +733,9 @@
       "text_sha1": "10b6f0f8b7f2",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Asserts that Gaza remained occupied after 2005, citing the UN and the ICJ, without mentioning that Israel and some legal scholars reject this.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "execution-of-saddam-hussein": {
       "text_sha1": "27fa3a7d585d",
@@ -749,8 +802,13 @@
       "text_sha1": "350eb8c8163e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Uses \"Assad regime\" and \"revolutionaries\" as fact and describes Hay'at Tahrir al-Sham without mentioning its al-Qaeda origins.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "Assad regime",
+        "revolutionaries"
+      ]
     },
     "yemeni-revolution": {
       "text_sha1": "aa01754e1850",
@@ -879,8 +937,12 @@
       "text_sha1": "9dfbd546e35e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Describes Jerusalem Day as \"celebrating the occupation of East Jerusalem\" as fact (Israelis call it reunification). Casualties, rockets and the Hamas ultimatum are all reported.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "celebrating the occupation of East Jerusalem"
+      ]
     },
     "mahsa-amini-protests": {
       "text_sha1": "b307a86316b1",
@@ -893,8 +955,9 @@
       "text_sha1": "4e88c0844251",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "fall-of-the-assad-regime": {
       "text_sha1": "99d360154fa3",
@@ -977,8 +1040,12 @@
       "text_sha1": "71f709dce359",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Calls Enver Pasha's decision \"stubbornness\" without attributing the judgement.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "stubbornness"
+      ]
     },
     "fao-landing": {
       "text_sha1": "fcb61eafc871",
@@ -1130,8 +1197,9 @@
       "text_sha1": "f8080236ed43",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Told entirely from the British Empire forces' side.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "battles-of-ramadi-1917": {
       "text_sha1": "9d6d85aa82f4",
@@ -1144,15 +1212,20 @@
       "text_sha1": "3a931726dbc9",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Told entirely from the British Empire forces' side.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "first-battle-of-gaza": {
       "text_sha1": "7bb390a3c9c1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Told from the British side (\"snatched defeat from the jaws of victory\").",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "snatched defeat from the jaws of victory"
+      ]
     },
     "second-battle-of-gaza": {
       "text_sha1": "605633ced9bf",
@@ -1165,15 +1238,20 @@
       "text_sha1": "04dd952e1c12",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "A heroic account of the Light Horse charge from the British Empire side, with a later-added claim about the Nili spy ring's importance.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "The data provided by the Jewish Nili spy ring was particularly important for the conquest of Beersheba and Jerusalem."
+      ]
     },
     "third-battle-of-gaza": {
       "text_sha1": "cbee198be267",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Told entirely from the British Empire forces' side.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "battle-of-megiddo-1918": {
       "text_sha1": "77d1b00bfd38",
@@ -1193,8 +1271,12 @@
       "text_sha1": "c9fd1cf5027d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Says the day \"is celebrated as Haifa Day\" without saying by whom (it is an Indian Army commemoration).",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "is celebrated as Haifa Day"
+      ]
     },
     "capture-of-damascus-1918": {
       "text_sha1": "3f298bdaa466",
@@ -1207,8 +1289,13 @@
       "text_sha1": "83b128a8a12d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Justifies the landing with Lloyd George's words, then calls the violence against Turkish civilians \"unsystematic\" and says the Greek command \"tried to thwart it\". The Turkish perspective is absent.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "unsystematic",
+        "tried to thwart it"
+      ]
     },
     "battle-of-oltu": {
       "text_sha1": "36f7ef5b3c32",
@@ -1443,8 +1530,12 @@
       "text_sha1": "546a8a2404dc",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Well sourced overall, but states the sweeping claim that \"Arab citizens were regarded by Israel as a hostile population\" as fact.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "Arab citizens were regarded by Israel as a hostile population"
+      ]
     },
     "khan-yunis-massacre": {
       "text_sha1": "59c65e9eee90",
@@ -1693,8 +1784,12 @@
       "text_sha1": "c2a9425cda99",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Names Egyptian Islamic Jihad as the assassins but attributes the motive to \"communist, socialist, and Islamist groups\", which is confusing and unsupported.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "communist, socialist, and Islamist groups"
+      ]
     },
     "1982-hama-massacre": {
       "text_sha1": "eb0582db6517",
@@ -1713,8 +1808,12 @@
       "text_sha1": "2ee6275dba02",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Uses the Iranian framing \"Liberation of Khorramshahr\" (the city was Iranian territory retaken); the Iraqi side is absent.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "Liberation of Khorramshahr"
+      ]
     },
     "siege-of-beirut": {
       "text_sha1": "89241d9d32af",
@@ -2152,8 +2251,9 @@
       "text_sha1": "0bc3706ced9e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "The government's position is absent; the crackdown is described through quoted criticism only.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "siege-of-daraa": {
       "text_sha1": "dba31e45a6cc",
@@ -2429,8 +2529,13 @@
       "text_sha1": "5bd109b723db",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "The wording \"turning a blind eye ... as part of their collaboration with ISIL\" treats collaboration as given inside what is only an accusation.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "turning a blind eye",
+        "as part of their collaboration with ISIL"
+      ]
     },
     "2015-ankara-bombings": {
       "text_sha1": "658da428addf",
@@ -2538,8 +2643,12 @@
       "text_sha1": "42e163a1bffb",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Leads with the highest death toll (\"up to 1,000\"); most counts are around 340.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "up to 1,000"
+      ]
     },
     "august-2016-gaziantep-bombing": {
       "text_sha1": "b8a7489fa4e0",
@@ -2700,8 +2809,9 @@
       "text_sha1": "20a48b32dd73",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Lists war crimes and arrests of critics but leaves out Turkey's stated reason (that it considers the YPG an arm of the PKK).",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "israel-united-arab-emirates-normalization-agreement": {
       "text_sha1": "16e2681749b9",
@@ -2872,8 +2982,9 @@
       "text_sha1": "d33341dfe326",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Reports Israel's and US intelligence's claims, then lists many media rebuttals; the evidence of hostages being taken into the hospital gets one line.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "battle-of-aleppo-2024": {
       "text_sha1": "b378486b5ffa",
@@ -2936,8 +3047,9 @@
       "text_sha1": "66812b47fcce",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Gives the Israeli, survivor and CNN accounts, but closes on one correspondent's claim of \"a broader pattern\".",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "israeli-airstrike-on-the-iranian-consulate-in-damascus": {
       "text_sha1": "1cbddeaca779",
@@ -2974,8 +3086,9 @@
       "text_sha1": "567b1b659d4c",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Gives Israel's account and Amnesty's finding that militants were present, but the emphasis is on the \"safe zone\" and civilians burned alive.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "july-2024-houthi-israel-attacks": {
       "text_sha1": "97b4c4bf5ce9",
@@ -3036,8 +3149,12 @@
       "text_sha1": "77e2af21f200",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Well documented (a victim's video contradicted the IDF account), with \"murdered\" used as fact.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "murdered"
+      ]
     },
     "mar-elias-church-attack": {
       "text_sha1": "d0918fe82685",
@@ -3093,15 +3210,21 @@
       "text_sha1": "ae2083eaf97e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Describes the Shah's government as \"oppressive\" and the period as \"a classic example of an environment ripe for protest\" as fact, without saying who holds that view.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "oppressive",
+        "a classic example of an environment ripe for protest"
+      ]
     },
     "attempted-assassination-of-abdul-hamid-ii": {
       "text_sha1": "316eccb0190a",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Opens with the attackers' grievance (the Hamidian massacres) as the motive before describing the bombing that killed 26; factual, but sympathetic in emphasis.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "31-march-incident": {
       "text_sha1": "da1b9a16312c",
@@ -3291,8 +3414,12 @@
       "text_sha1": "ea298e55c03a",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Closes on a Turkish nationalist quotation with no counterpart view.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "The retreat that started in Vienna on 13 September 1683 stopped 238 years later."
+      ]
     },
     "treaty-of-ankara-1921": {
       "text_sha1": "a493ff3cbdb6",
@@ -3520,9 +3647,10 @@
       "text_sha1": "dd7f2998cc80",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true,
-      "category_note": "Shown as \"uprising\" because Wikidata types it as a revolution; it was a reform programme launched by the Shah."
+      "reviewer_note": "Lists the reforms' benefits at length and reduces the opposition largely to clerics protecting their power.",
+      "second_look": false,
+      "category_note": "Shown as \"uprising\" because Wikidata types it as a revolution; it was a reform programme launched by the Shah.",
+      "note_source": "first-review"
     },
     "1963-syrian-coup-d-etat": {
       "text_sha1": "72281a9091ab",
@@ -3568,8 +3696,9 @@
       "text_sha1": "fd4c32df25fe",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "aeroflot-flight-244": {
       "text_sha1": "c0b51112f806",
@@ -3666,8 +3795,12 @@
       "text_sha1": "7fe8d771aab7",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Uses ironic wording as fact: the coup was \"welcomed by some for restoring order by quickly executing 50 people and arresting 500,000\".",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "welcomed by some for restoring order by quickly executing 50 people and arresting 500,000"
+      ]
     },
     "operation-kaman-99": {
       "text_sha1": "30c7fcf0523f",
@@ -3713,8 +3846,13 @@
       "text_sha1": "ae9c95c3299b",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Uses the Iranian framing \"Liberation of Bostan\" and Khomeini's \"victory of victories\".",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "Liberation of Bostan",
+        "victory of victories"
+      ]
     },
     "operation-fath-ol-mobin": {
       "text_sha1": "6dc1ccb8ed2f",
@@ -3819,8 +3957,9 @@
       "text_sha1": "38460040620e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Superlatives from the US side; Iraqi losses appear only as counts.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "operation-provide-comfort": {
       "text_sha1": "db9590879df6",
@@ -4311,8 +4450,12 @@
       "text_sha1": "76a01de62dc1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Treats \"the Gaza genocide\" as an established fact. That finding is supported by a UN commission and genocide scholars but rejected by Israel, the US and others, and the International Court of Justice has not ruled. Israel's stated reasons appear only as something criticised.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "the Gaza genocide"
+      ]
     },
     "war-crimes-in-the-gaza-war": {
       "text_sha1": "287f26117a7f",
@@ -4339,15 +4482,23 @@
       "text_sha1": "6be5bb6f6103",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Opens with the famine as \"a result of an Israeli blockade\"; other causes (looting, breakdown of order) come later as secondary.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "a result of an Israeli blockade"
+      ]
     },
     "gaza-strip-evacuations": {
       "text_sha1": "69bba30e40cf",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Gives the IDF's stated reason, then relies on evacuee and critic accounts, with \"forced evacuations\" as fact.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "forced evacuations"
+      ]
     },
     "gaza-genocide": {
       "text_sha1": "f1f4213b16e1",
@@ -4393,8 +4544,9 @@
       "text_sha1": "ae9d07af1775",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "red-sea-crisis": {
       "text_sha1": "fb3ab6b92486",
@@ -4428,8 +4580,9 @@
       "text_sha1": "59353eae5828",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "The title adopts the \"massacre\" label that the text itself attributes to \"some sources\"; the UN human rights office says both sides may have committed war crimes.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "2024-lebanon-electronic-device-attacks": {
       "text_sha1": "25f1e5793e9c",
@@ -4450,8 +4603,9 @@
       "text_sha1": "0642318064d1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Details the casualties and Lebanon's \"war of extermination\" charge but leaves out Hezbollah's year of rocket fire that preceded the campaign.",
+      "second_look": false,
+      "note_source": "first-review"
     },
     "2024-lebanon-war": {
       "text_sha1": "8ec389d376bb",
@@ -4512,8 +4666,12 @@
       "text_sha1": "7300d1259c7d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Mostly attributed, with the Israeli denial included; says \"amid a famine\" before the famine was formally declared in August 2025.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "amid a famine"
+      ]
     },
     "june-2025-israeli-strikes-on-iran": {
       "text_sha1": "eaf0091cac84",
@@ -4561,8 +4719,12 @@
       "text_sha1": "0277f6b1df1f",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": null,
-      "second_look": true
+      "reviewer_note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
+      "second_look": false,
+      "note_source": "first-review",
+      "note_phrases": [
+        "taking Iran's oil and gas resources"
+      ]
     },
     "fall-of-aden-2026": {
       "text_sha1": "385e11d0be9e",
@@ -4578,5 +4740,6 @@
       "reviewer_note": null,
       "second_look": false
     }
-  }
+  },
+  "first_review_on": "2026-09-27"
 }

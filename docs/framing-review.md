@@ -10,6 +10,21 @@ Every event on the map shows the lead section of its English Wikipedia article, 
 - It **never changes, hides or reorders** the Wikipedia text. The text is shown exactly as Wikipedia gives it, and the review sits in a separate, labelled box.
 - It is shown for **every** event, including the ones where nothing was found. Research on warning labels finds that when only some items carry a label, readers tend to treat the unlabelled ones as checked and accurate ([Pennycook et al., 2020](https://pubsonline.informs.org/doi/10.1287/mnsc.2019.3478)), so a "nothing found" result is shown as deliberately as a flag.
 
+## Two review methods
+
+Every summary has been reviewed twice, with two different methods that ask different questions:
+
+- **The first review (27 September 2026)** judged each summary's overall fairness: emphasis, balance, what it leaves out, and contested claims stated as fact, using the reviewer's general knowledge. It catches one-sidedness that is not in any single word.
+- **The current review (30 September 2026)** checks only the wording, against Wikipedia's own written guidelines (Part 1 below). It is consistent and checkable, but it cannot see emphasis or omission.
+
+They are combined like this:
+
+- The current review's wording points are always shown.
+- **Where the current review finds nothing but the first review found a problem, the first review's finding is kept** and shown as a reviewer's note labelled as coming from the first review.
+- Where the current review flags something the first review did not, the summary is marked for a second look by a person.
+
+Disagreement between the two is expected, because they look for different things. It is not one method contradicting itself.
+
 ## Who reviewed it
 
 All 571 summaries were reviewed on 30 September 2026 by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so.
@@ -42,16 +57,18 @@ The lists in these guidelines are examples, not complete lists. To keep the revi
 
 ## Part 2: reviewer's notes (judgement)
 
-Some one-sidedness is not in any single word: a battle told entirely from one army's side, or contested claims about two parties treated differently. These are covered by a **reviewer's note**, which is labelled on the page as a judgement rather than a guideline. A note must point to something in the text itself (for example "the Iraqi side appears only as the target") and is not highlighted.
+Some one-sidedness is not in any single word: a battle told entirely from one army's side, or contested claims about two parties treated differently. These are covered by a **reviewer's note**, which is labelled on the page as a judgement rather than a guideline. A note written for the current review must point to something in the text itself (for example "the Iraqi side appears only as the target") and is not highlighted.
+
+**Notes from the first review** (51 summaries) are shown where the current review found nothing. They keep the first review's wording and the words it highlighted, and they are labelled with its date and method. Unlike the current review, the first review drew on outside knowledge (for example, which death tolls most sources give), so these notes can contain such claims; its 0-3 scores and "leans toward" labels are not shown.
 
 ## Second look
 
-The first version of this review (see *History* below) rated the summaries with a different method. Where that method and this one disagree about whether a summary has a problem at all, the review box says the summary is **marked for a second look by a person**. These are the cases where the result depends most on the method, and where a human reviewer is most useful.
+Where the current review flags something that the first review did not (59 summaries), the review box says the summary was reviewed with two different methods that reached different conclusions, and that it is **marked for a second look by a person**.
 
 ## How it shows on the event page
 
 - **A notice above the text** says how many wording points were found and whether there is a reviewer's note. It never says how biased a summary is or toward whom.
-- **The quoted words are highlighted** inside the Wikipedia text. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
+- **The quoted words are highlighted** inside the Wikipedia text, including the words a first-review note points to. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
 - **The review box** lists each wording point with its guideline, the quoted words and a one-line note, then the reviewer's note, the second-look marker, and any category note, data note or disclosure.
 
 ## Results
@@ -59,8 +76,8 @@ The first version of this review (see *History* below) rated the summaries with 
 | | Summaries |
 |---|---|
 | At least one wording point | 78 |
-| Only a reviewer's note | 9 |
-| Marked for a second look | 110 |
+| Only a reviewer's note | 60 (9 from the current review, 51 kept from the first review) |
+| Marked for a second look | 59 |
 
 | Guideline | Wording points |
 |---|---|
@@ -75,12 +92,13 @@ We no longer publish counts of which side the flags favour; see *History* for wh
 
 ## History
 
-- **27 September 2026 (version 1, withdrawn).** Each summary got a 0-3 rating, a direction ("leans toward …") and a one-sentence reason, based on the reviewer's overall judgement, including outside knowledge of what courts, historians and governments hold. Results: 492 rated 0, 68 rated 1, 8 rated 2, 3 rated 3. We published that of the 153 Israel/Palestine summaries, 34 were flagged, 28 of them leaning toward the Palestinian side and 1 toward the Israeli side.
+- **27 September 2026 (version 1, the first review; its scores and side counts are withdrawn, its findings are kept where the current review finds nothing).** Each summary got a 0-3 rating, a direction ("leans toward …") and a one-sentence reason, based on the reviewer's overall judgement, including outside knowledge of what courts, historians and governments hold. Results: 492 rated 0, 68 rated 1, 8 rated 2, 3 rated 3. We published that of the 153 Israel/Palestine summaries, 34 were flagged, 28 of them leaning toward the Palestinian side and 1 toward the Israeli side.
 - **30 September 2026 (version 3, current).** Version 1 was withdrawn for two reasons:
   - **Some reasons made claims about the outside world that went beyond the sources.** For example, one described the 2024 ICJ advisory opinion as treating Gaza as still occupied; the opinion's actual wording is that Israel's obligations under the law of occupation remain "commensurate with the degree of its effective control over the Gaza Strip".
   - **The side counts depended heavily on the rules chosen.** Re-reviewing all summaries under wording-only rules (an unpublished version 2) changed 92 of 571 ratings. The Israel/Palestine split moved from 28 to 1 to 13 to 9; it would have been about 13 to 1 without the rule on "terrorist". A figure that moves this much with reasonable rule changes says more about the rules than about Wikipedia, so it is no longer published.
 
   Version 3 checks wording against Wikipedia's own guidelines instead, with judgement confined to separately labelled notes.
+- **30 September 2026 (the two reviews combined).** Rather than drop the first review's findings on the 51 summaries where the current review found nothing, those findings are kept as labelled reviewer's notes (see *Two review methods*). This resolved their second-look marker; 59 remain marked.
 
 ## Limits
 

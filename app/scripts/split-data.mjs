@@ -201,8 +201,11 @@ function framingFor(review, e) {
   return {
     observations,
     // Phrases are only marked in the exact text that was reviewed.
-    highlights: stale ? [] : observations.map((o) => o.phrase).filter((p) => text.includes(p)),
+    highlights: stale ? [] : [...observations.map((o) => o.phrase), ...(r.note_phrases ?? [])].filter((p) => text.includes(p)),
     reviewer_note: r.reviewer_note ?? null,
+    // "first-review": the note is the first review's finding, kept where the current method found nothing.
+    note_source: r.note_source ?? null,
+    first_review_on: review.first_review_on ?? null,
     second_look: r.second_look === true,
     category_note: r.category_note ?? null,
     data_note: r.data_note ?? null,
