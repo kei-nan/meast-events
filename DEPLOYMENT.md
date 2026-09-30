@@ -20,7 +20,11 @@ Only the frontend deploys itself. The other two pieces do not:
 |---|---|---|
 | `app/`, or any file in `data/` that the site shows (the build regenerates `app/public/data/` from it) | nothing: Workers Builds rebuilds and deploys the site | yes |
 | `worker/` (the API) | `cd worker` then `npx wrangler deploy` (on Windows PowerShell: `npx.cmd wrangler deploy`) | **no** |
-| `data/events.json` (categories, fixes) | `npm run load-redis` from the repo root (Windows: `npm.cmd run load-redis`) | **no** |
+| `data/events.json` (categories, fixes, and the monthly "Refresh Wikipedia summaries" pull request) | `npm run load-redis` from the repo root (Windows: `npm.cmd run load-redis`) | **no** |
+
+The monthly refresh workflow (`.github/workflows/refresh-data.yml`) needs one repository setting, once:
+**Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"**.
+Without it the workflow still refreshes and checks the data, but fails at the step that opens the pull request.
 
 Check afterwards: `/api/health` returns `{"ok":true,"redis":"PONG"}`, and a request
 sent with an unknown `Origin` header gets no `Access-Control-Allow-Origin: *` back
