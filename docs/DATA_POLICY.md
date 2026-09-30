@@ -225,16 +225,21 @@ Pipeline output never touches `data/events.json`. Only an explicit `merge-propos
 consistency only (ids `[a-z0-9-]+`, unique ids and QIDs, real calendar dates within 1000-3000, `date_end >= date_start` unless `date_flags` explains it, coordinates
 present unless `location_quality` is `none`, `wikidata_classes` array, `extract_retrieved_at` date, no `category_label`, non-empty extract); it never judges content.
 
-## Refreshing extracts (run quarterly)
+## Refreshing extracts (monthly, automatic)
 
-Wikipedia leads change (for example the Fall of the Assad regime lead moved from "1971" to "1970" within two weeks). Every quarter:
+Wikipedia leads change (for example the Fall of the Assad regime lead moved from "1971" to "1970" within two weeks). The **Refresh Wikipedia summaries** workflow
+(`.github/workflows/refresh-data.yml`) runs on the 1st of each month, and on demand from the Actions tab ("Run workflow"):
 
-1. `node scripts/refresh-extracts.js --proposed --report=refresh-report.md` (dry run, default). It re-fetches every lead uncached and prints, for each changed lead, the
-   old and new length and the removed/added sentences. Nothing is written.
-2. Read the diff. Changes in wording are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale before it goes live.
-3. `node scripts/refresh-extracts.js --apply --proposed` writes the new leads. `extract_retrieved_at` is set to today for changed leads **and** for leads that were re-checked
-   and are identical (the date always means "on this date the stored text matched Wikipedia"). Only `extract` and `extract_retrieved_at` change; the curated file and its app copy stay identical.
-4. `node scripts/validate-events.js`, commit the data, then reload the Redis index / regenerate static chunks as usual (WP-APP2 tooling).
+1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
+   `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes.
+2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists, for each changed lead,
+   the removed and added sentences. It never merges.
+3. **Before merging**, read those sentences. Changes in wording are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
+4. After merging, the site rebuilds itself; run `npm run load-redis` so search uses the new text. The framing review of each changed summary shows "may no longer
+   apply" until it is re-reviewed.
+
+To run it by hand instead: `node scripts/refresh-extracts.js --report=refresh-report.md` (dry run, default, writes nothing), then add `--apply` to write the changes.
+Add `--proposed` to also refresh `data/events.proposed.json`.
 
 ## Licensing of the source data
 

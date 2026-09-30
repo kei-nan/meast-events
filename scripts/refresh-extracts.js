@@ -9,8 +9,8 @@
 //   node scripts/refresh-extracts.js --report=path   also write the printout to a markdown file
 //
 // Rules: the lead text is Wikipedia's, only whitespace-normalised (lib/lead.js). `extract_retrieved_at` is set
-// to today only when the text changed OR when the lead was re-checked and is identical (so the date always means
-// "as of this date the stored text matched Wikipedia"). With --apply the curated file is
+// to today only for leads whose text changed, so an unchanged event is not touched and a refresh diff shows only
+// real changes (each check is recorded by the refresh workflow's run history). With --apply the curated file is
 // written. Nothing else in an event is touched.
 import { readFile, writeFile } from "node:fs/promises";
 import { fetchLeads, titleFromWikipediaUrl } from "./lib/lead.js";
@@ -63,7 +63,6 @@ async function refresh(events, label) {
     }
     if (lead.extract === e.extract) {
       out.unchanged++;
-      if (APPLY) e.extract_retrieved_at = today;
       continue;
     }
     const d = diffLeads(e.extract, lead.extract);
@@ -103,7 +102,7 @@ if (APPLY) {
   const text = JSON.stringify(curated, null, 2) + "\n";
   await writeFile(curatedUrl, text);
   if (propRes) await writeFile(proposedUrl, JSON.stringify(propRes.events, null, 2) + "\n");
-  say(`\nAPPLIED: wrote data/events.json${propRes ? " and data/events.proposed.json" : ""}. extract_retrieved_at = ${today}.`);
+  say(`\nAPPLIED: wrote data/events.json${propRes ? " and data/events.proposed.json" : ""}. extract_retrieved_at = ${today} for changed leads.`);
 } else {
   say("\nDry run - nothing written. Review the diffs above, then re-run with --apply.");
 }
