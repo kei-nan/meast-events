@@ -1,0 +1,10 @@
+# Files written by scripts rather than by hand. GitHub collapses their diffs by
+# default; the reviewable source is the script or the curated file named here.
+app/src/lib/dataVersion.js linguist-generated=true
+data/boundaries.json linguist-generated=true
+data/corrections-geometry.json linguist-generated=true
+app/src/data/land.json linguist-generated=true
+data/event-candidates.json linguist-generated=true
+data/enriched-candidates.json linguist-generated=true
+data/events.proposed.json linguist-generated=true
+data/selection-funnel.json linguist-generated=true

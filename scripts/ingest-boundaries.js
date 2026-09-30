@@ -12,6 +12,7 @@
 // properties, so the generated file is self-documenting about what came from where.
 import { readFile, writeFile } from "node:fs/promises";
 import { CORRECTIONS } from "./boundary-corrections.js";
+import { stringifyFeatureCollection } from "./lib/json-lines.js";
 
 const CSHAPES_CITATION = "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)";
 
@@ -199,7 +200,7 @@ async function main() {
     features,
   };
 
-  await writeFile(outPath, JSON.stringify(out));
+  await writeFile(outPath, stringifyFeatureCollection(out));
   console.log(`Wrote ${features.length} boundary features to data/boundaries.json`);
 
   const modified = features.filter((f) => f.properties.note);

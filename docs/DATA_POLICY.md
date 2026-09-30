@@ -215,7 +215,7 @@ node scripts/refresh-extracts.js [--apply] [--proposed] # quarterly lead refresh
 node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json
 node scripts/lib/verify-sample.js                       # -> data/import-verification-sample.md
 node scripts/validate-events.js                         # schema/ids/dates/coordinates (runs in CI)
-node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json AND app/src/data/events.json
+node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.

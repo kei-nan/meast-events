@@ -10,8 +10,8 @@
 //
 // Rules: the lead text is Wikipedia's, only whitespace-normalised (lib/lead.js). `extract_retrieved_at` is set
 // to today only when the text changed OR when the lead was re-checked and is identical (so the date always means
-// "as of this date the stored text matched Wikipedia"). With --apply the curated file AND its app copy
-// (app/src/data/events.json) are written identically. Nothing else in an event is touched.
+// "as of this date the stored text matched Wikipedia"). With --apply the curated file is
+// written. Nothing else in an event is touched.
 import { readFile, writeFile } from "node:fs/promises";
 import { fetchLeads, titleFromWikipediaUrl } from "./lib/lead.js";
 
@@ -24,7 +24,6 @@ const REPORT = arg("report");
 const today = new Date().toISOString().slice(0, 10);
 
 const curatedUrl = new URL("../data/events.json", import.meta.url);
-const appUrl = new URL("../app/src/data/events.json", import.meta.url);
 const proposedUrl = new URL("../data/events.proposed.json", import.meta.url);
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
 
@@ -103,9 +102,8 @@ for (const [name, r] of [["curated", res], ...(propRes ? [["proposed", propRes.r
 if (APPLY) {
   const text = JSON.stringify(curated, null, 2) + "\n";
   await writeFile(curatedUrl, text);
-  await writeFile(appUrl, text);
   if (propRes) await writeFile(proposedUrl, JSON.stringify(propRes.events, null, 2) + "\n");
-  say(`\nAPPLIED: wrote data/events.json and app/src/data/events.json${propRes ? " and data/events.proposed.json" : ""}. extract_retrieved_at = ${today}.`);
+  say(`\nAPPLIED: wrote data/events.json${propRes ? " and data/events.proposed.json" : ""}. extract_retrieved_at = ${today}.`);
 } else {
   say("\nDry run - nothing written. Review the diffs above, then re-run with --apply.");
 }

@@ -1,5 +1,9 @@
 node_modules/
 dist/
+
+# Generated from data/ by app/scripts/split-data.mjs on every dev start and build
+# (including Cloudflare's), so it is not committed.
+app/public/data/
 .vite/
 
 # Secrets - server/.env would hold a real Redis connection string (with

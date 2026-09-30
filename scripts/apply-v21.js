@@ -5,7 +5,7 @@
 //   category/category_group  OUR coarse grouping (unchanged values); category_label removed
 //   location_quality      precise | approximate (capital fallback pin) | none (no coordinates, never invented)
 //   date_flags / review_reasons  flags only; verified fixes come from scripts/lib/fixes.js (docs/data-fixes.md)
-// Ids are never changed. Dry-run by default; --apply writes data/events.json and app/src/data/events.json.
+// Ids are never changed. Dry-run by default; --apply writes data/events.json.
 //   node scripts/apply-v21.js [--apply] [--cache-dir=...]
 import { readFile, writeFile } from "node:fs/promises";
 import { buildContext } from "./lib/context.js";
@@ -14,7 +14,6 @@ import { validateEvents } from "./lib/validate.js";
 
 const APPLY = process.argv.includes("--apply");
 const dataUrl = (n) => new URL(`../data/${n}`, import.meta.url);
-const appUrl = new URL("../app/src/data/events.json", import.meta.url);
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
 
 const events = await read(dataUrl("events.json"));
@@ -61,6 +60,5 @@ if (v.errors.length) {
 if (APPLY) {
   const text = JSON.stringify(out, null, 2) + "\n";
   await writeFile(dataUrl("events.json"), text);
-  await writeFile(appUrl, text);
-  console.log(`Wrote data/events.json and app/src/data/events.json (${out.length} events).`);
+  console.log(`Wrote data/events.json (${out.length} events).`);
 } else console.log("Dry run - nothing written. Use --apply.");
