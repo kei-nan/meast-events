@@ -56,7 +56,37 @@ DATA_FIXES.push({
     'and the Wikipedia lead says "The conflict was sparked in 2004" (checked 2026-09-29). date_start = P580, day unknown',
 });
 
-export const FIXES_BY_QID = new Map(DATA_FIXES.map((f) => [f.qid, f]));
+// F6: Wikidata P585 ("point in time") is the battle's END, later than the item's own P582, so the
+// pipeline's COALESCE(P585, P580) start came out after the end. In all three the Wikipedia infobox
+// start equals Wikidata P580 and the infobox end equals Wikidata P585 (checked live 2026-10-01).
+DATA_FIXES.push(
+  {
+    qid: "Q17286795",
+    ref: "F6",
+    set: { date_start: "2014-06-26", date_end: "2014-07-21" },
+    note:
+      "First Battle of Tikrit: stored start 2014-07-21 was Wikidata P585, after P582 2014-06-30. Wikipedia infobox " +
+      '"26 June – 21 July 2014" = Wikidata P580 (2014-06-26) and P585 (2014-07-21). Dates = the infobox',
+  },
+  {
+    qid: "Q19926256",
+    ref: "F6",
+    set: { date_start: "2015-05-13", date_end: "2015-05-26" },
+    note:
+      "Palmyra offensive (May 2015): stored start 2015-05-26 was Wikidata P585, after P582 2015-05-25. Wikipedia infobox " +
+      '"13–26 May 2015" = Wikidata P580 (2015-05-13) and P585 (2015-05-26). Dates = the infobox',
+  },
+  {
+    qid: "Q24205448",
+    ref: "F6",
+    set: { date_start: "2016-05-22", date_end: "2016-06-29" },
+    note:
+      "Third Battle of Fallujah: stored start 2016-06-29 was Wikidata P585, after P582 2016-06-26. Wikipedia infobox " +
+      '"22 May – 29 June 2016" = Wikidata P580 (2016-05-22) and P585 (2016-06-29). Dates = the infobox',
+  }
+);
+
+export const FIXES_BY_QID =new Map(DATA_FIXES.map((f) => [f.qid, f]));
 
 // Applies the ledger entry for event.wikidata_qid (if any). Returns the changed field names.
 export function applyDataFix(event) {
