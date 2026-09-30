@@ -14,30 +14,29 @@ test("every event has exactly one framing review and no review is orphaned", () 
   assert.deepEqual([...reviewed].filter((id) => !ids.has(id)), []);
 });
 
-test("every finding is a wording point citing a guideline or a fairness judgement, and explains itself", () => {
+test("each summary has at most one concise fairness finding and wording points that cite a guideline", () => {
   for (const [id, r] of Object.entries(review.events)) {
-    assert.ok(Array.isArray(r.findings), `${id}: findings missing`);
-    for (const x of r.findings) {
-      assert.ok(x.kind === "wording" || x.kind === "fairness", `${id}: unknown kind ${x.kind}`);
-      if (x.kind === "wording") assert.ok(x.guideline in review.guidelines, `${id}: unknown guideline ${x.guideline}`);
+    if (r.fairness !== null) assert.ok(typeof r.fairness.note === "string" && r.fairness.note.length > 20, `${id}: fairness note missing or too short`);
+    assert.ok(Array.isArray(r.wording), `${id}: wording list missing`);
+    for (const x of r.wording) {
+      assert.ok(x.guideline in review.guidelines, `${id}: unknown guideline ${x.guideline}`);
       assert.ok(typeof x.note === "string" && x.note.length > 20, `${id}: note missing or too short`);
     }
-    assert.ok(r.findings.filter((x) => x.kind === "fairness").length <= 1, `${id}: fairness judgements are merged into one finding`);
   }
 });
 
 test("every quoted or highlighted phrase appears word for word in the text", () => {
   const byId = Object.fromEntries(events.map((e) => [e.id, e]));
   for (const [id, r] of Object.entries(review.events)) {
-    for (const x of r.findings) {
-      for (const p of x.kind === "wording" ? [x.phrase] : x.phrases ?? []) assert.ok(byId[id].extract.includes(p), `${id}: "${p}" not in the text`);
+    for (const p of [...(r.fairness?.phrases ?? []), ...r.wording.map((x) => x.phrase)]) {
+      assert.ok(byId[id].extract.includes(p), `${id}: "${p}" not in the text`);
     }
   }
 });
 
 test("no score or side is published", () => {
   for (const [id, r] of Object.entries(review.events)) {
-    for (const k of ["rating", "leans", "reason", "highlights", "observations", "first_review", "second_look"]) assert.ok(!(k in r), `${id}: old field ${k}`);
+    for (const k of ["rating", "leans", "reason", "highlights", "observations", "first_review", "second_look", "findings", "fairness_note"]) assert.ok(!(k in r), `${id}: old field ${k}`);
   }
 });
 

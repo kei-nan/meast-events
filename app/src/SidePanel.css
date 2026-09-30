@@ -533,7 +533,9 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail {
-  --fr-mark: #e0914f;
+  --fr-wording: #e0914f;
+  --fr-fairness: #c3a1f0;
+  --fr-mark: var(--fr-wording);
 }
 
 .framing-pointer {
@@ -577,14 +579,25 @@ button.sp-chip[aria-pressed="true"] {
   box-decoration-break: clone;
 }
 
+.framing-mark--wording { --fr-mark: var(--fr-wording); }
+
+.framing-mark--fairness { --fr-mark: var(--fr-fairness); }
+
+/* Flagged by both review types: fairness tint with the wording underline. */
+.framing-mark--fairness.framing-mark--wording {
+  background: color-mix(in srgb, var(--fr-fairness) 32%, transparent);
+  text-decoration-color: var(--fr-wording);
+}
+
 .framing-mark:focus-visible,
-.framing-review:focus-visible {
+.framing-review:focus-visible,
+.fr-tab:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
 }
 
 .framing-review {
-  margin: 4px 0 16px;
+  margin: 16px 0;
   padding: 12px 14px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -615,52 +628,76 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 68ch;
 }
 
-.framing-review--found {
-  border-left: 4px solid var(--fr-mark);
+.fr-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
 }
 
-.framing-review .fr-summary {
-  display: inline-block;
-  margin: 0 0 10px;
-  padding: 2px 10px;
-  border: 1px solid var(--text-tertiary);
-  border-radius: 999px;
-  font-size: 0.78rem;
+/* A review that found nothing is a quiet grey tab; one that found something is coloured. */
+.fr-tab {
+  --tab-color: var(--text-tertiary);
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 10px 8px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fr-tab--wording.fr-tab--found { --tab-color: var(--fr-wording); }
+.fr-tab--fairness.fr-tab--found { --tab-color: var(--fr-fairness); }
+
+.fr-tab--found {
+  border-color: color-mix(in srgb, var(--tab-color) 55%, var(--border));
+  border-top-color: var(--tab-color);
+  background: color-mix(in srgb, var(--tab-color) 12%, transparent);
+  color: var(--text-primary);
+}
+
+.fr-tab[aria-selected="true"] {
+  border-color: var(--tab-color);
+  box-shadow: 0 0 0 1px var(--tab-color);
+}
+
+.fr-tab:not([aria-selected="true"]):hover {
+  background: color-mix(in srgb, var(--tab-color) 18%, transparent);
+}
+
+.fr-tab-name {
+  display: block;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-tertiary);
 }
 
-.framing-review--found .fr-summary {
-  border-color: var(--fr-mark);
-  background: color-mix(in srgb, var(--fr-mark) 16%, transparent);
-  color: var(--fr-mark);
-}
-
-.fr-kind {
-  display: inline-block;
-  margin-right: 2px;
-  padding: 0 6px;
-  border-radius: 3px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  vertical-align: 1px;
-}
-
-.fr-finding--wording .fr-kind {
-  background: color-mix(in srgb, #e0914f 22%, transparent);
-  color: #e0914f;
-}
-
-.fr-finding--fairness .fr-kind {
-  background: color-mix(in srgb, #b996e0 22%, transparent);
-  color: #b996e0;
-}
-
-.framing-review .fr-legend {
+.fr-tab-status {
+  display: block;
   font-size: 0.75rem;
-  color: var(--text-tertiary);
+}
+
+.fr-tab--found .fr-tab-status {
+  color: var(--tab-color);
+  font-weight: 600;
+}
+
+.fr-panel {
+  --panel-color: var(--border);
+  border-left: 3px solid var(--panel-color);
+  padding-left: 11px;
+  margin-bottom: 10px;
+}
+
+.fr-panel--wording.fr-panel--found { --panel-color: var(--fr-wording); }
+.fr-panel--fairness.fr-panel--found { --panel-color: var(--fr-fairness); }
+
+.framing-review .fr-method {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
 }
 
 .fr-nothing {
@@ -669,8 +706,7 @@ button.sp-chip[aria-pressed="true"] {
 
 .framing-obs {
   margin: 0 0 10px;
-  padding-left: 0;
-  list-style: none;
+  padding-left: 18px;
   max-width: 68ch;
 }
 

@@ -193,19 +193,21 @@ function framingFor(review, e) {
   const text = e.extract ?? "";
   const sha1 = createHash("sha1").update(text).digest("hex").slice(0, 12);
   const stale = r.text_sha1 !== sha1;
-  // One list of findings: "wording" ones cite a Wikipedia guideline, "fairness" ones are
-  // the reviewer's judgement of emphasis, balance and omissions.
-  const findings = (r.findings ?? []).map((x) => {
-    if (x.kind === "fairness") return { kind: "fairness", note: x.note, phrases: x.phrases ?? [] };
+  // Two review types, shown in separate tabs: "fairness" is the reviewer's judgement of
+  // emphasis, balance and omissions; "wording" findings each cite a Wikipedia guideline.
+  const wording = (r.wording ?? []).map((x) => {
     const g = review.guidelines[x.guideline];
-    if (x.kind !== "wording" || !g) throw new Error(`framing review ${e.id}: bad finding ${x.kind}/${x.guideline}`);
-    return { kind: "wording", guideline: x.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: x.phrase, note: x.note };
+    if (!g) throw new Error(`framing review ${e.id}: unknown guideline ${x.guideline}`);
+    return { guideline: x.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: x.phrase, note: x.note };
   });
-  const phrases = findings.flatMap((x) => (x.kind === "wording" ? [x.phrase] : x.phrases));
+  // Phrases are only marked in the exact text that was reviewed.
+  const marks = (list) => (stale ? [] : list.filter((p) => text.includes(p)));
+  const fairnessMarks = marks(r.fairness?.phrases ?? []);
+  const wordingMarks = marks(wording.map((x) => x.phrase));
   return {
-    findings,
-    // Phrases are only marked in the exact text that was reviewed.
-    highlights: stale ? [] : phrases.filter((p) => text.includes(p)),
+    fairness: { found: !!r.fairness, note: r.fairness?.note ?? null, highlights: fairnessMarks },
+    wording: { found: wording.length > 0, findings: wording, highlights: wordingMarks },
+    highlights: [...fairnessMarks.map((t) => ({ text: t, kind: "fairness" })), ...wordingMarks.map((t) => ({ text: t, kind: "wording" }))],
     category_note: r.category_note ?? null,
     data_note: r.data_note ?? null,
     disclosure: r.disclosure ?? null,
@@ -222,16 +224,15 @@ async function splitEvents() {
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
-  const framingCounts = { guideline: {}, fairness: 0, with_findings: 0, stale: 0, missing: 0 };
+  const framingCounts = { guideline: {}, fairness: 0, with_wording: 0, with_findings: 0, stale: 0, missing: 0 };
   for (const e of allEvents) {
     const framing = framingFor(review, e);
     if (review && !framing) framingCounts.missing++;
     if (framing) {
-      for (const x of framing.findings) {
-        if (x.kind === "wording") framingCounts.guideline[x.guideline] = (framingCounts.guideline[x.guideline] ?? 0) + 1;
-        else framingCounts.fairness++;
-      }
-      if (framing.findings.length) framingCounts.with_findings++;
+      for (const x of framing.wording.findings) framingCounts.guideline[x.guideline] = (framingCounts.guideline[x.guideline] ?? 0) + 1;
+      if (framing.fairness.found) framingCounts.fairness++;
+      if (framing.wording.found) framingCounts.with_wording++;
+      if (framing.fairness.found || framing.wording.found) framingCounts.with_findings++;
       if (framing.stale) framingCounts.stale++;
     }
     fullBuckets[fullBucket(e.id)][e.id] = {

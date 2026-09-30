@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import FramingReview, { FramingPointer } from "./FramingReview.jsx";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
+import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 
 function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
@@ -16,6 +17,8 @@ function historyUrl(wikipediaUrl) {
 export default function EventDetail({ event, onBack }) {
   const headingRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
+  const [chosenTab, setChosenTab] = useState(null);
 
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
@@ -38,6 +41,14 @@ export default function EventDetail({ event, onBack }) {
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
   const flags = (event.date_flags ?? []).filter(Boolean);
   const paragraphs = (event.extract ?? "").split(/\n+/).filter((p) => p.trim());
+  const review = event.framing_review;
+  const reviewTab = chosenTab?.id === event.id ? chosenTab.tab : defaultReviewTab(review);
+  const openTab = (tab) => setChosenTab({ id: event.id, tab });
+  // A highlight opens the tab of the review that flagged it (the fairness tab if both did).
+  const showFinding = (kinds) => {
+    openTab(REVIEW_TABS.find((t) => kinds.includes(t)) ?? reviewTab);
+    showReview();
+  };
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
 
   async function copyLink() {
@@ -85,23 +96,22 @@ export default function EventDetail({ event, onBack }) {
         {paragraphs.length ? (
           paragraphs.map((p, i) => (
             <p key={i}>
-              {markSegments(p, event.framing_review?.highlights).map((s, j) =>
+              {markSegments(p, review?.highlights).map((s, j) =>
                 s.flagged ? (
                   <mark
                     key={j}
-                    className="framing-mark"
+                    className={`framing-mark ${s.kinds.map((k) => `framing-mark--${k}`).join(" ")}`}
                     tabIndex={0}
                     role="button"
-                    aria-describedby="framing-review-findings"
                     title="Flagged by our framing review. Select to read why."
-                    onClick={showReview}
+                    onClick={() => showFinding(s.kinds)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        showReview();
+                        showFinding(s.kinds);
                       }
                     }}
-                    aria-label={`Flagged phrase: ${s.text}`}
+                    aria-label={`Flagged by the ${s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ")}: ${s.text}`}
                   >
                     {s.text}
                   </mark>
@@ -128,7 +138,7 @@ export default function EventDetail({ event, onBack }) {
       {retrieved && (
         <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
       )}
-      <FramingReview event={event} />
+      <FramingReview event={event} tab={reviewTab} onTab={openTab} />
       {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its

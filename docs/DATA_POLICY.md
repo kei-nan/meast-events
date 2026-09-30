@@ -12,9 +12,9 @@ rather than a second layer of ours. Concretely:
   with evidence in `docs/data-fixes.md`.
 - There is **no per-event editorial decision about content or inclusion**. What is included follows from the published rule below.
 - We never invent coordinates and never edit Wikipedia or Wikidata.
-- In addition, the project publishes a **separately labelled framing review** of each summary (`data/framing-review.json`: one list of
-  findings per summary, either wording that departs from Wikipedia's own neutrality and wording guidelines, quoting the words and
-  naming the guideline, or a labelled fairness judgement of emphasis and omissions), produced by an AI model with the published method in
+- In addition, the project publishes a **separately labelled framing review** of each summary (`data/framing-review.json`: two separate
+  reviews per summary, a labelled overall-fairness judgement of emphasis and omissions, and a wording check that quotes wording
+  departing from Wikipedia's own neutrality and wording guidelines and names the guideline), produced by an AI model with the published method in
   `docs/framing-review.md`. There is no score and no verdict on which side a summary favours. It is our reading, not Wikipedia's and
   not a correction. It never alters, hides or reorders the extract, it is shown for every event (including those where nothing was
   found), and readers can contest it; re-reviews are recorded in the file's history. This is the one per-event judgement the project
