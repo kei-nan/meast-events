@@ -93,6 +93,10 @@ jobs:
       - name: Validate events
         run: node scripts/validate-events.js
 
+      # Pure-logic tests for the data pipeline (fix ledger, validator).
+      - name: Unit tests (scripts/lib)
+        run: node --test scripts/lib/*.test.js
+
   audit:
     name: Dependency audit (${{ matrix.dir }})
     runs-on: ubuntu-latest
