@@ -190,15 +190,20 @@ async function loadFramingReview() {
 function framingFor(review, e) {
   const r = review?.events?.[e.id];
   if (!r) return null;
-  const sha1 = createHash("sha1").update(e.extract ?? "").digest("hex").slice(0, 12);
+  const text = e.extract ?? "";
+  const sha1 = createHash("sha1").update(text).digest("hex").slice(0, 12);
   const stale = r.text_sha1 !== sha1;
+  const observations = (r.observations ?? []).map((o) => {
+    const g = review.guidelines[o.guideline];
+    if (!g) throw new Error(`framing review ${e.id}: unknown guideline ${o.guideline}`);
+    return { guideline: o.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: o.phrase, note: o.note };
+  });
   return {
+    observations,
     // Phrases are only marked in the exact text that was reviewed.
-    highlights: stale ? [] : (r.highlights ?? []).filter((h) => (e.extract ?? "").includes(h)),
-    rating: r.rating,
-    rating_label: review.ratings[String(r.rating)],
-    leans: r.leans ?? null,
-    reason: r.reason,
+    highlights: stale ? [] : observations.map((o) => o.phrase).filter((p) => text.includes(p)),
+    reviewer_note: r.reviewer_note ?? null,
+    second_look: r.second_look === true,
     category_note: r.category_note ?? null,
     data_note: r.data_note ?? null,
     disclosure: r.disclosure ?? null,
@@ -215,13 +220,15 @@ async function splitEvents() {
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
-  const framingCounts = { rating: {}, leans: {}, stale: 0, missing: 0 };
+  const framingCounts = { guideline: {}, with_observations: 0, with_note: 0, second_look: 0, stale: 0, missing: 0 };
   for (const e of allEvents) {
     const framing = framingFor(review, e);
     if (review && !framing) framingCounts.missing++;
     if (framing) {
-      framingCounts.rating[framing.rating] = (framingCounts.rating[framing.rating] ?? 0) + 1;
-      if (framing.leans) framingCounts.leans[framing.leans] = (framingCounts.leans[framing.leans] ?? 0) + 1;
+      for (const o of framing.observations) framingCounts.guideline[o.guideline] = (framingCounts.guideline[o.guideline] ?? 0) + 1;
+      if (framing.observations.length) framingCounts.with_observations++;
+      if (framing.reviewer_note) framingCounts.with_note++;
+      if (framing.second_look) framingCounts.second_look++;
       if (framing.stale) framingCounts.stale++;
     }
     fullBuckets[fullBucket(e.id)][e.id] = {
@@ -239,7 +246,8 @@ async function splitEvents() {
       reviewer: review.reviewer,
       reviewed_on: review.reviewed_on,
       rubric_version: review.rubric_version,
-      ratings: review.ratings,
+      total: allEvents.length,
+      guidelines: review.guidelines,
       counts: framingCounts,
     });
     console.log(
