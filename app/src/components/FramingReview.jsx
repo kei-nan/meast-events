@@ -1,29 +1,23 @@
-// Our two reviews of the Wikipedia summary (data/framing-review.json, docs/framing-review.md),
-// shown as two tabs above the text: the overall-fairness judgement (our first review, plus any
-// later note on emphasis or point of view) and the wording check against Wikipedia's own
-// guidelines. A tab is coloured when its
-// review found something and grey when it found nothing. Always boxed off from the text.
+// Our framing review of the Wikipedia summary (data/framing-review.json, docs/framing-review.md):
+// one list of findings. "Wording" findings cite Wikipedia's own guidelines; "fairness"
+// findings are the reviewer's judgement of emphasis, balance and omissions. Shown for every
+// event and always boxed off from the Wikipedia text it describes.
 
-import { useRef } from "react";
-import { REVIEW_TABS } from "../lib/reviewTabs.js";
+import { showReview } from "../lib/showReview.js";
 
 const REPO = "https://github.com/kei-nan/atlas-wiki";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 
 function contestUrl(event, review) {
   const title = `Framing review: ${event.title}`;
-  const w = review.wording;
-  const f = review.fairness;
+  const found = review.findings.map((x) =>
+    x.kind === "wording" ? `- Wording (${x.guideline_name}): "${x.phrase}"` : `- Fairness: ${x.note}`
+  );
   const body = [
     `Event: ${event.title} (${event.id})`,
+    found.length ? `Current findings:\n${found.join("\n")}` : "Current findings: none",
     "",
-    `Overall fairness, first review: ${f.first_found ? f.note : "nothing found"}`,
-    f.later_note ? `Overall fairness, later note: ${f.later_note}` : "",
-    "",
-    "Wording check:",
-    ...(w.observations.length ? w.observations.map((o) => `- ${o.guideline_name}: "${o.phrase}"`) : ["- nothing found"]),
-    "",
-    "Which review is wrong, and what shows it?",
+    "What is wrong with this review, and what shows it?",
     "",
   ].join("\n");
   return `${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=framing-review`;
@@ -31,128 +25,74 @@ function contestUrl(event, review) {
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
-function tabStatus(tab, r) {
-  if (!r.found) return "Nothing found";
-  if (tab === "wording") return plural(r.observations.length, "wording point", "wording points");
-  return "Issue found";
+// Short notice above the Wikipedia text, so nobody reads a flagged summary without knowing.
+// It says what was found, never how "biased" the summary is or toward whom.
+export function FramingPointer({ review }) {
+  const n = review?.findings.length ?? 0;
+  if (n === 0) return null;
+  return (
+    <p className="framing-pointer" role="note">
+      Our framing review found {plural(n, "issue", "issues")} in this summary.
+      {review.highlights.length > 0 && " The words in question are highlighted."}{" "}
+      <button type="button" className="framing-pointer-link" onClick={showReview}>
+        Read the review
+      </button>
+    </p>
+  );
 }
 
-const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };
-
-function WordingPanel({ r }) {
+function Finding({ x }) {
+  if (x.kind === "wording") {
+    return (
+      <li className="fr-finding fr-finding--wording">
+        <span className="fr-kind">Wording</span>{" "}
+        <a href={x.url} target="_blank" rel="noreferrer" title={`${x.shortcut} (opens in a new tab)`} className="framing-obs-guideline">
+          {x.guideline_name}
+        </a>
+        : <q>{x.phrase}</q>. {x.note}
+      </li>
+    );
+  }
   return (
-    <>
-      <p className="fr-method">
-        Checks the wording against Wikipedia&apos;s own neutrality and wording guidelines. Reviewed {r.reviewed_on}.
-      </p>
-      {r.observations.length > 0 ? (
-        <ul className="framing-obs">
-          {r.observations.map((o, i) => (
-            <li key={i}>
-              <a href={o.url} target="_blank" rel="noreferrer" title={`${o.shortcut} (opens in a new tab)`} className="framing-obs-guideline">
-                {o.guideline_name}
-              </a>
-              : <q>{o.phrase}</q>. {o.note}
-            </li>
+    <li className="fr-finding fr-finding--fairness">
+      <span className="fr-kind">Fairness</span> {x.note}
+    </li>
+  );
+}
+
+export default function FramingReview({ event }) {
+  const review = event.framing_review;
+  if (!review) return null;
+  const n = review.findings.length;
+  return (
+    <aside
+      id="framing-review"
+      className={`framing-review${n ? " framing-review--found" : ""}`}
+      aria-labelledby="framing-review-title"
+      tabIndex={-1}
+    >
+      <h3 id="framing-review-title">
+        Framing review <span className="framing-review-owner">our reading, not Wikipedia&apos;s</span>
+      </h3>
+      <p className="fr-summary">{n ? `${plural(n, "issue", "issues")} found` : "Nothing found"}</p>
+      {n > 0 ? (
+        <ul id="framing-review-findings" className="framing-obs">
+          {review.findings.map((x, i) => (
+            <Finding key={i} x={x} />
           ))}
         </ul>
       ) : (
-        <p className="fr-nothing">No wording found that Wikipedia&apos;s guidelines advise against.</p>
-      )}
-    </>
-  );
-}
-
-function FairnessPanel({ r }) {
-  return (
-    <>
-      <p className="fr-method">
-        Judges the summary&apos;s overall fairness (emphasis, balance, omissions and contested claims), using the
-        reviewer&apos;s general knowledge. A judgement, not a rule.
-      </p>
-      <p className="fr-dated">
-        <strong>First review ({r.reviewed_on}):</strong>{" "}
-        {r.first_found ? (
-          <>
-            {r.note}
-            {r.highlights.length > 0 && " The words in question are highlighted."}
-          </>
-        ) : (
-          <span className="fr-nothing">
-            No one-sided framing found.
-            {r.note ? ` ${r.note}` : ""}
-          </span>
-        )}
-      </p>
-      {r.later_note && (
-        <p className="fr-dated">
-          <strong>Later note ({r.later_on}):</strong> {r.later_note}
+        <p className="fr-nothing">
+          No one-sided framing found, and no wording that Wikipedia&apos;s own guidelines advise against.
         </p>
       )}
-    </>
-  );
-}
-
-export default function FramingReview({ event, tab, onTab }) {
-  const review = event.framing_review;
-  const tabRefs = useRef({});
-  if (!review) return null;
-
-  function onKeyDown(e) {
-    const i = REVIEW_TABS.indexOf(tab);
-    let next = null;
-    if (e.key === "ArrowRight") next = REVIEW_TABS[(i + 1) % REVIEW_TABS.length];
-    else if (e.key === "ArrowLeft") next = REVIEW_TABS[(i - 1 + REVIEW_TABS.length) % REVIEW_TABS.length];
-    else if (e.key === "Home") next = REVIEW_TABS[0];
-    else if (e.key === "End") next = REVIEW_TABS.at(-1);
-    if (!next) return;
-    e.preventDefault();
-    onTab(next);
-    tabRefs.current[next]?.focus();
-  }
-
-  const r = review[tab];
-  return (
-    <aside id="framing-review" className="framing-review" aria-labelledby="framing-review-title" tabIndex={-1}>
-      <h3 id="framing-review-title">
-        Framing review <span className="framing-review-owner">two reviews by us, not Wikipedia</span>
-      </h3>
-      <div className="fr-tabs" role="tablist" aria-labelledby="framing-review-title" onKeyDown={onKeyDown}>
-        {REVIEW_TABS.map((t) => (
-          <button
-            key={t}
-            ref={(el) => (tabRefs.current[t] = el)}
-            type="button"
-            role="tab"
-            id={`fr-tab-${t}`}
-            aria-selected={tab === t}
-            aria-controls="fr-panel"
-            tabIndex={tab === t ? 0 : -1}
-            className={`fr-tab fr-tab--${t}${review[t].found ? " fr-tab--found" : ""}`}
-            onClick={() => onTab(t)}
-          >
-            <span className="fr-tab-name">{TAB_NAMES[t]}</span>
-            <span className="fr-tab-status">{tabStatus(t, review[t])}</span>
-          </button>
-        ))}
-      </div>
-      <div
-        id="fr-panel"
-        role="tabpanel"
-        aria-labelledby={`fr-tab-${tab}`}
-        className={`fr-panel fr-panel--${tab}${r.found ? " fr-panel--found" : ""}`}
-      >
-        {tab === "wording" ? <WordingPanel r={r} /> : <FairnessPanel r={r} />}
-      </div>
-      {review.second_look && (
-        <p className="framing-review-flag">
-          The two reviews reached different conclusions on this summary, so it is marked for a second look by a
-          person.
-        </p>
-      )}
+      <p className="fr-legend">
+        <strong>Wording</strong> findings cite one of Wikipedia&apos;s own neutrality and wording guidelines.{" "}
+        <strong>Fairness</strong> findings are our judgement of emphasis, balance and what the summary leaves out.
+      </p>
       {review.stale && (
         <p className="framing-review-flag">
-          Wikipedia&apos;s text has changed since these reviews, so they may no longer apply.
+          Wikipedia&apos;s text has changed since this review ({review.reviewed_on}), so it may no longer apply.
         </p>
       )}
       {review.category_note && (
@@ -171,14 +111,15 @@ export default function FramingReview({ event, tab, onTab }) {
         </p>
       )}
       <p className="framing-review-meta">
-        Both reviews were made by Claude, an AI model made by Anthropic, and not checked line by line by a person.
-        Neither judges whether the events happened, and the Wikipedia text below is shown unchanged.{" "}
+        Reviewed {review.reviewed_on} by Claude, an AI model made by Anthropic, not checked line by line by a person.
+        It does not judge whether the events happened, and legal descriptions such as &ldquo;occupied&rdquo; or
+        &ldquo;illegal&rdquo; are not assessed. The text above is shown unchanged.{" "}
         <a href={METHOD_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
           How we review
         </a>{" "}
         ·{" "}
         <a href={contestUrl(event, review)} target="_blank" rel="noreferrer" title="Opens in a new tab">
-          Disagree with a review?
+          Disagree with this review?
         </a>
       </p>
     </aside>

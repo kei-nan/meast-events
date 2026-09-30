@@ -193,34 +193,19 @@ function framingFor(review, e) {
   const text = e.extract ?? "";
   const sha1 = createHash("sha1").update(text).digest("hex").slice(0, 12);
   const stale = r.text_sha1 !== sha1;
-  const observations = (r.observations ?? []).map((o) => {
-    const g = review.guidelines[o.guideline];
-    if (!g) throw new Error(`framing review ${e.id}: unknown guideline ${o.guideline}`);
-    return { guideline: o.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: o.phrase, note: o.note };
+  // One list of findings: "wording" ones cite a Wikipedia guideline, "fairness" ones are
+  // the reviewer's judgement of emphasis, balance and omissions.
+  const findings = (r.findings ?? []).map((x) => {
+    if (x.kind === "fairness") return { kind: "fairness", note: x.note, phrases: x.phrases ?? [] };
+    const g = review.guidelines[x.guideline];
+    if (x.kind !== "wording" || !g) throw new Error(`framing review ${e.id}: bad finding ${x.kind}/${x.guideline}`);
+    return { kind: "wording", guideline: x.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: x.phrase, note: x.note };
   });
-  // Phrases are only marked in the exact text that was reviewed.
-  const marks = (phrases) => (stale ? [] : phrases.filter((p) => text.includes(p)));
-  const first = r.first_review ?? { found: false, note: null };
+  const phrases = findings.flatMap((x) => (x.kind === "wording" ? [x.phrase] : x.phrases));
   return {
-    // Two reviews with different methods, shown as two tabs on the event page.
-    // Judgement about emphasis and point of view is all in "fairness": the first review's
-    // finding, plus any note added during the later wording check.
-    fairness: {
-      found: first.found === true || !!r.fairness_note,
-      first_found: first.found === true,
-      note: first.note ?? null,
-      reviewed_on: review.first_review?.reviewed_on ?? null,
-      later_note: r.fairness_note ?? null,
-      later_on: review.reviewed_on,
-      highlights: marks(first.phrases ?? []),
-    },
-    wording: {
-      found: observations.length > 0,
-      observations,
-      highlights: marks(observations.map((o) => o.phrase)),
-      reviewed_on: review.reviewed_on,
-    },
-    second_look: r.second_look === true,
+    findings,
+    // Phrases are only marked in the exact text that was reviewed.
+    highlights: stale ? [] : phrases.filter((p) => text.includes(p)),
     category_note: r.category_note ?? null,
     data_note: r.data_note ?? null,
     disclosure: r.disclosure ?? null,
@@ -237,16 +222,16 @@ async function splitEvents() {
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
-  const framingCounts = { guideline: {}, with_observations: 0, fairness_found: 0, second_look: 0, stale: 0, missing: 0 };
+  const framingCounts = { guideline: {}, fairness: 0, with_findings: 0, stale: 0, missing: 0 };
   for (const e of allEvents) {
     const framing = framingFor(review, e);
     if (review && !framing) framingCounts.missing++;
     if (framing) {
-      const w = framing.wording;
-      for (const o of w.observations) framingCounts.guideline[o.guideline] = (framingCounts.guideline[o.guideline] ?? 0) + 1;
-      if (w.observations.length) framingCounts.with_observations++;
-      if (framing.fairness.found) framingCounts.fairness_found++;
-      if (framing.second_look) framingCounts.second_look++;
+      for (const x of framing.findings) {
+        if (x.kind === "wording") framingCounts.guideline[x.guideline] = (framingCounts.guideline[x.guideline] ?? 0) + 1;
+        else framingCounts.fairness++;
+      }
+      if (framing.findings.length) framingCounts.with_findings++;
       if (framing.stale) framingCounts.stale++;
     }
     fullBuckets[fullBucket(e.id)][e.id] = {

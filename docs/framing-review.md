@@ -1,38 +1,26 @@
 # Framing review: how we check the Wikipedia summaries
 
-Every event on the map shows the lead section of its English Wikipedia article, unchanged. Above that text the event page shows a **framing review**: two reviews made with different methods, as two tabs. The **wording check** points out where the summary's wording departs from **Wikipedia's own neutrality and wording guidelines**; the **overall fairness** review judges whether the summary tells the event from one side. This page explains the method, who applied it, what changed, and how to challenge a review.
+Every event on the map shows the lead section of its English Wikipedia article, unchanged. Below that text the event page shows a **framing review**: one list of findings about how the summary is written, with the words in question highlighted in the text. This page explains how findings are made, who made them, and how to challenge one.
 
 ## What it is and is not
 
-- It reviews **how the summary is written, not whether the events happened**. Neither review says who was to blame.
-- The wording check uses **Wikipedia's rules, not ours**. Each flag names the guideline it relies on and links to it, so anyone can check whether the rule was applied fairly. The overall fairness review is a judgement, and is labelled as one.
-- There is **no score and no verdict on which side a summary favours**. A review lists what it found; readers judge what it means.
+- It reviews **how the summary is written, not whether the events happened**. It does not say who was to blame.
+- There is **no score and no verdict on which side a summary favours**. The review lists what it found; readers judge what it means.
 - It **never changes, hides or reorders** the Wikipedia text. The text is shown exactly as Wikipedia gives it, and the review sits in a separate, labelled box.
 - It is shown for **every** event, including the ones where nothing was found. Research on warning labels finds that when only some items carry a label, readers tend to treat the unlabelled ones as checked and accurate ([Pennycook et al., 2020](https://pubsonline.informs.org/doi/10.1287/mnsc.2019.3478)), so a "nothing found" result is shown as deliberately as a flag.
 
-## Two review methods
+## Two kinds of finding
 
-Every summary has been reviewed twice, with two different methods that ask different questions:
+Each finding is one of two kinds, labelled on the page:
 
-- **The first review (27 September 2026)** judged each summary's overall fairness: emphasis, balance, what it leaves out, and contested claims stated as fact, using the reviewer's general knowledge. It catches one-sidedness that is not in any single word.
-- **The current review (30 September 2026)** checks only the wording, against Wikipedia's own written guidelines (Part 1 below). It is consistent and checkable, but it cannot see emphasis or omission.
+- **Wording**: the summary's wording departs from one of **Wikipedia's own neutrality and wording guidelines**. The finding names the guideline and links to it, so anyone can check whether it was applied fairly.
+- **Fairness**: our **judgement** of what no word list can catch, such as emphasis, a story told only from one side, or what the summary leaves out. There is at most one per summary.
 
-Both are shown on every event page, each in its own tab ("Overall fairness" first, then "Wording check"). A tab is coloured when its review found something and grey when it found nothing, so both results are visible at a glance. The page opens on the first tab whose review found something.
+The review combines two passes over every summary: a judgement of overall fairness (27 September 2026) and a check of the wording against Wikipedia's guidelines (30 September 2026). Their results are merged into one list: where both passes found the same problem it appears once, as a wording finding, and anything only one pass caught is kept.
 
-- **Where the wording check finds nothing but the first review found a problem, the first review's finding stands**; the page opens on its tab.
-- Where the wording check flags something the first review did not, the summary is marked for a second look by a person.
+## Wording findings
 
-Disagreement between the two is expected, because they look for different things. It is not one method contradicting itself.
-
-## Who reviewed it
-
-All 571 summaries were reviewed on 30 September 2026 by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so.
-
-The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
-
-## Part 1: wording points (Wikipedia's guidelines)
-
-A wording point is flagged only when the words are **in Wikipedia's own voice**. Words inside a quotation, or attributed to someone ("Israel said", "according to Human Rights Watch", "described by Qatar as"), are not flagged: attribution is exactly what the guidelines ask for.
+A wording finding is made only when the words are **in Wikipedia's own voice**. Words inside a quotation, or attributed to someone ("Israel said", "according to Human Rights Watch", "described by Qatar as"), are not flagged: attribution is exactly what the guidelines ask for.
 
 | Guideline | What is flagged |
 |---|---|
@@ -43,43 +31,38 @@ A wording point is flagged only when the words are **in Wikipedia's own voice**.
 | [Puffery](https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Puffery) (MOS:PUFFERY) | Listed praise words (*remarkable*, *celebrated*) applied to one party. |
 | [Avoid stating opinions as facts](https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view#Explanation) (WP:YESPOV) | A contested characterisation of what an event *is* (genocide, ethnic cleansing, revolution or coup) stated in Wikipedia's own voice. The note says what the summary itself does about the dispute: whether it attributes the characterisation to anyone, and whether it gives the other side's position. |
 
-Deciding which characterisations are contested for the last row uses the reviewer's general knowledge; the note itself only describes what the text says.
+Deciding which characterisations are contested uses the reviewer's general knowledge; the note itself only describes what the text says. The guidelines' word lists are examples, not complete lists; to keep the review predictable, only the words they name, and their direct variants, are flagged. Words such as *liberation*, *regime*, *murdered* or *neo-fascist* can feel loaded but are not on the lists, so they are not flagged as wording (a fairness finding may still mention them).
 
-The lists in these guidelines are examples, not complete lists. To keep the review predictable, only the words the guidelines name, and their direct variants, are flagged. Words such as *liberation*, *regime*, *murdered* or *neo-fascist* can feel loaded but are not on the lists, so they are not flagged.
+## Fairness findings
 
-**Not checked:**
+A fairness finding covers one-sidedness that is not in any single listed word: emphasis, whose point of view a story is told from, contested claims about two parties treated differently, or something important left out. It is labelled as a judgement. Some fairness findings draw on the reviewer's general knowledge (for example, which death tolls most sources give) and may say so.
+
+## Not judged
 
 - **Legal descriptions** such as *occupied*, *annexed* or *illegal*. Deciding whether they are right is a legal question, not a wording one.
-- **Plain factual claims**, including claims about who did what and why. Judging whether a fact is true or disputed is outside the review.
+- **Whether a fact is true.** A fairness finding may point out that a contested claim is stated as fact, but the review does not settle the dispute.
 - **Names of other events.** "During the Armenian genocide" or "the Gaza genocide" used as the name of another event is not re-judged; that label is reviewed in the other event's own entry.
 - **Vague attributions** ("it is believed", "has been described as"). Wikipedia's guideline on [unsupported attributions](https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Unsupported_attributions) is about vague sourcing rather than taking sides, and applying it would flag hundreds of ordinary sentences.
 
-## Part 2: overall fairness (judgement)
+## Who reviewed it
 
-Some one-sidedness is not in any single word: a battle told entirely from one army's side, or contested claims about two parties treated differently. All such judgement is in the **"Overall fairness"** tab, never in the wording check, and it is labelled as a judgement rather than a rule. The tab shows:
-
-- **The first review's finding** for every summary, in its original wording, with the words it highlighted.
-- **A later note** (9 summaries), added during the wording check when the reviewer saw one-sidedness that no guideline covers. A later note must point to something in the text itself (for example "the Iraqi side appears only as the target") and is not highlighted. Each entry is dated, so it is clear which review said what. Unlike the wording check, the first review drew on outside knowledge (for example, which death tolls most sources give), so its findings can contain such claims. Its 0-3 scores and "leans toward" labels are not shown.
-
-## Second look
-
-Where the current review flags something that the first review did not (59 summaries), the review box says the summary was reviewed with two different methods that reached different conclusions, and that it is **marked for a second look by a person**.
+All 571 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
 
 ## How it shows on the event page
 
-- **The review box sits above the text**, with one tab per review. Each tab shows its status ("3 wording points", "Issue found" or "Nothing found"), coloured when something was found and grey when nothing was. It never says how biased a summary is or toward whom.
-- **The quoted words are highlighted** inside the Wikipedia text, in the colour of the selected tab: the wording check's phrases in orange, the overall fairness review's in lavender. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
-- **The overall fairness tab** gives the first review's finding and any later note, each dated. **The wording check tab** lists each wording point with its guideline, the quoted words and a one-line note. Below the tabs come the second-look marker and any category note, data note or disclosure.
+- **A short notice above the text** says how many issues were found and that the words are highlighted, with a link to the review. It never says how biased a summary is or toward whom.
+- **The words in question are highlighted** in the Wikipedia text. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
+- **The review box below the text** shows "N issues found" (or "Nothing found") and lists each finding with its kind: wording findings with the guideline, the quoted words and a one-line note; the fairness finding as a short note. Any category note, data note or disclosure follows.
 
 ## Results
 
 | | Summaries |
 |---|---|
-| Wording check: at least one wording point | 78 |
-| Overall fairness: issue found | 79 (9 of them also have a later note) |
-| Marked for a second look | 59 |
+| At least one finding | 136 of 571 |
+| With a wording finding | 78 |
+| With a fairness finding | 68 |
 
-| Guideline | Wording points |
+| Guideline | Wording findings |
 |---|---|
 | Contentious labels | 46 |
 | Synonyms for "said" | 19 |
@@ -88,17 +71,7 @@ Where the current review flags something that the first review did not (59 summa
 | Expressions of doubt | 4 |
 | Puffery | 1 |
 
-We no longer publish counts of which side the flags favour; see *History* for why.
-
-## History
-
-- **27 September 2026 (version 1, the first review; its scores and side counts are withdrawn, its findings are kept where the current review finds nothing).** Each summary got a 0-3 rating, a direction ("leans toward …") and a one-sentence reason, based on the reviewer's overall judgement, including outside knowledge of what courts, historians and governments hold. Results: 492 rated 0, 68 rated 1, 8 rated 2, 3 rated 3. We published that of the 153 Israel/Palestine summaries, 34 were flagged, 28 of them leaning toward the Palestinian side and 1 toward the Israeli side.
-- **30 September 2026 (version 3, current).** Version 1 was withdrawn for two reasons:
-  - **Some reasons made claims about the outside world that went beyond the sources.** For example, one described the 2024 ICJ advisory opinion as treating Gaza as still occupied; the opinion's actual wording is that Israel's obligations under the law of occupation remain "commensurate with the degree of its effective control over the Gaza Strip".
-  - **The side counts depended heavily on the rules chosen.** Re-reviewing all summaries under wording-only rules (an unpublished version 2) changed 92 of 571 ratings. The Israel/Palestine split moved from 28 to 1 to 13 to 9; it would have been about 13 to 1 without the rule on "terrorist". A figure that moves this much with reasonable rule changes says more about the rules than about Wikipedia, so it is no longer published.
-
-  Version 3 checks wording against Wikipedia's own guidelines instead, with judgement confined to separately labelled notes.
-- **30 September 2026 (the two reviews combined).** Rather than drop the first review's findings on the 51 summaries where the current review found nothing, those findings stand. Both reviews are now shown for every summary, as two tabs (see *Two review methods*). This resolved their second-look marker; 59 remain marked.
+We do not publish counts of which side the findings favour. An earlier version (27 September 2026) did: it rated each summary 0-3 with a direction and reported that of 153 Israel/Palestine summaries, 34 were flagged, 28 of them leaning toward the Palestinian side and 1 toward the Israeli side. That figure was withdrawn because it depended heavily on the rules chosen (under reasonable alternative rules it moved to 13 to 9), so it said more about the rules than about Wikipedia.
 
 ## Limits
 

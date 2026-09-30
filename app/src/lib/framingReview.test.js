@@ -14,36 +14,30 @@ test("every event has exactly one framing review and no review is orphaned", () 
   assert.deepEqual([...reviewed].filter((id) => !ids.has(id)), []);
 });
 
-test("every observation cites a published guideline and explains itself", () => {
+test("every finding is a wording point citing a guideline or a fairness judgement, and explains itself", () => {
   for (const [id, r] of Object.entries(review.events)) {
-    assert.ok(Array.isArray(r.observations), `${id}: observations missing`);
-    for (const o of r.observations) {
-      assert.ok(o.guideline in review.guidelines, `${id}: unknown guideline ${o.guideline}`);
-      assert.ok(typeof o.note === "string" && o.note.length > 20, `${id}: note missing or too short`);
+    assert.ok(Array.isArray(r.findings), `${id}: findings missing`);
+    for (const x of r.findings) {
+      assert.ok(x.kind === "wording" || x.kind === "fairness", `${id}: unknown kind ${x.kind}`);
+      if (x.kind === "wording") assert.ok(x.guideline in review.guidelines, `${id}: unknown guideline ${x.guideline}`);
+      assert.ok(typeof x.note === "string" && x.note.length > 20, `${id}: note missing or too short`);
     }
-    assert.ok(!("reviewer_note" in r), `${id}: judgement notes belong in fairness_note`);
-    if (r.fairness_note !== null) assert.ok(r.fairness_note.length > 20, `${id}: fairness note too short`);
-    assert.equal(typeof r.second_look, "boolean", `${id}: second_look must be true or false`);
-    const fr = r.first_review;
-    assert.ok(fr && typeof fr.found === "boolean", `${id}: first_review missing`);
-    if (fr.found) assert.ok(fr.note && fr.note.length > 20, `${id}: a first-review finding needs its reason`);
-    if (fr.phrases) assert.ok(fr.found, `${id}: first-review highlights without a finding`);
-    const laterFound = r.observations.length > 0 || r.fairness_note !== null;
-    assert.equal(r.second_look, laterFound && !fr.found, `${id}: second look is for summaries only the later review flags`);
+    assert.ok(r.findings.filter((x) => x.kind === "fairness").length <= 1, `${id}: fairness judgements are merged into one finding`);
   }
 });
 
-test("every quoted phrase appears word for word in the text", () => {
+test("every quoted or highlighted phrase appears word for word in the text", () => {
   const byId = Object.fromEntries(events.map((e) => [e.id, e]));
   for (const [id, r] of Object.entries(review.events)) {
-    for (const o of r.observations) assert.ok(byId[id].extract.includes(o.phrase), `${id}: "${o.phrase}" not in the text`);
-    for (const p of r.first_review.phrases ?? []) assert.ok(byId[id].extract.includes(p), `${id}: first-review phrase "${p}" not in the text`);
+    for (const x of r.findings) {
+      for (const p of x.kind === "wording" ? [x.phrase] : x.phrases ?? []) assert.ok(byId[id].extract.includes(p), `${id}: "${p}" not in the text`);
+    }
   }
 });
 
 test("no score or side is published", () => {
   for (const [id, r] of Object.entries(review.events)) {
-    for (const k of ["rating", "leans", "reason", "highlights"]) assert.ok(!(k in r), `${id}: old field ${k}`);
+    for (const k of ["rating", "leans", "reason", "highlights", "observations", "first_review", "second_look"]) assert.ok(!(k in r), `${id}: old field ${k}`);
   }
 });
 
