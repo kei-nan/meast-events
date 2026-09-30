@@ -89,10 +89,10 @@ export default function EventDetail({ event, onBack }) {
                 s.flagged ? (
                   <mark
                     key={j}
-                    className={`framing-mark framing-mark--${event.framing_review.rating}`}
+                    className="framing-mark"
                     tabIndex={0}
                     role="button"
-                    aria-describedby="framing-review-reason"
+                    aria-describedby="framing-review-observations"
                     title="Flagged by our framing review. Select to read why."
                     onClick={showReview}
                     onKeyDown={(e) => {

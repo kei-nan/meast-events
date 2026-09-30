@@ -14,21 +14,28 @@ test("every event has exactly one framing review and no review is orphaned", () 
   assert.deepEqual([...reviewed].filter((id) => !ids.has(id)), []);
 });
 
-test("ratings are on the published scale and flagged entries give a reason", () => {
+test("every observation cites a published guideline and explains itself", () => {
   for (const [id, r] of Object.entries(review.events)) {
-    assert.ok(String(r.rating) in review.ratings, `${id}: rating ${r.rating} not on the scale`);
-    assert.equal(typeof r.reason, "string", `${id}: reason missing`);
-    assert.ok(r.reason.length > 10, `${id}: reason too short`);
-    if (r.leans !== undefined) assert.ok(r.rating > 0, `${id}: a direction needs a rating above 0`);
+    assert.ok(Array.isArray(r.observations), `${id}: observations missing`);
+    for (const o of r.observations) {
+      assert.ok(o.guideline in review.guidelines, `${id}: unknown guideline ${o.guideline}`);
+      assert.ok(typeof o.note === "string" && o.note.length > 20, `${id}: note missing or too short`);
+    }
+    if (r.reviewer_note !== null) assert.ok(r.reviewer_note.length > 20, `${id}: reviewer's note too short`);
+    assert.equal(typeof r.second_look, "boolean", `${id}: second_look must be true or false`);
   }
 });
 
-test("highlighted phrases appear word for word in the text and only on flagged entries", () => {
+test("every quoted phrase appears word for word in the text", () => {
   const byId = Object.fromEntries(events.map((e) => [e.id, e]));
   for (const [id, r] of Object.entries(review.events)) {
-    if (!r.highlights) continue;
-    assert.ok(r.rating > 0, `${id}: highlights on an entry rated 0`);
-    for (const h of r.highlights) assert.ok(byId[id].extract.includes(h), `${id}: "${h}" not in the text`);
+    for (const o of r.observations) assert.ok(byId[id].extract.includes(o.phrase), `${id}: "${o.phrase}" not in the text`);
+  }
+});
+
+test("no score or side is published", () => {
+  for (const [id, r] of Object.entries(review.events)) {
+    for (const k of ["rating", "leans", "reason", "highlights"]) assert.ok(!(k in r), `${id}: old field ${k}`);
   }
 });
 

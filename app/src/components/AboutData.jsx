@@ -147,11 +147,21 @@ function FramingCounts({ state }) {
       </p>
     );
   }
-  const { ratings, counts } = state.data;
-  const rows = Object.entries(ratings).map(([k, name]) => ({ label: name, count: counts.rating[k] ?? 0 }));
+  const { guidelines, counts, total } = state.data;
+  const rows = Object.entries(guidelines)
+    .map(([k, g]) => ({ label: g.name, count: counts.guideline[k] ?? 0 }))
+    .sort((a, b) => b.count - a.count);
   return (
     <>
+      <p>
+        {fmt(counts.with_observations)} of {fmt(total)} summaries have at least one wording point;{" "}
+        {fmt(counts.with_note)} more have only a reviewer&apos;s note. Wording points by guideline:
+      </p>
       <BarList rows={rows} />
+      <p className="about-muted">
+        {fmt(counts.second_look)} summaries are marked for a second look because an earlier review method reached a
+        different conclusion.
+      </p>
       {counts.stale > 0 && (
         <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>
       )}
@@ -282,19 +292,21 @@ export default function AboutData({ onClose }) {
         <h3>Framing review</h3>
         <p>
           Wikipedia&apos;s summaries are shown unchanged, and some of them tell an event from one side. Every event
-          therefore carries a separately boxed <strong>framing review</strong>: our own rating of whether the summary
-          leans to one side, which side, and why, in one sentence. It is an opinion, not a fact-check and not
-          Wikipedia&apos;s view. Every summary was rated on 27 September 2026 by Claude, an AI model made by
-          Anthropic; a person has not checked every rating.
+          therefore carries a separately boxed <strong>framing review</strong>. It checks the summary against
+          Wikipedia&apos;s own neutrality and wording guidelines (contentious labels such as &ldquo;terrorist&rdquo;,
+          editorializing, words that cast doubt, uneven &ldquo;claimed&rdquo; and &ldquo;said&rdquo;, and contested
+          opinions stated as fact), quotes and highlights the words, and names the guideline. A separately labelled
+          reviewer&apos;s note covers what no word list can catch, such as a story told only from one side. There is
+          no score and no verdict on which side a summary favours. Every summary was reviewed on 30 September 2026
+          by Claude, an AI model made by Anthropic; a person has not checked every review.
         </p>
         <FramingCounts state={framing} />
         <p>
-          The flags are uneven: most of the higher ratings are on Israel–Palestine events, and most of those lean
-          toward the Palestinian side. The{" "}
+          The{" "}
           <a href={`${REPO}/blob/main/docs/framing-review.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             review method
           </a>{" "}
-          gives the scale, the full results and the limits. Each review box has a link to contest its rating.
+          gives the rules, the limits and the history of changes. Each review box has a link to contest it.
         </p>
 
         <h3>Selection funnel</h3>
