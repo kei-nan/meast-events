@@ -56,19 +56,19 @@ export { CATEGORY_COLORS };
 // `name` property is already the right one to show for whatever year a feature is
 // active. This component doesn't need its own historical knowledge.
 
-// The demo basemap's own political layers show today's borders regardless of the
-// timeline position - hide them so our own year-driven boundary layer is the only
-// source of political geography on the map.
-const MODERN_BORDER_LAYERS = [
-  "countries-fill",
-  "countries-boundary",
-  "countries-label",
-  "coastline",
-  "crimea-fill",
-  // The Tropic/Equator lines are dashed like our own disputed-border lines, which misleads.
-  "geolines",
-  "geolines-label",
-];
+// Our own base style: a sea-colored background and nothing else. Land, borders
+// and events are all added from our own data on load, so the map depends on no
+// third-party tile server, and no modern political layer can leak onto a
+// historical map. Label glyphs (Open Sans Semibold, Apache 2.0; see NOTICE) are
+// served from public/glyphs/ - only the ranges the labels use are shipped.
+// MapLibre needs an absolute glyphs URL.
+const LABEL_FONT = ["Open Sans Semibold"];
+const BASE_STYLE = {
+  version: 8,
+  glyphs: `${window.location.origin}${import.meta.env.BASE_URL}glyphs/{fontstack}/{range}.pbf`,
+  sources: {},
+  layers: [{ id: "background", type: "background", paint: { "background-color": "#D8F2FF" } }],
+};
 
 // `features` is whatever decade chunk covers `year` (see the boundary-loading
 // effects in MapView below) - a decade chunk can contain features that are only
@@ -307,7 +307,7 @@ export default function MapView({
   useEffect(() => {
     const map = new MaplibreMap({
       container: containerRef.current,
-      style: "https://demotiles.maplibre.org/style.json",
+      style: BASE_STYLE,
       bounds: DEFAULT_BOUNDS,
       fitBoundsOptions: { padding: 20 },
     });
@@ -315,10 +315,6 @@ export default function MapView({
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only
 
     map.on("load", async () => {
-      for (const layerId of MODERN_BORDER_LAYERS) {
-        map.setLayoutProperty(layerId, "visibility", "none");
-      }
-
       // Land silhouette and the boundary decade covering the initial year are
       // both needed for a correct first paint, so fetch them in parallel and
       // wait on both before building the map's own sources/layers - this
@@ -343,9 +339,8 @@ export default function MapView({
       // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
       // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth 1:50m land
       // polygons - pure physical geography with no political information at all, so it
-      // can't reintroduce modern-border anachronisms the way the demo style's
-      // "coastline" layer did. Kept subtle and placed below our own boundaries/events
-      // layers so it reads as background context, not the focal layer.
+      // can't introduce modern-border anachronisms. Added first, so it sits below our
+      // own boundaries/events layers and reads as background context.
       map.addSource("land", {
         type: "geojson",
         data: initialLand,
@@ -357,8 +352,7 @@ export default function MapView({
           type: "fill",
           source: "land",
           paint: { "fill-color": "#e4ded0", "fill-opacity": 0.65 },
-        },
-        "coastline"
+        }
       );
 
       map.addSource("boundaries", {
@@ -372,8 +366,7 @@ export default function MapView({
           type: "fill",
           source: "boundaries",
           paint: { "fill-color": "#8a6f45", "fill-opacity": 0.08 },
-        },
-        "coastline"
+        }
       );
 
       map.addLayer({
@@ -440,6 +433,7 @@ export default function MapView({
         filter: ["has", "point_count"],
         layout: {
           "text-field": ["get", "point_count_abbreviated"],
+          "text-font": LABEL_FONT,
           "text-size": 12,
         },
         paint: CLUSTER_LABEL_PAINT,
@@ -464,7 +458,7 @@ export default function MapView({
           // boundary-labels' "name" property is already the period-appropriate
           // display name, resolved at ingest time.
           "text-field": ["get", "name"],
-          "text-font": ["Open Sans Semibold"],
+          "text-font": LABEL_FONT,
           "text-size": [
             "interpolate",
             ["linear"],
@@ -596,7 +590,7 @@ export default function MapView({
         source: "area-label",
         layout: {
           "text-field": ["get", "text"],
-          "text-font": ["Open Sans Semibold"],
+          "text-font": LABEL_FONT,
           "text-size": 13,
           "text-offset": [0, -2.1],
           "text-allow-overlap": true,
