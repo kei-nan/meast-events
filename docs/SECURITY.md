@@ -158,9 +158,10 @@ worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri
   is not exercised here), Firefox/Safari.
 
 Caching (same file): `/assets/index-*` (Vite content-hashed JS/CSS)
-immutable for a year. The two unhashed MapLibre worker files
+immutable for a year. The two unhashed MapLibre files
 (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
-fall under `/assets/*` = 1 h + `stale-while-revalidate`, never immutable.
+sit in `/assets/maplibre-gl-<version>/`, also immutable: the version in the
+folder name changes on every MapLibre upgrade.
 `/data/events/all.*` (content-hashed) is immutable; everything else under
 `/data/*` (`meta.json`, `ids.json`, `full/*.json`, decade
 chunks, `boundaries/*.json`, `land.json`, `selection-funnel.json`) is 1 h +
