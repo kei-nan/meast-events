@@ -533,16 +533,13 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail {
-  --fr-0: var(--text-tertiary);
-  --fr-1: var(--accent);
-  --fr-2: #d98a4e;
-  --fr-3: #e3776c;
+  --fr-mark: #d98a4e;
 }
 
 .framing-pointer {
   margin: 0 0 12px;
   padding: 8px 11px;
-  border-left: 3px solid var(--fr-1);
+  border-left: 3px solid var(--fr-mark);
   background: var(--bg-2);
   font-size: 0.82rem;
   line-height: 1.5;
@@ -566,14 +563,11 @@ button.sp-chip[aria-pressed="true"] {
   outline-offset: 2px;
 }
 
-.framing-pointer--2 { border-left-color: var(--fr-2); }
-.framing-pointer--3 { border-left-color: var(--fr-3); }
-
 /* Background tint plus underline, so the mark still reads without colour. */
 .framing-mark {
   color: inherit;
-  background: color-mix(in srgb, var(--fr-1) 22%, transparent);
-  text-decoration: underline wavy var(--fr-1);
+  background: color-mix(in srgb, var(--fr-mark) 24%, transparent);
+  text-decoration: underline wavy var(--fr-mark);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
   border-radius: 2px;
@@ -583,16 +577,6 @@ button.sp-chip[aria-pressed="true"] {
   box-decoration-break: clone;
 }
 
-.framing-mark--2 {
-  background: color-mix(in srgb, var(--fr-2) 24%, transparent);
-  text-decoration-color: var(--fr-2);
-}
-
-.framing-mark--3 {
-  background: color-mix(in srgb, var(--fr-3) 26%, transparent);
-  text-decoration-color: var(--fr-3);
-}
-
 .framing-mark:focus-visible,
 .framing-review:focus-visible {
   outline: 2px solid var(--accent-strong);
@@ -600,10 +584,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .framing-review {
-  --fr-0: var(--text-tertiary);
-  --fr-1: var(--accent);
-  --fr-2: #d98a4e;
-  --fr-3: #e3776c;
+  --fr-mark: #d98a4e;
   margin: 16px 0;
   padding: 12px 14px;
   background: var(--bg-2);
@@ -635,34 +616,27 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 68ch;
 }
 
-.framing-review-verdict {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
+.framing-obs {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  max-width: 68ch;
 }
 
-.framing-review-rating {
-  display: inline-block;
-  padding: 2px 9px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  font-size: 0.78rem;
+.framing-obs li {
+  margin-bottom: 6px;
+}
+
+.framing-obs-guideline {
   font-weight: 600;
 }
 
-.framing-review-rating--0 { color: var(--fr-0); }
-.framing-review-rating--1 { color: var(--fr-1); }
-.framing-review-rating--2 { color: var(--fr-2); }
-.framing-review-rating--3 { color: var(--fr-3); }
-
-.framing-review-leans {
-  color: var(--text-secondary);
-  font-size: 0.82rem;
+.framing-review-note {
+  border-left: 2px solid var(--border);
+  padding-left: 9px;
 }
 
-.framing-review-stale {
-  border-left: 2px solid var(--fr-2);
+.framing-review-flag {
+  border-left: 2px solid var(--fr-mark);
   padding-left: 9px;
 }
 
