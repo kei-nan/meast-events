@@ -154,16 +154,12 @@ function FramingCounts({ state }) {
   return (
     <>
       <p>
-        {fmt(counts.with_observations)} of {fmt(total)} summaries have at least one wording point;{" "}
-        {fmt(counts.with_note)} more have only a reviewer&apos;s note. Wording points by guideline:
+        Each summary gets two separate reviews, shown as two tabs. <strong>Overall fairness</strong> (our judgement of
+        emphasis, balance and omissions) found an issue in {fmt(counts.fairness)} of {fmt(total)} summaries.{" "}
+        <strong>Wording check</strong> (against Wikipedia&apos;s own guidelines) found at least one wording point in{" "}
+        {fmt(counts.with_wording)}. Wording points by guideline:
       </p>
       <BarList rows={rows} />
-      <p className="about-muted">
-        Every summary was reviewed with two different methods: a first review that judged overall fairness, and the
-        current check of wording against Wikipedia&apos;s guidelines. Where the current check found nothing, the first
-        review&apos;s finding is kept as a labelled note. {fmt(counts.second_look)} summaries, where only the current
-        check found something, are marked for a second look by a person.
-      </p>
       {counts.stale > 0 && (
         <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>
       )}
@@ -294,12 +290,13 @@ export default function AboutData({ onClose }) {
         <h3>Framing review</h3>
         <p>
           Wikipedia&apos;s summaries are shown unchanged, and some of them tell an event from one side. Every event
-          therefore carries a separately boxed <strong>framing review</strong>. It checks the summary against
-          Wikipedia&apos;s own neutrality and wording guidelines (contentious labels such as &ldquo;terrorist&rdquo;,
-          editorializing, words that cast doubt, uneven &ldquo;claimed&rdquo; and &ldquo;said&rdquo;, and contested
-          opinions stated as fact), quotes and highlights the words, and names the guideline. A separately labelled
-          reviewer&apos;s note covers what no word list can catch, such as a story told only from one side. There is
-          no score and no verdict on which side a summary favours. Every summary was reviewed on 30 September 2026
+          therefore carries a separately boxed <strong>framing review</strong> with two separate reviews, and the words
+          in question are highlighted. <strong>Overall fairness</strong> is our judgement of what no word list can
+          catch, such as emphasis, a story told only from one side, or what is left out. The{" "}
+          <strong>wording check</strong> cites one of Wikipedia&apos;s own neutrality and wording guidelines
+          (contentious labels such as &ldquo;terrorist&rdquo;, editorializing, words that cast doubt, uneven
+          &ldquo;claimed&rdquo; and &ldquo;said&rdquo;, and contested opinions stated as fact). There is no score and no verdict on which side a summary
+          favours. Every summary was reviewed on 30 September 2026
           by Claude, an AI model made by Anthropic; a person has not checked every review.
         </p>
         <FramingCounts state={framing} />

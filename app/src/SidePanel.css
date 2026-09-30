@@ -533,14 +533,16 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail {
-  --fr-mark: #d98a4e;
+  --fr-wording: #e0914f;
+  --fr-fairness: #c3a1f0;
+  --fr-mark: var(--fr-wording);
 }
 
 .framing-pointer {
   margin: 0 0 12px;
   padding: 8px 11px;
   border-left: 3px solid var(--fr-mark);
-  background: var(--bg-2);
+  background: color-mix(in srgb, var(--fr-mark) 10%, var(--bg-2));
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-primary);
@@ -566,7 +568,7 @@ button.sp-chip[aria-pressed="true"] {
 /* Background tint plus underline, so the mark still reads without colour. */
 .framing-mark {
   color: inherit;
-  background: color-mix(in srgb, var(--fr-mark) 24%, transparent);
+  background: color-mix(in srgb, var(--fr-mark) 32%, transparent);
   text-decoration: underline wavy var(--fr-mark);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -577,14 +579,24 @@ button.sp-chip[aria-pressed="true"] {
   box-decoration-break: clone;
 }
 
+.framing-mark--wording { --fr-mark: var(--fr-wording); }
+
+.framing-mark--fairness { --fr-mark: var(--fr-fairness); }
+
+/* Flagged by both review types: fairness tint with the wording underline. */
+.framing-mark--fairness.framing-mark--wording {
+  background: color-mix(in srgb, var(--fr-fairness) 32%, transparent);
+  text-decoration-color: var(--fr-wording);
+}
+
 .framing-mark:focus-visible,
-.framing-review:focus-visible {
+.framing-review:focus-visible,
+.fr-tab:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
 }
 
 .framing-review {
-  --fr-mark: #d98a4e;
   margin: 16px 0;
   padding: 12px 14px;
   background: var(--bg-2);
@@ -616,6 +628,82 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 68ch;
 }
 
+.fr-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+/* A review that found nothing is a quiet grey tab; one that found something is coloured. */
+.fr-tab {
+  --tab-color: var(--text-tertiary);
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 10px 8px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fr-tab--wording.fr-tab--found { --tab-color: var(--fr-wording); }
+.fr-tab--fairness.fr-tab--found { --tab-color: var(--fr-fairness); }
+
+.fr-tab--found {
+  border-color: color-mix(in srgb, var(--tab-color) 55%, var(--border));
+  border-top-color: var(--tab-color);
+  background: color-mix(in srgb, var(--tab-color) 12%, transparent);
+  color: var(--text-primary);
+}
+
+.fr-tab[aria-selected="true"] {
+  border-color: var(--tab-color);
+  box-shadow: 0 0 0 1px var(--tab-color);
+}
+
+.fr-tab:not([aria-selected="true"]):hover {
+  background: color-mix(in srgb, var(--tab-color) 18%, transparent);
+}
+
+.fr-tab-name {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.fr-tab-status {
+  display: block;
+  font-size: 0.75rem;
+}
+
+.fr-tab--found .fr-tab-status {
+  color: var(--tab-color);
+  font-weight: 600;
+}
+
+.fr-panel {
+  --panel-color: var(--border);
+  border-left: 3px solid var(--panel-color);
+  padding-left: 11px;
+  margin-bottom: 10px;
+}
+
+.fr-panel--wording.fr-panel--found { --panel-color: var(--fr-wording); }
+.fr-panel--fairness.fr-panel--found { --panel-color: var(--fr-fairness); }
+
+.framing-review .fr-method {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.fr-nothing {
+  color: var(--text-secondary);
+}
+
 .framing-obs {
   margin: 0 0 10px;
   padding-left: 18px;
@@ -636,7 +724,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .framing-review-flag {
-  border-left: 2px solid var(--fr-mark);
+  border-left: 2px solid var(--text-tertiary);
   padding-left: 9px;
 }
 
