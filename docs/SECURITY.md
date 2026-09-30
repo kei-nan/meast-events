@@ -134,7 +134,7 @@ microphone, payment off).
 CSP (enforcing, not report-only): `default-src 'self'; script-src 'self';
 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src
 https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'
-https://atlaswiki-api.middle-wiki.workers.dev https://demotiles.maplibre.org;
+https://atlaswiki-api.middle-wiki.workers.dev;
 worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri
 'self'; form-action 'self'; frame-ancestors 'none'`.
 
@@ -148,7 +148,8 @@ worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri
   map renders (600+ distinct colours in the map screenshot; worker file
   served 200), event detail opens, search returns results, rectangle draw
   tool produces an area, About dialog opens, panning/zooming fetches
-  demotiles tiles and glyphs: zero `securitypolicyviolation` events and zero
+  tiles and glyphs (then from demotiles.maplibre.org; since 2026-10-01 the
+  base style and glyphs are self-hosted, see MapView.jsx BASE_STYLE): zero `securitypolicyviolation` events and zero
   CSP console messages. A positive control confirms the policy is enforced
   (an injected inline script is blocked and fires a violation event). Also
   run in API mode against the local Worker (allow-listed origin, search
@@ -158,11 +159,12 @@ worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri
   is not exercised here), Firefox/Safari.
 
 Caching (same file): `/assets/index-*` (Vite content-hashed JS/CSS)
-immutable for a year. The two unhashed MapLibre worker files
+immutable for a year. The two unhashed MapLibre files
 (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
-fall under `/assets/*` = 1 h + `stale-while-revalidate`, never immutable.
+sit in `/assets/maplibre-gl-<version>/`, also immutable: the version in the
+folder name changes on every MapLibre upgrade.
 `/data/events/all.*` (content-hashed) is immutable; everything else under
-`/data/*` (`meta.json`, `ids.json`, `index.json`, `full/*.json`, decade
+`/data/*` (`meta.json`, `ids.json`, `full/*.json`, decade
 chunks, `boundaries/*.json`, `land.json`, `selection-funnel.json`) is 1 h +
 `stale-while-revalidate=86400`. HTML keeps Cloudflare's default
 (`max-age=0, must-revalidate`) so a deploy is picked up immediately. If a

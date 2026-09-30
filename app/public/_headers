@@ -15,14 +15,15 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://atlaswiki-api.middle-wiki.workers.dev https://demotiles.maplibre.org; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://atlaswiki-api.middle-wiki.workers.dev; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # --- caching ----------------------------------------------------------------
-# /assets/*: Vite content-hashes everything EXCEPT the two MapLibre worker files
+# /assets/*: Vite content-hashes everything EXCEPT the two MapLibre files
 # (vite.config.js UNHASHED_ASSET_NAMES: maplibre-gl-worker.mjs and
-# maplibre-gl-shared.mjs, whose names the worker imports at runtime). Those must
-# never be immutable or a MapLibre upgrade would be served stale for a year, so
-# the default here is a short revalidating cache and only hashed names opt in.
+# maplibre-gl-shared.mjs, whose names the worker imports at runtime). Those live
+# in assets/maplibre-gl-<version>/, so the folder name is their cache key and a
+# MapLibre upgrade gets a new URL. The default here is a short revalidating
+# cache; hashed names and the versioned MapLibre folder opt in to immutable.
 /assets/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
@@ -30,9 +31,18 @@
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
+/assets/maplibre-gl-*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+# /glyphs/*: map label glyphs (Open Sans Semibold, MapView.jsx BASE_STYLE).
+# Static files that change only if the font does, so cache like /data/*.
+/glyphs/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
 # /data/*: the static dataset. Un-hashed names (events/1900.json, land.json ...)
 # change on every data regeneration, so cache moderately and revalidate in the
-# background: events/meta.json, ids.json, index.json, events/full/*.json, the
+# background: events/meta.json, ids.json, events/full/*.json, the
 # decade chunks events/19xx.json, boundaries/*.json, land.json,
 # selection-funnel.json. The ONE content-hashed data file is
 # events/all.<12-hex-content-hash>.json (app/scripts/split-data.mjs): the hash

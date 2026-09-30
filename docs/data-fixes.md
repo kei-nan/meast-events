@@ -54,7 +54,7 @@ Principle: fix only where Wikipedia and Wikidata clearly agree with each other a
 |---|---|---|
 | Record title differs from the Wikipedia article title and the title is not in the lead (`title_differs_from_article`) | 22 (before F1: 23) | flagged only. Mostly harmless renames (e.g. "Gaza War (2008-09)" vs "Gaza War (2008-2009)"), a few real scope differences ("Syrian independence" -> article "Second Syrian Republic"; "2023 Israel-Hamas war" -> "Gaza war"; "Operation Marg Bar Sarmachar" -> "2024 Iranian missile strikes in Pakistan"; "June 2025 Israeli strikes on Iran" -> "List of attacks during the Twelve-Day War") |
 | Start-date year not within 1 year of any year in the full lead (`date_start_year_not_in_lead`, in `date_flags`) | 13 | F2 fixed one; the rest flagged (e.g. Anglo-Iraqi Treaty 1930 dated 1932 by us, the treaty's entry-into-force; Al-Anfal 1986 vs 1988 in lead) |
-| Wikidata date order invalid (`date_order_invalid`) | 5 | kept, dates as Wikidata gives them, flagged with a Wikipedia lead comparison note |
+| Wikidata date order invalid (`date_order_invalid`) | 5 (2 after F6) | kept, dates as Wikidata gives them, flagged with a Wikipedia lead comparison note; F6 fixed three |
 | Tracked country tag not derivable from Wikidata P17/P276/P131 (`country_not_supported_by_wikidata`) | 9 (curated, hand-typed tags) | flagged only: arab-revolt, 1948-palestine-war, war-of-attrition, battle-of-karameh, 1982-lebanon-war, israeli-withdrawal-from-lebanon, saudi-arabian-led-intervention-in-yemen, killing-of-jamal-khashoggi, assassination-of-qasem-soleimani |
 | Country only via P276/P131 place while own P17 is another sovereign state (`country_via_place_only`) | 7 | flagged only (list in F4) |
 | Wikipedia article resolves to a different Wikidata item than the record's QID (`qid_mismatch`) | 5 in the proposed file (2 of them are the redirect duplicates already excluded by review, `proposed-exclusions.json`), 2 in the curated file (Musa Dagh Resistance, Operation Marg Bar Sarmachar) | flagged only |
@@ -92,3 +92,24 @@ tags and left 23 events with no tracked country, which the inclusion rule exclud
 
 The four F4 events are among them: F4 had corrected their tags to their own P17 (Georgia, Somalia, France, the Sahel states), which already
 put them outside the tracked set; the validator now rejects any event without a tracked country. Their framing reviews were removed with them.
+
+## F6 - Three battles whose start came out after their end (`first-battle-of-tikrit`, `palmyra-offensive-may-2015`, `third-battle-of-fallujah`)
+
+- Cause: the pipeline's start is COALESCE(P585, P580). For these three items Wikidata's P585 (point in time) is the battle's
+  last day and is later than the item's own P582 (end time), so the stored start fell after the stored end. The year filter
+  (`start <= to && end >= from`) then treats the record as a range that ends before it begins.
+- Evidence (checked live 2026-10-01, Wikidata `wbgetentities` and the infobox `date` line of the English Wikipedia article):
+
+| Event | Wikidata P580 / P582 / P585 | Wikipedia infobox | Fix |
+|---|---|---|---|
+| First Battle of Tikrit (Q17286795) | 2014-06-26 / 2014-06-30 / 2014-07-21 | 26 June – 21 July 2014 | 2014-06-26 to 2014-07-21 |
+| Palmyra offensive (May 2015) (Q19926256) | 2015-05-13 / 2015-05-25 / 2015-05-26 | 13–26 May 2015 | 2015-05-13 to 2015-05-26 |
+| Third Battle of Fallujah (Q24205448) | 2016-05-22 / 2016-06-26 / 2016-06-29 | 22 May – 29 June 2016 | 2016-05-22 to 2016-06-29 |
+
+- In each, the infobox start equals Wikidata P580 and the infobox end equals Wikidata P585, so Wikipedia and Wikidata agree with each
+  other against our record. Dates are set to the infobox. Applied to both `data/events.json` and `data/events.proposed.json`.
+- Not fixed, still flagged `date_order_invalid` (the two sources do not agree, so this is the owner's call or an upstream Wikidata edit):
+  - `second-battle-of-inonu` (Q2659746): Wikidata P580 1921-03-26, P582 1921-03-31, P585 1921-04-01; the infobox says
+    "March 23 – April 1, 1921". The end agrees with P585, but the start differs (23 vs 26 March).
+  - `iraqi-invasion-of-kuwait` (Q856650): Wikidata P580 is 2009-08-02, P582 1990-08-04, no P585; the infobox says "2–4 August 1990".
+    Wikidata's start is wrong; with it, the event is not shown when the timeline is set to 1990-1991.
