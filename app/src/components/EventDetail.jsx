@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import FramingReview, { FramingPointer } from "./FramingReview.jsx";
+import FramingReview from "./FramingReview.jsx";
+import { defaultReviewTab } from "../lib/reviewTabs.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 
@@ -16,6 +17,8 @@ function historyUrl(wikipediaUrl) {
 export default function EventDetail({ event, onBack }) {
   const headingRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  // The chosen review tab, remembered per event; otherwise the first review that found something.
+  const [chosenTab, setChosenTab] = useState(null);
 
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
@@ -38,6 +41,8 @@ export default function EventDetail({ event, onBack }) {
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
   const flags = (event.date_flags ?? []).filter(Boolean);
   const paragraphs = (event.extract ?? "").split(/\n+/).filter((p) => p.trim());
+  const review = event.framing_review;
+  const reviewTab = chosenTab?.id === event.id ? chosenTab.tab : defaultReviewTab(review);
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
 
   async function copyLink() {
@@ -80,19 +85,19 @@ export default function EventDetail({ event, onBack }) {
           Date unverified: {flags.join("; ")}. Dates are shown as Wikidata gives them.
         </p>
       )}
-      <FramingPointer review={event.framing_review} />
+      <FramingReview event={event} tab={reviewTab} onTab={(tab) => setChosenTab({ id: event.id, tab })} />
       <div className="event-detail-extract">
         {paragraphs.length ? (
           paragraphs.map((p, i) => (
             <p key={i}>
-              {markSegments(p, event.framing_review?.highlights).map((s, j) =>
+              {markSegments(p, review?.[reviewTab]?.highlights).map((s, j) =>
                 s.flagged ? (
                   <mark
                     key={j}
-                    className="framing-mark"
+                    className={`framing-mark framing-mark--${reviewTab}`}
                     tabIndex={0}
                     role="button"
-                    aria-describedby="framing-review-observations"
+                    aria-describedby="fr-panel"
                     title="Flagged by our framing review. Select to read why."
                     onClick={showReview}
                     onKeyDown={(e) => {
@@ -128,7 +133,6 @@ export default function EventDetail({ event, onBack }) {
       {retrieved && (
         <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
       )}
-      <FramingReview event={event} />
       {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its

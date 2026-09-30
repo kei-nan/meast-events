@@ -532,39 +532,15 @@ button.sp-chip[aria-pressed="true"] {
   border-style: dashed;
 }
 
+/* One colour per review: the tab, its panel edge and its highlights share it. */
 .event-detail {
-  --fr-mark: #d98a4e;
-}
-
-.framing-pointer {
-  margin: 0 0 12px;
-  padding: 8px 11px;
-  border-left: 3px solid var(--fr-mark);
-  background: var(--bg-2);
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--text-primary);
-  max-width: 68ch;
-}
-
-.framing-pointer-link {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: var(--link);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
-}
-
-.framing-pointer-link:focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
+  --fr-wording: #e0914f;
+  --fr-fairness: #b996e0;
 }
 
 /* Background tint plus underline, so the mark still reads without colour. */
 .framing-mark {
+  --fr-mark: var(--fr-wording);
   color: inherit;
   background: color-mix(in srgb, var(--fr-mark) 24%, transparent);
   text-decoration: underline wavy var(--fr-mark);
@@ -577,15 +553,19 @@ button.sp-chip[aria-pressed="true"] {
   box-decoration-break: clone;
 }
 
+.framing-mark--fairness {
+  --fr-mark: var(--fr-fairness);
+}
+
 .framing-mark:focus-visible,
-.framing-review:focus-visible {
+.framing-review:focus-visible,
+.fr-tab:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
 }
 
 .framing-review {
-  --fr-mark: #d98a4e;
-  margin: 16px 0;
+  margin: 4px 0 16px;
   padding: 12px 14px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -616,6 +596,82 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 68ch;
 }
 
+.fr-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+/* A review that found nothing is a quiet grey tab; one that found something is coloured. */
+.fr-tab {
+  --tab-color: var(--text-tertiary);
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 10px 8px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fr-tab--wording.fr-tab--found { --tab-color: var(--fr-wording); }
+.fr-tab--fairness.fr-tab--found { --tab-color: var(--fr-fairness); }
+
+.fr-tab--found {
+  border-color: color-mix(in srgb, var(--tab-color) 55%, var(--border));
+  border-top-color: var(--tab-color);
+  background: color-mix(in srgb, var(--tab-color) 12%, transparent);
+  color: var(--text-primary);
+}
+
+.fr-tab[aria-selected="true"] {
+  border-color: var(--tab-color);
+  box-shadow: 0 0 0 1px var(--tab-color);
+}
+
+.fr-tab:not([aria-selected="true"]):hover {
+  background: color-mix(in srgb, var(--tab-color) 18%, transparent);
+}
+
+.fr-tab-name {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.fr-tab-status {
+  display: block;
+  font-size: 0.75rem;
+}
+
+.fr-tab--found .fr-tab-status {
+  color: var(--tab-color);
+  font-weight: 600;
+}
+
+.fr-panel {
+  --panel-color: var(--border);
+  border-left: 3px solid var(--panel-color);
+  padding-left: 11px;
+  margin-bottom: 10px;
+}
+
+.fr-panel--wording.fr-panel--found { --panel-color: var(--fr-wording); }
+.fr-panel--fairness.fr-panel--found { --panel-color: var(--fr-fairness); }
+
+.framing-review .fr-method {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.fr-nothing {
+  color: var(--text-secondary);
+}
+
 .framing-obs {
   margin: 0 0 10px;
   padding-left: 18px;
@@ -636,7 +692,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .framing-review-flag {
-  border-left: 2px solid var(--fr-mark);
+  border-left: 2px solid var(--text-tertiary);
   padding-left: 9px;
 }
 

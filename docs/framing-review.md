@@ -1,11 +1,11 @@
 # Framing review: how we check the Wikipedia summaries
 
-Every event on the map shows the lead section of its English Wikipedia article, unchanged. Under that text the event page shows a **framing review**. It points out where the summary's wording departs from **Wikipedia's own neutrality and wording guidelines**, and, separately, where a reviewer judged that the summary tells the event from one side. This page explains the method, who applied it, what changed, and how to challenge a review.
+Every event on the map shows the lead section of its English Wikipedia article, unchanged. Above that text the event page shows a **framing review**: two reviews made with different methods, as two tabs. The **wording check** points out where the summary's wording departs from **Wikipedia's own neutrality and wording guidelines**; the **overall fairness** review judges whether the summary tells the event from one side. This page explains the method, who applied it, what changed, and how to challenge a review.
 
 ## What it is and is not
 
-- It checks **wording, not truth**. It does not say whether events happened, whether figures are right, or who was to blame.
-- It uses **Wikipedia's rules, not ours**. Each flag names the guideline it relies on and links to it, so anyone can check whether the rule was applied fairly.
+- It reviews **how the summary is written, not whether the events happened**. Neither review says who was to blame.
+- The wording check uses **Wikipedia's rules, not ours**. Each flag names the guideline it relies on and links to it, so anyone can check whether the rule was applied fairly. The overall fairness review is a judgement, and is labelled as one.
 - There is **no score and no verdict on which side a summary favours**. A review lists what it found; readers judge what it means.
 - It **never changes, hides or reorders** the Wikipedia text. The text is shown exactly as Wikipedia gives it, and the review sits in a separate, labelled box.
 - It is shown for **every** event, including the ones where nothing was found. Research on warning labels finds that when only some items carry a label, readers tend to treat the unlabelled ones as checked and accurate ([Pennycook et al., 2020](https://pubsonline.informs.org/doi/10.1287/mnsc.2019.3478)), so a "nothing found" result is shown as deliberately as a flag.
@@ -17,11 +17,10 @@ Every summary has been reviewed twice, with two different methods that ask diffe
 - **The first review (27 September 2026)** judged each summary's overall fairness: emphasis, balance, what it leaves out, and contested claims stated as fact, using the reviewer's general knowledge. It catches one-sidedness that is not in any single word.
 - **The current review (30 September 2026)** checks only the wording, against Wikipedia's own written guidelines (Part 1 below). It is consistent and checkable, but it cannot see emphasis or omission.
 
-They are combined like this:
+Both are shown on every event page, each in its own tab ("Wording check" and "Overall fairness"). A tab is coloured when its review found something and grey when it found nothing, so both results are visible at a glance. The page opens on the first tab whose review found something.
 
-- The current review's wording points are always shown.
-- **Where the current review finds nothing but the first review found a problem, the first review's finding is kept** and shown as a reviewer's note labelled as coming from the first review.
-- Where the current review flags something the first review did not, the summary is marked for a second look by a person.
+- **Where the wording check finds nothing but the first review found a problem, the first review's finding stands**; the page opens on its tab.
+- Where the wording check flags something the first review did not, the summary is marked for a second look by a person.
 
 Disagreement between the two is expected, because they look for different things. It is not one method contradicting itself.
 
@@ -59,7 +58,9 @@ The lists in these guidelines are examples, not complete lists. To keep the revi
 
 Some one-sidedness is not in any single word: a battle told entirely from one army's side, or contested claims about two parties treated differently. These are covered by a **reviewer's note**, which is labelled on the page as a judgement rather than a guideline. A note written for the current review must point to something in the text itself (for example "the Iraqi side appears only as the target") and is not highlighted.
 
-**Notes from the first review** (51 summaries) are shown where the current review found nothing. They keep the first review's wording and the words it highlighted, and they are labelled with its date and method. Unlike the current review, the first review drew on outside knowledge (for example, which death tolls most sources give), so these notes can contain such claims; its 0-3 scores and "leans toward" labels are not shown.
+## Part 3: overall fairness (the first review)
+
+The "Overall fairness" tab shows the first review's finding for every summary, in its original wording, with the words it highlighted. Unlike the wording check, the first review drew on outside knowledge (for example, which death tolls most sources give), so its findings can contain such claims. Its 0-3 scores and "leans toward" labels are not shown.
 
 ## Second look
 
@@ -67,16 +68,17 @@ Where the current review flags something that the first review did not (59 summa
 
 ## How it shows on the event page
 
-- **A notice above the text** says how many wording points were found and whether there is a reviewer's note. It never says how biased a summary is or toward whom.
-- **The quoted words are highlighted** inside the Wikipedia text, including the words a first-review note points to. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
-- **The review box** lists each wording point with its guideline, the quoted words and a one-line note, then the reviewer's note, the second-look marker, and any category note, data note or disclosure.
+- **The review box sits above the text**, with one tab per review. Each tab shows its status ("3 wording points", "Issue found" or "Nothing found"), coloured when something was found and grey when nothing was. It never says how biased a summary is or toward whom.
+- **The quoted words are highlighted** inside the Wikipedia text, in the colour of the selected tab: the wording check's phrases in orange, the overall fairness review's in lavender. Selecting a highlight jumps to the review. The words themselves are never changed. A phrase is highlighted only if it appears word for word in the exact text that was reviewed; if Wikipedia's text has changed since, the highlights are dropped and the review is marked as possibly out of date.
+- **The wording check tab** lists each wording point with its guideline, the quoted words and a one-line note, then any reviewer's note. **The overall fairness tab** gives the first review's finding. Below the tabs come the second-look marker and any category note, data note or disclosure.
 
 ## Results
 
 | | Summaries |
 |---|---|
-| At least one wording point | 78 |
-| Only a reviewer's note | 60 (9 from the current review, 51 kept from the first review) |
+| Wording check: at least one wording point | 78 |
+| Wording check: only a reviewer's note | 9 |
+| Overall fairness: issue found | 79 |
 | Marked for a second look | 59 |
 
 | Guideline | Wording points |
@@ -98,7 +100,7 @@ We no longer publish counts of which side the flags favour; see *History* for wh
   - **The side counts depended heavily on the rules chosen.** Re-reviewing all summaries under wording-only rules (an unpublished version 2) changed 92 of 571 ratings. The Israel/Palestine split moved from 28 to 1 to 13 to 9; it would have been about 13 to 1 without the rule on "terrorist". A figure that moves this much with reasonable rule changes says more about the rules than about Wikipedia, so it is no longer published.
 
   Version 3 checks wording against Wikipedia's own guidelines instead, with judgement confined to separately labelled notes.
-- **30 September 2026 (the two reviews combined).** Rather than drop the first review's findings on the 51 summaries where the current review found nothing, those findings are kept as labelled reviewer's notes (see *Two review methods*). This resolved their second-look marker; 59 remain marked.
+- **30 September 2026 (the two reviews combined).** Rather than drop the first review's findings on the 51 summaries where the current review found nothing, those findings stand. Both reviews are now shown for every summary, as two tabs (see *Two review methods*). This resolved their second-look marker; 59 remain marked.
 
 ## Limits
 

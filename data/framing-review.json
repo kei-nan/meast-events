@@ -42,6 +42,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "italo-turkish-war": {
@@ -49,6 +53,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "balkan-wars": {
@@ -56,6 +64,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "ottoman-entry-into-world-war-i": {
@@ -63,6 +75,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "armenian-genocide": {
@@ -76,6 +92,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "gallipoli-campaign": {
@@ -83,6 +103,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "mcmahon-hussein-correspondence": {
@@ -90,6 +114,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sykes-picot-agreement": {
@@ -108,24 +136,38 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Mostly gives both the Arab and British readings of the agreement, but includes an unattributed aside that \"for obvious reasons the Zionists took the same position\".",
+        "phrases": [
+          "for obvious reasons the Zionists took the same position"
+        ]
+      },
       "second_look": false
     },
     "arab-revolt": {
       "text_sha1": "b48aa72b6a03",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Calls the Allied conquest \"the liberation\" and states as fact that the Arab forces played only a limited role, a point historians debate.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "The liberation was led primarily by British and French forces"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Calls the Allied conquest \"the liberation\" and states as fact that the Arab forces played only a limited role, a point historians debate.",
+        "phrases": [
+          "The liberation was led primarily by British and French forces"
+        ]
+      },
+      "second_look": false
     },
     "balfour-declaration": {
       "text_sha1": "5612fe7da6b2",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "fall-of-baghdad-1917": {
@@ -133,25 +175,36 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-jerusalem-1917": {
       "text_sha1": "6cd88b5f8f05",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Ends on the capture as \"a great morale boost for the British Empire\" and a \"Christmas present for the British people\"; the city's residents and the Ottoman side are absent.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "a great morale boost for the British Empire",
-        "Christmas present for the British people"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Ends on the capture as \"a great morale boost for the British Empire\" and a \"Christmas present for the British people\"; the city's residents and the Ottoman side are absent.",
+        "phrases": [
+          "a great morale boost for the British Empire",
+          "Christmas present for the British people"
+        ]
+      },
+      "second_look": false
     },
     "armistice-of-mudros": {
       "text_sha1": "3c59cfd017d4",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "san-remo-conference": {
@@ -159,6 +212,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-revolt-against-the-british": {
@@ -166,6 +223,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "treaty-of-s-vres": {
@@ -173,6 +234,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "franco-syrian-war": {
@@ -180,6 +245,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "turkish-war-of-independence": {
@@ -187,6 +256,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "kingdom-of-iraq": {
@@ -194,6 +267,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "emirate-of-transjordan": {
@@ -207,6 +284,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Puts Jordan's \"uniting\" of the two banks of the Jordan in scare quotes, signalling scepticism in the article's own voice.",
+        "phrases": [
+          "\"uniting\""
+        ]
+      },
       "second_look": false
     },
     "treaty-of-lausanne": {
@@ -214,6 +298,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "abolition-of-the-ottoman-caliphate": {
@@ -221,25 +309,36 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "great-syrian-revolt": {
       "text_sha1": "ccb859005380",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Uses the rebels' vocabulary (\"French occupation\", \"local collaborators\") as fact.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "French occupation",
-        "local collaborators"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Uses the rebels' vocabulary (\"French occupation\", \"local collaborators\") as fact.",
+        "phrases": [
+          "French occupation",
+          "local collaborators"
+        ]
+      },
+      "second_look": false
     },
     "1929-palestine-riots": {
       "text_sha1": "7da89418626e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "unification-of-saudi-arabia": {
@@ -247,6 +346,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "anglo-iraqi-treaty-1930": {
@@ -254,35 +357,49 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1936-39-arab-revolt-in-palestine": {
       "text_sha1": "5b102cb136b7",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Arab casualties are given in detail while Jewish deaths are a vague \"up to several hundred\"; attacks on Jews are barely described.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "up to several hundred"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Arab casualties are given in detail while Jewish deaths are a vague \"up to several hundred\"; attacks on Jews are barely described.",
+        "phrases": [
+          "up to several hundred"
+        ]
+      },
+      "second_look": false
     },
     "peel-commission": {
       "text_sha1": "c91dfdbb1cf7",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Gives both leaderships' positions, but ends on a single historian's reading that Zionist leaders saw partition as a step toward \"the eventual takeover of the whole of Palestine\".",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "the eventual takeover of the whole of Palestine"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Gives both leaderships' positions, but ends on a single historian's reading that Zionist leaders saw partition as a step toward \"the eventual takeover of the whole of Palestine\".",
+        "phrases": [
+          "the eventual takeover of the whole of Palestine"
+        ]
+      },
+      "second_look": false
     },
     "white-paper-of-1939": {
       "text_sha1": "9a15cc048f6f",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "anglo-iraqi-war": {
@@ -290,6 +407,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "syria-lebanon-campaign": {
@@ -297,6 +418,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "national-pact": {
@@ -304,6 +429,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "syrian-independence": {
@@ -311,6 +440,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "data_note": "The summary shown is from the article on the Second Syrian Republic, not about the 1946 independence itself."
     },
@@ -319,6 +452,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "data_note": "The summary shown is the general \"History of Jordan\" article, not about the 1946 independence itself."
     },
@@ -326,12 +463,15 @@
       "text_sha1": "a863fc5a18da",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "States as fact that Ben-Gurion saw accepting the plan as \"a steppingstone to future territorial expansion\", and ends on the Palestinian exodus without mentioning the Arab states' military intervention.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "a steppingstone to future territorial expansion"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "States as fact that Ben-Gurion saw accepting the plan as \"a steppingstone to future territorial expansion\", and ends on the Palestinian exodus without mentioning the Arab states' military intervention.",
+        "phrases": [
+          "a steppingstone to future territorial expansion"
+        ]
+      },
+      "second_look": false
     },
     "1948-palestine-war": {
       "text_sha1": "b7c215a37d7b",
@@ -344,6 +484,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "israeli-declaration-of-independence": {
@@ -351,6 +495,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nakba": {
@@ -369,6 +517,14 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "The opening sentence defines the Nakba as \"the ethnic cleansing of Palestinian Arabs by Zionists\" and later states \"Israel employed biological warfare\" as fact. The Israeli view appears only as denial. Many historians use these terms, but they are contested and the summary does not attribute them.",
+        "phrases": [
+          "the ethnic cleansing of Palestinian Arabs by Zionists",
+          "Israel employed biological warfare"
+        ]
+      },
       "second_look": false
     },
     "1949-armistice-agreements": {
@@ -376,6 +532,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "jewish-exodus-from-the-muslim-world": {
@@ -383,6 +543,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "egyptian-revolution-of-1952": {
@@ -390,6 +554,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1953-iranian-coup-d-tat": {
@@ -397,6 +565,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "baghdad-pact": {
@@ -404,6 +576,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "suez-crisis": {
@@ -411,6 +587,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "united-arab-republic": {
@@ -418,6 +598,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "14-july-revolution": {
@@ -425,6 +609,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "north-yemen-civil-war": {
@@ -432,6 +620,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palestine-liberation-organization": {
@@ -439,6 +631,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1966-syrian-coup-d-tat": {
@@ -446,6 +642,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "six-day-war": {
@@ -453,6 +653,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "khartoum-resolution": {
@@ -460,6 +664,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "war-of-attrition": {
@@ -467,6 +675,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-karameh": {
@@ -474,6 +686,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1968-iraqi-coup-d-tat": {
@@ -481,6 +697,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "black-september-in-jordan": {
@@ -488,24 +708,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "hafez-al-assad": {
       "text_sha1": "b6c3c531834d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Gives the highest estimate of the Hama death toll (30,000) as fact; estimates range from about 10,000 to 40,000.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "massacres of 30,000 men, women and children in Hama alone"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Gives the highest estimate of the Hama death toll (30,000) as fact; estimates range from about 10,000 to 40,000.",
+        "phrases": [
+          "massacres of 30,000 men, women and children in Hama alone"
+        ]
+      },
+      "second_look": false
     },
     "yom-kippur-war": {
       "text_sha1": "9e618d28ab2f",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1973-oil-crisis": {
@@ -513,6 +744,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "lebanese-civil-war": {
@@ -520,6 +755,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "camp-david-accords": {
@@ -527,6 +766,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iranian-revolution": {
@@ -534,6 +777,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "egypt-israel-peace-treaty": {
@@ -541,6 +788,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "grand-mosque-seizure": {
@@ -548,6 +799,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iran-hostage-crisis": {
@@ -555,24 +810,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "saddam-hussein": {
       "text_sha1": "b422ad8e843a",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Says the US and its allies invaded while \"falsely accusing\" Iraq of having weapons of mass destruction. No stockpiles were found, but \"falsely\" implies deliberate deception, which is debated.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "falsely accusing"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Says the US and its allies invaded while \"falsely accusing\" Iraq of having weapons of mass destruction. No stockpiles were found, but \"falsely\" implies deliberate deception, which is debated.",
+        "phrases": [
+          "falsely accusing"
+        ]
+      },
+      "second_look": false
     },
     "iran-iraq-war": {
       "text_sha1": "b5c146e777df",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1982-lebanon-war": {
@@ -580,6 +846,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sabra-and-shatila-massacre": {
@@ -587,6 +857,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1983-beirut-barracks-bombings": {
@@ -594,6 +868,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "first-intifada": {
@@ -607,47 +885,67 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "States \"excessive violence in response from Israeli security forces\" as fact; it does also cover attacks, Israeli casualties and killings of alleged collaborators.",
+        "phrases": [
+          "excessive violence in response from Israeli security forces"
+        ]
+      },
       "second_look": false
     },
     "hamas": {
       "text_sha1": "ff8b33400333",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "States contested claims as fact: that Israel supported Hamas \"to prevent the creation of an independent Palestinian state\", and that Gaza was \"Israeli-occupied\" while Hamas governed it. October 7 is mentioned only by name. It does list terrorist designations and attacks on civilians.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "to prevent the creation of an independent Palestinian state",
-        "the Israeli-occupied Gaza Strip"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "States contested claims as fact: that Israel supported Hamas \"to prevent the creation of an independent Palestinian state\", and that Gaza was \"Israeli-occupied\" while Hamas governed it. October 7 is mentioned only by name. It does list terrorist designations and attacks on civilians.",
+        "phrases": [
+          "to prevent the creation of an independent Palestinian state",
+          "the Israeli-occupied Gaza Strip"
+        ]
+      },
+      "second_look": false
     },
     "al-anfal-campaign": {
       "text_sha1": "04ea53d68bcf",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Weakens the widely accepted genocide finding with a claim about a 2007 court ruling and a sweeping statement that \"many Iraqi Arabs reject that there were any mass killings\", neither sourced.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "many Iraqi Arabs reject that there were any mass killings"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Weakens the widely accepted genocide finding with a claim about a 2007 court ruling and a sweeping statement that \"many Iraqi Arabs reject that there were any mass killings\", neither sourced.",
+        "phrases": [
+          "many Iraqi Arabs reject that there were any mass killings"
+        ]
+      },
+      "second_look": false
     },
     "gulf-war": {
       "text_sha1": "19d448906e6b",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Presents one contested study (US bombing as the main cause of Gulf War syndrome) as settled; otherwise a coalition-perspective summary.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "were concluded to be the primary cause of Gulf War syndrome"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Presents one contested study (US bombing as the main cause of Gulf War syndrome) as settled; otherwise a coalition-perspective summary.",
+        "phrases": [
+          "were concluded to be the primary cause of Gulf War syndrome"
+        ]
+      },
+      "second_look": false
     },
     "madrid-conference-of-1991": {
       "text_sha1": "5f06273129b8",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "oslo-accords": {
@@ -661,6 +959,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "israel-jordan-peace-treaty": {
@@ -668,6 +970,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "assassination-of-yitzhak-rabin": {
@@ -675,25 +981,36 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "second-intifada": {
       "text_sha1": "6029037e4d6b",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Calls Sharon's visit \"provocative\" and says Israeli security \"responded with extreme violence\" as fact; it does cover the roughly 138 suicide bombings, mainly against civilians.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "provocative",
-        "responded with extreme violence"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Calls Sharon's visit \"provocative\" and says Israeli security \"responded with extreme violence\" as fact; it does cover the roughly 138 suicide bombings, mainly against civilians.",
+        "phrases": [
+          "provocative",
+          "responded with extreme violence"
+        ]
+      },
+      "second_look": false
     },
     "israeli-withdrawal-from-lebanon": {
       "text_sha1": "e10316f348b6",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "invasion-of-iraq": {
@@ -707,6 +1024,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "capture-of-saddam-hussein": {
@@ -714,6 +1035,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "cedar-revolution": {
@@ -727,15 +1052,22 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "israeli-disengagement-from-gaza": {
       "text_sha1": "10b6f0f8b7f2",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Asserts that Gaza remained occupied after 2005, citing the UN and the ICJ, without mentioning that Israel and some legal scholars reject this.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Asserts that Gaza remained occupied after 2005, citing the UN and the ICJ, without mentioning that Israel and some legal scholars reject this."
+      },
+      "second_look": false
     },
     "execution-of-saddam-hussein": {
       "text_sha1": "27fa3a7d585d",
@@ -748,6 +1080,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2006-lebanon-war": {
@@ -755,6 +1091,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-gaza-2007": {
@@ -762,6 +1102,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "gaza-war-2008-09": {
@@ -769,6 +1113,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Lists both sides' names for the war, both sides' account of how the ceasefire broke down, and the UN report together with its lead author's later partial retraction."
+      },
       "second_look": false
     },
     "iranian-green-movement": {
@@ -776,6 +1124,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "arab-spring": {
@@ -783,6 +1135,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "egyptian-revolution-of-2011": {
@@ -796,25 +1152,39 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Describes Morsi's 2013 removal as \"a revolution broke out\" and never uses the word coup (the separate 2013 coup entry does).",
+        "phrases": [
+          "a revolution broke out"
+        ]
+      },
       "second_look": false
     },
     "syrian-civil-war": {
       "text_sha1": "350eb8c8163e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Uses \"Assad regime\" and \"revolutionaries\" as fact and describes Hay'at Tahrir al-Sham without mentioning its al-Qaeda origins.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "Assad regime",
-        "revolutionaries"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Uses \"Assad regime\" and \"revolutionaries\" as fact and describes Hay'at Tahrir al-Sham without mentioning its al-Qaeda origins.",
+        "phrases": [
+          "Assad regime",
+          "revolutionaries"
+        ]
+      },
+      "second_look": false
     },
     "yemeni-revolution": {
       "text_sha1": "aa01754e1850",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "egyptian-crisis-2011-2014": {
@@ -828,6 +1198,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "islamic-state": {
@@ -846,6 +1220,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "yemeni-civil-war-2014-present": {
@@ -853,6 +1231,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "saudi-arabian-led-intervention-in-yemen": {
@@ -860,6 +1242,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "joint-comprehensive-plan-of-action": {
@@ -867,6 +1253,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-aleppo-2012-2016": {
@@ -874,6 +1264,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Attributes atrocities to all sides, from government barrel bombs to rebel \"hell cannons\", with UN sources."
+      },
       "second_look": false
     },
     "battle-of-mosul-2016-2017": {
@@ -881,6 +1275,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "qatar-diplomatic-crisis": {
@@ -888,6 +1286,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "united-states-recognition-of-jerusalem-as-the-capital-of-israel": {
@@ -895,6 +1297,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the US, Israeli, Palestinian, EU and UN positions and both the Gaza border deaths and Israel's justification."
+      },
       "second_look": false
     },
     "united-states-withdrawal-from-the-joint-comprehensive-plan-of-action": {
@@ -902,6 +1308,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "killing-of-jamal-khashoggi": {
@@ -909,6 +1319,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "abraham-accords": {
@@ -916,6 +1330,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2020-beirut-explosion": {
@@ -923,6 +1341,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"political\", a group assigned by hand when the event was added; the explosion was an industrial accident."
     },
@@ -931,39 +1353,57 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the Pentagon's justification, questions about the evidence, a UN rapporteur's legal view, and Iran's and Iraq's positions."
+      },
       "second_look": false
     },
     "2021-israel-palestine-crisis": {
       "text_sha1": "9dfbd546e35e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Describes Jerusalem Day as \"celebrating the occupation of East Jerusalem\" as fact (Israelis call it reunification). Casualties, rockets and the Hamas ultimatum are all reported.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "celebrating the occupation of East Jerusalem"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Describes Jerusalem Day as \"celebrating the occupation of East Jerusalem\" as fact (Israelis call it reunification). Casualties, rockets and the Hamas ultimatum are all reported.",
+        "phrases": [
+          "celebrating the occupation of East Jerusalem"
+        ]
+      },
+      "second_look": false
     },
     "mahsa-amini-protests": {
       "text_sha1": "b307a86316b1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Includes the government's view alongside the UN fact-finding mission's findings."
+      },
       "second_look": false
     },
     "2023-israel-hamas-war": {
       "text_sha1": "4e88c0844251",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included."
+      },
+      "second_look": false
     },
     "fall-of-the-assad-regime": {
       "text_sha1": "99d360154fa3",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2024-israel-hezbollah-conflict": {
@@ -971,6 +1411,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "twelve-day-war": {
@@ -978,6 +1422,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the nuclear background, the IAEA's non-compliance finding, the condemnations and the states that supported the strikes."
+      },
       "second_look": false
     },
     "battle-of-holy-apostles-monastery": {
@@ -985,6 +1433,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "adana-massacre": {
@@ -992,6 +1444,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-kunfuda-bay": {
@@ -999,6 +1455,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-beirut-1912": {
@@ -1006,6 +1466,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-lule-burgas": {
@@ -1013,6 +1477,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-adrianople-1912-1913": {
@@ -1020,6 +1488,14 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the Bulgarian side: the victors' commanders, the \"enormous military success\" and the later careers of Bulgarian officers; the Ottoman defenders appear only as the defeated.",
+      "first_review": {
+        "found": true,
+        "note": "Told in celebratory terms from the victors' side (\"enormous military success\", \"bold night attacks\").",
+        "phrases": [
+          "enormous military success",
+          "bold night attacks"
+        ]
+      },
       "second_look": false
     },
     "first-battle-of-catalca": {
@@ -1027,6 +1503,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-elli": {
@@ -1034,24 +1514,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-bulair": {
       "text_sha1": "71f709dce359",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Calls Enver Pasha's decision \"stubbornness\" without attributing the judgement.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "stubbornness"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Calls Enver Pasha's decision \"stubbornness\" without attributing the judgement.",
+        "phrases": [
+          "stubbornness"
+        ]
+      },
+      "second_look": false
     },
     "fao-landing": {
       "text_sha1": "fcb61eafc871",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-basra-1914": {
@@ -1059,6 +1550,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-qurna": {
@@ -1066,6 +1561,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-sarikamish": {
@@ -1073,6 +1572,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-ardahan": {
@@ -1080,6 +1583,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-manzikert-1915": {
@@ -1087,6 +1594,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-kara-killisse-1915": {
@@ -1094,6 +1605,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "defense-of-van-1915": {
@@ -1107,6 +1622,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Written as a rebuttal of genocide-denial arguments rather than a description. Its conclusions match the scholarly consensus, but the tone argues rather than reports.",
+        "phrases": [
+          "the alpha and omega of the plea of 'military necessity'"
+        ]
+      },
       "second_look": false
     },
     "landing-at-anzac-cove": {
@@ -1114,6 +1636,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "musa-dagh-resistance": {
@@ -1121,6 +1647,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-bitlis": {
@@ -1128,6 +1658,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "urfa-resistance": {
@@ -1135,6 +1669,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-ctesiphon-1915": {
@@ -1142,6 +1680,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-kut": {
@@ -1149,6 +1691,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "erzurum-offensive": {
@@ -1156,6 +1702,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-wadi-1916": {
@@ -1163,6 +1713,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "trebizond-campaign": {
@@ -1170,6 +1724,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-medina": {
@@ -1177,6 +1735,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-erzincan-1916": {
@@ -1184,6 +1746,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-romani": {
@@ -1191,73 +1757,104 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the British Empire side (\"reversing in a most emphatic manner\"); the Ottoman and German side appears only as the enemy force.",
+      "first_review": {
+        "found": true,
+        "note": "A long account told entirely from the British Empire forces' side; the Ottoman and German forces appear only as the enemy."
+      },
       "second_look": false
     },
     "battle-of-magdhaba": {
       "text_sha1": "f8080236ed43",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Told entirely from the British Empire forces' side.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Told entirely from the British Empire forces' side."
+      },
+      "second_look": false
     },
     "battles-of-ramadi-1917": {
       "text_sha1": "9d6d85aa82f4",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-rafa": {
       "text_sha1": "3a931726dbc9",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Told entirely from the British Empire forces' side.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Told entirely from the British Empire forces' side."
+      },
+      "second_look": false
     },
     "first-battle-of-gaza": {
       "text_sha1": "7bb390a3c9c1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Told from the British side (\"snatched defeat from the jaws of victory\").",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "snatched defeat from the jaws of victory"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Told from the British side (\"snatched defeat from the jaws of victory\").",
+        "phrases": [
+          "snatched defeat from the jaws of victory"
+        ]
+      },
+      "second_look": false
     },
     "second-battle-of-gaza": {
       "text_sha1": "605633ced9bf",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-beersheba-1917": {
       "text_sha1": "04dd952e1c12",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "A heroic account of the Light Horse charge from the British Empire side, with a later-added claim about the Nili spy ring's importance.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "The data provided by the Jewish Nili spy ring was particularly important for the conquest of Beersheba and Jerusalem."
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "A heroic account of the Light Horse charge from the British Empire side, with a later-added claim about the Nili spy ring's importance.",
+        "phrases": [
+          "The data provided by the Jewish Nili spy ring was particularly important for the conquest of Beersheba and Jerusalem."
+        ]
+      },
+      "second_look": false
     },
     "third-battle-of-gaza": {
       "text_sha1": "cbee198be267",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Told entirely from the British Empire forces' side.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Told entirely from the British Empire forces' side."
+      },
+      "second_look": false
     },
     "battle-of-megiddo-1918": {
       "text_sha1": "77d1b00bfd38",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-imbros": {
@@ -1265,43 +1862,61 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-haifa-1918": {
       "text_sha1": "c9fd1cf5027d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Says the day \"is celebrated as Haifa Day\" without saying by whom (it is an Indian Army commemoration).",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "is celebrated as Haifa Day"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Says the day \"is celebrated as Haifa Day\" without saying by whom (it is an Indian Army commemoration).",
+        "phrases": [
+          "is celebrated as Haifa Day"
+        ]
+      },
+      "second_look": false
     },
     "capture-of-damascus-1918": {
       "text_sha1": "3f298bdaa466",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "greek-landing-at-smyrna": {
       "text_sha1": "83b128a8a12d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Justifies the landing with Lloyd George's words, then calls the violence against Turkish civilians \"unsystematic\" and says the Greek command \"tried to thwart it\". The Turkish perspective is absent.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "unsystematic",
-        "tried to thwart it"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Justifies the landing with Lloyd George's words, then calls the violence against Turkish civilians \"unsystematic\" and says the Greek command \"tried to thwart it\". The Turkish perspective is absent.",
+        "phrases": [
+          "unsystematic",
+          "tried to thwart it"
+        ]
+      },
+      "second_look": false
     },
     "battle-of-oltu": {
       "text_sha1": "36f7ef5b3c32",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-marash": {
@@ -1309,6 +1924,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-maysalun": {
@@ -1316,6 +1935,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "armistice-of-mudanya": {
@@ -1323,6 +1946,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "capture-of-mecca-1924": {
@@ -1330,6 +1957,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "zilan-massacre": {
@@ -1337,6 +1968,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "simele-massacre": {
@@ -1344,6 +1979,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-compass": {
@@ -1351,6 +1990,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-brevity": {
@@ -1358,6 +2001,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-skorpion": {
@@ -1365,6 +2012,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-palmyra-1941": {
@@ -1372,6 +2023,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-crusader": {
@@ -1379,6 +2034,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "raid-on-alexandria-1941": {
@@ -1386,6 +2045,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-mersa-matruh": {
@@ -1393,6 +2056,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "first-battle-of-el-alamein": {
@@ -1400,6 +2067,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-alam-el-halfa": {
@@ -1407,6 +2078,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "second-battle-of-el-alamein": {
@@ -1414,6 +2089,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "king-david-hotel-bombing": {
@@ -1427,6 +2106,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "haifa-oil-refinery-massacre": {
@@ -1440,6 +2123,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "balad-al-shaykh-massacre": {
@@ -1447,6 +2134,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "semiramis-hotel-bombing": {
@@ -1454,6 +2145,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "hadassah-medical-convoy-massacre": {
@@ -1461,6 +2156,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-haifa-1948": {
@@ -1468,6 +2167,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "kfar-etzion-massacre": {
@@ -1475,6 +2178,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battles-of-latrun-1948": {
@@ -1482,6 +2189,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-pleshet": {
@@ -1489,6 +2200,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palestinian-expulsion-from-lydda-and-ramle": {
@@ -1496,6 +2211,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Graphic but specific and sourced (the written expulsion order, named historians); the disputed death toll is given as a range."
+      },
       "second_look": false
     },
     "al-dawayima-massacre": {
@@ -1503,6 +2222,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "eilabun-massacre": {
@@ -1510,6 +2233,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "hula-massacre": {
@@ -1517,6 +2244,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "qibya-massacre": {
@@ -1524,24 +2255,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "kafr-qasim-massacre": {
       "text_sha1": "546a8a2404dc",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Well sourced overall, but states the sweeping claim that \"Arab citizens were regarded by Israel as a hostile population\" as fact.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "Arab citizens were regarded by Israel as a hostile population"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Well sourced overall, but states the sweeping claim that \"Arab citizens were regarded by Israel as a hostile population\" as fact.",
+        "phrases": [
+          "Arab citizens were regarded by Israel as a hostile population"
+        ]
+      },
+      "second_look": false
     },
     "khan-yunis-massacre": {
       "text_sha1": "59c65e9eee90",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the accounts of an Israeli historian, a critic citing a journalist, and the Israeli authorities side by side."
+      },
       "second_look": false
     },
     "1958-lebanon-crisis": {
@@ -1549,6 +2291,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1966-attack-on-samu": {
@@ -1562,6 +2308,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-ammunition-hill": {
@@ -1569,6 +2319,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "bahr-el-baqar-primary-school-bombing": {
@@ -1576,6 +2330,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"terrorism\" because Wikidata types this Israeli air strike as a terrorist attack. The summary itself says the designation is disputed. Our category follows Wikidata's type without judging it."
     },
@@ -1590,6 +2348,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "dawson-s-field-hijackings": {
@@ -1597,6 +2359,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "ramsar-convention": {
@@ -1604,6 +2370,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sabena-flight-571": {
@@ -1617,6 +2387,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "lod-airport-massacre": {
@@ -1624,6 +2398,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1973-israeli-raid-in-lebanon": {
@@ -1631,6 +2409,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-the-chinese-farm": {
@@ -1638,6 +2420,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "ofira-air-battle": {
@@ -1651,6 +2437,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Relies on the Israeli account of the battle; notes that Egypt disputes it.",
+        "phrases": [
+          "In just under six minutes, seven Egyptian MiGs had been shot down"
+        ]
+      },
       "second_look": false
     },
     "battle-of-latakia": {
@@ -1658,6 +2451,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-baltim": {
@@ -1665,6 +2462,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "valley-of-tears": {
@@ -1678,6 +2479,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Told from the Israeli side (\"although massively outnumbered, the Israeli forces managed to hold\").",
+        "phrases": [
+          "Although massively outnumbered, the Israeli forces managed to hold their positions"
+        ]
+      },
       "second_look": false
     },
     "kiryat-shmona-massacre": {
@@ -1685,6 +2493,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "ma-alot-massacre": {
@@ -1698,6 +2510,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "karantina-massacre": {
@@ -1705,6 +2521,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "damour-massacre": {
@@ -1712,6 +2532,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "coastal-road-massacre": {
@@ -1725,6 +2549,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "cinema-rex-fire": {
@@ -1743,6 +2571,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "operation-eagle-claw": {
@@ -1750,6 +2582,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-khorramshahr-1980": {
@@ -1757,6 +2593,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-abadan": {
@@ -1764,6 +2604,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-nasr": {
@@ -1771,6 +2615,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "h-3-airstrike": {
@@ -1778,18 +2626,28 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the Iranian side (\"with no losses of their own\", \"one of the most successful raids in the history of aerial warfare\"); the Iraqi side appears only as the target.",
+      "first_review": {
+        "found": true,
+        "note": "Calls it \"one of the most successful raids in the history of aerial warfare\" without attribution.",
+        "phrases": [
+          "one of the most successful raids in the history of aerial warfare"
+        ]
+      },
       "second_look": false
     },
     "assassination-of-anwar-sadat": {
       "text_sha1": "c2a9425cda99",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Names Egyptian Islamic Jihad as the assassins but attributes the motive to \"communist, socialist, and Islamist groups\", which is confusing and unsupported.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "communist, socialist, and Islamist groups"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Names Egyptian Islamic Jihad as the assassins but attributes the motive to \"communist, socialist, and Islamist groups\", which is confusing and unsupported.",
+        "phrases": [
+          "communist, socialist, and Islamist groups"
+        ]
+      },
+      "second_look": false
     },
     "1982-hama-massacre": {
       "text_sha1": "eb0582db6517",
@@ -1802,24 +2660,39 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Well sourced, but describes it as an \"anti-Sunni massacre\" motivated by \"sectarian animosities\" as fact.",
+        "phrases": [
+          "anti-Sunni massacre",
+          "sectarian animosities"
+        ]
+      },
       "second_look": false
     },
     "battle-of-khorramshahr-1982": {
       "text_sha1": "2ee6275dba02",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Uses the Iranian framing \"Liberation of Khorramshahr\" (the city was Iranian territory retaken); the Iraqi side is absent.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "Liberation of Khorramshahr"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Uses the Iranian framing \"Liberation of Khorramshahr\" (the city was Iranian territory retaken); the Iraqi side is absent.",
+        "phrases": [
+          "Liberation of Khorramshahr"
+        ]
+      },
+      "second_look": false
     },
     "siege-of-beirut": {
       "text_sha1": "89241d9d32af",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "dujail-massacre": {
@@ -1827,6 +2700,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "ankara-esenboga-airport-attack": {
@@ -1834,6 +2711,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1983-us-embassy-bombing-in-beirut": {
@@ -1841,6 +2722,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "gulf-air-flight-771": {
@@ -1848,6 +2733,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-moses": {
@@ -1855,6 +2744,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"war\" because Wikidata types it as a military operation; it was an evacuation of Ethiopian Jews to Israel."
     },
@@ -1863,6 +2756,13 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the Iranian side (\"a sophisticated and carefully planned amphibious assault\", \"a major success for Iran\").",
+      "first_review": {
+        "found": true,
+        "note": "Calls the operation \"one of Iran's greatest achievements\" without attribution.",
+        "phrases": [
+          "one of Iran's greatest achievements"
+        ]
+      },
       "second_look": false
     },
     "siege-of-basra": {
@@ -1870,6 +2770,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "halabja-massacre": {
@@ -1877,6 +2781,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palestinian-declaration-of-independence": {
@@ -1884,6 +2792,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-dasman-palace": {
@@ -1891,6 +2803,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-khafji": {
@@ -1898,6 +2814,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "amiriyah-shelter-bombing": {
@@ -1905,6 +2825,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-73-easting": {
@@ -1912,6 +2836,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-medina-ridge": {
@@ -1919,6 +2847,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sivas-massacre": {
@@ -1926,6 +2858,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "qana-massacre": {
@@ -1939,6 +2875,14 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Says the UN investigation \"refuted\" Israel's account and \"found that the Israeli shelling was deliberate\"; the UN report said it was \"unlikely\" to be the result of errors, a softer finding.",
+        "phrases": [
+          "refuted",
+          "found that the Israeli shelling was deliberate"
+        ]
+      },
       "second_look": false
     },
     "khobar-towers-bombing": {
@@ -1946,6 +2890,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "luxor-massacre": {
@@ -1959,6 +2907,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "indian-airlines-flight-814": {
@@ -1972,6 +2924,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "uss-cole-bombing": {
@@ -1979,6 +2935,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-jenin-2002": {
@@ -1986,6 +2946,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "States that investigations found no evidence for the reported massacre, while also reporting the destruction and the blocked emergency access."
+      },
       "second_look": false
     },
     "siege-of-the-church-of-the-nativity": {
@@ -1999,6 +2963,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "iraqi-insurgency-2003-2011": {
@@ -2006,6 +2974,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-baghdad-2003": {
@@ -2013,6 +2985,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-viking-hammer": {
@@ -2020,6 +2996,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-al-faw-2003": {
@@ -2027,6 +3007,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-basra-2003": {
@@ -2034,6 +3018,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-umm-qasr": {
@@ -2041,6 +3029,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-nasiriyah": {
@@ -2048,6 +3040,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-najaf-2003": {
@@ -2055,6 +3051,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "canal-hotel-bombing": {
@@ -2068,6 +3068,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-najaf-2004": {
@@ -2075,6 +3079,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "abu-ghraib-torture-and-prisoner-abuse": {
@@ -2088,6 +3096,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "first-battle-of-fallujah": {
@@ -2095,6 +3107,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2004-israeli-operation-in-rafah": {
@@ -2102,6 +3118,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2004-israeli-operation-in-the-northern-gaza-strip": {
@@ -2109,6 +3129,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2004-sinai-bombings": {
@@ -2116,6 +3140,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "second-battle-of-fallujah": {
@@ -2123,6 +3151,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "assassination-of-rafic-hariri": {
@@ -2130,6 +3162,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2005-sharm-el-sheikh-bombings": {
@@ -2143,6 +3179,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2005-amman-bombings": {
@@ -2150,6 +3190,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "haditha-massacre": {
@@ -2157,6 +3201,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "mahmudiyah-rape-and-murders": {
@@ -2164,6 +3212,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2006-israeli-operation-in-beit-hanoun": {
@@ -2171,6 +3223,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "assassination-of-hrant-dink": {
@@ -2178,6 +3234,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "qahtaniyah-bombings": {
@@ -2185,6 +3245,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nisour-square-massacre": {
@@ -2198,6 +3262,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-basra-2008": {
@@ -2205,6 +3273,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2009-khan-el-khalili-bombing": {
@@ -2218,6 +3290,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2010-baghdad-church-siege": {
@@ -2225,6 +3301,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2011-alexandria-bombing": {
@@ -2232,6 +3312,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sinai-insurgency": {
@@ -2245,21 +3329,32 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2011-bahraini-uprising": {
       "text_sha1": "0bc3706ced9e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "The government's position is absent; the crackdown is described through quoted criticism only.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "The government's position is absent; the crackdown is described through quoted criticism only."
+      },
+      "second_look": false
     },
     "siege-of-daraa": {
       "text_sha1": "dba31e45a6cc",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-homs": {
@@ -2267,6 +3362,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "istanbul-convention": {
@@ -2274,6 +3373,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-talkalakh-may-2011": {
@@ -2281,6 +3384,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "june-2011-jisr-ash-shughur-clashes": {
@@ -2294,6 +3401,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Presents the government and opposition accounts explicitly as disputed."
+      },
       "second_look": true
     },
     "siege-of-hama-2011": {
@@ -2301,6 +3412,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2011-southern-israel-cross-border-attacks": {
@@ -2314,6 +3429,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2012-homs-offensive": {
@@ -2327,6 +3446,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "houla-massacre": {
@@ -2334,6 +3457,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Carefully sourced to UN reports and includes the government's alternative account and the press report that supported it."
+      },
       "second_look": false
     },
     "battle-of-damascus-2012": {
@@ -2341,6 +3468,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2012-gaza-war": {
@@ -2348,6 +3479,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives both sides' account of what started it, casualties on both sides, Western and Arab reactions, and a human-rights finding that both sides broke the laws of war."
+      },
       "second_look": false
     },
     "battle-of-ras-al-ayn-2012-13": {
@@ -2355,6 +3490,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-raqqa-2013": {
@@ -2362,6 +3501,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2013-reyhanl-car-bombings": {
@@ -2369,6 +3512,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2013-egyptian-coup-d-etat": {
@@ -2387,6 +3534,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "rabaa-massacre": {
@@ -2400,6 +3551,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the human-rights, government and Muslim Brotherhood death tolls side by side, and reports the retaliatory attacks on police and churches."
+      },
       "second_look": true
     },
     "ghouta-chemical-attack": {
@@ -2407,6 +3562,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "fall-of-fallujah": {
@@ -2414,6 +3573,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "fall-of-mosul": {
@@ -2421,6 +3584,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "camp-speicher-massacre": {
@@ -2434,6 +3601,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2014-kidnapping-and-murders-of-israeli-teenagers": {
@@ -2441,6 +3612,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-deir-ez-zor-2014-2017": {
@@ -2448,6 +3623,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sinjar-massacre": {
@@ -2455,6 +3634,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-zumar": {
@@ -2462,6 +3645,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "siege-of-kobani": {
@@ -2469,6 +3656,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2014-jerusalem-synagogue-attack": {
@@ -2482,6 +3673,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-ramadi-2014-2015": {
@@ -2489,6 +3684,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "houthi-insurgency": {
@@ -2496,6 +3695,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "march-2015-sanaa-mosque-bombings": {
@@ -2503,6 +3706,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-idlib-2015": {
@@ -2510,6 +3717,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2015-kuwait-mosque-bombing": {
@@ -2523,19 +3734,26 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "suruc-bombing": {
       "text_sha1": "5bd109b723db",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "The wording \"turning a blind eye ... as part of their collaboration with ISIL\" treats collaboration as given inside what is only an accusation.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "turning a blind eye",
-        "as part of their collaboration with ISIL"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "The wording \"turning a blind eye ... as part of their collaboration with ISIL\" treats collaboration as given inside what is only an accusation.",
+        "phrases": [
+          "turning a blind eye",
+          "as part of their collaboration with ISIL"
+        ]
+      },
+      "second_look": false
     },
     "2015-ankara-bombings": {
       "text_sha1": "658da428addf",
@@ -2548,6 +3766,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "metrojet-flight-9268": {
@@ -2555,6 +3777,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2015-beirut-bombings": {
@@ -2568,6 +3794,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "january-2016-istanbul-bombing": {
@@ -2575,6 +3805,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "february-2016-ankara-bombing": {
@@ -2582,6 +3816,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palmyra-offensive-march-2016": {
@@ -2589,6 +3827,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "march-2016-ankara-bombing": {
@@ -2596,6 +3838,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "march-2016-istanbul-bombing": {
@@ -2603,6 +3849,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iskandariya-suicide-bombing": {
@@ -2610,6 +3860,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "june-2016-istanbul-bombing": {
@@ -2617,6 +3871,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "june-2016-tel-aviv-shooting": {
@@ -2630,6 +3888,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2016-ataturk-airport-attack": {
@@ -2637,24 +3899,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2016-karrada-bombing": {
       "text_sha1": "42e163a1bffb",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Leads with the highest death toll (\"up to 1,000\"); most counts are around 340.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "up to 1,000"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Leads with the highest death toll (\"up to 1,000\"); most counts are around 340.",
+        "phrases": [
+          "up to 1,000"
+        ]
+      },
+      "second_look": false
     },
     "august-2016-gaziantep-bombing": {
       "text_sha1": "b8a7489fa4e0",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-euphrates-shield": {
@@ -2662,6 +3935,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-al-bab": {
@@ -2669,6 +3946,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palmyra-offensive-december-2016": {
@@ -2676,6 +3957,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2016-besiktas-bombings": {
@@ -2683,6 +3968,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "botroseya-church-bombing": {
@@ -2690,6 +3979,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "assassination-of-andrei-karlov": {
@@ -2697,6 +3990,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "istanbul-nightclub-shooting": {
@@ -2710,6 +4007,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2017-jerusalem-truck-attack": {
@@ -2717,6 +4018,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palm-sunday-church-bombings": {
@@ -2724,6 +4029,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2017-aleppo-suicide-car-bombing": {
@@ -2731,6 +4040,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2017-minya-bus-attack": {
@@ -2738,6 +4051,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2017-tehran-attacks": {
@@ -2756,6 +4073,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-kirkuk-2017": {
@@ -2763,6 +4084,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-raqqa-2017": {
@@ -2770,6 +4095,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2017-sinai-mosque-attack": {
@@ -2783,6 +4112,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "ahvaz-military-parade-attack": {
@@ -2796,6 +4129,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-baghuz-fawqani": {
@@ -2803,21 +4140,32 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-olive-branch": {
       "text_sha1": "20a48b32dd73",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Lists war crimes and arrests of critics but leaves out Turkey's stated reason (that it considers the YPG an arm of the PKK).",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Lists war crimes and arrests of critics but leaves out Turkey's stated reason (that it considers the YPG an arm of the PKK)."
+      },
+      "second_look": false
     },
     "israel-united-arab-emirates-normalization-agreement": {
       "text_sha1": "16e2681749b9",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "bahrain-israel-normalization-agreement": {
@@ -2825,6 +4173,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2020-aden-airport-attack": {
@@ -2832,6 +4184,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2022-al-aqsa-clashes": {
@@ -2839,6 +4195,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"terrorism\" because Wikidata types it as a terrorist attack and an attack on a mosque, without saying which party it means. The summary itself describes clashes between protesters and police. Our category follows Wikidata's type without judging it."
     },
@@ -2847,6 +4207,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2022-istanbul-bombing": {
@@ -2865,6 +4229,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2023-neve-yaakov-shooting": {
@@ -2872,6 +4240,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "july-2023-jenin-incursion": {
@@ -2879,6 +4251,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "october-7-attacks": {
@@ -2886,6 +4262,14 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Contested claims about the two sides are treated unevenly: the sexual-violence reports are introduced as what \"numerous sources have reported\" and paired with Hamas's denial, while the Hannibal Directive deaths are stated in Wikipedia's own voice.",
+      "first_review": {
+        "found": true,
+        "note": "Hedges the sexual-violence reports (\"Hamas officials denied\") while stating as fact that \"at least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive\", and uses \"illegal Israeli settlements\" as fact. It does note that 44 governments called the attack terrorism.",
+        "phrases": [
+          "illegal Israeli settlements",
+          "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
+        ]
+      },
       "second_look": false
     },
     "zikim-attack": {
@@ -2893,6 +4277,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nova-music-festival-massacre": {
@@ -2906,6 +4294,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "kfar-aza-massacre": {
@@ -2913,6 +4305,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "be-eri-massacre": {
@@ -2920,6 +4316,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "netiv-haasara-massacre": {
@@ -2927,6 +4327,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nir-oz-attack": {
@@ -2934,6 +4338,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nahal-oz-attack": {
@@ -2941,6 +4349,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "alumim-massacre": {
@@ -2948,6 +4360,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nirim-attack": {
@@ -2955,6 +4371,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "kissufim-massacre": {
@@ -2962,6 +4382,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "holit-attack": {
@@ -2969,6 +4393,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "church-of-saint-porphyrius-airstrike": {
@@ -2976,21 +4404,32 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "al-shifa-hospital-siege": {
       "text_sha1": "d33341dfe326",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Reports Israel's and US intelligence's claims, then lists many media rebuttals; the evidence of hostages being taken into the hospital gets one line.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Reports Israel's and US intelligence's claims, then lists many media rebuttals; the evidence of hostages being taken into the hospital gets one line."
+      },
+      "second_look": false
     },
     "battle-of-aleppo-2024": {
       "text_sha1": "b378486b5ffa",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "assassination-of-saleh-al-arouri": {
@@ -2998,6 +4437,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2024-kerman-bombings": {
@@ -3011,6 +4454,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "operation-marg-bar-sarmachar": {
@@ -3018,6 +4465,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "killing-of-hind-rajab": {
@@ -3041,15 +4492,25 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Well documented (independent investigations; the IDF later admitted firing), with one editorial touch (\"finally admitted\").",
+        "phrases": [
+          "finally admitted"
+        ]
+      },
       "second_look": false
     },
     "flour-massacre": {
       "text_sha1": "66812b47fcce",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Gives the Israeli, survivor and CNN accounts, but closes on one correspondent's claim of \"a broader pattern\".",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Gives the Israeli, survivor and CNN accounts, but closes on one correspondent's claim of \"a broader pattern\"."
+      },
+      "second_look": false
     },
     "israeli-airstrike-on-the-iranian-consulate-in-damascus": {
       "text_sha1": "1cbddeaca779",
@@ -3067,6 +4528,14 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "After Israel's position, argues against it in the article's own voice (\"the building was indeed a consulate\"; embassies \"frequently host military attaches\").",
+        "phrases": [
+          "the building was indeed a consulate",
+          "frequently host military attaches"
+        ]
+      },
       "second_look": false
     },
     "world-central-kitchen-aid-convoy-attack": {
@@ -3080,15 +4549,22 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Includes the IDF's admissions and disciplinary action, the charity's accusation, and an Australian government report that largely supported Israel's version."
+      },
       "second_look": true
     },
     "tel-al-sultan-attack": {
       "text_sha1": "567b1b659d4c",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Gives Israel's account and Amnesty's finding that militants were present, but the emphasis is on the \"safe zone\" and civilians burned alive.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Gives Israel's account and Amnesty's finding that militants were present, but the emphasis is on the \"safe zone\" and civilians burned alive."
+      },
+      "second_look": false
     },
     "july-2024-houthi-israel-attacks": {
       "text_sha1": "97b4c4bf5ce9",
@@ -3101,6 +4577,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "majdal-shams-attack": {
@@ -3108,6 +4588,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "assassination-of-ismail-haniyeh": {
@@ -3115,6 +4599,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2024-hezbollah-headquarters-strike": {
@@ -3122,6 +4610,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "killing-of-yahya-sinwar": {
@@ -3129,6 +4621,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives Israeli, US and Hamas reactions and both readings of the released drone footage."
+      },
       "second_look": false
     },
     "turkish-aerospace-industries-headquarters-attack": {
@@ -3136,6 +4632,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "fall-of-damascus-2024": {
@@ -3143,24 +4643,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "rafah-paramedic-massacre": {
       "text_sha1": "77e2af21f200",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Well documented (a victim's video contradicted the IDF account), with \"murdered\" used as fact.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "murdered"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Well documented (a victim's video contradicted the IDF account), with \"murdered\" used as fact.",
+        "phrases": [
+          "murdered"
+        ]
+      },
+      "second_look": false
     },
     "mar-elias-church-attack": {
       "text_sha1": "d0918fe82685",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "israeli-attack-on-doha": {
@@ -3168,6 +4679,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives Israel's stated reason and Qatar's characterisation, each attributed."
+      },
       "second_look": false
     },
     "assassination-of-ali-khamenei": {
@@ -3175,6 +4690,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2026-minab-school-attack": {
@@ -3182,6 +4701,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "The attribution to the US rests on the UN, Amnesty International, and several independent news and open-source investigations."
+      },
       "second_look": false,
       "disclosure": "This summary mentions Anthropic's Claude as part of a US military targeting system. This review was also produced by Claude, so the reviewer has a connection to the subject of this entry."
     },
@@ -3190,6 +4713,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-riyadh": {
@@ -3197,6 +4724,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "first-saudi-rashidi-war-1903-1907": {
@@ -3204,33 +4735,47 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "constitutionalization-attempts-in-iran": {
       "text_sha1": "ae2083eaf97e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Describes the Shah's government as \"oppressive\" and the period as \"a classic example of an environment ripe for protest\" as fact, without saying who holds that view.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "oppressive",
-        "a classic example of an environment ripe for protest"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Describes the Shah's government as \"oppressive\" and the period as \"a classic example of an environment ripe for protest\" as fact, without saying who holds that view.",
+        "phrases": [
+          "oppressive",
+          "a classic example of an environment ripe for protest"
+        ]
+      },
+      "second_look": false
     },
     "attempted-assassination-of-abdul-hamid-ii": {
       "text_sha1": "316eccb0190a",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Opens with the attackers' grievance (the Hamidian massacres) as the motive before describing the bombing that killed 26; factual, but sympathetic in emphasis.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Opens with the attackers' grievance (the Hamidian massacres) as the motive before describing the bombing that killed 26; factual, but sympathetic in emphasis."
+      },
+      "second_look": false
     },
     "31-march-incident": {
       "text_sha1": "da1b9a16312c",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1912-ottoman-coup-d-etat": {
@@ -3238,6 +4783,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "treaty-of-constantinople-1913": {
@@ -3245,6 +4794,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "world-war-i": {
@@ -3252,6 +4805,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "german-ottoman-alliance": {
@@ -3259,6 +4816,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "naval-operations-in-the-dardanelles-campaign": {
@@ -3266,6 +4827,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "20-hunchakian-gallows": {
@@ -3273,6 +4838,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "jungle-movement-of-gilan": {
@@ -3280,6 +4849,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "treaty-of-darin": {
@@ -3287,6 +4860,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-mecca-1916": {
@@ -3294,6 +4871,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "menemen-massacre": {
@@ -3301,6 +4882,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "data_note": "The start date (1916) comes from Wikidata; the summary dates the massacre to June 1919."
     },
@@ -3309,6 +4894,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "armistice-of-erzincan": {
@@ -3316,6 +4905,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-kurdish-conflict": {
@@ -3323,6 +4916,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "trebizond-peace-conference": {
@@ -3330,6 +4927,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "franco-turkish-war": {
@@ -3337,6 +4938,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1919-egyptian-revolution": {
@@ -3344,6 +4949,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "greco-turkish-war-1919-1922": {
@@ -3351,6 +4960,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-nemesis": {
@@ -3358,6 +4971,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Our category is \"political\" because Wikidata types this as an assassination campaign; the earlier bombing attempt on Abdul Hamid II by the same organisation is typed as a terrorist attack and shown as terrorism."
     },
@@ -3372,6 +4989,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true,
       "category_note": "Shown as \"migration\" because Wikidata types it as a population transfer; the summary describes massacres of Turkish civilians."
     },
@@ -3380,6 +5001,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1920-capture-of-damascus": {
@@ -3387,6 +5012,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1921-persian-coup-d-etat": {
@@ -3394,6 +5023,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "kurdish-turkish-conflict": {
@@ -3401,6 +5034,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "second-battle-of-inonu": {
@@ -3408,24 +5045,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-the-sakarya": {
       "text_sha1": "ea298e55c03a",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Closes on a Turkish nationalist quotation with no counterpart view.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "The retreat that started in Vienna on 13 September 1683 stopped 238 years later."
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Closes on a Turkish nationalist quotation with no counterpart view.",
+        "phrases": [
+          "The retreat that started in Vienna on 13 September 1683 stopped 238 years later."
+        ]
+      },
+      "second_look": false
     },
     "treaty-of-ankara-1921": {
       "text_sha1": "a493ff3cbdb6",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "unilateral-declaration-of-egyptian-independence": {
@@ -3433,6 +5081,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-dumlup-nar": {
@@ -3440,6 +5092,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "turkish-capture-of-smyrna": {
@@ -3447,6 +5103,14 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told only from the Turkish army's side: the entry is framed as \"bringing three years of Greek occupation to an end\", and the city's Greek and Armenian inhabitants do not appear in the summary.",
+      "first_review": {
+        "found": true,
+        "note": "Uses the Turkish name \"Liberation of İzmir\" and \"Greek occupation\", but leaves out the Great Fire of Smyrna and the killing of Greek and Armenian civilians that followed.",
+        "phrases": [
+          "Liberation of İzmir",
+          "Greek occupation"
+        ]
+      },
       "second_look": false
     },
     "uqair-protocol-of-1922": {
@@ -3454,6 +5118,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "sheikh-said-rebellion": {
@@ -3461,6 +5129,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "treaty-of-jeddah-1927": {
@@ -3468,6 +5140,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "ararat-rebellion": {
@@ -3475,6 +5151,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "saudi-yemeni-war-1934": {
@@ -3482,6 +5162,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "goharshad-mosque-rebellion": {
@@ -3489,6 +5173,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "montreux-convention-regarding-the-regime-of-the-straits": {
@@ -3496,6 +5184,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "dersim-massacre": {
@@ -3503,6 +5195,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "treaty-of-saadabad": {
@@ -3510,6 +5206,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "world-war-ii": {
@@ -3517,6 +5217,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-for-jerusalem": {
@@ -3524,6 +5228,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1948-palestinian-expulsion-and-flight": {
@@ -3542,6 +5250,14 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "States contested specifics as fact, such as a \"biological warfare programme\" of well-poisoning and typhoid \"caused by Israeli well-poisoning\". Its central point, that expulsions and fear were the main causes of flight, matches majority scholarship, and it notes that some disagree.",
+        "phrases": [
+          "biological warfare programme",
+          "caused by Israeli well-poisoning"
+        ]
+      },
       "second_look": false
     },
     "operation-dani": {
@@ -3549,6 +5265,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-nachshon": {
@@ -3556,6 +5276,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1948-arab-israeli-war": {
@@ -3563,6 +5287,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-yoav": {
@@ -3570,6 +5298,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-hiram": {
@@ -3577,6 +5309,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-horev": {
@@ -3584,6 +5320,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-uvda": {
@@ -3591,6 +5331,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "march-1949-syrian-coup-d-etat": {
@@ -3598,6 +5342,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-magic-carpet-yemen": {
@@ -3605,6 +5353,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"war\" because Wikidata types it as a military operation; it was an airlift of Yemenite Jews to Israel."
     },
@@ -3613,6 +5365,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "balkan-pact-1953": {
@@ -3620,6 +5376,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-musketeer-1956": {
@@ -3627,6 +5387,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1959-mosul-uprising": {
@@ -3634,6 +5398,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1960-turkish-coup-d-etat": {
@@ -3641,16 +5409,23 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "white-revolution": {
       "text_sha1": "dd7f2998cc80",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Lists the reforms' benefits at length and reduces the opposition largely to clerics protecting their power.",
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Lists the reforms' benefits at length and reduces the opposition largely to clerics protecting their power."
+      },
       "second_look": false,
-      "category_note": "Shown as \"uprising\" because Wikidata types it as a revolution; it was a reform programme launched by the Shah.",
-      "note_source": "first-review"
+      "category_note": "Shown as \"uprising\" because Wikidata types it as a revolution; it was a reform programme launched by the Shah."
     },
     "1963-syrian-coup-d-etat": {
       "text_sha1": "72281a9091ab",
@@ -3663,6 +5438,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "dhofar-rebellion": {
@@ -3676,6 +5455,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Calls it \"a revolution ... against British imperialism\" as fact and puts the government side's aim in scare quotes.",
+        "phrases": [
+          "against British imperialism"
+        ]
+      },
       "second_look": false
     },
     "ankara-agreement": {
@@ -3683,6 +5469,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "aden-emergency": {
@@ -3690,21 +5480,32 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palestinian-insurgency-in-south-lebanon": {
       "text_sha1": "fd4c32df25fe",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency."
+      },
+      "second_look": false
     },
     "aeroflot-flight-244": {
       "text_sha1": "c0b51112f806",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1970-syrian-coup-d-etat": {
@@ -3712,6 +5513,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1971-turkish-military-memorandum": {
@@ -3719,6 +5524,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "seizure-of-abu-musa-and-the-greater-and-lesser-tunbs": {
@@ -3726,6 +5535,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "first-yemenite-war": {
@@ -3733,6 +5546,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-badr-1973": {
@@ -3740,6 +5557,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the Egyptian side (\"the sweeping success of Egyptian troops\"); the Israeli defenders appear only as the force overcome.",
+      "first_review": {
+        "found": true,
+        "note": "Focuses on Egyptian success and commemorations; the Israeli counter-offensive gets one clause."
+      },
       "second_look": false
     },
     "tel-al-zaatar-massacre": {
@@ -3747,6 +5568,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "black-friday-1978": {
@@ -3754,6 +5579,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "maras-massacre": {
@@ -3761,6 +5590,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iran-saudi-arabia-proxy-war": {
@@ -3768,6 +5601,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1979-iranian-islamic-republic-referendum": {
@@ -3775,6 +5612,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1979-khuzestan-insurgency": {
@@ -3782,6 +5623,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1979-iranian-constitutional-referendum": {
@@ -3789,18 +5634,25 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1980-turkish-coup-d-etat": {
       "text_sha1": "7fe8d771aab7",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Uses ironic wording as fact: the coup was \"welcomed by some for restoring order by quickly executing 50 people and arresting 500,000\".",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "welcomed by some for restoring order by quickly executing 50 people and arresting 500,000"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Uses ironic wording as fact: the coup was \"welcomed by some for restoring order by quickly executing 50 people and arresting 500,000\".",
+        "phrases": [
+          "welcomed by some for restoring order by quickly executing 50 people and arresting 500,000"
+        ]
+      },
+      "second_look": false
     },
     "operation-kaman-99": {
       "text_sha1": "30c7fcf0523f",
@@ -3813,6 +5665,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "\"The outcome was clearly successful\"; written from the Iranian Air Force's side.",
+        "phrases": [
+          "The outcome was clearly successful"
+        ]
+      },
       "second_look": false
     },
     "operation-morvarid": {
@@ -3820,6 +5679,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1981-iranian-prime-minister-s-office-bombing": {
@@ -3827,6 +5690,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "haft-e-tir-bombing": {
@@ -3840,25 +5707,36 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "operation-tariq-al-quds": {
       "text_sha1": "ae9c95c3299b",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Uses the Iranian framing \"Liberation of Bostan\" and Khomeini's \"victory of victories\".",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "Liberation of Bostan",
-        "victory of victories"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Uses the Iranian framing \"Liberation of Bostan\" and Khomeini's \"victory of victories\".",
+        "phrases": [
+          "Liberation of Bostan",
+          "victory of victories"
+        ]
+      },
+      "second_look": false
     },
     "operation-fath-ol-mobin": {
       "text_sha1": "6dc1ccb8ed2f",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-beit-ol-moqaddas": {
@@ -3866,6 +5744,14 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the Iranian side (\"liberating Khorramshahr\", \"extremely significant events\").",
+      "first_review": {
+        "found": true,
+        "note": "Written from the Iranian side (\"liberating Khorramshahr\", \"extremely significant events\").",
+        "phrases": [
+          "liberating Khorramshahr",
+          "extremely significant events"
+        ]
+      },
       "second_look": false
     },
     "operation-mole-cricket-19": {
@@ -3873,6 +5759,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "may-17-agreement": {
@@ -3880,6 +5770,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iran-israel-proxy-conflict": {
@@ -3887,6 +5781,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "south-yemeni-crisis": {
@@ -3894,6 +5792,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-earnest-will": {
@@ -3901,6 +5803,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-prime-chance": {
@@ -3908,6 +5814,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "second-battle-of-al-faw": {
@@ -3915,6 +5825,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-praying-mantis": {
@@ -3922,6 +5836,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-mersad": {
@@ -3929,6 +5847,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1989-iranian-constitutional-referendum": {
@@ -3936,6 +5858,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "british-airways-flight-149": {
@@ -3943,6 +5869,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"terrorism\" because Wikidata types it as a hostage taking; the airliner and its passengers were seized by Iraqi forces during the invasion of Kuwait."
     },
@@ -3951,21 +5881,32 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-norfolk": {
       "text_sha1": "38460040620e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Superlatives from the US side; Iraqi losses appear only as counts.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Superlatives from the US side; Iraqi losses appear only as counts."
+      },
+      "second_look": false
     },
     "operation-provide-comfort": {
       "text_sha1": "db9590879df6",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-southern-watch": {
@@ -3973,6 +5914,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-accountability": {
@@ -3980,6 +5925,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-kurdish-civil-war": {
@@ -3987,6 +5936,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "yemeni-civil-war-1994": {
@@ -3994,6 +5947,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1996-cruise-missile-strikes-on-iraq": {
@@ -4001,6 +5958,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-grapes-of-wrath": {
@@ -4008,6 +5969,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "1998-bombing-of-iraq": {
@@ -4015,6 +5980,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-defensive-shield": {
@@ -4022,6 +5991,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraq-war": {
@@ -4035,6 +6008,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "iraqi-conflict": {
@@ -4042,6 +6019,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-karbala-2003": {
@@ -4049,6 +6030,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2003-nasiriyah-bombing": {
@@ -4056,6 +6041,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2004-ashura-massacre": {
@@ -4069,6 +6058,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "battle-of-samarra-2004": {
@@ -4076,6 +6069,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-civil-war-2006-2008": {
@@ -4083,6 +6080,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2008-turkish-incursion-into-northern-iraq": {
@@ -4096,6 +6097,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "operation-hot-winter": {
@@ -4103,6 +6108,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "south-yemen-insurgency": {
@@ -4110,6 +6119,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-invasion-of-kuwait": {
@@ -4117,6 +6130,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "data_note": "The start date (2009) comes from Wikidata and is wrong; the invasion began on 2 August 1990."
     },
@@ -4125,6 +6142,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2010-turkish-constitutional-referendum": {
@@ -4132,6 +6153,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-insurgency-2011-2013": {
@@ -4145,6 +6170,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "turkish-involvement-in-the-syrian-civil-war": {
@@ -4152,6 +6181,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "syrian-revolution": {
@@ -4159,6 +6192,13 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": "Told from the opposition's side throughout (\"the Ba'athist dictatorship\", \"sectarian Shabiha death squads\", \"Finally in December 2024, the Syrian revolution achieved its main goal\"); the government side appears only through its violence. The UN findings are attributed.",
+      "first_review": {
+        "found": true,
+        "note": "Written as a victory story (\"the Syrian revolution achieved its main goal\"); the jihadist groups that led the 2024 offensive are not identified. The regime's atrocities it describes are well documented.",
+        "phrases": [
+          "the Syrian revolution achieved its main goal"
+        ]
+      },
       "second_look": false
     },
     "arab-winter": {
@@ -4172,6 +6212,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "march-2012-gaza-israel-clashes": {
@@ -4179,6 +6223,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2012-syrian-constitutional-referendum": {
@@ -4186,6 +6234,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "rojava-revolution": {
@@ -4193,6 +6245,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2012-egyptian-constitutional-referendum": {
@@ -4206,6 +6262,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "anbar-campaign-2013-2014": {
@@ -4213,6 +6273,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2014-gaza-war": {
@@ -4220,6 +6284,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Places casualty estimates from the Gaza Health Ministry, the UN and Israeli officials side by side and gives both sides' war aims."
+      },
       "second_look": false
     },
     "war-in-iraq-2013-2017": {
@@ -4227,6 +6295,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2014-egyptian-constitutional-referendum": {
@@ -4234,6 +6306,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "first-battle-of-tikrit": {
@@ -4241,6 +6317,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "yazidi-genocide": {
@@ -4248,6 +6328,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iraqi-turkmen-genocide": {
@@ -4255,6 +6339,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-chammal": {
@@ -4268,6 +6356,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "houthi-takeover-of-yemen": {
@@ -4281,6 +6373,13 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "After listing both names, calls the takeover \"a popular revolution\" as fact rather than a coup.",
+        "phrases": [
+          "a popular revolution"
+        ]
+      },
       "second_look": false
     },
     "operation-inherent-resolve": {
@@ -4294,6 +6393,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "2015-2016-latakia-offensive": {
@@ -4301,6 +6404,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "palmyra-offensive-may-2015": {
@@ -4308,6 +6415,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "third-battle-of-fallujah": {
@@ -4315,6 +6426,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2016-turkish-coup-d-etat-attempt": {
@@ -4333,6 +6448,15 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Gives extended space to the theory that the coup was staged (a \"Reichstag Fire\", its \"overall absurdity\") and uses \"Erdogan regime\" as fact. The government's case appears mainly as Erdoğan's allegation.",
+        "phrases": [
+          "Reichstag Fire",
+          "overall absurdity",
+          "Erdogan regime"
+        ]
+      },
       "second_look": false
     },
     "aleppo-offensive-november-december-2016": {
@@ -4340,6 +6464,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2017-turkish-constitutional-referendum": {
@@ -4347,6 +6475,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2017-kurdistan-region-independence-referendum": {
@@ -4360,6 +6492,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": true
     },
     "iraqi-insurgency-2017-present": {
@@ -4367,6 +6503,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2019-turkish-offensive-into-northeastern-syria": {
@@ -4380,6 +6520,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Includes Turkey's stated reasons, the ethnic-cleansing criticism and Turkey's reply to it."
+      },
       "second_look": true
     },
     "2019-egyptian-constitutional-referendum": {
@@ -4387,6 +6531,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "mahshahr-massacre": {
@@ -4394,6 +6542,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "northwestern-syria-offensive-2019-2020": {
@@ -4401,6 +6553,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-spring-shield": {
@@ -4408,6 +6564,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "united-states-taliban-deal": {
@@ -4415,6 +6575,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-claw-eagle-2": {
@@ -4422,6 +6586,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "iran-china-25-year-cooperation-program": {
@@ -4429,6 +6597,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "black-sea-grain-initiative": {
@@ -4436,6 +6608,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "data_note": "A Russia-Ukraine grain agreement, tagged Turkey because it was signed in Istanbul."
     },
@@ -4444,24 +6620,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the Gaza Health Ministry's toll, the IDF's claim that misfired rockets caused some deaths, the dispute over it and an independent Israeli newspaper's count."
+      },
       "second_look": false
     },
     "israeli-blockade-of-the-gaza-strip-2023-present": {
       "text_sha1": "76a01de62dc1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Treats \"the Gaza genocide\" as an established fact. That finding is supported by a UN commission and genocide scholars but rejected by Israel, the US and others, and the International Court of Justice has not ruled. Israel's stated reasons appear only as something criticised.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "the Gaza genocide"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Treats \"the Gaza genocide\" as an established fact. That finding is supported by a UN commission and genocide scholars but rejected by Israel, the US and others, and the International Court of Justice has not ruled. Israel's stated reasons appear only as something criticised.",
+        "phrases": [
+          "the Gaza genocide"
+        ]
+      },
+      "second_look": false
     },
     "war-crimes-in-the-gaza-war": {
       "text_sha1": "287f26117a7f",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Attributes war-crimes findings to both Hamas and the IDF, including arrest warrants for leaders on both sides."
+      },
       "second_look": false
     },
     "may-2023-gaza-israel-clashes": {
@@ -4469,6 +6656,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "gaza-war-hostage-crisis": {
@@ -4476,29 +6667,39 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "A factual account that includes the hostages killed by IDF friendly fire and the Palestinians killed during a rescue."
+      },
       "second_look": false
     },
     "gaza-strip-famine": {
       "text_sha1": "6be5bb6f6103",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Opens with the famine as \"a result of an Israeli blockade\"; other causes (looting, breakdown of order) come later as secondary.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "a result of an Israeli blockade"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Opens with the famine as \"a result of an Israeli blockade\"; other causes (looting, breakdown of order) come later as secondary.",
+        "phrases": [
+          "a result of an Israeli blockade"
+        ]
+      },
+      "second_look": false
     },
     "gaza-strip-evacuations": {
       "text_sha1": "69bba30e40cf",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Gives the IDF's stated reason, then relies on evacuee and critic accounts, with \"forced evacuations\" as fact.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "forced evacuations"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Gives the IDF's stated reason, then relies on evacuee and critic accounts, with \"forced evacuations\" as fact.",
+        "phrases": [
+          "forced evacuations"
+        ]
+      },
+      "second_look": false
     },
     "gaza-genocide": {
       "text_sha1": "f1f4213b16e1",
@@ -4511,6 +6712,14 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "The opening sentence defines it as \"the ongoing, intentional, and systematic destruction of the Palestinian people ... carried out by Israel\". The finding is supported by a UN commission and genocide scholars, but Israel, the US and some scholars reject it and the International Court of Justice has not ruled. Israel's position gets one sentence near the end.",
+        "phrases": [
+          "the ongoing, intentional, and systematic destruction of the Palestinian people",
+          "carried out by Israel"
+        ]
+      },
       "second_look": false
     },
     "battle-of-sderot": {
@@ -4518,6 +6727,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "battle-of-re-im": {
@@ -4525,6 +6738,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "kidnapping-and-killing-of-the-bibas-family": {
@@ -4538,21 +6755,32 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives Hamas's claim and Israel's forensic claim, and notes that Israel did not publish its evidence."
+      },
       "second_look": true
     },
     "sexual-and-gender-based-violence-in-the-october-7-attacks": {
       "text_sha1": "ae9d07af1775",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas."
+      },
+      "second_look": false
     },
     "red-sea-crisis": {
       "text_sha1": "fb3ab6b92486",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2023-gaza-war-ceasefire": {
@@ -4560,6 +6788,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-prosperity-guardian": {
@@ -4567,6 +6799,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "operation-aspides": {
@@ -4574,21 +6810,32 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "nuseirat-rescue-and-massacre": {
       "text_sha1": "59353eae5828",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "The title adopts the \"massacre\" label that the text itself attributes to \"some sources\"; the UN human rights office says both sides may have committed war crimes.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "The title adopts the \"massacre\" label that the text itself attributes to \"some sources\"; the UN human rights office says both sides may have committed war crimes."
+      },
+      "second_look": false
     },
     "2024-lebanon-electronic-device-attacks": {
       "text_sha1": "25f1e5793e9c",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false,
       "category_note": "Shown as \"terrorism\" because Wikidata types this Israeli operation as a terrorist attack (and also as counter-terrorism). The summary quotes both UN experts and commentators who called it an anti-terrorist operation. Our category follows Wikidata's type without judging it."
     },
@@ -4597,21 +6844,32 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "september-2024-israeli-attacks-against-lebanon": {
       "text_sha1": "0642318064d1",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Details the casualties and Lebanon's \"war of extermination\" charge but leaves out Hezbollah's year of rocket fire that preceded the campaign.",
-      "second_look": false,
-      "note_source": "first-review"
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Details the casualties and Lebanon's \"war of extermination\" charge but leaves out Hezbollah's year of rocket fire that preceded the campaign."
+      },
+      "second_look": false
     },
     "2024-lebanon-war": {
       "text_sha1": "8ec389d376bb",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2024-israel-lebanon-ceasefire-agreement": {
@@ -4619,6 +6877,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Documents ceasefire violations by both sides."
+      },
       "second_look": false
     },
     "january-2025-gaza-war-ceasefire": {
@@ -4626,6 +6888,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Reports accusations of violations by both sides and Israel's reason for resuming strikes."
+      },
       "second_look": false
     },
     "2025-massacres-of-syrian-alawites": {
@@ -4633,6 +6899,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "march-may-2025-united-states-attacks-in-yemen": {
@@ -4640,6 +6910,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "march-2025-israeli-attacks-on-the-gaza-strip": {
@@ -4653,6 +6927,10 @@
         }
       ],
       "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "States Israel's position, but frames the entry around Israeli ceasefire breaches and argues who broke the ceasefire rather than describing the dispute."
+      },
       "second_look": false
     },
     "may-2025-gaza-offensive": {
@@ -4660,24 +6938,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2025-gaza-strip-aid-distribution-killings": {
       "text_sha1": "7300d1259c7d",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Mostly attributed, with the Israeli denial included; says \"amid a famine\" before the famine was formally declared in August 2025.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "amid a famine"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Mostly attributed, with the Israeli denial included; says \"amid a famine\" before the famine was formally declared in August 2025.",
+        "phrases": [
+          "amid a famine"
+        ]
+      },
+      "second_look": false
     },
     "june-2025-israeli-strikes-on-iran": {
       "text_sha1": "eaf0091cac84",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "southern-syria-clashes-july-september-2025": {
@@ -4685,6 +6974,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Reports violence by Druze, Bedouin and government forces alike."
+      },
       "second_look": false
     },
     "august-2025-israeli-attack-on-sanaa": {
@@ -4692,6 +6985,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "gaza-peace-summit": {
@@ -4699,6 +6996,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "2025-2026-iranian-protests": {
@@ -4706,6 +7007,10 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Gives the death-toll range from the government's figure to the highest estimates, each with its source."
+      },
       "second_look": false
     },
     "2025-2026-iran-massacres": {
@@ -4713,24 +7018,35 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": "Places government, human-rights and media estimates side by side, including the government's own framing."
+      },
       "second_look": false
     },
     "2026-iran-war": {
       "text_sha1": "0277f6b1df1f",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
-      "reviewer_note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
-      "second_look": false,
-      "note_source": "first-review",
-      "note_phrases": [
-        "taking Iran's oil and gas resources"
-      ]
+      "reviewer_note": null,
+      "first_review": {
+        "found": true,
+        "note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
+        "phrases": [
+          "taking Iran's oil and gas resources"
+        ]
+      },
+      "second_look": false
     },
     "fall-of-aden-2026": {
       "text_sha1": "385e11d0be9e",
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     },
     "mecca-joint-defence-agreement": {
@@ -4738,8 +7054,15 @@
       "text_retrieved_at": "2026-09-26",
       "observations": [],
       "reviewer_note": null,
+      "first_review": {
+        "found": false,
+        "note": null
+      },
       "second_look": false
     }
   },
-  "first_review_on": "2026-09-27"
+  "first_review": {
+    "reviewed_on": "2026-09-27",
+    "method": "Overall fairness: emphasis, balance, omissions and contested claims, using the reviewer's general knowledge. Its 0-3 scores and 'leans toward' labels are not published."
+  }
 }

@@ -198,14 +198,24 @@ function framingFor(review, e) {
     if (!g) throw new Error(`framing review ${e.id}: unknown guideline ${o.guideline}`);
     return { guideline: o.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: o.phrase, note: o.note };
   });
+  // Phrases are only marked in the exact text that was reviewed.
+  const marks = (phrases) => (stale ? [] : phrases.filter((p) => text.includes(p)));
+  const first = r.first_review ?? { found: false, note: null };
   return {
-    observations,
-    // Phrases are only marked in the exact text that was reviewed.
-    highlights: stale ? [] : [...observations.map((o) => o.phrase), ...(r.note_phrases ?? [])].filter((p) => text.includes(p)),
-    reviewer_note: r.reviewer_note ?? null,
-    // "first-review": the note is the first review's finding, kept where the current method found nothing.
-    note_source: r.note_source ?? null,
-    first_review_on: review.first_review_on ?? null,
+    // Two reviews with different methods, shown as two tabs on the event page.
+    wording: {
+      found: observations.length > 0 || !!r.reviewer_note,
+      observations,
+      reviewer_note: r.reviewer_note ?? null,
+      highlights: marks(observations.map((o) => o.phrase)),
+      reviewed_on: review.reviewed_on,
+    },
+    fairness: {
+      found: first.found === true,
+      note: first.note ?? null,
+      highlights: marks(first.phrases ?? []),
+      reviewed_on: review.first_review?.reviewed_on ?? null,
+    },
     second_look: r.second_look === true,
     category_note: r.category_note ?? null,
     data_note: r.data_note ?? null,
@@ -223,14 +233,16 @@ async function splitEvents() {
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
-  const framingCounts = { guideline: {}, with_observations: 0, with_note: 0, second_look: 0, stale: 0, missing: 0 };
+  const framingCounts = { guideline: {}, with_observations: 0, with_note: 0, fairness_found: 0, second_look: 0, stale: 0, missing: 0 };
   for (const e of allEvents) {
     const framing = framingFor(review, e);
     if (review && !framing) framingCounts.missing++;
     if (framing) {
-      for (const o of framing.observations) framingCounts.guideline[o.guideline] = (framingCounts.guideline[o.guideline] ?? 0) + 1;
-      if (framing.observations.length) framingCounts.with_observations++;
-      if (framing.reviewer_note) framingCounts.with_note++;
+      const w = framing.wording;
+      for (const o of w.observations) framingCounts.guideline[o.guideline] = (framingCounts.guideline[o.guideline] ?? 0) + 1;
+      if (w.observations.length) framingCounts.with_observations++;
+      else if (w.reviewer_note) framingCounts.with_note++;
+      if (framing.fairness.found) framingCounts.fairness_found++;
       if (framing.second_look) framingCounts.second_look++;
       if (framing.stale) framingCounts.stale++;
     }
