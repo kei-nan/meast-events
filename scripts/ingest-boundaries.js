@@ -10,6 +10,7 @@
 // Every historical correction/addition this project makes lives in boundary-corrections.js
 // instead, and is carried through to every output feature's `source`/`status`/`note`
 // properties, so the generated file is self-documenting about what came from where.
+import { readFileSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { CORRECTIONS } from "./boundary-corrections.js";
 import * as turf from "@turf/turf";
@@ -128,6 +129,7 @@ async function main() {
 
   const raw = JSON.parse(await readFile(sourcePath, "utf-8"));
   const correctionsGeometry = JSON.parse(await readFile(geometryPath, "utf-8"));
+  const land = JSON.parse(await readFile(new URL("../app/src/data/land.json", import.meta.url), "utf-8"));
   const filtered = raw.features.filter(
     (f) => REGION_ENTITIES.includes(f.properties.cntry_name) && f.properties.gweyear >= 1900
   );
@@ -171,21 +173,58 @@ async function main() {
     if (hits.length !== 1) throw new Error(`expected one CShapes record "${cntry_name}", got ${hits.length}`);
     return hits[0].geometry;
   };
-  // "reshape" entries: cut a corrections-geometry shape by a CShapes country's current
-  // (latest) outline, once, before any "add" entry uses it.
+  // "reshape" entries: give a corrections-geometry shape a CShapes country's line as its
+  // border, once, before any "add" entry uses the shape. Each listed border: cut the shape
+  // by that CShapes outline (the record in force in `year`, default the latest); with
+  // `grow`, also give the shape the land within `maxGapKm` between it and that outline
+  // which nothing else covers; with `coastEnd`, cut it where that border meets the sea.
+  const cshapesIn = (name, year) => {
+    const recs = raw.features.filter((f) => f.properties.cntry_name === name);
+    const rec = year == null ? recs.sort((a, b) => b.properties.gweyear - a.properties.gweyear)[0]
+      : recs.find((f) => f.properties.gwsyear <= year && year <= f.properties.gweyear);
+    if (!rec) throw new Error(`reshape: no CShapes "${name}" record${year != null ? ` for ${year}` : ""}`);
+    return rec.geometry;
+  };
+  // Natural Earth 1:10m country polygons (data/raw/ne10-countries.geojson, the source of
+  // several corrections-geometry shapes), loaded only if a reshape asks for them.
+  let ne10 = null;
+  const ne10Land = (area) => {
+    ne10 ??= JSON.parse(readFileSync(new URL("../data/raw/ne10-countries.geojson", import.meta.url), "utf-8"));
+    return area ? ne10.features.filter((f) => turf.booleanIntersects(f, area)).map((f) => asFeature(f.geometry)) : [];
+  };
   for (const r of CORRECTIONS.filter((c) => c.type === "reshape")) {
-    const name = r.minus.slice("cshapes:".length);
-    const latest = raw.features.filter((f) => f.properties.cntry_name === name).sort((a, b) => b.properties.gweyear - a.properties.gweyear)[0];
-    if (!latest || !correctionsGeometry[r.geometry]) throw new Error(`reshape: missing ${r.geometry} or ${r.minus}`);
-    let cut = turf.difference(turf.featureCollection([asFeature(correctionsGeometry[r.geometry]), asFeature(latest.geometry)]));
-    // The two sources' coastlines differ, so the cut can leave a strip of the shape lying
-    // along the other country's coast beyond the point where their border meets the sea.
-    // `coastEnd` names that point (a vertex of the CShapes outline): the border's last
-    // stretch is extended straight out to sea, and everything of the shape on the
-    // country's side of that line, near the point, is removed.
-    if (r.coastEnd) cut = cutBeyondCoastEnd(cut, latest.geometry, r.coastEnd, r.keepPoint);
+    if (!correctionsGeometry[r.geometry]) throw new Error(`reshape: no geometry "${r.geometry}"`);
+    let shape = asFeature(correctionsGeometry[r.geometry]);
+    const outlines = r.borders.map((b) => asFeature(cshapesIn(b.cshapes, b.year)));
+    r.borders.forEach((b, i) => {
+      if (b.grow) {
+        const between = turf.intersect(fc(turf.buffer(shape, b.maxGapKm), turf.buffer(outlines[i], b.maxGapKm)));
+        let gap = between && turf.difference(fc(between, shape));
+        for (const o of outlines) gap = gap && turf.difference(fc(gap, o));
+        // "Land" here must have the same coastline as the shape itself, or the coastal
+        // strip where two sources' coasts differ gets added along the whole shore.
+        const mask = r.landFrom === "naturalEarth10" ? ne10Land(gap) : land.features.map((l) => asFeature(l.geometry));
+        const onLand = gap ? mask.filter((l) => turf.booleanIntersects(l, gap)).map((l) => turf.intersect(fc(l, gap))).filter(Boolean) : [];
+        for (const piece of onLand) shape = turf.union(fc(shape, piece));
+      }
+    });
+    r.borders.forEach((b, i) => {
+      shape = turf.difference(fc(shape, outlines[i])) ?? shape;
+      // The two sources' coastlines differ, so the cut can leave a strip of the shape along
+      // the country's coast beyond the point where their border meets the sea: extend the
+      // border's last stretch (`coastEnd`: its last two CShapes vertices) out to sea and cut.
+      if (b.coastEnd) shape = cutBeyondCoastEnd(shape, outlines[i].geometry, b.coastEnd, r.keepPoint);
+    });
+    // The shape is one territory: keep only the piece containing keepPoint (growth can pick
+    // up a stray bit of gap beyond a tripoint).
+    const g = turf.getGeom(shape);
+    if (g.type === "MultiPolygon") {
+      const main = g.coordinates.find((rings) => turf.booleanPointInPolygon(turf.point(r.keepPoint), turf.polygon(rings)));
+      if (!main) throw new Error(`reshape: no piece of ${r.geometry} contains keepPoint`);
+      shape = turf.polygon(main);
+    }
     // Rounding can make two neighbouring points identical (a zero-length edge); drop those.
-    correctionsGeometry[r.geometry] = turf.cleanCoords(turf.truncate(cut, { precision: 5, coordinates: 2 })).geometry;
+    correctionsGeometry[r.geometry] = turf.cleanCoords(turf.truncate(shape, { precision: 5, coordinates: 2 })).geometry;
   }
   for (const c of CORRECTIONS) {
     if (c.type !== "add") continue;
@@ -208,7 +247,6 @@ async function main() {
     });
   }
 
-  const land = JSON.parse(await readFile(new URL("../app/src/data/land.json", import.meta.url), "utf-8"));
   const fitted = applyFits(features, land);
 
   const out = {
