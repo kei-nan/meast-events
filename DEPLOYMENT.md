@@ -9,7 +9,7 @@ deployed in this order because each depends on the previous one:
    TCP socket (`cloudflare:sockets`) and serves it to the frontend over HTTP.
    See `worker/README.md` for how it works.
 3. **The frontend** (`app/`) - the static Vite build, served by the Worker
-   `atlas-wiki` and built by Cloudflare Workers Builds on every push to `main`.
+   `meast-events` and built by Cloudflare Workers Builds on every push to `main`.
    It needs the API's URL at *build* time.
 
 ## After every merge to `main` (checklist)
@@ -100,13 +100,13 @@ npx wrangler deploy
   `npx wrangler deploy` first; the API just returns errors until the secret
   is set.
 - `wrangler deploy` prints the Worker URL:
-  `https://atlaswiki-api.<account-subdomain>.workers.dev`
+  `https://meast-api.<account-subdomain>.workers.dev`
   (the name comes from `name` in `worker/wrangler.jsonc`). Note it down.
 
 Verify:
 
 ```bash
-curl https://atlaswiki-api.<account-subdomain>.workers.dev/api/health
+curl https://meast-api.<account-subdomain>.workers.dev/api/health
 # {"ok":true,"redis":"PONG"}
 ```
 
@@ -128,7 +128,7 @@ A merged API change that is never deployed leaves production on the old code.
 ## Part 3: the frontend as a static-assets Worker (~5 minutes)
 
 The frontend is a Worker with only static assets (`app/wrangler.jsonc`: name
-`atlas-wiki`, assets from `./dist`, single-page-app fallback), built and deployed by
+`meast-events`, assets from `./dist`, single-page-app fallback), built and deployed by
 Cloudflare [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/)
 from this GitHub repository.
 
@@ -142,7 +142,7 @@ from this GitHub repository.
      `previews` block in `app/wrangler.jsonc`, which is there; each branch and pull
      request then gets its own preview URL without touching production.
 3. Add the build variable `VITE_API_URL` =
-   `https://atlaswiki-api.<account-subdomain>.workers.dev` (no trailing slash) in the
+   `https://meast-api.<account-subdomain>.workers.dev` (no trailing slash) in the
    Worker's build settings.
 
 **Why it's set at build time:** Vite substitutes `import.meta.env.VITE_API_URL`
@@ -151,7 +151,7 @@ If you change it later, trigger a new build: editing the variable alone doesn't
 change the already-built files.
 
 The site's address is the custom domain `https://middleeast.events`; the Worker's own
-`https://atlas-wiki.<account-subdomain>.workers.dev` address keeps working too.
+`https://meast-events.<account-subdomain>.workers.dev` address keeps working too.
 
 ### Custom domain (middleeast.events)
 
@@ -162,7 +162,7 @@ certificate itself.
 
 1. Add `middleeast.events` to the Cloudflare account as a zone, and switch the domain's
    nameservers at the registrar to the two Cloudflare gives you, so the zone becomes active.
-2. **Workers & Pages** -> `atlas-wiki` -> **Settings** -> **Domains & Routes** -> **Add** ->
+2. **Workers & Pages** -> `meast-events` -> **Settings** -> **Domains & Routes** -> **Add** ->
    **Custom Domain** -> `middleeast.events` -> **Add Custom Domain**.
 3. Redeploy the API Worker (`cd worker && npx wrangler deploy`) so its built-in CORS list,
    which now includes `https://middleeast.events`, is live. Without this, full-text search
@@ -171,9 +171,12 @@ certificate itself.
    Cloudflare's docs suggest a proxied DNS record for `www` (`A` -> `192.0.2.0`) plus a
    Single Redirect rule (301) to `https://middleeast.events`.
 
-The Worker names (`atlas-wiki`, `atlaswiki-api`) are internal and stay as they are.
-For Workers Builds the `name` in `app/wrangler.jsonc` must match the Worker's name in
-the dashboard, or the build fails.
+The Workers are named `meast-events` (site) and `meast-api` (API); they were renamed from
+`atlas-wiki` and `atlaswiki-api` on 2026-10-01, and the old workers.dev addresses stopped
+answering (Cloudflare error 1042). If a Worker is renamed again in the dashboard, change
+`name` in its wrangler.jsonc at the same time: Workers Builds fails when the two differ, and
+`wrangler deploy` with the old name would create a second, empty Worker. The API address is
+also in the `VITE_API_URL` build variable and in `connect-src` in `app/public/_headers`.
 
 Every push to `main` rebuilds the frontend. `.github/workflows/ci.yml` lints and
 tests the app, dry-run-bundles the API Worker and validates the data on every push
@@ -184,7 +187,7 @@ and pull request; it deploys nothing.
 The API only lets browsers read responses from an allow-list of origins. When
 `ALLOWED_ORIGINS` is unset the built-in default applies: the production
 frontend `https://middleeast.events` and its workers.dev address
-`https://atlas-wiki.middle-wiki.workers.dev`, plus local dev origins
+`https://meast-events.middle-wiki.workers.dev`, plus local dev origins
 (`http://localhost` / `127.0.0.1` on ports 5173, 4173, 8794). So the current
 deployment needs no configuration.
 
@@ -193,7 +196,7 @@ the comma-separated exact origins (scheme + host[:port], no trailing slash)
 in `worker/wrangler.jsonc` and redeploy:
 
 ```jsonc
-"vars": { "ALLOWED_ORIGINS": "https://middleeast.events,https://atlas-wiki.middle-wiki.workers.dev" }
+"vars": { "ALLOWED_ORIGINS": "https://middleeast.events,https://meast-events.middle-wiki.workers.dev" }
 ```
 
 `"*"` opens it to every origin; a blank value means the defaults, not open.
@@ -209,7 +212,7 @@ can and cannot protect, and what to click in the dashboard.
 
 ## Frontend headers (`app/public/_headers`)
 
-The static-assets Worker `atlas-wiki` serves `dist/_headers` (copied from
+The static-assets Worker `meast-events` serves `dist/_headers` (copied from
 `app/public/_headers` by Vite): a CSP, `nosniff`, `X-Frame-Options`,
 `Referrer-Policy`, and cache rules (immutable for hashed files, 1 h +
 stale-while-revalidate for the dataset and the unhashed MapLibre worker

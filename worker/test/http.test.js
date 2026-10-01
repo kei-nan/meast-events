@@ -54,7 +54,7 @@ test("handler: security headers on every kind of response", async () => {
 });
 
 test("handler: CORS default allow-list vs denied origin vs no Origin (curl)", async () => {
-  const prod = "https://atlas-wiki.middle-wiki.workers.dev";
+  const prod = "https://meast-events.middle-wiki.workers.dev";
   const ok = await worker.fetch(req("/nope", { headers: { Origin: prod } }), {});
   assert.equal(ok.headers.get("Access-Control-Allow-Origin"), prod);
   assert.equal(ok.headers.get("Vary"), "Origin");

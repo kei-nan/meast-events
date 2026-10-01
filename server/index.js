@@ -335,7 +335,7 @@ function eventsResponse(total, documents, req) {
 // Default (env var unset/blank): the production frontend + local dev origins.
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://middleeast.events",
-  "https://atlas-wiki.middle-wiki.workers.dev",
+  "https://meast-events.middle-wiki.workers.dev",
   "http://localhost:5173", // vite dev
   "http://127.0.0.1:5173",
   "http://localhost:4173", // vite preview

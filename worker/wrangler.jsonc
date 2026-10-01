@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "atlaswiki-api",
+  "name": "meast-api",
   "main": "src/index.js",
   "compatibility_date": "2026-09-26",
   // Required: src/resp.js opens the Redis connection via `cloudflare:sockets`,
@@ -29,12 +29,12 @@
   // host[:port], no trailing slash) that browsers may read the API from. When
   // unset/blank the built-in default applies (src/logic.js
   // DEFAULT_ALLOWED_ORIGINS: https://middleeast.events,
-  // https://atlas-wiki.middle-wiki.workers.dev plus
+  // https://meast-events.middle-wiki.workers.dev plus
   // localhost dev origins). "*" opens it to every origin. CORS is browser-only;
   // it does not stop curl/bots or protect the request quota (docs/SECURITY.md).
   // Uncomment to override (e.g. after adding a custom domain):
   //
-  // "vars": { "ALLOWED_ORIGINS": "https://middleeast.events,https://atlas-wiki.middle-wiki.workers.dev" },
+  // "vars": { "ALLOWED_ORIGINS": "https://middleeast.events,https://meast-events.middle-wiki.workers.dev" },
 
   // Per-client rate limit (Workers Rate Limiting binding, Wrangler >= 4.36).
   // Counters are per Cloudflare location and eventually consistent - a brake on
