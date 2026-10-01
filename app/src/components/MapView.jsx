@@ -34,7 +34,7 @@ import {
   loadLand,
   prefetchBoundaryDecade,
 } from "../lib/dataClient";
-import { MIN_YEAR, MAX_YEAR } from "./Timeline";
+import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 
 // MapLibre GL resolves its worker script relative to its own module URL at
 // runtime (via a dynamic import.meta.url template), which Vite's static

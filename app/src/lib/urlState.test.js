@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { areaToParam, parseArea, parseUrlState, serializeUrlState } from "./urlState.js";
+import { areaToParam, parseArea, parseUrlState, serializeUrlState, YEAR_MAX } from "./urlState.js";
 
-const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: 2026, scope: "all", area: null, eventId: null };
+const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
 
 test("defaults serialize to empty and parse back to defaults", () => {
   assert.equal(serializeUrlState(base), "");
@@ -82,4 +82,10 @@ test("serialize omits invalid pieces", () => {
   assert.equal(serializeUrlState({ ...base, eventId: "<bad>" }), "");
   assert.equal(serializeUrlState({ ...base, startYear: 1950, endYear: 1960 }), "?y=1950-1960");
   assert.equal(serializeUrlState({ ...base, q: "  " }), "");
+});
+
+test("the last year follows the clock, not a fixed year", () => {
+  assert.equal(YEAR_MAX, new Date().getUTCFullYear());
+  assert.deepEqual(parseUrlState(`?y=2000-${YEAR_MAX}`).years, [2000, YEAR_MAX]);
+  assert.equal(parseUrlState(`?y=2000-${YEAR_MAX + 1}`).years, null);
 });

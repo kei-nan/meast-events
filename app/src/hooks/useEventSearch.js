@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { API_ENABLED, fetchAllPages } from "../lib/dataClient";
-import { eventCoords, inArea } from "../lib/geo";
-import { localSearch } from "../lib/localSearch";
+import { apiMatchesFromStore, localSearch } from "../lib/localSearch";
 import { MIN_QUERY_LENGTH, rankEvents } from "../lib/ranking";
 import useDebouncedValue from "./useDebouncedValue";
 
@@ -63,7 +62,6 @@ export default function useEventSearch({
   ready,
   degraded,
   probeTick,
-  addEvents,
   onOutage,
   onRecovered,
 }) {
@@ -114,15 +112,8 @@ export default function useEventSearch({
     )
       .then((res) => {
         if (controller.signal.aborted) return;
-        // Coordinate-less events stay in text/filter results; a drawn area excludes them.
-        const trimmed = sArea
-          ? res.events.filter((e) => {
-              const c = eventCoords(e);
-              return c && e.location_quality !== "approximate" && inArea(c, sArea);
-            })
-          : res.events;
-        const results = rankEvents(trimmed, sq);
-        addEvents(results);
+        // Records come from the static store, not the (possibly stale) index.
+        const results = rankEvents(apiMatchesFromStore(res.events, storeRef.current, sArea), sq);
         onRecovered();
         setApi({
           key: settledKey,
@@ -139,7 +130,7 @@ export default function useEventSearch({
       });
 
     return () => controller.abort();
-  }, [settledKey, probeTick, ready, addEvents, onOutage, onRecovered]);
+  }, [settledKey, probeTick, ready, storeRef, onOutage, onRecovered]);
 
   if (!active) return IDLE;
   if (!ready) return { ...IDLE, status: "loading", textSearch: Boolean(q) };

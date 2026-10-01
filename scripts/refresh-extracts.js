@@ -1,5 +1,5 @@
-// Re-fetches the English Wikipedia lead of every event and reports what changed. Run quarterly
-// (see docs/DATA_POLICY.md, "Refreshing extracts").
+// Re-fetches the English Wikipedia lead of every event and reports what changed. Run monthly
+// by .github/workflows/refresh-data.yml (see docs/DATA_POLICY.md, "Refreshing extracts").
 //
 //   node scripts/refresh-extracts.js                 DRY RUN (default): prints every changed lead as a diff, writes nothing
 //   node scripts/refresh-extracts.js --apply         writes the new leads (never silently: the diff is always printed)

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import "../Timeline.css";
 
-const MIN_YEAR = 1900;
-const MAX_YEAR = 2026;
 const PLAY_INTERVAL_MS = 350;
 
 // Labelled year ranges only; the names carry no claims beyond the years shown.
@@ -13,7 +12,7 @@ const PRESETS = [
   { label: "1967", start: 1967, end: 1967 },
   { label: "1990", start: 1990, end: 1990 },
   { label: "2011", start: 2011, end: 2011 },
-  { label: "2026", start: 2026, end: 2026 },
+  { label: String(MAX_YEAR), start: MAX_YEAR, end: MAX_YEAR },
   { label: "All years", start: MIN_YEAR, end: MAX_YEAR },
 ];
 
@@ -167,4 +166,3 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
   );
 }
 
-export { MIN_YEAR, MAX_YEAR };
