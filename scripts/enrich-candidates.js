@@ -236,7 +236,7 @@ async function writeMissingReport({ curated, enriched, generatedAt }) {
 
 Generated ${generatedAt} by \`node scripts/enrich-candidates.js\`.
 
-These events have **no coordinates on Wikipedia or Wikidata**, so atlas.wiki can only pin them at a
+These events have **no coordinates on Wikipedia or Wikidata**, so middleeast.events can only pin them at a
 country-capital fallback (curated events only, labelled "approximate location") or not at all. Candidate events in
 the second table ARE included in \`data/events.proposed.json\` with \`location_quality: "none"\` and
 \`coordinates: null\` (listed and searchable, but no map marker; a location is never invented).

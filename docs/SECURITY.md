@@ -1,7 +1,7 @@
 # Security, abuse protection and operations
 
-Scope: the two Cloudflare Workers (static site `atlas-wiki`, API
-`atlaswiki-api`), the Redis Cloud free database behind the API, and the repo's
+Scope: the two Cloudflare Workers (static site `meast-events`, API
+`meast-api`), the Redis Cloud free database behind the API, and the repo's
 CI. There are no user accounts and no user data; everything served is public,
 Wikipedia-derived data. The realistic threats are **quota exhaustion**
 (Workers Free = 100,000 requests/day, 10 ms CPU), **a leaked Redis password**,
@@ -18,7 +18,8 @@ The API answers `Access-Control-Allow-Origin` only for an allow-listed
 (`DEFAULT_ALLOWED_ORIGINS` in `worker/src/logic.js`, duplicated in
 `server/index.js`, parity-tested):
 
-- `https://atlas-wiki.middle-wiki.workers.dev` (production frontend)
+- `https://middleeast.events` (production frontend, custom domain)
+- `https://meast-events.middle-wiki.workers.dev` (the same frontend's workers.dev address)
 - `http://localhost` and `http://127.0.0.1` on ports 5173 (vite dev), 4173
   (vite preview), 8794 (wrangler dev)
 
@@ -100,7 +101,7 @@ a multiple of the limit.
 ### What you must do in the dashboard
 
 Nothing for the binding: `npx wrangler deploy` creates it. To check:
-Dashboard -> **Workers & Pages** -> `atlaswiki-api` -> **Settings** ->
+Dashboard -> **Workers & Pages** -> `meast-api` -> **Settings** ->
 **Bindings** should list `RATE_LIMITER`. To go further (optional, needs a
 domain): add a custom domain to the API Worker (Workers & Pages -> the Worker
 -> Settings -> Domains & Routes), then in that zone create one WAF rate
@@ -134,7 +135,7 @@ microphone, payment off).
 CSP (enforcing, not report-only): `default-src 'self'; script-src 'self';
 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src
 https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'
-https://atlaswiki-api.middle-wiki.workers.dev;
+https://meast-api.middle-wiki.workers.dev;
 worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri
 'self'; form-action 'self'; frame-ancestors 'none'`.
 
@@ -177,8 +178,8 @@ Every API response (including 304/429/OPTIONS): `X-Content-Type-Options:
 nosniff`, `Cross-Origin-Resource-Policy: cross-origin`.
 
 **CORP decision:** `cross-origin`. The frontend lives on a different origin
-(`workers.dev` is on the public suffix list, so `atlas-wiki.*` and
-`atlaswiki-api.*` are cross-site) and the data is public. CORP only gates
+(`workers.dev` is on the public suffix list, so `meast-events.*` and
+`meast-api.*` are cross-site) and the data is public. CORP only gates
 no-cors embeds (`<img>`, `<script>`); it does not protect data that CORS
 already withholds, and `same-origin`/`same-site` would risk breaking future
 legitimate embeds for no gain. Revisit if the API ever serves anything
@@ -217,7 +218,7 @@ fetched):
 4. Update the local copies: `server/.env` (`REDIS_URL=...`) and
    `worker/.dev.vars` (both gitignored). Also the Render env var if you use
    the Express alternative.
-5. Verify: `curl https://atlaswiki-api.<subdomain>.workers.dev/api/health`
+5. Verify: `curl https://meast-api.<subdomain>.workers.dev/api/health`
    returns `{"ok":true,"redis":"PONG"}`; from the repo root `npm run
    load-redis` still works (proves the new `server/.env`). Confirm the old
    password is rejected: `redis-cli -u redis://default:<old>@<host>:<port>
@@ -254,15 +255,15 @@ supports `rediss://` but was also not tested against a TLS server here.
 
 Where to look (dashboard):
 
-- **Workers & Pages -> `atlaswiki-api` -> Metrics** (per the
+- **Workers & Pages -> `meast-api` -> Metrics** (per the
   [metrics docs](https://developers.cloudflare.com/workers/observability/metrics-and-analytics/),
   summarised): Requests (successful, errored, subrequests), **Errors**
   (select in the summary graph) and **CPU Time per execution**. Do the same
-  for `atlas-wiki` (static assets). **Unverified:** whether static-asset
+  for `meast-events` (static assets). **Unverified:** whether static-asset
   requests count toward the 100,000/day Workers Free quota; I did not confirm
   this in the docs, so watch the account's **Workers & Pages -> Overview**
   usage figures after deploying.
-- **Observability -> Logs** for `atlaswiki-api` (`observability` is enabled in
+- **Observability -> Logs** for `meast-api` (`observability` is enabled in
   `wrangler.jsonc`), or live: `cd worker && npx wrangler tail`. 429s,
   `Upstream Redis failure:` and `RATE_LIMITER failed` lines are logged here.
 - Redis Cloud console -> database -> **Metrics**: memory (30 MB cap),

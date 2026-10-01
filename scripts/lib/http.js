@@ -1,8 +1,8 @@
 // Shared polite HTTP helpers for the data pipeline.
-// Every request identifies itself with the AtlasWiki User-Agent (Wikimedia policy),
+// Every request identifies itself with the MiddleEastEvents User-Agent (Wikimedia policy),
 // and transient failures (429/5xx/network) are retried with exponential backoff,
 // honouring Retry-After when the server sends it.
-export const USER_AGENT = "AtlasWiki/0.1 (data pipeline; +https://github.com/kei-nan/atlas-wiki)";
+export const USER_AGENT = "MiddleEastEvents/0.1 (data pipeline; +https://github.com/kei-nan/meast-events)";
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

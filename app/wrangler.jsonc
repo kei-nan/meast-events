@@ -4,7 +4,7 @@
   // The API is a separate Worker, see ../worker/wrangler.jsonc.
   // Branches other than main run `npx wrangler preview`, which needs the
   // `previews` block; empty because the site has no bindings or secrets.
-  "name": "atlas-wiki",
+  "name": "meast-events",
   "compatibility_date": "2026-09-26",
   "assets": {
     "directory": "./dist",

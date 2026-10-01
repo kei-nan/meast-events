@@ -1,4 +1,4 @@
-# Response headers for the static-assets Worker "atlas-wiki" (app/wrangler.jsonc).
+# Response headers for the static-assets Worker "meast-events" (app/wrangler.jsonc).
 # Copied to dist/ by Vite; Workers parses it and does not serve it as an asset.
 # Docs: https://developers.cloudflare.com/workers/static-assets/headers/
 # Limits: 100 rules, 2,000 chars/line, ONE splat per URL pattern (a pattern with
@@ -15,7 +15,7 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://atlaswiki-api.middle-wiki.workers.dev; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://meast-api.middle-wiki.workers.dev; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # --- caching ----------------------------------------------------------------
 # /assets/*: Vite content-hashes everything EXCEPT the two MapLibre files

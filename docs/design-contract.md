@@ -1,4 +1,4 @@
-# atlas.wiki search-v2 contract (shared by all work packages)
+# middleeast.events search-v2 contract (shared by all work packages)
 
 Branch: `integration/search-v2`. NOTHING is pushed to `main` (pushing main auto-deploys the live site) until the user has seen it locally.
 

@@ -117,8 +117,10 @@ test("boundaryDocToFeature preserves shape and unicode", () => {
 
 test("matchOrigin / corsHeaders", () => {
   // unset/blank -> built-in defaults (production origin + localhost), never "*"
-  const prod = "https://atlas-wiki.middle-wiki.workers.dev";
+  const prod = "https://meast-events.middle-wiki.workers.dev";
   assert.equal(matchOrigin(undefined, prod), prod);
+  assert.equal(matchOrigin(undefined, "https://middleeast.events"), "https://middleeast.events");
+  assert.equal(matchOrigin(undefined, "https://www.middleeast.events"), null);
   assert.equal(matchOrigin("  ", "http://localhost:5173"), "http://localhost:5173");
   assert.equal(matchOrigin(undefined, "https://a.example"), null);
   assert.equal(matchOrigin("", undefined), null);
