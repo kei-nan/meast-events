@@ -31,6 +31,19 @@
 //     property so the credit travels with the data, which some upstream licenses
 //     require of us.
 //
+//   "fit" - makes a separately sourced shape (an "add" entry, or Hatay) and the CShapes
+//     countries around it share ONE line where they meet. The shapes come from sources
+//     of different detail (Natural Earth 1:10m, OCHA, CShapes), so drawn as-is they
+//     overlap or leave thin unclaimed slivers, and the map shows two lines a kilometre
+//     or two apart. For each listed neighbour, in the years both are on the map:
+//     "clip" removes the overlay's area from the neighbour; "trim" also drops the small
+//     detached leftovers that clipping strands next to the overlay (and, with `between`,
+//     its land in the narrow strip between the overlay and that named shape); "snap" also gives the
+//     neighbour the unclaimed land (within `maxGapKm`) between the two; "contain" is for
+//     a country whose shape is meant to include the overlay (Israel from 1967): it is
+//     widened to wrap the overlay fully. The overlay's own outline is never changed. Applied in ingest-boundaries.js after all other
+//     entries. This picks one sourced line over another; it invents no new line.
+//
 // Every entry with historical content must cite a source. Nothing here should be
 // taken on my (the model's) say-so alone without a citation a reader can check.
 
@@ -288,18 +301,22 @@ export const CORRECTIONS = [
   {
     type: "add",
     name: "Sanjak of Alexandretta (Hatay)",
-    start_year: 1923,
+    // Article 7 of the Treaty of Ankara (20 October 1921) gave the district its special
+    // regime within French Syria, so under the 1 July rule 1922 is its first year.
+    start_year: 1922,
     end_year: 1938,
     status: "mandate",
     geometry: "hatay",
     note:
-      "An autonomous sanjak within the French Mandate for Syria, its status formalized " +
-      "by a 1937 League of Nations agreement; briefly the separatist \"Hatay State\" from " +
+      "An autonomous sanjak within the French Mandate for Syria from the Treaty of Ankara of " +
+      "20 October 1921 (Article 7: \"A special administrative regime shall be established " +
+      "for the district of Alexandretta\"), its status formalized by a 1937 League of " +
+      "Nations agreement; briefly the separatist \"Hatay State\" from " +
       "September 1938 before Turkey annexed it in June 1939 following a referendum " +
       "widely regarded internationally as rigged. Geometry approximated using the " +
       "modern boundary of Turkey's Hatay Province (Natural Earth), which may not " +
       "exactly match the historical Sanjak/State boundary.",
-    source: "https://en.wikipedia.org/wiki/Hatay_State",
+    source: "https://en.wikipedia.org/wiki/Sanjak_of_Alexandretta; https://en.wikipedia.org/wiki/Hatay_State",
   },
   {
     type: "add",
@@ -455,11 +472,12 @@ export const CORRECTIONS = [
   // 18% / 22% / 60-62% figures.
   //
   // Caveat worth knowing: these three shapes come from a different source than the
-  // 1948-1999 "westBank" shape above (Natural Earth), and the two renderings of the
-  // Green Line don't agree exactly - about 274 km2 falls inside the Natural Earth
-  // outline but outside OCHA's, and about 190 km2 the other way (roughly 5% and 3% of
-  // the territory). So the West Bank's outer edge shifts very slightly as the timeline
-  // crosses 1999/2000. That is a source artefact, not a historical border change.
+  // 1948-1999 West Bank shape above (CShapes 2.0's own "West Bank" record), and the two
+  // renderings of the Green Line don't agree exactly - about 336 km2 falls inside the
+  // CShapes outline but outside OCHA's, and about 116 km2 the other way (roughly 6% and
+  // 2% of the territory; recomputed 2026-10-01). So the West Bank's outer edge shifts
+  // slightly as the timeline crosses 1999/2000. That is a source artefact, not a
+  // historical border change.
   {
     type: "add",
     name: "West Bank Area A (Palestinian Authority)",
@@ -648,6 +666,62 @@ export const CORRECTIONS = [
       "at about 4,800 km2 of land against the ~5,700-5,770 km2 usually quoted, a gap this " +
       "project has not been able to account for.",
     source: "https://library.law.fsu.edu/Digital-Collections/LimitsinSeas/pdf/ibs103.pdf",
+  },
+
+  // --- Fits: one shared line where differently sourced shapes meet (see "fit" above) ---
+  //
+  // Checked 2026-10-01 against Wikipedia's coordinates for the Erez, Karni and Kerem Shalom
+  // crossings, which sit on the Gaza Strip's land border: Natural Earth's Gaza edge is 1.19,
+  // 0.43 and 0.65 km from them, CShapes' Israel/Egypt edges 0.41, 0.62 and 0.21-0.41 km.
+  // Both sources are good to about a kilometre and neither is authoritative; Natural
+  // Earth's Gaza (340 km2) is the closer of the two to the official 365 km2 (CShapes leaves
+  // a 448 km2 gap for it). So Gaza's own outline is kept and the neighbours follow it.
+  {
+    type: "fit",
+    overlay: "Gaza Strip",
+    neighbours: [
+      // CShapes draws Egypt about 2 km into the Strip along the Rafah border (23.8 km2).
+      { name: "Egypt", mode: "clip" },
+      // 1948-1966: the armistice line is Gaza's edge.
+      { name: "Israel", mode: "snap", toYear: 1966 },
+      // From 1967 Israel's CShapes shape includes the Strip by design (its flag note), but
+      // only 90-97% of this outline, so its edge would cut across the Strip's south.
+      { name: "Israel", mode: "contain", fromYear: 1967 },
+    ],
+    maxGapKm: 3,
+    note:
+      "Gaza's land border follows the Gaza Strip shape (Natural Earth); Egypt's and (1948-1966) " +
+      "Israel's CShapes lines are fitted to it.",
+  },
+  {
+    type: "fit",
+    overlay: "Sanjak of Alexandretta",
+    neighbours: [
+      // The Ottoman shape in 1922-1923 is CShapes' Turkey, which includes the sanjak, and
+      // 1924-1938 Turkey is that shape minus this outline: both leave thin stranded pieces
+      // (up to 63 km2) between the sanjak and Syria and along the coast.
+      { name: "Ottoman Empire", mode: "trim" },
+      // Turkey also keeps a strip, attached to its main body, between the sanjak and Syria.
+      { name: "Turkey", mode: "trim", toYear: 1938, between: "French Mandate of Syria" },
+      { name: "French Mandate of Syria", mode: "snap" },
+    ],
+    maxGapKm: 3,
+    note:
+      "The sanjak's outline (Natural Earth's modern Hatay Province) is the line; the Ottoman " +
+      "shape no longer also covers it, and French Syria's CShapes edge is fitted to it.",
+  },
+  {
+    type: "fit",
+    overlay: "West Bank Area C",
+    // OCHA's Area C runs about 1 km past CShapes' Jordan-West Bank line along the Jordan
+    // River and Dead Sea (26.6 km2).
+    neighbours: [
+      { name: "Jordan", mode: "clip" },
+      // Israel's shape includes the West Bank from 1967 (see its flag) but stops at CShapes' line.
+      { name: "Israel", mode: "contain", fromYear: 2000 },
+    ],
+    maxGapKm: 3,
+    note: "The West Bank's eastern edge follows OCHA's Area C; Jordan's CShapes line is fitted to it.",
   },
   {
     type: "add",

@@ -12,6 +12,7 @@
 // properties, so the generated file is self-documenting about what came from where.
 import { readFile, writeFile } from "node:fs/promises";
 import { CORRECTIONS } from "./boundary-corrections.js";
+import * as turf from "@turf/turf";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
 
 const CSHAPES_CITATION = "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)";
@@ -191,23 +192,131 @@ async function main() {
     });
   }
 
+  const land = JSON.parse(await readFile(new URL("../app/src/data/land.json", import.meta.url), "utf-8"));
+  const fitted = applyFits(features, land);
+
   const out = {
     type: "FeatureCollection",
     source:
       `Derived from ${CSHAPES_CITATION} with corrections and additions by this project - ` +
       "see each feature's `source`/`note` properties, and scripts/boundary-corrections.js " +
       "for the full list of changes with citations.",
-    features,
+    features: fitted,
   };
 
   await writeFile(outPath, stringifyFeatureCollection(out));
-  console.log(`Wrote ${features.length} boundary features to data/boundaries.json`);
+  console.log(`Wrote ${fitted.length} boundary features to data/boundaries.json`);
 
-  const modified = features.filter((f) => f.properties.note);
+  const modified = fitted.filter((f) => f.properties.note);
   console.log(`${modified.length} features carry a correction:`);
   for (const f of modified) {
     console.log(`  ${f.properties.name} (${f.properties.start_year}-${f.properties.end_year})${f.properties.status ? ` [${f.properties.status}]` : ""}`);
   }
+}
+
+// --- "fit" entries (see boundary-corrections.js) --------------------------------------
+//
+// For each fit, every neighbour feature that is on the map in the same years as the overlay
+// is split at the overlay's year boundaries, and in the overlapping years its geometry
+// becomes: clip = neighbour minus overlay; snap = that, plus the land within maxGapKm of
+// both that no other feature covers (the sliver between the two lines).
+const asFeature = (geometry) => ({ type: "Feature", properties: {}, geometry });
+const fc = (...fs) => turf.featureCollection(fs);
+const activeIn = (f, y) => f.properties.start_year <= y && y <= f.properties.end_year;
+
+// Detached pieces of a clipped shape smaller than this, lying within maxGapKm of the
+// overlay, are leftovers of the two sources disagreeing, not real territory.
+const TRIM_MAX_PIECE_KM2 = 100;
+
+function fittedGeometry(neighbour, overlay, others, mode, maxGapKm, land, spec) {
+  if (mode === "contain") {
+    return turf.truncate(turf.union(fc(neighbour, overlay)), { precision: 5, coordinates: 2 }).geometry;
+  }
+  let geom = turf.difference(fc(neighbour, overlay));
+  if (!geom) throw new Error(`fit: ${neighbour.properties.name} vanished when clipped`);
+  if (mode === "trim") {
+    const near = turf.buffer(overlay, maxGapKm);
+    // Land this neighbour holds in a narrow strip between the overlay and another named
+    // shape (e.g. a Turkish strip between the sanjak and Syria) is not its own either.
+    const between = spec.between && others.find((o) => o.properties.name === spec.between);
+    if (between) {
+      const strip = turf.intersect(fc(near, turf.buffer(between, maxGapKm)));
+      if (strip) geom = turf.difference(fc(geom, strip)) ?? geom;
+    }
+    const parts = turf.getGeom(geom).type === "MultiPolygon" ? turf.getGeom(geom).coordinates : [turf.getGeom(geom).coordinates];
+    const kept = parts.filter((rings) => {
+      const part = turf.polygon(rings);
+      return turf.area(part) / 1e6 >= TRIM_MAX_PIECE_KM2 || !turf.booleanIntersects(part, near);
+    });
+    geom = kept.length === 1 ? turf.polygon(kept[0]) : turf.multiPolygon(kept);
+  }
+  if (mode === "snap") {
+    const between = turf.intersect(fc(turf.buffer(overlay, maxGapKm), turf.buffer(neighbour, maxGapKm)));
+    let sliver = between && turf.difference(fc(between, overlay));
+    sliver = sliver && turf.difference(fc(sliver, neighbour));
+    for (const o of others) sliver = sliver && turf.difference(fc(sliver, o));
+    // Only land: the buffers also reach into the sea between two coastlines.
+    const onLand = sliver
+      ? land.features.filter((l) => turf.booleanIntersects(l, sliver)).map((l) => turf.intersect(fc(asFeature(l.geometry), sliver))).filter(Boolean)
+      : [];
+    for (const piece of onLand) geom = turf.union(fc(geom, piece));
+  }
+  return turf.truncate(geom, { precision: 5, coordinates: 2 }).geometry;
+}
+
+function applyFits(features, land) {
+  let out = features;
+  for (const fit of CORRECTIONS.filter((c) => c.type === "fit")) {
+    const overlays = out.filter((f) => f.properties.name.startsWith(fit.overlay));
+    if (!overlays.length) throw new Error(`fit: no overlay named "${fit.overlay}..."`);
+    for (const spec of fit.neighbours) {
+      const next = [];
+      for (const n of out) {
+        if (n.properties.name !== spec.name) {
+          next.push(n);
+          continue;
+        }
+        // Year boundaries inside this neighbour's range where the overlay (or the spec window) changes.
+        const lo = n.properties.start_year;
+        const hi = n.properties.end_year;
+        const cuts = new Set([lo]);
+        for (const o of overlays) for (const y of [o.properties.start_year, o.properties.end_year + 1]) if (y > lo && y <= hi) cuts.add(y);
+        for (const y of [spec.fromYear, spec.toYear != null ? spec.toYear + 1 : null]) if (y != null && y > lo && y <= hi) cuts.add(y);
+        const starts = [...cuts].sort((a, b) => a - b);
+        starts.forEach((s, i) => {
+          const e = i + 1 < starts.length ? starts[i + 1] - 1 : hi;
+          const piece = { ...n, properties: { ...n.properties, start_year: s, end_year: e } };
+          SPLIT_FROM.set(piece, SPLIT_FROM.get(n) ?? n);
+          const inWindow = s >= (spec.fromYear ?? -Infinity) && s <= (spec.toYear ?? Infinity);
+          const overlay = inWindow && overlays.find((o) => activeIn(o, s));
+          if (overlay && turf.booleanIntersects(piece, turf.buffer(overlay, fit.maxGapKm))) {
+            const others = out.filter((f) => f !== n && f !== overlay && activeIn(f, s) && f.properties.name !== spec.name);
+            piece.geometry = fittedGeometry(piece, overlay, others, spec.mode, fit.maxGapKm, land, spec);
+            piece.properties.source = `${piece.properties.source}; edge fitted to the ${fit.overlay} shape (${fit.note})`;
+          }
+          next.push(piece);
+        });
+      }
+      out = mergeRuns(next);
+    }
+  }
+  return out;
+}
+
+// Splitting at every overlay period leaves consecutive pieces that came out identical
+// (Gaza's periods all share one shape); join them back into one feature. Only pieces cut
+// from the same original feature are joined, so CShapes' own records stay as they are.
+const SPLIT_FROM = new WeakMap(); // piece -> the feature it was cut from
+function mergeRuns(features) {
+  const out = [];
+  for (const f of features) {
+    const origin = SPLIT_FROM.get(f);
+    const prev = origin && out.findLast((g) => SPLIT_FROM.get(g) === origin && g.properties.end_year + 1 === f.properties.start_year);
+    const same = (a, b) => JSON.stringify({ ...a.properties, start_year: 0, end_year: 0 }) === JSON.stringify({ ...b.properties, start_year: 0, end_year: 0 }) && JSON.stringify(a.geometry) === JSON.stringify(b.geometry);
+    if (prev && same(prev, f)) prev.properties = { ...prev.properties, end_year: f.properties.end_year };
+    else out.push(f);
+  }
+  return out;
 }
 
 main();
