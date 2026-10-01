@@ -1,0 +1,3848 @@
+{
+  "retrieved": "2026-10-01",
+  "source": "Wikidata (CC0), via query.wikidata.org; query in scripts/fetch-border-references.js",
+  "points": [
+    {
+      "id": "Q387952",
+      "label": "Karni crossing",
+      "lon": 34.47361,
+      "lat": 31.47472,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q387952"
+    },
+    {
+      "id": "Q712133",
+      "label": "Allenby Bridge",
+      "lon": 35.54083,
+      "lat": 31.87417,
+      "kind": "international bridge",
+      "countries": [
+        "Jordan",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q712133"
+    },
+    {
+      "id": "Q731063",
+      "label": "Mandelbaum Gate",
+      "lon": 35.22681,
+      "lat": 31.78748,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q731063"
+    },
+    {
+      "id": "Q827735",
+      "label": "King Fahd Causeway",
+      "lon": 50.33583,
+      "lat": 26.1825,
+      "kind": "international bridge",
+      "countries": [
+        "Bahrain",
+        "Saudi Arabia"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q827735"
+    },
+    {
+      "id": "Q1528463",
+      "label": "Bab al-Hawa Border Crossing",
+      "lon": 36.69264,
+      "lat": 36.23064,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q1528463"
+    },
+    {
+      "id": "Q1545893",
+      "label": "Kapıkule",
+      "lon": 26.35694,
+      "lat": 41.71667,
+      "kind": "railway border crossing",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://trakyasinirlari.com/sinir-kapilari/kapikule",
+      "source": "https://www.wikidata.org/wiki/Q1545893"
+    },
+    {
+      "id": "Q2071881",
+      "label": "Fatima Gate",
+      "lon": 35.56461,
+      "lat": 33.28056,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2071881"
+    },
+    {
+      "id": "Q2319323",
+      "label": "Erez Crossing",
+      "lon": 34.54484,
+      "lat": 31.5582,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2319323"
+    },
+    {
+      "id": "Q2386953",
+      "label": "Menachem Begin-Taba Border Crossing",
+      "lon": 34.90283,
+      "lat": 29.49097,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2386953"
+    },
+    {
+      "id": "Q2386965",
+      "label": "Nitzana Border Crossing",
+      "lon": 34.39444,
+      "lat": 30.88222,
+      "kind": "international bridge",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2386965"
+    },
+    {
+      "id": "Q2559756",
+      "label": "Wadi Araba Crossing",
+      "lon": 34.97806,
+      "lat": 29.575,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2559756"
+    },
+    {
+      "id": "Q2560585",
+      "label": "Netafim Border Crossing",
+      "lon": 34.86778,
+      "lat": 29.59889,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2560585"
+    },
+    {
+      "id": "Q2564302",
+      "label": "Rafah Border Crossing",
+      "lon": 34.25923,
+      "lat": 31.24858,
+      "kind": "border crossing",
+      "countries": [
+        "Egypt",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2564302"
+    },
+    {
+      "id": "Q2671245",
+      "label": "Jordan River Crossing",
+      "lon": 35.57556,
+      "lat": 32.49694,
+      "kind": "international bridge",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2671245"
+    },
+    {
+      "id": "Q2916379",
+      "label": "Jisr ed Damiye",
+      "lon": 35.53505,
+      "lat": 32.10263,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Palestine"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q2916379"
+    },
+    {
+      "id": "Q2916595",
+      "label": "Daughters of Jacob Bridge",
+      "lon": 35.62829,
+      "lat": 33.01028,
+      "kind": "international bridge",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q2916595"
+    },
+    {
+      "id": "Q3125423",
+      "label": "Habur Border Crossing",
+      "lon": 42.56698,
+      "lat": 37.14775,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q3125423"
+    },
+    {
+      "id": "Q3399035",
+      "label": "Q3399035",
+      "lon": 35.56296,
+      "lat": 33.28308,
+      "kind": "border crossing",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q3399035"
+    },
+    {
+      "id": "Q5303894",
+      "label": "Doğukapı railway station",
+      "lon": 43.73789,
+      "lat": 40.72974,
+      "kind": "border train station",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q5303894"
+    },
+    {
+      "id": "Q5937983",
+      "label": "Chazabeh",
+      "lon": 47.80288,
+      "lat": 31.85392,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q5937983"
+    },
+    {
+      "id": "Q5951183",
+      "label": "Q5951183",
+      "lon": 45.64799,
+      "lat": 38.95167,
+      "kind": "international bridge",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q5951183"
+    },
+    {
+      "id": "Q5984616",
+      "label": "Ibrahim Khalil border crossing",
+      "lon": 42.56556,
+      "lat": 37.14472,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q5984616"
+    },
+    {
+      "id": "Q5995932",
+      "label": "Esendere Border Crossing",
+      "lon": 44.6202,
+      "lat": 37.7161,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q5995932"
+    },
+    {
+      "id": "Q5999948",
+      "label": "Akyaka Border Crossing",
+      "lon": 43.74028,
+      "lat": 40.72917,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q5999948"
+    },
+    {
+      "id": "Q6000881",
+      "label": "Pazarkule Border Crossing",
+      "lon": 26.49028,
+      "lat": 41.65389,
+      "kind": "border checkpoint",
+      "countries": [
+        "Greece",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q6000881"
+    },
+    {
+      "id": "Q6001565",
+      "label": "Türkgözü border checkpoint",
+      "lon": 42.81833,
+      "lat": 41.58778,
+      "kind": "border checkpoint",
+      "countries": [
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6001565"
+    },
+    {
+      "id": "Q6069726",
+      "label": "Bazargan–Gürbulak Border Crossing",
+      "lon": 44.3778,
+      "lat": 39.41138,
+      "kind": "border crossing",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6069726"
+    },
+    {
+      "id": "Q6367420",
+      "label": "Kapıkule railway station",
+      "lon": 26.36141,
+      "lat": 41.719,
+      "kind": "border train station",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6367420"
+    },
+    {
+      "id": "Q6393780",
+      "label": "Kerem Shalom border crossing",
+      "lon": 34.27056,
+      "lat": 31.22083,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6393780"
+    },
+    {
+      "id": "Q6411207",
+      "label": "King Abdullah Bridge",
+      "lon": 35.54807,
+      "lat": 31.80107,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6411207"
+    },
+    {
+      "id": "Q6562137",
+      "label": "Q6562137",
+      "lon": 35.59091,
+      "lat": 33.26254,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6562137"
+    },
+    {
+      "id": "Q6783485",
+      "label": "Masnaa Border Crossing",
+      "lon": 35.96398,
+      "lat": 33.67939,
+      "kind": "border crossing",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6783485"
+    },
+    {
+      "id": "Q6902376",
+      "label": "British Custom's House on HaRakevet Street",
+      "lon": 34.77686,
+      "lat": 32.0636,
+      "kind": "custom house",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6902376"
+    },
+    {
+      "id": "Q6968100",
+      "label": "Upper customs house",
+      "lon": 35.65115,
+      "lat": 33.01147,
+      "kind": "custom house",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q6968100"
+    },
+    {
+      "id": "Q7141400",
+      "label": "Parviz Khan border point",
+      "lon": 45.59114,
+      "lat": 34.55637,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q7141400"
+    },
+    {
+      "id": "Q7272793",
+      "label": "Quneitra Crossing",
+      "lon": 35.81583,
+      "lat": 33.11278,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q7272793"
+    },
+    {
+      "id": "Q12184544",
+      "label": "Q12184544",
+      "lon": 44.70306,
+      "lat": 17.43154,
+      "kind": "border checkpoint",
+      "countries": [
+        "Yemen"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q12184544"
+    },
+    {
+      "id": "Q12243767",
+      "label": "Q12243767",
+      "lon": 25.08628,
+      "lat": 31.57322,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q12243767"
+    },
+    {
+      "id": "Q12245768",
+      "label": "Q12245768",
+      "lon": 50.84639,
+      "lat": 24.74514,
+      "kind": "border checkpoint",
+      "countries": [
+        "Qatar"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q12245768"
+    },
+    {
+      "id": "Q12245770",
+      "label": "Q12245770",
+      "lon": 47.095,
+      "lat": 17.31,
+      "kind": "border checkpoint",
+      "countries": [
+        "Saudi Arabia",
+        "Yemen"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q12245770"
+    },
+    {
+      "id": "Q12809222",
+      "label": "Dilucu Border Crossing",
+      "lon": 44.79778,
+      "lat": 39.65556,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q12809222"
+    },
+    {
+      "id": "Q12840560",
+      "label": "Umut Bridge",
+      "lon": 44.80333,
+      "lat": 39.65528,
+      "kind": "international bridge",
+      "countries": [
+        "Azerbaijan",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q12840560"
+    },
+    {
+      "id": "Q13576098",
+      "label": "Nasib Border Crossing",
+      "lon": 36.20083,
+      "lat": 32.52861,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q13576098"
+    },
+    {
+      "id": "Q16053819",
+      "label": "Khosravi Border Crossing",
+      "lon": 45.46761,
+      "lat": 34.38396,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q16053819"
+    },
+    {
+      "id": "Q17511359",
+      "label": "Al-Qa'im border crossing",
+      "lon": 40.9771,
+      "lat": 34.3977,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q17511359"
+    },
+    {
+      "id": "Q18536636",
+      "label": "Zahedan Railway Station",
+      "lon": 60.87467,
+      "lat": 29.47963,
+      "kind": "border train station",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "http://pws0.rai.ir/",
+      "source": "https://www.wikidata.org/wiki/Q18536636"
+    },
+    {
+      "id": "Q18711382",
+      "label": "Alican border checkpoint",
+      "lon": 44.17893,
+      "lat": 40.02822,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q18711382"
+    },
+    {
+      "id": "Q19610825",
+      "label": "Borualan Border Crossing",
+      "lon": 44.61351,
+      "lat": 39.781,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q19610825"
+    },
+    {
+      "id": "Q20110978",
+      "label": "Kapikoy - Razi border post",
+      "lon": 44.32108,
+      "lat": 38.49753,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q20110978"
+    },
+    {
+      "id": "Q20422533",
+      "label": "al-Waleed Border Crossing",
+      "lon": 38.93216,
+      "lat": 33.4333,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q20422533"
+    },
+    {
+      "id": "Q20422539",
+      "label": "Turaibil Border Crossing",
+      "lon": 39.00973,
+      "lat": 32.7456,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q20422539"
+    },
+    {
+      "id": "Q20423464",
+      "label": "Q20423464",
+      "lon": 31.51303,
+      "lat": 22.00358,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q20423464"
+    },
+    {
+      "id": "Q20423683",
+      "label": "Syria Turkey border crossing #2703",
+      "lon": 37.08498,
+      "lat": 36.63353,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q20423683"
+    },
+    {
+      "id": "Q20476564",
+      "label": "Sarp checkpoint",
+      "lon": 41.54625,
+      "lat": 41.51753,
+      "kind": "border checkpoint",
+      "countries": [
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q20476564"
+    },
+    {
+      "id": "Q21031944",
+      "label": "Yayladağı Gümrük Kapısı",
+      "lon": 36.0111,
+      "lat": 35.9054,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q21031944"
+    },
+    {
+      "id": "Q22934260",
+      "label": "Q22934260",
+      "lon": 31.15078,
+      "lat": 22.00322,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Sudan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q22934260"
+    },
+    {
+      "id": "Q25379775",
+      "label": "Karkamış Bridge",
+      "lon": 38.0246,
+      "lat": 36.8301,
+      "kind": "international bridge",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q25379775"
+    },
+    {
+      "id": "Q25382061",
+      "label": "Rabia border crossing",
+      "lon": 42.07518,
+      "lat": 36.80592,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q25382061"
+    },
+    {
+      "id": "Q25382079",
+      "label": "Q25382079",
+      "lon": 42.35167,
+      "lat": 37.08944,
+      "kind": "international bridge",
+      "countries": [
+        "Iraq",
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q25382079"
+    },
+    {
+      "id": "Q25475617",
+      "label": "Dereköy Border Crossing",
+      "lon": 27.45898,
+      "lat": 41.96773,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q25475617"
+    },
+    {
+      "id": "Q25475622",
+      "label": "Bulgaria Turkey border crossing #2949",
+      "lon": 26.61056,
+      "lat": 41.9593,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q25475622"
+    },
+    {
+      "id": "Q25475636",
+      "label": "Uzunköprü Border Crossing",
+      "lon": 26.63102,
+      "lat": 41.36209,
+      "kind": "border checkpoint",
+      "countries": [
+        "Greece",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q25475636"
+    },
+    {
+      "id": "Q27345901",
+      "label": "Oman–Saudi Arabia–United Arab Emirates tripoint",
+      "lon": 55.21135,
+      "lat": 22.70546,
+      "kind": "international tripoint",
+      "countries": [
+        "Oman",
+        "Saudi Arabia",
+        "United Arab Emirates"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27345901"
+    },
+    {
+      "id": "Q27391576",
+      "label": "Israel–Jordan–West Bank North tripoint",
+      "lon": 35.55417,
+      "lat": 32.38889,
+      "kind": "international tripoint",
+      "countries": [
+        "Israel",
+        "Jordan",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27391576"
+    },
+    {
+      "id": "Q27391865",
+      "label": "Israel–Jordan–West Bank South tripoint",
+      "lon": 35.47778,
+      "lat": 31.49306,
+      "kind": "international tripoint",
+      "countries": [
+        "Israel",
+        "Jordan",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27391865"
+    },
+    {
+      "id": "Q27392566",
+      "label": "Iraq–Jordan–Saudi Arabia tripoint",
+      "lon": 39.2,
+      "lat": 32.15556,
+      "kind": "international tripoint",
+      "countries": [
+        "Iraq",
+        "Jordan",
+        "Saudi Arabia"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27392566"
+    },
+    {
+      "id": "Q27392703",
+      "label": "Iraq–Kuwait–Saudi Arabia tripoint",
+      "lon": 46.55833,
+      "lat": 29.10417,
+      "kind": "international tripoint",
+      "countries": [
+        "Iraq",
+        "Kuwait",
+        "Saudi Arabia"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27392703"
+    },
+    {
+      "id": "Q27396402",
+      "label": "Oman–Saudi Arabia–Yemen tripoint",
+      "lon": 52,
+      "lat": 19,
+      "kind": "international tripoint",
+      "countries": [
+        "Oman",
+        "Saudi Arabia",
+        "Yemen"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27396402"
+    },
+    {
+      "id": "Q27396528",
+      "label": "Egypt–Gaza Strip–Israel tripoint",
+      "lon": 34.26806,
+      "lat": 31.21944,
+      "kind": "international tripoint",
+      "countries": [
+        "Egypt",
+        "Gaza Strip",
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27396528"
+    },
+    {
+      "id": "Q27397277",
+      "label": "Iran–Iraq–Turkey tripoint",
+      "lon": 44.78431,
+      "lat": 37.14385,
+      "kind": "international tripoint",
+      "countries": [
+        "Iran",
+        "Iraq",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27397277"
+    },
+    {
+      "id": "Q27398745",
+      "label": "Israel–Lebanon–Syria tripoint",
+      "lon": 35.77334,
+      "lat": 33.33563,
+      "kind": "international tripoint",
+      "countries": [
+        "Israel",
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27398745"
+    },
+    {
+      "id": "Q27398859",
+      "label": "Israel–Jordan–Syria tripoint",
+      "lon": 35.7565,
+      "lat": 32.74509,
+      "kind": "international tripoint",
+      "countries": [
+        "Israel",
+        "Jordan",
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27398859"
+    },
+    {
+      "id": "Q27399427",
+      "label": "Afghanistan–Iran–Pakistan tripoint",
+      "lon": 60.88333,
+      "lat": 29.86111,
+      "kind": "international tripoint",
+      "countries": [
+        "Afghanistan",
+        "Iran",
+        "Pakistan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27399427"
+    },
+    {
+      "id": "Q27399644",
+      "label": "Armenia–Azerbaijan–Iran East tripoint",
+      "lon": 46.53399,
+      "lat": 38.86717,
+      "kind": "international tripoint",
+      "countries": [
+        "Armenia",
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27399644"
+    },
+    {
+      "id": "Q27399926",
+      "label": "Armenia–Azerbaijan–Iran West tripoint",
+      "lon": 46.13889,
+      "lat": 38.84444,
+      "kind": "international tripoint",
+      "countries": [
+        "Armenia",
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27399926"
+    },
+    {
+      "id": "Q27402044",
+      "label": "Egypt–Libya–Sudan tripoint",
+      "lon": 25,
+      "lat": 22,
+      "kind": "international tripoint",
+      "countries": [
+        "Egypt",
+        "Libya",
+        "Sudan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27402044"
+    },
+    {
+      "id": "Q27403602",
+      "label": "Afghanistan–Iran–Turkmenistan tripoint",
+      "lon": 61.27639,
+      "lat": 35.6125,
+      "kind": "international tripoint",
+      "countries": [
+        "Afghanistan",
+        "Iran",
+        "Turkmenistan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27403602"
+    },
+    {
+      "id": "Q27403734",
+      "label": "Armenia–Azerbaijan–Turkey tripoint",
+      "lon": 44.77083,
+      "lat": 39.71389,
+      "kind": "international tripoint",
+      "countries": [
+        "Armenia",
+        "Azerbaijan",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27403734"
+    },
+    {
+      "id": "Q27403879",
+      "label": "Armenia–Georgia–Turkey tripoint",
+      "lon": 43.47083,
+      "lat": 41.12917,
+      "kind": "international tripoint",
+      "countries": [
+        "Armenia",
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27403879"
+    },
+    {
+      "id": "Q27403947",
+      "label": "Azerbaijan–Iran–Turkey tripoint",
+      "lon": 44.80833,
+      "lat": 39.62778,
+      "kind": "international tripoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27403947"
+    },
+    {
+      "id": "Q27404153",
+      "label": "Iraq–Jordan–Syria tripoint",
+      "lon": 38.79444,
+      "lat": 33.36667,
+      "kind": "international tripoint",
+      "countries": [
+        "Iraq",
+        "Jordan",
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27404153"
+    },
+    {
+      "id": "Q27404225",
+      "label": "Iraq–Syria–Turkey tripoint",
+      "lon": 42.36389,
+      "lat": 37.11111,
+      "kind": "international tripoint",
+      "countries": [
+        "Iraq",
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27404225"
+    },
+    {
+      "id": "Q27405319",
+      "label": "Bulgaria–Greece–Turkey tripoint",
+      "lon": 26.35139,
+      "lat": 41.7125,
+      "kind": "international tripoint",
+      "countries": [
+        "Bulgaria",
+        "Greece",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q27405319"
+    },
+    {
+      "id": "Q29514020",
+      "label": "Shalamcha Border Crossing",
+      "lon": 48.02275,
+      "lat": 30.5053,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q29514020"
+    },
+    {
+      "id": "Q29514074",
+      "label": "al-Shib Border Crossing",
+      "lon": 47.79366,
+      "lat": 31.85375,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q29514074"
+    },
+    {
+      "id": "Q30688446",
+      "label": "Khatmat Malaha",
+      "lon": 56.3659,
+      "lat": 24.9753,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q30688446"
+    },
+    {
+      "id": "Q31189526",
+      "label": "Cildir/Aktas - Kartsakhi border post",
+      "lon": 43.20107,
+      "lat": 41.23509,
+      "kind": "border checkpoint",
+      "countries": [
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q31189526"
+    },
+    {
+      "id": "Q31190077",
+      "label": "İpsala Border Gate",
+      "lon": 26.33276,
+      "lat": 40.93418,
+      "kind": "border checkpoint",
+      "countries": [
+        "Greece",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q31190077"
+    },
+    {
+      "id": "Q47457749",
+      "label": "Checkpoint 300",
+      "lon": 35.20415,
+      "lat": 31.72591,
+      "kind": "border checkpoint",
+      "countries": [
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q47457749"
+    },
+    {
+      "id": "Q55630170",
+      "label": "Poldasht-Shah Takhti Bridge",
+      "lon": 45.07079,
+      "lat": 39.36039,
+      "kind": "international bridge",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q55630170"
+    },
+    {
+      "id": "Q59850850",
+      "label": "Kavak",
+      "lon": 26.35972,
+      "lat": 41.71111,
+      "kind": "tripoint",
+      "countries": [
+        "Bulgaria",
+        "Greece",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q59850850"
+    },
+    {
+      "id": "Q60572805",
+      "label": "Semalka Border Crossing",
+      "lon": 42.3525,
+      "lat": 37.08917,
+      "kind": "border crossing",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q60572805"
+    },
+    {
+      "id": "Q61073828",
+      "label": "Mürşitpınar Border Crossing",
+      "lon": 38.3495,
+      "lat": 36.8995,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q61073828"
+    },
+    {
+      "id": "Q63121548",
+      "label": "Q63121548",
+      "lon": 42.9701,
+      "lat": 16.5144,
+      "kind": "border checkpoint",
+      "countries": [
+        "Saudi Arabia"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q63121548"
+    },
+    {
+      "id": "Q67892967",
+      "label": "Tamarchin - Haji Omeran border post",
+      "lon": 45.06865,
+      "lat": 36.66533,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892967"
+    },
+    {
+      "id": "Q67892970",
+      "label": "Mehran Qasem Soleimani border post",
+      "lon": 46.05508,
+      "lat": 33.11865,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892970"
+    },
+    {
+      "id": "Q67892971",
+      "label": "Bashmakh - Penjwen border post",
+      "lon": 46.01761,
+      "lat": 35.61042,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892971"
+    },
+    {
+      "id": "Q67892973",
+      "label": "Shalamcheh border post",
+      "lon": 48.02656,
+      "lat": 30.50504,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892973"
+    },
+    {
+      "id": "Q67892976",
+      "label": "Parviz Khan border post",
+      "lon": 45.58827,
+      "lat": 34.55304,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892976"
+    },
+    {
+      "id": "Q67892977",
+      "label": "Al-Shayeb border post",
+      "lon": 47.80207,
+      "lat": 31.85364,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892977"
+    },
+    {
+      "id": "Q67892978",
+      "label": "Soomar - Mandali border post",
+      "lon": 45.60672,
+      "lat": 33.80052,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892978"
+    },
+    {
+      "id": "Q67892980",
+      "label": "Bilasuvar - Ardabil border post",
+      "lon": 48.36113,
+      "lat": 39.38971,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892980"
+    },
+    {
+      "id": "Q67892981",
+      "label": "Islam Qala - Taybad border post",
+      "lon": 61.0033,
+      "lat": 34.70916,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892981"
+    },
+    {
+      "id": "Q67892984",
+      "label": "Sarakhs - Saraghs border post",
+      "lon": 61.16707,
+      "lat": 36.51999,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892984"
+    },
+    {
+      "id": "Q67892985",
+      "label": "Bajgiran - Gaudan border post",
+      "lon": 58.41156,
+      "lat": 37.62728,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892985"
+    },
+    {
+      "id": "Q67892988",
+      "label": "Gudurolom - Incheboron border post",
+      "lon": 54.61946,
+      "lat": 37.44616,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Turkmenistan"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892988"
+    },
+    {
+      "id": "Q67892989",
+      "label": "Gurbulak - Bazargan border post",
+      "lon": 44.37754,
+      "lat": 39.41213,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q67892989"
+    },
+    {
+      "id": "Q67892990",
+      "label": "Esendere - Sero border post",
+      "lon": 44.62226,
+      "lat": 37.71669,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892990"
+    },
+    {
+      "id": "Q67892992",
+      "label": "Poldasht-Shahtakhti border post",
+      "lon": 45.0709,
+      "lat": 39.35939,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892992"
+    },
+    {
+      "id": "Q67892993",
+      "label": "Mirjaveh - Taftan border post",
+      "lon": 61.55004,
+      "lat": 28.97736,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892993"
+    },
+    {
+      "id": "Q67892994",
+      "label": "Iran-Pakistan barrier border post",
+      "lon": 62.80334,
+      "lat": 27.75609,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Pakistan"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67892994"
+    },
+    {
+      "id": "Q67893044",
+      "label": "Posof border border post",
+      "lon": 42.81848,
+      "lat": 41.58772,
+      "kind": "border checkpoint",
+      "countries": [
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67893044"
+    },
+    {
+      "id": "Q67893047",
+      "label": "Sadarak border post",
+      "lon": 44.8031,
+      "lat": 39.65527,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67893047"
+    },
+    {
+      "id": "Q67893107",
+      "label": "Jolfa - Julfa - Culfa border post",
+      "lon": 45.63515,
+      "lat": 38.94339,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67893107"
+    },
+    {
+      "id": "Q67893116",
+      "label": "Sarpi border post",
+      "lon": 41.54755,
+      "lat": 41.52066,
+      "kind": "border checkpoint",
+      "countries": [
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67893116"
+    },
+    {
+      "id": "Q67893141",
+      "label": "Horadiz border post",
+      "lon": 47.34627,
+      "lat": 39.43991,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67893141"
+    },
+    {
+      "id": "Q67893155",
+      "label": "Mahirud - Abu Nasr Farahi border post",
+      "lon": 60.8656,
+      "lat": 32.16266,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "https://caravanistan.com/border-crossings/",
+      "source": "https://www.wikidata.org/wiki/Q67893155"
+    },
+    {
+      "id": "Q68035420",
+      "label": "Turkey Syria border crossing #346",
+      "lon": 38.08953,
+      "lat": 36.86943,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68035420"
+    },
+    {
+      "id": "Q68035773",
+      "label": "Iran Pakistan border crossing #703",
+      "lon": 63.32528,
+      "lat": 27.15694,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Pakistan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68035773"
+    },
+    {
+      "id": "Q68035776",
+      "label": "Iran Pakistan border crossing #705",
+      "lon": 61.53845,
+      "lat": 29.00678,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Pakistan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68035776"
+    },
+    {
+      "id": "Q68036267",
+      "label": "Saudi Arabia Yemen border crossing #1280",
+      "lon": 43.49922,
+      "lat": 17.52289,
+      "kind": "border checkpoint",
+      "countries": [
+        "Saudi Arabia",
+        "Yemen"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036267"
+    },
+    {
+      "id": "Q68036269",
+      "label": "Saudi Arabia Yemen border crossing #1284",
+      "lon": 43.00443,
+      "lat": 16.49555,
+      "kind": "border checkpoint",
+      "countries": [
+        "Saudi Arabia",
+        "Yemen"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036269"
+    },
+    {
+      "id": "Q68036273",
+      "label": "Saudi Arabia United Arab Emirates border crossing #1292",
+      "lon": 51.58346,
+      "lat": 24.11651,
+      "kind": "border checkpoint",
+      "countries": [
+        "Saudi Arabia",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036273"
+    },
+    {
+      "id": "Q68036275",
+      "label": "Qatar Saudi Arabia border crossing #1296",
+      "lon": 50.83579,
+      "lat": 24.74166,
+      "kind": "border checkpoint",
+      "countries": [
+        "Qatar",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036275"
+    },
+    {
+      "id": "Q68036276",
+      "label": "Qatar Saudi Arabia border crossing #1300",
+      "lon": 51.0707,
+      "lat": 24.56219,
+      "kind": "border checkpoint",
+      "countries": [
+        "Qatar",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036276"
+    },
+    {
+      "id": "Q68036279",
+      "label": "Oman United Arab Emirates border crossing #1304",
+      "lon": 56.35655,
+      "lat": 24.97712,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036279"
+    },
+    {
+      "id": "Q68036281",
+      "label": "Oman United Arab Emirates border crossing #1308",
+      "lon": 55.99198,
+      "lat": 24.85515,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036281"
+    },
+    {
+      "id": "Q68036283",
+      "label": "Oman United Arab Emirates border crossing #1309",
+      "lon": 56.18505,
+      "lat": 24.80719,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036283"
+    },
+    {
+      "id": "Q68036286",
+      "label": "Oman United Arab Emirates border crossing #1316",
+      "lon": 55.94879,
+      "lat": 24.23221,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036286"
+    },
+    {
+      "id": "Q68036288",
+      "label": "Oman United Arab Emirates border crossing #1320",
+      "lon": 55.83658,
+      "lat": 24.02715,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036288"
+    },
+    {
+      "id": "Q68036291",
+      "label": "Oman United Arab Emirates border crossing #1324",
+      "lon": 55.82455,
+      "lat": 24.89733,
+      "kind": "border checkpoint",
+      "countries": [
+        "Oman",
+        "United Arab Emirates"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036291"
+    },
+    {
+      "id": "Q68036292",
+      "label": "Kuwait Saudi Arabia border crossing #1328",
+      "lon": 48.3894,
+      "lat": 28.54501,
+      "kind": "border checkpoint",
+      "countries": [
+        "Kuwait",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036292"
+    },
+    {
+      "id": "Q68036294",
+      "label": "Kuwait Saudi Arabia border crossing #1332",
+      "lon": 46.65499,
+      "lat": 29.09085,
+      "kind": "border checkpoint",
+      "countries": [
+        "Kuwait",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036294"
+    },
+    {
+      "id": "Q68036297",
+      "label": "Kuwait Saudi Arabia border crossing #1336",
+      "lon": 48.37934,
+      "lat": 28.54491,
+      "kind": "border checkpoint",
+      "countries": [
+        "Kuwait",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036297"
+    },
+    {
+      "id": "Q68036298",
+      "label": "Iraq Kuwait border crossing #1340",
+      "lon": 47.70901,
+      "lat": 30.08411,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq",
+        "Kuwait"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036298"
+    },
+    {
+      "id": "Q68036300",
+      "label": "Egypt Israel border crossing #1344",
+      "lon": 34.36173,
+      "lat": 30.96507,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036300"
+    },
+    {
+      "id": "Q68036303",
+      "label": "Egypt Israel border crossing #1348",
+      "lon": 34.53187,
+      "lat": 30.56584,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036303"
+    },
+    {
+      "id": "Q68036307",
+      "label": "Egypt Israel border crossing #1349",
+      "lon": 34.54894,
+      "lat": 30.51545,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036307"
+    },
+    {
+      "id": "Q68036309",
+      "label": "Egypt Israel border crossing #1356",
+      "lon": 34.67795,
+      "lat": 30.20425,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036309"
+    },
+    {
+      "id": "Q68036311",
+      "label": "Egypt Israel border crossing #1357",
+      "lon": 34.68463,
+      "lat": 30.18734,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036311"
+    },
+    {
+      "id": "Q68036313",
+      "label": "Egypt Israel border crossing #1358",
+      "lon": 34.69257,
+      "lat": 30.16723,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036313"
+    },
+    {
+      "id": "Q68036315",
+      "label": "Egypt Israel border crossing #1359",
+      "lon": 34.70573,
+      "lat": 30.13392,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036315"
+    },
+    {
+      "id": "Q68036318",
+      "label": "Egypt Israel border crossing #1372",
+      "lon": 34.86856,
+      "lat": 29.59251,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036318"
+    },
+    {
+      "id": "Q68036321",
+      "label": "Egypt Israel border crossing #1376",
+      "lon": 34.90015,
+      "lat": 29.49313,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036321"
+    },
+    {
+      "id": "Q68036322",
+      "label": "Egypt Gaza Strip border crossing #1380",
+      "lon": 34.26143,
+      "lat": 31.23347,
+      "kind": "border checkpoint",
+      "countries": [
+        "Egypt",
+        "Gaza Strip"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036322"
+    },
+    {
+      "id": "Q68036325",
+      "label": "Israel Jordan border crossing #1384",
+      "lon": 35.18038,
+      "lat": 30.51318,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036325"
+    },
+    {
+      "id": "Q68036328",
+      "label": "Israel Jordan border crossing #1385",
+      "lon": 35.16177,
+      "lat": 30.45418,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036328"
+    },
+    {
+      "id": "Q68036329",
+      "label": "Israel Jordan border crossing #1386",
+      "lon": 35.15751,
+      "lat": 30.38965,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036329"
+    },
+    {
+      "id": "Q68036332",
+      "label": "Israel Jordan border crossing #1396",
+      "lon": 35.16042,
+      "lat": 30.3368,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036332"
+    },
+    {
+      "id": "Q68036333",
+      "label": "Israel Jordan border crossing #1397",
+      "lon": 35.1365,
+      "lat": 30.08706,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036333"
+    },
+    {
+      "id": "Q68036334",
+      "label": "Israel Jordan border crossing #1398",
+      "lon": 35.09752,
+      "lat": 30.02976,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036334"
+    },
+    {
+      "id": "Q68036337",
+      "label": "Israel Jordan border crossing #1408",
+      "lon": 34.97982,
+      "lat": 29.54735,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036337"
+    },
+    {
+      "id": "Q68036341",
+      "label": "Gaza Strip Israel border crossing #1416",
+      "lon": 34.49167,
+      "lat": 31.48146,
+      "kind": "border checkpoint",
+      "countries": [
+        "Gaza Strip",
+        "Israel"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036341"
+    },
+    {
+      "id": "Q68036389",
+      "label": "Jordan Saudi Arabia border crossing #1472",
+      "lon": 37.10466,
+      "lat": 31.5311,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036389"
+    },
+    {
+      "id": "Q68036391",
+      "label": "Jordan Saudi Arabia border crossing #1476",
+      "lon": 34.96611,
+      "lat": 29.36013,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036391"
+    },
+    {
+      "id": "Q68036393",
+      "label": "Jordan Saudi Arabia border crossing #1480",
+      "lon": 36.07597,
+      "lat": 29.19324,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Saudi Arabia"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036393"
+    },
+    {
+      "id": "Q68036399",
+      "label": "Gilboa Crossing",
+      "lon": 35.30861,
+      "lat": 32.51083,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q68036399"
+    },
+    {
+      "id": "Q68036402",
+      "label": "Israel West Bank border crossing #1500",
+      "lon": 35.22511,
+      "lat": 32.53878,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036402"
+    },
+    {
+      "id": "Q68036403",
+      "label": "Mehola checkpoint",
+      "lon": 35.49528,
+      "lat": 32.40056,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q68036403"
+    },
+    {
+      "id": "Q68036405",
+      "label": "Israel West Bank border crossing #1508",
+      "lon": 34.99839,
+      "lat": 32.1888,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036405"
+    },
+    {
+      "id": "Q68036408",
+      "label": "Tarqumiyah Crossing",
+      "lon": 34.96261,
+      "lat": 31.59177,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q68036408"
+    },
+    {
+      "id": "Q68036411",
+      "label": "Israel West Bank border crossing #1516",
+      "lon": 35.40722,
+      "lat": 31.58111,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036411"
+    },
+    {
+      "id": "Q68036413",
+      "label": "Israel West Bank border crossing #1520",
+      "lon": 35.03848,
+      "lat": 32.3139,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036413"
+    },
+    {
+      "id": "Q68036415",
+      "label": "Israel West Bank border crossing #1524",
+      "lon": 34.96741,
+      "lat": 31.82915,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036415"
+    },
+    {
+      "id": "Q68036418",
+      "label": "Israel West Bank border crossing #1528",
+      "lon": 35.22413,
+      "lat": 31.77688,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036418"
+    },
+    {
+      "id": "Q68036420",
+      "label": "Israel West Bank border crossing #1529",
+      "lon": 35.2234,
+      "lat": 31.76918,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036420"
+    },
+    {
+      "id": "Q68036421",
+      "label": "Israel West Bank border crossing #1536",
+      "lon": 34.93536,
+      "lat": 31.35143,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036421"
+    },
+    {
+      "id": "Q68036424",
+      "label": "Israel West Bank border crossing #1540",
+      "lon": 34.96734,
+      "lat": 31.86756,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036424"
+    },
+    {
+      "id": "Q68036425",
+      "label": "Israel West Bank border crossing #1544",
+      "lon": 35.01549,
+      "lat": 31.82039,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036425"
+    },
+    {
+      "id": "Q68036427",
+      "label": "Israel West Bank border crossing #1548",
+      "lon": 35.20057,
+      "lat": 31.78887,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036427"
+    },
+    {
+      "id": "Q68036428",
+      "label": "Israel West Bank border crossing #1552",
+      "lon": 35.18118,
+      "lat": 31.79874,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036428"
+    },
+    {
+      "id": "Q68036431",
+      "label": "Israel West Bank border crossing #1553",
+      "lon": 35.18694,
+      "lat": 31.79581,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "West Bank"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036431"
+    },
+    {
+      "id": "Q68036432",
+      "label": "Israel Jordan border crossing #1560",
+      "lon": 35.63595,
+      "lat": 32.68676,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036432"
+    },
+    {
+      "id": "Q68036435",
+      "label": "Israel Jordan border crossing #1564",
+      "lon": 35.5699,
+      "lat": 32.62618,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036435"
+    },
+    {
+      "id": "Q68036436",
+      "label": "Israel Jordan border crossing #1568",
+      "lon": 35.58913,
+      "lat": 32.65909,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036436"
+    },
+    {
+      "id": "Q68036444",
+      "label": "Israel Syria border crossing #1578",
+      "lon": 35.63658,
+      "lat": 33.01068,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036444"
+    },
+    {
+      "id": "Q68036446",
+      "label": "Israel Lebanon border crossing #1582",
+      "lon": 35.57526,
+      "lat": 33.25255,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036446"
+    },
+    {
+      "id": "Q68036447",
+      "label": "Israel Lebanon border crossing #1586",
+      "lon": 35.47138,
+      "lat": 33.08542,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036447"
+    },
+    {
+      "id": "Q68036449",
+      "label": "Israel Lebanon border crossing #1587",
+      "lon": 35.45667,
+      "lat": 33.07993,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036449"
+    },
+    {
+      "id": "Q68036450",
+      "label": "Israel Lebanon border crossing #1594",
+      "lon": 35.12575,
+      "lat": 33.09587,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Lebanon"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036450"
+    },
+    {
+      "id": "Q68036451",
+      "label": "Jordan Syria border crossing #1598",
+      "lon": 35.66014,
+      "lat": 32.69257,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036451"
+    },
+    {
+      "id": "Q68036453",
+      "label": "Jordan Syria border crossing #1602",
+      "lon": 36.0487,
+      "lat": 32.58394,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036453"
+    },
+    {
+      "id": "Q68036454",
+      "label": "Iraq Jordan border crossing #1606",
+      "lon": 39.00637,
+      "lat": 32.74103,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq",
+        "Jordan"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036454"
+    },
+    {
+      "id": "Q68036455",
+      "label": "Lebanon Syria border crossing #1610",
+      "lon": 36.11502,
+      "lat": 34.64033,
+      "kind": "border checkpoint",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036455"
+    },
+    {
+      "id": "Q68036458",
+      "label": "Lebanon Syria border crossing #1614",
+      "lon": 36.32992,
+      "lat": 34.64093,
+      "kind": "border checkpoint",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036458"
+    },
+    {
+      "id": "Q68036460",
+      "label": "Lebanon Syria border crossing #1618",
+      "lon": 35.64611,
+      "lat": 33.28515,
+      "kind": "border checkpoint",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036460"
+    },
+    {
+      "id": "Q68036462",
+      "label": "Lebanon Syria border crossing #1622",
+      "lon": 35.98821,
+      "lat": 34.64351,
+      "kind": "border checkpoint",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036462"
+    },
+    {
+      "id": "Q68036463",
+      "label": "Lebanon Syria border crossing #1626",
+      "lon": 36.53494,
+      "lat": 34.39356,
+      "kind": "border checkpoint",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036463"
+    },
+    {
+      "id": "Q68036465",
+      "label": "Lebanon Syria border crossing #1630",
+      "lon": 35.96139,
+      "lat": 33.69492,
+      "kind": "border checkpoint",
+      "countries": [
+        "Lebanon",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036465"
+    },
+    {
+      "id": "Q68036486",
+      "label": "Iraq Syria border crossing #1682",
+      "lon": 40.97666,
+      "lat": 34.40671,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036486"
+    },
+    {
+      "id": "Q68036489",
+      "label": "Iraq Syria border crossing #1686",
+      "lon": 38.92979,
+      "lat": 33.44022,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036489"
+    },
+    {
+      "id": "Q68036490",
+      "label": "Al-Mandhariyah border post",
+      "lon": 45.46526,
+      "lat": 34.38201,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036490"
+    },
+    {
+      "id": "Q68036493",
+      "label": "Iran Iraq border crossing #1694",
+      "lon": 47.62626,
+      "lat": 32.06396,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Iraq"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036493"
+    },
+    {
+      "id": "Q68036494",
+      "label": "Iran Iraq border crossing #1698",
+      "lon": 48.21246,
+      "lat": 30.38781,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Iraq"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036494"
+    },
+    {
+      "id": "Q68036495",
+      "label": "Iran Iraq border crossing #1702",
+      "lon": 48.25779,
+      "lat": 30.3536,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Iraq"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036495"
+    },
+    {
+      "id": "Q68036576",
+      "label": "Georgia Turkey border crossing #1882",
+      "lon": 41.55752,
+      "lat": 41.51985,
+      "kind": "border checkpoint",
+      "countries": [
+        "Georgia",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036576"
+    },
+    {
+      "id": "Q68036964",
+      "label": "Iraq Syria border crossing #2674",
+      "lon": 42.07791,
+      "lat": 36.80731,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036964"
+    },
+    {
+      "id": "Q68036965",
+      "label": "Iraq Syria border crossing #2680",
+      "lon": 41.27953,
+      "lat": 36.264,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq",
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036965"
+    },
+    {
+      "id": "Q68036967",
+      "label": "Haji Omeran border post",
+      "lon": 45.0659,
+      "lat": 36.66608,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036967"
+    },
+    {
+      "id": "Q68036969",
+      "label": "Syria Turkey border crossing #2697",
+      "lon": 38.9571,
+      "lat": 36.6966,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036969"
+    },
+    {
+      "id": "Q68036972",
+      "label": "Syria Turkey border crossing #2709",
+      "lon": 36.60003,
+      "lat": 36.36696,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036972"
+    },
+    {
+      "id": "Q68036974",
+      "label": "Syria Turkey border crossing #2715",
+      "lon": 36.60173,
+      "lat": 36.36812,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036974"
+    },
+    {
+      "id": "Q68036975",
+      "label": "Syria Turkey border crossing #2721",
+      "lon": 42.18517,
+      "lat": 37.29041,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036975"
+    },
+    {
+      "id": "Q68036976",
+      "label": "Syria Turkey border crossing #2722",
+      "lon": 42.17455,
+      "lat": 37.28443,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036976"
+    },
+    {
+      "id": "Q68036978",
+      "label": "Syria Turkey border crossing #2723",
+      "lon": 42.16299,
+      "lat": 37.27317,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036978"
+    },
+    {
+      "id": "Q68036980",
+      "label": "Syria Turkey border crossing #2724",
+      "lon": 42.16271,
+      "lat": 37.2729,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036980"
+    },
+    {
+      "id": "Q68036981",
+      "label": "Syria Turkey border crossing #2745",
+      "lon": 41.22767,
+      "lat": 37.07268,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036981"
+    },
+    {
+      "id": "Q68036983",
+      "label": "Syria Turkey border crossing #2751",
+      "lon": 36.67971,
+      "lat": 36.23383,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036983"
+    },
+    {
+      "id": "Q68036989",
+      "label": "Armenia Iran border crossing #2769",
+      "lon": 46.37809,
+      "lat": 38.90655,
+      "kind": "border checkpoint",
+      "countries": [
+        "Armenia",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036989"
+    },
+    {
+      "id": "Q68036990",
+      "label": "Armenia Iran border crossing #2770",
+      "lon": 46.31856,
+      "lat": 38.90181,
+      "kind": "border checkpoint",
+      "countries": [
+        "Armenia",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036990"
+    },
+    {
+      "id": "Q68036993",
+      "label": "Armenia Iran border crossing #2771",
+      "lon": 46.31583,
+      "lat": 38.90112,
+      "kind": "border checkpoint",
+      "countries": [
+        "Armenia",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036993"
+    },
+    {
+      "id": "Q68036995",
+      "label": "Armenia Iran border crossing #2772",
+      "lon": 46.42526,
+      "lat": 38.89597,
+      "kind": "border checkpoint",
+      "countries": [
+        "Armenia",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036995"
+    },
+    {
+      "id": "Q68036997",
+      "label": "Armenia Iran border crossing #2793",
+      "lon": 46.18697,
+      "lat": 38.84266,
+      "kind": "border checkpoint",
+      "countries": [
+        "Armenia",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036997"
+    },
+    {
+      "id": "Q68036998",
+      "label": "Azerbaijan Iran border crossing #2799",
+      "lon": 45.6444,
+      "lat": 38.94383,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68036998"
+    },
+    {
+      "id": "Q68037001",
+      "label": "Azerbaijan Iran border crossing #2805",
+      "lon": 46.12955,
+      "lat": 38.85563,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037001"
+    },
+    {
+      "id": "Q68037003",
+      "label": "Azerbaijan Iran border crossing #2811",
+      "lon": 48.27065,
+      "lat": 39.34832,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037003"
+    },
+    {
+      "id": "Q68037004",
+      "label": "Azerbaijan Iran border crossing #2817",
+      "lon": 47.18901,
+      "lat": 39.33857,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037004"
+    },
+    {
+      "id": "Q68037007",
+      "label": "Azerbaijan Iran border crossing #2823",
+      "lon": 47.06957,
+      "lat": 39.26878,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037007"
+    },
+    {
+      "id": "Q68037008",
+      "label": "Azerbaijan Iran border crossing #2829",
+      "lon": 48.12267,
+      "lat": 39.26342,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037008"
+    },
+    {
+      "id": "Q68037011",
+      "label": "Azerbaijan Iran border crossing #2835",
+      "lon": 46.7393,
+      "lat": 39.04613,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037011"
+    },
+    {
+      "id": "Q68037013",
+      "label": "Azerbaijan Iran border crossing #2841",
+      "lon": 46.71619,
+      "lat": 39.02777,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037013"
+    },
+    {
+      "id": "Q68037015",
+      "label": "Azerbaijan Iran border crossing #2842",
+      "lon": 46.64719,
+      "lat": 38.97308,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037015"
+    },
+    {
+      "id": "Q68037016",
+      "label": "Azerbaijan Iran border crossing #2843",
+      "lon": 46.55539,
+      "lat": 38.89441,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037016"
+    },
+    {
+      "id": "Q68037018",
+      "label": "Azerbaijan Iran border crossing #2859",
+      "lon": 48.87043,
+      "lat": 38.44547,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037018"
+    },
+    {
+      "id": "Q68037019",
+      "label": "Azerbaijan Iran border crossing #2865",
+      "lon": 48.61899,
+      "lat": 38.40029,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037019"
+    },
+    {
+      "id": "Q68037021",
+      "label": "Azerbaijan Iran border crossing #2866",
+      "lon": 48.65867,
+      "lat": 38.38994,
+      "kind": "border checkpoint",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037021"
+    },
+    {
+      "id": "Q68037024",
+      "label": "Iran Turkey border crossing #2883",
+      "lon": 44.31824,
+      "lat": 38.49608,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037024"
+    },
+    {
+      "id": "Q68037027",
+      "label": "Iran Turkey border crossing #2889",
+      "lon": 44.61258,
+      "lat": 37.72415,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037027"
+    },
+    {
+      "id": "Q68037029",
+      "label": "Iran Turkey border crossing #2895",
+      "lon": 44.38948,
+      "lat": 39.41251,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Turkey"
+      ],
+      "bulk": true,
+      "coordinate_source": "https://worldmap.harvard.edu/data/geonode:border_crossings_phv",
+      "source": "https://www.wikidata.org/wiki/Q68037029"
+    },
+    {
+      "id": "Q76612653",
+      "label": "Ashk Tappeh Railway Station",
+      "lon": 54.61414,
+      "lat": 37.42987,
+      "kind": "border train station",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q76612653"
+    },
+    {
+      "id": "Q81216532",
+      "label": "Taybeh crossing",
+      "lon": 35.01182,
+      "lat": 32.29254,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q81216532"
+    },
+    {
+      "id": "Q82015864",
+      "label": "Jbara checkpoint",
+      "lon": 35.03939,
+      "lat": 32.28032,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q82015864"
+    },
+    {
+      "id": "Q85114905",
+      "label": "104 Border checkpoint (Tulkarm)",
+      "lon": 35.01572,
+      "lat": 32.312,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q85114905"
+    },
+    {
+      "id": "Q85168021",
+      "label": "Incheh Borun train station",
+      "lon": 54.61395,
+      "lat": 37.42997,
+      "kind": "border train station",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "http://pws0.rai.ir/",
+      "source": "https://www.wikidata.org/wiki/Q85168021"
+    },
+    {
+      "id": "Q85168057",
+      "label": "Razi Railway Station",
+      "lon": 44.3442,
+      "lat": 38.49301,
+      "kind": "border train station",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "http://pws0.rai.ir/",
+      "source": "https://www.wikidata.org/wiki/Q85168057"
+    },
+    {
+      "id": "Q85168684",
+      "label": "Sarakhs railway station",
+      "lon": 61.10475,
+      "lat": 36.47046,
+      "kind": "border train station",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "http://pws0.rai.ir/",
+      "source": "https://www.wikidata.org/wiki/Q85168684"
+    },
+    {
+      "id": "Q85168850",
+      "label": "Kapıköy railway station",
+      "lon": 44.29544,
+      "lat": 38.51046,
+      "kind": "border train station",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q85168850"
+    },
+    {
+      "id": "Q85172763",
+      "label": "Shamtigh railway station",
+      "lon": 60.8885,
+      "lat": 34.31933,
+      "kind": "border train station",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": "http://pws0.rai.ir/",
+      "source": "https://www.wikidata.org/wiki/Q85172763"
+    },
+    {
+      "id": "Q91102757",
+      "label": "Sero - Esendere border post",
+      "lon": 44.6229,
+      "lat": 37.71776,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q91102757"
+    },
+    {
+      "id": "Q97216919",
+      "label": "Kermanshah Custom House",
+      "lon": 47.06889,
+      "lat": 34.32161,
+      "kind": "custom house",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q97216919"
+    },
+    {
+      "id": "Q99618173",
+      "label": "Kissufim Crossing",
+      "lon": 34.37341,
+      "lat": 31.37366,
+      "kind": "border crossing",
+      "countries": [
+        "Israel",
+        "Palestine"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q99618173"
+    },
+    {
+      "id": "Q106413700",
+      "label": "Q106413700",
+      "lon": 50.76317,
+      "lat": 24.72483,
+      "kind": "border checkpoint",
+      "countries": [
+        "Saudi Arabia"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q106413700"
+    },
+    {
+      "id": "Q106956999",
+      "label": "Mandeli Border Crossing",
+      "lon": 45.60564,
+      "lat": 33.7997,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q106956999"
+    },
+    {
+      "id": "Q108428702",
+      "label": "Milak - Zaranj border post",
+      "lon": 61.81962,
+      "lat": 30.96945,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q108428702"
+    },
+    {
+      "id": "Q109548954",
+      "label": "Sayran Ban border post",
+      "lon": 45.95612,
+      "lat": 35.83181,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q109548954"
+    },
+    {
+      "id": "Q109571725",
+      "label": "Zurbatiyah border post",
+      "lon": 46.04542,
+      "lat": 33.12584,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q109571725"
+    },
+    {
+      "id": "Q110907811",
+      "label": "Lotfabad - Artyk Border Post",
+      "lon": 59.33415,
+      "lat": 37.52809,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q110907811"
+    },
+    {
+      "id": "Q110908008",
+      "label": "Yazdan Border Crossing",
+      "lon": 60.89444,
+      "lat": 33.50278,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q110908008"
+    },
+    {
+      "id": "Q110929486",
+      "label": "Pishin - Mand border post",
+      "lon": 61.84546,
+      "lat": 26.09481,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q110929486"
+    },
+    {
+      "id": "Q111963819",
+      "label": "al-Muntheriyah Border Crossing",
+      "lon": 45.4646,
+      "lat": 34.38168,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q111963819"
+    },
+    {
+      "id": "Q111974111",
+      "label": "Arar Border Crossing",
+      "lon": 41.46207,
+      "lat": 31.39351,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q111974111"
+    },
+    {
+      "id": "Q112035394",
+      "label": "al-Jumaimah Border Crossing",
+      "lon": 43.87534,
+      "lat": 29.8279,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q112035394"
+    },
+    {
+      "id": "Q112039675",
+      "label": "Rabia Border Crossing",
+      "lon": 42.07607,
+      "lat": 36.8058,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q112039675"
+    },
+    {
+      "id": "Q112040540",
+      "label": "Haj Emran Border Crossing",
+      "lon": 45.06694,
+      "lat": 36.66578,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q112040540"
+    },
+    {
+      "id": "Q112042366",
+      "label": "Bashmagh Border Crossing",
+      "lon": 46.015,
+      "lat": 35.61442,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q112042366"
+    },
+    {
+      "id": "Q112042439",
+      "label": "Parviz Khan Border Crossing",
+      "lon": 45.59266,
+      "lat": 34.55615,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q112042439"
+    },
+    {
+      "id": "Q113168753",
+      "label": "Jurayshan Border crossing",
+      "lon": 47.13171,
+      "lat": 29.97433,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q113168753"
+    },
+    {
+      "id": "Q113700600",
+      "label": "al-Abdali Border Crossing",
+      "lon": 47.70353,
+      "lat": 30.08518,
+      "kind": "border crossing",
+      "countries": [
+        "Kuwait"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q113700600"
+    },
+    {
+      "id": "Q114243522",
+      "label": "Meitar Crossing",
+      "lon": 34.9338,
+      "lat": 31.34454,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q114243522"
+    },
+    {
+      "id": "Q115590232",
+      "label": "Fishkhabour Border Crossing",
+      "lon": 42.35262,
+      "lat": 37.08914,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q115590232"
+    },
+    {
+      "id": "Q115630553",
+      "label": "al-Tanaf Border Crossing",
+      "lon": 38.83675,
+      "lat": 33.43625,
+      "kind": "border crossing",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q115630553"
+    },
+    {
+      "id": "Q119797216",
+      "label": "Q119797216",
+      "lon": 36.00911,
+      "lat": 35.90442,
+      "kind": "border checkpoint",
+      "countries": [
+        "Syria"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q119797216"
+    },
+    {
+      "id": "Q119823398",
+      "label": "Sufa Border Crossing",
+      "lon": 34.32611,
+      "lat": 31.25694,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q119823398"
+    },
+    {
+      "id": "Q124751083",
+      "label": "railway border crossing Astara",
+      "lon": 48.84138,
+      "lat": 38.45226,
+      "kind": "railway border crossing",
+      "countries": [
+        "Azerbaijan",
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q124751083"
+    },
+    {
+      "id": "Q125927487",
+      "label": "al-Awdah/Sufa crossing",
+      "lon": 34.32572,
+      "lat": 31.25731,
+      "kind": "border crossing",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q125927487"
+    },
+    {
+      "id": "Q125947142",
+      "label": "Markaz Ḩudūd Jābir",
+      "lon": 36.19413,
+      "lat": 32.52203,
+      "kind": "border checkpoint",
+      "countries": [
+        "Jordan"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q125947142"
+    },
+    {
+      "id": "Q129562117",
+      "label": "Tamarchin",
+      "lon": 45.07235,
+      "lat": 36.66614,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q129562117"
+    },
+    {
+      "id": "Q129652184",
+      "label": "Serve border crossing",
+      "lon": 44.5,
+      "lat": 37.81667,
+      "kind": "border checkpoint",
+      "countries": [
+        "Iran",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q129652184"
+    },
+    {
+      "id": "Q130382086",
+      "label": "Çobanbey Border Crossing",
+      "lon": 37.47,
+      "lat": 36.63397,
+      "kind": "border checkpoint",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q130382086"
+    },
+    {
+      "id": "Q131403358",
+      "label": "Kaz Ova bridge",
+      "lon": 26.6311,
+      "lat": 41.3621,
+      "kind": "international bridge",
+      "countries": [
+        "Greece",
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q131403358"
+    },
+    {
+      "id": "Q131726247",
+      "label": "Jezreel Valley railway bridge at Old Gesher",
+      "lon": 35.56505,
+      "lat": 32.62402,
+      "kind": "international bridge",
+      "countries": [
+        "Israel",
+        "Jordan",
+        "Ottoman Empire"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q131726247"
+    },
+    {
+      "id": "Q133815419",
+      "label": "Mazmoria checkpoint",
+      "lon": 35.24693,
+      "lat": 31.715,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q133815419"
+    },
+    {
+      "id": "Q137569937",
+      "label": "Zikim Crossing",
+      "lon": 34.49471,
+      "lat": 31.59303,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q137569937"
+    },
+    {
+      "id": "Q137572922",
+      "label": "Gate 96",
+      "lon": 34.45179,
+      "lat": 31.44857,
+      "kind": "border checkpoint",
+      "countries": [
+        "Israel"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q137572922"
+    },
+    {
+      "id": "Q139424314",
+      "label": "Q139424314",
+      "lon": 39.73565,
+      "lat": 41.00788,
+      "kind": "custom house",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q139424314"
+    },
+    {
+      "id": "Q139431919",
+      "label": "Q139431919",
+      "lon": 33.87769,
+      "lat": 36.31752,
+      "kind": "custom house",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q139431919"
+    },
+    {
+      "id": "Q139433498",
+      "label": "Q139433498",
+      "lon": 26.76975,
+      "lat": 38.36522,
+      "kind": "custom house",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q139433498"
+    },
+    {
+      "id": "Q139435033",
+      "label": "Q139435033",
+      "lon": 27.11755,
+      "lat": 37.63194,
+      "kind": "custom house",
+      "countries": [
+        "Turkey"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q139435033"
+    },
+    {
+      "id": "Q140176196",
+      "label": "Chalat Birder Crossing",
+      "lon": 46.929,
+      "lat": 32.599,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q140176196"
+    },
+    {
+      "id": "Q140521218",
+      "label": "Tawilah Border Crossing",
+      "lon": 46.18097,
+      "lat": 35.18118,
+      "kind": "border crossing",
+      "countries": [
+        "Iraq"
+      ],
+      "bulk": false,
+      "coordinate_source": null,
+      "source": "https://www.wikidata.org/wiki/Q140521218"
+    }
+  ]
+}

@@ -97,6 +97,15 @@ jobs:
       - name: Unit tests (scripts/lib)
         run: node --test scripts/lib/*.test.js
 
+      # Borders vs independent Wikidata reference points (border crossings, tripoints) in
+      # data/border-reference-points.json. Fails if any point is now more than 0.25 km
+      # further from the drawn border than in data/border-check-baseline.json, for the
+      # years checked there. No network. Report: docs/border-verification.md.
+      - name: Install repo-root dependencies (geometry library)
+        run: npm ci
+      - name: Border check against reference points
+        run: node scripts/verify-borders.js --check
+
   audit:
     name: Dependency audit (${{ matrix.dir }})
     runs-on: ubuntu-latest
