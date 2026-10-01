@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
-import { humaniseStatus, yearsLabel } from "./mapBorders";
+import { humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import "./MapUi.css";
 
 // ---- a single boundary's details (used by the popup and the Borders list) ----
@@ -10,7 +10,7 @@ function BoundaryDetails({ b }) {
   return (
     <>
       <p className="mu-b-status">
-        <span className={`mu-swatch-line ${b.status ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
+        <span className={`mu-swatch-line ${isDashedStatus(b.status) ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
         {status ?? "Source-dated border (no status flag)"}
       </p>
       {b.note && <p className="mu-b-note">{b.note}</p>}
@@ -62,7 +62,7 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
 // the current year, each expandable to the same details.
 export function BordersList({ year, items }) {
   const [open, setOpen] = useState(false);
-  const flagged = items.filter((b) => b.status).length;
+  const flagged = items.filter((b) => isDashedStatus(b.status)).length;
   return (
     <div className="mu-borders">
       <button
@@ -84,7 +84,7 @@ export function BordersList({ year, items }) {
           {items.map((b) => (
             <details key={`${b.name}|${b.start_year}|${b.end_year}`} className="mu-b-list-item">
               <summary>
-                <span className={`mu-swatch-line ${b.status ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
+                <span className={`mu-swatch-line ${isDashedStatus(b.status) ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
                 {b.name} <span className="mu-b-years-inline">{yearsLabel(b)}</span>
               </summary>
               <BoundaryDetails b={b} />
