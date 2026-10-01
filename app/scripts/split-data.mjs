@@ -44,6 +44,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { FULL_BUCKETS, fullBucket } from "../src/lib/fullBucket.js";
+import { MAP_EXTENT } from "../src/lib/mapExtent.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -219,6 +220,15 @@ async function splitEvents() {
   const allEvents = JSON.parse(await readFile(EVENTS_FILE, "utf8"));
   const events = allEvents.map(publicEvent);
   const noLocation = events.filter((e) => e.location_quality === "none").length;
+  // The map cannot pan past MAP_EXTENT (MapView maxBounds), so a marker outside
+  // it could never be seen: widen the extent instead of shipping that.
+  const [minLon, minLat, maxLon, maxLat] = MAP_EXTENT;
+  const outside = events.filter(
+    (e) => e.coordinates && (e.coordinates.lon < minLon || e.coordinates.lon > maxLon || e.coordinates.lat < minLat || e.coordinates.lat > maxLat)
+  );
+  if (outside.length) {
+    throw new Error(`events outside MAP_EXTENT (src/lib/mapExtent.js): ${outside.map((e) => e.id).join(", ")}`);
+  }
   const review = await loadFramingReview();
 
   // Full leads, bucketed by id hash (see header comment).
@@ -345,10 +355,34 @@ async function splitEvents() {
   );
 }
 
+// Polygon bbox, [minLon, minLat, maxLon, maxLat].
+function geometryBbox(geometry) {
+  const b = [Infinity, Infinity, -Infinity, -Infinity];
+  const walk = (c) => {
+    if (typeof c[0] === "number") {
+      b[0] = Math.min(b[0], c[0]);
+      b[1] = Math.min(b[1], c[1]);
+      b[2] = Math.max(b[2], c[0]);
+      b[3] = Math.max(b[3], c[1]);
+    } else c.forEach(walk);
+  };
+  walk(geometry.coordinates);
+  return b;
+}
+
+// The source covers the whole world (scripts/ingest-boundaries.js reads it as
+// such), but the map never shows land outside MAP_EXTENT. Polygons entirely
+// outside it are dropped from the shipped copy; polygons that cross the edge
+// are kept whole and unmodified, so every coordinate drawn is the source's own.
 async function copyLand() {
   const raw = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
-  await writeJSON(path.join(OUT_DIR, "land.json"), raw);
-  console.log("land: copied as a single static asset (no time dimension to chunk by)");
+  const [minLon, minLat, maxLon, maxLat] = MAP_EXTENT;
+  const features = raw.features.filter((f) => {
+    const b = geometryBbox(f.geometry);
+    return b[2] >= minLon && b[0] <= maxLon && b[3] >= minLat && b[1] <= maxLat;
+  });
+  await writeJSON(path.join(OUT_DIR, "land.json"), { ...raw, features });
+  console.log(`land: ${features.length} of ${raw.features.length} polygons inside MAP_EXTENT, copied as one static asset`);
 }
 
 async function copyFunnel() {

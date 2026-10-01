@@ -18,8 +18,11 @@
   --accent-strong: #ddb35f; /* lighter gold for hover/highlight */
   --link: #7badb0;          /* faded teal-blue, like old map ink */
 
-  --font-serif: "Spectral", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  /* Self-hosted (src/main.jsx). Each "... fallback" is a local system font
+     resized to the web font's metrics (fontaine, vite.config.js), so text
+     takes the same space before and after the web font loads: no layout shift. */
+  --font-serif: "Spectral", "Spectral fallback", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter Variable", "Inter Variable fallback", system-ui, -apple-system, sans-serif;
 }
 
 body {

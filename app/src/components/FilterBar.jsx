@@ -1,18 +1,6 @@
-import * as MapViewModule from "./MapView.jsx";
+// From mapLayers, not MapView: MapView (and MapLibre) is lazy-loaded (App.jsx).
+import { CATEGORY_COLORS as COLORS } from "./mapLayers";
 
-// CATEGORY_COLORS is exported by MapView (WP-MAP); tolerate its absence so this
-// component still renders on branches that predate the export.
-const COLORS = MapViewModule.CATEGORY_COLORS ?? {
-  war: "#a13f2e",
-  treaty: "#4c7a63",
-  political: "#455d80",
-  uprising: "#c99a45",
-  migration: "#7d5a7d",
-  diplomatic: "#3f7d84",
-  economic: "#8c7a3f",
-  terrorism: "#6b3140",
-  atrocity: "#3d3833",
-};
 const DEFAULT_CATEGORIES = Object.keys(COLORS);
 
 /** Category chips (colour dot + always a text label), country select, scope toggle. */
