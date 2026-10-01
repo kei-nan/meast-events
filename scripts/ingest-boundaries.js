@@ -171,6 +171,15 @@ async function main() {
     if (hits.length !== 1) throw new Error(`expected one CShapes record "${cntry_name}", got ${hits.length}`);
     return hits[0].geometry;
   };
+  // "reshape" entries: cut a corrections-geometry shape by a CShapes country's current
+  // (latest) outline, once, before any "add" entry uses it.
+  for (const r of CORRECTIONS.filter((c) => c.type === "reshape")) {
+    const name = r.minus.slice("cshapes:".length);
+    const latest = raw.features.filter((f) => f.properties.cntry_name === name).sort((a, b) => b.properties.gweyear - a.properties.gweyear)[0];
+    if (!latest || !correctionsGeometry[r.geometry]) throw new Error(`reshape: missing ${r.geometry} or ${r.minus}`);
+    const cut = turf.difference(turf.featureCollection([asFeature(correctionsGeometry[r.geometry]), asFeature(latest.geometry)]));
+    correctionsGeometry[r.geometry] = turf.truncate(cut, { precision: 5, coordinates: 2 }).geometry;
+  }
   for (const c of CORRECTIONS) {
     if (c.type !== "add") continue;
     const fromCshapes = c.geometry.startsWith("cshapes:");

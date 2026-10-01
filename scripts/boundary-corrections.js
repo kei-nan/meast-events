@@ -31,6 +31,11 @@
 //     property so the credit travels with the data, which some upstream licenses
 //     require of us.
 //
+//   "reshape" - cuts a shape in data/corrections-geometry.json by a CShapes country's
+//     current outline before any entry uses it (`minus: "cshapes:<cntry_name>"`), for a
+//     stretch of border where CShapes is checked to be the more accurate source. Applied
+//     once, so every entry that uses the shape gets the same outline.
+//
 //   "fit" - makes a separately sourced shape (an "add" entry, or Hatay) and the CShapes
 //     countries around it share ONE line where they meet. The shapes come from sources
 //     of different detail (Natural Earth 1:10m, OCHA, CShapes), so drawn as-is they
@@ -670,17 +675,30 @@ export const CORRECTIONS = [
 
   // --- Fits: one shared line where differently sourced shapes meet (see "fit" above) ---
   //
-  // Checked 2026-10-01 against Wikipedia's coordinates for the Erez, Karni and Kerem Shalom
-  // crossings, which sit on the Gaza Strip's land border: Natural Earth's Gaza edge is 1.19,
-  // 0.43 and 0.65 km from them, CShapes' Israel/Egypt edges 0.41, 0.62 and 0.21-0.41 km.
-  // Both sources are good to about a kilometre and neither is authoritative; Natural
-  // Earth's Gaza (340 km2) is the closer of the two to the official 365 km2 (CShapes leaves
-  // a 448 km2 gap for it). So Gaza's own outline is kept and the neighbours follow it.
+  // Gaza, checked 2026-10-01 against reference points that sit ON its land border:
+  //   Gaza-Egypt (Rafah) border - Wikidata's Rafah Border Crossing (Q2564302, 31.2486 N
+  //   34.2592 E) and Philadelphi Route (Q765017, 31.2481 N 34.2571 E): CShapes' Egypt edge
+  //   is 0.30 and 0.09 km from them, Natural Earth's Gaza edge 2.25 and 2.04 km, with both
+  //   points inside the Natural Earth outline. Its southern tip is also 2.4 km from the
+  //   Kerem Shalom crossing (Wikipedia, 31.2208 N 34.2706 E), where CShapes' Egypt-Israel
+  //   line arrives (0.41 km). So on this border CShapes is right and Natural Earth's Gaza
+  //   runs about 2 km into Egypt: the "reshape" entry below cuts it back to Egypt's line.
+  //   Gaza-Israel border - Wikipedia's Erez and Karni crossings: Natural Earth 1.19 and
+  //   0.43 km, CShapes 0.41 and 0.62 km. Neither is clearly better, so there Gaza's own
+  //   outline is kept and Israel follows it.
+  // The reshaped Gaza is about 316 km2 against the official 365 km2; neither source
+  // reproduces the official figure, and this one is placed correctly on the Egypt side.
+  {
+    type: "reshape",
+    geometry: "gaza",
+    minus: "cshapes:Egypt",
+    note: "Gaza's Rafah border follows CShapes' Egypt line, which matches the Rafah crossing to 0.3 km.",
+  },
   {
     type: "fit",
     overlay: "Gaza Strip",
     neighbours: [
-      // CShapes draws Egypt about 2 km into the Strip along the Rafah border (23.8 km2).
+      // After the reshape the two share Egypt's line; this only removes rounding overlaps.
       { name: "Egypt", mode: "clip" },
       // 1948-1966: the armistice line is Gaza's edge.
       { name: "Israel", mode: "snap", toYear: 1966 },
