@@ -4,6 +4,9 @@ dist/
 # Generated from data/ by app/scripts/split-data.mjs on every dev start and build
 # (including Cloudflare's), so it is not committed.
 app/public/data/
+# Full-text search index, built from data/ by app/scripts/build-search-index.mjs
+# on every dev start and build.
+app/public/pagefind/
 .vite/
 
 # Secrets - server/.env would hold a real Redis connection string (with

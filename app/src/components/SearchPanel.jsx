@@ -4,6 +4,7 @@ import FilterBar from "./FilterBar.jsx";
 import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
 import EventDetail from "./EventDetail.jsx";
+import { preloadTextSearch } from "../lib/textSearch";
 import "../SidePanel.css";
 
 /**
@@ -27,7 +28,7 @@ import "../SidePanel.css";
  * @param {object[]} props.results          lite events {id,title,date_start,date_end,countries,category,
  *                                          location_quality,snippet}, already ordered
  * @param {number}   props.total            total matches (may exceed results.length)
- * @param {"api"|"static"} props.source     "static" shows the "Matching is simpler in offline mode" banner
+ * @param {"fulltext"|"local"|"static"} props.source    "static" shows the "Matching is simpler in offline mode" banner
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
@@ -192,7 +193,10 @@ export default function SearchPanel({
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
                 onKeyDown={onInputKeyDown}
-                onFocus={() => setSheet("full")}
+                onFocus={() => {
+                  setSheet("full");
+                  preloadTextSearch();
+                }}
               />
               {query && (
                 <button

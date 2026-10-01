@@ -8,8 +8,8 @@
   },
   "scripts": {
     "split-data": "node scripts/split-data.mjs",
-    "predev": "node scripts/split-data.mjs",
-    "prebuild": "node scripts/split-data.mjs",
+    "predev": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
+    "prebuild": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
@@ -28,6 +28,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "fontaine": "^1.0.0",
     "oxlint": "^1.85.0",
+    "pagefind": "^1.5.2",
     "vite": "^8.3.0"
   }
 }

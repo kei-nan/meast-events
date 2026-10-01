@@ -1,10 +1,10 @@
 // Everything the app answers from the in-memory event store, with no API call:
 // title/snippet text matching, category/country filters, drawn-area queries
 // (bbox + circle trim, precise-only rule) and the "events on the map in the
-// current view" count. Pure. The API is only needed for free-text search over
-// full lead text (q) - see hooks/useEventSearch.js.
+// current view" count. Pure. Only free-text search over full lead text (q)
+// needs more: a static index, see hooks/useEventSearch.js.
 
-import { eventCoords, inArea, inBbox } from "./geo.js";
+import { eventCoords, inBbox } from "./geo.js";
 import { matchesFilters, rankEvents } from "./ranking.js";
 
 // Lite view for matching: the list shows title + snippet, so local matching must
@@ -21,22 +21,16 @@ export function localSearch(events, { q = "", area = null, categories = [], coun
   return rankEvents(hits, q);
 }
 
-// Turns an API answer into the events to list. The API only decides WHICH events
-// match: each record is taken from the static store, the site's source of truth.
-// The search index lags behind a data change until `npm run load-redis` is run,
-// so its own copies could carry stale dates or text, or be events that were
-// since removed (those are dropped). With a drawn area, coordinate-less and
-// approximate events are excluded, as in localSearch. Unranked.
-export function apiMatchesFromStore(apiEvents, store, area = null) {
+// Turns the full-text index's answer (event ids, most relevant first) into the
+// events to list. Records come from the static store, the site's source of
+// truth (an id no longer in it is dropped); category/country filters and the
+// drawn-area rule (coordinate-less and approximate events excluded) apply as in
+// localSearch. Unranked: index order.
+export function textMatchesFromStore(ids, store, { area = null, categories = [], countries = [] } = {}) {
   const out = [];
-  for (const { id } of apiEvents) {
+  for (const id of ids) {
     const e = store.get(id);
-    if (!e) continue;
-    if (area) {
-      const c = eventCoords(e);
-      if (!c || e.location_quality === "approximate" || !inArea(c, area)) continue;
-    }
-    out.push(e);
+    if (e && matchesFilters(e, { area, categories, countries })) out.push(e);
   }
   return out;
 }

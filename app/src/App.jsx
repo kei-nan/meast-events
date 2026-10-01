@@ -135,9 +135,9 @@ export default function App() {
   // range, viewport, filter and area queries are all computed from this store.
   const { storeRef, version, addEvents, loading: eventsLoading, error: eventsError } = useAllEvents();
 
-  // Full-text search is the only thing that needs the API. `degraded` means a
-  // search request failed: matching is then local (titles + summaries only) and
-  // the API is re-probed every 20 s until it answers again.
+  // Full-text search is the only thing that needs more than the store: a static
+  // index (lib/textSearch.js). `degraded` means it could not be loaded: matching
+  // is then local (titles + summaries only) and it is retried every 20 s.
   const [degraded, setDegraded] = useState(false);
   const [probeTick, setProbeTick] = useState(0);
   const markOutage = useCallback(() => setDegraded(true), []);
@@ -459,7 +459,7 @@ export default function App() {
           status={search.status}
           results={panelResults}
           total={panelTotal}
-          source={search.source ?? "api"}
+          source={search.source ?? "fulltext"}
           eventsLoading={eventsLoading}
           selectedEvent={selectedEvent}
           viewCount={viewportEventCount}
