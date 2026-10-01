@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient";
 import "./AboutData.css";
 
-const REPO = "https://github.com/kei-nan/atlas-wiki";
+const REPO = "https://github.com/kei-nan/meast-events";
 
 const fmt = (v) => (typeof v === "number" ? v.toLocaleString("en-US") : String(v));
 const label = (k) => k.replace(/_/g, " ");

@@ -336,6 +336,7 @@ export function boundaryDocToFeature(raw) {
 //
 // Default (env var unset/blank): the production frontend + local dev origins.
 export const DEFAULT_ALLOWED_ORIGINS = [
+  "https://middleeast.events",
   "https://atlas-wiki.middle-wiki.workers.dev",
   "http://localhost:5173", // vite dev
   "http://127.0.0.1:5173",

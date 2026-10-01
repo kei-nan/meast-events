@@ -1,4 +1,4 @@
-# atlas.wiki
+# middleeast.events
 
 An interactive map and timeline of the Middle East, 1900 to the present:
 events from Wikipedia and historically dated borders, with the source and

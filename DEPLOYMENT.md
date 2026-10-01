@@ -150,8 +150,30 @@ into the JavaScript while building; the browser never reads an environment.
 If you change it later, trigger a new build: editing the variable alone doesn't
 change the already-built files.
 
-The production URL is `https://atlas-wiki.<account-subdomain>.workers.dev`; a custom
-domain can be added to the same Worker in the dashboard without rebuilding.
+The site's address is the custom domain `https://middleeast.events`; the Worker's own
+`https://atlas-wiki.<account-subdomain>.workers.dev` address keeps working too.
+
+### Custom domain (middleeast.events)
+
+From Cloudflare's docs (developers.cloudflare.com/workers/configuration/routing/custom-domains/):
+a Custom Domain needs "an active Cloudflare zone" that you own, and cannot be added on a
+hostname that already has a CNAME record. Cloudflare then creates the DNS record and the
+certificate itself.
+
+1. Add `middleeast.events` to the Cloudflare account as a zone, and switch the domain's
+   nameservers at the registrar to the two Cloudflare gives you, so the zone becomes active.
+2. **Workers & Pages** -> `atlas-wiki` -> **Settings** -> **Domains & Routes** -> **Add** ->
+   **Custom Domain** -> `middleeast.events` -> **Add Custom Domain**.
+3. Redeploy the API Worker (`cd worker && npx wrangler deploy`) so its built-in CORS list,
+   which now includes `https://middleeast.events`, is live. Without this, full-text search
+   from the new address falls back to titles and summaries.
+4. Optional, `www`: a Worker on `middleeast.events` does not receive `www.middleeast.events`.
+   Cloudflare's docs suggest a proxied DNS record for `www` (`A` -> `192.0.2.0`) plus a
+   Single Redirect rule (301) to `https://middleeast.events`.
+
+The Worker names (`atlas-wiki`, `atlaswiki-api`) are internal and stay as they are.
+For Workers Builds the `name` in `app/wrangler.jsonc` must match the Worker's name in
+the dashboard, or the build fails.
 
 Every push to `main` rebuilds the frontend. `.github/workflows/ci.yml` lints and
 tests the app, dry-run-bundles the API Worker and validates the data on every push
@@ -161,7 +183,8 @@ and pull request; it deploys nothing.
 
 The API only lets browsers read responses from an allow-list of origins. When
 `ALLOWED_ORIGINS` is unset the built-in default applies: the production
-frontend `https://atlas-wiki.middle-wiki.workers.dev` plus local dev origins
+frontend `https://middleeast.events` and its workers.dev address
+`https://atlas-wiki.middle-wiki.workers.dev`, plus local dev origins
 (`http://localhost` / `127.0.0.1` on ports 5173, 4173, 8794). So the current
 deployment needs no configuration.
 
@@ -170,7 +193,7 @@ the comma-separated exact origins (scheme + host[:port], no trailing slash)
 in `worker/wrangler.jsonc` and redeploy:
 
 ```jsonc
-"vars": { "ALLOWED_ORIGINS": "https://atlas-wiki.middle-wiki.workers.dev,https://atlas.wiki" }
+"vars": { "ALLOWED_ORIGINS": "https://middleeast.events,https://atlas-wiki.middle-wiki.workers.dev" }
 ```
 
 `"*"` opens it to every origin; a blank value means the defaults, not open.

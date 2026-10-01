@@ -171,7 +171,7 @@ Same variable, same meaning as the Express version:
 | Variable    | Default (local dev)      | Set via                                    |
 |-------------|---------------------------|---------------------------------------------|
 | `REDIS_URL` | `redis://localhost:6379` | `.dev.vars` (local, gitignored) / `wrangler secret put REDIS_URL` (real deploy, never committed) |
-| `ALLOWED_ORIGINS` | built-in list: `https://atlas-wiki.middle-wiki.workers.dev` + `http://localhost|127.0.0.1` on 5173, 4173, 8794 | `vars` in `wrangler.jsonc` (comma-separated exact origins; `*` = any). Legacy name `ALLOWED_ORIGIN` still read. Blank = default, NOT open. |
+| `ALLOWED_ORIGINS` | built-in list: `https://middleeast.events`, `https://atlas-wiki.middle-wiki.workers.dev` + `http://localhost|127.0.0.1` on 5173, 4173, 8794 | `vars` in `wrangler.jsonc` (comma-separated exact origins; `*` = any). Legacy name `ALLOWED_ORIGIN` still read. Blank = default, NOT open. |
 | `RATE_LIMITER` (binding) | absent locally = no binding limit | `ratelimits` in `wrangler.jsonc`, 120 requests / 60 s per client IP per Cloudflare location |
 
 Also always on: a per-isolate guard (240 requests/min per IP), 414 for URLs over 2048 characters, `X-Content-Type-Options: nosniff`, `Cross-Origin-Resource-Policy: cross-origin`, weak `ETag` + `If-None-Match` -> 304 on `/api/events` and `/api/boundaries`, and `Cache-Control` (events 5 min, boundaries 1 h, both with `stale-while-revalidate=86400`). Rationale, limits and what to click in the dashboard: [`../docs/SECURITY.md`](../docs/SECURITY.md).

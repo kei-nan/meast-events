@@ -28,12 +28,13 @@
   // CORS: ALLOWED_ORIGINS is a comma-separated list of exact origins (scheme +
   // host[:port], no trailing slash) that browsers may read the API from. When
   // unset/blank the built-in default applies (src/logic.js
-  // DEFAULT_ALLOWED_ORIGINS: https://atlas-wiki.middle-wiki.workers.dev plus
+  // DEFAULT_ALLOWED_ORIGINS: https://middleeast.events,
+  // https://atlas-wiki.middle-wiki.workers.dev plus
   // localhost dev origins). "*" opens it to every origin. CORS is browser-only;
   // it does not stop curl/bots or protect the request quota (docs/SECURITY.md).
   // Uncomment to override (e.g. after adding a custom domain):
   //
-  // "vars": { "ALLOWED_ORIGINS": "https://atlas-wiki.middle-wiki.workers.dev,https://atlas.wiki" },
+  // "vars": { "ALLOWED_ORIGINS": "https://middleeast.events,https://atlas-wiki.middle-wiki.workers.dev" },
 
   // Per-client rate limit (Workers Rate Limiting binding, Wrangler >= 4.36).
   // Counters are per Cloudflare location and eventually consistent - a brake on

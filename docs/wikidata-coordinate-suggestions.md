@@ -1,6 +1,6 @@
-# Suggested Wikidata coordinates (P625) for events atlas.wiki cannot pin
+# Suggested Wikidata coordinates (P625) for events middleeast.events cannot pin
 
-**DRAFT: FOR HUMAN REVIEW BEFORE SUBMITTING.** Nothing here has been submitted anywhere. atlas.wiki never edits Wikipedia or
+**DRAFT: FOR HUMAN REVIEW BEFORE SUBMITTING.** Nothing here has been submitted anywhere. middleeast.events never edits Wikipedia or
 Wikidata and never invents coordinates (see [DATA_POLICY.md](DATA_POLICY.md)). Every coordinate below is copied from an existing
 Wikidata place item (its own P625), fetched on 2026-09-26, and cross-checked against the English Wikipedia article's coordinates for
 that place. The companion file is `data/wikidata-coordinate-suggestions.tsv` (QuickStatements V1).

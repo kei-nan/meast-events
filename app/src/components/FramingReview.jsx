@@ -8,7 +8,7 @@ import { useRef } from "react";
 import { REVIEW_TABS } from "../lib/reviewTabs.js";
 import { showReview } from "../lib/showReview.js";
 
-const REPO = "https://github.com/kei-nan/atlas-wiki";
+const REPO = "https://github.com/kei-nan/meast-events";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 
 const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };

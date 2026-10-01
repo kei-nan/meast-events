@@ -18,7 +18,8 @@ The API answers `Access-Control-Allow-Origin` only for an allow-listed
 (`DEFAULT_ALLOWED_ORIGINS` in `worker/src/logic.js`, duplicated in
 `server/index.js`, parity-tested):
 
-- `https://atlas-wiki.middle-wiki.workers.dev` (production frontend)
+- `https://middleeast.events` (production frontend, custom domain)
+- `https://atlas-wiki.middle-wiki.workers.dev` (the same frontend's workers.dev address)
 - `http://localhost` and `http://127.0.0.1` on ports 5173 (vite dev), 4173
   (vite preview), 8794 (wrangler dev)
 

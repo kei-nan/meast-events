@@ -413,7 +413,7 @@ export default function App() {
         <strong>with corrections and additions by this project</strong>; every changed
         or added shape cites its own source (
         <a
-          href="https://github.com/kei-nan/atlas-wiki/blob/main/scripts/boundary-corrections.js"
+          href="https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js"
           target="_blank"
           rel="noreferrer"
         >
