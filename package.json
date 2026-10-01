@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "ingest": "node scripts/ingest.js",
-    "load-redis": "node --env-file-if-exists=server/.env scripts/load-redis.js"
+    "load-redis": "node --env-file-if-exists=server/.env scripts/load-redis.js",
+    "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },
   "dependencies": {
     "redis": "^6.2.1"

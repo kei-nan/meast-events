@@ -31,6 +31,14 @@
 //     property so the credit travels with the data, which some upstream licenses
 //     require of us.
 //
+//   "reshape" - cuts a shape in data/corrections-geometry.json by a CShapes country's
+//     current outline before any entry uses it (`minus: "cshapes:<cntry_name>"`), for a
+//     stretch of border where CShapes is checked to be the more accurate source. Applied
+//     once, so every entry that uses the shape gets the same outline. The two sources'
+//     coastlines differ, so with `coastEnd` (the border's last two CShapes vertices, the
+//     second where it meets the sea) that stretch is extended straight out to sea and the
+//     shape is cut there too; `keepPoint` marks the side that is kept.
+//
 //   "fit" - makes a separately sourced shape (an "add" entry, or Hatay) and the CShapes
 //     countries around it share ONE line where they meet. The shapes come from sources
 //     of different detail (Natural Earth 1:10m, OCHA, CShapes), so drawn as-is they
@@ -670,20 +678,46 @@ export const CORRECTIONS = [
 
   // --- Fits: one shared line where differently sourced shapes meet (see "fit" above) ---
   //
-  // Checked 2026-10-01 against Wikipedia's coordinates for the Erez, Karni and Kerem Shalom
-  // crossings, which sit on the Gaza Strip's land border: Natural Earth's Gaza edge is 1.19,
-  // 0.43 and 0.65 km from them, CShapes' Israel/Egypt edges 0.41, 0.62 and 0.21-0.41 km.
-  // Both sources are good to about a kilometre and neither is authoritative; Natural
-  // Earth's Gaza (340 km2) is the closer of the two to the official 365 km2 (CShapes leaves
-  // a 448 km2 gap for it). So Gaza's own outline is kept and the neighbours follow it.
+  // Gaza, checked 2026-10-01 against independent Wikidata reference points that sit ON its
+  // land border (distance from each point to the line; scripts/verify-borders.js reports and
+  // CI-checks these, see docs/border-verification.md):
+  //   Gaza-Egypt (Rafah) - Rafah Border Crossing (Q2564302) and Philadelphi Route (Q765017):
+  //   CShapes' Egypt line 0.30 and 0.09 km, Natural Earth's Gaza 2.25 and 2.04 km (both
+  //   points inside its outline).
+  //   Gaza-Israel - Erez (Q2319323), Zikim (Q137569937), Kissufim (Q99618173), Sufa
+  //   (Q119823398), al-Awdah/Sufa (Q125927487), Kerem Shalom, the Egypt-Gaza-Israel tripoint
+  //   and Gate 96 (Q137572922): CShapes' 1949-1967 Israel line 0.02-0.42 km, Natural Earth's
+  //   Gaza 0.62-1.65 km. Only Karni (Q387952) is closer to Natural Earth (0.43 vs 0.62 km).
+  // So Gaza's whole land border follows CShapes: the "reshape" entry below cuts the Natural
+  // Earth shape back to Egypt's line and to Israel's armistice line, grows it to that line
+  // where it fell short, and cuts it where each line meets the sea. Only the coast is
+  // still Natural Earth's. The result is about 382 km2 against the official 365 km2.
+  {
+    type: "reshape",
+    geometry: "gaza",
+    borders: [
+      // The last stretch of CShapes' Egypt-Gaza line: its previous vertex, then the vertex
+      // where it reaches the sea (Natural Earth's coast runs on past that point).
+      { cshapes: "Egypt", coastEnd: [[34.23916, 31.29472], [34.21676, 31.32321]] },
+      // Israel's 1949-1967 armistice line, which has bounded the Strip ever since; its last
+      // stretch before the sea, as at Rafah (CShapes' Israel ring, vertices 53 and 52).
+      { cshapes: "Israel", year: 1960, grow: true, maxGapKm: 3, coastEnd: [[34.55889, 31.54], [34.49291, 31.59972]] },
+    ],
+    keepPoint: [34.4667, 31.5], // Gaza City: the side of a coastEnd cut, and the piece, that is kept
+    // Growth only adds land as Natural Earth 1:10m draws it - the same coastline as the
+    // Gaza shape - so no coastal strip is added where the land layer's coast differs.
+    landFrom: "naturalEarth10",
+    note: "Gaza's Rafah border follows CShapes' Egypt line, which matches the Rafah crossing to 0.3 km.",
+  },
   {
     type: "fit",
     overlay: "Gaza Strip",
     neighbours: [
-      // CShapes draws Egypt about 2 km into the Strip along the Rafah border (23.8 km2).
+      // After the reshape the two share Egypt's line; this only removes rounding overlaps.
       { name: "Egypt", mode: "clip" },
-      // 1948-1966: the armistice line is Gaza's edge.
-      { name: "Israel", mode: "snap", toYear: 1966 },
+      // 1948-1966: Gaza's edge is now Israel's own CShapes line (the reshape above), so
+      // this only removes rounding overlaps; a snap here would hand Israel the coastal strip.
+      { name: "Israel", mode: "clip", toYear: 1966 },
       // From 1967 Israel's CShapes shape includes the Strip by design (its flag note), but
       // only 90-97% of this outline, so its edge would cut across the Strip's south.
       { name: "Israel", mode: "contain", fromYear: 1967 },
