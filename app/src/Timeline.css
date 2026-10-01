@@ -4,6 +4,10 @@
   padding: 10px 22px 12px;
   border-top: 1px solid var(--border);
   background: var(--bg-1);
+  /* Own stacking context: the year bubble and slider thumbs (z-index 2-5) rank
+     only within the timeline, so the mobile article sheet (SidePanel.css,
+     z-index 5, drawn over the timeline) stays on top of them. */
+  isolation: isolate;
 }
 
 .timeline-top {
