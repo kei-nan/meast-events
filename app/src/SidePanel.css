@@ -16,6 +16,16 @@
   min-width: 0;
 }
 
+/* Stands in for the lazy-loaded map (App.jsx): same box and sea colour as the
+   map's own background (MapView BASE_STYLE), so nothing shifts when it loads. */
+.map-placeholder {
+  background: #d8f2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d1a15;
+}
+
 .side-panel {
   width: 380px;
   flex-shrink: 0;

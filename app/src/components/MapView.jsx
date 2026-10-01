@@ -34,6 +34,7 @@ import {
   loadLand,
   prefetchBoundaryDecade,
 } from "../lib/dataClient";
+import { MAP_EXTENT } from "../lib/mapExtent";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 
 // MapLibre GL resolves its worker script relative to its own module URL at
@@ -49,8 +50,6 @@ import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 if (import.meta.env.PROD) {
   setWorkerUrl(maplibreWorkerUrl);
 }
-
-export { CATEGORY_COLORS };
 
 // Period-correct naming (Ottoman Empire -> Turkey, mandate-era names, etc.) is now
 // resolved at ingest time - see scripts/boundary-corrections.js - so boundaries.json's
@@ -222,6 +221,9 @@ export default function MapView({
       style: BASE_STYLE,
       bounds: DEFAULT_BOUNDS,
       fitBoundsOptions: { padding: 20 },
+      // land.json is clipped to this extent (scripts/split-data.mjs), so panning
+      // further would show a sea where land was dropped.
+      maxBounds: [MAP_EXTENT.slice(0, 2), MAP_EXTENT.slice(2)],
     });
     mapRef.current = map;
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only

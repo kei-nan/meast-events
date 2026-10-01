@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import MapView from "./components/MapView";
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchPanel from "./components/SearchPanel.jsx";
 import AboutData from "./components/AboutData.jsx";
 import Timeline from "./components/Timeline";
 import useAllEvents from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
 import useUrlState from "./hooks/useUrlState";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import {
+  decadeFloor,
   eventOverlapsRange,
   eventYearRange,
+  loadBoundaryDecade,
   loadEventById,
   loadFullLead,
+  loadLand,
 } from "./lib/dataClient";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
@@ -18,6 +21,73 @@ import { rankEvents } from "./lib/ranking";
 import { parseUrlState } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
+
+// MapLibre is ~1.1 MB of JS (about 80% of the app's code), so the map is loaded
+// as its own chunk: the header, panel and timeline paint without waiting for it.
+// A failed chunk download is retried once; after that the map area says so
+// instead of the whole app crashing.
+const MapView = lazy(() =>
+  import("./components/MapView").catch(
+    () =>
+      new Promise((resolve) => setTimeout(resolve, 1500)).then(() => import("./components/MapView")).catch(() => ({
+        default: () => (
+          <div className="map-view map-placeholder" role="alert">
+            The map could not be loaded. Please reload the page.
+          </div>
+        ),
+      }))
+  )
+);
+const MAP_PLACEHOLDER = <div className="map-view map-placeholder" aria-busy="true" aria-label="Loading map" />;
+
+// Everything the map needs (its chunk, MapLibre's shared chunk, land, the
+// initial borders decade) starts downloading right after the FIRST PAINT, all
+// in parallel. Not before it: on a slow connection these ~400 KB would share
+// bandwidth with index.js and delay the header, panel and timeline (Lighthouse
+// measured LCP 4.1 s -> 5.6 s with them preloaded from index.html). The data
+// loaders cache their requests, so MapView reuses these.
+function startMapDownloads(year) {
+  if (import.meta.env.PROD) {
+    // maplibre-gl.mjs imports this file only once it runs (vite.config.js
+    // shareMaplibreChunk); it sits next to the worker, whose URL Vite knows.
+    const link = document.createElement("link");
+    link.rel = "modulepreload";
+    link.href = new URL("maplibre-gl-shared.mjs", new URL(maplibreWorkerUrl, window.location.href)).href;
+    document.head.append(link);
+  }
+  for (const load of [loadLand(), loadBoundaryDecade(decadeFloor(year))]) load.catch(() => {}); // MapView retries
+}
+
+// Calls fn once the browser reports the First Contentful Paint. "The next frame"
+// is not enough: while a web font loads, frames paint no text. Falls back to a
+// timer where paint timing is unsupported or never reported (e.g. a background
+// tab). Returns a cancel function.
+function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
+  let done = false;
+  let observer = null;
+  let timer;
+  const run = () => {
+    if (done) return;
+    done = true;
+    observer?.disconnect();
+    clearTimeout(timer);
+    fn();
+  };
+  if (window.PerformanceObserver?.supportedEntryTypes?.includes("paint")) {
+    observer = new PerformanceObserver((list) => {
+      if (list.getEntriesByName("first-contentful-paint").length) setTimeout(run);
+    });
+    observer.observe({ type: "paint", buffered: true });
+  } else {
+    fallbackMs = 0;
+  }
+  timer = setTimeout(run, fallbackMs);
+  return () => {
+    done = true;
+    observer?.disconnect();
+    clearTimeout(timer);
+  };
+}
 
 const RETRY_MS = 20000;
 const DEEP_LINK_PAD_YEARS = 5;
@@ -48,6 +118,18 @@ export default function App() {
   const [area, setArea] = useState(initial.area);
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
+
+  // The map mounts (and its downloads start) after the first paint; see
+  // startMapDownloads.
+  const [mapStarted, setMapStarted] = useState(false);
+  useEffect(
+    () =>
+      afterFirstContentfulPaint(() => {
+        startMapDownloads(initial.years?.[1] ?? MAX_YEAR); // the map shows the range's end year
+        setMapStarted(true);
+      }),
+    [initial]
+  );
 
   // The whole lite event set is loaded ONCE from static data (no API call);
   // range, viewport, filter and area queries are all computed from this store.
@@ -348,21 +430,27 @@ export default function App() {
         </div>
       </header>
       <main className="app-body">
-        <MapView
-          events={mapEvents}
-          matchIds={matchIds}
-          eventsLoading={eventsLoading}
-          year={endYear}
-          selectedEventId={selectedEventId}
-          hoverId={hoverId}
-          focus={focus}
-          areaMode={areaMode}
-          area={area}
-          onAreaModeChange={setAreaMode}
-          onAreaChange={setArea}
-          onViewportChange={handleViewportChange}
-          onSelectEvent={handleSelectFromMap}
-        />
+        {mapStarted ? (
+          <Suspense fallback={MAP_PLACEHOLDER}>
+            <MapView
+              events={mapEvents}
+              matchIds={matchIds}
+              eventsLoading={eventsLoading}
+              year={endYear}
+              selectedEventId={selectedEventId}
+              hoverId={hoverId}
+              focus={focus}
+              areaMode={areaMode}
+              area={area}
+              onAreaModeChange={setAreaMode}
+              onAreaChange={setArea}
+              onViewportChange={handleViewportChange}
+              onSelectEvent={handleSelectFromMap}
+            />
+          </Suspense>
+        ) : (
+          MAP_PLACEHOLDER
+        )}
         <SearchPanel
           query={query}
           filters={filters}

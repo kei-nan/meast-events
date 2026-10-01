@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
+import { FontaineTransform } from 'fontaine'
 import { defineConfig } from 'vite'
 
 // maplibre-gl's worker script (see src/components/MapView.jsx) does a
@@ -42,7 +43,21 @@ function shareMaplibreChunk() {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), shareMaplibreChunk()],
+  plugins: [
+    react(),
+    shareMaplibreChunk(),
+    // Generates "<family> fallback" @font-faces: local system fonts with
+    // size/ascent/descent overrides measured from the self-hosted web fonts
+    // (src/main.jsx), named in --font-sans/--font-serif (src/index.css). One
+    // fallback each: same-named faces with equal descriptors do not chain, the
+    // last one wins (and fontaine writes one per subset; the Latin one is last).
+    FontaineTransform.vite({
+      fallbacks: {
+        'Inter Variable': ['Arial'],
+        Spectral: ['Georgia'],
+      },
+    }),
+  ],
   optimizeDeps: {
     exclude: ['maplibre-gl'],
   },
