@@ -54,7 +54,7 @@ jobs:
 
       - name: Unit tests
         if: steps.diff.outputs.changed == 'true'
-        run: node --test app/src/lib/*.test.js
+        run: node --test app/src/lib/*.test.js scripts/lib/*.test.js
 
       - name: Open a pull request
         if: steps.diff.outputs.changed == 'true'

@@ -211,7 +211,7 @@ node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-can
 node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
 node scripts/apply-v21.js [--apply]                     # one-off: brings data/events.json + app copy to shape v2.1 (idempotent)
-node scripts/refresh-extracts.js [--apply] [--proposed] # quarterly lead refresh, see below
+node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead refresh (automatic), see below
 node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json
 node scripts/lib/verify-sample.js                       # -> data/import-verification-sample.md
 node scripts/validate-events.js                         # schema/ids/dates/coordinates (runs in CI)
