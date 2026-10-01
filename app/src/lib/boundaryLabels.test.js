@@ -48,3 +48,12 @@ test("boundaryLabelsForYear: one point per active territory, degenerate shapes d
   assert.equal(labels[0].properties.name, "Big");
   assert.equal(labels[0].properties.big, 1); // sqrt(400) / 20, capped at 1
 });
+
+test("isDashedStatus: an '...-included' status keeps the outline solid", async () => {
+  const { isDashedStatus } = await import("../components/mapBorders.js");
+  assert.equal(isDashedStatus(null), false);
+  assert.equal(isDashedStatus("occupied-administered"), true);
+  assert.equal(isDashedStatus("mandate"), true);
+  assert.equal(isDashedStatus("occupied-territory-included"), false);
+  assert.equal(isDashedStatus("shared-sovereignty-included"), false);
+});

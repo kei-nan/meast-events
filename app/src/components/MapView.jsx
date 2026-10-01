@@ -19,7 +19,7 @@ import {
   oppositeCorner,
   pointFeature,
 } from "./mapLayers";
-import { BORDER_STYLE, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
+import { BORDER_STYLE, DASHED_EXPR, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
 import {
   BoundaryPopup,
   BordersList,
@@ -287,12 +287,13 @@ export default function MapView({
         source: "boundaries",
         paint: {
           // Solid = source-dated geometry; dashed + darker amber + thicker = a
-          // status flag (mandate/occupation/annexation/dispute). See BORDER_STYLE.
-          "line-color": ["case", ["!=", ["get", "status"], null], BORDER_STYLE.flagged.color, BORDER_STYLE.solid.color],
-          "line-width": ["case", ["!=", ["get", "status"], null], BORDER_STYLE.flagged.width, BORDER_STYLE.solid.width],
+          // status flag (mandate/occupation/annexation/dispute). See BORDER_STYLE
+          // and isDashedStatus for the "...-included" exception.
+          "line-color": ["case", DASHED_EXPR, BORDER_STYLE.flagged.color, BORDER_STYLE.solid.color],
+          "line-width": ["case", DASHED_EXPR, BORDER_STYLE.flagged.width, BORDER_STYLE.solid.width],
           "line-dasharray": [
             "case",
-            ["!=", ["get", "status"], null],
+            DASHED_EXPR,
             ["literal", BORDER_STYLE.flagged.dash],
             ["literal", [1, 0]],
           ],

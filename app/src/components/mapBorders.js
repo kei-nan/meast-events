@@ -30,6 +30,20 @@ export function humaniseStatus(status) {
 
 // One line style per meaning. Solid = source-dated geometry; dashed = a status flag
 // is attached. Shared by the boundaries-line layer and the legend swatches.
+//
+// Exception: an "...-included" status (Israel from 1967, Saudi Arabia and Kuwait in the
+// neutral-zone years) means the shape CONTAINS a flagged area that is drawn on top as
+// its own dashed shape. The country's outline itself - its coast, its border with
+// Lebanon - is not what is flagged, so it stays solid; the note still explains it.
+export function isDashedStatus(status) {
+  return Boolean(status) && !String(status).endsWith("-included");
+}
+// The same rule as a MapLibre expression, for the boundaries-line layer.
+export const DASHED_EXPR = [
+  "all",
+  ["!=", ["get", "status"], null],
+  ["!", ["in", "-included", ["coalesce", ["get", "status"], ""]]],
+];
 export const BORDER_STYLE = {
   solid: { color: "#6f6148", width: 1.4 },
   flagged: { color: "#9a5b13", width: 2.2, dash: [3, 2] },
