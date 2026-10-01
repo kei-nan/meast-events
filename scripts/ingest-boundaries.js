@@ -177,8 +177,15 @@ async function main() {
     const name = r.minus.slice("cshapes:".length);
     const latest = raw.features.filter((f) => f.properties.cntry_name === name).sort((a, b) => b.properties.gweyear - a.properties.gweyear)[0];
     if (!latest || !correctionsGeometry[r.geometry]) throw new Error(`reshape: missing ${r.geometry} or ${r.minus}`);
-    const cut = turf.difference(turf.featureCollection([asFeature(correctionsGeometry[r.geometry]), asFeature(latest.geometry)]));
-    correctionsGeometry[r.geometry] = turf.truncate(cut, { precision: 5, coordinates: 2 }).geometry;
+    let cut = turf.difference(turf.featureCollection([asFeature(correctionsGeometry[r.geometry]), asFeature(latest.geometry)]));
+    // The two sources' coastlines differ, so the cut can leave a strip of the shape lying
+    // along the other country's coast beyond the point where their border meets the sea.
+    // `coastEnd` names that point (a vertex of the CShapes outline): the border's last
+    // stretch is extended straight out to sea, and everything of the shape on the
+    // country's side of that line, near the point, is removed.
+    if (r.coastEnd) cut = cutBeyondCoastEnd(cut, latest.geometry, r.coastEnd, r.keepPoint);
+    // Rounding can make two neighbouring points identical (a zero-length edge); drop those.
+    correctionsGeometry[r.geometry] = turf.cleanCoords(turf.truncate(cut, { precision: 5, coordinates: 2 })).geometry;
   }
   for (const c of CORRECTIONS) {
     if (c.type !== "add") continue;
@@ -236,6 +243,35 @@ const activeIn = (f, y) => f.properties.start_year <= y && y <= f.properties.end
 // Detached pieces of a clipped shape smaller than this, lying within maxGapKm of the
 // overlay, are leftovers of the two sources disagreeing, not real territory.
 const TRIM_MAX_PIECE_KM2 = 100;
+// "reshape" coastEnd: how far the border's last stretch is extended to sea, and the radius
+// around the coastal end within which the far side is removed.
+const COAST_EXTEND_KM = 3;
+const COAST_CUT_RADIUS_KM = 4;
+
+function cutBeyondCoastEnd(shape, countryGeometry, [border, coastEnd], keepPoint) {
+  // Both points must be vertices of the country's CShapes outline, so the line is the
+  // sourced border's own last stretch, not a line drawn by us.
+  const near = (a, b) => Math.abs(a[0] - b[0]) < 1e-4 && Math.abs(a[1] - b[1]) < 1e-4;
+  const vertices = turf.coordAll(asFeature(countryGeometry));
+  for (const p of [border, coastEnd]) if (!vertices.some((c) => near(c, p))) throw new Error(`reshape: ${p} is not a vertex of the country outline`);
+  const end = coastEnd;
+  const bearing = turf.bearing(turf.point(border), turf.point(end));
+  const out = turf.destination(turf.point(end), COAST_EXTEND_KM, bearing).geometry.coordinates;
+  const back = turf.destination(turf.point(end), COAST_CUT_RADIUS_KM, bearing + 180).geometry.coordinates;
+  // Two half-planes, each a big quadrilateral on one side of the line back -> out.
+  const side = (sign) => turf.polygon([[back, out,
+    turf.destination(turf.point(out), COAST_CUT_RADIUS_KM, bearing + sign * 90).geometry.coordinates,
+    turf.destination(turf.point(back), COAST_CUT_RADIUS_KM, bearing + sign * 90).geometry.coordinates, back]]);
+  // Which side of the line back -> out is keepPoint on? (sign of the 2-D cross product)
+  const cross = (out[0] - back[0]) * (keepPoint[1] - back[1]) - (out[1] - back[1]) * (keepPoint[0] - back[0]);
+  const keepSide = (sign) => {
+    const corner = turf.destination(turf.point(out), 1, bearing + sign * 90).geometry.coordinates;
+    const c = (out[0] - back[0]) * (corner[1] - back[1]) - (out[1] - back[1]) * (corner[0] - back[0]);
+    return Math.sign(c) === Math.sign(cross);
+  };
+  const far = keepSide(1) ? side(-1) : side(1);
+  return turf.difference(turf.featureCollection([shape, far])) ?? shape;
+}
 
 function fittedGeometry(neighbour, overlay, others, mode, maxGapKm, land, spec) {
   if (mode === "contain") {

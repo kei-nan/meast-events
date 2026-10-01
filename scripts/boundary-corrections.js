@@ -34,7 +34,10 @@
 //   "reshape" - cuts a shape in data/corrections-geometry.json by a CShapes country's
 //     current outline before any entry uses it (`minus: "cshapes:<cntry_name>"`), for a
 //     stretch of border where CShapes is checked to be the more accurate source. Applied
-//     once, so every entry that uses the shape gets the same outline.
+//     once, so every entry that uses the shape gets the same outline. The two sources'
+//     coastlines differ, so with `coastEnd` (the border's last two CShapes vertices, the
+//     second where it meets the sea) that stretch is extended straight out to sea and the
+//     shape is cut there too; `keepPoint` marks the side that is kept.
 //
 //   "fit" - makes a separately sourced shape (an "add" entry, or Hatay) and the CShapes
 //     countries around it share ONE line where they meet. The shapes come from sources
@@ -692,6 +695,10 @@ export const CORRECTIONS = [
     type: "reshape",
     geometry: "gaza",
     minus: "cshapes:Egypt",
+    // The last stretch of CShapes' Egypt-Gaza line: its previous vertex, then the vertex
+    // where it reaches the sea (Natural Earth's coast runs on past that point).
+    coastEnd: [[34.23916, 31.29472], [34.21676, 31.32321]],
+    keepPoint: [34.4667, 31.5], // Gaza City: the side of the cut that is kept
     note: "Gaza's Rafah border follows CShapes' Egypt line, which matches the Rafah crossing to 0.3 km.",
   },
   {
