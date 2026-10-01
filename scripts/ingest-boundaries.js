@@ -234,7 +234,7 @@ function fittedGeometry(neighbour, overlay, others, mode, maxGapKm, land, spec) 
   }
   let geom = turf.difference(fc(neighbour, overlay));
   if (!geom) throw new Error(`fit: ${neighbour.properties.name} vanished when clipped`);
-  if (mode === "trim") {
+  if (mode === "trim" || spec.trim) {
     const near = turf.buffer(overlay, maxGapKm);
     // Land this neighbour holds in a narrow strip between the overlay and another named
     // shape (e.g. a Turkish strip between the sanjak and Syria) is not its own either.

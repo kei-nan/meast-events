@@ -41,7 +41,7 @@
 //     its land in the narrow strip between the overlay and that named shape); "snap" also gives the
 //     neighbour the unclaimed land (within `maxGapKm`) between the two; "contain" is for
 //     a country whose shape is meant to include the overlay (Israel from 1967): it is
-//     widened to wrap the overlay fully. The overlay's own outline is never changed. Applied in ingest-boundaries.js after all other
+//     widened to wrap the overlay fully. `trim: true` adds trim's clean-up to "snap". The overlay's own outline is never changed. Applied in ingest-boundaries.js after all other
 //     entries. This picks one sourced line over another; it invents no new line.
 //
 // Every entry with historical content must cite a source. Nothing here should be
@@ -248,26 +248,26 @@ export const CORRECTIONS = [
     source: "https://en.wikipedia.org/wiki/Hawar_Islands_dispute",
   },
   // CShapes has no notion of either Uqair Protocol neutral zone: it hands each zone's two
-  // eventual halves to their modern owners for the whole 20th century. The zones are added
-  // as their own features further down; these flags mark the polygons that wrongly include
-  // them in the meantime. Iraq deliberately gets no such flag even though its polygon has
-  // the same problem: a flag's note replaces a split's note for the same years, and an
-  // Iraq flag spanning 1922-1981 would wipe out the mandate/kingdom/republic note above
-  // for exactly the period that note explains. The Saudi-Iraqi zone's own entry names Iraq
-  // instead.
+  // eventual halves to their modern owners for the whole 20th century, so the later
+  // partition line would run through each zone. The zones are added as their own
+  // features further down, and "fit" entries at the end cut them out of Saudi Arabia,
+  // Kuwait and Iraq for the years they existed. These flags explain that on the two
+  // shapes whose outline changes when the zone is partitioned. Iraq gets no flag: a
+  // flag's note replaces a split's note for the same years, and an Iraq flag spanning
+  // 1922-1981 would wipe out the mandate/kingdom/republic note above; the Saudi-Iraqi
+  // zone's own entry names Iraq instead.
   {
     type: "flag",
     target: "Saudi Arabia",
     fromYear: 1922,
     toYear: 1981,
-    status: "shared-sovereignty-included",
+    status: null,
     note:
-      "This shape includes both Uqair Protocol neutral zones, which Saudi Arabia did not " +
-      "hold alone while they existed: the Saudi-Kuwaiti zone (shared with Kuwait until " +
-      "1969) and the Saudi-Iraqi zone (shared with Iraq until 1981). Saudi Arabia took " +
-      "roughly half of each on partition, and this polygon reflects those later " +
-      "settlements throughout. Both zones are also drawn as separate features for the " +
-      "years they existed - see the two entries below.",
+      "Both Uqair Protocol neutral zones are drawn as their own shared territories for the " +
+      "years they existed and are not part of this shape: the Saudi-Kuwaiti zone (shared " +
+      "with Kuwait until its partition took effect in December 1969) and the Saudi-Iraqi " +
+      "zone (shared with Iraq until the 1981 treaty, in force February 1982). Saudi Arabia " +
+      "received roughly half of each on partition.",
     source: "https://en.wikipedia.org/wiki/Uqair_Protocol_of_1922",
   },
   {
@@ -275,12 +275,12 @@ export const CORRECTIONS = [
     target: "Kuwait",
     fromYear: 1922,
     toYear: 1969,
-    status: "shared-sovereignty-included",
+    status: null,
     note:
-      "This shape includes the northern half of the Saudi-Kuwaiti neutral zone, which " +
-      "Kuwait shared equally with Najd/Saudi Arabia from the 1922 Uqair Protocol until " +
-      "the zone was partitioned in 1965-69, rather than holding outright. The zone is " +
-      "also drawn as a separate feature for those years - see the entry below.",
+      "The Saudi-Kuwaiti neutral zone, which Kuwait shared equally with Najd/Saudi Arabia " +
+      "from the 1922 Uqair Protocol until the partition took effect in December 1969, is " +
+      "drawn as its own shared territory and is not part of this shape until then; Kuwait " +
+      "received its northern half.",
     source: "https://en.wikipedia.org/wiki/Uqair_Protocol_of_1922",
   },
   {
@@ -722,6 +722,35 @@ export const CORRECTIONS = [
     ],
     maxGapKm: 3,
     note: "The West Bank's eastern edge follows OCHA's Area C; Jordan's CShapes line is fitted to it.",
+  },
+  // The neutral zones were undivided shared territory until partition, so neither
+  // neighbour's shape may include any of them (and the later partition line, which CShapes
+  // draws through each zone, disappears). "trim" also drops the small pieces the
+  // hand-digitized zone edges strand next to it.
+  {
+    type: "fit",
+    overlay: "Saudi-Kuwaiti Neutral Zone",
+    neighbours: [
+      { name: "Kuwait", mode: "trim" },
+      // CShapes' Kuwait also reaches a few km past the zone's western edge (about 87 km2,
+      // south of Kuwait's own border and west of the zone, i.e. Najd); once cut from Kuwait,
+      // Saudi Arabia's edge is snapped to the zone so that wedge is not left unclaimed.
+      { name: "Saudi Arabia", mode: "snap", trim: true },
+    ],
+    maxGapKm: 5,
+    note: "the zone was shared territory until its partition took effect in December 1969",
+  },
+  {
+    type: "fit",
+    overlay: "Saudi-Iraqi Neutral Zone",
+    neighbours: [
+      { name: "Saudi Arabia", mode: "trim" },
+      { name: "Kingdom of Iraq (British Mandate)", mode: "trim" },
+      { name: "Kingdom of Iraq", mode: "trim" },
+      { name: "Iraq", mode: "trim" },
+    ],
+    maxGapKm: 3,
+    note: "the zone was shared territory until the 1981 partition treaty",
   },
   {
     type: "add",
