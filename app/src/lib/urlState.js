@@ -6,9 +6,10 @@
 //   e=<event id>, about=1 (the "About the data" dialog is open)
 
 import { MAX_RADIUS_KM, makeCircleArea, makeRectArea } from "./geo.js";
+import { MAX_YEAR, MIN_YEAR } from "./years.js";
 
-export const YEAR_MIN = 1900;
-export const YEAR_MAX = 2026;
+export const YEAR_MIN = MIN_YEAR;
+export const YEAR_MAX = MAX_YEAR;
 export const MAX_Q_LENGTH = 100;
 const MAX_ITEMS = 20;
 const MAX_ITEM_LENGTH = 60;

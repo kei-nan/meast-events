@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import MapView from "./components/MapView";
 import SearchPanel from "./components/SearchPanel.jsx";
 import AboutData from "./components/AboutData.jsx";
-import Timeline, { MIN_YEAR, MAX_YEAR } from "./components/Timeline";
+import Timeline from "./components/Timeline";
 import useAllEvents from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
 import useUrlState from "./hooks/useUrlState";
@@ -16,6 +16,7 @@ import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
 import { rankEvents } from "./lib/ranking";
 import { parseUrlState } from "./lib/urlState";
+import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
 
 const RETRY_MS = 20000;
@@ -95,7 +96,6 @@ export default function App() {
     ready: !eventsLoading,
     degraded,
     probeTick,
-    addEvents,
     onOutage: markOutage,
     onRecovered: markRecovered,
   });

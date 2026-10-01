@@ -36,14 +36,15 @@
 // data/selection-funnel.json (written by the data pipeline) is copied to
 // public/data/ for the "About the data" page; missing is a warning, not an error.
 //
-// Keep MIN_YEAR/MAX_YEAR here in sync with src/components/Timeline.jsx - they
-// bound which decade chunks are ever requested by the app, so a feature/event
-// active only outside this window doesn't need its own chunk.
+// MIN_YEAR/MAX_YEAR (src/lib/years.js, shared with the app) bound which decade
+// chunks are ever requested by the app, so a feature/event active only outside
+// this window doesn't need its own chunk.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { FULL_BUCKETS, fullBucket } from "../src/lib/fullBucket.js";
+import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.join(__dirname, "..", "src", "data"); // land.json
@@ -60,8 +61,6 @@ const MAX_CHUNK_BYTES = Number(process.env.MAX_CHUNK_BYTES) || 1024 * 1024;
 const MAX_FULL_BYTES = Number(process.env.MAX_FULL_BYTES) || 1024 * 1024;
 const SNIPPET_LENGTH = 160;
 
-const MIN_YEAR = 1900;
-const MAX_YEAR = 2026;
 const DECADE_SIZE = 10;
 
 function decadeFloor(year) {
