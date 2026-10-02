@@ -18,7 +18,7 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://meast-api.middle-wiki.workers.dev https://cloudflareinsights.com; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # --- caching ----------------------------------------------------------------
 # /assets/*: Vite content-hashes everything EXCEPT the two MapLibre files
@@ -56,6 +56,18 @@
 # Static files that change only if the font does, so cache like /data/*.
 /glyphs/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# /pagefind/*: the full-text search index (app/scripts/build-search-index.mjs).
+# ids.json, the engine and the .pf_meta keep their names across data changes,
+# and a stale ids.json would silently drop results for changed events, so they
+# revalidate on every visit (a 304 when unchanged). The index chunks are named
+# by content hash, so they are immutable.
+/pagefind/*
+  Cache-Control: public, no-cache
+
+/pagefind/index/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
 
 # /data/*: the static dataset. Un-hashed names (events/1900.json, land.json ...)
 # change on every data regeneration, so cache moderately and revalidate in the

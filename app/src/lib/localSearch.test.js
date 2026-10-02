@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { apiMatchesFromStore, localSearch, countInBbox } from "./localSearch.js";
+import { textMatchesFromStore, localSearch, countInBbox } from "./localSearch.js";
 import { makeCircleArea, makeRectArea } from "./geo.js";
 
 const ev = (id, title, lon, lat, extra = {}) => ({
@@ -57,23 +57,29 @@ test("countInBbox counts only mapped events in view", () => {
   assert.equal(countInBbox(store, null), null);
 });
 
-test("apiMatchesFromStore: records come from the store, unknown ids are dropped", () => {
-  const fixed = ev("tikrit", "First Battle of Tikrit", 43.7, 34.6, { date_start: "2014-06-26", date_end: "2014-07-21" });
-  const byId = new Map([[fixed.id, fixed]]);
-  const stale = { ...fixed, date_start: "2014-07-21", date_end: "2014-06-30" };
-  const removed = ev("gone", "Removed event", 40, 30);
-  const out = apiMatchesFromStore([stale, removed], byId);
-  assert.equal(out.length, 1);
-  assert.equal(out[0], fixed);
+test("textMatchesFromStore: records come from the store in index order, unknown ids are dropped", () => {
+  const a = ev("tikrit", "First Battle of Tikrit", 43.7, 34.6, { date_start: "2014-06-26", date_end: "2014-07-21" });
+  const b = ev("mosul", "Fall of Mosul", 43.1, 36.3);
+  const byId = new Map([a, b].map((e) => [e.id, e]));
+  const out = textMatchesFromStore(["mosul", "gone", "tikrit"], byId);
+  assert.deepEqual(out, [b, a]);
 });
 
-test("apiMatchesFromStore: a drawn area keeps only precise events inside it", () => {
+test("textMatchesFromStore: category and country filters apply", () => {
+  const war = ev("w", "A war", 35, 31, { category: "war", countries: ["Iraq"] });
+  const treaty = ev("t", "A treaty", 35, 31, { category: "treaty", countries: ["Syria"] });
+  const byId = new Map([war, treaty].map((e) => [e.id, e]));
+  assert.deepEqual(textMatchesFromStore(["w", "t"], byId, { categories: ["treaty"] }).map((e) => e.id), ["t"]);
+  assert.deepEqual(textMatchesFromStore(["w", "t"], byId, { countries: ["Iraq"] }).map((e) => e.id), ["w"]);
+});
+
+test("textMatchesFromStore: a drawn area keeps only precise events inside it", () => {
   const inside = ev("in", "Inside", 35, 31);
   const outside = ev("out", "Outside", 50, 20);
   const approx = ev("cap", "Capital pin", 35.1, 31.1, { location_quality: "approximate" });
   const none = ev("none", "No location", null, null);
   const byId = new Map([inside, outside, approx, none].map((e) => [e.id, e]));
   const area = makeRectArea([34, 30, 36, 32]);
-  assert.deepEqual(apiMatchesFromStore([...byId.values()], byId, area).map((e) => e.id), ["in"]);
-  assert.equal(apiMatchesFromStore([...byId.values()], byId).length, 4);
+  assert.deepEqual(textMatchesFromStore([...byId.keys()], byId, { area }).map((e) => e.id), ["in"]);
+  assert.equal(textMatchesFromStore([...byId.keys()], byId).length, 4);
 });

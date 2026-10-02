@@ -1,6 +1,13 @@
 # Deployment
 
-Current setup: **Redis Cloud (free) -> API on Cloudflare Workers (free
+> **The site no longer uses the API or Redis.** Full-text search now runs in
+> the browser on a static index (Pagefind) that `npm run build` generates from
+> `data/events.json`, so the frontend (Part 3) is the only piece the site needs,
+> and it needs no `VITE_API_URL`. Parts 1 and 2 below (Redis Cloud, the API
+> Worker, `npm run load-redis`) describe infrastructure that is still deployed
+> but unused, kept until it is retired.
+
+Previous setup: **Redis Cloud (free) -> API on Cloudflare Workers (free
 plan) -> frontend as a static-assets Cloudflare Worker (free)**. Three pieces,
 deployed in this order because each depends on the previous one:
 

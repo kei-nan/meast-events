@@ -132,16 +132,25 @@ nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy:
 strict-origin-when-cross-origin`, `Permissions-Policy` (geolocation, camera,
 microphone, payment off).
 
-CSP (enforcing, not report-only): `default-src 'self'; script-src 'self';
-style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src
-https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'
-https://meast-api.middle-wiki.workers.dev;
-worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri
-'self'; form-action 'self'; frame-ancestors 'none'`.
+CSP (enforcing, not report-only): `default-src 'self'; script-src 'self'
+'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self'
+'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src
+'self' https://cloudflareinsights.com; worker-src 'self' blob:; child-src
+'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';
+frame-ancestors 'none'`.
 
 - `style-src 'unsafe-inline'` is required by MapLibre and React inline
   `style` attributes; scripts stay locked to same-origin files (no inline
   script, no `eval`).
+- `'wasm-unsafe-eval'` lets the full-text search engine (Pagefind, served
+  from `/pagefind/`) compile its WebAssembly module. It allows WebAssembly
+  compilation only, not JavaScript `eval` or inline scripts.
+- `static.cloudflareinsights.com` / `cloudflareinsights.com`: the Cloudflare
+  Web Analytics beacon, injected by Cloudflare, and where it reports.
+- No API host: since full-text search moved to a static index, the site
+  calls no API. Cloudflare's bot-detection inline script
+  (`/cdn-cgi/challenge-platform`) stays blocked; its content changes per
+  response, so only `'unsafe-inline'` would allow it.
 - The CSP is an allow-list: a new external host (custom API domain, a new
   tile server) must be added to `connect-src`/`img-src`, otherwise the
   request is blocked and only a console violation shows it.

@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { API_ENABLED, fetchAllPages } from "../lib/dataClient";
-import { apiMatchesFromStore, localSearch } from "../lib/localSearch";
+import { localSearch, textMatchesFromStore } from "../lib/localSearch";
 import { MIN_QUERY_LENGTH, rankEvents } from "../lib/ranking";
+import { searchEventIds } from "../lib/textSearch";
 import useDebouncedValue from "./useDebouncedValue";
 
 const SEARCH_DEBOUNCE_MS = 300;
-const MAX_SEARCH_PAGES = 5;
 
 const IDLE = {
   status: "idle",
@@ -31,27 +30,28 @@ function paramsKey(q, area, categories, countries) {
 // timeline (the year scope is applied by the caller, so toggling it needs no
 // refetch and both "N results" and "M in selected years" are exact).
 //
-// WHAT NEEDS THE API: only free-text search (q), because it matches the full
-// lead text and ranks server-side. Everything else - category/country filters
-// and drawn-area queries (bbox + circle trim, precise-only rule) - is computed
-// locally from the in-memory store (`storeRef`, filled from static data), so it
-// is instant and works with the API down or absent.
+// WHAT NEEDS THE FULL-TEXT INDEX: only free-text search (q), because it matches
+// the full lead text, which the store does not hold (lib/textSearch.js, a static
+// Pagefind index searched in the browser). The index only decides WHICH events
+// match; category/country filters and drawn-area queries (bbox + circle trim,
+// precise-only rule) and the ranking are computed locally from the in-memory
+// store (`storeRef`, filled from static data).
 //
 //   status: 'idle'    nothing to search (no text >= 2 chars, no filters)
-//           'loading' the store is still loading, or a q request for the CURRENT
-//                     inputs is in flight; `results` then holds INSTANT LOCAL
+//           'loading' the store is still loading, or a q search for the CURRENT
+//                     inputs is running; `results` then holds INSTANT LOCAL
 //                     title/snippet matches for that same query (interim true)
 //           'ready'
 //   results: ranked events with coordinates (circle areas trimmed by haversine)
-//   total / truncated: server total when the answer was incomplete
-//   source: 'api' (full-text answer) | 'local' (filters/area only, exact) |
-//           'static' (q answered locally because the API is unavailable/absent:
-//           titles and summaries only)
+//   total / truncated: always exact (the index returns every match)
+//   source: 'fulltext' (full-text answer) | 'local' (filters/area only, exact) |
+//           'static' (q answered locally because the index could not be
+//           loaded: titles and summaries only)
 //
-// A new q aborts the previous request (AbortController). If the q request fails
-// `onOutage()` is called and local matches become the answer; while `degraded`
-// the API is not tried again for each keystroke, only when `probeTick` changes
-// (App bumps it every 20 s), and `onRecovered()` fires when a probe succeeds.
+// A newer q makes an older answer stale (ignored). If the index cannot be
+// loaded `onOutage()` is called and local matches become the answer; while
+// `degraded` it is not tried again for each keystroke, only when `probeTick`
+// changes (App bumps it every 20 s), and `onRecovered()` fires when it loads.
 export default function useEventSearch({
   query,
   area = null,
@@ -84,8 +84,8 @@ export default function useEventSearch({
     [ready, active, q, area, cats, cs, version]
   );
 
-  // Latest API answer: {key, status: 'ready'|'failed', ...}
-  const [api, setApi] = useState({ key: null });
+  // Latest full-text answer: {key, status: 'ready'|'failed', ...}
+  const [full, setFull] = useState({ key: null });
   const degradedRef = useRef(degraded);
   degradedRef.current = degraded;
   const handledProbeRef = useRef(probeTick);
@@ -94,42 +94,28 @@ export default function useEventSearch({
     const isProbe = probeTick !== handledProbeRef.current;
     handledProbeRef.current = probeTick;
     const [sq, sArea, sCats, sCountries] = JSON.parse(settledKey);
-    if (!sq || !API_ENABLED || !ready) return;
+    if (!sq || !ready) return;
     if (degradedRef.current && !isProbe) return;
-    const controller = new AbortController();
+    let stale = false;
 
-    fetchAllPages(
-      {
-        q: sq,
-        bbox: sArea?.bbox,
-        category: sCats,
-        country: sCountries,
-        precise: sArea ? 1 : undefined,
-        sort: "relevance",
-        fields: "lite",
-      },
-      { signal: controller.signal, maxPages: MAX_SEARCH_PAGES }
-    )
-      .then((res) => {
-        if (controller.signal.aborted) return;
-        // Records come from the static store, not the (possibly stale) index.
-        const results = rankEvents(apiMatchesFromStore(res.events, storeRef.current, sArea), sq);
+    searchEventIds(sq)
+      .then((ids) => {
+        if (stale) return;
+        // Records come from the static store; filters and area apply locally.
+        const hits = textMatchesFromStore(ids, storeRef.current, { area: sArea, categories: sCats, countries: sCountries });
+        const results = rankEvents(hits, sq);
         onRecovered();
-        setApi({
-          key: settledKey,
-          status: "ready",
-          results,
-          total: res.truncated ? Math.max(res.total, results.length) : results.length,
-          truncated: res.truncated,
-        });
+        setFull({ key: settledKey, status: "ready", results, total: results.length, truncated: false });
       })
-      .catch((err) => {
-        if (err.aborted || controller.signal.aborted) return;
-        if (err.outage !== false) onOutage();
-        setApi({ key: settledKey, status: "failed" });
+      .catch(() => {
+        if (stale) return;
+        onOutage();
+        setFull({ key: settledKey, status: "failed" });
       });
 
-    return () => controller.abort();
+    return () => {
+      stale = true;
+    };
   }, [settledKey, probeTick, ready, storeRef, onOutage, onRecovered]);
 
   if (!active) return IDLE;
@@ -146,12 +132,12 @@ export default function useEventSearch({
   });
 
   if (!q) return localState("local");
-  if (api.key === currentKey && api.status === "ready") {
-    return { ...IDLE, ...api, source: "api", textSearch: true };
+  if (full.key === currentKey && full.status === "ready") {
+    return { ...IDLE, ...full, source: "fulltext", textSearch: true };
   }
-  if (!API_ENABLED || degraded || (api.key === currentKey && api.status === "failed")) {
+  if (degraded || (full.key === currentKey && full.status === "failed")) {
     return localState("static");
   }
-  // API answer pending: show the instant local matches meanwhile.
-  return { ...localState("api"), status: "loading", interim: true };
+  // Full-text answer pending: show the instant local matches meanwhile.
+  return { ...localState("fulltext"), status: "loading", interim: true };
 }
