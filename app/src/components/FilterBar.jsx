@@ -1,5 +1,6 @@
 // From mapLayers, not MapView: MapView (and MapLibre) is lazy-loaded (App.jsx).
 import { CATEGORY_COLORS as COLORS } from "./mapLayers";
+import { categoryLabel } from "../lib/categoryLabels";
 
 const DEFAULT_CATEGORIES = Object.keys(COLORS);
 
@@ -37,7 +38,7 @@ export default function FilterBar({
                 aria-hidden="true"
                 style={{ background: COLORS[c] ?? "#6b6151" }}
               />
-              {c}
+              {categoryLabel(c)}
             </button>
           ))}
         </div>
