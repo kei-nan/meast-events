@@ -173,8 +173,8 @@
       "wording": []
     },
     "turkish-war-of-independence": {
-      "text_sha1": "b213247dfd46",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "e396f3a88854",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -232,8 +232,8 @@
       "wording": []
     },
     "unification-of-saudi-arabia": {
-      "text_sha1": "f551d5482679",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c32ebad9aae2",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -374,8 +374,8 @@
       "wording": []
     },
     "1953-iranian-coup-d-tat": {
-      "text_sha1": "32647f57a370",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7daca200b6d1",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -581,11 +581,12 @@
       "wording": []
     },
     "al-anfal-campaign": {
-      "text_sha1": "04ea53d68bcf",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "31d3391624b7",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
-        "note": "Weakens the widely accepted genocide finding with a claim about a 2007 court ruling and a sweeping statement that \"many Iraqi Arabs reject that there were any mass killings\", neither sourced.",
+        "note": "Weakens the genocide finding, which it attributes to \"many scholars and human rights groups\", with a 2007 Hague court ruling and a sweeping, unattributed statement that \"many Iraqi Arabs reject that there were any mass killings\". It does not mention that Iraq's High Tribunal convicted Ali Hassan al-Majid of genocide for the campaign in 2007.",
         "phrases": [
+          "This characterization of the Anfal campaign was disputed by a 2007 Hague court ruling",
           "many Iraqi Arabs reject that there were any mass killings"
         ]
       },
@@ -681,10 +682,13 @@
       ]
     },
     "israeli-disengagement-from-gaza": {
-      "text_sha1": "10b6f0f8b7f2",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ccfb8e7afc3b",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
-        "note": "Asserts that Gaza remained occupied after 2005, citing the UN and the ICJ, without mentioning that Israel and some legal scholars reject this."
+        "note": "Gives the view that Gaza remained occupied after 2005, attributed to the UN, international organisations, most academic commentators and the 2024 ICJ advisory opinion, and backs it with a legal argument in its own voice (\"it has been generally understood ...\"), without mentioning that Israel and some legal scholars reject this. The same paragraph also dates the occupation \"(1967–2005)\".",
+        "phrases": [
+          "it has been generally understood that a territory remains effectively occupied"
+        ]
       },
       "wording": []
     },
@@ -778,8 +782,8 @@
       ]
     },
     "islamic-state": {
-      "text_sha1": "3ab0b3401e2d",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c80b1d583fe4",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [
         {
@@ -825,8 +829,8 @@
       "wording": []
     },
     "qatar-diplomatic-crisis": {
-      "text_sha1": "4c0eb2a642dc",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "99b1f60d8af3",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -885,8 +889,8 @@
       "wording": []
     },
     "2023-israel-hamas-war": {
-      "text_sha1": "4e88c0844251",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "dd2e5059c1cf",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
         "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included."
       },
@@ -1563,8 +1567,8 @@
       "wording": []
     },
     "ma-alot-massacre": {
-      "text_sha1": "7ebb09a33bcf",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "842074c120e2",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [
         {
@@ -2598,8 +2602,8 @@
       "wording": []
     },
     "2020-aden-airport-attack": {
-      "text_sha1": "00f1664909c5",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "68de41f6070b",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -2646,12 +2650,12 @@
       "wording": []
     },
     "october-7-attacks": {
-      "text_sha1": "f300fad67b61",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "aadde53fa18e",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
-        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), while the Hannibal Directive deaths are stated as fact. Also uses \"illegal Israeli settlements\" as fact. It does note that 44 governments called the attack terrorism.",
+        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\", while the Hannibal Directive deaths are stated as fact. Hamas's stated reasons are given at length and attributed; the summary also notes that 44 governments called the attack terrorism.",
         "phrases": [
-          "illegal Israeli settlements",
+          "The day was labelled the bloodiest in Israel's history",
           "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
         ]
       },
@@ -2774,8 +2778,8 @@
       "wording": []
     },
     "killing-of-hind-rajab": {
-      "text_sha1": "18f2ac091ba7",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7345c532b01c",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
         "note": "Well documented (independent investigations; the IDF later admitted firing), with one editorial touch (\"finally admitted\").",
         "phrases": [
@@ -3071,8 +3075,8 @@
       "wording": []
     },
     "1919-egyptian-revolution": {
-      "text_sha1": "a05eb5426012",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "8975b63c8809",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3638,8 +3642,8 @@
       "category_note": "Shown as \"terrorism\" because Wikidata types it as a hostage taking; the airliner and its passengers were seized by Iraqi forces during the invasion of Kuwait."
     },
     "1991-iraqi-uprisings": {
-      "text_sha1": "3026e2a59eb1",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "b4fb19dac794",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3718,8 +3722,8 @@
       ]
     },
     "iraqi-conflict": {
-      "text_sha1": "c1cb2be4ab24",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "036db0fd651f",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3910,8 +3914,8 @@
       "wording": []
     },
     "iraqi-turkmen-genocide": {
-      "text_sha1": "f789ba7bc9dd",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ff8219d633b0",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3945,8 +3949,8 @@
       ]
     },
     "operation-inherent-resolve": {
-      "text_sha1": "2e9297ee3e87",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "febcc0d20b66",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [
         {
@@ -4229,8 +4233,8 @@
       "wording": []
     },
     "2024-lebanon-electronic-device-attacks": {
-      "text_sha1": "25f1e5793e9c",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ee898208963b",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [],
       "category_note": "Shown as \"terrorism\" because Wikidata types this Israeli operation as a terrorist attack (and also as counter-terrorism). The summary quotes both UN experts and commentators who called it an anti-terrorist operation. Our category follows Wikidata's type without judging it."
@@ -4341,14 +4345,19 @@
       "wording": []
     },
     "2025-2026-iran-massacres": {
-      "text_sha1": "16ec5ccb7c45",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "048ab44bde7e",
+      "text_retrieved_at": "2026-10-01",
+      "fairness": {
+        "note": "Gives the highest estimate the most weight: Iran International's figure of over 36,500 deaths appears three times, and the opening range of \"most death toll estimates\" starts at 5,000, above the government's own figure of 3,117 given later. The government's figures and its account (\"terrorists\", blame on the US and Israel) are included and attributed.",
+        "phrases": [
+          "According to documents, Iran International reported that more than 36,500 Iranians were killed"
+        ]
+      },
       "wording": []
     },
     "2026-iran-war": {
-      "text_sha1": "0277f6b1df1f",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "b61901815121",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
         "note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
         "phrases": [
@@ -4358,8 +4367,8 @@
       "wording": []
     },
     "fall-of-aden-2026": {
-      "text_sha1": "385e11d0be9e",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "f3286feea086",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
