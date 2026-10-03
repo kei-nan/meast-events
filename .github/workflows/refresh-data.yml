@@ -87,7 +87,7 @@ jobs:
             echo
             echo "Only summaries whose text changed on Wikipedia are updated. Their framing reviews now show \"may no longer apply\" on the site until they are re-reviewed."
             echo
-            echo "**Before merging:** read the changed sentences below and look for vandalism or a summary rewritten wholesale. After merging, run \`npm run load-redis\` so search uses the new text."
+            echo "**Before merging:** read the changed sentences below and look for vandalism or a summary rewritten wholesale. After merging, the site rebuilds itself, including the search index, so search uses the new text."
             echo
             echo "Titles: \`data/title-refresh-report.md\` lists events whose title is no longer the current Wikipedia article title. They are NOT changed by this PR; after merging, review the report and run \`node scripts/merge-proposed.js --titles\` (dry run), then \`node scripts/merge-proposed.js --titles --apply\`."
             echo

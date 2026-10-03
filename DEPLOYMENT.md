@@ -27,7 +27,7 @@ Only the frontend deploys itself. The other two pieces do not:
 |---|---|---|
 | `app/`, or any file in `data/` that the site shows (the build regenerates `app/public/data/` from it) | nothing: Workers Builds rebuilds and deploys the site | yes |
 | `worker/` (the API) | `cd worker` then `npx wrangler deploy` (on Windows PowerShell: `npx.cmd wrangler deploy`) | **no** |
-| `data/events.json` (categories, fixes, and the monthly "Refresh Wikipedia summaries" pull request) | `npm run load-redis` from the repo root (Windows: `npm.cmd run load-redis`) | **no** |
+| `data/events.json` (categories, fixes, and the monthly "Refresh Wikipedia summaries" pull request) | nothing for the site: the rebuild also regenerates the search index. Only to keep the unused, still-deployed API in sync: `npm run load-redis` (Windows: `npm.cmd run load-redis`) | yes (site) |
 
 The monthly refresh workflow (`.github/workflows/refresh-data.yml`) needs one repository setting, once:
 **Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"**.

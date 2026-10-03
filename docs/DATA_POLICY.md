@@ -236,7 +236,7 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists, for each changed lead,
    the removed and added sentences. It never merges.
 3. **Before merging**, read those sentences. Changes in wording are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
-4. After merging, the site rebuilds itself; run `npm run load-redis` so search uses the new text. The framing review of each changed summary shows "may no longer
+4. After merging, the site rebuilds itself, including the search index (Pagefind, built from `data/events.json`), so search uses the new text. The framing review of each changed summary shows "may no longer
    apply" until it is re-reviewed.
 
 To run it by hand instead: `node scripts/refresh-extracts.js --report=refresh-report.md` (dry run, default, writes nothing), then add `--apply` to write the changes.
