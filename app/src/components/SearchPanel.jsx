@@ -3,7 +3,7 @@ import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
 import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
-import { categoryLabel } from "../lib/categoryLabels";
+import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
 import { CATEGORY_COLORS } from "./mapLayers";
 import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
@@ -133,7 +133,8 @@ export default function SearchPanel({
   const activeChips = [
     ...cats.map((c) => ({
       key: `cat:${c}`,
-      label: categoryLabel(c),
+      label: categoryShortLabel(c),
+      title: categoryLabel(c),
       color: CATEGORY_COLORS[c] ?? "#6b6151",
       remove: () => onFiltersChange({ ...filters, categories: cats.filter((x) => x !== c) }),
     })),
@@ -300,7 +301,7 @@ export default function SearchPanel({
                   {chip.color && (
                     <span className="sp-dot" aria-hidden="true" style={{ background: chip.color }} />
                   )}
-                  <span>{chip.label}</span>
+                  <span title={chip.title}>{chip.label}</span>
                   <button
                     type="button"
                     className="sp-chip-x"
