@@ -23,9 +23,14 @@ import { BORDER_STYLE, DASHED_EXPR, readHintDismissed, uniqueBoundaries, writeHi
 import {
   BoundaryPopup,
   BordersList,
+  DrawTools,
   MapLegend,
   MapNotices,
 } from "./MapUi";
+import useMediaQuery from "../hooks/useMediaQuery";
+import ClusterList from "./ClusterList";
+import useMapHoverLabel from "./useMapHoverLabel";
+import { LIST_MAX, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels";
 import {
@@ -72,6 +77,11 @@ const BASE_STYLE = {
 
 const reducedMotion = () =>
   typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+// Points stop clustering above this zoom; identical points then draw as one dot.
+const CLUSTER_MAX_ZOOM = 12;
+// The first-visit hint hides itself after this long (or on the first map interaction).
+const HINT_AUTO_HIDE_MS = 8000;
 
 // Drag/tap hit tolerance around area handles, in CSS pixels.
 const HANDLE_HIT_PX = { mouse: 10, touch: 22, pen: 14 };
@@ -153,6 +163,10 @@ export default function MapView({
   const [borderPopup, setBorderPopup] = useState(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [hintOpen, setHintOpen] = useState(() => !readHintDismissed());
+  // Events sharing one spot, listed after a click: {point, items, total}.
+  const [stackList, setStackList] = useState(null);
+  const hoverLabelRef = useRef(null);
+  const compact = useMediaQuery("(max-width: 768px)");
   const landFailedRef = useRef(false);
   // Only the settled year triggers a new fetch; boundariesForYear/labels below
   // still run against the live `year` for instant filtering of whatever decade
@@ -327,7 +341,7 @@ export default function MapView({
         data: eventsToGeoJSON(eventsRef.current, matchIdsRef.current),
         cluster: true,
         clusterRadius: 40,
-        clusterMaxZoom: 12,
+        clusterMaxZoom: CLUSTER_MAX_ZOOM,
         // Number of search matches inside each cluster (m is 1 for every
         // feature when no search is active, so nothing dims in that case).
         clusterProperties: { matches: ["+", ["get", "m"]] },
@@ -555,28 +569,52 @@ export default function MapView({
 
       const clickable = () => propsRef.current.areaMode === "off" && !suppressClickRef.current;
 
+      const openStack = (e, features, total) => {
+        setBorderPopup(null);
+        setStackList({ point: [e.point.x, e.point.y], items: stackItems(features), total });
+      };
+
       map.on("click", "clusters", async (e) => {
         if (!clickable()) return;
         const feature = e.features[0];
         const center = feature.geometry.coordinates;
+        const { cluster_id: clusterId, point_count: count } = feature.properties;
+        const source = map.getSource("events");
         // Visible click feedback: flash the cluster while the map zooms into it.
         map.getSource("cluster-flash")?.setData(ringFor(feature, 8));
         setTimeout(() => map.getSource("cluster-flash")?.setData(EMPTY_FC), 550);
         let zoom = map.getZoom() + 2;
+        let expansion = NaN;
         try {
-          const expansion = await map.getSource("events").getClusterExpansionZoom(feature.properties.cluster_id);
+          expansion = await source.getClusterExpansionZoom(clusterId);
           zoom = Math.max(expansion, map.getZoom() + 1);
         } catch {
           // Fall back to the fixed +2 zoom step.
         }
+        // A cluster no zoom can split (e.g. capital-pinned events on one point)
+        // lists its events instead of zooming in to a single unclickable dot.
+        const leaves =
+          count <= LIST_MAX ? await source.getClusterLeaves(clusterId, LIST_MAX, 0).catch(() => null) : null;
+        const action = clusterClickAction({ count, expansionZoom: expansion, clusterMaxZoom: CLUSTER_MAX_ZOOM, leaves });
+        if (action === "list" && leaves?.length) return openStack(e, leaves, count);
         map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 });
       });
 
-      const selectFromLayer = (e) => {
-        if (clickable()) propsRef.current.onSelectEvent?.(e.features[0].properties.id);
-      };
-      map.on("click", "unclustered-point", selectFromLayer);
-      map.on("click", "selected-point", selectFromLayer);
+      // A dot with others drawn under it (same spot, past CLUSTER_MAX_ZOOM)
+      // lists them all; a lone dot selects its event.
+      map.on("click", "unclustered-point", (e) => {
+        if (!clickable()) return;
+        const here = map.queryRenderedFeatures(e.point, { layers: ["unclustered-point"] });
+        const distinct = stackItems(here).length;
+        if (distinct > 1) return openStack(e, here, distinct);
+        propsRef.current.onSelectEvent?.(e.features[0].properties.id);
+      });
+      map.on("click", "selected-point", (e) => {
+        if (!clickable()) return;
+        // Over a regular dot, the handler above already handled this click.
+        if (map.queryRenderedFeatures(e.point, { layers: ["unclustered-point"] }).length) return;
+        propsRef.current.onSelectEvent?.(e.features[0].properties.id);
+      });
 
       // Click on a border polygon (not on a marker): show its status/note/source.
       map.on("click", (e) => {
@@ -585,6 +623,7 @@ export default function MapView({
           layers: ["clusters", "unclustered-point", "selected-point"],
         });
         if (onMarker.length) return;
+        setStackList(null);
         const hits = map.queryRenderedFeatures(e.point, { layers: ["boundaries-fill"] });
         setBorderPopup(hits.length ? { point: [e.point.x, e.point.y], items: uniqueBoundaries(hits) } : null);
       });
@@ -640,8 +679,39 @@ export default function MapView({
     return () => ro.disconnect();
   }, []);
   useEffect(() => {
-    if (areaMode !== "off") setBorderPopup(null);
+    if (areaMode !== "off") {
+      setBorderPopup(null);
+      setStackList(null);
+    }
   }, [areaMode]);
+  // A listed stack goes stale once the events (year range, search) change.
+  useEffect(() => setStackList(null), [events]);
+
+  useMapHoverLabel({
+    mapRef,
+    mapReady,
+    labelRef: hoverLabelRef,
+    isIdle: () => propsRef.current.areaMode === "off" && !draggingRef.current,
+    clusterMaxZoom: CLUSTER_MAX_ZOOM,
+  });
+
+  // The first-visit hint steps aside after a few seconds (for this visit only),
+  // or for good once the map is used.
+  useEffect(() => {
+    if (!hintOpen || !mapReady) return;
+    const map = mapRef.current;
+    const timer = setTimeout(() => setHintOpen(false), HINT_AUTO_HIDE_MS);
+    const used = () => {
+      setHintOpen(false);
+      writeHintDismissed();
+    };
+    const types = ["click", "dragstart", "wheel", "touchstart"];
+    for (const t of types) map.on(t, used);
+    return () => {
+      clearTimeout(timer);
+      for (const t of types) map.off(t, used);
+    };
+  }, [hintOpen, mapReady]);
 
   const decadeCached = boundaryCacheRef.current.has(decadeFloor(year));
   // Borders drawn for the current year (for the keyboard-reachable list).
@@ -662,6 +732,32 @@ export default function MapView({
     map.fitBounds(DEFAULT_BOUNDS, { padding: 20, duration: reducedMotion() ? 0 : 600 });
   };
   const closePopup = useCallback(() => setBorderPopup(null), []);
+  const closeStack = useCallback(() => setStackList(null), []);
+  const selectFromStack = (id) => {
+    setStackList(null);
+    onSelectEvent?.(id);
+  };
+
+  // "Show results on map": fit the view around the search/filter matches that
+  // have coordinates. Only on request - never on each keystroke.
+  const matchBounds = useMemo(() => (matchIds ? eventsBounds(events, matchIds) : null), [events, matchIds]);
+  const showMatches = () => {
+    const map = mapRef.current;
+    if (!map || !matchBounds) return;
+    const [w, s, e, n] = matchBounds.bbox;
+    map.fitBounds(
+      [
+        [w, s],
+        [e, n],
+      ],
+      {
+        // Keep clear of the overlay controls (and the phone results sheet).
+        padding: compact ? { top: 80, bottom: 150, left: 40, right: 40 } : { top: 80, bottom: 60, left: 200, right: 120 },
+        maxZoom: 8,
+        duration: reducedMotion() ? 0 : 700,
+      }
+    );
+  };
   const dismissHint = () => {
     setHintOpen(false);
     writeHintDismissed();
@@ -882,12 +978,7 @@ export default function MapView({
     <div className="map-view" style={{ position: "relative" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
       <div className="mu-ctrl-left" role="group" aria-label="Search area tools">
-        <button type="button" className="mu-btn" aria-pressed={areaMode === "rect"} onClick={() => toggle("rect")}>
-          {"\u25ad"} Draw rectangle
-        </button>
-        <button type="button" className="mu-btn" aria-pressed={areaMode === "circle"} onClick={() => toggle("circle")}>
-          {"\u25ef"} Draw circle
-        </button>
+        <DrawTools areaMode={areaMode} onToggle={toggle} compact={compact} />
         {area && (
           <button type="button" className="mu-btn" onClick={() => onAreaChange?.(null)}>
             Clear area
@@ -896,6 +987,16 @@ export default function MapView({
         <button type="button" className="mu-btn" onClick={resetView}>
           {"\u21ba"} Reset view
         </button>
+        {matchBounds && (
+          <button
+            type="button"
+            className="mu-btn"
+            onClick={showMatches}
+            aria-label={`Show the ${matchBounds.count} mapped ${matchBounds.count === 1 ? "match" : "matches"} on the map`}
+          >
+            {"\u25ce"} {compact ? `Show results (${matchBounds.count})` : `Show ${matchBounds.count} results on map`}
+          </button>
+        )}
         {hint && (
           <div
             role="status"
@@ -931,6 +1032,10 @@ export default function MapView({
       </div>
       <MapLegend />
       {borderPopup && <BoundaryPopup popup={borderPopup} onClose={closePopup} width={size.w} height={size.h} />}
+      {stackList && (
+        <ClusterList list={stackList} onSelect={selectFromStack} onClose={closeStack} width={size.w} height={size.h} />
+      )}
+      <div ref={hoverLabelRef} className="mu-tooltip" aria-hidden="true" hidden />
     </div>
   );
 }

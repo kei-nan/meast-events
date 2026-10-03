@@ -3,6 +3,78 @@ import { CATEGORY_COLORS } from "./mapLayers";
 import { humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import "./MapUi.css";
 
+// ---- search-area draw tools ----
+
+const DRAW_MODES = [
+  { mode: "rect", icon: "▭", label: "Draw rectangle", short: "Rectangle" },
+  { mode: "circle", icon: "◯", label: "Draw circle", short: "Circle" },
+];
+
+// Desktop: one button per shape. Phones (compact): a single "Draw" button that
+// opens the two choices, so fewer controls float over a small map.
+export function DrawTools({ areaMode, onToggle, compact }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    const onDown = (e) => !wrapRef.current?.contains(e.target) && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [open]);
+
+  if (!compact) {
+    return DRAW_MODES.map((d) => (
+      <button
+        key={d.mode}
+        type="button"
+        className="mu-btn"
+        aria-pressed={areaMode === d.mode}
+        onClick={() => onToggle(d.mode)}
+      >
+        {d.icon} {d.label}
+      </button>
+    ));
+  }
+  const active = DRAW_MODES.find((d) => d.mode === areaMode);
+  return (
+    <div className="mu-draw" ref={wrapRef}>
+      <button
+        type="button"
+        className="mu-btn"
+        aria-expanded={open}
+        aria-controls="mu-draw-menu"
+        aria-pressed={!!active}
+        onClick={() => setOpen((v) => !v)}
+      >
+        {active ? `${active.icon} Drawing ${active.short.toLowerCase()}` : "✎ Draw"}
+      </button>
+      {open && (
+        <div id="mu-draw-menu" className="mu-draw-menu" role="group" aria-label="Draw a search area">
+          {DRAW_MODES.map((d) => (
+            <button
+              key={d.mode}
+              type="button"
+              className="mu-btn"
+              aria-pressed={areaMode === d.mode}
+              onClick={() => {
+                onToggle(d.mode);
+                setOpen(false);
+              }}
+            >
+              {d.icon} {d.short}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---- a single boundary's details (used by the popup and the Borders list) ----
 
 function BoundaryDetails({ b }) {
@@ -152,7 +224,7 @@ export function MapLegend() {
               <span className="mu-dot is-cluster" aria-hidden="true">
                 9
               </span>
-              Cluster: several events; click to zoom in
+              Cluster: several events; click to zoom in, or to list events that share one spot
             </li>
           </ul>
           <h3>Search area</h3>
