@@ -38,7 +38,7 @@ export function titleFromWikipediaUrl(url) {
 // Fetches leads for many titles. `cache` (see cache.js) is consulted/updated per requested
 // title, so an interrupted run resumes. Returns Map(requestedTitle -> record|null).
 // record: { title (canonical, after redirects), extract, wikibase_item, pageid, lastrevid,
-//           url, redirected_from|null, retrieved_at }
+//           url, redirected_from|null, redirect_fragment|null (redirect to a section), retrieved_at }
 export async function fetchLeads(titles, { cache = null, delayMs = 400, log = () => {} } = {}) {
   const wanted = [...new Set(titles.filter(Boolean))];
   const result = new Map();
@@ -59,6 +59,7 @@ export async function fetchLeads(titles, { cache = null, delayMs = 400, log = ()
     const q = data.query ?? {};
     const norm = new Map((q.normalized ?? []).map((n) => [n.from, n.to]));
     const redir = new Map((q.redirects ?? []).map((r) => [r.from, r.to]));
+    const redirFragment = new Map((q.redirects ?? []).filter((r) => r.tofragment).map((r) => [r.from, r.tofragment]));
     const pages = new Map((q.pages ?? []).map((p) => [p.title, p]));
     for (const t of chunk) {
       const n = norm.get(t) ?? t;
@@ -74,6 +75,7 @@ export async function fetchLeads(titles, { cache = null, delayMs = 400, log = ()
           lastrevid: p.lastrevid ?? null,
           url: p.canonicalurl ?? p.fullurl ?? null,
           redirected_from: r !== n ? n : null,
+          redirect_fragment: r !== n ? redirFragment.get(n) ?? null : null,
           retrieved_at: new Date().toISOString(),
         };
       }
