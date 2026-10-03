@@ -1,13 +1,13 @@
 name: Refresh Wikipedia summaries
 
-# Monthly (and on demand): re-fetch every event's English Wikipedia lead. If any
-# changed, open a pull request with the changed summaries and a readable list of
-# the changed sentences. It never merges: the owner reviews and merges. A changed
-# summary's framing review shows "may no longer apply" on the site until redone.
-# The same run lists events whose title is no longer the current Wikipedia article
-# title (data/title-changes.proposed.json + data/title-refresh-report.md). Titles
-# are never applied here: the owner applies them with
-# `node scripts/merge-proposed.js --titles --apply` after merging the PR.
+# Monthly (and on demand): re-fetch every event's English Wikipedia lead and
+# article title. If a summary or a title changed, open a pull request with the
+# changes and a readable list of them. It never merges: the owner reviews and
+# merges. A changed summary's framing review shows "may no longer apply" on the
+# site until redone. Titles follow Wikipedia like summaries: plain renames are
+# applied in the PR; held cases (a redirect to a section of another article,
+# another Wikidata item, a stored title Wikipedia does not redirect to the
+# article) are not changed and are listed in the PR description for review.
 #
 # Needs: Settings -> Actions -> General -> "Allow GitHub Actions to create and
 # approve pull requests". Pull requests opened with the workflow token do not
@@ -39,22 +39,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Re-fetch the Wikipedia summaries
-        run: node scripts/refresh-extracts.js --apply --propose-titles --report="$RUNNER_TEMP/refresh-report.md"
+      - name: Re-fetch the Wikipedia summaries and titles
+        run: node scripts/refresh-extracts.js --apply --report="$RUNNER_TEMP/refresh-report.md"
 
       - name: Check for changes
         id: diff
         run: |
-          # Title proposals count as changed only if the list itself changed (not just its date).
-          if git cat-file -e HEAD:data/title-changes.proposed.json 2>/dev/null && node -e '
-            const fs = require("fs"), { execSync } = require("child_process");
-            const now = JSON.parse(fs.readFileSync("data/title-changes.proposed.json", "utf8")).changes;
-            const before = JSON.parse(execSync("git show HEAD:data/title-changes.proposed.json")).changes;
-            process.exit(JSON.stringify(now) === JSON.stringify(before) ? 0 : 1);'; then
-            git checkout -- data/title-changes.proposed.json data/title-refresh-report.md
-          fi
-          if git diff --quiet -- data/events.json data/title-changes.proposed.json data/title-refresh-report.md \
-             && [ -z "$(git ls-files --others --exclude-standard -- data/title-changes.proposed.json)" ]; then
+          if git diff --quiet -- data/events.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No summary or title changed; nothing to do."
           else
@@ -79,20 +70,20 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add data/events.json data/title-changes.proposed.json data/title-refresh-report.md
-          git commit -m "Refresh Wikipedia summaries (${day})"
+          git add data/events.json
+          git commit -m "Refresh Wikipedia summaries and titles (${day})"
           git push origin "$branch"
           {
-            echo "Monthly refresh of the English Wikipedia summaries (${day})."
+            echo "Monthly refresh of the English Wikipedia summaries and titles (${day})."
             echo
             echo "Only summaries whose text changed on Wikipedia are updated. Their framing reviews now show \"may no longer apply\" on the site until they are re-reviewed."
             echo
-            echo "**Before merging:** read the changed sentences below and look for vandalism or a summary rewritten wholesale. After merging, the site rebuilds itself, including the search index, so search uses the new text."
+            echo "Titles follow Wikipedia too: an event whose article was renamed gets the new title (and the new URL if the old one now redirects). Event ids do not change, so links keep working. Cases that are not a plain rename are listed below as held; this PR does not change them."
             echo
-            echo "Titles: \`data/title-refresh-report.md\` lists events whose title is no longer the current Wikipedia article title. They are NOT changed by this PR; after merging, review the report and run \`node scripts/merge-proposed.js --titles\` (dry run), then \`node scripts/merge-proposed.js --titles --apply\`."
+            echo "**Before merging:** read the title changes, the held cases and the changed sentences below. Look for vandalism or a summary rewritten wholesale. After merging, the site rebuilds itself, including the search index, so search uses the new titles and text."
             echo
             head -c 60000 "$RUNNER_TEMP/refresh-report.md"
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base main --head "$branch" \
-            --title "Refresh Wikipedia summaries (${day})" \
+            --title "Refresh Wikipedia summaries and titles (${day})" \
             --body-file "$RUNNER_TEMP/pr-body.md"
