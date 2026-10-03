@@ -15,6 +15,7 @@ import {
   loadFullLead,
   loadLand,
 } from "./lib/dataClient";
+import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
 import { rankEvents } from "./lib/ranking";
@@ -93,6 +94,17 @@ const RETRY_MS = 20000;
 const DEEP_LINK_PAD_YEARS = 5;
 
 const clampYear = (y) => Math.min(MAX_YEAR, Math.max(MIN_YEAR, y));
+
+// Map focus for an opened event: fly to its marker, or - for an event without
+// a precise location - fit the map to its shaded countries (MapView's
+// countryHighlight.js; it falls back to the capital pin when no country has a
+// shape that year). null = nothing to focus.
+function focusFor(ev, nonceRef) {
+  const c = eventCoords(ev);
+  const fitCountries = needsCountryShading(ev);
+  if (!c && !fitCountries) return null;
+  return { id: ev.id, lon: c?.lon, lat: c?.lat, fitCountries, countries: ev.countries, nonce: ++nonceRef.current };
+}
 
 export default function App() {
   // Initial state comes from the (validated) URL so links are shareable.
@@ -225,6 +237,21 @@ export default function App() {
 
   const selectedEventRaw = selectedEventId ? (storeRef.current.get(selectedEventId) ?? null) : null;
 
+  // While an event is open the map shows the borders of the event's own year
+  // (eventBorderYear: its start year), not the timeline's end year, unless the
+  // user chose "Use timeline year" for this event. The range is left alone.
+  const [timelineBordersFor, setTimelineBordersFor] = useState(null); // event id
+  const eventYear = selectedEventRaw ? eventBorderYear(selectedEventRaw, MIN_YEAR, MAX_YEAR) : null;
+  const borderYear = eventYear != null && timelineBordersFor !== selectedEventId ? eventYear : null;
+  const toggleEventYear = useCallback(
+    () => setTimelineBordersFor((id) => (id === selectedEventId ? null : selectedEventId)),
+    [selectedEventId]
+  );
+  // Countries shaded on the map: the hovered list row's, else the open event's,
+  // for events without a precise location only.
+  const hoverEvent = hoverId ? (storeRef.current.get(hoverId) ?? null) : null;
+  const highlightEvent = [hoverEvent, selectedEventRaw].find(needsCountryShading) ?? null;
+
   // Full leads are fetched lazily, only for the opened event (never for lists).
   // id -> {extract, extract_retrieved_at, framing_review} | "error"
   const [leads, setLeads] = useState({});
@@ -318,7 +345,6 @@ export default function App() {
     const ev = storeRef.current.get(selectedEventId);
     if (ev && pendingFocusRef.current === selectedEventId) {
       pendingFocusRef.current = null;
-      const c = eventCoords(ev);
       const [s] = eventYearRange(ev);
       const y = clampYear(s);
       setRange((r) =>
@@ -326,7 +352,8 @@ export default function App() {
           ? r
           : { start: clampYear(y - DEEP_LINK_PAD_YEARS), end: clampYear(y + DEEP_LINK_PAD_YEARS) }
       );
-      if (c) setFocus({ id: ev.id, lon: c.lon, lat: c.lat, nonce: ++focusNonceRef.current });
+      const f = focusFor(ev, focusNonceRef);
+      if (f) setFocus(f);
     }
     if (!ev && !triedRef.current.has(selectedEventId)) {
       triedRef.current.add(selectedEventId);
@@ -376,8 +403,8 @@ export default function App() {
       setNotFound(false);
       setSelectedEventId(id);
       const ev = storeRef.current.get(id);
-      const c = ev && eventCoords(ev);
-      if (c) setFocus({ id, lon: c.lon, lat: c.lat, nonce: ++focusNonceRef.current });
+      const f = ev && focusFor(ev, focusNonceRef);
+      if (f) setFocus(f);
     },
     [storeRef]
   );
@@ -437,6 +464,10 @@ export default function App() {
               matchIds={matchIds}
               eventsLoading={eventsLoading}
               year={endYear}
+              borderYear={borderYear}
+              eventYear={eventYear}
+              onToggleEventYear={toggleEventYear}
+              highlightEvent={highlightEvent}
               selectedEventId={selectedEventId}
               hoverId={hoverId}
               focus={focus}

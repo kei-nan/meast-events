@@ -3,6 +3,25 @@ import FramingReview, { FramingPointer } from "./FramingReview.jsx";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
+import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
+import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
+
+// What the map shades for an event without a precise location (see
+// countryHighlight.js): its listed countries, with the borders of its year.
+function ShadingNote({ event }) {
+  const year = eventBorderYear(event, MIN_YEAR, MAX_YEAR);
+  const { shaded, unshaded } = countryShading(event.countries, year);
+  if (!shaded.length) {
+    return <> None of its listed countries has a border shape for {year} in our data, so nothing is shaded.</>;
+  }
+  return (
+    <>
+      {" "}The shaded area on the map is the event&apos;s listed countries ({shaded.join(", ")}) as of {year}, not a
+      precise location.
+      {unshaded.length > 0 && <> Not shaded: {unshaded.join(", ")} (no matching border shape for {year}).</>}
+    </>
+  );
+}
 
 function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
@@ -143,12 +162,14 @@ export default function EventDetail({ event, onBack }) {
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its
           marker is placed at a national capital. It is left out of drawn-area searches.
+          <ShadingNote event={event} />
         </p>
       )}
       {quality === "none" && (
         <p className="event-detail-note">
           No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
           marker on the map and is left out of drawn-area searches.
+          <ShadingNote event={event} />
         </p>
       )}
       {event.wikipedia_url && (
