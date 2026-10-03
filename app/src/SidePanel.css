@@ -501,6 +501,15 @@ button.sp-chip[aria-pressed="true"] {
   display: none;
 }
 
+.event-detail .event-detail-wiki {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
 .event-detail-copied {
   font-size: 0.78rem;
   color: var(--accent-strong);
@@ -509,11 +518,11 @@ button.sp-chip[aria-pressed="true"] {
 .event-detail-category {
   display: inline-block;
   text-transform: uppercase;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--accent-strong);
-  margin-bottom: 8px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
 }
 
 .event-detail h2 {
@@ -541,6 +550,32 @@ button.sp-chip[aria-pressed="true"] {
 .event-detail-extract p {
   margin: 0 0 0.85em;
   max-width: 68ch;
+}
+
+.event-detail-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 0 4px;
+}
+
+.event-detail-more-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* A swatch in the highlight colour, so the note reads as a key, not a link. */
+.event-detail-more-note::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--fr-mark) 32%, transparent);
+  border: 1px solid var(--fr-mark);
 }
 
 .event-detail-classes,
@@ -775,12 +810,6 @@ button.sp-chip[aria-pressed="true"] {
 .event-detail a {
   color: var(--link);
   font-size: 0.85rem;
-}
-
-.event-detail > a {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 8px 0;
 }
 
 .event-detail-attribution {

@@ -6,6 +6,7 @@ import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import { categoryLabel } from "../lib/categoryLabels.js";
+import { formatEventDate } from "../lib/eventDate.js";
 
 // What the map shades for an event without a precise location (see
 // countryHighlight.js): its listed countries, with the borders of its year.
@@ -24,6 +25,9 @@ function ShadingNote({ event }) {
   );
 }
 
+// Paragraphs of the lead shown before "Show full text".
+const LEAD_PARAGRAPHS = 2;
+
 function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
 }
@@ -41,6 +45,10 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
   const [copied, setCopied] = useState(false);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
+  // The event whose full lead is open, so the next event starts collapsed.
+  const [expandedId, setExpandedId] = useState(null);
+  // Set when "Read the review" opened the text, to scroll to the review once it has grown.
+  const reviewAfterExpand = useRef(false);
 
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
@@ -52,24 +60,41 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
     return () => clearTimeout(t);
   }, [copied]);
 
-  const yearRange =
-    event.date_end && event.date_end.slice(0, 4) !== event.date_start.slice(0, 4)
-      ? `${event.date_start.slice(0, 4)}–${event.date_end.slice(0, 4)}`
-      : event.date_start.slice(0, 4);
-
   const quality =
     event.location_quality ??
     (event.coordinate_source?.startsWith("country-fallback") ? "approximate" : "precise");
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
+  // Shown only when they say more than the category does.
+  const showClasses = classes.some((c) => c.toLowerCase() !== (event.category ?? "").toLowerCase());
   const flags = (event.date_flags ?? []).filter(Boolean);
-  const paragraphs = (event.extract ?? "").split(/\n+/).filter((p) => p.trim());
+  // Unverified dates show only their years.
+  const dateText = formatEventDate(event.date_start, event.date_end, { yearOnly: flags.length > 0 });
   const review = event.framing_review;
+  // Each paragraph as plain and highlighted pieces. Paragraphs past the first
+  // LEAD_PARAGRAPHS are hidden or shown whole, never cut or rewritten.
+  const paragraphs = (event.extract ?? "")
+    .split(/\n+/)
+    .filter((p) => p.trim())
+    .map((p) => markSegments(p, review?.highlights));
+  const clamps = paragraphs.length > LEAD_PARAGRAPHS;
+  const expanded = expandedId === event.id;
+  const hiddenFlagged = clamps && paragraphs.slice(LEAD_PARAGRAPHS).some((segs) => segs.some((s) => s.flagged));
   const reviewTab = chosenTab?.id === event.id ? chosenTab.tab : defaultReviewTab(review);
   const openTab = (tab) => setChosenTab({ id: event.id, tab });
   // A highlight opens the tab of the review that flagged it (the fairness tab if both did).
   const showFinding = (kinds) => {
     openTab(REVIEW_TABS.find((t) => kinds.includes(t)) ?? reviewTab);
     showReview();
+  };
+  useEffect(() => {
+    if (!expanded || !reviewAfterExpand.current) return;
+    reviewAfterExpand.current = false;
+    showReview();
+  }, [expanded]);
+  const openForReview = () => {
+    if (expanded) return;
+    reviewAfterExpand.current = true;
+    setExpandedId(event.id);
   };
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
 
@@ -81,6 +106,34 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
       window.prompt("Copy this link", window.location.href);
     }
   }
+
+  const renderParagraph = (segs, i) => (
+    <p key={i}>
+      {segs.map((s, j) =>
+        s.flagged ? (
+          <mark
+            key={j}
+            className={`framing-mark ${s.kinds.map((k) => `framing-mark--${k}`).join(" ")}`}
+            tabIndex={0}
+            role="button"
+            title="Flagged by our framing review. Select to read why."
+            onClick={() => showFinding(s.kinds)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                showFinding(s.kinds);
+              }
+            }}
+            aria-label={`Flagged by the ${s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ")}: ${s.text}`}
+          >
+            {s.text}
+          </mark>
+        ) : (
+          s.text
+        )
+      )}
+    </p>
+  );
 
   return (
     <article className="event-detail" aria-labelledby="event-detail-title">
@@ -96,6 +149,13 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
         <button type="button" className="sp-btn" onClick={copyLink}>
           Copy link
         </button>
+        {event.wikipedia_url && (
+          <a className="sp-btn event-detail-wiki" href={event.wikipedia_url} target="_blank" rel="noreferrer">
+            {/* "Read on" is for screen readers only, to keep the action row short. */}
+            <span className="sp-sr-status">Read on </span>Wikipedia <span aria-hidden="true">↗</span>
+            <span className="sp-sr-status"> (opens in a new tab)</span>
+          </a>
+        )}
         <span className="sp-sr-status" role="status">
           {copied ? "Link copied" : ""}
         </span>
@@ -108,9 +168,9 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
         {event.title}
       </h2>
       <p className="event-detail-meta">
-        {yearRange} · {(event.countries ?? []).join(", ")}
+        {dateText} · {(event.countries ?? []).join(", ")}
       </p>
-      {classes.length > 0 && (
+      {showClasses && (
         <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>
       )}
       {flags.length > 0 && (
@@ -118,40 +178,40 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
           Date unverified: {flags.join("; ")}. Dates are shown as Wikidata gives them.
         </p>
       )}
-      <FramingPointer review={event.framing_review} />
+      {/* Going to the review opens the full text, so every highlight it refers to is on the page. */}
+      <div onClickCapture={hiddenFlagged ? openForReview : undefined}>
+        <FramingPointer review={event.framing_review} />
+      </div>
       <div className="event-detail-extract">
         {paragraphs.length ? (
-          paragraphs.map((p, i) => (
-            <p key={i}>
-              {markSegments(p, review?.highlights).map((s, j) =>
-                s.flagged ? (
-                  <mark
-                    key={j}
-                    className={`framing-mark ${s.kinds.map((k) => `framing-mark--${k}`).join(" ")}`}
-                    tabIndex={0}
-                    role="button"
-                    title="Flagged by our framing review. Select to read why."
-                    onClick={() => showFinding(s.kinds)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        showFinding(s.kinds);
-                      }
-                    }}
-                    aria-label={`Flagged by the ${s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ")}: ${s.text}`}
-                  >
-                    {s.text}
-                  </mark>
-                ) : (
-                  s.text
-                )
-              )}
-            </p>
-          ))
+          <>
+            {paragraphs.slice(0, LEAD_PARAGRAPHS).map(renderParagraph)}
+            {clamps && (
+              <div id="event-detail-more" hidden={!expanded}>
+                {paragraphs.slice(LEAD_PARAGRAPHS).map((segs, i) => renderParagraph(segs, i + LEAD_PARAGRAPHS))}
+              </div>
+            )}
+          </>
         ) : (
           <p>No summary available.</p>
         )}
       </div>
+      {clamps && (
+        <div className="event-detail-more">
+          <button
+            type="button"
+            className="sp-btn"
+            aria-expanded={expanded}
+            aria-controls="event-detail-more"
+            onClick={() => setExpandedId(expanded ? null : event.id)}
+          >
+            {expanded ? "Show less" : "Show full text"}
+          </button>
+          {hiddenFlagged && !expanded && (
+            <span className="event-detail-more-note">Includes highlighted wording</span>
+          )}
+        </div>
+      )}
       {event.leadStatus === "loading" && (
         <p className="event-detail-note" role="status">
           Loading the full text…
@@ -180,11 +240,6 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
           <ShadingNote event={event} />
         </p>
       )}
-      {event.wikipedia_url && (
-        <a href={event.wikipedia_url} target="_blank" rel="noreferrer">
-          Read more on Wikipedia →
-        </a>
-      )}
       <p className="event-detail-attribution">
         Text from Wikipedia, licensed{" "}
         <a
@@ -205,7 +260,7 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
         ) : (
           " by Wikipedia contributors"
         )}
-        . Classes are Wikidata&apos;s labels (CC0).
+        .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
       </p>
     </article>
   );
