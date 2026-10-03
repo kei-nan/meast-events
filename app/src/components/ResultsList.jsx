@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { eventYears, highlight, inRange } from "./resultsUtil.jsx";
+import { categoryLabel } from "../lib/categoryLabels.js";
+import { startedBefore } from "../lib/browseOrder.js";
 
 const PAGE = 50;
 
@@ -9,7 +11,9 @@ function yearLabel(e) {
 }
 
 /**
- * Results as a list of buttons. Arrow keys move between rows (roving tabindex);
+ * Results as a list of buttons. With `browse` (the idle list, ordered by
+ * lib/browseOrder.js) events that began before the selected years follow a
+ * subheading and carry an "ongoing since" tag. Arrow keys move between rows (roving tabindex);
  * ArrowUp on the first row and Escape return to `onFocusInput`.
  * Remount (change `key`) to reset pagination when the result set changes.
  */
@@ -22,6 +26,7 @@ export default function ResultsList({
   onHover,
   onFocusInput,
   busy,
+  browse = false,
 }) {
   const [shown, setShown] = useState(PAGE);
   const [active, setActive] = useState(0);
@@ -59,40 +64,50 @@ export default function ResultsList({
       <ul className="sp-list" onKeyDown={onKeyDown} aria-busy={busy || undefined}>
         {visible.map((ev, idx) => {
           const outside = !inRange(ev, range);
+          const ongoing = browse && range && startedBefore(ev, range[0]);
+          const firstOngoing = ongoing && (idx === 0 || !startedBefore(visible[idx - 1], range[0]));
           return (
-            <li key={ev.id}>
-              <button
-                type="button"
-                className={"sp-row" + (ev.id === selectedId ? " sp-row--selected" : "")}
-                data-id={ev.id}
-                tabIndex={idx === active ? 0 : -1}
-                onFocus={() => setActive(idx)}
-                onClick={() => onSelect?.(ev.id)}
-                onMouseEnter={() => onHover?.(ev.id)}
-                onMouseLeave={() => onHover?.(null)}
-              >
-                <span className="sp-row-title">{highlight(ev.title, query)}</span>
-                <span className="sp-row-meta">
-                  {yearLabel(ev)}
-                  {ev.countries?.length ? ` · ${ev.countries.join(", ")}` : ""}
-                  {ev.category ? ` · ${ev.category}` : ""}
-                </span>
-                {ev.snippet && (
-                  <span className="sp-row-snippet">{highlight(ev.snippet, query)}</span>
-                )}
-                {(outside || ev.location_quality === "approximate" || ev.location_quality === "none") && (
-                  <span className="sp-tags">
-                    {outside && <span className="sp-tag">outside selected years</span>}
-                    {ev.location_quality === "none" && (
-                      <span className="sp-tag sp-tag--nomap">No map location</span>
-                    )}
-                    {ev.location_quality === "approximate" && (
-                      <span className="sp-tag">approximate location</span>
-                    )}
+            <Fragment key={ev.id}>
+              {firstOngoing && (
+                <li className="sp-list-heading">
+                  Ongoing, started before {range[0]}
+                </li>
+              )}
+              <li>
+                <button
+                  type="button"
+                  className={"sp-row" + (ev.id === selectedId ? " sp-row--selected" : "")}
+                  data-id={ev.id}
+                  tabIndex={idx === active ? 0 : -1}
+                  onFocus={() => setActive(idx)}
+                  onClick={() => onSelect?.(ev.id)}
+                  onMouseEnter={() => onHover?.(ev.id)}
+                  onMouseLeave={() => onHover?.(null)}
+                >
+                  <span className="sp-row-title">{highlight(ev.title, query)}</span>
+                  <span className="sp-row-meta">
+                    {yearLabel(ev)}
+                    {ev.countries?.length ? ` · ${ev.countries.join(", ")}` : ""}
+                    {ev.category ? ` · ${categoryLabel(ev.category)}` : ""}
                   </span>
-                )}
-              </button>
-            </li>
+                  {ev.snippet && (
+                    <span className="sp-row-snippet">{highlight(ev.snippet, query)}</span>
+                  )}
+                  {(outside || ongoing || ev.location_quality === "approximate" || ev.location_quality === "none") && (
+                    <span className="sp-tags">
+                      {outside && <span className="sp-tag">outside selected years</span>}
+                      {ongoing && <span className="sp-tag">ongoing since {eventYears(ev)[0]}</span>}
+                      {ev.location_quality === "none" && (
+                        <span className="sp-tag sp-tag--nomap">No map location</span>
+                      )}
+                      {ev.location_quality === "approximate" && (
+                        <span className="sp-tag">approximate location</span>
+                      )}
+                    </span>
+                  )}
+                </button>
+              </li>
+            </Fragment>
           );
         })}
       </ul>

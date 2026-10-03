@@ -385,6 +385,17 @@ button.sp-chip[aria-pressed="true"] {
   border-top: 1px solid var(--border-soft);
 }
 
+/* "Ongoing, started before <year>" between the two browse-list groups. */
+.sp-list li.sp-list-heading {
+  padding: 14px 8px 6px 11px; /* aligned with .sp-row text */
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+}
+
 .sp-row {
   display: block;
   width: 100%;
@@ -483,6 +494,11 @@ button.sp-chip[aria-pressed="true"] {
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
+}
+
+/* Mobile only: the sheet covers the map, so this collapses it. */
+.event-detail-showmap {
+  display: none;
 }
 
 .event-detail-copied {
@@ -859,6 +875,11 @@ button.sp-chip[aria-pressed="true"] {
 
   .side-panel[data-sheet="peek"] .sp-label {
     display: none;
+  }
+
+  .event-detail-showmap {
+    display: inline-flex;
+    align-items: center;
   }
 
   .sp-seg-btn,

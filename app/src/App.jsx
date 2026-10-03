@@ -17,7 +17,7 @@ import {
 } from "./lib/dataClient";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
-import { rankEvents } from "./lib/ranking";
+import { orderBrowseList } from "./lib/browseOrder";
 import { parseUrlState } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
@@ -89,6 +89,8 @@ function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
   };
 }
 
+const SITE_TITLE = "Middle East, 1900–present"; // as in index.html
+const BOUNDARY_CORRECTIONS_URL = "https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js";
 const RETRY_MS = 20000;
 const DEEP_LINK_PAD_YEARS = 5;
 
@@ -271,13 +273,14 @@ export default function App() {
     return new Set(scopedResults.map((e) => e.id));
   }, [search.status, scopedResults]);
 
-  // What the panel lists: idle => the chronological browse list for the
-  // selected years (capped for rendering; `total` stays exact); otherwise the
-  // ranked search results in the chosen scope.
+  // What the panel lists: idle => the browse list for the selected years
+  // (events starting in them first, then ones ongoing from earlier; see
+  // lib/browseOrder.js; capped for rendering, `total` stays exact); otherwise
+  // the ranked search results in the chosen scope.
   const BROWSE_CAP = 500;
   const browseList = useMemo(
-    () => (search.status === "idle" ? inViewFilter(rankEvents(visibleEvents, "")) : null),
-    [search.status, inViewFilter, visibleEvents]
+    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear)) : null),
+    [search.status, inViewFilter, visibleEvents, startYear]
   );
   const panelResults = browseList ? browseList.slice(0, BROWSE_CAP) : scopedResults;
   const panelTotal = browseList
@@ -382,6 +385,20 @@ export default function App() {
     [storeRef]
   );
 
+  // The tab title names the open event (and is restored when it closes).
+  // Link previews still show the site title: crawlers do not run this script,
+  // so per-event previews would need a server-side function.
+  const selectedTitle = selectedEventRaw?.title;
+  const selectedYears = selectedEventRaw ? eventYearRange(selectedEventRaw) : null;
+  const selectedYearText = selectedYears
+    ? selectedYears[1] !== selectedYears[0]
+      ? `${selectedYears[0]}–${selectedYears[1]}`
+      : `${selectedYears[0]}`
+    : "";
+  useEffect(() => {
+    document.title = selectedTitle ? `${selectedTitle} (${selectedYearText}) – ${SITE_TITLE}` : SITE_TITLE;
+  }, [selectedTitle, selectedYearText]);
+
   return (
     <div className="app">
       <a
@@ -398,7 +415,7 @@ export default function App() {
         Skip to search
       </a>
       <header className="app-header">
-        <h1>Middle East, 1900–present</h1>
+        <h1>{SITE_TITLE}</h1>
         <p>A map and timeline of major regional events, sourced from Wikipedia.</p>
         <div className="app-search">
           {viewportEventCount !== null && (
@@ -493,23 +510,19 @@ export default function App() {
           About the data
         </button>
         {" · "}
-        Event summaries from Wikipedia (CC BY-SA 4.0). Borders adapted from{" "}
+        Text:{" "}
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">
+          Wikipedia (CC BY-SA 4.0)
+        </a>
+        {" · "}
+        Borders:{" "}
         <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
           CShapes 2.0
         </a>{" "}
-        (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0) — non-commercial use only —{" "}
-        <strong>with corrections and additions by this project</strong>; every changed
-        or added shape cites its own source (
-        <a
-          href="https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js"
-          target="_blank"
-          rel="noreferrer"
-        >
-          see the corrections list
+        (ETH Zurich, CC BY-NC-SA 4.0), non-commercial use only, with{" "}
+        <a href={BOUNDARY_CORRECTIONS_URL} target="_blank" rel="noreferrer">
+          our cited corrections
         </a>
-        ).
-        Dashed borders mark territory under a mandate, occupation, unrecognized
-        annexation, or a since-resolved sovereignty dispute.
       </footer>
     </div>
   );
