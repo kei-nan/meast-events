@@ -278,8 +278,6 @@ export default function App() {
     if (!raw) return raw;
     const lead = leads[raw.id];
     const full = lead && lead !== "error" ? lead : null;
-    // A record that already carries its text (API) only takes the review from the lead file.
-    if (raw.extract !== undefined) return full ? { ...raw, framing_review: full.framing_review ?? null } : raw;
     if (full) return { ...raw, ...full };
     // Until the full lead arrives (or if it cannot be fetched) show the snippet, flagged as partial.
     return { ...raw, extract: raw.snippet ?? "", leadStatus: lead === "error" ? "error" : "loading" };
