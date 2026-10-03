@@ -4,9 +4,9 @@ An interactive map and timeline of the Middle East, 1900 to the present:
 events from Wikipedia and historically dated borders, with the source and
 status of every border shown honestly.
 
-Structure: `app/` (React + MapLibre frontend), `worker/` (Cloudflare Worker
-API), `server/` (Express version of the same API), `scripts/` and `data/`
-(ingestion and the cited border-corrections pipeline). See DEPLOYMENT.md.
+Structure: `app/` (React + MapLibre frontend, a fully static site with
+in-browser full-text search), `scripts/` and `data/` (ingestion and the cited
+border-corrections pipeline). See DEPLOYMENT.md.
 
 ## Licenses
 

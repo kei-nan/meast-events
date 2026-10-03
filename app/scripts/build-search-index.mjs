@@ -34,7 +34,7 @@ async function main() {
   if (!index) throw new Error(`pagefind: ${errors.join("; ")}`);
   for (const e of events) {
     // The title is part of the content so it is searchable like the lead
-    // (the API searched title|extract). Ranking is done by the app.
+    // (as the old search API did: title|extract). Ranking is done by the app.
     const res = await index.addCustomRecord({
       url: `/?e=${encodeURIComponent(e.id)}`,
       content: `${e.title}\n\n${e.extract ?? ""}`,

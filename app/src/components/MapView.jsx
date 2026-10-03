@@ -781,8 +781,8 @@ export default function MapView({
   };
 
   // Reports the settled viewport ([west, south, east, north]) after each
-  // pan/zoom so the parent can count events in view (server bbox query, or
-  // client-side when the API is unavailable).
+  // pan/zoom so the parent can count events in view (computed client-side
+  // from the static event store).
   const hasViewportCb = !!(onViewportChange ?? onViewportBounds);
   const viewportCb = onViewportChange ?? onViewportBounds;
   useEffect(() => {

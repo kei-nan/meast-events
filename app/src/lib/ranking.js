@@ -1,6 +1,7 @@
 // Text normalisation, static-search matching and result ranking. Pure.
 //
-// Static (offline) matching mirrors the API's semantics: the query is split
+// Local (title + summary) matching, used for instant results and when the
+// full-text index cannot be loaded: the query is split
 // into tokens (case- and diacritic-insensitive); every token must occur as a
 // whole word in title+extract, except the LAST token which is prefix-matched
 // when it has >= 2 characters.

@@ -37,7 +37,7 @@ rather than a second layer of ours. Concretely:
 
 Fetched with the MediaWiki API (`action=query&prop=extracts&exintro=1&explaintext=1&redirects=1`), i.e. all paragraphs of the lead as plain
 text. Only whitespace is normalised (no-break spaces to plain spaces, runs of spaces collapsed, paragraphs separated by one blank line).
-`snippet` (API/UI) is the first 160 characters of it. Length before and after the change for the 394 curated events: median 435 -> 1,207
+`snippet` (lite data/UI) is the first 160 characters of it. Length before and after the change for the 394 curated events: median 435 -> 1,207
 characters, mean 476 -> 1,494, max 1,487 -> 5,481; 327 got longer, 66 were already the whole lead, 1 got shorter (Wikipedia rewrote the lead of the
 Battle of Elli in between). The earlier text was mostly the first paragraph only. `extract_retrieved_at` says when the text was fetched, so it can be shown as "as of".
 

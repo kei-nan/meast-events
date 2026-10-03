@@ -1,7 +1,7 @@
 {
   // The frontend, deployed as a static-assets Worker by Cloudflare Workers
   // Builds (Path: app, build: npm run build, deploy: npx wrangler deploy).
-  // The API is a separate Worker, see ../worker/wrangler.jsonc.
+  // The whole site is static (data and search index are built files).
   // Branches other than main run `npx wrangler preview`, which needs the
   // `previews` block; empty because the site has no bindings or secrets.
   "name": "meast-events",
