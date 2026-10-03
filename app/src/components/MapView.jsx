@@ -31,6 +31,7 @@ import useMediaQuery from "../hooks/useMediaQuery";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "./useMapHoverLabel";
 import { LIST_MAX, allSameCoordinates, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
+import useCountryHighlight from "./countryHighlight";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels";
 import {
@@ -125,7 +126,11 @@ async function withRetry(fn, onFirstFail) {
 
 export default function MapView({
   events,
-  year,
+  year: timelineYear,
+  borderYear = null, // an opened event's year: shown instead of the timeline year (App.jsx)
+  eventYear = null, // the opened event's year, for the "Use event year" button
+  onToggleEventYear,
+  highlightEvent = null, // event whose listed countries are shaded (countryHighlight.js)
   matchIds = null,
   selectedEventId,
   hoverId,
@@ -139,6 +144,7 @@ export default function MapView({
   onSelectEvent,
   eventsLoading = false,
 }) {
+  const year = borderYear ?? timelineYear;
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const eventsRef = useRef(events);
@@ -727,6 +733,12 @@ export default function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [year, boundaryVersion]);
   const shownBorderYear = decadeCached ? year : displayedYear;
+  const yearFeatures = useMemo(
+    () => boundaryCacheRef.current.get(decadeFloor(year)) ?? null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [year, boundaryVersion]
+  );
+  useCountryHighlight({ mapRef, mapReady, event: highlightEvent, year, features: yearFeatures, focus });
   const relevantError =
     borderError && (borderError.decade === "land" || borderError.decade === decadeFloor(year))
       ? borderError.phase
@@ -801,7 +813,7 @@ export default function MapView({
   useEffect(() => {
     if (!mapReady) return;
     let ev = selectedEventId ? events.find((e) => e.id === selectedEventId) : null;
-    if (!ev && selectedEventId && focus && focus.id === selectedEventId) {
+    if (!ev && selectedEventId && focus && focus.id === selectedEventId && focus.lon != null) {
       ev = { id: focus.id, coordinates: { lon: focus.lon, lat: focus.lat } };
     }
     mapRef.current.getSource("selected")?.setData(pointFeature(ev));
@@ -815,7 +827,7 @@ export default function MapView({
 
   // Fly to a focused event. `nonce` lets the caller re-focus the same event.
   useEffect(() => {
-    if (!mapReady || !focus) return;
+    if (!mapReady || !focus || focus.fitCountries) return; // fitCountries: useCountryHighlight
     const map = mapRef.current;
     const ev = eventsRef.current.find((e) => e.id === focus.id);
     const minZoom = ev?.location_quality === "approximate" ? 5 : 6;
@@ -1021,10 +1033,16 @@ export default function MapView({
       </div>
       <div className="mu-ctrl-right">
         {shownBorderYear != null && (
-          <div className="mu-badge" aria-label={`Borders as of ${shownBorderYear}`}>
+          <div className="mu-badge">
             Borders as of {shownBorderYear}
+            {borderYear != null && decadeCached && <span className="mu-badge-sub"> (event year)</span>}
             {!decadeCached && <span className="mu-badge-sub"> (updating to {year})</span>}
           </div>
+        )}
+        {eventYear != null && eventYear !== timelineYear && (
+          <button type="button" className="mu-btn mu-btn-small" onClick={onToggleEventYear}>
+            {borderYear != null ? `Use timeline year (${timelineYear})` : `Use event year (${eventYear})`}
+          </button>
         )}
         <BordersList year={year} items={yearBorders} />
         <MapNotices
