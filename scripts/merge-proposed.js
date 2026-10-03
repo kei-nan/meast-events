@@ -6,75 +6,20 @@
 //                                                  leave out proposed events that carry a possible_duplicates hint
 //                                                  (by default they are merged with the hint kept as a review note)
 //
-//   node scripts/merge-proposed.js --titles        DRY RUN of the title refresh: lists the title/URL changes from
-//                                                  data/title-changes.proposed.json (written by refresh-extracts.js --propose-titles)
-//   node scripts/merge-proposed.js --titles --apply
-//                                                  writes ONLY those title/wikipedia_url changes (no events are added)
-//
 // Nothing is rewritten: proposed events are appended exactly as proposed; curated events are untouched.
 // Proposed events whose id or wikidata_qid already exists in the curated file are skipped and listed.
-// With --titles only `title`, `wikipedia_url` and the then-moot `title_differs_from_article` flag change, ids never;
-// a proposal is skipped if the event no longer has the old title/URL (see lib/title-refresh.js).
 import { readFile, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import { validateEvents, findClashes } from "./lib/validate.js";
-import { applyTitleChanges } from "./lib/title-refresh.js";
 
 const APPLY = process.argv.includes("--apply");
 const SKIP_DUP = process.argv.includes("--skip-duplicate-hints");
-const TITLES = process.argv.includes("--titles");
 
 const curatedUrl = new URL("../data/events.json", import.meta.url);
 const proposedUrl = new URL("../data/events.proposed.json", import.meta.url);
-const titleChangesUrl = new URL("../data/title-changes.proposed.json", import.meta.url);
 
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
 
 const curated = await read(curatedUrl);
-
-if (TITLES) {
-  if (!existsSync(titleChangesUrl)) {
-    console.error("No data/title-changes.proposed.json - run node scripts/refresh-extracts.js --propose-titles first.");
-    process.exit(1);
-  }
-  const { changes, generated_on } = await read(titleChangesUrl);
-  const files = [
-    ["curated", curatedUrl, curated],
-    ...(existsSync(proposedUrl) ? [["proposed", proposedUrl, await read(proposedUrl)]] : []),
-  ];
-  console.log(`${APPLY ? "APPLY" : "DRY RUN"} - title refresh from data/title-changes.proposed.json (generated ${generated_on})`);
-  console.log(`  held (never applied, see data/title-refresh-report.md): ${changes.filter((c) => c.hold).length}`);
-  const writes = [];
-  for (const [name, url, events] of files) {
-    const mine = changes.filter((c) => (c.file ?? "curated") === name);
-    if (!mine.length) continue;
-    const r = applyTitleChanges(events, mine);
-    const v = validateEvents(events, { name, lenient: name === "curated" });
-    if (v.errors.length) {
-      console.error(`${name} would be invalid after the title changes (${v.errors.length}); refusing:`);
-      for (const e of v.errors.slice(0, 20)) console.error("  " + e);
-      process.exit(1);
-    }
-    console.log(`\n  ${name}: ${r.applied.length} to change, ${r.already.length} already current, ${r.stale.length} skipped (event edited since), ${r.unknown.length} unknown id`);
-    const byId = new Map(mine.map((c) => [c.id, c]));
-    for (const id of r.applied) {
-      const c = byId.get(id);
-      console.log(`      ${id}: "${c.old_title}" -> "${c.new_title}"${c.url_update ? `  [${c.old_url} -> ${c.new_url}]` : ""}`);
-    }
-    for (const id of r.stale) console.log(`      skipped ${id}: title/URL differ from the proposal's old values`);
-    if (r.applied.length) writes.push([name, url, events]);
-  }
-  if (!APPLY) {
-    console.log(`\nDry run only - nothing was written. Re-run with --titles --apply to write it.`);
-  } else {
-    for (const [name, url, events] of writes) {
-      await writeFile(url, JSON.stringify(events, null, 2) + "\n");
-      console.log(`Wrote ${name === "curated" ? "data/events.json" : "data/events.proposed.json"}.`);
-    }
-    if (!writes.length) console.log("\nNothing to write.");
-  }
-  process.exit(0);
-}
 const exclusionsUrl = new URL("../data/proposed-exclusions.json", import.meta.url);
 const exclusions = await read(exclusionsUrl).catch(() => []);
 const excludedIds = new Set(exclusions.map((x) => x.id));
