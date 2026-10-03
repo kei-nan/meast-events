@@ -13,6 +13,36 @@ function describeArea(area) {
   return "Area: rectangle";
 }
 
+/**
+ * The removable area chip, or a short note while an area is being drawn.
+ * Renders nothing otherwise (the draw tools live on the map).
+ */
+export function AreaTag({ area, areaMode, onAreaChange, onRemoved }) {
+  const label = describeArea(area);
+  if (label) {
+    return (
+      <span className="sp-chip sp-chip--area">
+        <span>{label}</span>
+        <button
+          type="button"
+          className="sp-chip-x"
+          aria-label={`Remove ${label.toLowerCase()}`}
+          onClick={() => {
+            onAreaChange?.(null);
+            onRemoved?.();
+          }}
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </span>
+    );
+  }
+  if (areaMode && areaMode !== "off") {
+    return <span className="sp-muted sp-area-hint">Drawing an area on the map…</span>;
+  }
+  return null;
+}
+
 export default function AreaChip({
   area,
   areaMode,
@@ -21,30 +51,13 @@ export default function AreaChip({
   onInViewChange,
   viewCount,
 }) {
-  const label = describeArea(area);
   return (
     <div className="sp-area">
-      <div className="sp-area-row">
-        {label ? (
-          <span className="sp-chip sp-chip--area">
-            <span>{label}</span>
-            <button
-              type="button"
-              className="sp-chip-x"
-              aria-label={`Remove ${label.toLowerCase()}`}
-              onClick={() => onAreaChange?.(null)}
-            >
-              <span aria-hidden="true">×</span>
-            </button>
-          </span>
-        ) : (
-          <span className="sp-muted sp-area-hint">
-            {areaMode === "off"
-              ? "No area selected. Use the draw buttons on the map to search an area."
-              : "Drawing an area on the map…"}
-          </span>
-        )}
-      </div>
+      {(area || (areaMode && areaMode !== "off")) && (
+        <div className="sp-area-row">
+          <AreaTag area={area} areaMode={areaMode} onAreaChange={onAreaChange} />
+        </div>
+      )}
       <label className="sp-check">
         <input
           type="checkbox"

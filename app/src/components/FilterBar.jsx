@@ -4,12 +4,17 @@ import { categoryLabel } from "../lib/categoryLabels";
 
 const DEFAULT_CATEGORIES = Object.keys(COLORS);
 
-/** Category chips (colour dot + always a text label), country select, scope toggle. */
+/**
+ * Category chips (colour dot + always a text label; alphabetical by id, kept on
+ * purpose for neutrality), country select, and the scope toggle, which only
+ * matters while something is being searched (`showScope`).
+ */
 export default function FilterBar({
   filters,
   onFiltersChange,
   categoryOptions,
   countryOptions,
+  showScope = true,
 }) {
   const cats = filters.categories ?? [];
   const countries = filters.countries ?? [];
@@ -65,24 +70,26 @@ export default function FilterBar({
             </select>
           </label>
         )}
-        <div className="sp-seg" role="group" aria-label="Search scope">
-          <button
-            type="button"
-            className="sp-seg-btn"
-            aria-pressed={filters.scope !== "range"}
-            onClick={() => onFiltersChange({ ...filters, scope: "all" })}
-          >
-            Whole timeline
-          </button>
-          <button
-            type="button"
-            className="sp-seg-btn"
-            aria-pressed={filters.scope === "range"}
-            onClick={() => onFiltersChange({ ...filters, scope: "range" })}
-          >
-            Only selected years
-          </button>
-        </div>
+        {showScope && (
+          <div className="sp-seg" role="group" aria-label="Search scope">
+            <button
+              type="button"
+              className="sp-seg-btn"
+              aria-pressed={filters.scope !== "range"}
+              onClick={() => onFiltersChange({ ...filters, scope: "all" })}
+            >
+              Whole timeline
+            </button>
+            <button
+              type="button"
+              className="sp-seg-btn"
+              aria-pressed={filters.scope === "range"}
+              onClick={() => onFiltersChange({ ...filters, scope: "range" })}
+            >
+              Only selected years
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

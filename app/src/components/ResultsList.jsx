@@ -95,13 +95,13 @@ export default function ResultsList({
                   )}
                   {(outside || ongoing || ev.location_quality === "approximate" || ev.location_quality === "none") && (
                     <span className="sp-tags">
-                      {outside && <span className="sp-tag">outside selected years</span>}
-                      {ongoing && <span className="sp-tag">ongoing since {eventYears(ev)[0]}</span>}
+                      {outside && <span className="sp-tag">Outside selected years</span>}
+                      {ongoing && <span className="sp-tag">Ongoing since {eventYears(ev)[0]}</span>}
                       {ev.location_quality === "none" && (
                         <span className="sp-tag sp-tag--nomap">No map location</span>
                       )}
                       {ev.location_quality === "approximate" && (
-                        <span className="sp-tag">approximate location</span>
+                        <span className="sp-tag">Approximate location</span>
                       )}
                     </span>
                   )}
