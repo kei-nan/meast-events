@@ -149,11 +149,95 @@
   background: rgba(201, 154, 69, 0.1);
 }
 
+/* ---------- Filters disclosure ---------- */
+
+/* One row under the search box: Filters button + status / result count. */
+.sp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sp-filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  min-height: 32px;
+  padding: 4px 10px;
+  background: none;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sp-filters-toggle:hover {
+  border-color: var(--accent);
+}
+
+.sp-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: transform 0.15s;
+}
+
+.sp-filters-toggle[aria-expanded="true"] .sp-caret {
+  transform: rotate(180deg);
+}
+
+/* Active filters as removable chips while the disclosure is closed. */
+.sp-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.sp-chip--active {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  padding-right: 2px;
+}
+
+.sp-clear-all {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  min-height: 30px;
+  padding: 3px 6px;
+  background: none;
+  border: 0;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sp-clear-all:hover {
+  color: var(--text-primary);
+}
+
+.sp-filterpanel {
+  margin-top: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
 /* ---------- Area + filters ---------- */
 
 .sp-area,
 .sp-filters {
-  margin-top: 12px;
+  margin-top: 10px;
+}
+
+.sp-area-row + .sp-check {
+  margin-top: 8px;
 }
 
 .sp-area-row,
@@ -168,7 +252,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
   min-height: 32px;
   font-size: 0.82rem;
   color: var(--text-secondary);
@@ -303,9 +386,8 @@ button.sp-chip[aria-pressed="true"] {
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 1px solid rgba(236, 226, 201, 0.35);
-  /* keeps near-black category colours (atrocity) visible on the dark panel */
-  box-shadow: 0 0 0 1px rgba(236, 226, 201, 0.25);
+  /* light hairline ring: keeps near-black category colours (atrocity) visible on the dark panel */
+  box-shadow: 0 0 0 1px rgba(236, 226, 201, 0.5);
 }
 
 .sp-select {
@@ -347,15 +429,16 @@ button.sp-chip[aria-pressed="true"] {
 /* ---------- Status + results ---------- */
 
 .sp-status {
-  margin: 14px 0 6px;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
   font-size: 0.82rem;
   color: var(--text-secondary);
 }
 
-.sp-idle-hint {
-  margin: 0 0 6px;
-  font-size: 0.82rem;
-  color: var(--text-secondary);
+.sp-results,
+.sp-empty {
+  margin-top: 8px;
 }
 
 .sp-empty {
@@ -802,10 +885,12 @@ button.sp-chip[aria-pressed="true"] {
     min-height: 100dvh;
   }
 
+  /* Takes whatever the header, timeline and footer leave, but never less than
+     62dvh, so the map keeps a usable size on short screens. */
   .app-body {
-    flex: none;
-    height: 62dvh;
-    min-height: 420px;
+    flex: 1 0 auto;
+    height: auto;
+    min-height: max(420px, 62dvh);
     flex-direction: column;
   }
 
@@ -831,9 +916,10 @@ button.sp-chip[aria-pressed="true"] {
     height: auto;
   }
 
+  /* Stays inside .app-body (not fixed to the viewport) so the timeline below
+     remains visible and usable; at least 120px of map stays visible above. */
   .side-panel[data-sheet="full"] {
-    position: fixed;
-    height: 84dvh;
+    height: min(60dvh, calc(100% - 120px));
   }
 
   .sp-sheet-toggle {
@@ -885,6 +971,8 @@ button.sp-chip[aria-pressed="true"] {
   .sp-seg-btn,
   .sp-chip,
   .sp-btn,
+  .sp-filters-toggle,
+  .sp-clear-all,
   .sp-select select {
     min-height: 44px;
   }

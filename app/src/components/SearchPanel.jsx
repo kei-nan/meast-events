@@ -1,8 +1,10 @@
 import { useEffect, useId, useRef, useState } from "react";
-import AreaChip from "./AreaChip.jsx";
+import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
 import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
+import { categoryLabel } from "../lib/categoryLabels";
+import { CATEGORY_COLORS } from "./mapLayers";
 import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
 import "../SidePanel.css";
@@ -10,7 +12,7 @@ import "../SidePanel.css";
 /**
  * Right-hand side panel (bottom sheet on mobile): search, area, filters, status,
  * results and the selected-event detail. Fully controlled; owns only UI state
- * (mobile sheet position, focus management).
+ * (mobile sheet position, filters disclosure, focus management).
  *
  * @typedef {{categories: string[], countries: string[], scope: "all"|"range", inView: boolean}} Filters
  * @typedef {{type:"rect"|"circle", bbox:number[], center?:number[], radiusKm?:number}} Area
@@ -68,12 +70,16 @@ export default function SearchPanel({
 }) {
   const inputId = useId();
   const hintId = useId();
+  const filtersId = useId();
+  const filtersBtnRef = useRef(null);
   const inputRef = useRef(null);
   const toggleRef = useRef(null);
   const listWrapRef = useRef(null);
   const lastSelectedRef = useRef(null);
   const hadSelectionRef = useRef(false);
   const [sheet, setSheet] = useState(query || selectedEvent ? "full" : "peek");
+  // Filters sit behind a disclosure so results start near the top of the panel.
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Selecting an event (from a row or the map) opens the sheet on mobile.
   const selectedId = selectedEvent?.id ?? null;
@@ -120,6 +126,38 @@ export default function SearchPanel({
     onAreaChange(null);
   }
 
+  // Active filters as removable chips (shown while the disclosure is closed).
+  // Removing one moves focus to the Filters button, since the chip is gone.
+  const cats = filters.categories ?? [];
+  const countries = filters.countries ?? [];
+  const activeChips = [
+    ...cats.map((c) => ({
+      key: `cat:${c}`,
+      label: categoryLabel(c),
+      color: CATEGORY_COLORS[c] ?? "#6b6151",
+      remove: () => onFiltersChange({ ...filters, categories: cats.filter((x) => x !== c) }),
+    })),
+    ...countries.map((c) => ({
+      key: `country:${c}`,
+      label: c,
+      remove: () => onFiltersChange({ ...filters, countries: countries.filter((x) => x !== c) }),
+    })),
+    ...(filters.inView
+      ? [{ key: "inView", label: "In map view", remove: () => onFiltersChange({ ...filters, inView: false }) }]
+      : []),
+    ...(searching && filters.scope === "range"
+      ? [{ key: "scope", label: "Only selected years", remove: () => onFiltersChange({ ...filters, scope: "all" }) }]
+      : []),
+  ];
+  const activeCount = activeChips.length + (area ? 1 : 0);
+  const focusFiltersBtn = () => filtersBtnRef.current?.focus();
+
+  function clearFilters() {
+    onFiltersChange({ ...filters, categories: [], countries: [], inView: false, scope: "all" });
+    onAreaChange(null);
+    focusFiltersBtn();
+  }
+
   function onInputKeyDown(e) {
     if (e.key === "ArrowDown") {
       const first = listWrapRef.current?.querySelector("button.sp-row");
@@ -152,7 +190,7 @@ export default function SearchPanel({
   else
     statusText =
       `${total} result${total === 1 ? "" : "s"}` +
-      (shownInRange !== null ? ` (${shownInRange} in selected years)` : "");
+      (shownInRange !== null && shownInRange !== total ? ` (${shownInRange} in selected years)` : "");
 
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}`;
 
@@ -232,25 +270,76 @@ export default function SearchPanel({
             </p>
           )}
 
-          <AreaChip
-            area={area}
-            areaMode={areaMode}
-            onAreaModeChange={onAreaModeChange}
-            onAreaChange={onAreaChange}
-            inView={filters.inView}
-            onInViewChange={(v) => onFiltersChange({ ...filters, inView: v })}
-            viewCount={viewCount}
-          />
-          <FilterBar
-            filters={filters}
-            onFiltersChange={onFiltersChange}
-            categoryOptions={categoryOptions}
-            countryOptions={countryOptions}
-          />
+          <div className="sp-toolbar">
+            <button
+              ref={filtersBtnRef}
+              type="button"
+              className="sp-filters-toggle"
+              aria-expanded={filtersOpen}
+              aria-controls={filtersId}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              <span className="sp-caret" aria-hidden="true" />
+              Filters{activeCount > 0 ? ` (${activeCount})` : ""}
+            </button>
+            <p className="sp-status" role="status" aria-live="polite">
+              {statusText}
+            </p>
+          </div>
 
-          <p className="sp-status" role="status" aria-live="polite">
-            {statusText}
-          </p>
+          {!filtersOpen && (activeCount > 0 || areaMode !== "off") && (
+            <div className="sp-active" aria-label="Active filters" role="group">
+              <AreaTag
+                area={area}
+                areaMode={areaMode}
+                onAreaChange={onAreaChange}
+                onRemoved={focusFiltersBtn}
+              />
+              {activeChips.map((chip) => (
+                <span key={chip.key} className="sp-chip sp-chip--active">
+                  {chip.color && (
+                    <span className="sp-dot" aria-hidden="true" style={{ background: chip.color }} />
+                  )}
+                  <span>{chip.label}</span>
+                  <button
+                    type="button"
+                    className="sp-chip-x"
+                    aria-label={`Remove filter: ${chip.label}`}
+                    onClick={() => {
+                      chip.remove();
+                      focusFiltersBtn();
+                    }}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </span>
+              ))}
+              {activeCount > 1 && (
+                <button type="button" className="sp-clear-all" onClick={clearFilters}>
+                  Clear all
+                </button>
+              )}
+            </div>
+          )}
+
+          <div id={filtersId} className="sp-filterpanel" hidden={!filtersOpen}>
+            <AreaChip
+              area={area}
+              areaMode={areaMode}
+              onAreaModeChange={onAreaModeChange}
+              onAreaChange={onAreaChange}
+              inView={filters.inView}
+              onInViewChange={(v) => onFiltersChange({ ...filters, inView: v })}
+              viewCount={viewCount}
+            />
+            <FilterBar
+              filters={filters}
+              onFiltersChange={onFiltersChange}
+              categoryOptions={categoryOptions}
+              countryOptions={countryOptions}
+              showScope={searching}
+            />
+          </div>
 
           <div ref={listWrapRef}>
             {eventsLoading ? (
@@ -280,26 +369,18 @@ export default function SearchPanel({
                 )}
               </div>
             ) : (
-              <>
-                {!searching && (
-                  <p className="sp-idle-hint">
-                    Type above, pick a filter, or draw an area on the map. Events in the selected
-                    years:
-                  </p>
-                )}
-                <ResultsList
-                  key={resultsKey}
-                  results={results}
-                  query={query}
-                  range={range}
-                  selectedId={selectedEvent?.id ?? null}
-                  onSelect={onSelect}
-                  onHover={onHover}
-                  onFocusInput={() => inputRef.current?.focus()}
-                  busy={loading}
-                  browse={!searching}
-                />
-              </>
+              <ResultsList
+                key={resultsKey}
+                results={results}
+                query={query}
+                range={range}
+                selectedId={selectedEvent?.id ?? null}
+                onSelect={onSelect}
+                onHover={onHover}
+                onFocusInput={() => inputRef.current?.focus()}
+                busy={loading}
+                browse={!searching}
+              />
             )}
           </div>
         </div>
