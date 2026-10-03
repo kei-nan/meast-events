@@ -49,8 +49,9 @@ html, body, #root {
 }
 
 .app-footer {
-  padding: 7px 22px 10px;
-  font-size: 0.8rem;
+  padding: 3px 22px 4px;
+  font-size: 0.78rem;
+  line-height: 1.4;
   color: var(--text-secondary);
   background: var(--bg-2);
   border-top: 1px solid var(--border-soft);
@@ -63,7 +64,7 @@ html, body, #root {
 .app-footer-link {
   background: none;
   border: 0;
-  padding: 4px 0;
+  padding: 2px 0;
   font: inherit;
   font-weight: 600;
   color: var(--link);
@@ -86,7 +87,8 @@ html, body, #root {
 
   .app-footer {
     margin-top: auto;
-    padding: 8px 14px 12px;
+    padding: 4px 14px 8px;
+    font-size: 0.74rem;
   }
 }
 
