@@ -123,12 +123,20 @@ test("applyTitleChanges: idempotent, skips edited events, held entries and unkno
   assert.deepEqual(applyTitleChanges([], [ch]).unknown, ["2023-israel-hamas-war"]);
 });
 
-test("titleReport: lists every change and the merge command", () => {
+test("applyTitleChanges: never gives two events the same title", () => {
+  const e = gaza();
+  const taken = { id: "gaza-war-other", title: "Gaza war", wikipedia_url: "https://en.wikipedia.org/wiki/Other" };
+  const r = applyTitleChanges([e, taken], [detectTitleChange(gaza(), lead())]);
+  assert.deepEqual(r.duplicate, ["2023-israel-hamas-war"]);
+  assert.equal(e.title, "2023 Israel–Hamas war");
+});
+
+test("titleReport: lists every change and every held case", () => {
   const ch = { file: "curated", ...detectTitleChange(gaza(), lead()) };
   const held = { file: "curated", ...detectTitleChange({ ...gaza(), id: "b" }, null) };
-  const md = titleReport([ch, held], { date: "2026-10-03", checked: 2 });
-  assert.match(md, /\*\*1\*\* titles are out of date/);
-  assert.match(md, /`2023-israel-hamas-war` \| 2023 Israel–Hamas war \| Gaza war \| no/);
-  assert.match(md, /Held - not proposed: 1/);
-  assert.match(md, /merge-proposed\.js --titles --apply/);
+  const dry = titleReport([ch, held], { name: "curated" });
+  assert.match(dry, /curated titles: 1 to update \(dry run\), 1 held/);
+  assert.match(dry, /`2023-israel-hamas-war`: "2023 Israel–Hamas war" -> "Gaza war"/);
+  assert.match(dry, /`b` \("2023 Israel–Hamas war"\): No article returned/);
+  assert.match(titleReport([ch], { applied: true }), /1 updated, 0 held/);
 });
