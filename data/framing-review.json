@@ -889,8 +889,8 @@
       "wording": []
     },
     "2023-israel-hamas-war": {
-      "text_sha1": "4e88c0844251",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "dd2e5059c1cf",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
         "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included."
       },
@@ -1567,8 +1567,8 @@
       "wording": []
     },
     "ma-alot-massacre": {
-      "text_sha1": "7ebb09a33bcf",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "842074c120e2",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [
         {
@@ -2602,8 +2602,8 @@
       "wording": []
     },
     "2020-aden-airport-attack": {
-      "text_sha1": "00f1664909c5",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "68de41f6070b",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -2650,12 +2650,12 @@
       "wording": []
     },
     "october-7-attacks": {
-      "text_sha1": "f300fad67b61",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "aadde53fa18e",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
-        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), while the Hannibal Directive deaths are stated as fact. Also uses \"illegal Israeli settlements\" as fact. It does note that 44 governments called the attack terrorism.",
+        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\", while the Hannibal Directive deaths are stated as fact. Hamas's stated reasons are given at length and attributed; the summary also notes that 44 governments called the attack terrorism.",
         "phrases": [
-          "illegal Israeli settlements",
+          "The day was labelled the bloodiest in Israel's history",
           "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
         ]
       },
@@ -2778,8 +2778,8 @@
       "wording": []
     },
     "killing-of-hind-rajab": {
-      "text_sha1": "18f2ac091ba7",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7345c532b01c",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
         "note": "Well documented (independent investigations; the IDF later admitted firing), with one editorial touch (\"finally admitted\").",
         "phrases": [
@@ -3075,8 +3075,8 @@
       "wording": []
     },
     "1919-egyptian-revolution": {
-      "text_sha1": "a05eb5426012",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "8975b63c8809",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3642,8 +3642,8 @@
       "category_note": "Shown as \"terrorism\" because Wikidata types it as a hostage taking; the airliner and its passengers were seized by Iraqi forces during the invasion of Kuwait."
     },
     "1991-iraqi-uprisings": {
-      "text_sha1": "3026e2a59eb1",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "b4fb19dac794",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
