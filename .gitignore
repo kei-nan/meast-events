@@ -9,24 +9,23 @@ app/public/data/
 app/public/pagefind/
 .vite/
 
-# Secrets - server/.env would hold a real Redis connection string (with
-# password) once someone points this at a real Redis Cloud instance.
-# app/.env is intentionally NOT covered by this - it only holds a public
-# default API URL, not a secret, and is meant to be committed.
+# Secrets. server/.env and worker/.dev.vars held the Redis connection string
+# (with password) for the retired API; server/ and worker/ were removed, but
+# old local copies may still exist, so they stay ignored (see DEPLOYMENT.md,
+# "Retiring the old API").
 server/.env
+worker/.dev.vars
 .env.local
 
-# wrangler's local dev state (miniflare SQLite caches, bundled temp output)
-# and its equivalent of a real Redis Cloud connection string.
-worker/.wrangler/
+# wrangler's local dev state (miniflare SQLite caches, bundled temp output).
 app/.wrangler/
-worker/.dev.vars
+worker/.wrangler/
 
 # Large raw source dump for boundary data - regenerate via scripts/ingest-boundaries.js
 # after downloading https://icr.ethz.ch/data/cshapes/CShapes-2.0.geojson into data/raw/
 data/raw/
 
-# Output of `wrangler deploy --dry-run --outdir=.dry-run` (worker/, CI)
+# Output of `wrangler deploy --dry-run --outdir=.dry-run`
 .dry-run/
 
 .claude/
