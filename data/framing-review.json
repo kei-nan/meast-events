@@ -173,8 +173,8 @@
       "wording": []
     },
     "turkish-war-of-independence": {
-      "text_sha1": "b213247dfd46",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "e396f3a88854",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -232,8 +232,8 @@
       "wording": []
     },
     "unification-of-saudi-arabia": {
-      "text_sha1": "f551d5482679",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c32ebad9aae2",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -374,8 +374,8 @@
       "wording": []
     },
     "1953-iranian-coup-d-tat": {
-      "text_sha1": "32647f57a370",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7daca200b6d1",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -581,11 +581,12 @@
       "wording": []
     },
     "al-anfal-campaign": {
-      "text_sha1": "04ea53d68bcf",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "31d3391624b7",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
-        "note": "Weakens the widely accepted genocide finding with a claim about a 2007 court ruling and a sweeping statement that \"many Iraqi Arabs reject that there were any mass killings\", neither sourced.",
+        "note": "Weakens the genocide finding, which it attributes to \"many scholars and human rights groups\", with a 2007 Hague court ruling and a sweeping, unattributed statement that \"many Iraqi Arabs reject that there were any mass killings\". It does not mention that Iraq's High Tribunal convicted Ali Hassan al-Majid of genocide for the campaign in 2007.",
         "phrases": [
+          "This characterization of the Anfal campaign was disputed by a 2007 Hague court ruling",
           "many Iraqi Arabs reject that there were any mass killings"
         ]
       },
@@ -681,10 +682,13 @@
       ]
     },
     "israeli-disengagement-from-gaza": {
-      "text_sha1": "10b6f0f8b7f2",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ccfb8e7afc3b",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
-        "note": "Asserts that Gaza remained occupied after 2005, citing the UN and the ICJ, without mentioning that Israel and some legal scholars reject this."
+        "note": "Gives the view that Gaza remained occupied after 2005, attributed to the UN, international organisations, most academic commentators and the 2024 ICJ advisory opinion, and backs it with a legal argument in its own voice (\"it has been generally understood ...\"), without mentioning that Israel and some legal scholars reject this. The same paragraph also dates the occupation \"(1967–2005)\".",
+        "phrases": [
+          "it has been generally understood that a territory remains effectively occupied"
+        ]
       },
       "wording": []
     },
@@ -778,8 +782,8 @@
       ]
     },
     "islamic-state": {
-      "text_sha1": "3ab0b3401e2d",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c80b1d583fe4",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [
         {
@@ -825,8 +829,8 @@
       "wording": []
     },
     "qatar-diplomatic-crisis": {
-      "text_sha1": "4c0eb2a642dc",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "99b1f60d8af3",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
