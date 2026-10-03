@@ -67,8 +67,12 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
   // Shown only when they say more than the category does.
   const showClasses = classes.some((c) => c.toLowerCase() !== (event.category ?? "").toLowerCase());
   const flags = (event.date_flags ?? []).filter(Boolean);
-  // Unverified dates show only their years.
-  const dateText = formatEventDate(event.date_start, event.date_end, { yearOnly: flags.length > 0 });
+  // Unverified dates show only their years. date_precision comes with the full lead,
+  // so the year alone shows until it arrives.
+  const dateText = formatEventDate(event.date_start, event.date_end, {
+    precision: event.date_precision,
+    yearOnly: flags.length > 0,
+  });
   const review = event.framing_review;
   // Each paragraph as plain and highlighted pieces. Paragraphs past the first
   // LEAD_PARAGRAPHS are hidden or shown whole, never cut or rewritten.

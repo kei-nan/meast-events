@@ -1,52 +1,31 @@
-// Formats an event's Wikidata dates ("YYYY-MM-DD" strings) for the detail view, e.g.
-// "5–10 June 1967", "June 1967 – 1970" or "1915–1917". The data carries no date
-// precision, and Wikidata pads coarse dates to the first of the month or year
-// (e.g. the Nakba "ends" 1949-01-01), so a date on 1 January is shown as its year
-// only and one on the 1st of a month as month and year. That can drop a real day
-// but never adds precision that may not be there. `yearOnly` (set when the dates
-// are flagged as unverified) shows just the years.
+// Formats an event's Wikidata dates ("YYYY-MM-DD" strings) for the detail view, showing
+// no more precision than the data records. `precision` is Wikidata's precision of the
+// start date ("day", "month", "year", "decade", or missing): a day shows as
+// "5 June 1967", a month as "June 1967", anything else as the year only. No precision
+// is recorded for the end date, so it shows as a year only: "20 March 2003 – 2011", or
+// "5 June 1967 (ended 1967)" when it ends in the start's year. `yearOnly` (set when the
+// dates are flagged as unverified) shows just the years, in the order given.
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
 
-function parse(s) {
-  const m = /^(-?\d{1,4})(?:-(\d{2}))?(?:-(\d{2}))?/.exec(s ?? "");
-  if (!m) return null;
-  const month = Number(m[2] ?? 0);
-  const day = Number(m[3] ?? 0);
-  const year = m[1];
-  if (!month || (month === 1 && day <= 1)) return { year };
-  if (day <= 1) return { year, month };
-  return { year, month, day };
+function formatStart(date, precision) {
+  const [year, month, day] = date.split("-");
+  const m = MONTHS[Number(month) - 1];
+  if (precision === "day" && m && Number(day)) return `${Number(day)} ${m} ${year}`;
+  if ((precision === "day" || precision === "month") && m) return `${m} ${year}`;
+  return year;
 }
 
-const monthName = (d) => MONTHS[d.month - 1];
-
-function full(d) {
-  if (!d.month) return d.year;
-  return d.day ? `${d.day} ${monthName(d)} ${d.year}` : `${monthName(d)} ${d.year}`;
-}
-
-export function formatEventDate(start, end, { yearOnly = false } = {}) {
-  let a = parse(start);
-  let b = end && end !== start ? parse(end) : null;
-  if (!a) return start ?? "";
-  if (yearOnly) {
-    a = { year: a.year };
-    b = b && { year: b.year };
-  }
-  if (!b) return full(a);
-  if (!a.month && !b.month) return a.year === b.year ? a.year : `${a.year}–${b.year}`;
-  if (a.year === b.year && a.month && b.month) {
-    if (a.month === b.month) {
-      if (a.day && b.day) return `${a.day}–${b.day} ${monthName(a)} ${a.year}`;
-      if (!a.day && !b.day) return full(a);
-      return `${full(a)} – ${full(b)}`;
-    }
-    const left = a.day ? `${a.day} ${monthName(a)}` : monthName(a);
-    return `${left} – ${full(b)}`;
-  }
-  return `${full(a)} – ${full(b)}`;
+export function formatEventDate(start, end, { precision = null, yearOnly = false } = {}) {
+  if (!start) return "";
+  const startYear = start.slice(0, 4);
+  const endYear = end && end !== start ? end.slice(0, 4) : null;
+  // An end before the start is shown as given, but only as years.
+  const startText = yearOnly || (end && end < start) ? startYear : formatStart(start, precision);
+  if (!endYear) return startText;
+  if (startText === startYear) return endYear === startYear ? startYear : `${startYear}–${endYear}`;
+  return endYear === startYear ? `${startText} (ended ${endYear})` : `${startText} – ${endYear}`;
 }
