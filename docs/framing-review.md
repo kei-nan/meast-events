@@ -58,9 +58,9 @@ All 571 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI mod
 
 | | Summaries |
 |---|---|
-| Overall fairness: issue found | 79 of 571 |
+| Overall fairness: issue found | 80 of 571 |
 | Wording check: at least one wording point | 78 of 571 |
-| Either | 138 of 571 |
+| Either | 139 of 571 |
 
 | Guideline | Wording points |
 |---|---|
