@@ -17,7 +17,7 @@
 // FULL LEADS ARE NOT IN THE DECADE CHUNKS. A full lead is up to ~10 KB, and the
 // lite list must never download them. Decade chunks carry a 160-char snippet
 // (no `extract`); the full lead + extract_retrieved_at live in
-// events/full/<bucket>.json ({id: {extract, extract_retrieved_at}}), 64 buckets
+// events/full/<bucket>.json ({id: {extract, extract_retrieved_at, ...}}), 64 buckets
 // chosen by a hash of the id (src/lib/fullBucket.js, shared with the client),
 // fetched lazily when an event is opened. Offline text search therefore matches
 // title + snippet only.
@@ -251,6 +251,9 @@ async function splitEvents() {
       // the detail view merges this file over whichever record it has.
       wikidata_classes: strings(e.wikidata_classes),
       date_flags: strings(e.date_flags),
+      // Wikidata's precision of date_start ("day", "month", "year", "decade"); only
+      // the detail view uses it, so it lives here rather than in the chunks.
+      date_precision: e.date_precision ?? null,
       framing_review: framing,
     };
   }
