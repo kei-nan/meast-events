@@ -1313,8 +1313,8 @@
       "wording": []
     },
     "king-david-hotel-bombing": {
-      "text_sha1": "9050348455a7",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "15fdee0d8ea2",
+      "text_retrieved_at": "2026-10-03",
       "fairness": null,
       "wording": [
         {
@@ -1481,8 +1481,8 @@
       "wording": []
     },
     "sabena-flight-571": {
-      "text_sha1": "c84f39687dcc",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7d93dd58c965",
+      "text_retrieved_at": "2026-10-03",
       "fairness": null,
       "wording": [
         {
@@ -1841,8 +1841,8 @@
       ]
     },
     "uss-cole-bombing": {
-      "text_sha1": "873c2c9150bd",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "6a850fcc3456",
+      "text_retrieved_at": "2026-10-03",
       "fairness": null,
       "wording": []
     },
@@ -3706,8 +3706,8 @@
       "wording": []
     },
     "iraq-war": {
-      "text_sha1": "7c99ff63f645",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "f6880bedf906",
+      "text_retrieved_at": "2026-10-03",
       "fairness": null,
       "wording": [
         {
@@ -3748,8 +3748,8 @@
       ]
     },
     "battle-of-samarra-2004": {
-      "text_sha1": "2793e6e6f456",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "e67649a1697a",
+      "text_retrieved_at": "2026-10-03",
       "fairness": null,
       "wording": []
     },
