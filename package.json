@@ -9,7 +9,7 @@
     "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },
   "dependencies": {
-    "redis": "^6.2.1"
+    "redis": "^6.3.0"
   },
   "devDependencies": {
     "@turf/turf": "^7.4.0",
