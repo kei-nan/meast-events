@@ -216,6 +216,7 @@ node scripts/build-selection-funnel.js                  # -> data/selection-funn
 node scripts/lib/verify-sample.js                       # -> data/import-verification-sample.md
 node scripts/validate-events.js                         # schema/ids/dates/coordinates (runs in CI)
 node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
+node scripts/merge-proposed.js --titles [--apply]       # title refresh: dry-run by default; --apply writes title/wikipedia_url only
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
@@ -240,6 +241,17 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 
 To run it by hand instead: `node scripts/refresh-extracts.js --report=refresh-report.md` (dry run, default, writes nothing), then add `--apply` to write the changes.
 Add `--proposed` to also refresh `data/events.proposed.json`.
+
+### Titles
+
+`title` is the **current** English Wikipedia article title, and articles get renamed (for example "2023 Israel–Hamas war" is now "Gaza war").
+The same refresh run, with `--propose-titles` (the workflow passes it), compares each event's title and URL with the article the API resolves
+(`redirects=1`) and writes the differences to `data/title-changes.proposed.json` plus a readable list in `data/title-refresh-report.md`. It never
+changes a title itself, not even with `--apply`. A change is proposed only when it is a plain rename: the stored URL redirects to the renamed article,
+or the URL is current and Wikipedia redirects the stored title to that same article. Anything else (a redirect to a section of a larger article, an
+article whose Wikidata item is not the event's, a stored title that does not redirect to the article) is listed as held and is never applied.
+A person applies the proposals with `node scripts/merge-proposed.js --titles` (dry run) and then `--titles --apply`, which changes only `title`,
+`wikipedia_url` (when the stored URL is a redirect) and the then-moot `title_differs_from_article` flag. Event ids never change, so deep links keep working.
 
 ## Licensing of the source data
 
