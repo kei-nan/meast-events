@@ -16,36 +16,44 @@ html, body, #root {
   color: var(--text-primary);
 }
 
+/* One line: title left, status notices right. */
 .app-header {
-  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 22px;
   background: var(--bg-2);
   border-bottom: 1px solid var(--border);
 }
 
 .app-header h1 {
+  flex: none;
   margin: 0;
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
+  line-height: 1.4;
   letter-spacing: 0.01em;
   color: var(--text-primary);
 }
 
-.app-header p {
-  margin: 3px 0 0;
-  font-size: 0.85rem;
+/* Notices never wrap (a long one is cut with an ellipsis), so one appearing
+   never changes the header's height or resizes the map. */
+.app-search {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
-/* One reserved line, so the count/loading text appearing never resizes the map. */
-.app-search {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  min-height: 1.5em;
-  margin-top: 3px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+.app-search > * {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .app-footer {
@@ -72,17 +80,21 @@ html, body, #root {
   cursor: pointer;
 }
 
+/* Keeps the credit line on one line down to about 1000px. */
+@media (max-width: 1180px) {
+  .app-footer {
+    font-size: 0.72rem;
+  }
+}
+
 @media (max-width: 768px) {
   .app-header {
-    padding: 10px 14px;
+    gap: 10px;
+    padding: 6px 14px;
   }
 
   .app-header h1 {
-    font-size: 1.1rem;
-  }
-
-  .app-header p {
-    display: none;
+    font-size: 1.05rem;
   }
 
   .app-footer {

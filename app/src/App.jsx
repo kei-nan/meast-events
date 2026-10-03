@@ -231,7 +231,7 @@ export default function App() {
   );
 
   const handleViewportChange = useCallback((bounds) => setViewportBbox(normalizeBounds(bounds)), []);
-  // "N events on the map in the current view": local, no request.
+  // The panel's "N in view" count: local, no request.
   const viewportEventCount = useMemo(
     () => (eventsLoading ? null : countInBbox(visibleEvents, viewportBbox)),
     [eventsLoading, visibleEvents, viewportBbox]
@@ -441,13 +441,8 @@ export default function App() {
       </a>
       <header className="app-header">
         <h1>{SITE_TITLE}</h1>
-        <p>A map and timeline of major regional events, sourced from Wikipedia.</p>
+        {/* Status notices share the title's line; the in-view count is in the panel. */}
         <div className="app-search">
-          {viewportEventCount !== null && (
-            <span className="app-viewport-count">
-              {viewportEventCount.toLocaleString("en-US")} {viewportEventCount === 1 ? "event" : "events"} on the map in the current view
-            </span>
-          )}
           {eventsLoading && (
             <span className="app-loading" role="status">
               <span className="app-loading-spinner" aria-hidden="true" />
@@ -548,7 +543,12 @@ export default function App() {
         <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
           CShapes 2.0
         </a>{" "}
-        (ETH Zurich, CC BY-NC-SA 4.0), non-commercial use only, with{" "}
+        {/* CC BY-NC-SA: authors, licence link and a note that the borders were changed, on every page. */}
+        (Schvitz et al., ETH Zurich,{" "}
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer">
+          CC BY-NC-SA 4.0
+        </a>
+        ), non-commercial use, with{" "}
         <a href={BOUNDARY_CORRECTIONS_URL} target="_blank" rel="noreferrer">
           our cited corrections
         </a>
