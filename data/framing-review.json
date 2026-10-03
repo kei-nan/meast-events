@@ -3722,8 +3722,8 @@
       ]
     },
     "iraqi-conflict": {
-      "text_sha1": "c1cb2be4ab24",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "036db0fd651f",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3914,8 +3914,8 @@
       "wording": []
     },
     "iraqi-turkmen-genocide": {
-      "text_sha1": "f789ba7bc9dd",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ff8219d633b0",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
@@ -3949,8 +3949,8 @@
       ]
     },
     "operation-inherent-resolve": {
-      "text_sha1": "2e9297ee3e87",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "febcc0d20b66",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [
         {
@@ -4233,8 +4233,8 @@
       "wording": []
     },
     "2024-lebanon-electronic-device-attacks": {
-      "text_sha1": "25f1e5793e9c",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ee898208963b",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": [],
       "category_note": "Shown as \"terrorism\" because Wikidata types this Israeli operation as a terrorist attack (and also as counter-terrorism). The summary quotes both UN experts and commentators who called it an anti-terrorist operation. Our category follows Wikidata's type without judging it."
@@ -4345,14 +4345,19 @@
       "wording": []
     },
     "2025-2026-iran-massacres": {
-      "text_sha1": "16ec5ccb7c45",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "048ab44bde7e",
+      "text_retrieved_at": "2026-10-01",
+      "fairness": {
+        "note": "Gives the highest estimate the most weight: Iran International's figure of over 36,500 deaths appears three times, and the opening range of \"most death toll estimates\" starts at 5,000, above the government's own figure of 3,117 given later. The government's figures and its account (\"terrorists\", blame on the US and Israel) are included and attributed.",
+        "phrases": [
+          "According to documents, Iran International reported that more than 36,500 Iranians were killed"
+        ]
+      },
       "wording": []
     },
     "2026-iran-war": {
-      "text_sha1": "0277f6b1df1f",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "b61901815121",
+      "text_retrieved_at": "2026-10-01",
       "fairness": {
         "note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
         "phrases": [
@@ -4362,8 +4367,8 @@
       "wording": []
     },
     "fall-of-aden-2026": {
-      "text_sha1": "385e11d0be9e",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "f3286feea086",
+      "text_retrieved_at": "2026-10-01",
       "fairness": null,
       "wording": []
     },
