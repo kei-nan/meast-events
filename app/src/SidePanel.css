@@ -19,7 +19,7 @@
 /* Stands in for the lazy-loaded map (App.jsx): same box and sea colour as the
    map's own background (MapView BASE_STYLE), so nothing shifts when it loads. */
 .map-placeholder {
-  background: #d8f2ff;
+  background: #b9d5e3;
   display: flex;
   align-items: center;
   justify-content: center;

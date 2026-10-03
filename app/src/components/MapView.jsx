@@ -7,6 +7,7 @@ import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import "maplibre-gl/dist/maplibre-gl-shared.mjs?url";
 import {
   CATEGORY_COLORS,
+  CLUSTER_COUNT_TEXT,
   CLUSTER_LABEL_PAINT,
   CLUSTER_PAINT,
   EMPTY_FC,
@@ -23,9 +24,9 @@ import { BORDER_STYLE, DASHED_EXPR, readHintDismissed, uniqueBoundaries, writeHi
 import {
   BoundaryPopup,
   BordersList,
-  DrawTools,
-  MapLegend,
   MapNotices,
+  MapTip,
+  MapToolbar,
 } from "./MapUi";
 import useMediaQuery from "../hooks/useMediaQuery";
 import ClusterList from "./ClusterList";
@@ -69,11 +70,14 @@ if (import.meta.env.PROD) {
 // served from public/glyphs/ - only the ranges the labels use are shipped.
 // MapLibre needs an absolute glyphs URL.
 const LABEL_FONT = ["Open Sans Semibold"];
+// A calm, slightly greyed sea (was a bright #d8f2ff). Keep in sync with
+// .map-placeholder in SidePanel.css, which stands in for the map while it loads.
+const SEA_COLOR = "#b9d5e3";
 const BASE_STYLE = {
   version: 8,
   glyphs: `${window.location.origin}${import.meta.env.BASE_URL}glyphs/{fontstack}/{range}.pbf`,
   sources: {},
-  layers: [{ id: "background", type: "background", paint: { "background-color": "#D8F2FF" } }],
+  layers: [{ id: "background", type: "background", paint: { "background-color": SEA_COLOR } }],
 };
 
 const reducedMotion = () =>
@@ -350,7 +354,9 @@ export default function MapView({
         clusterMaxZoom: CLUSTER_MAX_ZOOM,
         // Number of search matches inside each cluster (m is 1 for every
         // feature when no search is active, so nothing dims in that case).
-        clusterProperties: { matches: ["+", ["get", "m"]] },
+        // `searching` (s is the same on every feature) tells the count label
+        // whether to show matches or the plain total.
+        clusterProperties: { matches: ["+", ["get", "m"]], searching: ["max", ["get", "s"]] },
       });
 
       map.addLayer({
@@ -359,19 +365,6 @@ export default function MapView({
         source: "events",
         filter: ["has", "point_count"],
         paint: CLUSTER_PAINT,
-      });
-
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "events",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-font": LABEL_FONT,
-          "text-size": 12,
-        },
-        paint: CLUSTER_LABEL_PAINT,
       });
 
       map.addLayer({
@@ -418,6 +411,27 @@ export default function MapView({
           "text-halo-width": 1.6,
           "text-halo-blur": 0.3,
         },
+      });
+
+      // Cluster counts sit above the country labels, so they are placed first
+      // (symbols are placed top layer down) and always drawn: a cluster on
+      // "Syria" or "Kuwait" used to lose its number to the label. They still
+      // take part in collision detection, so a country label that would sit
+      // under a cluster's digits is dropped (it returns on zoom) instead of
+      // being overprinted. A 0-match cluster has no text, so it blocks nothing.
+      map.addLayer({
+        id: "cluster-count",
+        type: "symbol",
+        source: "events",
+        filter: ["has", "point_count"],
+        layout: {
+          "text-field": CLUSTER_COUNT_TEXT,
+          "text-font": LABEL_FONT,
+          "text-size": 12,
+          "text-allow-overlap": true,
+          "text-ignore-placement": false,
+        },
+        paint: CLUSTER_LABEL_PAINT,
       });
 
       // Hover and selection live in their own (unclustered) sources so the
@@ -725,13 +739,6 @@ export default function MapView({
   }, [hintOpen, mapReady]);
 
   const decadeCached = boundaryCacheRef.current.has(decadeFloor(year));
-  // Borders drawn for the current year (for the keyboard-reachable list).
-  const yearBorders = useMemo(() => {
-    const feats = boundaryCacheRef.current.get(decadeFloor(year));
-    if (!feats) return [];
-    return uniqueBoundaries(boundariesForYear(year, feats).features);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, boundaryVersion]);
   const shownBorderYear = decadeCached ? year : displayedYear;
   const yearFeatures = useMemo(
     () => boundaryCacheRef.current.get(decadeFloor(year)) ?? null,
@@ -739,6 +746,15 @@ export default function MapView({
     [year, boundaryVersion]
   );
   useCountryHighlight({ mapRef, mapReady, event: highlightEvent, year, features: yearFeatures, focus });
+  // Borders drawn for the year the map currently shows (for the keyboard-reachable
+  // list) - the previous year's while a new decade is still loading.
+  const yearBorders = useMemo(() => {
+    if (shownBorderYear == null) return [];
+    const feats = boundaryCacheRef.current.get(decadeFloor(shownBorderYear));
+    if (!feats) return [];
+    return uniqueBoundaries(boundariesForYear(shownBorderYear, feats).features);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shownBorderYear, boundaryVersion]);
   const relevantError =
     borderError && (borderError.decade === "land" || borderError.decade === decadeFloor(year))
       ? borderError.phase
@@ -747,6 +763,15 @@ export default function MapView({
     const map = mapRef.current;
     if (!map) return;
     map.fitBounds(DEFAULT_BOUNDS, { padding: 20, duration: reducedMotion() ? 0 : 600 });
+  };
+  // Zoom buttons for mouse users (MapLibre's own NavigationControl is not used,
+  // so the buttons match the rest of the toolbar).
+  const zoomBy = (dir) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const opts = { duration: reducedMotion() ? 0 : 300 };
+    if (dir > 0) map.zoomIn(opts);
+    else map.zoomOut(opts);
   };
   const closePopup = useCallback(() => setBorderPopup(null), []);
   const closeStack = useCallback(() => setStackList(null), []);
@@ -775,6 +800,8 @@ export default function MapView({
       }
     );
   };
+  // The × on the tip, and any use of the toolbar, retire it for good (the map
+  // itself is covered by the auto-hide effect above).
   const dismissHint = () => {
     setHintOpen(false);
     writeHintDismissed();
@@ -994,66 +1021,40 @@ export default function MapView({
   return (
     <div className="map-view" style={{ position: "relative" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
-      <div className="mu-ctrl-left" role="group" aria-label="Search area tools">
-        <DrawTools areaMode={areaMode} onToggle={toggle} compact={compact} />
-        {area && (
-          <button type="button" className="mu-btn" onClick={() => onAreaChange?.(null)}>
-            Clear area
-          </button>
-        )}
-        <button type="button" className="mu-btn" onClick={resetView}>
-          {"\u21ba"} Reset view
-        </button>
-        {matchBounds && (
-          <button
-            type="button"
-            className="mu-btn"
-            onClick={showMatches}
-            aria-label={`Show the ${matchBounds.count} mapped ${matchBounds.count === 1 ? "match" : "matches"} on the map`}
-          >
-            {"\u25ce"} {compact ? `Show results (${matchBounds.count})` : `Show ${matchBounds.count} results on map`}
-          </button>
-        )}
-        {hint && (
-          <div
-            role="status"
-            style={{
-              font: "12px/1.3 system-ui, sans-serif",
-              maxWidth: 220,
-              padding: "6px 8px",
-              background: "rgba(244,241,234,0.95)",
-              border: "1px solid #5c4d38",
-              borderRadius: 6,
-              color: "#3a3020",
-            }}
-          >
-            {hint}
-          </div>
-        )}
-      </div>
+      <MapToolbar
+        areaMode={areaMode}
+        hasArea={!!area}
+        compact={compact}
+        onToggleMode={toggle}
+        onClearArea={() => onAreaChange?.(null)}
+        onZoomIn={() => zoomBy(1)}
+        onZoomOut={() => zoomBy(-1)}
+        onReset={resetView}
+        matchCount={matchBounds?.count ?? null}
+        onShowMatches={showMatches}
+        drawHint={hint}
+        onInteract={hintOpen ? dismissHint : undefined}
+      />
       <div className="mu-ctrl-right">
-        {shownBorderYear != null && (
-          <div className="mu-badge">
-            Borders as of {shownBorderYear}
-            {borderYear != null && decadeCached && <span className="mu-badge-sub"> (event year)</span>}
-            {!decadeCached && <span className="mu-badge-sub"> (updating to {year})</span>}
-          </div>
-        )}
+        <BordersList
+          year={year}
+          shownYear={shownBorderYear}
+          updating={!decadeCached}
+          eventYearShown={borderYear != null}
+          items={yearBorders}
+        />
         {eventYear != null && eventYear !== timelineYear && (
           <button type="button" className="mu-btn mu-btn-small" onClick={onToggleEventYear}>
             {borderYear != null ? `Use timeline year (${timelineYear})` : `Use event year (${eventYear})`}
           </button>
         )}
-        <BordersList year={year} items={yearBorders} />
         <MapNotices
           loading={eventsLoading || !mapReady || !decadeCached}
           borderError={relevantError}
           onRetry={retryBorders}
-          hint={hintOpen}
-          onDismissHint={dismissHint}
         />
       </div>
-      <MapLegend />
+      {hintOpen && <MapTip onDismiss={dismissHint} />}
       {borderPopup && <BoundaryPopup popup={borderPopup} onClose={closePopup} width={size.w} height={size.h} />}
       {stackList && (
         <ClusterList list={stackList} onSelect={selectFromStack} onClose={closeStack} width={size.w} height={size.h} />

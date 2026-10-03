@@ -59,8 +59,21 @@ export const CLUSTER_PAINT = {
   "circle-stroke-opacity": ["case", ["==", ["get", "matches"], 0], 0.25, 1],
 };
 
+// Cluster number: during a search/filter the matches inside the cluster (no
+// number at all on a dimmed 0-match cluster), otherwise the plain total.
+// `searching` and `matches` are the source's clusterProperties (MapView),
+// summed from each feature's s/m.
+export const CLUSTER_COUNT_TEXT = [
+  "case",
+  ["!=", ["get", "searching"], 1],
+  ["get", "point_count_abbreviated"],
+  ["==", ["get", "matches"], 0],
+  "",
+  ["to-string", ["get", "matches"]],
+];
+
 export const CLUSTER_LABEL_PAINT = {
-  "text-color": ["case", ["==", ["get", "matches"], 0], "rgba(236,226,201,0.45)", "#ece2c9"],
+  "text-color": "#ece2c9",
 };
 
 export function eventsToGeoJSON(events, matchIds) {
