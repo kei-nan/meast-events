@@ -2,6 +2,7 @@
   "about": "Framing review: two review types per Wikipedia summary, shown separately. Overall fairness is the reviewer's judgement of emphasis, balance and omissions; the wording check cites Wikipedia's own neutrality and wording guidelines. Shown next to the summary, never merged into it. Not a fact-check and not a verdict on the events.",
   "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
   "reviewed_on": "2026-09-30",
+  "updated_on": "2026-10-03",
   "rubric_version": 5,
   "method": "docs/framing-review.md",
   "guidelines": {

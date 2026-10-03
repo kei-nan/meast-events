@@ -258,6 +258,7 @@ async function splitEvents() {
     await writeJSON(path.join(OUT_DIR, "framing-review.json"), {
       reviewer: review.reviewer,
       reviewed_on: review.reviewed_on,
+      updated_on: review.updated_on ?? null,
       rubric_version: review.rubric_version,
       total: allEvents.length,
       guidelines: review.guidelines,
