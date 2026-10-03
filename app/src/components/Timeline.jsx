@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
+import { playRestart, playStep } from "../lib/playback";
 import "../Timeline.css";
 
 const PLAY_INTERVAL_MS = 350;
@@ -18,26 +19,36 @@ const PRESETS = [
 
 const frac = (y) => (y - MIN_YEAR) / (MAX_YEAR - MIN_YEAR);
 
+const PLAY_MODES = [
+  { id: "accumulate", label: "Accumulate", help: "Play keeps the start year and advances the end year" },
+  { id: "slide", label: "Slide", help: "Play moves the whole period forward, keeping its length" },
+];
+
 export default function Timeline({ startYear, endYear, onChangeRange, eventCountsByYear }) {
   const maxCount = Math.max(1, ...Object.values(eventCountsByYear));
   const [playing, setPlaying] = useState(false);
+  const [playMode, setPlayMode] = useState("accumulate");
   const [active, setActive] = useState(null); // "start" | "end" while dragged/focused
   const latest = useRef({ startYear, endYear, onChangeRange });
   useEffect(() => {
     latest.current = { startYear, endYear, onChangeRange };
   });
 
-  // Play advances the END year one step at a time and stops at MAX_YEAR.
+  // Play advances one year per step (see playStep) and stops at MAX_YEAR.
   useEffect(() => {
     if (!playing || endYear >= MAX_YEAR) return undefined;
     const id = setTimeout(() => {
       const cur = latest.current;
-      const next = Math.min(MAX_YEAR, cur.endYear + 1);
-      cur.onChangeRange(cur.startYear, next);
-      if (next >= MAX_YEAR) setPlaying(false);
+      const next = playStep(cur.startYear, cur.endYear, playMode);
+      if (!next) {
+        setPlaying(false);
+        return;
+      }
+      cur.onChangeRange(next[0], next[1]);
+      if (next[1] >= MAX_YEAR) setPlaying(false);
     }, PLAY_INTERVAL_MS);
     return () => clearTimeout(id);
-  }, [playing, endYear]);
+  }, [playing, endYear, playMode]);
 
   function handleStartChange(value) {
     setPlaying(false);
@@ -54,8 +65,17 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
       setPlaying(false);
       return;
     }
-    if (endYear >= MAX_YEAR) onChangeRange(startYear, startYear); // restart from the start year
+    if (endYear >= MAX_YEAR) onChangeRange(...playRestart(startYear, endYear, playMode));
     setPlaying(true);
+  }
+
+  // Density bars: a click jumps to that single year (pointer-only; the
+  // sliders and presets cover keyboard use).
+  function handleDensityClick(e) {
+    const y = Number(e.target.closest("[data-year]")?.dataset.year);
+    if (!Number.isFinite(y)) return;
+    setPlaying(false);
+    onChangeRange(y, y);
   }
 
   function applyPreset(p) {
@@ -80,10 +100,32 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
           className="timeline-play"
           onClick={togglePlay}
           aria-pressed={playing && endYear < MAX_YEAR}
-          aria-label={playing ? "Pause: stop advancing the end year" : "Play: advance the end year"}
+          aria-label={
+            playMode === "slide"
+              ? playing
+                ? "Pause: stop moving the period"
+                : "Play: move the period forward"
+              : playing
+                ? "Pause: stop advancing the end year"
+                : "Play: advance the end year"
+          }
         >
           <span aria-hidden="true">{playing ? "❚❚ Pause" : "▶ Play"}</span>
         </button>
+        <div className="timeline-mode" role="group" aria-label="Play mode">
+          {PLAY_MODES.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              className="timeline-mode-btn"
+              aria-pressed={playMode === m.id}
+              title={m.help}
+              onClick={() => setPlayMode(m.id)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
         <div className="timeline-title">
           <span className="timeline-year">{rangeText}</span>
           <p className="timeline-help" id="timeline-help">
@@ -105,16 +147,22 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
         ))}
       </div>
       </div>
-      <div className="timeline-density" aria-hidden="true">
-        {Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i).map((y) => (
-          <div
-            key={y}
-            className={
-              "timeline-tick" + (y >= startYear && y <= endYear ? " timeline-tick--active" : "")
-            }
-            style={{ height: `${4 + 16 * ((eventCountsByYear[y] ?? 0) / maxCount)}px` }}
-          />
-        ))}
+      <div className="timeline-density" aria-hidden="true" onClick={handleDensityClick}>
+        {Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i).map((y) => {
+          const n = eventCountsByYear[y] ?? 0;
+          return (
+            <div
+              key={y}
+              data-year={y}
+              className={
+                "timeline-tick" + (y >= startYear && y <= endYear ? " timeline-tick--active" : "")
+              }
+              title={`${y}: ${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"} starting`}
+            >
+              <span className="timeline-tick-bar" style={{ height: `${4 + 16 * (n / maxCount)}px` }} />
+            </div>
+          );
+        })}
       </div>
       <div className="timeline-range">
         <div className="timeline-track" />

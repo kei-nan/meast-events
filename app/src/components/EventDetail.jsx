@@ -3,6 +3,26 @@ import FramingReview, { FramingPointer } from "./FramingReview.jsx";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
+import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
+import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
+import { categoryLabel } from "../lib/categoryLabels.js";
+
+// What the map shades for an event without a precise location (see
+// countryHighlight.js): its listed countries, with the borders of its year.
+function ShadingNote({ event }) {
+  const year = eventBorderYear(event, MIN_YEAR, MAX_YEAR);
+  const { shaded, unshaded } = countryShading(event.countries, year);
+  if (!shaded.length) {
+    return <> None of its listed countries has a border shape for {year} in our data, so nothing is shaded.</>;
+  }
+  return (
+    <>
+      {" "}The shaded area on the map is the event&apos;s listed countries ({shaded.join(", ")}) as of {year}, not a
+      precise location.
+      {unshaded.length > 0 && <> Not shaded: {unshaded.join(", ")} (no matching border shape for {year}).</>}
+    </>
+  );
+}
 
 function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
@@ -13,8 +33,10 @@ function historyUrl(wikipediaUrl) {
  * rendered as-is. `event.leadStatus` is "loading"/"error" while only the
  * snippet is available (the full lead is fetched lazily by the app).
  * `onBack` returns to the results list (the panel restores focus to the row).
+ * `onShowOnMap` (optional) collapses the mobile sheet so the map is visible;
+ * its button is shown on narrow screens only (SidePanel.css).
  */
-export default function EventDetail({ event, onBack }) {
+export default function EventDetail({ event, onBack, onShowOnMap }) {
   const headingRef = useRef(null);
   const [copied, setCopied] = useState(false);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
@@ -66,6 +88,11 @@ export default function EventDetail({ event, onBack }) {
         <button type="button" className="sp-btn" onClick={onBack}>
           <span aria-hidden="true">←</span> Back to results
         </button>
+        {onShowOnMap && quality !== "none" && (
+          <button type="button" className="sp-btn event-detail-showmap" onClick={onShowOnMap}>
+            Show on map
+          </button>
+        )}
         <button type="button" className="sp-btn" onClick={copyLink}>
           Copy link
         </button>
@@ -75,7 +102,7 @@ export default function EventDetail({ event, onBack }) {
         {copied && <span className="event-detail-copied" aria-hidden="true">Link copied</span>}
       </div>
       {event.category && (
-        <span className="event-detail-category">Category (our grouping): {event.category}</span>
+        <span className="event-detail-category">Category (our grouping): {categoryLabel(event.category)}</span>
       )}
       <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
         {event.title}
@@ -143,12 +170,14 @@ export default function EventDetail({ event, onBack }) {
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its
           marker is placed at a national capital. It is left out of drawn-area searches.
+          <ShadingNote event={event} />
         </p>
       )}
       {quality === "none" && (
         <p className="event-detail-note">
           No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
           marker on the map and is left out of drawn-area searches.
+          <ShadingNote event={event} />
         </p>
       )}
       {event.wikipedia_url && (

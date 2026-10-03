@@ -113,7 +113,7 @@
   },
   {
     "id": "armenian-genocide",
-    "title": "Armenian Genocide",
+    "title": "Armenian genocide",
     "date_start": "1915-04-24",
     "date_end": "1917-01-01",
     "countries": [
@@ -172,7 +172,7 @@
   },
   {
     "id": "mcmahon-hussein-correspondence",
-    "title": "McMahon–Hussein Correspondence",
+    "title": "McMahon–Hussein correspondence",
     "date_start": "1915-07-14",
     "date_end": "1916-03-10",
     "countries": [
@@ -294,7 +294,7 @@
   },
   {
     "id": "fall-of-baghdad-1917",
-    "title": "Fall of Baghdad (1917)",
+    "title": "Capture of Baghdad (1917)",
     "date_start": "1917-03-11",
     "date_end": null,
     "countries": [
@@ -303,7 +303,7 @@
     "category": "war",
     "retrieved_at": "2026-09-13T14:28:18.448Z",
     "wikidata_qid": "Q2665637",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Fall_of_Baghdad_(1917)",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Capture_of_Baghdad_(1917)",
     "extract": "The capture of Baghdad (11 March 1917) occurred during the Mesopotamian campaign, fought between the forces of the British Empire and the Ottoman Empire in World War I.",
     "coordinates": {
       "lat": 33.3152,
@@ -322,7 +322,7 @@
   },
   {
     "id": "battle-of-jerusalem-1917",
-    "title": "Battle of Jerusalem (1917)",
+    "title": "Battle of Jerusalem",
     "date_start": "1917-11-17",
     "date_end": "1917-12-30",
     "countries": [
@@ -344,10 +344,8 @@
       "battle"
     ],
     "category_group": "war",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Battle of Jerusalem (1917)\" differs from the Wikipedia article title \"Battle of Jerusalem\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "precise"
   },
   {
@@ -408,7 +406,7 @@
   },
   {
     "id": "iraqi-revolt-against-the-british",
-    "title": "Iraqi revolt against the British",
+    "title": "Iraqi Revolt",
     "date_start": "1920-05-30",
     "date_end": "1920-10-17",
     "countries": [
@@ -430,10 +428,8 @@
       "revolt"
     ],
     "category_group": "uprising",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Iraqi revolt against the British\" differs from the Wikipedia article title \"Iraqi Revolt\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -611,7 +607,7 @@
   },
   {
     "id": "abolition-of-the-ottoman-caliphate",
-    "title": "Abolition of the Ottoman Caliphate",
+    "title": "Abolition of the Caliphate",
     "date_start": "1924-03-03",
     "date_end": null,
     "countries": [
@@ -633,10 +629,8 @@
       "reform"
     ],
     "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Abolition of the Ottoman Caliphate\" differs from the Wikipedia article title \"Abolition of the Caliphate\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -698,7 +692,7 @@
   },
   {
     "id": "unification-of-saudi-arabia",
-    "title": "Unification of Saudi Arabia",
+    "title": "Formation of Saudi Arabia",
     "date_start": "1932-09-23",
     "date_end": null,
     "countries": [
@@ -726,7 +720,7 @@
   },
   {
     "id": "anglo-iraqi-treaty-1930",
-    "title": "Anglo-Iraqi Treaty (1930)",
+    "title": "Anglo-Iraqi Treaty of 1930",
     "date_start": "1932-10-03",
     "date_end": null,
     "countries": [
@@ -748,9 +742,7 @@
       "treaty"
     ],
     "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Anglo-Iraqi Treaty (1930)\" differs from the Wikipedia article title \"Anglo-Iraqi Treaty of 1930\" and does not appear in its lead"
-    ],
+    "review_reasons": [],
     "date_flags": [
       "date_start_year_not_in_lead: start year 1932 (1932-10-03) is not within 1 year of any year in the Wikipedia lead [1930, 1922, 1927]"
     ],
@@ -759,7 +751,7 @@
   },
   {
     "id": "1936-39-arab-revolt-in-palestine",
-    "title": "1936–39 Arab revolt in Palestine",
+    "title": "1936–1939 Arab revolt in Palestine",
     "date_start": "1936-04-19",
     "date_end": "1939-05-17",
     "countries": [
@@ -781,10 +773,8 @@
       "rebellion"
     ],
     "category_group": "uprising",
-    "review_reasons": [
-      "title_differs_from_article: record title \"1936–39 Arab revolt in Palestine\" differs from the Wikipedia article title \"1936–1939 Arab revolt in Palestine\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -1238,7 +1228,7 @@
   },
   {
     "id": "baghdad-pact",
-    "title": "Baghdad Pact",
+    "title": "Central Treaty Organization",
     "date_start": "1955-02-24",
     "date_end": null,
     "countries": [
@@ -1360,7 +1350,7 @@
   },
   {
     "id": "north-yemen-civil-war",
-    "title": "North Yemen Civil War",
+    "title": "North Yemen civil war",
     "date_start": "1962-09-26",
     "date_end": "1970-05-01",
     "countries": [
@@ -1570,7 +1560,7 @@
   },
   {
     "id": "1968-iraqi-coup-d-tat",
-    "title": "1968 Iraqi coup d'état",
+    "title": "17 July Revolution",
     "date_start": "1968-07-17",
     "date_end": null,
     "countries": [
@@ -1592,15 +1582,13 @@
       "coup d'état"
     ],
     "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"1968 Iraqi coup d'état\" differs from the Wikipedia article title \"17 July Revolution\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
     "id": "black-september-in-jordan",
-    "title": "Black September in Jordan",
+    "title": "Black September",
     "date_start": "1970-09-16",
     "date_end": "1971-07-17",
     "countries": [
@@ -1623,10 +1611,8 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Black September in Jordan\" differs from the Wikipedia article title \"Black September\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -2348,7 +2334,7 @@
   },
   {
     "id": "invasion-of-iraq",
-    "title": "Invasion of Iraq",
+    "title": "2003 invasion of Iraq",
     "date_start": "2003-03-20",
     "date_end": "2003-05-01",
     "countries": [
@@ -2432,7 +2418,7 @@
   },
   {
     "id": "israeli-disengagement-from-gaza",
-    "title": "Israeli disengagement from Gaza",
+    "title": "Israeli disengagement from the Gaza Strip",
     "date_start": "2005-08-15",
     "date_end": "2005-09-12",
     "countries": [
@@ -2456,10 +2442,8 @@
       "withdrawal"
     ],
     "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Israeli disengagement from Gaza\" differs from the Wikipedia article title \"Israeli disengagement from the Gaza Strip\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -2551,7 +2535,7 @@
   },
   {
     "id": "gaza-war-2008-09",
-    "title": "Gaza War (2008–09)",
+    "title": "Gaza War (2008–2009)",
     "date_start": "2008-12-27",
     "date_end": "2009-01-18",
     "countries": [
@@ -2574,10 +2558,8 @@
       "military operation"
     ],
     "category_group": "war",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Gaza War (2008–09)\" differs from the Wikipedia article title \"Gaza War (2008–2009)\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -2639,7 +2621,7 @@
   },
   {
     "id": "egyptian-revolution-of-2011",
-    "title": "Egyptian revolution of 2011",
+    "title": "2011 Egyptian revolution",
     "date_start": "2011-01-25",
     "date_end": "2011-02-11",
     "countries": [
@@ -2661,10 +2643,8 @@
       "protest"
     ],
     "category_group": "uprising",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Egyptian revolution of 2011\" differs from the Wikipedia article title \"2011 Egyptian revolution\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "precise"
   },
   {
@@ -2700,7 +2680,7 @@
   },
   {
     "id": "yemeni-revolution",
-    "title": "Yemeni Revolution",
+    "title": "Yemeni revolution",
     "date_start": "2011-01-27",
     "date_end": "2012-02-27",
     "countries": [
@@ -2729,7 +2709,7 @@
   },
   {
     "id": "egyptian-crisis-2011-2014",
-    "title": "Egyptian crisis (2011–2014)",
+    "title": "Egyptian Crisis (2011–2014)",
     "date_start": "2012-06-30",
     "date_end": "2014-06-08",
     "countries": [
@@ -2819,7 +2799,7 @@
   },
   {
     "id": "saudi-arabian-led-intervention-in-yemen",
-    "title": "Saudi Arabian–led intervention in Yemen",
+    "title": "Saudi-led intervention in the Yemeni civil war",
     "date_start": "2015-03-26",
     "date_end": null,
     "countries": [
@@ -2843,7 +2823,6 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "title_differs_from_article: record title \"Saudi Arabian–led intervention in Yemen\" differs from the Wikipedia article title \"Saudi-led intervention in the Yemeni civil war\" and does not appear in its lead",
       "country_not_supported_by_wikidata: Saudi Arabia not derivable from Wikidata P17/P276/P131 (Wikidata gives: Yemen)"
     ],
     "needs_review": true,
@@ -2851,7 +2830,7 @@
   },
   {
     "id": "joint-comprehensive-plan-of-action",
-    "title": "Joint Comprehensive Plan of Action",
+    "title": "Iran nuclear deal",
     "date_start": "2015-07-14",
     "date_end": null,
     "countries": [
@@ -2966,7 +2945,7 @@
   },
   {
     "id": "united-states-recognition-of-jerusalem-as-the-capital-of-israel",
-    "title": "United States recognition of Jerusalem as the capital of Israel",
+    "title": "United States recognition of Jerusalem as capital of Israel",
     "date_start": "2018-05-14",
     "date_end": null,
     "countries": [
@@ -2988,15 +2967,13 @@
       "diplomatic recognition"
     ],
     "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"United States recognition of Jerusalem as the capital of Israel\" differs from the Wikipedia article title \"United States recognition of Jerusalem as capital of Israel\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
     "id": "united-states-withdrawal-from-the-joint-comprehensive-plan-of-action",
-    "title": "United States withdrawal from the Joint Comprehensive Plan of Action",
+    "title": "United States withdrawal from the Iran nuclear deal",
     "date_start": "2018-05-08",
     "date_end": null,
     "countries": [
@@ -3018,15 +2995,13 @@
       "incident"
     ],
     "category_group": "diplomatic",
-    "review_reasons": [
-      "title_differs_from_article: record title \"United States withdrawal from the Joint Comprehensive Plan of Action\" differs from the Wikipedia article title \"United States withdrawal from the Iran nuclear deal\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
     "id": "killing-of-jamal-khashoggi",
-    "title": "Killing of Jamal Khashoggi",
+    "title": "Assassination of Jamal Khashoggi",
     "date_start": "2018-10-02",
     "date_end": null,
     "countries": [
@@ -3051,7 +3026,6 @@
     ],
     "category_group": "political",
     "review_reasons": [
-      "title_differs_from_article: record title \"Killing of Jamal Khashoggi\" differs from the Wikipedia article title \"Assassination of Jamal Khashoggi\" and does not appear in its lead",
       "country_not_supported_by_wikidata: Saudi Arabia not derivable from Wikidata P17/P276/P131 (Wikidata gives: Turkey)"
     ],
     "needs_review": true,
@@ -3213,7 +3187,7 @@
   },
   {
     "id": "2023-israel-hamas-war",
-    "title": "2023 Israel–Hamas war",
+    "title": "Gaza war",
     "date_start": "2023-10-07",
     "date_end": null,
     "countries": [
@@ -3235,10 +3209,8 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [
-      "title_differs_from_article: record title \"2023 Israel–Hamas war\" differs from the Wikipedia article title \"Gaza war\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -3271,7 +3243,7 @@
   },
   {
     "id": "2024-israel-hezbollah-conflict",
-    "title": "2024 Israel–Hezbollah conflict",
+    "title": "Hezbollah–Israel conflict (2023–present)",
     "date_start": "2024-09-23",
     "date_end": "2024-11-27",
     "countries": [
@@ -3295,10 +3267,8 @@
       "border conflict"
     ],
     "category_group": "war",
-    "review_reasons": [
-      "title_differs_from_article: record title \"2024 Israel–Hezbollah conflict\" differs from the Wikipedia article title \"Hezbollah–Israel conflict (2023–present)\" and does not appear in its lead"
-    ],
-    "needs_review": true,
+    "review_reasons": [],
+    "needs_review": false,
     "location_quality": "approximate"
   },
   {
@@ -5738,7 +5708,7 @@
     "wikidata_qid": "Q1814446",
     "resolved_qid": "Q1814446",
     "wikipedia_url": "https://en.wikipedia.org/wiki/King_David_Hotel_bombing",
-    "extract": "The British administrative headquarters for Mandatory Palestine, housed in the southern wing of the King David Hotel in Jerusalem, were bombed in a terrorist attack on 22 July 1946, by the militant right-wing Zionist underground organization Irgun during the Jewish insurgency. Ninety-one people of various nationalities were killed, including Arabs, Britons and Jews, and 46 were injured.\n\nThe hotel was the site of the central offices of the British Mandatory authorities of Palestine, principally the Secretariat of the Government of Palestine and the Headquarters of the British Armed Forces in Palestine and Transjordan. When planned, the attack had the approval of the Haganah, the principal Jewish paramilitary group in Palestine, though, unbeknownst to the Irgun, this had been cancelled by the time the operation was carried out. The main motive of the bombing was to destroy documents incriminating the Jewish Agency in attacks against the British, which were obtained during Operation Agatha, a series of raids by mandate authorities. It was the deadliest attack directed at the British during the Mandate era (1920–1948).\n\nDisguised as Arab workmen and as hotel waiters, members of the Irgun planted a bomb in the basement of the main building of the hotel, whose southern wing housed the Mandate Secretariat and a few offices of the British military headquarters. The resulting explosion caused the collapse of the western half of the southern wing of the hotel. Some of the deaths and injuries occurred in the road outside the hotel and in adjacent buildings.\n\nControversy has arisen over the timing and adequacy of any warnings. The Irgun stated subsequently that warnings were delivered by telephone; Thurston Clarke states that the first warning was delivered by a 16-year-old recruit to the hotel switchboard 15 minutes before the explosion. The British Government said after the inquest that no warning had been received by anyone at the Secretariat \"in an official position with any power to take action\".",
+    "extract": "The British administrative headquarters for Mandatory Palestine, housed in the southern wing of the King David Hotel in Jerusalem, were bombed in a terrorist attack on 22 July 1946, by the militant right-wing Zionist underground organization Irgun during the Jewish insurgency. 91 people of various nationalities were killed, including Arabs, Britons and Jews, and 46 were injured.\n\nThe hotel was the site of the central offices of the British Mandatory authorities of Palestine, principally the Secretariat of the Government of Palestine and the Headquarters of the British Armed Forces in Palestine and Transjordan. When planned, the attack had the approval of the Haganah, the principal Jewish paramilitary group in Palestine, though, unbeknownst to the Irgun, this had been cancelled by the time the operation was carried out. The main motive of the bombing was to destroy documents incriminating the Jewish Agency in attacks against the British, which were obtained during Operation Agatha, a series of raids by mandate authorities. It was the deadliest attack directed at the British during the Mandate era (1920–1948).\n\nDisguised as Arab workmen and as hotel waiters, members of the Irgun planted a bomb in the basement of the main building of the hotel, whose southern wing housed the Mandate Secretariat and a few offices of the British military headquarters. The resulting explosion caused the collapse of the western half of the southern wing of the hotel. Some of the deaths and injuries occurred in the road outside the hotel and in adjacent buildings.\n\nControversy has arisen over the timing and adequacy of any warnings. The Irgun stated subsequently that warnings were delivered by telephone; Thurston Clarke states that the first warning was delivered by a 16-year-old recruit to the hotel switchboard 15 minutes before the explosion. The British Government said after the inquest that no warning had been received by anyone at the Secretariat \"in an official position with any power to take action\".",
     "coordinates": {
       "lat": 31.77444444,
       "lon": 35.2225
@@ -5759,7 +5729,7 @@
     ],
     "needs_review": true,
     "wikidata_description": "1946 event in Jerusalem",
-    "extract_retrieved_at": "2026-09-26"
+    "extract_retrieved_at": "2026-10-03"
   },
   {
     "id": "haifa-oil-refinery-massacre",
@@ -6668,7 +6638,7 @@
     "wikidata_qid": "Q15106049",
     "resolved_qid": "Q15106049",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Sabena_Flight_571",
-    "extract": "Sabena Flight 571 was a scheduled passenger flight from Brussels to Tel Aviv via Vienna, operated by the Belgian national airline, Sabena. On 8 May 1972, a Boeing 707 passenger aircraft operating that service, captained by British pilot Reginald Levy, DFC, was hijacked by four members of the Black September Organization, a Palestinian terrorist group.\n\nFollowing their instructions, Captain Levy landed the plane at Lod Airport, later Ben Gurion International Airport. The hijackers demanded that Israel release Palestinian prisoners in exchange for the hostages. The standoff was ended by an Israeli commando raid in which all of the hijackers were killed or captured.",
+    "extract": "Sabena Flight 571 was a scheduled passenger flight from Brussels to Tel Aviv via Vienna, operated by the Belgian national airline, Sabena. On 8 May 1972, a Boeing 707 passenger aircraft operating that service, captained by British pilot Reginald Levy, DFC, was hijacked by four members of the Black September Organization, a Palestinian terrorist group.\n\nFollowing their instructions, Captain Levy landed the plane at Lod Airport in Israel. The hijackers demanded Israel release Palestinian prisoners in exchange for the hostages. The standoff was ended by an Israeli commando raid in which all of the hijackers were killed or captured.",
     "coordinates": {
       "lat": 32.0094,
       "lon": 34.8769
@@ -6689,7 +6659,7 @@
     ],
     "needs_review": true,
     "wikidata_description": "aircraft hijacking",
-    "extract_retrieved_at": "2026-09-26"
+    "extract_retrieved_at": "2026-10-03"
   },
   {
     "id": "lod-airport-massacre",
@@ -8362,7 +8332,7 @@
     "wikidata_qid": "Q612086",
     "resolved_qid": "Q612086",
     "wikipedia_url": "https://en.wikipedia.org/wiki/USS_Cole_bombing",
-    "extract": "The USS Cole bombing was a suicide attack by al-Qaeda against USS Cole, a guided missile destroyer of the United States Navy, on 12 October 2000, while it was being refueled in Yemen's Aden harbor.\n\nSeventeen U.S. Navy sailors were killed and thirty-seven injured in the deadliest attack against a United States naval vessel since the USS Stark incident in 1987.\n\nAl-Qaeda claimed responsibility for the attack. A U.S. judge held Sudan liable for the attack, while another released over $13 million in Sudanese frozen assets to the relatives of those killed. The U.S. Navy reconsidered its rules of engagement in response to this attack. On 30 October 2020, Sudan and the United States signed a bilateral claims agreement to compensate families of the sailors who died in the bombing. The agreement entered into force in February 2021.",
+    "extract": "The USS Cole bombing was a suicide attack by al-Qaeda against USS Cole, a guided missile destroyer of the United States Navy, on 12 October 2000, while she was being refueled in Yemen's Aden harbor.\n\nSeventeen U.S. Navy sailors were killed and thirty-seven injured in the deadliest attack against a United States naval vessel since the USS Stark incident in 1987.\n\nAl-Qaeda claimed responsibility for the attack. A U.S. judge held Sudan liable for the attack, while another released over $13 million in Sudanese frozen assets to the relatives of those killed. The U.S. Navy reconsidered its rules of engagement in response to this attack. On 30 October 2020, Sudan and the United States signed a bilateral claims agreement to compensate families of the sailors who died in the bombing. The agreement entered into force in February 2021.",
     "coordinates": {
       "lat": 12.8022,
       "lon": 45.0054
@@ -8376,7 +8346,7 @@
     "review_reasons": [],
     "needs_review": false,
     "wikidata_description": "Al-Qaeda bombing of USS Cole",
-    "extract_retrieved_at": "2026-09-26"
+    "extract_retrieved_at": "2026-10-03"
   },
   {
     "id": "battle-of-jenin-2002",
@@ -18516,7 +18486,7 @@
     "wikidata_qid": "Q545449",
     "resolved_qid": "Q545449",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Iraq_War",
-    "extract": "The Iraq War (Arabic: حرب العراق, romanized: ḥarb al-ʿirāq), also referred to as the Second Gulf War (Gulf War II), was a protracted armed conflict in Iraq from 2003 to 2011. It began with the invasion by a United States–led coalition, which resulted in the overthrow of the Ba'athist government of Saddam Hussein. During the US occupation of Iraq, the conflict persisted as an insurgency that arose against coalition forces and the newly established Iraqi government. US forces were officially withdrawn in 2011. In 2014, the US became re-engaged in Iraq, leading a new coalition under Combined Joint Task Force – Operation Inherent Resolve, as the conflict evolved into the ongoing Islamic State insurgency.\n\nThe Iraq invasion was part of the Bush administration's broader war on terror, launched in response to the September 11 attacks. In October 2002, the US Congress passed a bipartisan resolution granting Bush authority to use military force against Iraq. The war began on March 20, 2003, when the US, joined by the UK, Australia, and Poland, initiated a \"shock and awe\" bombing campaign. Coalition forces launched a ground invasion, defeating Iraqi forces and toppling the Ba'athist regime. Saddam Hussein was captured in 2003 and executed in 2006.\n\nThe fall of Saddam's regime created a power vacuum, which, along with the Coalition Provisional Authority's mismanagement, fueled a sectarian civil war between Iraq's Shia majority and Sunni minority, and contributed to a lengthy insurgency. In response, the US deployed an additional 170,000 troops during the 2007 troop surge, which helped stabilize parts of the country. In 2008, Bush agreed to withdraw US combat troops, a process completed in 2011 under President Barack Obama.\n\nThe primary rationale for the invasion centered around false claims that Iraq possessed weapons of mass destruction (WMDs) and that Saddam Hussein was supporting al-Qaeda. The 9/11 Commission concluded in 2004 that there was no credible evidence linking Saddam to al-Qaeda, and no WMD stockpiles were found in Iraq. These false claims faced widespread criticism, in the US and abroad. Kofi Annan, then secretary-general of the United Nations, declared the invasion illegal under international law, as it violated the UN Charter. The 2016 Chilcot Report, a British inquiry, concluded the war was unnecessary, as peaceful alternatives had not been fully explored. Iraq held multi-party elections in 2005, and Nouri al-Maliki became Prime Minister in 2006, a position he held until 2014. His government's policies alienated Iraq's Sunni minority, exacerbating sectarian tensions.\n\nThe war led to an estimated 150,000 to over a million deaths, including over 100,000 civilians, with most occurring during the post-invasion insurgency and civil war. The war had lasting geopolitical effects, including the emergence of the extremist Islamic State, whose rise led to the 2013–2017 War in Iraq. The war damaged American international reputation, and Bush's popularity declined. UK prime minister Tony Blair's support for the war diminished his standing, contributing to his resignation in 2007.\n\nAmong the international law justifications for the Iraq War offered by the United States were the inherent right of anticipatory self-defense and prior authorization by the Security Council.",
+    "extract": "The Iraq War (Arabic: حرب العراق, romanized: ḥarb al-ʿirāq), also referred to as the Second Gulf War (Gulf War II), was a protracted armed conflict in Iraq from 2003 to 2011. It began with the invasion by a United States–led coalition, which resulted in the overthrow of the Ba'athist government of Saddam Hussein. During the US occupation of Iraq, the conflict persisted as an insurgency that arose against coalition forces and the newly established Iraqi government. US forces were officially withdrawn in 2011. In 2014, the US became re-engaged in Iraq, leading a new coalition under Combined Joint Task Force – Operation Inherent Resolve, as the conflict evolved into the ongoing Islamic State insurgency.\n\nThe Iraq invasion was part of the Bush administration's broader war on terror, launched in response to the September 11 attacks. In October 2002, the US Congress passed a bipartisan resolution granting Bush authority to use military force against Iraq. The war began on March 20, 2003, when the US, joined by the UK, Australia, and Poland, initiated a \"shock and awe\" bombing campaign. Coalition forces launched a ground invasion, defeating Iraqi forces and toppling the Ba'athist regime. Saddam Hussein was captured in 2003 and executed in 2006.\n\nThe fall of Saddam's regime created a power vacuum, which, along with the Coalition Provisional Authority's mismanagement, fueled a sectarian civil war between Iraq's Shia majority and Sunni minority, and contributed to a lengthy insurgency. In response, the US deployed an additional 170,000 troops during the 2007 troop surge, which helped stabilize parts of the country. In 2008, Bush agreed to withdraw US combat troops, a process completed in 2011 under President Barack Obama.\n\nAmong the international law justifications advanced by the United States for the Iraq War were the inherent right of anticipatory self-defense and prior authorization by the Security Council. The primary rationale for the invasion centered around false claims that Iraq possessed weapons of mass destruction (WMDs) and that Saddam Hussein was supporting al-Qaeda. The 9/11 Commission concluded in 2004 that there was no credible evidence linking Saddam to al-Qaeda, and no WMD stockpiles were found in Iraq. These false claims faced widespread criticism, in the US and abroad. Kofi Annan, then secretary-general of the United Nations, declared the invasion illegal under international law, as it violated the UN Charter. The 2016 Chilcot Report, a British inquiry, concluded the war was unnecessary, as peaceful alternatives had not been fully explored. Iraq held multi-party elections in 2005, and Nouri al-Maliki became Prime Minister in 2006, a position he held until 2014. His government's policies alienated Iraq's Sunni minority, exacerbating sectarian tensions.\n\nThe war led to an estimated 150,000 to over a million deaths, including over 100,000 civilians, with most occurring during the post-invasion insurgency and civil war. The war had lasting geopolitical effects, including the emergence of the extremist Islamic State, whose rise led to the 2013–2017 War in Iraq. The war damaged American international reputation, and Bush's popularity declined. UK prime minister Tony Blair's support for the war diminished his standing, contributing to his resignation in 2007.",
     "coordinates": null,
     "coordinate_source": null,
     "location_quality": "none",
@@ -18538,7 +18508,7 @@
       "part_of: Wikidata (P361) lists this event as part of \"War on Terrorism\" (Q185729); it may overlap with that larger event"
     ],
     "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
+    "extract_retrieved_at": "2026-10-03",
     "wikidata_description": "2003–2011 war after an American-led invasion"
   },
   {
@@ -18706,7 +18676,7 @@
     "wikidata_qid": "Q4087318",
     "resolved_qid": "Q4087318",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Battle_of_Samarra_(2004)",
-    "extract": "The Battle of Samarra, also called Operation Baton Rouge, took place in 2004 during the Iraq War. The city of Samarra in central Iraq had fallen under the control of insurgents shortly after insurgents had seized control of Fallujah and Ramadi. In preparation for an offensive to retake Fallujah, on 1 October, 5,000 American and Iraqi troops assaulted Samarra and secured the city after three days of fighting.",
+    "extract": "The Battle of Samarra, also called Operation Baton Rouge, took place in 2004 during the Iraq War. The city of Samarra in central Iraq had fallen under the control of insurgents shortly after insurgents had seized control of Fallujah and Ramadi. In preparation for an offensive to retake Fallujah, on 2 October, 5,000 American and Iraqi troops assaulted Samarra and secured the city after three days of fighting.",
     "coordinates": null,
     "coordinate_source": null,
     "location_quality": "none",
@@ -18723,7 +18693,7 @@
       "part_of: Wikidata (P361) lists this event as part of \"Iraq War\" (Q545449); it may overlap with that larger event"
     ],
     "needs_review": true,
-    "extract_retrieved_at": "2026-09-26",
+    "extract_retrieved_at": "2026-10-03",
     "wikidata_description": "2004 battle"
   },
   {
@@ -19545,7 +19515,7 @@
   },
   {
     "id": "iraqi-turkmen-genocide",
-    "title": "Iraqi Turkmen genocide",
+    "title": "Persecution of the Iraqi Turkmen by the Islamic State",
     "date_start": "2014-08-01",
     "date_end": "2017-08-31",
     "countries": [
@@ -19560,7 +19530,7 @@
     "sitelinks": 19,
     "wikidata_qid": "Q116783960",
     "resolved_qid": "Q116783960",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Iraqi_Turkmen_genocide",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Persecution_of_the_Iraqi_Turkmen_by_the_Islamic_State",
     "extract": "Persecution of the Iraqi Turkmen by the Islamic State refers to the series of killings, rapes, executions, expulsions, and sexual slavery of the Iraqi Turkmen in Islamic State-controlled territory. The persecution began when IS captured Iraqi Turkmen lands in 2014 and continued until IS lost all of their land in Iraq. In 2017, it was officially recognized as a genocide by the Parliament of Iraq, and in 2018, the sexual slavery was also recognized by the United Nations.",
     "coordinates": null,
     "coordinate_source": null,

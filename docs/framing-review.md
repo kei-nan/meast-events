@@ -58,9 +58,9 @@ All 571 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI mod
 
 | | Summaries |
 |---|---|
-| Overall fairness: issue found | 79 of 571 |
+| Overall fairness: issue found | 80 of 571 |
 | Wording check: at least one wording point | 78 of 571 |
-| Either | 138 of 571 |
+| Either | 139 of 571 |
 
 | Guideline | Wording points |
 |---|---|
@@ -77,7 +77,7 @@ We do not publish counts of which side the reviews favour. An earlier version (2
 
 - **One reviewer.** Every review is applied by a single AI model. Another careful reader could apply the same guidelines differently.
 - **English Wikipedia only.** Other language editions frame many of these events differently; the review does not compare them.
-- **A snapshot.** Wikipedia text changes. Each entry stores a fingerprint of the exact text reviewed; when the text shown no longer matches, the event page says the review may no longer apply until it is redone.
+- **A snapshot.** Wikipedia text changes. Each entry stores a fingerprint of the exact text reviewed; when the text shown no longer matches, the event page says the review may no longer apply until it is redone. When a review is redone, findings on sentences whose wording has not changed are kept as they were, so the same words are not judged differently from one review to the next; only changed sentences are judged again.
 - **Not a balance of sources.** The review only describes the summary shown. It does not add the other side's account, because choosing and wording that account would itself be an editorial act.
 
 ## Disagree with a review?

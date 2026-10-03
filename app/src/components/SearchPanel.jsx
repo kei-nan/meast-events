@@ -22,13 +22,13 @@ import "../SidePanel.css";
  *                                          inView (restrict to current map view)
  * @param {Area|null} props.area            active drawn area, or null
  * @param {"off"|"rect"|"circle"} props.areaMode  current draw mode
- * @param {"idle"|"loading"|"ready"|"error"} props.status
+ * @param {"idle"|"loading"|"ready"} props.status
  *        idle = no query/filters/area (results is then the browse list for the range);
- *        loading = keep previous `results` (dimmed); error = API failed, static fallback in use
+ *        loading = keep previous `results` (dimmed)
  * @param {object[]} props.results          lite events {id,title,date_start,date_end,countries,category,
  *                                          location_quality,snippet}, already ordered
  * @param {number}   props.total            total matches (may exceed results.length)
- * @param {"fulltext"|"local"|"static"} props.source    "static" shows the "Matching is simpler in offline mode" banner
+ * @param {"fulltext"|"local"|"static"} props.source    "static" (full-text index unavailable) shows the "Matching is simpler in offline mode" banner
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
@@ -69,6 +69,7 @@ export default function SearchPanel({
   const inputId = useId();
   const hintId = useId();
   const inputRef = useRef(null);
+  const toggleRef = useRef(null);
   const listWrapRef = useRef(null);
   const lastSelectedRef = useRef(null);
   const hadSelectionRef = useRef(false);
@@ -83,7 +84,7 @@ export default function SearchPanel({
   }
 
   const loading = status === "loading";
-  const offline = source === "static" || status === "error";
+  const offline = source === "static";
   const hasFilters =
     (filters.categories?.length ?? 0) > 0 ||
     (filters.countries?.length ?? 0) > 0 ||
@@ -105,6 +106,13 @@ export default function SearchPanel({
       (row ?? inputRef.current)?.focus();
     }
   }, [selectedEvent]);
+
+  // Mobile: collapse the sheet to its peek bar so the map (already centred on
+  // the event) shows; focus moves to the toggle, which reopens the event.
+  function showOnMap() {
+    setSheet("peek");
+    toggleRef.current?.focus();
+  }
 
   function clearAll() {
     onQueryChange("");
@@ -151,6 +159,7 @@ export default function SearchPanel({
   return (
     <aside className="side-panel" data-sheet={sheet} aria-label="Search and event details">
       <button
+        ref={toggleRef}
         type="button"
         className="sp-sheet-toggle"
         aria-expanded={sheet === "full"}
@@ -158,7 +167,7 @@ export default function SearchPanel({
         onClick={() => setSheet(sheet === "full" ? "peek" : "full")}
       >
         <span className="sp-sheet-grip" aria-hidden="true" />
-        {sheet === "full" ? "Show map" : "Show results"}
+        {sheet === "full" ? "Show map" : selectedEvent ? "Show event" : "Show results"}
       </button>
 
       <div className="sp-scroll">
@@ -168,7 +177,7 @@ export default function SearchPanel({
               if (e.key === "Escape") onBack();
             }}
           >
-            <EventDetail event={selectedEvent} onBack={onBack} />
+            <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} />
           </div>
         )}
 
@@ -288,6 +297,7 @@ export default function SearchPanel({
                   onHover={onHover}
                   onFocusInput={() => inputRef.current?.focus()}
                   busy={loading}
+                  browse={!searching}
                 />
               </>
             )}

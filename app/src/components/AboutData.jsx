@@ -6,6 +6,9 @@ const REPO = "https://github.com/kei-nan/meast-events";
 
 const fmt = (v) => (typeof v === "number" ? v.toLocaleString("en-US") : String(v));
 const label = (k) => k.replace(/_/g, " ");
+// "2026-10-03" -> "3 October 2026" (UTC, so the day never shifts with the viewer's time zone).
+const longDate = (iso) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 const isPlain = (v) => v === null || ["string", "number", "boolean"].includes(typeof v);
 
 // Renders whatever selection-funnel.json contains, without assuming a schema:
@@ -147,7 +150,7 @@ function FramingCounts({ state }) {
       </p>
     );
   }
-  const { guidelines, counts, total } = state.data;
+  const { guidelines, counts, total, reviewed_on, updated_on } = state.data;
   const rows = Object.entries(guidelines)
     .map(([k, g]) => ({ label: g.name, count: counts.guideline[k] ?? 0 }))
     .sort((a, b) => b.count - a.count);
@@ -160,6 +163,14 @@ function FramingCounts({ state }) {
         {fmt(counts.with_wording)}. Wording points by guideline:
       </p>
       <BarList rows={rows} />
+      {reviewed_on && (
+        <p className="about-muted">
+          All summaries were reviewed on {longDate(reviewed_on)}
+          {updated_on && updated_on !== reviewed_on
+            ? `; summaries that changed on Wikipedia since then were re-reviewed, most recently on ${longDate(updated_on)}.`
+            : "."}
+        </p>
+      )}
       {counts.stale > 0 && (
         <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>
       )}
@@ -296,8 +307,8 @@ export default function AboutData({ onClose }) {
           <strong>wording check</strong> cites one of Wikipedia&apos;s own neutrality and wording guidelines
           (contentious labels such as &ldquo;terrorist&rdquo;, editorializing, words that cast doubt, uneven
           &ldquo;claimed&rdquo; and &ldquo;said&rdquo;, and contested opinions stated as fact). There is no score and no verdict on which side a summary
-          favours. Every summary was reviewed on 30 September 2026
-          by Claude, an AI model made by Anthropic; a person has not checked every review.
+          favours. Every summary was reviewed by Claude, an AI model made by Anthropic; a person has not checked
+          every review.
         </p>
         <FramingCounts state={framing} />
         <p>
@@ -320,6 +331,25 @@ export default function AboutData({ onClose }) {
           Wrong date, missing event, or a mistake in a text? Please{" "}
           <a href={`${REPO}/issues`} target="_blank" rel="noreferrer" title="Opens in a new tab">open an issue</a>. Errors in article text
           are best fixed on Wikipedia or Wikidata itself; the next data refresh picks the fix up.
+        </p>
+
+        <h3>Borders</h3>
+        <p>
+          Borders are adapted from{" "}
+          <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            CShapes 2.0
+          </a>{" "}
+          (Schvitz et al., ETH Zurich), licensed{" "}
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            CC BY-NC-SA 4.0
+          </a>
+          : <strong>non-commercial use only</strong>. This project has corrected and added some shapes; every changed
+          or added shape cites its own source (see the{" "}
+          <a href={`${REPO}/blob/main/scripts/boundary-corrections.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            corrections list
+          </a>
+          ). The map draws the borders of the last year in the selected period. Dashed borders mark territory under a
+          mandate, occupation, unrecognized annexation, or a since-resolved sovereignty dispute.
         </p>
 
         <h3>Licensing</h3>

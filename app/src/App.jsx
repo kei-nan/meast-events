@@ -15,9 +15,10 @@ import {
   loadFullLead,
   loadLand,
 } from "./lib/dataClient";
+import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
-import { rankEvents } from "./lib/ranking";
+import { orderBrowseList } from "./lib/browseOrder";
 import { parseUrlState } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
@@ -89,10 +90,23 @@ function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
   };
 }
 
+const SITE_TITLE = "Middle East, 1900–present"; // as in index.html
+const BOUNDARY_CORRECTIONS_URL = "https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js";
 const RETRY_MS = 20000;
 const DEEP_LINK_PAD_YEARS = 5;
 
 const clampYear = (y) => Math.min(MAX_YEAR, Math.max(MIN_YEAR, y));
+
+// Map focus for an opened event: fly to its marker, or - for an event without
+// a precise location - fit the map to its shaded countries (MapView's
+// countryHighlight.js; it falls back to the capital pin when no country has a
+// shape that year). null = nothing to focus.
+function focusFor(ev, nonceRef) {
+  const c = eventCoords(ev);
+  const fitCountries = needsCountryShading(ev);
+  if (!c && !fitCountries) return null;
+  return { id: ev.id, lon: c?.lon, lat: c?.lat, fitCountries, countries: ev.countries, nonce: ++nonceRef.current };
+}
 
 export default function App() {
   // Initial state comes from the (validated) URL so links are shareable.
@@ -225,6 +239,21 @@ export default function App() {
 
   const selectedEventRaw = selectedEventId ? (storeRef.current.get(selectedEventId) ?? null) : null;
 
+  // While an event is open the map shows the borders of the event's own year
+  // (eventBorderYear: its start year), not the timeline's end year, unless the
+  // user chose "Use timeline year" for this event. The range is left alone.
+  const [timelineBordersFor, setTimelineBordersFor] = useState(null); // event id
+  const eventYear = selectedEventRaw ? eventBorderYear(selectedEventRaw, MIN_YEAR, MAX_YEAR) : null;
+  const borderYear = eventYear != null && timelineBordersFor !== selectedEventId ? eventYear : null;
+  const toggleEventYear = useCallback(
+    () => setTimelineBordersFor((id) => (id === selectedEventId ? null : selectedEventId)),
+    [selectedEventId]
+  );
+  // Countries shaded on the map: the hovered list row's, else the open event's,
+  // for events without a precise location only.
+  const hoverEvent = hoverId ? (storeRef.current.get(hoverId) ?? null) : null;
+  const highlightEvent = [hoverEvent, selectedEventRaw].find(needsCountryShading) ?? null;
+
   // Full leads are fetched lazily, only for the opened event (never for lists).
   // id -> {extract, extract_retrieved_at, framing_review} | "error"
   const [leads, setLeads] = useState({});
@@ -249,8 +278,6 @@ export default function App() {
     if (!raw) return raw;
     const lead = leads[raw.id];
     const full = lead && lead !== "error" ? lead : null;
-    // A record that already carries its text (API) only takes the review from the lead file.
-    if (raw.extract !== undefined) return full ? { ...raw, framing_review: full.framing_review ?? null } : raw;
     if (full) return { ...raw, ...full };
     // Until the full lead arrives (or if it cannot be fetched) show the snippet, flagged as partial.
     return { ...raw, extract: raw.snippet ?? "", leadStatus: lead === "error" ? "error" : "loading" };
@@ -271,13 +298,14 @@ export default function App() {
     return new Set(scopedResults.map((e) => e.id));
   }, [search.status, scopedResults]);
 
-  // What the panel lists: idle => the chronological browse list for the
-  // selected years (capped for rendering; `total` stays exact); otherwise the
-  // ranked search results in the chosen scope.
+  // What the panel lists: idle => the browse list for the selected years
+  // (events starting in them first, then ones ongoing from earlier; see
+  // lib/browseOrder.js; capped for rendering, `total` stays exact); otherwise
+  // the ranked search results in the chosen scope.
   const BROWSE_CAP = 500;
   const browseList = useMemo(
-    () => (search.status === "idle" ? inViewFilter(rankEvents(visibleEvents, "")) : null),
-    [search.status, inViewFilter, visibleEvents]
+    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear)) : null),
+    [search.status, inViewFilter, visibleEvents, startYear]
   );
   const panelResults = browseList ? browseList.slice(0, BROWSE_CAP) : scopedResults;
   const panelTotal = browseList
@@ -318,7 +346,6 @@ export default function App() {
     const ev = storeRef.current.get(selectedEventId);
     if (ev && pendingFocusRef.current === selectedEventId) {
       pendingFocusRef.current = null;
-      const c = eventCoords(ev);
       const [s] = eventYearRange(ev);
       const y = clampYear(s);
       setRange((r) =>
@@ -326,7 +353,8 @@ export default function App() {
           ? r
           : { start: clampYear(y - DEEP_LINK_PAD_YEARS), end: clampYear(y + DEEP_LINK_PAD_YEARS) }
       );
-      if (c) setFocus({ id: ev.id, lon: c.lon, lat: c.lat, nonce: ++focusNonceRef.current });
+      const f = focusFor(ev, focusNonceRef);
+      if (f) setFocus(f);
     }
     if (!ev && !triedRef.current.has(selectedEventId)) {
       triedRef.current.add(selectedEventId);
@@ -376,11 +404,25 @@ export default function App() {
       setNotFound(false);
       setSelectedEventId(id);
       const ev = storeRef.current.get(id);
-      const c = ev && eventCoords(ev);
-      if (c) setFocus({ id, lon: c.lon, lat: c.lat, nonce: ++focusNonceRef.current });
+      const f = ev && focusFor(ev, focusNonceRef);
+      if (f) setFocus(f);
     },
     [storeRef]
   );
+
+  // The tab title names the open event (and is restored when it closes).
+  // Link previews still show the site title: crawlers do not run this script,
+  // so per-event previews would need a server-side function.
+  const selectedTitle = selectedEventRaw?.title;
+  const selectedYears = selectedEventRaw ? eventYearRange(selectedEventRaw) : null;
+  const selectedYearText = selectedYears
+    ? selectedYears[1] !== selectedYears[0]
+      ? `${selectedYears[0]}–${selectedYears[1]}`
+      : `${selectedYears[0]}`
+    : "";
+  useEffect(() => {
+    document.title = selectedTitle ? `${selectedTitle} (${selectedYearText}) – ${SITE_TITLE}` : SITE_TITLE;
+  }, [selectedTitle, selectedYearText]);
 
   return (
     <div className="app">
@@ -398,7 +440,7 @@ export default function App() {
         Skip to search
       </a>
       <header className="app-header">
-        <h1>Middle East, 1900–present</h1>
+        <h1>{SITE_TITLE}</h1>
         <p>A map and timeline of major regional events, sourced from Wikipedia.</p>
         <div className="app-search">
           {viewportEventCount !== null && (
@@ -437,6 +479,10 @@ export default function App() {
               matchIds={matchIds}
               eventsLoading={eventsLoading}
               year={endYear}
+              borderYear={borderYear}
+              eventYear={eventYear}
+              onToggleEventYear={toggleEventYear}
+              highlightEvent={highlightEvent}
               selectedEventId={selectedEventId}
               hoverId={hoverId}
               focus={focus}
@@ -493,23 +539,19 @@ export default function App() {
           About the data
         </button>
         {" · "}
-        Event summaries from Wikipedia (CC BY-SA 4.0). Borders adapted from{" "}
+        Text:{" "}
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">
+          Wikipedia (CC BY-SA 4.0)
+        </a>
+        {" · "}
+        Borders:{" "}
         <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
           CShapes 2.0
         </a>{" "}
-        (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0) — non-commercial use only —{" "}
-        <strong>with corrections and additions by this project</strong>; every changed
-        or added shape cites its own source (
-        <a
-          href="https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js"
-          target="_blank"
-          rel="noreferrer"
-        >
-          see the corrections list
+        (ETH Zurich, CC BY-NC-SA 4.0), non-commercial use only, with{" "}
+        <a href={BOUNDARY_CORRECTIONS_URL} target="_blank" rel="noreferrer">
+          our cited corrections
         </a>
-        ).
-        Dashed borders mark territory under a mandate, occupation, unrecognized
-        annexation, or a since-resolved sovereignty dispute.
       </footer>
     </div>
   );

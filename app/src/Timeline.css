@@ -58,6 +58,47 @@
   min-width: 96px;
 }
 
+.timeline-mode {
+  display: flex;
+  flex: none;
+}
+
+.timeline-mode-btn {
+  min-height: 44px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.timeline-mode-btn:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.timeline-mode-btn:last-child {
+  margin-left: -1px;
+  border-radius: 0 6px 6px 0;
+}
+
+.timeline-mode-btn[aria-pressed="true"] {
+  position: relative; /* its accent border draws over the neighbour's */
+  color: var(--text-primary);
+  background: rgba(201, 154, 69, 0.16);
+  border-color: var(--accent);
+}
+
+.timeline-mode-btn:hover {
+  color: var(--text-primary);
+}
+
+.timeline-mode-btn:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
 .timeline-play:hover,
 .timeline-preset:hover {
   border-color: var(--accent);
@@ -101,12 +142,24 @@
 
 .timeline-tick {
   flex: 1;
-  background: var(--border);
-  min-height: 2px;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  cursor: pointer; /* click = jump to that year */
 }
 
-.timeline-tick--active {
+.timeline-tick-bar {
+  width: 100%;
+  min-height: 2px;
+  background: var(--border);
+}
+
+.timeline-tick--active .timeline-tick-bar {
   background: var(--accent);
+}
+
+.timeline-tick:hover .timeline-tick-bar {
+  background: var(--accent-strong);
 }
 
 .timeline-range {
@@ -253,8 +306,26 @@
     gap: 6px;
   }
 
+  /* Year and help on their own row above Play and the play mode. */
+  .timeline-header {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
   .timeline-title {
-    align-items: flex-start;
+    order: -1;
+    flex: 1 0 100%;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .timeline-year {
+    flex: none;
+  }
+
+  .timeline-play {
+    flex: 1;
   }
 
   .timeline-help {

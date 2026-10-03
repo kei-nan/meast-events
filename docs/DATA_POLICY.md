@@ -37,7 +37,7 @@ rather than a second layer of ours. Concretely:
 
 Fetched with the MediaWiki API (`action=query&prop=extracts&exintro=1&explaintext=1&redirects=1`), i.e. all paragraphs of the lead as plain
 text. Only whitespace is normalised (no-break spaces to plain spaces, runs of spaces collapsed, paragraphs separated by one blank line).
-`snippet` (API/UI) is the first 160 characters of it. Length before and after the change for the 394 curated events: median 435 -> 1,207
+`snippet` (lite data/UI) is the first 160 characters of it. Length before and after the change for the 394 curated events: median 435 -> 1,207
 characters, mean 476 -> 1,494, max 1,487 -> 5,481; 327 got longer, 66 were already the whole lead, 1 got shorter (Wikipedia rewrote the lead of the
 Battle of Elli in between). The earlier text was mostly the first paragraph only. `extract_retrieved_at` says when the text was fetched, so it can be shown as "as of".
 
@@ -211,7 +211,7 @@ node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-can
 node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
 node scripts/apply-v21.js [--apply]                     # one-off: brings data/events.json + app copy to shape v2.1 (idempotent)
-node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead refresh (automatic), see below
+node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json
 node scripts/lib/verify-sample.js                       # -> data/import-verification-sample.md
 node scripts/validate-events.js                         # schema/ids/dates/coordinates (runs in CI)
@@ -231,15 +231,30 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 (`.github/workflows/refresh-data.yml`) runs on the 1st of each month, and on demand from the Actions tab ("Run workflow"):
 
 1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
-   `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes.
-2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists, for each changed lead,
-   the removed and added sentences. It never merges.
-3. **Before merging**, read those sentences. Changes in wording are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
-4. After merging, the site rebuilds itself; run `npm run load-redis` so search uses the new text. The framing review of each changed summary shows "may no longer
+   `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes. The same run updates titles of
+   renamed articles (see "Titles" below).
+2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists the title changes,
+   the held title cases, and, for each changed lead, the removed and added sentences. It never merges.
+3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
+4. After merging, the site rebuilds itself, including the search index (Pagefind, built from `data/events.json`), so search uses the new titles and text. The framing review of each changed summary shows "may no longer
    apply" until it is re-reviewed.
 
-To run it by hand instead: `node scripts/refresh-extracts.js --report=refresh-report.md` (dry run, default, writes nothing), then add `--apply` to write the changes.
+To run it by hand instead: `node scripts/refresh-extracts.js --report=refresh-report.md` (dry run, default, writes nothing), then add `--apply` to write the changes
+(leads and titles).
 Add `--proposed` to also refresh `data/events.proposed.json`.
+
+### Titles
+
+`title` is the **current** English Wikipedia article title, and articles get renamed (for example "2023 Israel–Hamas war" is now "Gaza war").
+Titles follow Wikipedia the same way summaries do. The refresh run compares each event's title and URL with the article the API resolves
+(`redirects=1`). A dry run only lists the differences; `--apply` (which the monthly workflow uses) writes the plain renames, so they arrive in the same
+pull request as the changed summaries. A plain rename is one where the stored URL redirects to the renamed article, or the URL is current and Wikipedia
+redirects the stored title to that same article. It changes `title`, `wikipedia_url` (only when the stored URL is a redirect) and drops the then-moot
+`title_differs_from_article` flag. Event ids never change, so deep links keep working, and a rename that would give two events the same title is not applied.
+
+Anything else is **held**: never applied, only listed in the run's report (the pull request description) for a person to judge. Held cases are a redirect
+to a section of a larger article, an article whose Wikidata item is not the event's, or a stored title that Wikipedia does not redirect to the article
+(usually a hand-picked label for an event whose URL points at a broader article).
 
 ## Licensing of the source data
 

@@ -6,7 +6,7 @@
 //
 // Answers only WHICH events match, as event ids in Pagefind's relevance order;
 // filters, drawn areas and the final ranking are applied by the caller from
-// the static store (hooks/useEventSearch.js), as they were for the API.
+// the static store (hooks/useEventSearch.js).
 
 const BASE = `${import.meta.env.BASE_URL}pagefind/`;
 
