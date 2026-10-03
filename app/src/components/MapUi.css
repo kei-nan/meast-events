@@ -276,6 +276,108 @@
   display: none;
 }
 
+/* Events sharing one spot (stacked/unsplittable cluster), listed at the click. */
+.mu-stack:focus {
+  outline: none;
+}
+.mu-stack:focus-visible {
+  outline: 3px solid #1f5a8a;
+  outline-offset: 2px;
+}
+.mu-stack-note {
+  margin: 2px 28px 6px 0;
+  color: #5c4d38;
+}
+.mu-stack-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.mu-stack-list li + li {
+  border-top: 1px solid #c9bfa8;
+}
+.mu-stack-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #2b2418;
+  font: 13px/1.3 system-ui, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.mu-stack-item:hover {
+  background: #e9e2d2;
+}
+.mu-stack-item:focus-visible {
+  outline: 3px solid #1f5a8a;
+  outline-offset: -3px;
+}
+.mu-stack-item.is-miss {
+  color: #6d6150;
+}
+.mu-stack-item .mu-dot {
+  align-self: center;
+}
+.mu-dot.is-ring.is-small {
+  width: 12px;
+  height: 12px;
+  border-width: 2.5px;
+}
+.mu-stack-title {
+  flex: 1;
+  min-width: 0;
+}
+.mu-stack-year {
+  flex: none;
+  color: #5c4d38;
+  font-variant-numeric: tabular-nums;
+}
+.mu-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Desktop hover label for dots and clusters (positioned by useMapHoverLabel). */
+.mu-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  max-width: 280px;
+  padding: 4px 7px;
+  pointer-events: none;
+  font: 600 12px/1.3 system-ui, sans-serif;
+  color: #f4f1ea;
+  background: rgba(43, 36, 24, 0.94);
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.mu-tooltip[hidden] {
+  display: none;
+}
+
+/* Phone "Draw" menu: the two shape choices open beside its button. */
+.mu-draw {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.mu-draw-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 /* Mobile: the results sheet overlaps the bottom of the map; lift the legend above it. */
 @media (max-width: 768px) {
   .mu-legend {
