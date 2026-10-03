@@ -322,6 +322,25 @@ export default function AboutData({ onClose }) {
           are best fixed on Wikipedia or Wikidata itself; the next data refresh picks the fix up.
         </p>
 
+        <h3>Borders</h3>
+        <p>
+          Borders are adapted from{" "}
+          <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            CShapes 2.0
+          </a>{" "}
+          (Schvitz et al., ETH Zurich), licensed{" "}
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            CC BY-NC-SA 4.0
+          </a>
+          : <strong>non-commercial use only</strong>. This project has corrected and added some shapes; every changed
+          or added shape cites its own source (see the{" "}
+          <a href={`${REPO}/blob/main/scripts/boundary-corrections.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            corrections list
+          </a>
+          ). The map draws the borders of the last year in the selected period. Dashed borders mark territory under a
+          mandate, occupation, unrecognized annexation, or a since-resolved sovereignty dispute.
+        </p>
+
         <h3>Licensing</h3>
         <p>
           Source code: AGPL-3.0. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a

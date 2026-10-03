@@ -5,6 +5,7 @@ import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
+import { categoryLabel } from "../lib/categoryLabels.js";
 
 // What the map shades for an event without a precise location (see
 // countryHighlight.js): its listed countries, with the borders of its year.
@@ -32,8 +33,10 @@ function historyUrl(wikipediaUrl) {
  * rendered as-is. `event.leadStatus` is "loading"/"error" while only the
  * snippet is available (the full lead is fetched lazily by the app).
  * `onBack` returns to the results list (the panel restores focus to the row).
+ * `onShowOnMap` (optional) collapses the mobile sheet so the map is visible;
+ * its button is shown on narrow screens only (SidePanel.css).
  */
-export default function EventDetail({ event, onBack }) {
+export default function EventDetail({ event, onBack, onShowOnMap }) {
   const headingRef = useRef(null);
   const [copied, setCopied] = useState(false);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
@@ -85,6 +88,11 @@ export default function EventDetail({ event, onBack }) {
         <button type="button" className="sp-btn" onClick={onBack}>
           <span aria-hidden="true">←</span> Back to results
         </button>
+        {onShowOnMap && quality !== "none" && (
+          <button type="button" className="sp-btn event-detail-showmap" onClick={onShowOnMap}>
+            Show on map
+          </button>
+        )}
         <button type="button" className="sp-btn" onClick={copyLink}>
           Copy link
         </button>
@@ -94,7 +102,7 @@ export default function EventDetail({ event, onBack }) {
         {copied && <span className="event-detail-copied" aria-hidden="true">Link copied</span>}
       </div>
       {event.category && (
-        <span className="event-detail-category">Category (our grouping): {event.category}</span>
+        <span className="event-detail-category">Category (our grouping): {categoryLabel(event.category)}</span>
       )}
       <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
         {event.title}
