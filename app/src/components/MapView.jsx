@@ -30,7 +30,7 @@ import {
 import useMediaQuery from "../hooks/useMediaQuery";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "./useMapHoverLabel";
-import { LIST_MAX, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
+import { LIST_MAX, allSameCoordinates, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels";
 import {
@@ -571,7 +571,12 @@ export default function MapView({
 
       const openStack = (e, features, total) => {
         setBorderPopup(null);
-        setStackList({ point: [e.point.x, e.point.y], items: stackItems(features), total });
+        setStackList({
+          point: [e.point.x, e.point.y],
+          items: stackItems(features),
+          total,
+          oneSpot: allSameCoordinates(features),
+        });
       };
 
       map.on("click", "clusters", async (e) => {

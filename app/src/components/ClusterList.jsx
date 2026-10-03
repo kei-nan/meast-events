@@ -22,7 +22,7 @@ export default function ClusterList({ list, onSelect, onClose, width, height }) 
   const reserve = window.matchMedia?.("(max-width: 768px)").matches ? 120 : 8;
   const bottomLimit = Math.max(200, height - reserve);
   const top = Math.max(8, Math.min(list.point[1] + 12, bottomLimit - 220));
-  const { items, total } = list;
+  const { items, total, oneSpot } = list;
   const allApprox = items.length > 0 && items.every((i) => i.approx);
   const headingId = "mu-stack-heading";
   return (
@@ -38,7 +38,7 @@ export default function ClusterList({ list, onSelect, onClose, width, height }) 
         {"×"}
       </button>
       <h3 id={headingId} className="mu-b-name">
-        {total} events at this spot
+        {total} events {oneSpot ? "at this spot" : "here"}
       </h3>
       {allApprox && (
         <p className="mu-stack-note">Approximate locations: pinned to a capital or region, not the exact site.</p>

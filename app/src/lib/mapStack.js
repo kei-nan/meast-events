@@ -26,12 +26,32 @@ export function allSameCoordinates(features) {
   return features.every((f) => coordKey(f) === k);
 }
 
+// Size of the biggest group of features sharing exactly one point.
+export function largestStack(features) {
+  const counts = new Map();
+  let max = 0;
+  for (const f of features ?? []) {
+    const k = coordKey(f);
+    if (!k) continue;
+    const n = (counts.get(k) ?? 0) + 1;
+    counts.set(k, n);
+    if (n > max) max = n;
+  }
+  return max;
+}
+
+// Share of a cluster's leaves on one point above which we list rather than zoom:
+// zooming would only peel off a few dots and leave the same unsplittable stack.
+export const STACK_SHARE = 2 / 3;
+
 // What a click on a cluster should do. Zoom while zooming can still split the
-// cluster; list its events once it can't: all leaves on one point, or the split
-// would only happen past clusterMaxZoom (where points stop clustering and
-// identical ones render as a single dot).
+// cluster; list its events once it can't usefully: (nearly) all leaves on one
+// point, or the split would only happen past clusterMaxZoom (where points stop
+// clustering and identical ones render as a single dot).
 export function clusterClickAction({ count, expansionZoom, clusterMaxZoom, leaves = null }) {
-  if (leaves && allSameCoordinates(leaves)) return "list";
+  if (leaves?.length && leaves.length >= count && largestStack(leaves) >= Math.max(2, count * STACK_SHARE)) {
+    return "list";
+  }
   if (Number.isFinite(expansionZoom) && expansionZoom > clusterMaxZoom && count <= LIST_MAX) return "list";
   return "zoom";
 }

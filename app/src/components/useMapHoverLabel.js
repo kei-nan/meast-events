@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { hoverLabel, stackItems } from "../lib/mapStack";
+import { LIST_MAX, clusterClickAction, hoverLabel, stackItems } from "../lib/mapStack";
 
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 const OFFSET = 14; // px from the cursor
@@ -14,8 +14,9 @@ export default function useMapHoverLabel({ mapRef, mapReady, labelRef, isIdle, c
     const map = mapRef.current;
     const el = labelRef.current;
     if (!map || !el) return;
-    // cluster_id -> expansion zoom; cluster ids change whenever the data does.
-    const expansion = new Map();
+    // cluster_id -> "zoom" | "list" (what a click does, decided as in MapView);
+    // cluster ids change whenever the data does.
+    const actions = new Map();
     let key = null;
 
     const hide = () => {
@@ -43,17 +44,19 @@ export default function useMapHoverLabel({ mapRef, mapReady, labelRef, isIdle, c
       if (p.point_count) {
         const id = p.cluster_id;
         const k = `c${id}`;
-        const z = expansion.get(id);
-        show(hoverLabel(p, { listable: z != null && z > clusterMaxZoom }), e.point);
-        if (z == null && key !== k) {
-          map
-            .getSource("events")
-            ?.getClusterExpansionZoom(id)
-            .then((zoom) => {
-              expansion.set(id, zoom);
-              if (key === k && !el.hidden) show(hoverLabel(p, { listable: zoom > clusterMaxZoom }), e.point);
-            })
-            .catch(() => {});
+        const action = actions.get(id);
+        show(hoverLabel(p, { listable: action === "list" }), e.point);
+        const source = map.getSource("events");
+        if (action == null && key !== k && source) {
+          const count = p.point_count;
+          Promise.all([
+            source.getClusterExpansionZoom(id).catch(() => NaN),
+            count <= LIST_MAX ? source.getClusterLeaves(id, LIST_MAX, 0).catch(() => null) : null,
+          ]).then(([expansionZoom, leaves]) => {
+            const a = clusterClickAction({ count, expansionZoom, clusterMaxZoom, leaves });
+            actions.set(id, a);
+            if (key === k && !el.hidden) show(hoverLabel(p, { listable: a === "list" }), e.point);
+          });
         }
         key = k;
         return;
@@ -63,17 +66,20 @@ export default function useMapHoverLabel({ mapRef, mapReady, labelRef, isIdle, c
       show(hoverLabel(p, { stacked }), e.point);
     };
     const onData = (e) => {
-      if (e.sourceId === "events" && e.sourceDataType !== "metadata") expansion.clear();
+      if (e.sourceId === "events" && e.sourceDataType !== "metadata") actions.clear();
     };
 
     map.on("mousemove", onMove);
     map.on("movestart", hide);
+    // A click opens a list/popup or the article; the label would sit under it.
+    map.on("click", hide);
     map.on("data", onData);
     const canvas = map.getCanvas();
     canvas.addEventListener("mouseleave", hide);
     return () => {
       map.off("mousemove", onMove);
       map.off("movestart", hide);
+      map.off("click", hide);
       map.off("data", onData);
       canvas.removeEventListener("mouseleave", hide);
       hide();
