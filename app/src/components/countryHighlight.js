@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { countryHighlightFeatures, featuresBbox } from "../lib/eventCountries";
+import { reducedMotion } from "../lib/reducedMotion";
 
 // Map layer that shades the listed countries of an event without a precise
 // location (lib/eventCountries.js decides which border shapes those are). The
@@ -12,9 +13,6 @@ const SOURCE = "country-highlight";
 // Above the borders, below the search area, markers and country labels.
 const BEFORE_LAYER = "area-fill";
 const FIT_MAX_ZOOM = 6;
-
-const reducedMotion = () =>
-  typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 function addLayers(map) {
   map.addSource(SOURCE, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
