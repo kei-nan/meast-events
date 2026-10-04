@@ -479,6 +479,12 @@ button.sp-chip[aria-pressed="true"] {
   border-top: 1px solid var(--border);
 }
 
+.sp-list-heading h2 {
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .sp-row {
   display: block;
   width: 100%;
@@ -544,7 +550,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .sp-tag {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   padding: 1px 7px;
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -909,17 +915,19 @@ button.sp-chip[aria-pressed="true"] {
 /* ---------- Mobile: map on top, panel as bottom sheet ---------- */
 
 @media (max-width: 768px) {
+  /* The page is exactly one screen tall (dvh: the visible height, without the
+     browser's toolbars), so the timeline is never below the fold and a drag
+     on the map always pans it rather than having to scroll the page. */
   .app {
-    height: auto;
-    min-height: 100dvh;
+    height: 100dvh;
   }
 
-  /* Takes whatever the header, timeline and footer leave, but never less than
-     62dvh, so the map keeps a usable size on short screens. */
+  /* Takes whatever the header, timeline and footer leave: on a short phone the
+     map shrinks rather than the page growing. Only below 200px (landscape
+     phones) does the page scroll. */
   .app-body {
-    flex: 1 0 auto;
-    height: auto;
-    min-height: max(420px, 62dvh);
+    flex: 1 1 0;
+    min-height: 200px;
     flex-direction: column;
   }
 

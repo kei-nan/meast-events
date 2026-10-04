@@ -127,3 +127,17 @@ export function serializeUrlState(state) {
   if (state.about) parts.push("about=1");
   return parts.length ? `?${parts.join("&")}` : "";
 }
+
+// How useUrlState writes `nextSearch` over `prevSearch`: null = nothing to do;
+// "push" = an event was opened/closed or the About dialog toggled (a history
+// entry of its own, written at once); "replace" = the same change, but
+// overwriting the current entry (`replace`: e.g. clearing a link to an event
+// that does not exist, so Back does not return to the dead URL); "debounce" =
+// any other change, replaced after a pause.
+export function urlWriteMode(prevSearch, nextSearch, { replace = false } = {}) {
+  if (nextSearch === prevSearch) return null;
+  const prev = parseUrlState(prevSearch);
+  const next = parseUrlState(nextSearch);
+  if (prev.eventId === next.eventId && prev.about === next.about) return "debounce";
+  return replace ? "replace" : "push";
+}

@@ -171,11 +171,15 @@ export function loadAllLite() {
 
 // Resolve one event by id from the static data: events/ids.json maps
 // id -> decade chunk. Falls back to scanning every chunk if the map is
-// missing (older deployments). Resolves null when unknown.
+// missing (older deployments) or unreachable; a failed map is not cached, so
+// the next lookup tries it again. Resolves null when unknown.
 let idsPromise = null;
 export async function loadEventById(id) {
   if (!idsPromise) {
-    idsPromise = fetchJSONCached(dataUrl("events/ids.json")).catch(() => null);
+    idsPromise = fetchJSONCached(dataUrl("events/ids.json")).catch(() => {
+      idsPromise = null;
+      return null;
+    });
   }
   const ids = await idsPromise;
   if (ids && Object.prototype.hasOwnProperty.call(ids, id)) {

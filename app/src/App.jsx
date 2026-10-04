@@ -2,7 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 import SearchPanel from "./components/SearchPanel.jsx";
 import AboutData from "./components/AboutData.jsx";
 import Timeline from "./components/Timeline";
-import useAllEvents from "./hooks/useAllEvents";
+import useAllEvents, { RETRY_MS } from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
 import useUrlState from "./hooks/useUrlState";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
@@ -92,7 +92,6 @@ function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
 
 const SITE_TITLE = "Middle East, 1900–present"; // as in index.html
 const BOUNDARY_CORRECTIONS_URL = "https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js";
-const RETRY_MS = 20000;
 const DEEP_LINK_PAD_YEARS = 5;
 
 const clampYear = (y) => Math.min(MAX_YEAR, Math.max(MIN_YEAR, y));
@@ -122,7 +121,9 @@ export default function App() {
   const [focus, setFocus] = useState(null); // {id, lon, lat, nonce}
   const focusNonceRef = useRef(0);
   const pendingFocusRef = useRef(initial.eventId); // deep link awaiting its event
+  const panelRef = useRef(null); // SearchPanel's skipTo (skip link)
   const [notFound, setNotFound] = useState(false);
+  const [playState, setPlayState] = useState("stopped"); // timeline Play, see Timeline (SearchPanel holds its announcements)
 
   const [query, setQuery] = useState(initial.q);
   const [categories, setCategories] = useState(initial.categories);
@@ -307,7 +308,13 @@ export default function App() {
     () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear)) : null),
     [search.status, inViewFilter, visibleEvents, startYear]
   );
-  const panelResults = browseList ? browseList.slice(0, BROWSE_CAP) : scopedResults;
+  // Memoized (like range below) so a hover re-render of App passes the memoized
+  // ResultsList the same props and it skips rendering.
+  const panelResults = useMemo(
+    () => (browseList ? browseList.slice(0, BROWSE_CAP) : scopedResults),
+    [browseList, scopedResults]
+  );
+  const panelRange = useMemo(() => [startYear, endYear], [startYear, endYear]);
   const panelTotal = browseList
     ? browseList.length
     : scope === "all" && !inView && search.truncated
@@ -338,39 +345,6 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [version]);
 
-  // Deep link / selection resolution: make sure the selected event is in the
-  // store with its full record, and (for links) move the range + focus it.
-  const triedRef = useRef(new Set());
-  useEffect(() => {
-    if (!selectedEventId || eventsLoading) return; // wait for the store: no ids.json/chunk requests on a deep link
-    const ev = storeRef.current.get(selectedEventId);
-    if (ev && pendingFocusRef.current === selectedEventId) {
-      pendingFocusRef.current = null;
-      const [s] = eventYearRange(ev);
-      const y = clampYear(s);
-      setRange((r) =>
-        eventOverlapsRange(ev, r.start, r.end)
-          ? r
-          : { start: clampYear(y - DEEP_LINK_PAD_YEARS), end: clampYear(y + DEEP_LINK_PAD_YEARS) }
-      );
-      const f = focusFor(ev, focusNonceRef);
-      if (f) setFocus(f);
-    }
-    if (!ev && !triedRef.current.has(selectedEventId)) {
-      triedRef.current.add(selectedEventId);
-      loadEventById(selectedEventId)
-        .then((full) => {
-          if (full) addEvents([full]);
-          else if (!storeRef.current.has(selectedEventId)) {
-            pendingFocusRef.current = null;
-            setSelectedEventId(null);
-            setNotFound(true);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [selectedEventId, version, eventsLoading, addEvents, storeRef]);
-
   // Back/forward: re-apply the parsed URL to every piece of state.
   const handleNavigate = useCallback((parsed) => {
     setQuery(parsed.q);
@@ -385,14 +359,60 @@ export default function App() {
     setAbout(parsed.about);
   }, []);
 
-  useUrlState(
+  const replaceNextUrl = useUrlState(
     { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about },
     handleNavigate
   );
 
-  function handleChangeRange(nextStart, nextEnd) {
+  // Deep link / selection resolution: make sure the selected event is in the
+  // store with its full record, and (for links) move the range + focus it.
+  // An id that cannot be resolved is cleared by REPLACING the URL, so Back does
+  // not lead to the dead link again.
+  const triedRef = useRef(new Set());
+  useEffect(() => {
+    if (!selectedEventId || eventsLoading) return; // wait for the store: no ids.json/chunk requests on a deep link
+    const markNotFound = () => {
+      pendingFocusRef.current = null;
+      replaceNextUrl();
+      setSelectedEventId(null);
+      setNotFound(true);
+    };
+    const ev = storeRef.current.get(selectedEventId);
+    if (ev && pendingFocusRef.current === selectedEventId) {
+      pendingFocusRef.current = null;
+      const [s] = eventYearRange(ev);
+      const y = clampYear(s);
+      setRange((r) =>
+        eventOverlapsRange(ev, r.start, r.end)
+          ? r
+          : { start: clampYear(y - DEEP_LINK_PAD_YEARS), end: clampYear(y + DEEP_LINK_PAD_YEARS) }
+      );
+      const f = focusFor(ev, focusNonceRef);
+      if (f) setFocus(f);
+    }
+    if (ev) return;
+    // The full lite set is every event in the dataset: once it has loaded, an
+    // id missing from it is unknown, with no need to ask ids.json and a chunk.
+    if (!eventsError) {
+      markNotFound();
+      return;
+    }
+    if (!triedRef.current.has(selectedEventId)) {
+      const id = selectedEventId;
+      triedRef.current.add(id);
+      loadEventById(id)
+        .then((full) => {
+          if (full) addEvents([full]);
+          else if (!storeRef.current.has(id)) markNotFound();
+        })
+        .catch(() => triedRef.current.delete(id)); // unreachable: try again when the id is next selected
+    }
+  }, [selectedEventId, version, eventsLoading, eventsError, addEvents, storeRef, replaceNextUrl]);
+
+  const handleChangeRange = useCallback((nextStart, nextEnd) => {
     setRange({ start: nextStart, end: nextEnd });
-  }
+  }, []);
+  const handleBack = useCallback(() => setSelectedEventId(null), []);
 
   // Map click: select only. List click: select AND fly the map there.
   const handleSelectFromMap = useCallback((id) => {
@@ -426,18 +446,19 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Skips the map controls: to the search box, or - while an event is open
+          and the search is hidden - to the event's heading. SearchPanel's
+          skipTo first opens the mobile sheet if it is collapsed. */}
       <a
         className="app-skip"
-        href="#sp-body"
+        href={selectedEventRaw ? "#event-detail-title" : "#sp-body"}
         onClick={(e) => {
-          const input = document.querySelector("#sp-body:not([hidden]) input");
-          if (input) {
-            e.preventDefault();
-            input.focus();
-          }
+          if (!panelRef.current) return;
+          e.preventDefault();
+          panelRef.current.skipTo();
         }}
       >
-        Skip to search
+        {selectedEventRaw ? "Skip to panel" : "Skip to search"}
       </a>
       <header className="app-header">
         <h1>{SITE_TITLE}</h1>
@@ -493,6 +514,7 @@ export default function App() {
           MAP_PLACEHOLDER
         )}
         <SearchPanel
+          ref={panelRef}
           query={query}
           filters={filters}
           area={area}
@@ -504,7 +526,8 @@ export default function App() {
           eventsLoading={eventsLoading}
           selectedEvent={selectedEvent}
           viewCount={viewportEventCount}
-          range={[startYear, endYear]}
+          range={panelRange}
+          playState={playState}
           categoryOptions={categoryOptions}
           countryOptions={countryOptions}
           onQueryChange={setQuery}
@@ -513,12 +536,11 @@ export default function App() {
           onAreaChange={setArea}
           onSelect={handleSelectFromList}
           onHover={setHoverId}
-          onBack={() => setSelectedEventId(null)}
+          onBack={handleBack}
           // Extras beyond the agreed props (ignored if unused):
           counts={counts}
           truncated={search.truncated}
           interim={search.interim}
-          hoverId={hoverId}
           selectedEventId={selectedEventId}
         />
       </main>
@@ -527,6 +549,9 @@ export default function App() {
         endYear={endYear}
         onChangeRange={handleChangeRange}
         eventCountsByYear={eventCountsByYear}
+        borderYear={borderYear}
+        playState={playState}
+        onPlayStateChange={setPlayState}
       />
       {about && <AboutData onClose={() => setAbout(false)} />}
       <footer className="app-footer">
