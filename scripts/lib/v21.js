@@ -1,4 +1,4 @@
-// Data-shape v2.1 helpers shared by enrich-candidates.js, apply-v21.js and refresh-extracts.js.
+// Data-shape v2.1 helpers shared by enrich-candidates.js and refresh-extracts.js.
 // Nothing here rewrites Wikipedia/Wikidata content: it copies it, or FLAGS a discrepancy.
 import { EVENT_CLASSES, COUNTRIES, QID_TO_COUNTRY, groupForEvent } from "./event-classes.js";
 import { yearsIn, yearOf } from "./wiki.js";
@@ -120,8 +120,8 @@ export function titleMismatch(event, urlTitle, extract) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Shared v2.1 finalisation used by enrich-candidates.js (proposed events) and apply-v21.js
-// (curated events). Copies Wikipedia/Wikidata content; only ever ADDS flags.
+// Shared v2.1 finalisation used by enrich-candidates.js (proposed events; the curated events
+// were brought to v2.1 once by the since-removed apply-v21.js). Copies Wikipedia/Wikidata content; only ever ADDS flags.
 // ---------------------------------------------------------------------------------------------
 const dropPrefix = (list, prefixes) => (list ?? []).filter((r) => !prefixes.some((p) => r.startsWith(p)));
 

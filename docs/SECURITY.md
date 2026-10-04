@@ -39,17 +39,42 @@ detaches. **Verified locally with `wrangler dev`** (2026-09-26, wrangler
 index.html); a pattern with **two splats is silently ignored**; `! Cache-Control`
 followed by a new `Cache-Control` in the same rule replaces the value.
 
-Sent on every response: `Content-Security-Policy`, `X-Content-Type-Options:
-nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy:
-strict-origin-when-cross-origin`, `Permissions-Policy` (geolocation, camera,
-microphone, payment off).
+Sent on every response: `Strict-Transport-Security: max-age=31536000;
+includeSubDomains`, `Cross-Origin-Opener-Policy: same-origin`,
+`Content-Security-Policy`, `X-Content-Type-Options: nosniff`,
+`X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`,
+`Permissions-Policy` (geolocation, camera, microphone, payment off).
+
+- HSTS (one year, subdomains included): browsers ignore it over plain HTTP,
+  so it takes effect from the first HTTPS visit. `includeSubDomains` commits
+  every `*.middleeast.events` name to HTTPS for a year, so any subdomain
+  added later must serve HTTPS. Not submitted for the browsers' preload list
+  (that needs `preload` and is hard to undo).
+- COOP `same-origin`: the site opens other sites only through links with
+  `rel="noreferrer"`, and nothing it opens needs a handle back to it.
 
 CSP (enforcing, not report-only): `default-src 'self'; script-src 'self'
 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self'
 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src
-'self' https://cloudflareinsights.com; worker-src 'self' blob:; child-src
-'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';
-frame-ancestors 'none'`.
+'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self';
+object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
+'none'`.
+
+- `worker-src`/`child-src` no longer allow `blob:` (2026-10-04). Both web
+  workers are same-origin files: MapLibre's
+  `/assets/maplibre-gl-<version>/maplibre-gl-worker.mjs` (set with
+  `setWorkerUrl`, MapView.jsx) and Pagefind's `/pagefind/pagefind-worker.js`.
+  Checked with Playwright + Chromium against `wrangler dev` (wrangler
+  4.147.0) serving the built `dist/` with and without `blob:`: in both runs
+  the only workers created were those two files, the map rendered (checked
+  in a screenshot after a zoom), a search for "armistice" returned 20 Pagefind
+  results and showed them in the panel, and there were zero
+  `securitypolicyviolation` events and zero CSP console messages. Positive
+  control: on the policy without `blob:`, `new Worker(blob URL)` is blocked
+  with a `worker-src` violation. If a future MapLibre or Pagefind version
+  creates blob workers, the map or search breaks with a `worker-src`
+  violation in the console; add `blob:` back then. `img-src` keeps `blob:`
+  (not re-tested; left as it was).
 
 - `style-src 'unsafe-inline'` is required by MapLibre and React inline
   `style` attributes; scripts stay locked to same-origin files (no inline
@@ -127,8 +152,15 @@ add a rule for it; the hash alone cannot be matched by a glob.
   (`continue-on-error`) so an advisory in a build tool cannot block unrelated
   PRs, while still appearing in the log. The repo root has only dev
   dependencies (the geometry libraries the data scripts use).
-- CI also lints, tests and builds the app, validates the data and runs the
-  border check; it deploys nothing.
+- CI also lints, tests and builds the app (then `app/scripts/check-dist.mjs`
+  checks the built `dist/`), validates the data and runs the border check; it
+  deploys nothing.
+- Every `uses:` in `.github/workflows/` is pinned to a full commit SHA, with
+  the tag in a comment; Dependabot's github-actions entry bumps both.
+  `wrangler` (the deploy command Workers Builds runs) is an exact-version
+  devDependency in `app/package.json`, so a deploy uses the locked copy.
 - Workflow permissions: `ci.yml` is read-only (`contents: read`).
   `refresh-data.yml` can write (it pushes a branch and opens a pull request)
   but never merges; every data change goes through a reviewed pull request.
+  Its checkout does not persist the token (`persist-credentials: false`); only
+  the final step, which pushes the branch and opens the PR, receives it.
