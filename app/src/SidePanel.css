@@ -909,17 +909,12 @@ button.sp-chip[aria-pressed="true"] {
 /* ---------- Mobile: map on top, panel as bottom sheet ---------- */
 
 @media (max-width: 768px) {
-  .app {
-    height: auto;
-    min-height: 100dvh;
-  }
-
-  /* Takes whatever the header, timeline and footer leave, but never less than
-     62dvh, so the map keeps a usable size on short screens. */
+  /* Takes whatever the header, timeline and footer leave. No minimum height:
+     the shell is exactly the viewport (App.css), and a minimum here made the
+     page taller than a 320x640 screen, so it scrolled and cut off the footer. */
   .app-body {
-    flex: 1 0 auto;
-    height: auto;
-    min-height: max(420px, 62dvh);
+    flex: 1 1 0;
+    min-height: 0;
     flex-direction: column;
   }
 
@@ -946,9 +941,11 @@ button.sp-chip[aria-pressed="true"] {
   }
 
   /* Stays inside .app-body (not fixed to the viewport) so the timeline below
-     remains visible and usable; at least 120px of map stays visible above. */
+     remains visible and usable. It takes all of the map area but a 120px strip,
+     which keeps the event's place in sight; the old 60dvh cap left the article
+     about half the screen on a phone. */
   .side-panel[data-sheet="full"] {
-    height: min(60dvh, calc(100% - 120px));
+    height: calc(100% - 120px);
   }
 
   .sp-sheet-toggle {
