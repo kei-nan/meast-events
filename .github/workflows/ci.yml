@@ -74,6 +74,11 @@ jobs:
       # years checked there. No network. Report: docs/border-verification.md.
       - name: Install repo-root dependencies (geometry library)
         run: npm ci
+      # data/boundaries.json: required properties, per-name year gaps, overlaps between shapes
+      # shown in the same year (with their unit tests, which need the geometry library).
+      # Fails only on structural errors; gaps and unexpected overlaps are listed as warnings.
+      - name: Validate boundaries
+        run: npm run validate-boundaries
       - name: Border check against reference points
         run: node scripts/verify-borders.js --check
 
