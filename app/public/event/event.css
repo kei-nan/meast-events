@@ -1,0 +1,142 @@
+/* Static event pages (/event/<id>, /event/), written by scripts/build-event-pages.mjs.
+   Colours follow the app (src/index.css, src/SidePanel.css); system fonts, no JS. */
+:root {
+  --bg: #1d1a15;
+  --bg-2: #2d2721;
+  --border: #453a2b;
+  --text-primary: #ece2c9;
+  --text-secondary: #b6a888;
+  --text-tertiary: #a0927a;
+  --accent: #c99a45;
+  --accent-strong: #ddb35f;
+  --link: #7badb0;
+  --fr-wording: #e0914f;
+  --fr-fairness: #c3a1f0;
+  --fr-mark: var(--fr-wording);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font: 1rem/1.6 Georgia, "Times New Roman", serif;
+}
+
+a { color: var(--link); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+
+.site-header, main, .site-footer {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  justify-content: space-between;
+  padding-top: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.9rem;
+}
+
+.site-name { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+h1 { font-size: 1.9rem; line-height: 1.2; margin: 0.3rem 0 0.4rem; overflow-wrap: anywhere; }
+h2 { font-size: 1.2rem; margin: 0 0 0.6rem; }
+h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
+
+.category, .meta, .classes, .asof, .note, .attribution, .actions, .framing-pointer,
+.framing-review, .site-footer, .event-index .meta {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.category { margin: 1.5rem 0 0; color: var(--text-tertiary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.meta { margin: 0; color: var(--text-secondary); }
+.classes, .asof, .attribution { color: var(--text-tertiary); font-size: 0.85rem; }
+.note { color: var(--text-secondary); font-size: 0.9rem; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 1.2rem 0; }
+
+.open-map, .wiki {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.open-map { background: var(--accent); color: var(--bg); }
+.open-map:hover { background: var(--accent-strong); }
+.wiki { border: 1px solid var(--border); }
+
+.extract p { margin: 0 0 1em; }
+
+.framing-pointer {
+  padding: 8px 11px;
+  border-left: 3px solid var(--fr-mark);
+  background: color-mix(in srgb, var(--fr-mark) 10%, var(--bg-2));
+  font-size: 0.88rem;
+}
+
+.framing-mark {
+  color: inherit;
+  background: color-mix(in srgb, var(--fr-mark) 32%, transparent);
+  text-decoration: underline wavy var(--fr-mark);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  border-radius: 2px;
+  padding: 0 1px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.framing-mark--wording { --fr-mark: var(--fr-wording); }
+.framing-mark--fairness { --fr-mark: var(--fr-fairness); }
+.framing-mark--fairness.framing-mark--wording {
+  background: color-mix(in srgb, var(--fr-fairness) 32%, transparent);
+  text-decoration-color: var(--fr-wording);
+}
+
+.framing-review {
+  margin: 1.5rem 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-2);
+  font-size: 0.9rem;
+}
+
+.framing-review-owner, .fr-status, .fr-method, .fr-nothing, .framing-review-meta {
+  color: var(--text-tertiary);
+  font-weight: normal;
+}
+
+.framing-review-owner, .fr-status { font-size: 0.8rem; margin-left: 6px; }
+.fr-section { border-left: 3px solid var(--border); padding-left: 10px; }
+.fr-section--fairness.fr-section--found { border-left-color: var(--fr-fairness); }
+.fr-section--wording.fr-section--found { border-left-color: var(--fr-wording); }
+.fr-method { font-size: 0.82rem; margin: 0 0 0.4rem; }
+.framing-obs { padding-left: 1.2rem; }
+.framing-obs li { margin-bottom: 0.4rem; }
+.framing-review-flag { color: var(--fr-wording); }
+.framing-review-meta { font-size: 0.8rem; }
+
+.event-index { padding-left: 1.6rem; }
+.event-index li { margin-bottom: 0.3rem; }
+.event-index .meta { display: inline; font-size: 0.85rem; }
+
+.site-footer {
+  margin-top: 2rem;
+  padding-top: 12px;
+  padding-bottom: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
