@@ -8280,7 +8280,7 @@
   {
     "id": "indian-airlines-flight-814",
     "title": "Indian Airlines Flight 814",
-    "date_start": "1999-12-01",
+    "date_start": "1999-12-24",
     "date_end": "1999-12-31",
     "countries": [
       "UAE"
@@ -8303,12 +8303,12 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "month",
+    "date_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
       "country_via_place_only: Wikidata P17 of the item is India; the tracked country tag comes only from the P276/P131 place",
-      "month_precision_day_in_lead: date_start 1999-12-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 1999-12-24; the stored day is a placeholder"
+      "data_fix F8: Indian Airlines Flight 814: stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = 1999-12-24 (day precision); the Wikipedia infobox reads \"24 December 1999 – 31 December 1999\" (checked 2026-10-04). date_start = P580 (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "aircraft hijacking",
@@ -12662,7 +12662,7 @@
   {
     "id": "july-2023-jenin-incursion",
     "title": "July 2023 Jenin incursion",
-    "date_start": "2023-07-01",
+    "date_start": "2023-07-03",
     "date_end": "2023-07-05",
     "countries": [
       "Israel/Palestine"
@@ -12689,7 +12689,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "month",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q151622",
@@ -12699,7 +12699,7 @@
     "possible_duplicates": [],
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event",
-      "month_precision_day_in_lead: date_start 2023-07-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2023-07-03; the stored day is a placeholder"
+      "data_fix F8: July 2023 Jenin incursion: stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = 2023-07-03 (day precision); the Wikipedia infobox reads \"3–5 July 2023\" (checked 2026-10-04). date_start = P580 (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "2023 Israeli military operation in the West Bank",
@@ -12760,7 +12760,7 @@
   {
     "id": "zikim-attack",
     "title": "Zikim attack",
-    "date_start": "2023-10-01",
+    "date_start": "2023-10-07",
     "date_end": null,
     "countries": [
       "Israel/Palestine"
@@ -12783,7 +12783,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "month",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q122962941",
@@ -12793,7 +12793,7 @@
     "possible_duplicates": [],
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Gaza War\" (Q122962941); it may overlap with that larger event",
-      "month_precision_day_in_lead: date_start 2023-10-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2023-10-07; the stored day is a placeholder"
+      "data_fix F8: Zikim attack: stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = 2023-10-07 (day precision); the Wikipedia infobox reads \"7 October 2023\" (checked 2026-10-04). date_start = P580 (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "2023 key battle in the Gaza War",
@@ -14050,7 +14050,7 @@
   {
     "id": "fall-of-damascus-2024",
     "title": "Fall of Damascus (2024)",
-    "date_start": "2024-12-01",
+    "date_start": "2024-12-07",
     "date_end": "2024-12-08",
     "countries": [
       "Syria"
@@ -14074,7 +14074,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "month",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q131342170",
@@ -14084,7 +14084,7 @@
     "possible_duplicates": [],
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"2024 Syrian opposition offensives\" (Q131342170); it may overlap with that larger event",
-      "month_precision_day_in_lead: date_start 2024-12-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2024-12-07; the stored day is a placeholder"
+      "data_fix F8: Fall of Damascus (2024): stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = 2024-12-07 (day precision); the Wikipedia infobox reads \"7–8 December 2024\" (checked 2026-10-04). date_start = P580 (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "2024 conquest during the Syrian civil war",

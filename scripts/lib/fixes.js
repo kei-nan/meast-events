@@ -99,6 +99,24 @@ DATA_FIXES.push({
     "(checked 2026-10-04). date_start = P580. date_end (P582 2023-10-09; infobox 8 October) is not changed: the sources differ",
 });
 
+// F8: the same pattern as F7 in four more events, found by the month_precision_day_in_lead flag. In each, Wikidata
+// P580 (day precision) and the Wikipedia infobox give the same start day (checked live 2026-10-04); date_end unchanged.
+for (const [qid, date, label, infobox] of [
+  ["Q2009640", "1999-12-24", "Indian Airlines Flight 814", "24 December 1999 – 31 December 1999"],
+  ["Q120201630", "2023-07-03", "July 2023 Jenin incursion", "3–5 July 2023"],
+  ["Q123014721", "2023-10-07", "Zikim attack", "7 October 2023"],
+  ["Q131401087", "2024-12-07", "Fall of Damascus (2024)", "7–8 December 2024"],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F8",
+    set: { date_start: date },
+    note:
+      `${label}: stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = ${date} (day precision); ` +
+      `the Wikipedia infobox reads "${infobox}" (checked 2026-10-04). date_start = P580`,
+  });
+}
+
 export const FIXES_BY_QID =new Map(DATA_FIXES.map((f) => [f.qid, f]));
 
 // Applies the ledger entry for event.wikidata_qid (if any). Returns the changed field names.

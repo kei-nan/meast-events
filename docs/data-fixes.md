@@ -127,6 +127,25 @@ put them outside the tracked set; the validator now rejects any event without a 
   `data/events.json` and `data/events.proposed.json`; `date_precision` follows the kept date (P580, day; see "date_precision" below).
 - Not changed: `date_end` 2023-10-09 (Wikidata P582) vs the infobox's 8 October. The two sources differ, so it stays as Wikidata gives it.
 
+## F8 - four more month-precision start dates pinned to the 1st (same cause as F7)
+
+- Found by the `month_precision_day_in_lead` flag. Same cause as F7: the item's P585 has month precision and won the discovery
+  query's COALESCE(P585, P580) over a day-precision P580.
+- Evidence (checked live 2026-10-04, Wikidata `wbgetentities` and the infobox `date` line of the English Wikipedia article):
+
+| Event (QID) | Stored | Wikidata P580 / P582 / P585 | Wikipedia infobox (revision) | Fix |
+|---|---|---|---|---|
+| Indian Airlines Flight 814 (Q2009640) | 1999-12-01 | 1999-12-24 (day) / 1999-12-31 / 1999-12 (month) | "24 December 1999 – 31 December 1999" (1373675196) | 1999-12-24 |
+| July 2023 Jenin incursion (Q120201630) | 2023-07-01 | 2023-07-03 (day) / 2023-07-05 / 2023-07 (month) | "3–5 July 2023" (1370625180) | 2023-07-03 |
+| Zikim attack (Q123014721) | 2023-10-01 | 2023-10-07 (day) / none / 2023-10 (month) | "7 October 2023" (1377889137) | 2023-10-07 |
+| Fall of Damascus (2024) (Q131401087) | 2024-12-01 | 2024-12-07 (day) / 2024-12-08 / 2024-12 (month) | "7–8 December 2024" (1370617734) | 2024-12-07 |
+
+- In each, Wikipedia and Wikidata's P580 agree on the day against our record. -> `date_start` = P580, applied to both
+  `data/events.json` and `data/events.proposed.json`; `date_precision` follows the kept date (day). `date_end` already matched both
+  sources and is unchanged. The `month_precision_day_in_lead` flag is removed from these four.
+- Not fixed: `2022-gaza-israel-clashes` and `may-2023-gaza-israel-clashes` (also flagged): Wikidata's P580 does not match the day the
+  lead names (per the data-fixes agent's check), so they stay flagged.
+
 ## Checks of 2026-10-04 (no data value changed unless stated)
 
 ### Three events show another article's lead (`musa-dagh-resistance`, `june-2025-israeli-strikes-on-iran`, `operation-marg-bar-sarmachar`): not fixed
