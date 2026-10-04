@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
 import ResultsList from "./ResultsList.jsx";
@@ -34,6 +34,7 @@ import "../SidePanel.css";
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
+ * @param {boolean}  [props.playing]        timeline Play is running: live announcements wait for it to stop
  * @param {string[]} [props.categoryOptions] category ids to offer (default: CATEGORY_COLORS keys)
  * @param {string[]} [props.countryOptions]  country names for the select (select hidden when empty)
  * @param {(q:string)=>void}       props.onQueryChange
@@ -58,6 +59,7 @@ export default function SearchPanel({
   selectedEvent,
   viewCount,
   range,
+  playing = false,
   categoryOptions,
   countryOptions,
   onQueryChange,
@@ -152,6 +154,8 @@ export default function SearchPanel({
   ];
   const activeCount = activeChips.length + (area ? 1 : 0);
   const focusFiltersBtn = () => filtersBtnRef.current?.focus();
+  // Stable, so the memoized ResultsList skips App's hover re-renders.
+  const focusInput = useCallback(() => inputRef.current?.focus(), []);
 
   function clearFilters() {
     onFiltersChange({ ...filters, categories: [], countries: [], inView: false, scope: "all" });
@@ -181,22 +185,45 @@ export default function SearchPanel({
       ? results.filter((e) => inRange(e, range)).length
       : null;
 
-  let statusText;
-  if (eventsLoading) statusText = "Loading events…";
-  else if (loading && interim && results.length > 0)
-    statusText = `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`;
-  else if (loading && results.length === 0) statusText = "Searching…";
-  else if (!searching) statusText = `${total} event${total === 1 ? "" : "s"} in the selected years`;
-  else if (total === 0) statusText = "0 results";
-  else
-    statusText =
+  // `years` names the selected years: the visible line says "selected years"
+  // (the timeline shows them), the announcement below spells them out.
+  function describeStatus(years) {
+    if (eventsLoading) return "Loading events…";
+    if (loading && interim && results.length > 0)
+      return `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`;
+    if (loading && results.length === 0) return "Searching…";
+    if (!searching) return `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}`;
+    if (total === 0) return "0 results";
+    return (
       `${total} result${total === 1 ? "" : "s"}` +
-      (shownInRange !== null && shownInRange !== total ? ` (${shownInRange} in selected years)` : "");
+      (shownInRange !== null && shownInRange !== total ? ` (${shownInRange} in ${years ?? "selected years"})` : "")
+    );
+  }
+  const statusText = describeStatus(null);
+
+  // Screen reader announcements. The visible status line is not a live region:
+  // Play changes it every 350 ms. This hidden one stays empty while Play runs
+  // and speaks once when it stops ("Paused at 1967. ..."), and after manual
+  // changes, naming the years.
+  const rangeKey = `${range[0]}-${range[1]}`;
+  const [prevPlaying, setPrevPlaying] = useState(playing);
+  const [pausedAt, setPausedAt] = useState(null); // rangeKey where Play stopped
+  if (playing !== prevPlaying) {
+    setPrevPlaying(playing);
+    setPausedAt(playing ? null : rangeKey);
+  }
+  const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
+  const liveText = playing
+    ? ""
+    : (pausedAt === rangeKey ? `Paused at ${range[1]}. ` : "") + describeStatus(yearsText);
 
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}`;
 
   return (
     <aside className="side-panel" data-sheet={sheet} aria-label="Search and event details">
+      <p className="sp-sr-status" role="status">
+        {liveText}
+      </p>
       <button
         ref={toggleRef}
         type="button"
@@ -283,9 +310,7 @@ export default function SearchPanel({
               <span className="sp-caret" aria-hidden="true" />
               Filters{activeCount > 0 ? ` (${activeCount})` : ""}
             </button>
-            <p className="sp-status" role="status" aria-live="polite">
-              {statusText}
-            </p>
+            <p className="sp-status">{statusText}</p>
           </div>
 
           {!filtersOpen && (activeCount > 0 || areaMode !== "off") && (
@@ -378,7 +403,7 @@ export default function SearchPanel({
                 selectedId={selectedEvent?.id ?? null}
                 onSelect={onSelect}
                 onHover={onHover}
-                onFocusInput={() => inputRef.current?.focus()}
+                onFocusInput={focusInput}
                 busy={loading}
                 browse={!searching}
               />

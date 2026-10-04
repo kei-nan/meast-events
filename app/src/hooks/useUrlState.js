@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { parseUrlState, serializeUrlState } from "../lib/urlState";
+import { useCallback, useEffect, useRef } from "react";
+import { parseUrlState, serializeUrlState, urlWriteMode } from "../lib/urlState";
 
 const REPLACE_DEBOUNCE_MS = 400;
 
@@ -10,40 +10,50 @@ const REPLACE_DEBOUNCE_MS = 400;
 //    current entry, debounced so typing doesn't spam history.
 //  - popstate re-reads the URL (strictly validated) and hands the parsed
 //    state to `onNavigate`; the write-back that follows is suppressed.
+// See urlWriteMode (lib/urlState.js).
+//
+// Returns replaceNext(): call it just before an event change that should
+// overwrite the current entry instead of pushing one (clearing a link to an
+// unknown event, so Back does not return to the dead URL).
 //
 // state: {q, categories, countries, startYear, endYear, scope, area, eventId}
 export default function useUrlState(state, onNavigate) {
   const serialized = serializeUrlState(state);
-  const { eventId, about } = state;
   const lastRef = useRef(typeof window === "undefined" ? "" : window.location.search);
+  const replaceNextRef = useRef(false);
   const navigateRef = useRef(onNavigate);
   useEffect(() => {
     navigateRef.current = onNavigate;
   }, [onNavigate]);
 
   useEffect(() => {
-    if (serialized === lastRef.current) return;
-    const prev = parseUrlState(lastRef.current);
-    const eventChanged = prev.eventId !== eventId || prev.about !== Boolean(about);
-    const write = () => {
+    const mode = urlWriteMode(lastRef.current, serialized, { replace: replaceNextRef.current });
+    if (!mode) return;
+    const write = (method) => {
       const url = `${window.location.pathname}${serialized}${window.location.hash}`;
-      window.history[eventChanged ? "pushState" : "replaceState"](null, "", url);
+      window.history[method](null, "", url);
       lastRef.current = serialized;
     };
-    if (eventChanged) {
-      write();
+    if (mode !== "debounce") {
+      replaceNextRef.current = false;
+      write(mode === "push" ? "pushState" : "replaceState");
       return;
     }
-    const timer = setTimeout(write, REPLACE_DEBOUNCE_MS);
+    const timer = setTimeout(() => write("replaceState"), REPLACE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [serialized, eventId, about]);
+  }, [serialized]);
 
   useEffect(() => {
     const onPop = () => {
       lastRef.current = window.location.search;
+      replaceNextRef.current = false;
       navigateRef.current(parseUrlState(window.location.search));
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  return useCallback(() => {
+    replaceNextRef.current = true;
   }, []);
 }
