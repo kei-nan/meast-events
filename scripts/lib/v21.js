@@ -4,6 +4,9 @@ import { EVENT_CLASSES, COUNTRIES, QID_TO_COUNTRY, groupForEvent } from "./event
 import { yearsIn, yearOf } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
 import { applyDataFix, reconcileStartDate } from "./fixes.js";
+import { detectExtractHold } from "./title-refresh.js";
+
+export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
 
 export const CLASS_GROUP = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
@@ -130,8 +133,17 @@ export function finalizeEvent(ev, ctx) {
   const lead = ctx.leads.get(urlTitle) ?? null;
   const entity = ctx.entities.get(ev.wikidata_qid) ?? null;
 
-  // 1. full lead
-  if (lead?.extract) {
+  // 1. full lead - only from an article of the record's own Wikidata item. When the URL leads (directly or via a
+  // redirect) to another item's article, its lead describes another subject: the stored extract is kept and the
+  // case is flagged (the same rule as refresh-extracts.js, lib/title-refresh.js detectExtractHold).
+  ev.review_reasons = dropPrefix(ev.review_reasons, [EXTRACT_HELD_FLAG]);
+  const held = detectExtractHold(ev, lead);
+  if (held) {
+    ev.review_reasons = [...ev.review_reasons, `${EXTRACT_HELD_FLAG}: ${held.detail}`];
+    if (ev.extract && !ev.extract_retrieved_at) {
+      ev.extract_retrieved_at = (ev.retrieved_at ?? new Date().toISOString()).slice(0, 10);
+    }
+  } else if (lead?.extract) {
     ev.extract = lead.extract;
     ev.extract_retrieved_at = lead.retrieved_at.slice(0, 10);
   } else if (ev.extract && !ev.extract_retrieved_at) {
