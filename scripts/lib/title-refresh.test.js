@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { detectTitleChange, checkFormerTitle, applyTitleChanges, titleReport } from "./title-refresh.js";
+import { detectTitleChange, checkFormerTitle, applyTitleChanges, titleReport, detectExtractHold, extractHoldReport } from "./title-refresh.js";
 
 const gaza = () => ({
   id: "2023-israel-hamas-war",
@@ -139,4 +139,41 @@ test("titleReport: lists every change and every held case", () => {
   assert.match(dry, /`2023-israel-hamas-war`: "2023 Israel–Hamas war" -> "Gaza war"/);
   assert.match(dry, /`b` \("2023 Israel–Hamas war"\): No article returned/);
   assert.match(titleReport([ch], { applied: true }), /1 updated, 0 held/);
+});
+
+// The Musa Dagh case: the event's QID (the resistance) has no article of its own; its stored URL leads to the
+// mountain's article, which is another Wikidata item. A refreshed lead from that article must not replace the extract.
+const musa = () => ({
+  id: "musa-dagh-resistance",
+  title: "Musa Dagh Resistance",
+  wikidata_qid: "Q19831524",
+  wikipedia_url: "https://en.wikipedia.org/wiki/Musa_Dagh",
+  extract: "old text",
+});
+const mountainLead = (over = {}) =>
+  lead({ title: "Musa Dagh", url: "https://en.wikipedia.org/wiki/Musa_Dagh", wikibase_item: "Q1953975", extract: "Musa Dagh is a mountain.", ...over });
+
+test("detectExtractHold: a lead from another Wikidata item's article is held", () => {
+  const h = detectExtractHold(musa(), mountainLead());
+  assert.equal(h.hold, "qid_mismatch");
+  assert.equal(h.id, "musa-dagh-resistance");
+  assert.equal(h.article_qid, "Q1953975");
+  assert.equal(h.wikidata_qid, "Q19831524");
+  assert.match(h.detail, /Musa Dagh" is Wikidata Q1953975, the event is Q19831524/);
+});
+
+test("detectExtractHold: same item, unchanged text, no lead, or no QID to compare -> not held", () => {
+  assert.equal(detectExtractHold(musa(), mountainLead({ wikibase_item: "Q19831524" })), null);
+  assert.equal(detectExtractHold(musa(), mountainLead({ extract: "old text" })), null);
+  assert.equal(detectExtractHold(musa(), null), null);
+  assert.equal(detectExtractHold(musa(), mountainLead({ extract: null })), null);
+  assert.equal(detectExtractHold({ ...musa(), wikidata_qid: null }, mountainLead()), null);
+  assert.equal(detectExtractHold(musa(), mountainLead({ wikibase_item: null })), null);
+});
+
+test("extractHoldReport: lists every held extract, nothing when none", () => {
+  assert.equal(extractHoldReport([]), "");
+  const r = extractHoldReport([detectExtractHold(musa(), mountainLead())], { name: "proposed" });
+  assert.match(r, /proposed extracts held: 1/);
+  assert.match(r, /`musa-dagh-resistance` \("Musa Dagh Resistance"\): Article belongs to a different Wikidata item\./);
 });

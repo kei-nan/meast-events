@@ -1,7 +1,35 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { DATA_FIXES, applyDataFix, reconcileStartDate } from "./fixes.js";
+import { DATA_FIXES, applyDataFix, reconcileStartDate, keptDatePrecision } from "./fixes.js";
+
+test("applyDataFix F7: October 7 attacks start = Wikidata P580, end untouched", () => {
+  const ev = { id: "october-7-attacks", wikidata_qid: "Q122976243", date_start: "2023-10-01", date_end: "2023-10-09", review_reasons: [] };
+  assert.deepEqual(applyDataFix(ev), ["date_start"]);
+  assert.equal(ev.date_start, "2023-10-07");
+  assert.equal(ev.date_end, "2023-10-09");
+  assert.match(ev.review_reasons[0], /^data_fix F7:/);
+});
+
+test("keptDatePrecision: precision of the date actually kept, not of a discarded one", () => {
+  // 1948 Arab-Israeli War: decade-precision P585 "1940" was replaced by P580 1948-05-15
+  const war = { p585: [{ time: "1940-00-00", precision: 8 }], p580: [{ time: "1948-05-15", precision: 11 }] };
+  assert.deepEqual(keptDatePrecision(war, "1948-05-15"), { code: 11, name: "day", property: "P580" });
+  assert.equal(keptDatePrecision(war, "1940-01-01").name, "decade", "the stored 1940-01-01 is Wikidata's 1940-00-00");
+  // October 7 attacks: month-precision P585 2023-10 vs day-precision P580 2023-10-07
+  const oct7 = { p585: [{ time: "2023-10-00", precision: 10 }], p580: [{ time: "2023-10-07", precision: 11 }] };
+  assert.equal(keptDatePrecision(oct7, "2023-10-01").name, "month");
+  assert.equal(keptDatePrecision(oct7, "2023-10-07").name, "day");
+  // an exact match beats a normalised one; P585 first among equals (the discovery COALESCE order)
+  const both = { p585: [{ time: "2020-01-00", precision: 10 }], p580: [{ time: "2020-01-01", precision: 11 }] };
+  assert.equal(keptDatePrecision(both, "2020-01-01").property, "P580");
+  const same = { p585: [{ time: "2020-01-01", precision: 11 }], p580: [{ time: "2020-01-01", precision: 9 }] };
+  assert.equal(keptDatePrecision(same, "2020-01-01").property, "P585");
+  // a date that is no P585/P580 value of the item (e.g. taken from the Wikipedia infobox) has no derivable precision
+  assert.equal(keptDatePrecision(war, "1949-03-10"), null);
+  assert.equal(keptDatePrecision(null, "1948-05-15"), null);
+  assert.equal(keptDatePrecision(war, null), null);
+});
 
 test("ledger: one entry per QID, each ref documented in docs/data-fixes.md", () => {
   const qids = DATA_FIXES.map((f) => f.qid);
