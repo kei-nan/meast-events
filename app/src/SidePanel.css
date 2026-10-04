@@ -428,12 +428,47 @@ button.sp-chip[aria-pressed="true"] {
 
 /* ---------- Status + results ---------- */
 
-.sp-status {
+/* Result count plus the scope button ("show the 3 in selected years" /
+   "show all 23"); wraps under the count when the panel is narrow. */
+.sp-statusline {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+
+.sp-status {
   margin: 0;
   font-size: 0.82rem;
   color: var(--text-secondary);
+}
+
+.sp-scope-link {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  min-height: 28px;
+  padding: 2px 0;
+  background: none;
+  border: 0;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sp-scope-link:hover {
+  color: var(--text-primary);
+}
+
+/* Touch-sized like the other panel controls (kept out of the shared mobile
+   block further down). */
+@media (max-width: 768px) {
+  .sp-scope-link {
+    min-height: 44px;
+  }
 }
 
 .sp-results,

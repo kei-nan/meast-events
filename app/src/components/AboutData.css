@@ -2,14 +2,17 @@
   width: min(720px, calc(100vw - 24px));
   max-height: calc(100dvh - 24px);
   padding: 0;
-  border: 2px solid #5c4d38;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #faf7f0;
-  color: #2b2418;
-  font: 15px/1.55 system-ui, sans-serif;
+  /* Same dark tokens as the side panel (index.css), so the dialog reads as
+     part of the app rather than a light sheet laid over it. */
+  background: var(--bg-1);
+  color: var(--text-primary);
+  font: 15px/1.55 var(--font-sans);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
 }
 .about-dialog::backdrop {
-  background: rgba(30, 24, 14, 0.55);
+  background: rgba(12, 10, 7, 0.7);
 }
 .about-inner {
   padding: 16px 20px 24px;
@@ -24,31 +27,40 @@
   gap: 12px;
   position: sticky;
   top: -16px;
-  background: #faf7f0;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border-soft);
   padding: 8px 0;
   margin-top: -8px;
   z-index: 1;
 }
 .about-dialog .sp-btn {
-  color: #2b2418;
-  background: #fff;
-  border: 1px solid #5c4d38;
+  color: var(--text-primary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 6px 14px;
   font: inherit;
   cursor: pointer;
 }
+.about-dialog .sp-btn:hover {
+  border-color: var(--accent);
+}
 .about-dialog .sp-btn:focus-visible,
 .about-dialog a:focus-visible {
-  outline: 2px solid #1f4d80;
+  outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
 }
 .about-head h2 {
   margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
   font-size: 1.35rem;
 }
 .about-inner h3 {
   margin: 1.4em 0 0.4em;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--accent-strong);
   font-size: 1.1rem;
 }
 .about-inner h4 {
@@ -63,15 +75,18 @@
   margin: 0.35em 0;
 }
 .about-inner a {
-  color: #1f4d80;
+  color: var(--link);
+}
+.about-inner strong {
+  color: var(--text-primary);
 }
 .about-muted {
-  color: #5a5040;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 .about-unavailable {
   padding: 8px 10px;
-  border: 1px dashed #8a7a5c;
+  border: 1px dashed var(--text-tertiary);
   border-radius: 6px;
 }
 .about-bars {
@@ -87,7 +102,8 @@
   margin: 4px 0;
 }
 .about-bar-track {
-  background: #e6dfd0;
+  background: var(--bg-0);
+  border: 1px solid var(--border-soft);
   border-radius: 3px;
   height: 12px;
   overflow: hidden;
@@ -95,7 +111,7 @@
 .about-bar-fill {
   display: block;
   height: 100%;
-  background: #5c4d38;
+  background: var(--accent);
 }
 .about-bar-count {
   font-variant-numeric: tabular-nums;
@@ -111,7 +127,9 @@
   gap: 8px;
 }
 .about-dl dt {
-  color: #5a5040;
+  /* Without this a long value squeezes its label into broken pieces ("Ru / le"). */
+  flex-shrink: 0;
+  color: var(--text-secondary);
   text-transform: capitalize;
 }
 .about-dl dt::after {
@@ -130,7 +148,7 @@
 }
 .about-table th,
 .about-table td {
-  border: 1px solid #d3c9b3;
+  border: 1px solid var(--border);
   padding: 3px 8px;
   text-align: left;
 }
