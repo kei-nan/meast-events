@@ -31,13 +31,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # The token is not left in .git/config: only the "Open a pull request"
+      # step gets it, so the refresh script, npm install scripts and the build
+      # cannot push.
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
 
       - name: Re-fetch the Wikipedia summaries and titles
         run: node scripts/refresh-extracts.js --apply --report="$RUNNER_TEMP/refresh-report.md"
@@ -58,12 +67,38 @@ jobs:
 
       - name: Unit tests
         if: steps.diff.outputs.changed == 'true'
-        run: node --test app/src/lib/*.test.js scripts/lib/*.test.js
+        run: |
+          npm test
+          npm test --prefix app
+
+      # The same build Workers Builds runs after a merge: split-data's chunk
+      # size limits, the search index (Pagefind) and the Vite build, then the
+      # dist/ smoke check. A refresh that would break the deploy fails here.
+      - name: Build the site
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: app
+        run: |
+          npm ci
+          npm run build
+          node scripts/check-dist.mjs
+
+      # The PR description is capped (GitHub allows 65,536 characters), so the
+      # full report is kept as a workflow artifact and linked from the PR.
+      - name: Upload the full refresh report
+        id: report
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: refresh-report
+          path: ${{ runner.temp }}/refresh-report.md
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Open a pull request
         if: steps.diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          REPORT_URL: ${{ steps.report.outputs.artifact-url }}
         run: |
           day="$(date -u +%Y-%m-%d)"
           branch="data-refresh/${day}-${GITHUB_RUN_NUMBER}"
@@ -72,7 +107,14 @@ jobs:
           git switch -c "$branch"
           git add data/events.json
           git commit -m "Refresh Wikipedia summaries and titles (${day})"
-          git push origin "$branch"
+          # Checkout ran with persist-credentials: false. Authenticate this one
+          # push the way actions/checkout does (an http.extraheader), passed
+          # through git's GIT_CONFIG_* environment so it is never written to
+          # .git/config nor shown on the command line.
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
+            GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
+            git push origin "$branch"
           {
             echo "Monthly refresh of the English Wikipedia summaries and titles (${day})."
             echo
@@ -82,7 +124,10 @@ jobs:
             echo
             echo "**Before merging:** read the title changes, the held cases and the changed sentences below. Look for vandalism or a summary rewritten wholesale. After merging, the site rebuilds itself, including the search index, so search uses the new titles and text."
             echo
-            head -c 60000 "$RUNNER_TEMP/refresh-report.md"
+            echo "Full report (this description stops at 60,000 bytes): ${REPORT_URL}"
+            echo
+            # First 60,000 bytes, without splitting a multi-byte UTF-8 character.
+            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, 60000); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$RUNNER_TEMP/refresh-report.md"
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base main --head "$branch" \
             --title "Refresh Wikipedia summaries and titles (${day})" \

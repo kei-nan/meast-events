@@ -55,6 +55,10 @@ from this GitHub repository. Setup (already done; for reference or a rebuild):
    - **Non-production branch builds:** `npx wrangler preview` (the default). It needs the
      `previews` block in `app/wrangler.jsonc`, which is there; each branch and pull
      request then gets its own preview URL without touching production.
+   - `npx wrangler` runs the copy pinned in `app/package.json` (an exact version in
+     `devDependencies`, locked in `app/package-lock.json`), installed by the build's
+     `npm ci`, so a deploy never picks up whatever wrangler release is newest that day.
+     Dependabot proposes upgrades like any other dependency.
 3. No build variables or secrets are needed.
 
 Workers Builds' docs list a free-plan allowance of 3,000 build minutes/month, 1
@@ -88,9 +92,10 @@ Worker.
 ## CI and the data pipeline
 
 `.github/workflows/ci.yml` runs on every push and pull request to `main` and deploys
-nothing: it lints, unit-tests and builds `app/`; validates `data/events.json` and
+nothing: it lints, unit-tests (`npm test` in `app/`) and builds `app/`, then checks the
+built `dist/` (`node app/scripts/check-dist.mjs`); validates `data/events.json` and
 `data/events.proposed.json` (`node scripts/validate-events.js`), runs the data-pipeline
-tests (`node --test scripts/lib/*.test.js`) and the border check
+tests (`npm test` at the repo root) and the border check
 (`node scripts/verify-borders.js --check`); and runs `npm audit` for the repo root and
 `app/`.
 
@@ -104,8 +109,12 @@ and `data/events.json` changes only through `node scripts/merge-proposed.js`). S
 `.github/workflows/refresh-data.yml` runs on the 1st of each month (and on demand from
 the Actions tab). It re-fetches every event's English Wikipedia lead and, if any changed,
 opens a pull request with the changed summaries and a list of events whose title is no
-longer the current article title. It never merges; merging the pull request rebuilds the
-site, including the search index.
+longer the current article title. Before opening it, it validates the data, runs both
+unit-test suites and builds the site (`npm ci && npm run build` in `app/`, then
+`check-dist.mjs`), since pull requests opened with the workflow token do not trigger CI.
+The PR description holds the first 60,000 bytes of the refresh report; the full report is
+uploaded as the run's `refresh-report` artifact (kept 90 days) and linked from the PR. It
+never merges; merging the pull request rebuilds the site, including the search index.
 
 It needs one repository setting, once:
 **Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"**.
