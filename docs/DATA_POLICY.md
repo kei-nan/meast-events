@@ -199,10 +199,37 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 - `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (80 events, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
-  Discovered events never get a capital-fallback pin any more. Currently 1 curated event (Arab Spring) and 197 proposed events.
-- Validation (`scripts/lib/validate.js`): coordinates are required unless `location_quality` is `none` (then they must be `null`).
+  Discovered events never get a capital-fallback pin any more. As of 2026-10-04: 192 of the 571 curated events and 191 of the 461 proposed events
+  (counted from `data/events.json` and `data/events.proposed.json`).
+- Validation (`scripts/lib/validate.js`): coordinates are required unless `location_quality` is `none` (then they must be `null`), and
+  `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override`, `approximate` = `country-fallback:<tracked country>`,
+  `none` = `null`. Coordinates outside a generous Middle East box (lat 10-44, lon 24-65) are only a warning, because a few events really happened
+  abroad (San Remo, Madrid, Algiers, Kandahar, Washington); coordinates that would fall inside the box with latitude and longitude exchanged are an error.
 - `data/missing-coordinates-report.md` lists every curated and candidate event lacking a precise location, sorted by sitelinks, with Wikipedia and Wikidata links, so
   contributions can be made upstream (Wikidata `P625`).
+
+## Map borders: where there is no shape
+
+The time-driven borders (`data/boundaries.json`) come from CShapes 2.0 plus our documented corrections (`scripts/boundary-corrections.js`).
+CShapes codes independent states and only some colonial dependencies, and the import (`REGION_ENTITIES` in `scripts/ingest-boundaries.js`) takes
+17 of its entities. A territory with no shape for a year is simply blank on the map that year: we do not draw a border we have no source for.
+The map gives each year to the record in force on 1 July, so a state that CShapes starts in the second half of a year appears the next year.
+Checked on 2026-10-04 by testing a point in each place against every feature for every year 1900-2026:
+
+| Place | No shape in | What CShapes has |
+|---|---|---|
+| Najd / central Arabia (Riyadh, Ha'il) | 1900-1932 | Saudi Arabia from 23 Sep 1932 (first map year 1933). No Najd, Jabal Shammar or Sultanate of Nejd record. |
+| Hejaz (Mecca, Jeddah) | 1920-1932 | Drawn inside the Ottoman Empire shape through 1919 (CShapes' Ottoman record runs to April 1920); no Kingdom of Hejaz record. |
+| Al-Hasa / eastern Arabia (Dhahran) | 1915-1932 | Inside the Ottoman Empire shape through 1914. |
+| Kuwait | 1915-1960 | Inside the Ottoman Empire shape through 1914; Kuwait from 19 Jun 1961 (first map year 1961). The Saudi-Kuwaiti Neutral Zone (our addition) is drawn from 1922. |
+| Bahrain | 1900-1971 | Bahrain from 15 Aug 1971 (first map year 1972). |
+| Qatar | 1900-1916 | Qatar from 3 Nov 1916 (first map year 1917). |
+| Aden and South Arabia (Aden, Mukalla) | 1900-1967 | People's Republic of South Yemen from 30 Nov 1967 (first map year 1968). CShapes does have Aden and the East Aden Protectorate (Apr 1937 - Apr 1962) and the Federation of South Arabia (Apr 1962 - Nov 1967), but they are not among the imported entities, and it has nothing for the area before 1937. |
+
+Everywhere else among the 15 tracked countries a point is covered in every year: Turkey and Iran from before 1900, Egypt from 1899, Iraq, Syria,
+Lebanon, Jordan and Israel/Palestine by the Ottoman Empire shape through 1919 and by mandate or state shapes from 1920, the Trucial States
+(later the UAE) from 1892, Muscat and Oman from before 1900, and northern Yemen by the Ottoman Empire shape through 1918 and the Mutawakkilite Kingdom from 1919.
+Kuwait in 1990-1991 is drawn under the name "Kuwait (annexed by Iraq)", which `validate-boundaries.js` reports as a gap in the name "Kuwait".
 
 ## Pipeline and workflow
 
@@ -210,20 +237,37 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-candidates.json (bounded runs merge)
 node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
-node scripts/apply-v21.js [--apply]                     # one-off: brings data/events.json + app copy to shape v2.1 (idempotent)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json
 node scripts/lib/verify-sample.js                       # -> data/import-verification-sample.md
-node scripts/validate-events.js                         # schema/ids/dates/coordinates (runs in CI)
+node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
+npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps (runs in CI; needs root npm ci)
 node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
 
-Pipeline output never touches `data/events.json`. Only an explicit `merge-proposed.js --apply` run by a person does (the one-off `apply-v21.js` and
-`refresh-extracts.js --apply` are the other two, both deliberate, and both keep the app copy byte-identical). `validate-events.js` checks format and internal
-consistency only (ids `[a-z0-9-]+`, unique ids and QIDs, real calendar dates within 1000-3000, `date_end >= date_start` unless `date_flags` explains it, coordinates
-present unless `location_quality` is `none`, `wikidata_classes` array, `extract_retrieved_at` date, no `category_label`, non-empty extract); it never judges content.
+Pipeline output never touches `data/events.json`. Only an explicit `merge-proposed.js --apply` run by a person does, plus `refresh-extracts.js --apply`
+(deliberate, and run monthly through a pull request). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
+There is no second, committed copy of the events any more: `app/public/data/` is generated from `data/` by `app/scripts/split-data.mjs` on every dev start and
+build, and is gitignored.
+
+`validate-events.js` checks format and internal consistency only, and never judges content. **Errors** (CI fails): ids `[a-z0-9-]+`, unique ids and QIDs,
+real calendar dates from 1900 to next year, `date_end >= date_start` unless `date_flags` explains it, coordinates present unless `location_quality` is `none`,
+`location_quality` matching `coordinate_source` (see "Location quality"), no lat/lon swap, `category` and `category_group` equal and one of the groups in
+`scripts/lib/event-classes.js` (war, treaty, political, atrocity, terrorism, uprising, migration, diplomatic, economic), `wikidata_classes` array,
+`extract_retrieved_at` date, no `category_label`, non-empty extract. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
+shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`,
+`possible_duplicates` naming an id that is in neither the file nor (for the proposed file) the curated file, and, for the curated file, an event without a
+framing review or whose review is stale (its `text_sha1` is not the SHA-1 of the current extract, the same test the site uses to show "may no longer apply").
+Warnings are for a person to look at; nothing is changed automatically.
+
+`validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
+`end_year` or `source`, a bad year range or geometry type, or two shapes with the same name in the same year. Warnings: a feature without a `status` or
+`note` key, a status value with no label in the app, a year gap between shapes of the same name, and an area of at least 0.5 km² covered by two shapes
+shown in the same year. Overlaps between a shape whose status ends in `-included` (for example Israel from 1967, `occupied-territory-included`) and a
+flagged shape drawn on top of it (the West Bank, Gaza Strip and Golan Heights) are intentional and not listed. Smaller slivers along shared borders
+(at most about 0.13 km² on the current data) come from two separately sourced lines not coinciding exactly and are only counted. It never edits geometry.
 
 ## Refreshing extracts (monthly, automatic)
 

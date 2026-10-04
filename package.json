@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "ingest": "node scripts/ingest.js",
+    "validate-boundaries": "node --test scripts/lib/boundary-checks.test.js && node scripts/validate-boundaries.js",
     "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },
   "devDependencies": {
