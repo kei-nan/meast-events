@@ -11,7 +11,9 @@
 // Rules: the lead text is Wikipedia's, only whitespace-normalised (lib/lead.js). `extract_retrieved_at` is set
 // to today only for leads whose text changed, so an unchanged event is not touched and a refresh diff shows only
 // real changes (each check is recorded by the refresh workflow's run history). With --apply the curated file is
-// written. Apart from titles (below), nothing else in an event is touched.
+// written. Apart from titles (below), nothing else in an event is touched. A lead is never copied when the fetched
+// article belongs to a different Wikidata item than the event's wikidata_qid (the stored URL leads to another
+// subject's article); such updates are held and listed under "held" (lib/title-refresh.js detectExtractHold).
 //
 // Titles follow Wikipedia the same way: the same fetch tells whether each event's `title` is still the current
 // article title (an article renamed on Wikipedia, or a stored URL that now redirects; lib/title-refresh.js).
@@ -20,7 +22,14 @@
 // Wikipedia does not redirect to the article) are held: never applied, only listed. Event ids never change.
 import { readFile, writeFile } from "node:fs/promises";
 import { fetchLeads, titleFromWikipediaUrl } from "./lib/lead.js";
-import { detectTitleChange, checkFormerTitle, applyTitleChanges, titleReport } from "./lib/title-refresh.js";
+import {
+  detectTitleChange,
+  checkFormerTitle,
+  applyTitleChanges,
+  titleReport,
+  detectExtractHold,
+  extractHoldReport,
+} from "./lib/title-refresh.js";
 
 const APPLY = process.argv.includes("--apply");
 const PROPOSED = process.argv.includes("--proposed");
@@ -61,7 +70,7 @@ async function refresh(events, label, file) {
   console.log(`${label}: re-fetching ${targets.length} leads (no cache) ...`);
   const leads = await fetchLeads(titles, { cache: null, log: (m) => process.stdout.write(`\r${m}      `) });
   console.log();
-  const out = { changed: [], unchanged: 0, missing: [], titles: [], checked: targets.length };
+  const out = { changed: [], unchanged: 0, missing: [], held: [], titles: [], checked: targets.length };
   for (const e of targets) {
     const lead = leads.get(titleFromWikipediaUrl(e.wikipedia_url));
     const tc = detectTitleChange(e, lead);
@@ -72,6 +81,12 @@ async function refresh(events, label, file) {
     }
     if (lead.extract === e.extract) {
       out.unchanged++;
+      continue;
+    }
+    // the article is another Wikidata item's (lib/title-refresh.js detectExtractHold): never copy its lead
+    const held = detectExtractHold(e, lead);
+    if (held) {
+      out.held.push(held);
       continue;
     }
     const d = diffLeads(e.extract, lead.extract);
@@ -116,7 +131,8 @@ const results = [["curated", res], ...(propRes ? [["proposed", propRes.res]] : [
 // titles first, so a long list of changed leads can never push them out of a truncated PR description
 for (const [name, r] of results) say("\n" + titleReport(r.titles, { name, applied: APPLY }));
 for (const [name, r] of results) {
-  say(`\n## ${name}: ${r.changed.length} changed, ${r.unchanged} identical, ${r.missing.length} missing`);
+  say(`\n## ${name}: ${r.changed.length} changed, ${r.unchanged} identical, ${r.held.length} held, ${r.missing.length} missing`);
+  if (r.held.length) say("\n" + extractHoldReport(r.held, { name }));
   for (const c of r.changed) {
     say(`\n- ${c.id} ("${c.title}") stored ${c.from ?? "?"}: ${c.d.lenBefore} -> ${c.d.lenAfter} chars, -${c.d.removed.length} +${c.d.added.length} sentences`);
     for (const s of c.d.removed.slice(0, MAX_LINES)) say(`    - ${clip(s)}`);

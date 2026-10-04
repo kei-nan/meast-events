@@ -65,6 +65,42 @@ export function coordinateFlag(coordinates, countries) {
     : null;
 }
 
+// ---------- month-precision date vs an exact day in the lead (flag only) ----------
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const M = MONTH_NAMES.join("|");
+// "7 October 2023", "October 7, 2023", and ranges "13–26 May 2015" / "October 7–8, 2023" (the first day)
+const DAY_MONTH_YEAR = new RegExp(`\\b(\\d{1,2})(?:\\s*[–-]\\s*\\d{1,2})? (${M}) (\\d{4})\\b`, "g");
+const MONTH_DAY_YEAR = new RegExp(`\\b(${M}) (\\d{1,2})(?:\\s*[–-]\\s*\\d{1,2})?, (\\d{4})\\b`, "g");
+
+// First sentence of a lead: up to the first ". " (or ! ?) followed by a capital/digit/quote, within the first paragraph.
+export function firstSentence(text) {
+  const para = String(text ?? "").split(/\n/)[0];
+  return para.split(/(?<=[.!?])\s+(?=[A-Z0-9"“(])/)[0] ?? "";
+}
+
+// Exact days ("YYYY-MM-DD") named in a piece of prose.
+export function exactDaysIn(text) {
+  const out = [];
+  const iso = (y, m, d) => `${y}-${String(MONTH_NAMES.indexOf(m) + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  for (const x of String(text ?? "").matchAll(DAY_MONTH_YEAR)) out.push(iso(x[3], x[2], x[1]));
+  for (const x of String(text ?? "").matchAll(MONTH_DAY_YEAR)) out.push(iso(x[3], x[1], x[2]));
+  return [...new Set(out)].filter((d) => Number(d.slice(8)) >= 1 && Number(d.slice(8)) <= 31);
+}
+
+// A month-precision date_start (Wikidata only knows the month; the pipeline stores the 1st) whose Wikipedia lead
+// names an exact day IN THAT SAME MONTH in its first sentence: the day is probably known (e.g. October 7 attacks,
+// stored 2023-10-01). FLAG ONLY: the date is never changed here; a fix needs the ledger (docs/data-fixes.md).
+export const MONTH_DAY_FLAG = "month_precision_day_in_lead";
+export function monthPrecisionDayFlag({ date_start, date_precision, extract }) {
+  if (date_precision !== "month" || !date_start || !extract) return null;
+  const days = exactDaysIn(firstSentence(extract)).filter((d) => d.slice(0, 7) === date_start.slice(0, 7));
+  if (!days.length) return null;
+  return (
+    `${MONTH_DAY_FLAG}: date_start ${date_start} has only month precision in Wikidata, but the first sentence of the ` +
+    `Wikipedia lead names ${days.join(", ")}; the stored day is a placeholder`
+  );
+}
+
 // ---------- duplicate hints (never auto-drop) ----------
 export function normTitle(t) {
   return (t ?? "")
@@ -135,4 +171,21 @@ export function duplicateHints(events, targetIds) {
     }
   }
   return out;
+}
+
+// Removes duplicate hints that point at an id that is not published next to the event (an excluded candidate, an
+// event left out by review in data/proposed-exclusions.json, or a curated event since removed), together with the
+// matching `possible_duplicate:` review note. Hints are pointers to other records; one to a record nobody can open
+// is a dangling id. `keepIds`: Set of ids that exist. Mutates `event`; returns the removed ids.
+export function pruneDuplicateHints(event, keepIds, reasonsKey = "review_reasons") {
+  const hints = event.possible_duplicates ?? [];
+  const removed = hints.filter((h) => !keepIds.has(h.id)).map((h) => h.id);
+  if (!removed.length) return removed;
+  event.possible_duplicates = hints.filter((h) => keepIds.has(h.id));
+  if (Array.isArray(event[reasonsKey])) {
+    event[reasonsKey] = event[reasonsKey].filter(
+      (r) => !(String(r).startsWith("possible_duplicate:") && removed.some((id) => String(r).includes(`(${id}) - `)))
+    );
+  }
+  return removed;
 }

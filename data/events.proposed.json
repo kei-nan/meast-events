@@ -4430,7 +4430,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "decade",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q49097",
@@ -4439,7 +4439,6 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "date_precision_coarse: Wikidata records the date only to decade precision",
       "part_of: Wikidata (P361) lists this event as part of \"1948 Palestine war\" (Q49097); it may overlap with that larger event"
     ],
     "needs_review": true,
@@ -9064,7 +9063,8 @@
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
-      "country_via_place_only: Wikidata P17 of the item is India; the tracked country tag comes only from the P276/P131 place"
+      "country_via_place_only: Wikidata P17 of the item is India; the tracked country tag comes only from the P276/P131 place",
+      "month_precision_day_in_lead: date_start 1999-12-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 1999-12-24; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -12866,7 +12866,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "day",
+    "date_precision": "month",
     "part_of": [
       {
         "qid": "Q15946570",
@@ -15146,7 +15146,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"2021 Israel–Palestine crisis\" (Q106775117); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event",
       "possible_duplicate: possible duplicate of \"2021 Israel–Palestine crisis\" (2021-israel-palestine-crisis) - same Wikidata item (QID / resolved QID)",
-      "title_differs_from_article: record title \"Operation Guardian of the Walls\" differs from the Wikipedia article title \"2021 Israel–Palestine crisis\" and does not appear in its lead"
+      "title_differs_from_article: record title \"Operation Guardian of the Walls\" differs from the Wikipedia article title \"2021 Israel–Palestine crisis\" and does not appear in its lead",
+      "month_precision_day_in_lead: date_start 2021-05-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2021-05-10; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -15265,7 +15266,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event",
+      "month_precision_day_in_lead: date_start 2022-08-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2022-08-07; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -15515,7 +15517,8 @@
     "possible_duplicates": [],
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Mowing the lawn\" (Q123594566); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Mowing the lawn\" (Q123594566); it may overlap with that larger event",
+      "month_precision_day_in_lead: date_start 2023-05-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2023-05-02; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -15560,7 +15563,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event",
+      "month_precision_day_in_lead: date_start 2023-07-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2023-07-03; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -15569,7 +15573,7 @@
   {
     "id": "october-7-attacks",
     "title": "October 7 attacks",
-    "date_start": "2023-10-01",
+    "date_start": "2023-10-07",
     "date_end": "2023-10-09",
     "countries": [
       "Israel/Palestine"
@@ -15597,7 +15601,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "month",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q122962941",
@@ -15608,17 +15612,11 @@
         "label": "Gaza–Israel conflict"
       }
     ],
-    "possible_duplicates": [
-      {
-        "id": "ein-hashlosha-massacre",
-        "title": "Ein HaShlosha massacre",
-        "reason": "same Wikidata item (QID / resolved QID)"
-      }
-    ],
+    "possible_duplicates": [],
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Gaza War\" (Q122962941); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event",
-      "possible_duplicate: possible duplicate of \"Ein HaShlosha massacre\" (ein-hashlosha-massacre) - same Wikidata item (QID / resolved QID)"
+      "data_fix F7: October 7 attacks: stored date_start 2023-10-01 was Wikidata P585 2023-10 (month precision) pinned to the 1st. Wikidata P580 = 2023-10-07 (day precision); the Wikipedia infobox reads \"October 7–8, 2023\" and the lead \"On October 7, 2023\" (checked 2026-10-04). date_start = P580. date_end (P582 2023-10-09; infobox 8 October) is not changed: the sources differ (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -15749,7 +15747,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Gaza War\" (Q122962941); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Gaza War\" (Q122962941); it may overlap with that larger event",
+      "month_precision_day_in_lead: date_start 2023-10-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2023-10-07; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -17610,7 +17609,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "decade",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q122974556",
@@ -17627,7 +17626,6 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "date_precision_coarse: Wikidata records the date only to decade precision",
       "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"September 2024 Israeli attacks against Lebanon\" (Q130354504); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event"
@@ -17797,7 +17795,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"2024 Syrian opposition offensives\" (Q131342170); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"2024 Syrian opposition offensives\" (Q131342170); it may overlap with that larger event",
+      "month_precision_day_in_lead: date_start 2024-12-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2024-12-07; the stored day is a placeholder"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
@@ -18400,7 +18399,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "decade",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q136338700",
@@ -18409,7 +18408,6 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "date_precision_coarse: Wikidata records the date only to decade precision",
       "category_year_mismatch: Wikipedia year categories mention [2025, 2026, 2023] but none is within 1 year of 2020",
       "part_of: Wikidata (P361) lists this event as part of \"Asian Spring\" (Q136338700); it may overlap with that larger event"
     ],
