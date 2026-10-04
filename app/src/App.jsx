@@ -132,6 +132,7 @@ export default function App() {
   const [area, setArea] = useState(initial.area);
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
+  const [creditsOpen, setCreditsOpen] = useState(false); // footer credits, folded on small screens only
 
   // The map mounts (and its downloads start) after the first paint; see
   // startMapDownloads.
@@ -527,31 +528,56 @@ export default function App() {
         endYear={endYear}
         onChangeRange={handleChangeRange}
         eventCountsByYear={eventCountsByYear}
+        eventYear={eventYear}
       />
       {about && <AboutData onClose={() => setAbout(false)} />}
-      <footer className="app-footer">
-        <button type="button" className="app-footer-link" onClick={() => setAbout(true)}>
-          About the data
+      <footer className="app-footer" data-credits={creditsOpen ? "open" : undefined}>
+        <button type="button" className="app-footer-link" aria-label="About the data" onClick={() => setAbout(true)}>
+          About<span className="app-footer-wide"> the data</span>
         </button>
-        {" · "}
-        Text:{" "}
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">
-          Wikipedia (CC BY-SA 4.0)
-        </a>
-        {" · "}
-        Borders:{" "}
-        <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
-          CShapes 2.0
-        </a>{" "}
-        {/* CC BY-NC-SA: authors, licence link and a note that the borders were changed, on every page. */}
-        (Schvitz et al., ETH Zurich,{" "}
-        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer">
-          CC BY-NC-SA 4.0
-        </a>
-        ), non-commercial use, with{" "}
-        <a href={BOUNDARY_CORRECTIONS_URL} target="_blank" rel="noreferrer">
-          our cited corrections
-        </a>
+        {/* Phones and short screens: the full credits fold behind this button so
+            the footer is one line instead of two to four (App.css), and the
+            sources are still named on that line. The credits stay in the page,
+            one tap away; CC 4.0 licences (section 3(a)(2)) accept "a hyperlink
+            to a resource that includes the required information". */}
+        <span className="app-footer-compact">
+          <span aria-hidden="true">{" · "}</span>
+          <button
+            type="button"
+            className="app-footer-link"
+            aria-expanded={creditsOpen}
+            aria-controls="app-credits"
+            onClick={() => setCreditsOpen((o) => !o)}
+          >
+            Credits
+          </button>
+          {": Wikipedia, CShapes"}
+          <span className="app-footer-wide">{" 2.0"}</span>
+          {" (modified)"}
+        </span>
+        <span className="app-credits" id="app-credits">
+          <span className="app-credits-sep" aria-hidden="true">
+            {" · "}
+          </span>
+          Text:{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">
+            Wikipedia (CC BY-SA 4.0)
+          </a>
+          {" · "}
+          Borders:{" "}
+          <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
+            CShapes 2.0
+          </a>{" "}
+          {/* CC BY-NC-SA: authors, licence link and a note that the borders were changed, on every page. */}
+          (Schvitz et al., ETH Zurich,{" "}
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer">
+            CC BY-NC-SA 4.0
+          </a>
+          ), non-commercial use, with{" "}
+          <a href={BOUNDARY_CORRECTIONS_URL} target="_blank" rel="noreferrer">
+            our cited corrections
+          </a>
+        </span>
       </footer>
     </div>
   );

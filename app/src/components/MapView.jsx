@@ -27,6 +27,7 @@ import {
   MapNotices,
   MapTip,
   MapToolbar,
+  YearToggle,
 } from "./MapUi";
 import useMediaQuery from "../hooks/useMediaQuery";
 import ClusterList from "./ClusterList";
@@ -857,8 +858,18 @@ export default function MapView({
     if (!mapReady || !focus || focus.fitCountries) return; // fitCountries: useCountryHighlight
     const map = mapRef.current;
     const ev = eventsRef.current.find((e) => e.id === focus.id);
-    const minZoom = ev?.location_quality === "approximate" ? 5 : 6;
-    const opts = { center: [focus.lon, focus.lat], zoom: Math.max(map.getZoom(), minZoom) };
+    // There is no basemap with towns or rivers: the only context is the land
+    // outline and one name per state. Zoom 6 often showed neither (just grey
+    // land and dots), so the target is the deepest zoom that still kept a
+    // coastline and a state name in view in screenshots (Mush, 1901): 5 on a
+    // ~1060px desktop map, 4.5 on a 390px phone, 4 on a 320px one. An
+    // approximate location gets half a level less. A user who zoomed in
+    // further keeps their zoom, but at most two levels past the target, so a
+    // jump never lands in blank land.
+    const w = map.getContainer().clientWidth;
+    const target = 5 - (w < 700 ? 0.5 : 0) - (w < 360 ? 0.5 : 0) - (ev?.location_quality === "approximate" ? 0.5 : 0);
+    const zoom = Math.min(Math.max(map.getZoom(), target), target + 2);
+    const opts = { center: [focus.lon, focus.lat], zoom };
     if (reducedMotion()) map.jumpTo(opts);
     else map.flyTo(opts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1031,6 +1042,7 @@ export default function MapView({
         onZoomOut={() => zoomBy(-1)}
         onReset={resetView}
         matchCount={matchBounds?.count ?? null}
+        matchTotal={matchIds?.size ?? null}
         onShowMatches={showMatches}
         drawHint={hint}
         onInteract={hintOpen ? dismissHint : undefined}
@@ -1042,11 +1054,16 @@ export default function MapView({
           updating={!decadeCached}
           eventYearShown={borderYear != null}
           items={yearBorders}
+          compact={compact}
         />
         {eventYear != null && eventYear !== timelineYear && (
-          <button type="button" className="mu-btn mu-btn-small" onClick={onToggleEventYear}>
-            {borderYear != null ? `Use timeline year (${timelineYear})` : `Use event year (${eventYear})`}
-          </button>
+          <YearToggle
+            useTimeline={borderYear != null}
+            timelineYear={timelineYear}
+            eventYear={eventYear}
+            compact={compact}
+            onClick={onToggleEventYear}
+          />
         )}
         <MapNotices
           loading={eventsLoading || !mapReady || !decadeCached}

@@ -428,12 +428,47 @@ button.sp-chip[aria-pressed="true"] {
 
 /* ---------- Status + results ---------- */
 
-.sp-status {
+/* Result count plus the scope button ("show the 3 in selected years" /
+   "show all 23"); wraps under the count when the panel is narrow. */
+.sp-statusline {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
+}
+
+.sp-status {
   margin: 0;
   font-size: 0.82rem;
   color: var(--text-secondary);
+}
+
+.sp-scope-link {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  min-height: 28px;
+  padding: 2px 0;
+  background: none;
+  border: 0;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sp-scope-link:hover {
+  color: var(--text-primary);
+}
+
+/* Touch-sized like the other panel controls (kept out of the shared mobile
+   block further down). */
+@media (max-width: 768px) {
+  .sp-scope-link {
+    min-height: 44px;
+  }
 }
 
 .sp-results,
@@ -909,17 +944,12 @@ button.sp-chip[aria-pressed="true"] {
 /* ---------- Mobile: map on top, panel as bottom sheet ---------- */
 
 @media (max-width: 768px) {
-  .app {
-    height: auto;
-    min-height: 100dvh;
-  }
-
-  /* Takes whatever the header, timeline and footer leave, but never less than
-     62dvh, so the map keeps a usable size on short screens. */
+  /* Takes whatever the header, timeline and footer leave. No minimum height:
+     the shell is exactly the viewport (App.css), and a minimum here made the
+     page taller than a 320x640 screen, so it scrolled and cut off the footer. */
   .app-body {
-    flex: 1 0 auto;
-    height: auto;
-    min-height: max(420px, 62dvh);
+    flex: 1 1 0;
+    min-height: 0;
     flex-direction: column;
   }
 
@@ -946,9 +976,11 @@ button.sp-chip[aria-pressed="true"] {
   }
 
   /* Stays inside .app-body (not fixed to the viewport) so the timeline below
-     remains visible and usable; at least 120px of map stays visible above. */
+     remains visible and usable. It takes all of the map area but a 120px strip,
+     which keeps the event's place in sight; the old 60dvh cap left the article
+     about half the screen on a phone. */
   .side-panel[data-sheet="full"] {
-    height: min(60dvh, calc(100% - 120px));
+    height: calc(100% - 120px);
   }
 
   .sp-sheet-toggle {
