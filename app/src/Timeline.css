@@ -1,7 +1,8 @@
 .timeline {
   --tl-thumb: 28px;
-  --tl-h: 40px;
-  padding: 10px 22px 12px;
+  --tl-h: 34px;
+  --tl-btn: 34px;
+  padding: 6px 22px 6px;
   border-top: 1px solid var(--border);
   background: var(--bg-1);
   /* Own stacking context: the year bubble and slider thumbs (z-index 2-5) rank
@@ -10,42 +11,32 @@
   isolation: isolate;
 }
 
+/* One row: Play, play mode, the selected years, the help line and the presets. */
 .timeline-top {
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.timeline-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex: 1;
-  min-width: 0;
-}
-
-.timeline-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
+  gap: 12px;
 }
 
 .timeline-year {
+  flex: none;
+  min-width: 6.4em; /* "1900 – 2026": the row does not jump while dragging */
   font-family: var(--font-serif);
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 600;
   letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
   color: var(--text-primary);
 }
 
 .timeline-play,
 .timeline-preset {
-  min-height: 44px;
-  padding: 0 14px;
+  min-height: var(--tl-btn);
+  padding: 0 10px;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
+  white-space: nowrap;
   color: var(--text-primary);
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -55,7 +46,14 @@
 
 .timeline-play {
   flex: none;
-  min-width: 96px;
+  min-width: 76px;
+}
+
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 10px;
 }
 
 .timeline-mode {
@@ -64,10 +62,10 @@
 }
 
 .timeline-mode-btn {
-  min-height: 44px;
-  padding: 0 10px;
+  min-height: var(--tl-btn);
+  padding: 0 9px;
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -117,41 +115,89 @@
   outline-offset: 2px;
 }
 
+/* Small print; the sliders' tooltips repeat it. Stays in the
+   DOM everywhere because both sliders point at it (aria-describedby). */
 .timeline-help {
+  flex: 0 1 auto;
+  min-width: 0;
   margin: 0;
-  text-align: center;
-  font-size: 0.85rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Presets scroll sideways inside their row instead of wrapping into more rows. */
+.timeline-presets {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px; /* room for the focus outline inside the scroller */
+}
+
+.timeline-preset {
+  flex: none;
+}
+
+/* Right-aligned when they fit; an auto margin collapses to 0 when they
+   overflow, so the first preset stays reachable by scrolling. */
+.timeline-preset:first-child {
+  margin-left: auto;
+}
+
+.timeline-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.timeline-bound {
+  flex: none;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
 }
 
-.timeline-presets {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
-  max-width: 55%;
-}
-
-.timeline-density {
-  display: flex;
-  align-items: flex-end;
-  height: 20px;
-  gap: 1px;
-  margin-bottom: 4px;
-}
-
-.timeline-tick {
+.timeline-range {
+  position: relative;
   flex: 1;
+  min-width: 0;
+  height: var(--tl-h);
+}
+
+/* Bars mirror around the track line; bar i is centred where the slider puts
+   year i, so the strip starts half a bar before the first thumb position. */
+.timeline-density {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: calc(var(--tl-thumb) / 2 - (100% - var(--tl-thumb)) / var(--tl-years) / 2);
+  right: calc(var(--tl-thumb) / 2 - (100% - var(--tl-thumb)) / var(--tl-years) / 2);
   display: flex;
-  align-items: flex-end;
-  height: 100%;
-  cursor: pointer; /* click = jump to that year */
+}
+
+/* The whole column is the click target (jump to that year); the bar inside is
+   only the picture. Padding, not a flex gap, separates bars so no click
+   lands between two years. */
+.timeline-tick {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 0 0.5px;
+  cursor: pointer;
 }
 
 .timeline-tick-bar {
   width: 100%;
   min-height: 2px;
-  background: var(--border);
+  background: color-mix(in srgb, var(--text-secondary) 32%, transparent);
+  border-radius: 1px;
 }
 
 .timeline-tick--active .timeline-tick-bar {
@@ -162,34 +208,18 @@
   background: var(--accent-strong);
 }
 
-.timeline-range {
-  position: relative;
-  height: var(--tl-h);
-  margin-top: 18px; /* room for the value bubble */
-}
-
-.timeline-track,
-.timeline-track-fill {
+.timeline-track {
   position: absolute;
   top: calc(var(--tl-h) / 2 - 1px);
-  height: 2px;
-}
-
-.timeline-track {
   left: calc(var(--tl-thumb) / 2);
   right: calc(var(--tl-thumb) / 2);
-  background: var(--border);
-}
-
-.timeline-track-fill {
-  left: calc(var(--tl-thumb) / 2 + (100% - var(--tl-thumb)) * var(--tl-start));
-  right: calc(var(--tl-thumb) / 2 + (100% - var(--tl-thumb)) * (1 - var(--tl-end)));
-  background: var(--accent);
+  height: 2px;
+  background: var(--border-soft);
 }
 
 .timeline-bubble {
   position: absolute;
-  top: -22px;
+  top: -20px;
   left: calc(var(--tl-thumb) / 2 + (100% - var(--tl-thumb)) * var(--tl-pos));
   transform: translateX(-50%);
   padding: 1px 8px;
@@ -226,7 +256,8 @@
   height: var(--tl-h);
 }
 
-/* Thumb box is the touch target; the visible dot is drawn inside it. */
+/* Thumb box is the touch target; the visible dot is drawn inside it, with a
+   dark ring so it stands out on the gold bars. */
 .timeline-slider::-webkit-slider-thumb {
   pointer-events: auto;
   -webkit-appearance: none;
@@ -236,7 +267,7 @@
   margin-top: calc((var(--tl-h) - var(--tl-thumb)) / 2);
   border: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, transparent 9.5px);
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--bg-0) 9.5px 11px, transparent 11.5px);
   cursor: pointer;
 }
 
@@ -246,7 +277,7 @@
   height: var(--tl-thumb);
   border: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, transparent 9.5px);
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--bg-0) 9.5px 11px, transparent 11.5px);
   cursor: pointer;
 }
 
@@ -255,11 +286,11 @@
 }
 
 .timeline-slider:focus-visible::-webkit-slider-thumb {
-  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 11px, transparent 11.5px);
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 12px, transparent 12.5px);
 }
 
 .timeline-slider:focus-visible::-moz-range-thumb {
-  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 11px, transparent 11.5px);
+  background: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 12px, transparent 12.5px);
 }
 
 .timeline-slider--start {
@@ -274,80 +305,102 @@
   z-index: 4;
 }
 
-.timeline-bounds {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+/* Not enough room for the help line next to the presets: screen readers
+   still get it (aria-describedby), mouse users the sliders' tooltips. */
+@media (max-width: 1180px) {
+  .timeline-help {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .timeline-presets {
+    gap: 4px;
+  }
+
+  .timeline-preset {
+    padding: 0 6px;
+  }
+
+  .timeline-top,
+  .timeline-controls {
+    gap: 8px;
+  }
+
+  .timeline-year {
+    min-width: 6.2em;
+  }
+
+  .timeline-play {
+    min-width: 40px;
+  }
+
+  .timeline-play-word {
+    display: none;
+  }
 }
 
 @media (pointer: coarse) {
   .timeline {
     --tl-thumb: 44px;
     --tl-h: 44px;
+    --tl-btn: 44px;
   }
 }
 
+/* Mobile: Play, play mode and the years on one row, the presets scrolling
+   sideways on the next, then the strip, so the timeline stays short. */
 @media (max-width: 768px) {
   .timeline {
     --tl-thumb: 44px;
     --tl-h: 44px;
-    padding: 8px 14px 10px;
-  }
-
-  .timeline-year {
-    font-size: 1.15rem;
+    --tl-btn: 44px;
+    padding: 4px 10px 2px;
   }
 
   .timeline-top {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  /* Year and help on their own row above Play and the play mode. */
-  .timeline-header {
     flex-wrap: wrap;
-    gap: 6px 10px;
+    gap: 4px 8px;
   }
 
-  .timeline-title {
-    order: -1;
-    flex: 1 0 100%;
-    flex-direction: row;
-    align-items: baseline;
-    gap: 10px;
+  .timeline-controls {
+    gap: 8px;
   }
 
-  .timeline-year {
-    flex: none;
+  .timeline-presets {
+    flex-basis: 100%;
+    padding: 2px 0;
+  }
+
+  .timeline-preset:first-child {
+    margin-left: 0;
   }
 
   .timeline-play {
-    flex: 1;
+    min-width: 44px;
+    padding: 0 8px;
   }
 
-  .timeline-help {
-    text-align: left;
-    font-size: 0.8rem;
+  .timeline-year {
+    min-width: 6.4em;
+    font-size: 1rem;
   }
 
-  /* Presets scroll sideways inside their own row instead of stacking into many rows. */
-  .timeline-presets {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    max-width: none;
-    overflow-x: auto;
-    padding-bottom: 2px;
+  .timeline-strip {
+    gap: 4px;
+    margin-top: 0;
   }
 
-  .timeline-preset {
-    flex: none;
+  /* Bars about 2px wide: gaps would turn them into hairlines. */
+  .timeline-tick {
+    padding: 0;
   }
 
-  .timeline-bounds span:nth-child(2) {
-    display: none;
+  .timeline-bound {
+    font-size: 0.68rem;
   }
 }
 

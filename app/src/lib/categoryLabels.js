@@ -1,5 +1,5 @@
-// Display labels for the category ids ("our grouping"). Same text as the map
-// legend (components/MapUi.jsx CATEGORY_TEXT); URLs and data keep the ids.
+// Display labels for the category ids ("our grouping"), shared by the map
+// legend, filters, rows and detail view; URLs and data keep the ids.
 export const CATEGORY_LABELS = {
   war: "War",
   treaty: "Treaty",
@@ -16,4 +16,9 @@ export const CATEGORY_LABELS = {
 export function categoryLabel(id) {
   if (!id) return "";
   return CATEGORY_LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1);
+}
+
+/** Label without its parenthetical gloss, for tight spots (active-filter chips). */
+export function categoryShortLabel(id) {
+  return categoryLabel(id).replace(/\s*\(.*\)$/, "");
 }

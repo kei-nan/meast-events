@@ -6,14 +6,19 @@ import "../Timeline.css";
 const PLAY_INTERVAL_MS = 350;
 
 // Labelled year ranges only; the names carry no claims beyond the years shown.
+// Where a name could be contested the label is just the years. The slider's
+// own ends need no preset.
 const PRESETS = [
-  { label: "1900", start: 1900, end: 1900 },
   { label: "WWI 1914–18", start: 1914, end: 1918 },
-  { label: "1948", start: 1948, end: 1948 },
+  { label: "1948–49", start: 1948, end: 1949 },
+  { label: "1956", start: 1956, end: 1956 },
   { label: "1967", start: 1967, end: 1967 },
-  { label: "1990", start: 1990, end: 1990 },
+  { label: "1973", start: 1973, end: 1973 },
+  { label: "1979", start: 1979, end: 1979 },
+  { label: "1980–88", start: 1980, end: 1988 },
+  { label: "1990–91", start: 1990, end: 1991 },
+  { label: "2003", start: 2003, end: 2003 },
   { label: "2011", start: 2011, end: 2011 },
-  { label: String(MAX_YEAR), start: MAX_YEAR, end: MAX_YEAR },
   { label: "All years", start: MIN_YEAR, end: MAX_YEAR },
 ];
 
@@ -91,126 +96,130 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
     <section
       className="timeline"
       aria-label="Time range"
-      style={{ "--tl-start": frac(startYear), "--tl-end": frac(endYear) }}
+      style={{ "--tl-start": frac(startYear), "--tl-end": frac(endYear), "--tl-years": MAX_YEAR - MIN_YEAR }}
     >
       <div className="timeline-top">
-      <div className="timeline-header">
-        <button
-          type="button"
-          className="timeline-play"
-          onClick={togglePlay}
-          aria-pressed={playing && endYear < MAX_YEAR}
-          aria-label={
-            playMode === "slide"
-              ? playing
-                ? "Pause: stop moving the period"
-                : "Play: move the period forward"
-              : playing
-                ? "Pause: stop advancing the end year"
-                : "Play: advance the end year"
-          }
-        >
-          <span aria-hidden="true">{playing ? "❚❚ Pause" : "▶ Play"}</span>
-        </button>
-        <div className="timeline-mode" role="group" aria-label="Play mode">
-          {PLAY_MODES.map((m) => (
+        <div className="timeline-controls">
+          <button
+            type="button"
+            className="timeline-play"
+            onClick={togglePlay}
+            aria-pressed={playing && endYear < MAX_YEAR}
+            aria-label={
+              playMode === "slide"
+                ? playing
+                  ? "Pause: stop moving the period"
+                  : "Play: move the period forward"
+                : playing
+                  ? "Pause: stop advancing the end year"
+                  : "Play: advance the end year"
+            }
+          >
+            <span aria-hidden="true">
+              {playing ? "❚❚" : "▶"}
+              <span className="timeline-play-word"> {playing ? "Pause" : "Play"}</span>
+            </span>
+          </button>
+          <div className="timeline-mode" role="group" aria-label="Play mode">
+            {PLAY_MODES.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className="timeline-mode-btn"
+                aria-pressed={playMode === m.id}
+                title={m.help}
+                onClick={() => setPlayMode(m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <span className="timeline-year">{rangeText}</span>
+        </div>
+        <p className="timeline-help" id="timeline-help">
+          Borders show the end year.
+        </p>
+        <div className="timeline-presets" role="group" aria-label="Jump to a year or period">
+          {PRESETS.map((p) => (
             <button
-              key={m.id}
+              key={p.label}
               type="button"
-              className="timeline-mode-btn"
-              aria-pressed={playMode === m.id}
-              title={m.help}
-              onClick={() => setPlayMode(m.id)}
+              className="timeline-preset"
+              aria-pressed={p.start === startYear && p.end === endYear}
+              onClick={() => applyPreset(p)}
             >
-              {m.label}
+              {p.label}
             </button>
           ))}
         </div>
-        <div className="timeline-title">
-          <span className="timeline-year">{rangeText}</span>
-          <p className="timeline-help" id="timeline-help">
-            Drag the handles to choose a period; borders show the end year.
-          </p>
-        </div>
       </div>
-      <div className="timeline-presets" role="group" aria-label="Jump to a year or period">
-        {PRESETS.map((p) => (
-          <button
-            key={p.label}
-            type="button"
-            className="timeline-preset"
-            aria-pressed={p.start === startYear && p.end === endYear}
-            onClick={() => applyPreset(p)}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
-      </div>
-      <div className="timeline-density" aria-hidden="true" onClick={handleDensityClick}>
-        {Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i).map((y) => {
-          const n = eventCountsByYear[y] ?? 0;
-          return (
-            <div
-              key={y}
-              data-year={y}
-              className={
-                "timeline-tick" + (y >= startYear && y <= endYear ? " timeline-tick--active" : "")
-              }
-              title={`${y}: ${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"} starting`}
+      <div className="timeline-strip">
+        <span className="timeline-bound">{MIN_YEAR}</span>
+        {/* One strip: the density bars sit behind the two range inputs, so the
+            handles are on the histogram. The inputs only catch pointer events on
+            their thumbs, so a click elsewhere reaches the bars. Each bar is
+            centred on its year's slider position. */}
+        <div className="timeline-range">
+          <div className="timeline-track" />
+          <div className="timeline-density" aria-hidden="true" onClick={handleDensityClick}>
+            {Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i).map((y) => {
+              const n = eventCountsByYear[y] ?? 0;
+              return (
+                <div
+                  key={y}
+                  data-year={y}
+                  className={
+                    "timeline-tick" + (y >= startYear && y <= endYear ? " timeline-tick--active" : "")
+                  }
+                  title={`${y}: ${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"} starting`}
+                >
+                  <span className="timeline-tick-bar" style={{ height: `${10 + 80 * (n / maxCount)}%` }} />
+                </div>
+              );
+            })}
+          </div>
+          {active && (
+            <span
+              className={`timeline-bubble timeline-bubble--${active}`}
+              aria-hidden="true"
+              style={{ "--tl-pos": active === "start" ? "var(--tl-start)" : "var(--tl-end)" }}
             >
-              <span className="timeline-tick-bar" style={{ height: `${4 + 16 * (n / maxCount)}px` }} />
-            </div>
-          );
-        })}
-      </div>
-      <div className="timeline-range">
-        <div className="timeline-track" />
-        <div className="timeline-track-fill" />
-        {active && (
-          <span
-            className={`timeline-bubble timeline-bubble--${active}`}
-            aria-hidden="true"
-            style={{ "--tl-pos": active === "start" ? "var(--tl-start)" : "var(--tl-end)" }}
-          >
-            {active === "start" ? `Start ${startYear}` : `End ${endYear}`}
-          </span>
-        )}
-        <input
-          type="range"
-          min={MIN_YEAR}
-          max={MAX_YEAR}
-          value={startYear}
-          onChange={(e) => handleStartChange(e.target.value)}
-          onFocus={() => setActive("start")}
-          onBlur={() => setActive(null)}
-          onPointerDown={() => setActive("start")}
-          aria-label="Start year"
-          aria-valuetext={`Start year ${startYear}`}
-          aria-describedby="timeline-help"
-          className={"timeline-slider timeline-slider--start" + (startOnTop ? " timeline-slider--top" : "")}
-        />
-        <input
-          type="range"
-          min={MIN_YEAR}
-          max={MAX_YEAR}
-          value={endYear}
-          onChange={(e) => handleEndChange(e.target.value)}
-          onFocus={() => setActive("end")}
-          onBlur={() => setActive(null)}
-          onPointerDown={() => setActive("end")}
-          aria-label="End year"
-          aria-valuetext={`End year ${endYear}`}
-          aria-describedby="timeline-help"
-          className="timeline-slider timeline-slider--end"
-        />
-      </div>
-      <div className="timeline-bounds">
-        <span>{MIN_YEAR}</span>
-        <span>Events shown cover the whole range.</span>
-        <span>{MAX_YEAR}</span>
+              {active === "start" ? `Start ${startYear}` : `End ${endYear}`}
+            </span>
+          )}
+          <input
+            type="range"
+            min={MIN_YEAR}
+            max={MAX_YEAR}
+            value={startYear}
+            onChange={(e) => handleStartChange(e.target.value)}
+            onFocus={() => setActive("start")}
+            onBlur={() => setActive(null)}
+            onPointerDown={() => setActive("start")}
+            aria-label="Start year"
+            aria-valuetext={`Start year ${startYear}`}
+            aria-describedby="timeline-help"
+            title="Drag to choose the start year; borders show the end year."
+            className={"timeline-slider timeline-slider--start" + (startOnTop ? " timeline-slider--top" : "")}
+          />
+          <input
+            type="range"
+            min={MIN_YEAR}
+            max={MAX_YEAR}
+            value={endYear}
+            onChange={(e) => handleEndChange(e.target.value)}
+            onFocus={() => setActive("end")}
+            onBlur={() => setActive(null)}
+            onPointerDown={() => setActive("end")}
+            aria-label="End year"
+            aria-valuetext={`End year ${endYear}`}
+            aria-describedby="timeline-help"
+            title="Drag to choose the end year; borders show the end year."
+            className="timeline-slider timeline-slider--end"
+          />
+        </div>
+        <span className="timeline-bound">{MAX_YEAR}</span>
       </div>
     </section>
   );
 }
-
