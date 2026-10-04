@@ -509,12 +509,45 @@
   .mu-legend-panel {
     max-height: 34dvh;
   }
+  /* With an event open the Borders chip and "Use 2026" sit side by side in
+     one row (stacked they covered the map where the event was zoomed to);
+     only a very narrow phone (320px) wraps the button under the chip. The
+     right edge of the 3-button toolbar is at ~185px. */
   .mu-ctrl-right {
-    max-width: calc(100% - 200px);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: flex-start;
+    max-width: calc(100% - 195px);
+  }
+  /* The opened Borders list goes on its own row under both buttons, not
+     between them. */
+  .mu-ctrl-right .mu-borders {
+    display: contents;
+  }
+  .mu-ctrl-right .mu-borders-panel {
+    order: 5;
+  }
+  .mu-ctrl-right .mu-borders-panel,
+  .mu-ctrl-right > .mu-notices {
+    flex-basis: 100%;
+    box-sizing: border-box;
+  }
+  .mu-ctrl-right > .mu-notices {
+    order: 6;
   }
   .mu-borders-btn {
     min-height: 44px;
     padding: 5px 8px;
+  }
+  .mu-borders-main,
+  .mu-borders-sub,
+  .mu-year-toggle {
+    white-space: nowrap;
+  }
+  .mu-year-toggle {
+    padding-left: 9px;
+    padding-right: 9px;
   }
   .mu-borders-panel {
     max-height: 34dvh;
