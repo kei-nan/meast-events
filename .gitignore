@@ -7,6 +7,9 @@ app/public/data/
 # Full-text search index, built from data/ by app/scripts/build-search-index.mjs
 # on every dev start and build.
 app/public/pagefind/
+# Names the content-hashed events/all.<hash>.json; rewritten by
+# app/scripts/split-data.mjs on every dev start and build.
+app/src/lib/dataVersion.js
 .vite/
 
 # Secrets. server/.env and worker/.dev.vars held the Redis connection string
