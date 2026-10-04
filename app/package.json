@@ -12,6 +12,7 @@
     "prebuild": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node scripts/build-event-pages.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },

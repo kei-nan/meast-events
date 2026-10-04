@@ -69,6 +69,13 @@
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
+# /event/*: the static per-event pages, the /event/ index and event.css
+# (app/scripts/build-event-pages.mjs). Un-hashed HTML that changes with the data,
+# so it revalidates on every visit like the home page (Cloudflare's default for
+# HTML, set explicitly here).
+/event/*
+  Cache-Control: public, max-age=0, must-revalidate
+
 # /data/*: the static dataset. Un-hashed names (events/1900.json, land.json ...)
 # change on every data regeneration, so cache moderately and revalidate in the
 # background: events/meta.json, ids.json, events/full/*.json, the
