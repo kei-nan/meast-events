@@ -532,8 +532,8 @@ export default function App() {
       />
       {about && <AboutData onClose={() => setAbout(false)} />}
       <footer className="app-footer" data-credits={creditsOpen ? "open" : undefined}>
-        <button type="button" className="app-footer-link" onClick={() => setAbout(true)}>
-          About the data
+        <button type="button" className="app-footer-link" aria-label="About the data" onClick={() => setAbout(true)}>
+          About<span className="app-footer-wide"> the data</span>
         </button>
         {/* Phones and short screens: the full credits fold behind this button so
             the footer is one line instead of two to four (App.css), and the
@@ -552,7 +552,8 @@ export default function App() {
             Credits
           </button>
           {": Wikipedia, CShapes"}
-          <span className="app-footer-wide">{" 2.0 (modified)"}</span>
+          <span className="app-footer-wide">{" 2.0"}</span>
+          {" (modified)"}
         </span>
         <span className="app-credits" id="app-credits">
           <span className="app-credits-sep" aria-hidden="true">

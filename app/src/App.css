@@ -139,8 +139,9 @@ html, body, #root {
   }
 }
 
-/* Below 360px the compact line would wrap; the version and "modified" note
-   are left to the full credits there. */
+/* Below 360px the compact line would wrap, so "About the data" shortens to
+   "About" and the version number is left to the full credits. "(modified)"
+   stays: CC BY-NC-SA asks for the note that the borders were changed. */
 @media (max-width: 359px) {
   .app-footer-wide {
     display: none;
