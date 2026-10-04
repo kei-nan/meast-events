@@ -32,8 +32,9 @@ const PLAY_MODES = [
 const countText = (n) => `${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"}`;
 
 // Memoized (export below): hovering a list row re-renders App, which must not
-// redraw ~130 density bars. `playing` lives in App so the side panel can hold
-// its live announcements while Play runs. `borderYear` (non-null while an open
+// redraw ~130 density bars. The play state lives in App so the side panel can
+// hold its live announcements while Play runs: "playing", "paused" (by the
+// button, or at the last year) or "stopped" (the range was changed by hand). `borderYear` (non-null while an open
 // event's year drives the map borders) adjusts the help text.
 function Timeline({
   startYear,
@@ -41,10 +42,11 @@ function Timeline({
   onChangeRange,
   eventCountsByYear,
   borderYear = null,
-  playing,
-  onPlayingChange: setPlaying,
+  playState,
+  onPlayStateChange: setPlayState,
 }) {
   const maxCount = Math.max(1, ...Object.values(eventCountsByYear));
+  const playing = playState === "playing";
   const [playMode, setPlayMode] = useState("accumulate");
   const [active, setActive] = useState(null); // "start" | "end" while dragged/focused
   const latest = useRef({ startYear, endYear, onChangeRange });
@@ -59,32 +61,32 @@ function Timeline({
       const cur = latest.current;
       const next = playStep(cur.startYear, cur.endYear, playMode);
       if (!next) {
-        setPlaying(false);
+        setPlayState("paused");
         return;
       }
       cur.onChangeRange(next[0], next[1]);
-      if (next[1] >= MAX_YEAR) setPlaying(false);
+      if (next[1] >= MAX_YEAR) setPlayState("paused");
     }, PLAY_INTERVAL_MS);
     return () => clearTimeout(id);
-  }, [playing, endYear, playMode, setPlaying]);
+  }, [playing, endYear, playMode, setPlayState]);
 
   function handleStartChange(value) {
-    setPlaying(false);
+    setPlayState("stopped");
     onChangeRange(Math.min(Number(value), endYear), endYear);
   }
 
   function handleEndChange(value) {
-    setPlaying(false);
+    setPlayState("stopped");
     onChangeRange(startYear, Math.max(Number(value), startYear));
   }
 
   function togglePlay() {
     if (playing) {
-      setPlaying(false);
+      setPlayState("paused");
       return;
     }
     if (endYear >= MAX_YEAR) onChangeRange(...playRestart(startYear, endYear, playMode));
-    setPlaying(true);
+    setPlayState("playing");
   }
 
   // Density bars: a click jumps to that single year (pointer-only; the
@@ -92,12 +94,12 @@ function Timeline({
   function handleDensityClick(e) {
     const y = Number(e.target.closest("[data-year]")?.dataset.year);
     if (!Number.isFinite(y)) return;
-    setPlaying(false);
+    setPlayState("stopped");
     onChangeRange(y, y);
   }
 
   function applyPreset(p) {
-    setPlaying(false);
+    setPlayState("stopped");
     onChangeRange(p.start, p.end);
   }
 

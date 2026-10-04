@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
 import ResultsList from "./ResultsList.jsx";
@@ -34,7 +35,8 @@ import "../SidePanel.css";
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
- * @param {boolean}  [props.playing]        timeline Play is running: live announcements wait for it to stop
+ * @param {"playing"|"paused"|"stopped"} [props.playState] timeline Play: live announcements wait while
+ *                                          "playing"; "paused" (not a manual move) announces where it stopped
  * @param {string[]} [props.categoryOptions] category ids to offer (default: CATEGORY_COLORS keys)
  * @param {string[]} [props.countryOptions]  country names for the select (select hidden when empty)
  * @param {(q:string)=>void}       props.onQueryChange
@@ -44,6 +46,8 @@ import "../SidePanel.css";
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
+ * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
+ *                                          event heading (event open) or the search box: App's skip link
  */
 export default function SearchPanel({
   query,
@@ -59,7 +63,7 @@ export default function SearchPanel({
   selectedEvent,
   viewCount,
   range,
-  playing = false,
+  playState = "stopped",
   categoryOptions,
   countryOptions,
   onQueryChange,
@@ -69,6 +73,7 @@ export default function SearchPanel({
   onSelect,
   onHover,
   onBack,
+  ref,
 }) {
   const inputId = useId();
   const hintId = useId();
@@ -114,6 +119,20 @@ export default function SearchPanel({
       (row ?? inputRef.current)?.focus();
     }
   }, [selectedEvent]);
+
+  // The skip link: on mobile the collapsed sheet hides the event, so open the
+  // sheet first (synchronously, so the target is visible) and then focus.
+  useImperativeHandle(
+    ref,
+    () => ({
+      skipTo() {
+        flushSync(() => setSheet("full"));
+        const target = selectedId ? document.getElementById("event-detail-title") : inputRef.current;
+        target?.focus();
+      },
+    }),
+    [selectedId]
+  );
 
   // Mobile: collapse the sheet to its peek bar so the map (already centred on
   // the event) shows; focus moves to the toggle, which reopens the event.
@@ -203,14 +222,15 @@ export default function SearchPanel({
 
   // Screen reader announcements. The visible status line is not a live region:
   // Play changes it every 350 ms. This hidden one stays empty while Play runs
-  // and speaks once when it stops ("Paused at 1967. ..."), and after manual
-  // changes, naming the years.
+  // and speaks once when it is paused ("Paused at 1967. ..."), and after
+  // manual changes (a slider moved during Play included), naming the years.
+  const playing = playState === "playing";
   const rangeKey = `${range[0]}-${range[1]}`;
-  const [prevPlaying, setPrevPlaying] = useState(playing);
-  const [pausedAt, setPausedAt] = useState(null); // rangeKey where Play stopped
-  if (playing !== prevPlaying) {
-    setPrevPlaying(playing);
-    setPausedAt(playing ? null : rangeKey);
+  const [prevPlayState, setPrevPlayState] = useState(playState);
+  const [pausedAt, setPausedAt] = useState(null); // rangeKey where Play was paused
+  if (playState !== prevPlayState) {
+    setPrevPlayState(playState);
+    setPausedAt(playState === "paused" ? rangeKey : null);
   }
   const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
   const liveText = playing

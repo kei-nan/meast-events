@@ -121,8 +121,9 @@ export default function App() {
   const [focus, setFocus] = useState(null); // {id, lon, lat, nonce}
   const focusNonceRef = useRef(0);
   const pendingFocusRef = useRef(initial.eventId); // deep link awaiting its event
+  const panelRef = useRef(null); // SearchPanel's skipTo (skip link)
   const [notFound, setNotFound] = useState(false);
-  const [playing, setPlaying] = useState(false); // timeline Play (SearchPanel holds its announcements)
+  const [playState, setPlayState] = useState("stopped"); // timeline Play, see Timeline (SearchPanel holds its announcements)
 
   const [query, setQuery] = useState(initial.q);
   const [categories, setCategories] = useState(initial.categories);
@@ -446,18 +447,15 @@ export default function App() {
   return (
     <div className="app">
       {/* Skips the map controls: to the search box, or - while an event is open
-          and the search is hidden - to the event's heading. */}
+          and the search is hidden - to the event's heading. SearchPanel's
+          skipTo first opens the mobile sheet if it is collapsed. */}
       <a
         className="app-skip"
         href={selectedEventRaw ? "#event-detail-title" : "#sp-body"}
         onClick={(e) => {
-          const target = document.querySelector(
-            selectedEventRaw ? "#event-detail-title" : "#sp-body:not([hidden]) input"
-          );
-          if (target) {
-            e.preventDefault();
-            target.focus();
-          }
+          if (!panelRef.current) return;
+          e.preventDefault();
+          panelRef.current.skipTo();
         }}
       >
         {selectedEventRaw ? "Skip to panel" : "Skip to search"}
@@ -516,6 +514,7 @@ export default function App() {
           MAP_PLACEHOLDER
         )}
         <SearchPanel
+          ref={panelRef}
           query={query}
           filters={filters}
           area={area}
@@ -528,7 +527,7 @@ export default function App() {
           selectedEvent={selectedEvent}
           viewCount={viewportEventCount}
           range={panelRange}
-          playing={playing}
+          playState={playState}
           categoryOptions={categoryOptions}
           countryOptions={countryOptions}
           onQueryChange={setQuery}
@@ -551,8 +550,8 @@ export default function App() {
         onChangeRange={handleChangeRange}
         eventCountsByYear={eventCountsByYear}
         borderYear={borderYear}
-        playing={playing}
-        onPlayingChange={setPlaying}
+        playState={playState}
+        onPlayStateChange={setPlayState}
       />
       {about && <AboutData onClose={() => setAbout(false)} />}
       <footer className="app-footer">
