@@ -527,6 +527,7 @@ export default function App() {
         endYear={endYear}
         onChangeRange={handleChangeRange}
         eventCountsByYear={eventCountsByYear}
+        eventYear={eventYear}
       />
       {about && <AboutData onClose={() => setAbout(false)} />}
       <footer className="app-footer">
