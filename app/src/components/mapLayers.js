@@ -4,17 +4,20 @@ import { eventYearLabel } from "../lib/mapStack.js";
 
 // A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
 // hand-tinted cartography (brick, verdigris, indigo, ochre) rather than generic
-// bright web-primary colors. Each hue stays distinguishable at small marker sizes.
+// bright web-primary colors. Each hue stays distinguishable at small marker sizes,
+// also under simulated red-green colour blindness (deuteranopia/protanopia):
+// the hues that merge there (red/olive/green, indigo/plum/teal) are kept apart by
+// lightness, and the two darkest inks (oxblood, lamp black) by a wide lightness gap.
 export const CATEGORY_COLORS = {
-  war: "#a13f2e", // brick red
-  treaty: "#4c7a63", // verdigris green
-  political: "#455d80", // muted indigo
+  war: "#8d2b16", // deep brick red
+  treaty: "#5e9377", // verdigris green
+  political: "#304876", // muted indigo
   uprising: "#c99a45", // antique gold
-  migration: "#7d5a7d", // dusty plum
-  diplomatic: "#3f7d84", // muted teal
-  economic: "#8c7a3f", // olive mustard
-  terrorism: "#6b3140", // deep oxblood
-  atrocity: "#3d3833", // lamp black
+  migration: "#a585ac", // dusty lilac
+  diplomatic: "#36747d", // muted teal
+  economic: "#8b7938", // olive mustard
+  terrorism: "#783e4d", // oxblood
+  atrocity: "#2b251c", // lamp black
 };
 const FALLBACK_COLOR = "#6b6151";
 
@@ -25,9 +28,9 @@ export const CATEGORY_COLOR_EXPRESSION = [
   FALLBACK_COLOR,
 ];
 
-const HOLLOW_FILL = "#f4f1ea";
+export const HOLLOW_FILL = "#f4f1ea";
 const STROKE_LIGHT = "rgba(236,226,201,0.85)";
-const IS_APPROX = ["==", ["get", "a"], 1];
+export const IS_APPROX = ["==", ["get", "a"], 1];
 const IS_MISS = ["==", ["get", "m"], 0];
 const IS_HIT_IN_SEARCH = ["all", ["==", ["get", "s"], 1], ["==", ["get", "m"], 1]];
 
