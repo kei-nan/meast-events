@@ -408,8 +408,9 @@ async function main() {
     ...osloGeometry,
     saudiIraqiNeutralZone: saudiIraqiNeutralZone.geometry,
     saudiKuwaitiNeutralZone: saudiKuwaitiNeutralZone.geometry,
-    golan: turf.truncate(golan, { precision: 5, coordinates: 2 }).geometry,
-    gulfIslands: turf.truncate(gulfIslands, { precision: 5, coordinates: 2 }).geometry,
+    // Full source precision - border geometry is never rounded.
+    golan: golan.geometry,
+    gulfIslands: gulfIslands.geometry,
   };
 
   await writeFile(new URL("../data/corrections-geometry.json", import.meta.url), stringifyKeyPerLine(out));
