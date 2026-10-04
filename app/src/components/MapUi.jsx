@@ -100,6 +100,54 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear, compact }) {
   );
 }
 
+// Some results have no map location, so the panel's "23 results" and this
+// button's count can differ; the button says "18 of 23" then, and its title
+// and accessible name say why.
+function ShowMatchesButton({ count, total, compact, onClick }) {
+  const unmapped = total != null && total > count ? total - count : 0;
+  const why = unmapped ? `${unmapped} ${unmapped === 1 ? "has" : "have"} no map location` : null;
+  const shown = unmapped ? `${count} of ${total}` : `${count}`;
+  const text = compact ? `Show results (${shown})` : `Show ${shown} results on map`;
+  // The accessible name starts with the visible text (voice control users say
+  // what they see).
+  return (
+    <button
+      type="button"
+      className="mu-btn"
+      onClick={onClick}
+      title={why ?? undefined}
+      aria-label={`${text}${why ? `; ${why}` : ""}`}
+    >
+      {"◎"} {text}
+    </button>
+  );
+}
+
+// "Use 2026" / "Use 1901" next to the Borders chip. Phones get the short
+// form so the two sit in one row; the accessible name still says which year.
+export function YearToggle({ useTimeline, timelineYear, eventYear, compact, onClick }) {
+  const full = useTimeline ? `Use timeline year (${timelineYear})` : `Use event year (${eventYear})`;
+  const short = `Use ${useTimeline ? timelineYear : eventYear}`;
+  const kind = useTimeline ? "the timeline year" : "the event year";
+  return (
+    <button
+      type="button"
+      className="mu-btn mu-btn-small mu-year-toggle"
+      onClick={onClick}
+      aria-label={compact ? `${short}, ${kind}, for the borders` : `${full} for the borders`}
+      title={compact ? full : undefined}
+    >
+      {compact ? short : full}
+    </button>
+  );
+}
+
+// Map instructions say "tap" on touch screens and "click" with a mouse.
+const pointerVerb = () =>
+  typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches ? "tap" : "click";
+
+const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 // The one map toolbar (top-left): draw an area, zoom in/out (desktop; phones
 // pinch), reset view, legend - plus "Show N results on map" while a search or
 // filter has mapped matches.
@@ -113,6 +161,7 @@ export function MapToolbar({
   onZoomOut,
   onReset,
   matchCount,
+  matchTotal,
   onShowMatches,
   drawHint,
   onInteract,
@@ -141,14 +190,7 @@ export function MapToolbar({
         </button>
       </div>
       {matchCount != null && (
-        <button
-          type="button"
-          className="mu-btn"
-          onClick={onShowMatches}
-          aria-label={`Show the ${matchCount} mapped ${matchCount === 1 ? "match" : "matches"} on the map`}
-        >
-          {"◎"} {compact ? `Show results (${matchCount})` : `Show ${matchCount} results on map`}
-        </button>
+        <ShowMatchesButton count={matchCount} total={matchTotal} compact={compact} onClick={onShowMatches} />
       )}
       {drawHint && (
         <div className="mu-draw-hint" role="status">
@@ -219,23 +261,30 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
 // the shown year, each expandable to the same details. Its button doubles as
 // the "borders as of YEAR" indicator, with a sub-line for the opened event's
 // year or while the decade for a newly picked year is still loading.
-export function BordersList({ year, shownYear, updating, eventYearShown, items }) {
+export function BordersList({ year, shownYear, updating, eventYearShown, items, compact }) {
   const [open, setOpen] = useState(false);
   const flagged = items.filter((b) => isDashedStatus(b.status)).length;
   if (shownYear == null) return null;
   const sub = updating ? `updating to ${year}` : eventYearShown ? "event year" : null;
+  const n = items.length;
+  const countText = `${n} ${n === 1 ? "border" : "borders"} drawn for ${shownYear}`;
   return (
     <div className="mu-borders">
+      {/* A bare "(21)" read as unexplained, so the count says what it counts.
+          Phones leave it out to keep the chip one line; the opened list
+          starts with the same count, and the title / name carry it too. */}
       <button
         type="button"
         className="mu-btn mu-borders-btn"
         aria-expanded={open}
         aria-controls="mu-borders-panel"
+        aria-label={`Borders ${shownYear}${n ? `: ${n} drawn` : ""}${sub ? `, ${sub}` : ""}. Show the list`}
+        title={n ? countText : undefined}
         onClick={() => setOpen((v) => !v)}
       >
-        <span>
+        <span className="mu-borders-main">
           Borders {shownYear}
-          {items.length ? <span className="mu-badge-sub"> ({items.length})</span> : null}
+          {n > 0 && !compact ? <span className="mu-badge-sub"> · {n} drawn</span> : null}
         </span>
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
       </button>
@@ -280,7 +329,8 @@ function LegendPanel() {
         </li>
         <li>
           <span className="mu-swatch-line is-flagged" aria-hidden="true" />
-          Dashed: status-flagged (mandate, occupation, annexation or dispute). Click it for details.
+          Dashed: status-flagged (mandate, occupation, annexation or dispute). {capitalise(pointerVerb())} it for
+          details.
         </li>
       </ul>
       <h3>Events (category is our grouping)</h3>
@@ -301,7 +351,7 @@ function LegendPanel() {
           <span className="mu-dot is-cluster" aria-hidden="true">
             9
           </span>
-          Cluster: several events; click to zoom in, or to list events that share one spot. During a search the
+          Cluster: several events; {pointerVerb()} to zoom in, or to list events that share one spot. During a search the
           number counts only the matches.
         </li>
       </ul>
@@ -341,7 +391,7 @@ export function MapNotices({ loading, borderError, onRetry }) {
 export function MapTip({ onDismiss }) {
   return (
     <div className="mu-tip" role="note">
-      <span>Tip: click a cluster to zoom in, a dot to read it; Draw searches an area.</span>
+      <span>Tip: {pointerVerb()} a cluster to zoom in, a dot to read it; Draw searches an area.</span>
       <button type="button" className="mu-close mu-close-inline" onClick={onDismiss} aria-label="Dismiss tip">
         {"×"}
       </button>
