@@ -1,51 +1,51 @@
 // Splits the monolithic boundaries and the curated events (both in data/ at the
-// repo root, the single source of truth) into small per-decade
-// chunks under public/data/, so the app can fetch() only the time range it
-// currently needs instead of bundling ~2MB of JSON into the JS bundle.
+// repo root, the single source of truth) into static files under public/data/,
+// so the app fetches only what it needs instead of bundling the JSON.
 //
 // Run via `npm run build` (wired in as a "prebuild" step) or `node scripts/split-data.mjs`
 // directly during development. Safe to re-run any time the inputs change -
 // it fully regenerates public/data/ (override the output dir with SPLIT_OUT_DIR).
 //
+// EVENTS: everything lives in ONE versioned folder, events/v.<version>/, where
+// <version> is a hash of every file in it. The app bundles the version
+// (src/lib/dataVersion.js), so the folder can be cached immutably and a page can
+// never mix files from two builds. events/meta.json (the one mutable file) names
+// the current folder, for a page whose bundle is older than the deployed data.
+//
+//   events/v.<version>/all.json         the whole LITE set (every event,
+//       coordinate-less included): only the fields the lists, filters and map
+//       need. The app loads it once and does range/viewport/filter/area/
+//       title-snippet matching locally. This is the file that grows with the
+//       dataset and is on the critical path, so it carries nothing the list does
+//       not show (see publicEvent) and its compressed size has a budget
+//       (MAX_LITE_GZIP_BYTES, the build fails above it).
+//   events/v.<version>/full/<b>.json    everything only the detail view needs
+//       (full lead, Wikipedia link, Wikidata classes and QID, date flags, framing
+//       review, part of / includes), bucketed by a hash of the id
+//       (src/lib/fullBucket.js). The bucket count grows with the dataset
+//       (fullBucketCount), so opening an event always fetches one small file.
+//
 // Events without real numeric coordinates are KEPT (data shape v2.1): they get
 // location_quality "none" and coordinates null, and simply never become map
 // markers. Every event carries location_quality ("none" | "approximate" iff
 // coordinate_source starts with "country-fallback" | "precise"; an explicit
-// value in the data wins). events/ids.json maps event id -> the decade chunk
-// that holds it (for deep links), using the first decade of the event's span.
+// value in the data wins).
 //
-// FULL LEADS ARE NOT IN THE DECADE CHUNKS. A full lead is up to ~10 KB, and the
-// lite list must never download them. Decade chunks carry a 160-char snippet
-// (no `extract`); the full lead + extract_retrieved_at live in
-// events/full/<bucket>.json ({id: {extract, extract_retrieved_at, ...}}), 64 buckets
-// chosen by a hash of the id (src/lib/fullBucket.js, shared with the client),
-// fetched lazily when an event is opened. Offline text search therefore matches
-// title + snippet only. Wikidata's "part of" parents and the reverse list
-// (part_of / includes, src/lib/partOf.js) ride in the same full records, only on
-// events that have them.
+// Sizes are bounded: the build fails if any full file exceeds MAX_FULL_BYTES
+// (default 1 MB) or the gzipped lite file exceeds MAX_LITE_GZIP_BYTES (default 1 MB).
 //
-// events/all.<hash>.json is the whole lite set (every event, coordinate-less
-// included) in ONE file: the app loads it once and does range/viewport/filter/
-// area/title-snippet matching locally, so a default page load makes no API call.
-// The file name carries a content hash (also written to events/meta.json as
-// `allFile`/`version` and to src/lib/dataVersion.js, which the app bundles), so
-// it can be cached immutably and can never be stale: changed data = new name.
-// Decade chunks are kept for deep-link resolution (ids.json) and as a fallback.
-//
-// Sizes are bounded: the build fails if any events chunk exceeds MAX_CHUNK_BYTES
-// (default 1 MB) or any full file exceeds MAX_FULL_BYTES (default 1 MB).
+// BOUNDARIES are split per decade (boundaries/<decade>.json): the map needs only
+// the year shown. MIN_YEAR/MAX_YEAR (src/lib/years.js, shared with the app) bound
+// which decade chunks are ever requested.
 //
 // data/selection-funnel.json (written by the data pipeline) is copied to
 // public/data/ for the "About the data" page; missing is a warning, not an error.
-//
-// MIN_YEAR/MAX_YEAR (src/lib/years.js, shared with the app) bound which decade
-// chunks are ever requested by the app, so a feature/event active only outside
-// this window doesn't need its own chunk.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { FULL_BUCKETS, fullBucket } from "../src/lib/fullBucket.js";
+import { gzipSync } from "node:zlib";
+import { fullBucket, fullBucketCount } from "../src/lib/fullBucket.js";
 import { MAP_EXTENT } from "../src/lib/mapExtent.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
@@ -61,9 +61,13 @@ const BOUNDARIES_FILE = path.join(ROOT_DATA_DIR, "boundaries.json");
 const OUT_DIR = process.env.SPLIT_OUT_DIR
   ? path.resolve(process.env.SPLIT_OUT_DIR)
   : path.join(__dirname, "..", "public", "data");
-const MAX_CHUNK_BYTES = Number(process.env.MAX_CHUNK_BYTES) || 1024 * 1024;
 const MAX_FULL_BYTES = Number(process.env.MAX_FULL_BYTES) || 1024 * 1024;
+// About 10,000 events at today's ~100 compressed bytes per lite record. Past it the
+// next step is to split the lite file (see docs/SCALING.md), not to raise this.
+const MAX_LITE_GZIP_BYTES = Number(process.env.MAX_LITE_GZIP_BYTES) || 1024 * 1024;
 const SNIPPET_LENGTH = 160;
+// Multi-decade boundary geometries at least this large are stored once (see splitBoundaries).
+const SHARED_GEOMETRY_MIN_BYTES = 32 * 1024;
 
 const DECADE_SIZE = 10;
 
@@ -113,9 +117,11 @@ function locationQuality(event) {
 
 const strings = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === "string") : []);
 
-// Only the fields the lists and map need (no full lead). category = our coarse
-// grouping (colour/filter; category_group is the pre-v2.1 spelling);
-// wikidata_classes are Wikidata's own labels, shown as-is.
+// Only the fields the lists, filters and map need (no full lead). category = our
+// coarse grouping (colour/filter; category_group is the pre-v2.1 spelling).
+// Fields only the detail view shows (Wikipedia link, Wikidata classes and QID,
+// date flags, coordinate source) are in the full record instead (detailFields),
+// which the app merges over this one when an event is opened.
 function publicEvent(e) {
   const quality = locationQuality(e);
   return {
@@ -125,15 +131,26 @@ function publicEvent(e) {
     date_end: e.date_end,
     countries: e.countries,
     category: e.category_group || e.category,
-    wikidata_classes: strings(e.wikidata_classes),
-    date_flags: strings(e.date_flags),
-    wikidata_qid: e.wikidata_qid,
-    wikipedia_url: e.wikipedia_url,
     snippet: makeSnippet(e.extract),
     coordinates: quality === "none" ? null : e.coordinates,
-    coordinate_source: e.coordinate_source,
     location_quality: quality,
   };
+}
+
+// wikidata_classes are Wikidata's own labels, shown as-is.
+function detailFields(e) {
+  return {
+    wikipedia_url: e.wikipedia_url,
+    wikidata_qid: e.wikidata_qid,
+    wikidata_classes: strings(e.wikidata_classes),
+    date_flags: strings(e.date_flags),
+    coordinate_source: e.coordinate_source ?? null,
+  };
+}
+
+async function ensureDir(dir) {
+  await mkdir(dir, { recursive: true });
+  return dir;
 }
 
 async function writeJSON(filePath, data) {
@@ -152,13 +169,38 @@ async function splitBoundaries() {
     }
   }
 
+  // A large geometry that spans several decades is written ONCE, to
+  // boundaries/shared/<content hash>.json, and each decade chunk points to it
+  // (geometry_ref) instead of repeating it: the map loads the shown decade and
+  // prefetches its neighbours, which would otherwise download the same geometry
+  // (e.g. OCHA's West Bank areas, ~2.9 MB, in 2000, 2010 and 2020) up to three
+  // times. The geometry is the source's, byte for byte; dataClient.js puts it
+  // back before the map sees the feature.
+  const sharedRefs = new Map(); // feature -> hash
+  let sharedBytes = 0;
+  for (const feature of raw.features) {
+    const { start_year, end_year } = feature.properties;
+    const json = JSON.stringify(feature.geometry);
+    if (decadesFor(start_year, end_year).length < 2 || json.length < SHARED_GEOMETRY_MIN_BYTES) continue;
+    const hash = createHash("sha256").update(json).digest("hex").slice(0, 12);
+    sharedRefs.set(feature, hash);
+    await writeFile(path.join(await ensureDir(path.join(OUT_DIR, "boundaries", "shared")), `${hash}.json`), json);
+    sharedBytes += json.length;
+  }
+
   let totalBytes = 0;
   for (const [decade, features] of byDecade) {
-    const fc = { type: "FeatureCollection", features };
+    const fc = {
+      type: "FeatureCollection",
+      features: features.map((f) =>
+        sharedRefs.has(f) ? { type: "Feature", properties: f.properties, geometry: null, geometry_ref: sharedRefs.get(f) } : f
+      ),
+    };
     const filePath = path.join(OUT_DIR, "boundaries", `${decade}.json`);
     await writeJSON(filePath, fc);
     totalBytes += JSON.stringify(fc).length;
   }
+  totalBytes += sharedBytes;
 
   await writeJSON(path.join(OUT_DIR, "boundaries", "meta.json"), {
     decadeSize: DECADE_SIZE,
@@ -168,7 +210,7 @@ async function splitBoundaries() {
   });
 
   console.log(
-    `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks, ` +
+    `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks + ${sharedRefs.size} shared geometries, ` +
       `${(totalBytes / 1024).toFixed(0)}KB total (source was ${(
         (await readFile(BOUNDARIES_FILE)).length / 1024
       ).toFixed(0)}KB)`
@@ -236,8 +278,9 @@ async function splitEvents() {
   // Wikidata "part of" (P361) and its reverse, only for the detail view (see lib/partOf.js).
   const relations = resolvePartOf(allEvents);
 
-  // Full leads, bucketed by id hash (see header comment).
-  const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
+  // Detail records, bucketed by id hash (see header comment).
+  const bucketCount = fullBucketCount(allEvents.length);
+  const fullBuckets = Array.from({ length: bucketCount }, () => ({}));
   const framingCounts = { guideline: {}, fairness: 0, with_wording: 0, with_findings: 0, stale: 0, missing: 0 };
   for (const e of allEvents) {
     const framing = framingFor(review, e);
@@ -249,22 +292,19 @@ async function splitEvents() {
       if (framing.fairness.found || framing.wording.found) framingCounts.with_findings++;
       if (framing.stale) framingCounts.stale++;
     }
-    fullBuckets[fullBucket(e.id)][e.id] = {
+    const record = {
       extract: e.extract ?? "",
       extract_retrieved_at: e.extract_retrieved_at ?? null,
-      // Also here (they are in the chunks too): lite API records lack them, and
-      // the detail view merges this file over whichever record it has.
-      wikidata_classes: strings(e.wikidata_classes),
-      date_flags: strings(e.date_flags),
-      // Wikidata's precision of date_start ("day", "month", "year", "decade"); only
-      // the detail view uses it, so it lives here rather than in the chunks.
+      ...detailFields(e),
+      // Wikidata's precision of date_start ("day", "month", "year", "decade").
       date_precision: e.date_precision ?? null,
       framing_review: framing,
     };
     // Only on events that have them, so the buckets stay small.
     const rel = relations.get(e.id);
-    if (rel?.part_of.length) fullBuckets[fullBucket(e.id)][e.id].part_of = rel.part_of;
-    if (rel?.includes.length) fullBuckets[fullBucket(e.id)][e.id].includes = rel.includes;
+    if (rel?.part_of.length) record.part_of = rel.part_of;
+    if (rel?.includes.length) record.includes = rel.includes;
+    fullBuckets[fullBucket(e.id, bucketCount)][e.id] = record;
   }
   {
     let withParent = 0;
@@ -292,90 +332,73 @@ async function splitEvents() {
         `${framingCounts.stale} with text changed since review`
     );
   }
+  // Every file of the versioned folder, serialized once: the version is a hash
+  // over all of them, so it changes whenever anything a page can load changes.
+  const allJson = JSON.stringify(events);
+  const fullJson = fullBuckets.map((b) => JSON.stringify(b));
+  const hash = createHash("sha256").update(allJson);
+  for (const j of fullJson) hash.update("\0").update(j);
+  const version = hash.digest("hex").slice(0, 12);
+  const dir = `v.${version}`;
+
+  const allBytes = Buffer.byteLength(allJson);
+  const allGzip = gzipSync(allJson, { level: 9 }).length;
+  if (allGzip > MAX_LITE_GZIP_BYTES) {
+    throw new Error(
+      `events/${dir}/all.json is ${allGzip} bytes gzipped (budget ${MAX_LITE_GZIP_BYTES}) for ${events.length} events: ` +
+        "split the lite file before raising the budget (docs/SCALING.md)"
+    );
+  }
+  await mkdir(path.join(OUT_DIR, "events", dir), { recursive: true });
+  await writeFile(path.join(OUT_DIR, "events", dir, "all.json"), allJson);
+
   let fullTotal = 0;
   let fullMax = 0;
-  for (let i = 0; i < FULL_BUCKETS; i++) {
-    const bytes = Buffer.byteLength(JSON.stringify(fullBuckets[i]));
+  for (let i = 0; i < bucketCount; i++) {
+    const bytes = Buffer.byteLength(fullJson[i]);
     if (bytes > MAX_FULL_BYTES) {
-      throw new Error(`events/full/${i}.json is ${bytes} bytes (limit ${MAX_FULL_BYTES}); raise MAX_FULL_BYTES or use more buckets`);
+      throw new Error(`events/${dir}/full/${i}.json is ${bytes} bytes (limit ${MAX_FULL_BYTES}); lower EVENTS_PER_BUCKET (src/lib/fullBucket.js)`);
     }
-    await writeJSON(path.join(OUT_DIR, "events", "full", `${i}.json`), fullBuckets[i]);
+    await mkdir(path.join(OUT_DIR, "events", dir, "full"), { recursive: true });
+    await writeFile(path.join(OUT_DIR, "events", dir, "full", `${i}.json`), fullJson[i]);
     fullTotal += bytes;
     fullMax = Math.max(fullMax, bytes);
   }
 
-  function yearRange(e) {
-    const start = Number(e.date_start.slice(0, 4));
-    const end = e.date_end ? Number(e.date_end.slice(0, 4)) : start;
-    return [start, end];
-  }
-
-  const byDecade = new Map();
-  const ids = {};
-  for (const event of events) {
-    const [start, end] = yearRange(event);
-    const decades = decadesFor(start, end);
-    ids[event.id] = decades[0];
-    for (const decade of decades) {
-      if (!byDecade.has(decade)) byDecade.set(decade, []);
-      byDecade.get(decade).push(event);
-    }
-  }
-
-  let totalBytes = 0;
-  let maxBytes = 0;
-  for (const [decade, decadeEvents] of byDecade) {
-    const filePath = path.join(OUT_DIR, "events", `${decade}.json`);
-    const bytes = Buffer.byteLength(JSON.stringify(decadeEvents));
-    if (bytes > MAX_CHUNK_BYTES) {
-      throw new Error(
-        `events chunk ${decade}.json is ${bytes} bytes (limit ${MAX_CHUNK_BYTES}); raise MAX_CHUNK_BYTES or chunk finer`
-      );
-    }
-    await writeJSON(filePath, decadeEvents);
-    totalBytes += bytes;
-    maxBytes = Math.max(maxBytes, bytes);
-  }
-
-  // The whole lite set in one immutable, content-hashed file (see header).
-  const allJson = JSON.stringify(events);
-  const version = createHash("sha256").update(allJson).digest("hex").slice(0, 12);
-  const allFile = `all.${version}.json`;
-  await mkdir(path.join(OUT_DIR, "events"), { recursive: true });
-  await writeFile(path.join(OUT_DIR, "events", allFile), allJson);
   if (!process.env.SPLIT_OUT_DIR) {
     await writeFile(
       path.join(__dirname, "..", "src", "lib", "dataVersion.js"),
-      "// GENERATED by scripts/split-data.mjs - do not edit. Names the content-hashed\n" +
-        "// events/all.<hash>.json the app loads on start (see lib/dataClient.js loadAllLite).\n" +
-        `export const DATA_VERSION = ${JSON.stringify(version)};\n`
+      "// GENERATED by scripts/split-data.mjs - do not edit. Names the versioned data folder\n" +
+        "// events/v.<DATA_VERSION>/ the app loads on start and its number of full-record\n" +
+        "// buckets (see lib/dataClient.js and lib/fullBucket.js).\n" +
+        `export const DATA_VERSION = ${JSON.stringify(version)};\n` +
+        `export const FULL_BUCKETS = ${bucketCount};\n`
     );
   }
 
-  // id -> decade chunk, for deep links (?e=<id>) without scanning every chunk.
-  await writeJSON(path.join(OUT_DIR, "events", "ids.json"), ids);
-
+  // The one mutable file: names the current folder, for pages whose bundle is
+  // older than the deployed data (dataClient.js falls back to it).
   await writeJSON(path.join(OUT_DIR, "events", "meta.json"), {
-    decadeSize: DECADE_SIZE,
-    decades: [...byDecade.keys()].sort((a, b) => a - b),
     minYear: MIN_YEAR,
     maxYear: MAX_YEAR,
     version,
-    allFile,
-    allBytes: Buffer.byteLength(allJson),
+    dir,
+    fullBuckets: bucketCount,
     totalEvents: events.length,
     withoutLocation: noLocation,
-    fullBuckets: FULL_BUCKETS,
-    maxChunkBytes: maxBytes,
+    allBytes,
+    allGzipBytes: allGzip,
     maxFullBytes: fullMax,
   });
 
-  console.log(`events/${allFile}: ${(Buffer.byteLength(allJson) / 1024).toFixed(0)}KB (all ${events.length} lite records)`);
   console.log(
-    `events: ${events.length} events (${noLocation} without coordinates, kept) -> ${byDecade.size} decade chunks, ` +
-      `${(totalBytes / 1024).toFixed(0)}KB total, largest chunk ${(maxBytes / 1024).toFixed(0)}KB; ` +
-      `full leads: ${FULL_BUCKETS} files, ${(fullTotal / 1024).toFixed(0)}KB total, largest ${(fullMax / 1024).toFixed(0)}KB; ` +
-      `${Object.keys(ids).length} ids (source was ${((await readFile(EVENTS_FILE)).length / 1024).toFixed(0)}KB)`
+    `events/${dir}/all.json: ${events.length} lite records (${noLocation} without coordinates, kept), ` +
+      `${(allBytes / 1024).toFixed(0)}KB, ${(allGzip / 1024).toFixed(0)}KB gzipped (${Math.round(allGzip / Math.max(1, events.length))} B/event; ` +
+      `budget ${(MAX_LITE_GZIP_BYTES / 1024).toFixed(0)}KB)`
+  );
+  console.log(
+    `events/${dir}/full: ${bucketCount} files, ${(fullTotal / 1024).toFixed(0)}KB total, largest ${(fullMax / 1024).toFixed(0)}KB ` +
+      `(source was ${((await readFile(EVENTS_FILE)).length / 1024).toFixed(0)}KB)`
   );
 }
 

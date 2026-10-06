@@ -117,7 +117,42 @@ for (const [qid, date, label, infobox] of [
   });
 }
 
+// F10: the F7/F8 pattern in three events found by the classes added on 2026-10-06 (checked live 2026-10-07).
+for (const [qid, date, label, infobox] of [
+  ["Q125464497", "2024-04-13", "April 2024 Iranian strikes on Israel", "13–14 April 2024"],
+  ["Q131392292", "2024-12-05", "2024 Homs offensive", "5 December 2024 – 8 December 2024"],
+  ["Q33038478", "2020-11-21", "2020 G20 Riyadh summit", "21–23 November 2020"],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F10",
+    set: { date_start: date },
+    note:
+      `${label}: stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = ${date} (day precision); ` +
+      `the Wikipedia infobox reads "${infobox}" (checked 2026-10-07). date_start = P580`,
+  });
+}
+
 export const FIXES_BY_QID =new Map(DATA_FIXES.map((f) => [f.qid, f]));
+
+// Coordinates that look swapped to the validator (outside the region, inside it with
+// lat/lon exchanged) but were checked against BOTH sources and are what they give. Nothing
+// is changed; validate.js reports them as the ordinary "outside the region" warning.
+// Each entry is exact (item and point), so a later real swap on the same item still fails.
+export const CHECKED_COORDINATES = [
+  {
+    qid: "Q696817",
+    lat: 35,
+    lon: 18,
+    ref: "F9",
+    note: "Mediterranean and Middle East theatre of World War II: Wikipedia {{Coord|35|N|18|E|type:waterbody}} (revision 1378869230) and Wikidata P625 both give 35N 18E, a point in the Ionian Sea standing for the whole theatre",
+  },
+];
+
+export function coordinatesChecked(event) {
+  const c = event?.coordinates;
+  return CHECKED_COORDINATES.find((x) => x.qid === event?.wikidata_qid && c && x.lat === c.lat && x.lon === c.lon) ?? null;
+}
 
 // Applies the ledger entry for event.wikidata_qid (if any). Returns the changed field names.
 export function applyDataFix(event) {

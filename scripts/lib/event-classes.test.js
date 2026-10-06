@@ -34,6 +34,11 @@ test("groupForEvent: terrorism outranks atrocity, whatever order Wikidata lists 
   assert.equal(groupForEvent(["war crime", "battle"], "war"), "atrocity");
   assert.equal(groupForEvent(["genocide"], "political"), "atrocity");
   assert.equal(groupForEvent(["hostage taking", "siege"], "war"), "terrorism");
+  // 2026-10-07: a suicide attack is terrorism whether or not Wikidata also types it "terrorist attack".
+  assert.equal(groupForEvent(["suicide attack"], "war"), "terrorism");
+  assert.equal(groupForEvent(["suicide attack", "mass murder"], "war"), "terrorism");
+  assert.equal(groupForEvent(["pogrom"], "protest"), "atrocity");
+  assert.equal(groupForEvent(["riot", "protest"], "protest"), "protest", "protest is not overriding");
 });
 
 test("groupForEvent: without an overriding class the event keeps its group", () => {

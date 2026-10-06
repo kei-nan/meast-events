@@ -87,6 +87,14 @@ test("validateEvents: coordinates abroad are a warning, a lat/lon swap is an err
   // Baghdad is (33.31, 44.36); exchanged it lands outside the box, but swapping back fits.
   const swapped = validateEvents([event({ coordinates: { lat: 44.36 + 1, lon: 33.31 } })]);
   assert.match(swapped.errors[0], /look swapped/);
+  // A point checked against both sources (fixes.js CHECKED_COORDINATES, F9) is only a warning,
+  // and only for that exact item and point.
+  const theatre = { wikidata_qid: "Q696817", coordinates: { lat: 35, lon: 18 }, coordinate_source: "wikipedia" };
+  const checked = validateEvents([event(theatre)]);
+  assert.equal(checked.errors.length, 0);
+  assert.match(checked.warnings[0], /not swapped \(docs\/data-fixes\.md F9\)/);
+  assert.match(validateEvents([event({ ...theatre, coordinates: { lat: 35, lon: 18.5 } })]).errors[0], /look swapped/);
+  assert.match(validateEvents([event({ ...theatre, wikidata_qid: "Q49077" })]).errors[0], /look swapped/);
 });
 
 test("validateEvents: location_quality and coordinate_source must agree", () => {

@@ -55,8 +55,8 @@ or "war" that the curated file used to carry as if they were Wikidata's are gone
 `category` is **our own coarse mapping**, not Wikidata's classification, and the UI labels it "Category (our grouping)". It is set by one rule applied to every
 event (`groupForEvent` in `scripts/lib/event-classes.js`):
 
-1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking), the category is terrorism.
-2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime), the category is atrocity.
+1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking, suicide attack), the category is terrorism.
+2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime, pogrom, mass murder), the category is atrocity.
 3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the 112 legacy events keep the
    group hand-assigned in `data/seed-events.json`.
 
@@ -90,6 +90,34 @@ The rule still passes Wikidata's typing through without judging it; the UI lists
 | peace conference | Q7157512 | diplomatic |
 | embargo | Q989265 | economic |
 | nationalization | Q178564 | economic |
+| armed conflict | Q350604 | war |
+| military campaign | Q831663 | war |
+| military occupation | Q188686 | war |
+| airstrike | Q2380335 | war |
+| bombardment | Q678146 | war |
+| aircraft shootdown | Q6539177 | war |
+| suicide attack | Q217327 | terrorism |
+| pogrom | Q177716 | atrocity |
+| mass murder | Q750215 | atrocity |
+| riot | Q124757 | protest |
+| political crisis | Q3002772 | political |
+| international crisis | Q5791104 | political |
+| public election | Q40231 | political |
+| protest | Q273120 | protest |
+| demonstration | Q175331 | protest |
+| summit | Q1072326 | diplomatic |
+
+The last 16 rows were added on 2026-10-06 (see "Event classes"). "Pogrom" and "mass murder" join the overriding atrocity group because Wikidata uses them for
+the same kind of event as "massacre"; adding them changed the group of none of the 571 events already shown. "Suicide attack" joins the overriding
+terrorism group. It was first placed in the war group (a suicide attack is a method armies use too), but the review of the new events showed what that
+did: seven bombings Wikidata types only as "suicide attack" (the Dolphinarium, Sbarro, Passover and Maxim restaurant attacks on Israeli civilians, and the
+2003 Istanbul, 2016 Saudi and January 2021 Baghdad bombings) would have been shown as war, while comparable bombings that Wikidata also types "terrorist
+attack" are terrorism - the same mechanism as the 2026-09-28 finding above. The owner chose terrorism (2026-10-07), so that the group no longer
+depends on whether a Wikidata editor added "terrorist attack" next to "suicide attack". It moved one event already shown, the 2011 southern Israel cross-border attacks, from war to terrorism.
+"Terrorism" remains our group name, not a Wikidata label: the UI lists the item's Wikidata classes next to it. "Protest" is a new group (protest, demonstration, riot); before, the only
+protests shown were those Wikidata also types as a revolution or rebellion (uprising). "International crisis" is in the political group like "political
+crisis": in Wikidata it is a subclass of "political crisis" (checked in WDQS on 2026-10-06), so every international crisis is found under "political crisis"
+first and a different group for it would never apply.
 
 ## Inclusion rule
 
@@ -101,7 +129,7 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
    (`placeIsMostlyInRegion` in `scripts/lib/v21.js`). Seas and regions that mostly belong to other countries - the Mediterranean (6 in, 16 out), Black Sea,
    Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
    are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the 112 hand-picked
-   events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`, 23 events on 2026-09-29).
+   events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`: 23 events on 2026-09-29, 5 more from the classes added on 2026-10-06).
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**.
 5. **Basic integrity.** Wikipedia returned a summary with a non-empty extract.
@@ -116,9 +144,10 @@ with the dates as Wikidata gives them and a `date_flags` reason. Nothing is drop
 
 Earlier text said "10 Wikipedia language editions". That was wrong. The rule uses Wikidata's `wikibase:sitelinks`, which counts links to **all Wikimedia
 projects** (Wikipedias, but also Wikisource, Wikiquote, Commons, Wikivoyage, ...). Measured on the current discovery candidates
-(`node scripts/build-selection-funnel.js`, stored in `data/selection-funnel.json` under `sitelink_measurement`): of the 1,900 candidates with an English
-article, **535** have 10+ sitelinks across all projects (what the rule uses) while **506** would pass if only Wikipedia language editions were counted;
-29 events pass only thanks to non-Wikipedia sitelinks, and none pass by Wikipedia editions but fail by all projects. The median is 16 either way among passing events.
+(`node scripts/build-selection-funnel.js`, stored in `data/selection-funnel.json` under `sitelink_measurement`): of the 3,194 candidates with an English
+article (2026-10-06, after the class additions), **801** have 10+ sitelinks across all projects (what the rule uses) while **760** would pass if only Wikipedia
+language editions were counted; 41 events pass only thanks to non-Wikipedia sitelinks, and none pass by Wikipedia editions but fail by all projects. The median
+among passing events is 16 across all projects and 15 counting Wikipedia editions only. (Before the class additions: 1,900, 535, 506 and 29.)
 The rule stays as coded (all projects); the documentation now says so.
 
 ### Honest caveat: the rule itself is biased
@@ -130,15 +159,17 @@ The rule stays as coded (all projects); the documentation now says so.
   (roughly the median of the earlier 5+ candidate set), not a validated cutoff. Among events dropped for fewer than 10 sitelinks, 49% have more Arabic/Hebrew/Turkish/Persian
   editions than European ones (dataset-coverage review).
 - **The class list is a choice.** Someone had to decide which Wikidata classes count as "events"; classes with many well-modelled items (battles, terrorist attacks)
-  are over-represented against concepts Wikidata models loosely (diplomacy, elections, protests), so those are under-found.
+  are over-represented against concepts Wikidata models loosely (diplomacy, elections, protests), so those are under-found. Elections, protests and summits
+  have been searched for since 2026-10-06, but they still pass the 10-sitelink bar less often than battles and attacks do.
 - **Wikidata modelling is uneven.** Only events that some editor has typed with a class, dated and located in a tracked country are found at all. Multi-country events
   carry only the countries Wikidata lists.
 - **English Wikipedia is required** for an extract, which biases toward what English Wikipedia covers.
-- **The hand-picked seed list** (112 events, 61 of them not reachable by the rule) is our own selection and the only source of diplomatic and economic events.
+- **The hand-picked seed list** (112 events, 52 of them not reachable by the rule since the class additions of 2026-10-06, 61 before) is our own selection.
+  It is still the only source of economic events; the rule now also finds diplomatic ones (summits, ceasefires, peace conferences).
 - **Location is not required, but it changes visibility.** Events without coordinates are listed but have no marker; abstract and large-area events (wars, referendums,
   treaties) lack coordinates far more often than point-like ones.
 
-The funnel from 2,539 raw candidates to what is shown, with breakdowns by country, class, group and decade, is machine readable in `data/selection-funnel.json`
+The funnel from 5,063 raw candidates to what is shown, with breakdowns by country, class, group and decade, is machine readable in `data/selection-funnel.json`
 (recomputed from the data files by `scripts/build-selection-funnel.js`, not copied from documents) so the app's About page can render it.
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
@@ -167,9 +198,42 @@ before the sitelinks filter; "s>=10" is how many of those have 10+ sitelinks).
 Two classes (embargo, nationalization) contribute nothing today; they are kept so events will be picked up if Wikidata editors add them. Considered and not added:
 general strike (Q49775), prisoner exchange (Q2001775).
 
+**Added 2026-10-06.** A probe of 37 further classes (same query as discovery, 2026-10-06) found well-known events that the rule could not reach only because
+Wikidata types them with a class outside the list: for example the Deir Yassin massacre and the Farhud ("mass murder", "pogrom"), the Cave of the Patriarchs
+and Passover massacres, the Sbarro and Dolphinarium bombings ("suicide attack"), Operation Opera and the 2024 Iranian strikes on Israel ("airstrike", "armed
+conflict"), Iran Air Flight 655 ("aircraft shootdown"). The 12 classes that closed this gap, and 4 civic classes the caveat above named as under-found
+(elections, protests, summits), were added. "New, s>=10" counts items not already found by an earlier class; an item matching several new classes is counted
+under each, so the column does not add up to the total.
+
+| Class | QID | Group | In region (transitive) | New, s>=10 |
+|---|---|---|---|---|
+| armed conflict | Q350604 | war | 1,438 | 101 |
+| military campaign | Q831663 | war | 46 | 9 |
+| military occupation | Q188686 | war | 16 | 7 |
+| airstrike | Q2380335 | war | 244 | 26 |
+| bombardment | Q678146 | war | 260 | 29 |
+| aircraft shootdown | Q6539177 | war | 9 | 4 |
+| suicide attack | Q217327 | terrorism | 210 | 7 |
+| pogrom | Q177716 | atrocity | 12 | 7 |
+| mass murder | Q750215 | atrocity | 586 | 11 |
+| riot | Q124757 | protest | 56 | 14 |
+| political crisis | Q3002772 | political | 112 | 24 |
+| international crisis | Q5791104 | political | 69 | 21 |
+| public election | Q40231 | political | 1,679 | 91 |
+| protest | Q273120 | protest | 176 | 31 |
+| demonstration | Q175331 | protest | 49 | 9 |
+| summit | Q1072326 | diplomatic | 52 | 7 |
+
+Probed and not added: agreement (Q321839; in this region it returns currencies such as the Turkish lira and the new shekel), and insurgency, intifada,
+ethnic cleansing, deportation, refugee crisis, UN Security Council resolution, proxy war (nothing the existing classes do not already find). Natural
+disasters and accidents (earthquake, aviation accident, epidemic, famine) were left out as outside the site's subject; adding them would be a scope decision,
+not a gap fix.
+
 ### Query robustness
 
-Each class is queried separately. WDQS answers a class query that is too expensive with HTTP 504; the script then retries once with plain `P31` (no subclass expansion)
+Each class is queried separately. WDQS answers a class query that is too expensive with HTTP 504; the script then fetches the class's subclass tree (`P279*`)
+on its own and queries `P31` instances of 250 subclasses at a time, which is the same rule split into requests that finish in time ("public election", with
+thousands of per-country subclasses, needs this: plain `P31` found 3 of its 91 new items). Only if that fails too does it retry once with plain `P31` (no subclass expansion)
 and logs that it did so. 429/5xx responses on the other Wikimedia APIs are retried with exponential backoff honouring `Retry-After`. Requests are sequential, delayed
 and identify themselves with the `MiddleEastEvents` User-Agent (`MiddleEastEvents/0.1 (data pipeline; +https://github.com/kei-nan/meast-events)`).
 
@@ -255,7 +319,7 @@ build, and is gitignored.
 `validate-events.js` checks format and internal consistency only, and never judges content. **Errors** (CI fails): ids `[a-z0-9-]+`, unique ids and QIDs,
 real calendar dates from 1900 to next year, `date_end >= date_start` unless `date_flags` explains it, coordinates present unless `location_quality` is `none`,
 `location_quality` matching `coordinate_source` (see "Location quality"), no lat/lon swap, `category` and `category_group` equal and one of the groups in
-`scripts/lib/event-classes.js` (war, treaty, political, atrocity, terrorism, uprising, migration, diplomatic, economic), `wikidata_classes` array,
+`scripts/lib/event-classes.js` (war, treaty, political, atrocity, terrorism, uprising, protest, migration, diplomatic, economic), `wikidata_classes` array,
 `extract_retrieved_at` date, no `category_label`, non-empty extract. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
 shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`,
 `possible_duplicates` naming an id that is in neither the file nor (for the proposed file) the curated file, and, for the curated file, an event without a

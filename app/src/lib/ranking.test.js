@@ -71,3 +71,22 @@ test("rank: no query sorts by date, stable on ties", () => {
   ];
   assert.deepEqual(rankEvents(list, "").map((e) => e.id), ["a", "b1", "b2", "c"]);
 });
+
+test("rankEvents without a query: already-chronological input gives the same order as a full stable sort", () => {
+  // Reference: the stable sort by date_start the function performs on unsorted input.
+  const reference = (list) =>
+    list
+      .map((e, i) => ({ e, i }))
+      .sort((a, b) => (a.e.date_start < b.e.date_start ? -1 : a.e.date_start > b.e.date_start ? 1 : a.i - b.i))
+      .map((x) => x.e);
+  const dates = ["1948-05-14", "1948-05-14", "1967-06-05", "1900-01-01", "2023-10-07", "1967-06-05", "1980-09-22"];
+  const list = dates.map((d, i) => ev(`e${i}`, `T${i}`, { date_start: d }));
+  const sorted = rankEvents(list, "");
+  assert.deepEqual(sorted.map((e) => e.id), reference(list).map((e) => e.id));
+  // Feeding the sorted list (and any order-preserving filter of it) back in is the identity, ties included.
+  assert.deepEqual(rankEvents(sorted, "").map((e) => e.id), sorted.map((e) => e.id));
+  const filtered = sorted.filter((e) => e.date_start >= "1948");
+  assert.deepEqual(rankEvents(filtered, "").map((e) => e.id), filtered.map((e) => e.id));
+  // A fresh array, so callers may mutate it.
+  assert.notEqual(rankEvents(sorted, ""), sorted);
+});

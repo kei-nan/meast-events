@@ -11,7 +11,6 @@ import {
   eventOverlapsRange,
   eventYearRange,
   loadBoundaryDecade,
-  loadEventById,
   loadFullLead,
   loadLand,
 } from "./lib/dataClient";
@@ -19,6 +18,7 @@ import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
 import { orderBrowseList } from "./lib/browseOrder";
+import { rankEvents } from "./lib/ranking";
 import { parseUrlState } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
@@ -149,7 +149,7 @@ export default function App() {
 
   // The whole lite event set is loaded ONCE from static data (no API call);
   // range, viewport, filter and area queries are all computed from this store.
-  const { storeRef, version, addEvents, loading: eventsLoading, error: eventsError } = useAllEvents();
+  const { storeRef, version, loading: eventsLoading, error: eventsError } = useAllEvents();
 
   // Full-text search is the only thing that needs more than the store: a static
   // index (lib/textSearch.js). `degraded` means it could not be loaded: matching
@@ -164,13 +164,20 @@ export default function App() {
     return () => clearInterval(id);
   }, [degraded]);
 
+  // Every event, in browse (chronological) order, sorted once per data load:
+  // filtering it keeps that order, so a timeline step never re-sorts (rankEvents).
+  const chronological = useMemo(
+    () => rankEvents([...storeRef.current.values()], ""),
+    // version is the signal that the (mutable) store has new entries.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [version]
+  );
+
   const visibleEvents = useMemo(
     () =>
       // Includes coordinate-less events (listed, never mapped: MapView skips them).
-      [...storeRef.current.values()].filter((e) => eventOverlapsRange(e, startYear, endYear)),
-    // version is the signal that the (mutable) store has new entries.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [startYear, endYear, version]
+      chronological.filter((e) => eventOverlapsRange(e, startYear, endYear)),
+    [chronological, startYear, endYear]
   );
 
   // Per-year event counts for the timeline density chart, from the store.
@@ -369,9 +376,8 @@ export default function App() {
   // store with its full record, and (for links) move the range + focus it.
   // An id that cannot be resolved is cleared by REPLACING the URL, so Back does
   // not lead to the dead link again.
-  const triedRef = useRef(new Set());
   useEffect(() => {
-    if (!selectedEventId || eventsLoading) return; // wait for the store: no ids.json/chunk requests on a deep link
+    if (!selectedEventId || eventsLoading) return; // wait for the store
     const markNotFound = () => {
       pendingFocusRef.current = null;
       replaceNextUrl();
@@ -391,24 +397,11 @@ export default function App() {
       const f = focusFor(ev, focusNonceRef);
       if (f) setFocus(f);
     }
-    if (ev) return;
     // The full lite set is every event in the dataset: once it has loaded, an
-    // id missing from it is unknown, with no need to ask ids.json and a chunk.
-    if (!eventsError) {
-      markNotFound();
-      return;
-    }
-    if (!triedRef.current.has(selectedEventId)) {
-      const id = selectedEventId;
-      triedRef.current.add(id);
-      loadEventById(id)
-        .then((full) => {
-          if (full) addEvents([full]);
-          else if (!storeRef.current.has(id)) markNotFound();
-        })
-        .catch(() => triedRef.current.delete(id)); // unreachable: try again when the id is next selected
-    }
-  }, [selectedEventId, version, eventsLoading, eventsError, addEvents, storeRef, replaceNextUrl]);
+    // id missing from it is unknown. If it could not be loaded, the link stays
+    // pending until useAllEvents' retry succeeds (version changes).
+    if (!ev && !eventsError) markNotFound();
+  }, [selectedEventId, version, eventsLoading, eventsError, storeRef, replaceNextUrl]);
 
   const handleChangeRange = useCallback((nextStart, nextEnd) => {
     setRange({ start: nextStart, end: nextEnd });

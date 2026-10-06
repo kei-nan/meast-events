@@ -46,7 +46,7 @@ The overall fairness review covers one-sidedness that is not in any single liste
 
 ## Who reviewed it
 
-All 571 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
+All 820 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: the first 571 on 2026-09-30 (updated to 2026-10-04), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
 
 ## How it shows on the event page
 
@@ -58,17 +58,17 @@ All 571 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI mod
 
 | | Summaries |
 |---|---|
-| Overall fairness: issue found | 80 of 571 |
-| Wording check: at least one wording point | 78 of 571 |
-| Either | 139 of 571 |
+| Overall fairness: issue found | 105 of 820 |
+| Wording check: at least one wording point | 100 of 820 |
+| Either | 184 of 820 |
 
 | Guideline | Wording points |
 |---|---|
-| Contentious labels | 46 |
-| Synonyms for "said" | 19 |
-| Avoid stating opinions as facts | 12 |
-| Editorializing | 8 |
-| Expressions of doubt | 4 |
+| Contentious labels | 54 |
+| Synonyms for "said" | 24 |
+| Avoid stating opinions as facts | 13 |
+| Editorializing | 12 |
+| Expressions of doubt | 11 |
 | Puffery | 1 |
 
 We do not publish counts of which side the reviews favour. An earlier version (27 September 2026) did: it rated each summary 0-3 with a direction and reported that of 153 Israel/Palestine summaries, 34 were flagged, 28 of them leaning toward the Palestinian side and 1 toward the Israeli side. That figure was withdrawn because it depended heavily on the rules chosen (under reasonable alternative rules it moved to 13 to 9), so it said more about the rules than about Wikipedia.

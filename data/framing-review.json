@@ -2,7 +2,7 @@
   "about": "Framing review: two review types per Wikipedia summary, shown separately. Overall fairness is the reviewer's judgement of emphasis, balance and omissions; the wording check cites Wikipedia's own neutrality and wording guidelines. Shown next to the summary, never merged into it. Not a fact-check and not a verdict on the events.",
   "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
   "reviewed_on": "2026-09-30",
-  "updated_on": "2026-10-04",
+  "updated_on": "2026-10-07",
   "rubric_version": 5,
   "method": "docs/framing-review.md",
   "guidelines": {
@@ -4377,6 +4377,1780 @@
     "mecca-joint-defence-agreement": {
       "text_sha1": "90d11633683d",
       "text_retrieved_at": "2026-09-26",
+      "fairness": null,
+      "wording": []
+    },
+    "shiraz-pogrom": {
+      "text_sha1": "d2e38093a93a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "mesopotamian-campaign": {
+      "text_sha1": "3ecea68493d7",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "occupation-of-constantinople": {
+      "text_sha1": "e0d4262e8137",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1929-hebron-massacre": {
+      "text_sha1": "703027c3c651",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "italian-invasion-of-egypt": {
+      "text_sha1": "612c318d6ef7",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "tehran-conference": {
+      "text_sha1": "05ab0e0b4d21",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1947-anti-jewish-riots-in-aleppo": {
+      "text_sha1": "c62931ddadaf",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "gaza-israel-conflict": {
+      "text_sha1": "6d21378c5bad",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States in its own voice that the blockade turned Gaza into an \"open-air prison\" and that 1% of Gaza's population was \"killed, tortured, or imprisoned\" during the first occupation; Palestinian rocket fire appears only as Israel's justification for the blockade. The genocide finding and the October 7 attack are attributed and reported.",
+        "phrases": [
+          "turning it into an \"open-air prison\"",
+          "1% of the Gaza Strip's population was killed, tortured, or imprisoned by Israel"
+        ]
+      },
+      "wording": []
+    },
+    "cairo-fire": {
+      "text_sha1": "cb7968e79c58",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1959-israeli-legislative-election": {
+      "text_sha1": "c07171273e6f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "operation-focus": {
+      "text_sha1": "52935069773d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Told from the Israeli Air Force's side, ending on an unattributed superlative that it \"remains one of the most successful air attack campaigns in military history\"; the Egyptian, Syrian and Jordanian sides appear only as targets.",
+        "phrases": [
+          "remains one of the most successful air attack campaigns in military history"
+        ]
+      },
+      "wording": []
+    },
+    "bloody-sunday-1969": {
+      "text_sha1": "09aabbbd12e5",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1977-israeli-legislative-election": {
+      "text_sha1": "99a4d108a8c0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1979-international-women-s-day-protests-in-tehran": {
+      "text_sha1": "0131eddb0011",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Told from the protesters' side; says in its own voice that the veiling laws gave Iran's leadership \"a convenient pretext\", imputing a motive. The supporters of the new order appear only as forces that met the protests with violence.",
+        "phrases": [
+          "a convenient pretext"
+        ]
+      },
+      "wording": []
+    },
+    "july-1981-iranian-presidential-election": {
+      "text_sha1": "388dc29bae5c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "israeli-occupation-of-southern-lebanon-1982-2000": {
+      "text_sha1": "b7629ba27ca0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1991-iraqi-missile-attacks-against-israel": {
+      "text_sha1": "445b1b68856a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1996-israeli-general-election": {
+      "text_sha1": "eb15aef5a2e2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "israeli-lebanese-conflict": {
+      "text_sha1": "a8e7e85e9d35",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "sbarro-restaurant-suicide-bombing": {
+      "text_sha1": "e6b292e64932",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2003-israeli-legislative-election": {
+      "text_sha1": "c073fb4dfbb0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2004-qamishli-riots": {
+      "text_sha1": "beddf01a1c4c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2005-iranian-presidential-election": {
+      "text_sha1": "2ab767624b3e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2006-palestinian-legislative-election": {
+      "text_sha1": "635a71bfadc4",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "july-12-2007-baghdad-airstrike": {
+      "text_sha1": "2422cb7b1b90",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States that all of the casualties \"were civilians\" while later mentioning \"some armed men\" in the third strike, and leaves out the US military's own investigation and its position that the crew acted within the rules of engagement.",
+        "phrases": [
+          "all of whom were civilians"
+        ]
+      },
+      "wording": []
+    },
+    "2009-israeli-legislative-election": {
+      "text_sha1": "d7b90913d430",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2010-iraqi-parliamentary-election": {
+      "text_sha1": "c84c7b81c76b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "kuwaiti-protests-2011-2012": {
+      "text_sha1": "45781a4f05bf",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2011-12-egyptian-parliamentary-election": {
+      "text_sha1": "64aab50f3488",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2012-egyptian-presidential-election": {
+      "text_sha1": "1a2b411db39e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "NPOV",
+          "phrase": "ousted in a military coup",
+          "note": "Calls Morsi's removal \"a military coup\" in Wikipedia's own voice; the summary does not attribute the description or mention that his opponents call it a revolution."
+        }
+      ]
+    },
+    "gezi-park-protests": {
+      "text_sha1": "1ee667e51c18",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Lists the \"AKP government's erosion of Turkey's secularism\" as fact among the protesters' concerns, and gives the government's side only through Erdoğan's insult (\"a few looters\"); the police response is described through criticism.",
+        "phrases": [
+          "the AKP government's erosion of Turkey's secularism",
+          "a few looters"
+        ]
+      },
+      "wording": []
+    },
+    "2014-iraqi-parliamentary-election": {
+      "text_sha1": "c07f2762669b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2014-israeli-presidential-election": {
+      "text_sha1": "2badbc5f9589",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "second-battle-of-tikrit": {
+      "text_sha1": "b275e026da07",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-2016-lebanese-protests": {
+      "text_sha1": "a4f1b1f4a0a7",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "november-2015-turkish-general-election": {
+      "text_sha1": "2d1d044a755a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "the deadliest terrorist attack in Turkey's modern history",
+          "note": "Uses \"terrorist\" for the Ankara bombing in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "2016-iranian-legislative-election": {
+      "text_sha1": "f5aae0043a45",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "manbij-offensive-2016": {
+      "text_sha1": "d6db07c07706",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "palmyra-offensive-2017": {
+      "text_sha1": "ed33d302eaee",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "battle-of-tal-afar-2017": {
+      "text_sha1": "6e1b48326b18",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-egyptian-presidential-election": {
+      "text_sha1": "0d7100bda7dd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "rif-dimashq-offensive-february-april-2018": {
+      "text_sha1": "d96a81c698af",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-iraqi-parliamentary-election": {
+      "text_sha1": "38e0c3edfb0a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-2018-iraqi-protests": {
+      "text_sha1": "1450656412ae",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States in its own voice, inside a parenthesis, that the muhasasa quota system was \"undermining and obliterating any sense of Iraqi national unity\"; the defence of power-sharing is absent.",
+        "phrases": [
+          "thus undermining and obliterating any sense of Iraqi national unity"
+        ]
+      },
+      "wording": []
+    },
+    "april-2019-israeli-legislative-election": {
+      "text_sha1": "c511c7b0f77b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2019-2021-iraqi-protests": {
+      "text_sha1": "a112356ff3ef",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "DOUBT",
+          "phrase": "purportedly leading to incompetent and corrupt politics",
+          "note": "\"Purportedly\" casts doubt on the protesters' account of the muhasasa system without saying who doubts it."
+        }
+      ]
+    },
+    "ukraine-international-airlines-flight-752": {
+      "text_sha1": "22d652d085a9",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2020-iranian-legislative-election": {
+      "text_sha1": "e6bc2087dfb6",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "sofagate": {
+      "text_sha1": "67ca32f3f791",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Explains the seating by gender in its own voice (\"as a man\" ... \"as a woman\") before attributing the sexism charge; Turkey's account that the arrangement followed the European side's requests comes only at the end.",
+        "phrases": [
+          "Michel as a man took the more prominent position than von der Leyen as a woman"
+        ]
+      },
+      "wording": []
+    },
+    "2021-qatari-general-election": {
+      "text_sha1": "53add337704a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2021-afghanistan-iran-clashes": {
+      "text_sha1": "cfda79748f83",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2023-iran-drone-attacks": {
+      "text_sha1": "f3fd30ef44a5",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2023-turkish-parliamentary-election": {
+      "text_sha1": "44d1f0c87123",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2023-homs-drone-strike": {
+      "text_sha1": "68fd151fc017",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "attacks-on-us-bases-during-the-middle-eastern-crisis-2023-present": {
+      "text_sha1": "8f3aee7f6997",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2024-iranian-missile-strikes-in-iraq-and-syria": {
+      "text_sha1": "5f47be1d7e01",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "april-2024-israeli-strikes-on-iran": {
+      "text_sha1": "c392bba6796a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "SAID",
+          "phrase": "claimed that there had been no missile attack on Iran",
+          "note": "The Iranian official \"claimed\" there was no missile attack, while the US official \"stated\" and \"said\" the opposite."
+        }
+      ]
+    },
+    "october-2024-israeli-strikes-on-iran": {
+      "text_sha1": "df85ad10a189",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2024-homs-offensive": {
+      "text_sha1": "5ae979711c92",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2025-united-states-strikes-on-iranian-nuclear-sites": {
+      "text_sha1": "ed226bcce0af",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "SAID",
+          "phrase": "President Trump claimed the strikes",
+          "note": "Trump \"claimed\" the damage to the sites, while Iran's foreign minister \"said\" the sites sustained severe damage."
+        }
+      ]
+    },
+    "2025-iraqi-parliamentary-election": {
+      "text_sha1": "fb6496dd2035",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "united-arab-emirates-in-the-2026-iran-war": {
+      "text_sha1": "5815e80518ec",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-onikisubat-school-shooting": {
+      "text_sha1": "6d2348fb84dc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "russian-occupation-of-tabriz": {
+      "text_sha1": "fe4ea0ff2436",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "raid-on-the-suez-canal": {
+      "text_sha1": "01ef70deb765",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1920-nebi-musa-riots": {
+      "text_sha1": "9d40a576c066",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Adds an unattributed suggestion that the Arab village sheikhs' condemnation of the riots \"may have been procured with bribes\", which discounts the one Arab statement against the violence without saying who makes that claim.",
+        "phrases": [
+          "This condemnation may have been procured with bribes."
+        ]
+      },
+      "wording": []
+    },
+    "1934-thrace-pogroms": {
+      "text_sha1": "f0fc68bbfc1f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "bombing-of-bahrain-in-world-war-ii": {
+      "text_sha1": "bff86ab832b9",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "levant-crisis": {
+      "text_sha1": "987a0d85035e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1947-anti-jewish-riots-in-aden": {
+      "text_sha1": "6de6ac45e266",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "safsaf-massacre": {
+      "text_sha1": "4b2ccf2f55f9",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "ma-ale-akrabim-massacre": {
+      "text_sha1": "22a82269041c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1961-israeli-legislative-election": {
+      "text_sha1": "464475f0234a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "israeli-occupation-of-the-west-bank": {
+      "text_sha1": "f4c39f7df78b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States the illegality of the occupation as fact in its own voice (\"Though its occupation is illegal\") before Israel's reasons, although the last paragraph presents the same point as the finding of most international-law scholars; Israel's position on the legal question itself is not given.",
+        "phrases": [
+          "Though its occupation is illegal"
+        ]
+      },
+      "wording": [
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "Though its occupation is illegal, Israel has cited several reasons",
+          "note": "\"Though\" sets Israel's stated reasons against a legal verdict given in Wikipedia's own voice, steering the reader before the reasons are listed."
+        }
+      ]
+    },
+    "1969-israeli-legislative-election": {
+      "text_sha1": "38af404b42e6",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1978-south-lebanon-conflict": {
+      "text_sha1": "0a0247c28a13",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1980-iranian-presidential-election": {
+      "text_sha1": "9ba89df0668a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "october-1981-iranian-presidential-election": {
+      "text_sha1": "4c19590c8cb8",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1985-iranian-presidential-election": {
+      "text_sha1": "fb85de2aba87",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1992-israeli-legislative-election": {
+      "text_sha1": "1334390afd61",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1999-istanbul-summit": {
+      "text_sha1": "83bb575fcd00",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2001-israeli-prime-ministerial-election": {
+      "text_sha1": "a24e4e67b1e1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "passover-massacre": {
+      "text_sha1": "6a616559b038",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "anbar-campaign-2003-2011": {
+      "text_sha1": "5f0c23a9939c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2004-istanbul-nato-summit": {
+      "text_sha1": "aadcaebc433f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2005-egyptian-presidential-election": {
+      "text_sha1": "c51d6d3e0c92",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2006-israeli-legislative-election": {
+      "text_sha1": "c829b6face01",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2007-turkish-general-election": {
+      "text_sha1": "b1d50870a281",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2009-lebanese-general-election": {
+      "text_sha1": "05d21560ae52",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2010-gaza-flotilla-raid": {
+      "text_sha1": "b5dd3de0e680",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Says the Palmer report \"also concluded that the raid was illegal\" but leaves out the report's main findings that the naval blockade was legal and that the commandos met organised and violent resistance; only its criticisms of Israel are given.",
+        "phrases": [
+          "also concluded that the raid was illegal"
+        ]
+      },
+      "wording": []
+    },
+    "2011-2012-iranian-protests": {
+      "text_sha1": "777e8e774b47",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2011-british-embassy-in-iran-attack": {
+      "text_sha1": "fbc11633516d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2012-2013-egyptian-protests": {
+      "text_sha1": "03bf7748b0a1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "DOUBT",
+          "phrase": "purported fans",
+          "note": "\"Purported\" casts doubt on the attackers at Port Said being football fans, in Wikipedia's own voice, without saying who doubts it."
+        }
+      ]
+    },
+    "iranian-intervention-in-the-syrian-civil-war": {
+      "text_sha1": "043ea809e3b3",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States contested claims about Iran's aims as fact (\"Shi'ification attempts through forced conversions\", demographic transformation through settlers), while Iran's own stated reasons for the intervention appear only as \"regional interests\".",
+        "phrases": [
+          "Shi'ification attempts through forced conversions",
+          "demographic transformations by bringing in foreign Twelver Shia settlers"
+        ]
+      },
+      "wording": []
+    },
+    "2014-egyptian-presidential-election": {
+      "text_sha1": "46a77fe47934",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "war-against-the-islamic-state": {
+      "text_sha1": "e1ce48ba08d1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "DOUBT",
+          "phrase": "its purported state-sponsorship of terrorism",
+          "note": "\"Purported\" casts doubt on the Western charge against the Syrian government in Wikipedia's own voice, without saying who doubts it."
+        },
+        {
+          "guideline": "DOUBT",
+          "phrase": "Hezbollah purportedly sent trainers",
+          "note": "\"Purportedly\" casts doubt on the report of Hezbollah trainers in Iraq without saying whose account it is or who doubts it."
+        }
+      ]
+    },
+    "2015-israeli-legislative-election": {
+      "text_sha1": "0d24910fb054",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "russian-intervention-in-the-syrian-civil-war": {
+      "text_sha1": "6d73414877ba",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-g20-antalya-summit": {
+      "text_sha1": "cc9f822abedf",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2016-syrian-parliamentary-election": {
+      "text_sha1": "4bc15b88f5c1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2016-jordanian-general-election": {
+      "text_sha1": "4fe69cabc328",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "DOUBT",
+          "phrase": "supposedly more moderate party",
+          "note": "\"Supposedly\" casts doubt on the new party's moderation in Wikipedia's own voice, without saying who doubts it."
+        }
+      ]
+    },
+    "khan-shaykhun-chemical-attack": {
+      "text_sha1": "938b04ac80b6",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "iranian-protests-against-compulsory-hijab": {
+      "text_sha1": "5eaaa988224d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-2019-gaza-border-protests": {
+      "text_sha1": "a7a8cd87695b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "united-arab-emirates-occupation-of-socotra": {
+      "text_sha1": "cf2c1d5d4a4f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-turkish-presidential-election": {
+      "text_sha1": "95bcaf7c3fcf",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "syria-missile-strikes-september-2018": {
+      "text_sha1": "c3da996a898a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "june-2019-istanbul-mayoral-election": {
+      "text_sha1": "dd065c053165",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "17-october-revolution": {
+      "text_sha1": "0c0cee12cc76",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "operation-martyr-soleimani": {
+      "text_sha1": "456031c1657b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2020-g20-riyadh-summit": {
+      "text_sha1": "76e9361135da",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2021-syrian-presidential-election": {
+      "text_sha1": "e1bde338c76d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "technically meaning a voter turnout of 130%",
+          "note": "Draws its own arithmetic conclusion against the official figures in Wikipedia's own voice; the observers' similar point is attributed in the next sentence."
+        }
+      ]
+    },
+    "2021-iraqi-parliamentary-election": {
+      "text_sha1": "f3eb84c8846a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2022-abu-dhabi-attack": {
+      "text_sha1": "d08e3f8df0b1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "an terrorist attack",
+          "note": "Uses \"terrorist\" for the Houthi attack, in the defining sentence, in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "2023-israel-palestine-tensions": {
+      "text_sha1": "ab6f14dc180c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2023-turkish-general-election": {
+      "text_sha1": "801ab10343cd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "middle-eastern-crisis-2023-present": {
+      "text_sha1": "da6d69208fd5",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Names \"the genocide in Gaza\" as one of the triggers of the crisis, treating the genocide finding as established fact; it is supported by a UN commission and genocide scholars but rejected by Israel, the US and others, and the International Court of Justice has not ruled.",
+        "phrases": [
+          "the genocide in Gaza"
+        ]
+      },
+      "wording": []
+    },
+    "2023-egyptian-presidential-election": {
+      "text_sha1": "c08d8105055e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "tower-22-drone-attack": {
+      "text_sha1": "d89c46302787",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2024-iranian-presidential-election": {
+      "text_sha1": "9b9acab069ce",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2024-syrian-opposition-offensives": {
+      "text_sha1": "97a19269da29",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Calls the HTS-led coalition \"Syrian revolutionary factions\" and the government \"the Ba'athist regime\" as fact, and describes Hay'at Tahrir al-Sham without mentioning its al-Qaeda origins.",
+        "phrases": [
+          "Syrian revolutionary factions",
+          "the Ba'athist regime's armed forces"
+        ]
+      },
+      "wording": []
+    },
+    "israeli-invasion-of-syria-2024-present": {
+      "text_sha1": "1df2e8a7c24b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2025-iranian-strikes-on-al-udeid-air-base": {
+      "text_sha1": "aca42d4e4db4",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2025-2026-southern-yemen-campaign": {
+      "text_sha1": "8db41a946a1d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-lebanon-war": {
+      "text_sha1": "b9bd5506cda4",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-ankara-nato-summit": {
+      "text_sha1": "1f8d92577030",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "caucasus-campaign": {
+      "text_sha1": "d5d6e009d042",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "sinai-and-palestine-campaign": {
+      "text_sha1": "c010b0a2e472",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Told from the British Empire side: it follows the Egyptian Expeditionary Force from victory to victory, and its paragraph on how the campaign was seen covers only Britain, India and Australia. The Ottoman forces appear only as opponents and the local population not at all.",
+        "phrases": [
+          "EEF victories followed",
+          "The successful infantry battles at Tulkarm and Tabsor"
+        ]
+      },
+      "wording": []
+    },
+    "jaffa-riots-may-1921": {
+      "text_sha1": "96c579d49198",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "mediterranean-and-middle-east-theatre-of-world-war-ii": {
+      "text_sha1": "b0bd8d48e4d1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "farhud": {
+      "text_sha1": "7dd6a6deb1ec",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "iran-crisis-of-1946": {
+      "text_sha1": "e394511d96c0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Framed from the US Cold War perspective: it says in its own voice what the end of the war \"should have\" brought and presents US pressure as \"the earliest evidence of success\" of containment, without saying who holds that view.",
+        "phrases": [
+          "The end of World War II should have resulted in the end of the Allied joint occupation of Iran",
+          "is the earliest evidence of success"
+        ]
+      },
+      "wording": []
+    },
+    "deir-yassin-massacre": {
+      "text_sha1": "30a8639e669f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1949-israeli-constituent-assembly-election": {
+      "text_sha1": "86780c45a5bc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1955-israeli-legislative-election": {
+      "text_sha1": "7ddb07d7760f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1964-hama-riot": {
+      "text_sha1": "a8d1b19e6ebf",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "political-violence-in-turkey-1976-1980": {
+      "text_sha1": "3292e7a88124",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1973-israeli-legislative-election": {
+      "text_sha1": "1cc4e812d44d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "kurdistan-workers-party-insurgency": {
+      "text_sha1": "083f2891abd2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Details Turkey's abuses through European Court of Human Rights rulings, while the PKK's attacks on civilians appear only as condemnation \"mainly by Turkish allies\". It does not mention that the PKK is designated a terrorist organisation by the US and the European Union as well as Turkey.",
+        "phrases": [
+          "mainly by Turkish allies"
+        ]
+      },
+      "wording": []
+    },
+    "operation-opera": {
+      "text_sha1": "a58ffcd91d26",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "tanker-war": {
+      "text_sha1": "a323a5ea5685",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "iran-air-flight-655": {
+      "text_sha1": "90376d28ea88",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "cave-of-the-patriarchs-massacre": {
+      "text_sha1": "c54ed6295d45",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1999-israeli-general-election": {
+      "text_sha1": "cea6594de784",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "dolphinarium-discotheque-bombing": {
+      "text_sha1": "4957ac6112a1",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2002-iraqi-presidential-referendum": {
+      "text_sha1": "6944b1aa568c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "maxim-restaurant-suicide-bombing": {
+      "text_sha1": "f0512571b428",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2005-palestinian-presidential-election": {
+      "text_sha1": "a4dfc9bc5e90",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "december-2005-iraqi-parliamentary-election": {
+      "text_sha1": "aa85e83f15a9",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2006-qana-airstrike": {
+      "text_sha1": "fa05a26b6e67",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "DOUBT",
+          "phrase": "Katyusha rockets supposedly being fired by Hezbollah",
+          "note": "\"Supposedly\" casts doubt on the IDF's stated reason inside a sentence that already attributes it (\"According to the IDF\")."
+        }
+      ]
+    },
+    "2007-turkish-presidential-election": {
+      "text_sha1": "cdb5b9b486e6",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2009-iranian-presidential-election": {
+      "text_sha1": "975d13f48b29",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States \"large irregularities in the results\" as fact, although the summary later calls them \"alleged irregularities\" and reports that the Guardian Council found none. A long paragraph lists supporters of the protests, while the government side appears only through Khamenei's statements and the recount.",
+        "phrases": [
+          "There were large irregularities in the results"
+        ]
+      },
+      "wording": []
+    },
+    "2011-iraqi-protests": {
+      "text_sha1": "437703429535",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2011-turkish-general-election": {
+      "text_sha1": "46916bc2d581",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "port-said-stadium-riot": {
+      "text_sha1": "26c7b59e9f9e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2013-israeli-legislative-election": {
+      "text_sha1": "a1aeb28fdc2a",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2013-iranian-presidential-election": {
+      "text_sha1": "a1382950d649",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2014-syrian-presidential-election": {
+      "text_sha1": "3fd0bb15f946",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2014-turkish-presidential-election": {
+      "text_sha1": "90a97ebff9cd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "houthi-saudi-conflict": {
+      "text_sha1": "83ec1026e9a2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-egyptian-parliamentary-election": {
+      "text_sha1": "a64556e49efe",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-russian-sukhoi-su-24-shootdown": {
+      "text_sha1": "050e7ef5d2cc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "SAID",
+          "phrase": "claiming that their satellite data showed",
+          "note": "Russia's account is introduced with \"claiming\", while Turkey's is given with \"According to Turkey\" and Erdoğan \"pointed out\" Turkey's right to defend its airspace, a verb that presents his statement as true."
+        }
+      ]
+    },
+    "2016-saudi-arabia-bombings": {
+      "text_sha1": "802c7e961d68",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "raqqa-campaign-2016-2017": {
+      "text_sha1": "2d27605a9904",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2017-shayrat-missile-strike": {
+      "text_sha1": "5bcbcadd6890",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2017-2018-iranian-protests": {
+      "text_sha1": "8e30d9207f10",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Uses the protesters' vantage point in its own voice (\"showcased their fury\", \"shaking the very pillars of this regime\"); the authorities' account of the violence is included but attributed.",
+        "phrases": [
+          "showcased their fury",
+          "shaking the very pillars of this regime"
+        ]
+      },
+      "wording": []
+    },
+    "douma-chemical-attack": {
+      "text_sha1": "9315eb069d99",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-lebanese-general-election": {
+      "text_sha1": "fece4513bb13",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-turkish-general-election": {
+      "text_sha1": "2422962afc75",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "december-2019-united-states-airstrikes-in-iraq-and-syria": {
+      "text_sha1": "c4dd658de9a2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "an extremist Shi'ite militia",
+          "note": "Uses \"extremist\" for Kata'ib Hezbollah in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "abqaiq-khurais-attack": {
+      "text_sha1": "19617ecbaad3",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2019-2020-iranian-protests": {
+      "text_sha1": "f64948e12741",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Gives \"as many as 2,000\" protesters killed as fact, the top of the range (Amnesty International documented about 300 deaths, Reuters reported about 1,500), and states the government's motives (\"to mask the scale\") in its own voice. The authorities' account of the unrest is absent.",
+        "phrases": [
+          "As many as 2,000 Iranian protesters were killed",
+          "In an effort to mask the scale and casualty count of the protests"
+        ]
+      },
+      "wording": []
+    },
+    "2020-israeli-legislative-election": {
+      "text_sha1": "3a3374f713fc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "january-2021-baghdad-bombings": {
+      "text_sha1": "1cf8bf72b88f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "were a pair of terrorist attacks",
+          "note": "Uses \"terrorist\" for the bombings, in the defining sentence, in Wikipedia's own voice, without saying who uses the label."
+        },
+        {
+          "guideline": "LABEL",
+          "phrase": "first terrorist attack since 2019",
+          "note": "Uses \"terrorist\" for the bombings in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "2021-iranian-presidential-election": {
+      "text_sha1": "1387f3f7fbac",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2021-beirut-clashes": {
+      "text_sha1": "92a7c2fc43de",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "negev-summit": {
+      "text_sha1": "a3ca73c78065",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2023-afghanistan-iran-clash": {
+      "text_sha1": "89147d23f67f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "al-shati-refugee-camp-airstrikes": {
+      "text_sha1": "96be61c6d972",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "killing-of-alon-shamriz-yotam-haim-and-samer-talalka": {
+      "text_sha1": "f8b8f5623469",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2024-turkish-local-elections": {
+      "text_sha1": "b7885b3478ce",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2024-syrian-parliamentary-election": {
+      "text_sha1": "f0d30de4ec99",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "southern-syria-offensive-2024": {
+      "text_sha1": "11c19cac582b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2025-2026-turkish-protests": {
+      "text_sha1": "29cad8cce587",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2025-nasser-hospital-strikes": {
+      "text_sha1": "494aec275321",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Calls the attack a \"double tap strike\" as fact and gives no Israeli account of it (the IDF said it was targeting a camera it believed Hamas was using); only the condemnation is reported.",
+        "phrases": [
+          "double tap strike"
+        ]
+      },
+      "wording": []
+    },
+    "2026-northeastern-syria-offensive": {
+      "text_sha1": "cc707f4cd0b2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "sinking-of-iris-dena": {
+      "text_sha1": "42967a693bb6",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-yemen-offensives": {
+      "text_sha1": "c2b776c3c4ad",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "middle-eastern-theatre-of-world-war-i": {
+      "text_sha1": "287f01a261d0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "stalemate-in-southern-palestine": {
+      "text_sha1": "69e6ab3ddcc2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "chanak-crisis": {
+      "text_sha1": "72789c8d8bdd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "western-desert-campaign": {
+      "text_sha1": "c5a0384bcccc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "anglo-soviet-invasion-of-iran": {
+      "text_sha1": "2f2b9b2af2a0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1946-turkish-general-election": {
+      "text_sha1": "c3e1c6885d52",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "arab-israeli-conflict": {
+      "text_sha1": "d0bc63b8f06c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1951-israeli-legislative-election": {
+      "text_sha1": "2f02d0093469",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "istanbul-pogrom": {
+      "text_sha1": "2885688f2dcd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "The bomb was actually planted",
+          "note": "\"Actually\" sets the summary's account of the bombing against the Turkish press version in Wikipedia's own voice."
+        }
+      ]
+    },
+    "1965-israeli-legislative-election": {
+      "text_sha1": "72b8536cc6d4",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1968-israeli-raid-on-beirut-airport": {
+      "text_sha1": "d01bd27a0a0e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "syrian-occupation-of-lebanon": {
+      "text_sha1": "5649b80026fc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Describes the whole 1976–2005 period through Syrian abuses and leaves out that the intervention began at the Lebanese president's request and was given an Arab League mandate as the Arab Deterrent Force.",
+        "phrases": [
+          "beginning with the Syrian intervention in the Lebanese Civil War"
+        ]
+      },
+      "wording": []
+    },
+    "arab-cold-war": {
+      "text_sha1": "2e6d421b39c0",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States as fact, without attribution, that revolutionary Iran was \"committed to overthrowing the predominantly Sunni governments of Arab states\", a contested characterisation of its aims.",
+        "phrases": [
+          "committed to overthrowing the predominantly Sunni governments of Arab states"
+        ]
+      },
+      "wording": [
+        {
+          "guideline": "DOUBT",
+          "phrase": "‘revolutionary’",
+          "note": "Puts the new republics' \"revolutionary\" description in scare quotes, casting doubt on it without saying who doubts it."
+        }
+      ]
+    },
+    "1981-israeli-legislative-election": {
+      "text_sha1": "143b44a1da5e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1984-israeli-legislative-election": {
+      "text_sha1": "bf60b7c6b057",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1988-israeli-legislative-election": {
+      "text_sha1": "cc5f84cf3a66",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1996-palestinian-general-election": {
+      "text_sha1": "0e5ae036872f",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "1999-iranian-student-protests": {
+      "text_sha1": "7ae681b57031",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2001-iranian-presidential-election": {
+      "text_sha1": "e125d8f13399",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2002-turkish-general-election": {
+      "text_sha1": "79bebc655d88",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2003-istanbul-bombings": {
+      "text_sha1": "17c6d573c7cd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "january-2005-iraqi-parliamentary-election": {
+      "text_sha1": "80134cf77b06",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2006-gaza-israel-conflict": {
+      "text_sha1": "8a2a985733fb",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2007-syrian-presidential-election": {
+      "text_sha1": "82af6e541c45",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "george-w-bush-shoe-throwing-incident": {
+      "text_sha1": "22e71eb35ce9",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2009-iranian-presidential-election-protests": {
+      "text_sha1": "b6794c4ec933",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "SAID",
+          "phrase": "all three opposition candidates claimed the votes were manipulated",
+          "note": "The opposition candidates \"claimed\" the election was rigged, while Ahmadinejad \"called\" it free and the government \"confirmed\" its death toll."
+        }
+      ]
+    },
+    "2011-lebanese-protests": {
+      "text_sha1": "b5a994cea678",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "syrian-civil-war-spillover-in-lebanon": {
+      "text_sha1": "57dde89d295c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2012-syrian-parliamentary-election": {
+      "text_sha1": "69426d997797",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "turkey-islamic-state-conflict": {
+      "text_sha1": "b1bb5e209b34",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2014-turkish-local-elections": {
+      "text_sha1": "e0f9880ec464",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Gives the fraud allegations at length and states \"significant cases of fraud\" in Ankara and Yalova as fact, although the cases were only referred to the electoral council; the governing party's response to the allegations is absent.",
+        "phrases": [
+          "Significant cases of fraud in Ankara and Yalova"
+        ]
+      },
+      "wording": []
+    },
+    "islamic-state-invasion-of-iraq": {
+      "text_sha1": "d9e830855709",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "some extremist factions",
+          "note": "Uses \"extremist\" for factions allied with ISIL in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "united-states-intervention-in-syria": {
+      "text_sha1": "e97c957c9434",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "the terror group lost its last remaining territory",
+          "note": "Uses \"terror\" for the Islamic State in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "june-2015-turkish-general-election": {
+      "text_sha1": "d4b3821e5d72",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-al-hawl-offensive": {
+      "text_sha1": "d51c4208267b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2015-saudi-arabian-municipal-elections": {
+      "text_sha1": "cfae6470488c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "turkish-occupation-of-northern-syria": {
+      "text_sha1": "c6d305ba883c",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2017-dutch-turkish-diplomatic-incident": {
+      "text_sha1": "82050d0ba2e8",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2017-iranian-presidential-election": {
+      "text_sha1": "1febab899752",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "february-2018-israel-syria-incident": {
+      "text_sha1": "937736645552",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "april-2018-missile-strikes-against-syria": {
+      "text_sha1": "557a803db5b7",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "operation-house-of-cards": {
+      "text_sha1": "7eb0fe0f55fb",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2018-turkish-parliamentary-election": {
+      "text_sha1": "210ee2e1432b",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2019-turkish-local-elections": {
+      "text_sha1": "31027b88a66d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "the Christchurch terrorist attack",
+          "note": "Uses \"terrorist\" for the Christchurch attack in Wikipedia's own voice, without saying who uses the label."
+        },
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "the People's Alliance indeed won the plurality of votes",
+          "note": "\"Indeed\" affirms Erdoğan's victory claim in Wikipedia's own voice."
+        }
+      ]
+    },
+    "september-2019-israeli-legislative-election": {
+      "text_sha1": "0a867fcf3c30",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2020-syrian-parliamentary-election": {
+      "text_sha1": "15f7c8acaa93",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2021-israeli-legislative-election": {
+      "text_sha1": "acdd3fe269ab",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2021-2022-iranian-protests": {
+      "text_sha1": "560b3d25c04d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "States \"police violence and brutality\" as fact in its own voice; the government's account of the protests and its response is absent.",
+        "phrases": [
+          "quickly met with police violence and brutality"
+        ]
+      },
+      "wording": []
+    },
+    "2021-2022-iraqi-political-crisis": {
+      "text_sha1": "bcf19e095e83",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2022-israeli-legislative-election": {
+      "text_sha1": "74aa0c47ace2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2023-turkish-presidential-election": {
+      "text_sha1": "880e541808be",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "attacks-on-jabalia-refugee-camp-2023-present": {
+      "text_sha1": "28d9ac55187d",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "al-ahli-arab-hospital-explosion": {
+      "text_sha1": "a2ebb224cbcc",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": {
+        "note": "Gives both accounts and attributes them, but after the news organisations and Human Rights Watch that found a rocket from Gaza most likely, it closes on a longer paragraph of investigations contesting that explanation, so the last word goes to the doubt.",
+        "phrases": [
+          "cast further doubt on the errant rocket launch theory"
+        ]
+      },
+      "wording": []
+    },
+    "us-uk-airstrikes-on-yemen": {
+      "text_sha1": "507f0d8f8b15",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "april-2024-iranian-strikes-on-israel": {
+      "text_sha1": "647aa4625ea4",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "october-2024-iranian-strikes-on-israel": {
+      "text_sha1": "91cc136f0671",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "SAID",
+          "phrase": "Iran claimed that the attack was an act of self-defense",
+          "note": "Iran's statements are introduced with \"claimed\" (twice), while Israel's are given with \"said\" and Netanyahu's with \"called\"."
+        }
+      ]
+    },
+    "2024-hama-offensive": {
+      "text_sha1": "c273b594725e",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2025-syrian-parliamentary-election": {
+      "text_sha1": "85a73dda18bd",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "prelude-to-the-2026-iran-war": {
+      "text_sha1": "1a8a07a19617",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-iranian-supreme-leader-election": {
+      "text_sha1": "2c6cd91677c6",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-israeli-legislative-election": {
+      "text_sha1": "ac1801912f7d",
+      "text_retrieved_at": "2026-10-06",
       "fairness": null,
       "wording": []
     }

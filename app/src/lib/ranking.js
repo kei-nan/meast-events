@@ -66,10 +66,22 @@ function tier(event, qNorm, tokens) {
   return 3;
 }
 
+function isChronological(events) {
+  for (let i = 1; i < events.length; i++) {
+    if ((events[i - 1].date_start ?? "") > (events[i].date_start ?? "")) return false;
+  }
+  return true;
+}
+
 // With a query: exact title > title prefix > title contains > everything else
 // (in the server's order). Without: chronological by start date. Stable.
 export function rankEvents(events, q = "") {
   const tokens = tokenize(q);
+  // Chronological input (the app keeps its store in this order, so every
+  // range's list is already sorted) is returned as-is: one O(n) check instead
+  // of an O(n log n) sort on every timeline step. Same result: a stable sort of
+  // sorted input is the identity.
+  if (tokens.length === 0 && isChronological(events)) return events.slice();
   const indexed = events.map((event, i) => ({ event, i }));
   if (tokens.length === 0) {
     indexed.sort((a, b) => {
