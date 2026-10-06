@@ -194,6 +194,53 @@ export const CORRECTIONS = [
       "unified with North Yemen on 22 May 1990.",
     source: "https://en.wikipedia.org/wiki/South_Yemen",
   },
+  // South Arabia before independence: CShapes 2.0's own units, imported as they are
+  // (geometry and dates untouched), renamed after the Wikipedia articles. British colony
+  // and protected states, so - like the Trucial States, Qatar or Egypt as a British
+  // protectorate - no status flag; the note says what they were.
+  {
+    type: "split",
+    target: "Aden",
+    // CShapes record 1 Apr 1937 - 3 Apr 1962: map years 1937-1961 (1 July rule).
+    phases: [{ until: 1962, name: "Aden Colony and Western Aden Protectorate" }],
+    note:
+      "CShapes 2.0 unit \"Aden\" (gwcode 681, 1 April 1937 - 3 April 1962). Aden was separated " +
+      "from British India and made a Crown colony on 1 April 1937. The shape also takes in the " +
+      "British-protected states of the western Aden Protectorate (Lahij, Fadhli and Beihan, " +
+      "among others); the Protectorate was divided into a Western and an Eastern Protectorate " +
+      "for administration in 1940, while CShapes draws the two apart from 1937. Followed by the " +
+      "Federation of South Arabia.",
+    source: "https://en.wikipedia.org/wiki/Aden_Colony; https://en.wikipedia.org/wiki/Aden_Protectorate",
+  },
+  {
+    type: "split",
+    target: "East Aden Protectorate",
+    phases: [{ until: 1962, name: "Eastern Aden Protectorate" }],
+    note:
+      "CShapes 2.0 unit \"East Aden Protectorate\" (gwcode 6812, 1 April 1937 - 3 April 1962): " +
+      "the British-protected states of Hadhramaut and Mahra (the Qu'aiti, Kathiri and Mahra " +
+      "sultanates, among others). Administered separately from the western protectorate from " +
+      "1940; CShapes draws the two apart from 1937.",
+    source: "https://en.wikipedia.org/wiki/Aden_Protectorate",
+  },
+  {
+    type: "split",
+    target: "Federation of South Arabia",
+    // CShapes record 4 Apr 1962 - 29 Nov 1967: map years 1962-1967; South Yemen from 1968.
+    phases: [{ until: 1968, name: "Federation of South Arabia" }],
+    note:
+      "CShapes 2.0 unit \"Federation of South Arabia\" (gwcode 6801, 4 April 1962 - 29 November " +
+      "1967). The Federation of Arab Emirates of the South (1959) became known as the " +
+      "Federation of South Arabia on 4 April 1962; Aden joined it on 18 January 1963. The " +
+      "states that did not join (the Kathiri, Mahra and Qu'aiti sultanates and Upper Yafa) " +
+      "formed the Protectorate of South Arabia from that day. CShapes draws one shape for all " +
+      "of South Arabia - the same as South Yemen's at independence - so it includes them. " +
+      "Both ended on 30 November 1967, when South Yemen became independent.",
+    source:
+      "https://en.wikipedia.org/wiki/Federation_of_Arab_Emirates_of_the_South; " +
+      "https://en.wikipedia.org/wiki/Federation_of_South_Arabia; " +
+      "https://en.wikipedia.org/wiki/Protectorate_of_South_Arabia",
+  },
 
   // --- Status flags: corrections and additions to CShapes' existing geometry ---
   {

@@ -21,7 +21,7 @@
 //   Syria, Lebanon, Jordan, Israel/Palestine before 1920 (inside the Ottoman
 //   Empire); Turkey before 1920; Saudi Arabia before 1933 (Hejaz/Nejd are not
 //   drawn); Kuwait before 1961; Bahrain before 1972; Qatar before 1917; Yemen
-//   before 1919 (and South Yemen before 1968).
+//   before 1919 (and the south before 1937).
 // - Shared or disputed extras: the Saudi-Iraqi and Saudi-Kuwaiti Neutral Zones,
 //   Abu Musa and the Tunbs, the Sanjak of Alexandretta, and the Golan Heights
 //   (Syrian territory under Israeli occupation/annexation) are not added to any
@@ -84,10 +84,14 @@ export const COUNTRY_SHAPES = {
     ["Jordan", 1946, NOW],
   ],
   // The data's "Yemen" is the present-day country, so both North and South
-  // Yemen are its territory before unification in 1990.
+  // Yemen are its territory before unification in 1990, and so is British South
+  // Arabia (Aden and the protectorates, 1937-1967) before South Yemen.
   Yemen: [
     ["Mutawakkilite Kingdom of Yemen", 1919, 1962],
     ["Yemen Arab Republic", 1963, 1989],
+    ["Aden Colony and Western Aden Protectorate", 1937, 1961],
+    ["Eastern Aden Protectorate", 1937, 1961],
+    ["Federation of South Arabia", 1962, 1967],
     ["People's Republic of South Yemen", 1968, 1970],
     ["People's Democratic Republic of Yemen", 1971, 1989],
     ["Yemen", 1990, NOW],

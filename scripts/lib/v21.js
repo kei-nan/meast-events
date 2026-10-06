@@ -1,9 +1,12 @@
-// Data-shape v2.1 helpers shared by enrich-candidates.js, apply-v21.js and refresh-extracts.js.
+// Data-shape v2.1 helpers shared by enrich-candidates.js and refresh-extracts.js.
 // Nothing here rewrites Wikipedia/Wikidata content: it copies it, or FLAGS a discrepancy.
 import { EVENT_CLASSES, COUNTRIES, QID_TO_COUNTRY, groupForEvent } from "./event-classes.js";
 import { yearsIn, yearOf } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
 import { applyDataFix, reconcileStartDate } from "./fixes.js";
+import { detectExtractHold } from "./title-refresh.js";
+
+export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
 
 export const CLASS_GROUP = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
@@ -117,8 +120,8 @@ export function titleMismatch(event, urlTitle, extract) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Shared v2.1 finalisation used by enrich-candidates.js (proposed events) and apply-v21.js
-// (curated events). Copies Wikipedia/Wikidata content; only ever ADDS flags.
+// Shared v2.1 finalisation used by enrich-candidates.js (proposed events; the curated events
+// were brought to v2.1 once by the since-removed apply-v21.js). Copies Wikipedia/Wikidata content; only ever ADDS flags.
 // ---------------------------------------------------------------------------------------------
 const dropPrefix = (list, prefixes) => (list ?? []).filter((r) => !prefixes.some((p) => r.startsWith(p)));
 
@@ -130,8 +133,17 @@ export function finalizeEvent(ev, ctx) {
   const lead = ctx.leads.get(urlTitle) ?? null;
   const entity = ctx.entities.get(ev.wikidata_qid) ?? null;
 
-  // 1. full lead
-  if (lead?.extract) {
+  // 1. full lead - only from an article of the record's own Wikidata item. When the URL leads (directly or via a
+  // redirect) to another item's article, its lead describes another subject: the stored extract is kept and the
+  // case is flagged (the same rule as refresh-extracts.js, lib/title-refresh.js detectExtractHold).
+  ev.review_reasons = dropPrefix(ev.review_reasons, [EXTRACT_HELD_FLAG]);
+  const held = detectExtractHold(ev, lead);
+  if (held) {
+    ev.review_reasons = [...ev.review_reasons, `${EXTRACT_HELD_FLAG}: ${held.detail}`];
+    if (ev.extract && !ev.extract_retrieved_at) {
+      ev.extract_retrieved_at = (ev.retrieved_at ?? new Date().toISOString()).slice(0, 10);
+    }
+  } else if (lead?.extract) {
     ev.extract = lead.extract;
     ev.extract_retrieved_at = lead.retrieved_at.slice(0, 10);
   } else if (ev.extract && !ev.extract_retrieved_at) {

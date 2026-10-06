@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { playRestart, playStep } from "../lib/playback";
 import { checkTypedYear, handleForDirection, keyTarget, moveHandle, pickHandle } from "../lib/rangeSlider";
@@ -37,9 +37,27 @@ const PLAY_MODES = [
 
 const HANDLE_NAME = { start: "Start year", end: "End year" };
 
-export default function Timeline({ startYear, endYear, onChangeRange, eventCountsByYear, eventYear = null }) {
+const countText = (n) => `${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"}`;
+
+// Memoized (export below): hovering a list row re-renders App, which must not
+// redraw ~130 density bars. The play state lives in App so the side panel can
+// hold its live announcements while Play runs: "playing", "paused" (by the
+// button, or at the last year) or "stopped" (the range was changed by hand).
+// `borderYear` (non-null while an open event's year drives the map borders)
+// adjusts the help text; `eventYear` marks the open event on the strip.
+
+function Timeline({
+  startYear,
+  endYear,
+  onChangeRange,
+  eventCountsByYear,
+  eventYear = null,
+  borderYear = null,
+  playState,
+  onPlayStateChange: setPlayState,
+}) {
   const maxCount = Math.max(1, ...Object.values(eventCountsByYear));
-  const [playing, setPlaying] = useState(false);
+  const playing = playState === "playing";
   const [playMode, setPlayMode] = useState("accumulate");
   const [active, setActive] = useState(null); // "start" | "end" while dragged/focused
   const [editing, setEditing] = useState(false);
@@ -66,14 +84,14 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
       const cur = latest.current;
       const next = playStep(cur.startYear, cur.endYear, playMode);
       if (!next) {
-        setPlaying(false);
+        setPlayState("paused");
         return;
       }
       cur.onChangeRange(next[0], next[1]);
-      if (next[1] >= MAX_YEAR) setPlaying(false);
+      if (next[1] >= MAX_YEAR) setPlayState("paused");
     }, PLAY_INTERVAL_MS);
     return () => clearTimeout(id);
-  }, [playing, endYear, playMode]);
+  }, [playing, endYear, playMode, setPlayState]);
 
   function setHandle(handle, year) {
     const cur = latest.current;
@@ -83,15 +101,15 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
 
   function togglePlay() {
     if (playing) {
-      setPlaying(false);
+      setPlayState("paused");
       return;
     }
     if (endYear >= MAX_YEAR) onChangeRange(...playRestart(startYear, endYear, playMode));
-    setPlaying(true);
+    setPlayState("playing");
   }
 
   function applyPreset(p) {
-    setPlaying(false);
+    setPlayState("stopped");
     onChangeRange(p.start, p.end);
   }
 
@@ -120,7 +138,7 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
   function handlePointerDown(e) {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     e.preventDefault(); // no text selection or touch scrolling while dragging
-    setPlaying(false);
+    setPlayState("stopped");
     const g = geometry();
     const pos = posAt(g, e.clientX);
     const cur = latest.current;
@@ -161,7 +179,7 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
     const g = geometry();
     const y = Math.round(posAt(g, e.clientX));
     if (y < MIN_YEAR || y > MAX_YEAR) return;
-    setPlaying(false);
+    setPlayState("stopped");
     onChangeRange(y, y);
   }
 
@@ -170,7 +188,7 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
     const target = keyTarget(e.key, value);
     if (target == null) return;
     e.preventDefault();
-    setPlaying(false);
+    setPlayState("stopped");
     setHandle(handle, target);
   }
 
@@ -182,6 +200,9 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
   );
 
   const showEventMarker = eventYear != null && eventYear >= MIN_YEAR && eventYear <= MAX_YEAR;
+  // While an event is open the map may show that event's year (App borderYear).
+  const bordersText =
+    borderYear != null ? `Borders show ${borderYear}, the open event's year` : "Borders show the end year";
 
   return (
     <section
@@ -195,7 +216,6 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
             type="button"
             className="timeline-play"
             onClick={togglePlay}
-            aria-pressed={playing && endYear < MAX_YEAR}
             aria-label={
               playMode === "slide"
                 ? playing
@@ -256,14 +276,14 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
           </button>
         </div>
         <p className="timeline-help" id="timeline-help">
-          Borders show the end year.
+          {bordersText}.
         </p>
         {editing ? (
           <YearEditor
             startYear={startYear}
             endYear={endYear}
             onChangeRange={(s, e) => {
-              setPlaying(false);
+              setPlayState("stopped");
               onChangeRange(s, e);
             }}
             onClose={closeEditor}
@@ -297,7 +317,7 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
                   className={
                     "timeline-tick" + (y >= startYear && y <= endYear ? " timeline-tick--active" : "")
                   }
-                  title={`${y}: ${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"} starting. Click to move the nearest handle here, double-click to show only ${y}.`}
+                  title={`${y}: ${countText(n)} starting. Click to move the nearest handle here, double-click to show only ${y}.`}
                 >
                   <span className="timeline-tick-bar" style={{ height: `${10 + 80 * (n / maxCount)}%` }} />
                 </div>
@@ -336,10 +356,10 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
                 aria-valuemin={MIN_YEAR}
                 aria-valuemax={MAX_YEAR}
                 aria-valuenow={value}
-                aria-valuetext={`${HANDLE_NAME[h]} ${value}`}
+                aria-valuetext={`${HANDLE_NAME[h]} ${value}, ${countText(eventCountsByYear[value] ?? 0)} starting that year`}
                 aria-orientation="horizontal"
                 aria-describedby="timeline-help"
-                title={`Drag to choose the ${h} year; borders show the end year.`}
+                title={`Drag to choose the ${h} year; ${bordersText.toLowerCase()}.`}
                 className={`timeline-handle timeline-handle--${h}` + (active === h ? " timeline-handle--active" : "")}
                 style={{ "--tl-pos": h === "start" ? "var(--tl-start)" : "var(--tl-end)" }}
                 onKeyDown={(e) => handleKeyDown(h, e)}
@@ -355,6 +375,8 @@ export default function Timeline({ startYear, endYear, onChangeRange, eventCount
     </section>
   );
 }
+
+export default memo(Timeline);
 
 // The presets scroll sideways when they don't fit. A fade on the clipped side
 // shows there is more, and the mouse wheel scrolls them sideways too.

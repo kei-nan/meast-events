@@ -2,6 +2,7 @@
 // A fix is applied ONLY to a listed Wikidata item, after the discrepancy was checked against
 // live Wikipedia + Wikidata (2026-09-26). Everything not listed is at most FLAGGED, never changed.
 // ids are never changed.
+import { precisionName } from "./wiki.js";
 export const DATA_FIXES = [
   {
     qid: "Q2479435",
@@ -86,6 +87,36 @@ DATA_FIXES.push(
   }
 );
 
+// F7: a month-precision Wikidata P585 ("2023-10", stored as the 1st) won the pipeline's COALESCE(P585, P580) over the
+// item's day-precision P580. Wikipedia and Wikidata P580 agree on the day (checked live 2026-10-04).
+DATA_FIXES.push({
+  qid: "Q122976243",
+  ref: "F7",
+  set: { date_start: "2023-10-07" },
+  note:
+    "October 7 attacks: stored date_start 2023-10-01 was Wikidata P585 2023-10 (month precision) pinned to the 1st. " +
+    'Wikidata P580 = 2023-10-07 (day precision); the Wikipedia infobox reads "October 7–8, 2023" and the lead "On October 7, 2023" ' +
+    "(checked 2026-10-04). date_start = P580. date_end (P582 2023-10-09; infobox 8 October) is not changed: the sources differ",
+});
+
+// F8: the same pattern as F7 in four more events, found by the month_precision_day_in_lead flag. In each, Wikidata
+// P580 (day precision) and the Wikipedia infobox give the same start day (checked live 2026-10-04); date_end unchanged.
+for (const [qid, date, label, infobox] of [
+  ["Q2009640", "1999-12-24", "Indian Airlines Flight 814", "24 December 1999 – 31 December 1999"],
+  ["Q120201630", "2023-07-03", "July 2023 Jenin incursion", "3–5 July 2023"],
+  ["Q123014721", "2023-10-07", "Zikim attack", "7 October 2023"],
+  ["Q131401087", "2024-12-07", "Fall of Damascus (2024)", "7–8 December 2024"],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F8",
+    set: { date_start: date },
+    note:
+      `${label}: stored date_start was Wikidata P585 (month precision) pinned to the 1st. Wikidata P580 = ${date} (day precision); ` +
+      `the Wikipedia infobox reads "${infobox}" (checked 2026-10-04). date_start = P580`,
+  });
+}
+
 export const FIXES_BY_QID =new Map(DATA_FIXES.map((f) => [f.qid, f]));
 
 // Applies the ledger entry for event.wikidata_qid (if any). Returns the changed field names.
@@ -105,6 +136,24 @@ export function applyDataFix(event) {
     event.needs_review = true;
   }
   return changed;
+}
+
+const normWdTime = (t) => String(t ?? "").replace(/-00(?=-|$)/g, "-01"); // Wikidata "1940-00-00" is stored as 1940-01-01
+
+// Precision of the date the event actually KEEPS as date_start: the Wikidata P585/P580 statement whose value is that
+// date. An exact match wins over a match only after the "-00" -> "-01" normalisation (so a day-precision 2023-10-01
+// beats a month-precision 2023-10); within each, P585 before P580 (the discovery query's COALESCE order).
+// Returns { code, name, property } or null when no statement of the item has that value (the date then did not
+// come from Wikidata, e.g. a ledger date taken from the Wikipedia infobox, and no precision can be derived).
+export function keptDatePrecision(entity, dateStart) {
+  if (!entity || !dateStart) return null;
+  const vals = [
+    ...(entity.p585 ?? []).map((v) => ({ ...v, property: "P585" })),
+    ...(entity.p580 ?? []).map((v) => ({ ...v, property: "P580" })),
+  ];
+  const hit = vals.find((v) => v.time === dateStart) ?? vals.find((v) => normWdTime(v.time) === dateStart);
+  if (!hit) return null;
+  return { code: hit.precision, name: precisionName(hit.precision), property: hit.property };
 }
 
 // Rule for Wikidata "point in time" (P585) mis-used as a range bound. The pipeline's date is

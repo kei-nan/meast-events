@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { loadAllLite, normalizeEvents } from "../lib/dataClient";
 
-const RETRY_MS = 20000;
+// How often an unreachable source is retried (here and App's full-text index).
+export const RETRY_MS = 20000;
 
 // Owns the event store: a ref-held Map of every event (lite records; a record
 // gains its full lead when one arrives), filled ONCE from the static

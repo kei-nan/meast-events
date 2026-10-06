@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { areaToParam, parseArea, parseUrlState, serializeUrlState, YEAR_MAX } from "./urlState.js";
+import { areaToParam, parseArea, parseUrlState, serializeUrlState, urlWriteMode, YEAR_MAX } from "./urlState.js";
 
 const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
 
@@ -88,4 +88,19 @@ test("the last year follows the clock, not a fixed year", () => {
   assert.equal(YEAR_MAX, new Date().getUTCFullYear());
   assert.deepEqual(parseUrlState(`?y=2000-${YEAR_MAX}`).years, [2000, YEAR_MAX]);
   assert.equal(parseUrlState(`?y=2000-${YEAR_MAX + 1}`).years, null);
+});
+
+test("urlWriteMode: pushes event changes, debounces the rest, replaces on request", () => {
+  assert.equal(urlWriteMode("?e=a", "?e=a"), null);
+  assert.equal(urlWriteMode("", "?e=a"), "push");
+  assert.equal(urlWriteMode("?e=a", "?e=b"), "push");
+  assert.equal(urlWriteMode("?e=a", ""), "push");
+  assert.equal(urlWriteMode("", "?about=1"), "push");
+  assert.equal(urlWriteMode("?e=a", "?e=a&q=x"), "debounce");
+  assert.equal(urlWriteMode("?y=1900-1950", "?y=1900-1960"), "debounce");
+  // Clearing an unresolvable deep link overwrites it instead of adding an entry.
+  assert.equal(urlWriteMode("?e=bogus", "", { replace: true }), "replace");
+  assert.equal(urlWriteMode("?q=x&e=bogus", "?q=x", { replace: true }), "replace");
+  // The flag only matters for event changes.
+  assert.equal(urlWriteMode("?q=x", "?q=y", { replace: true }), "debounce");
 });

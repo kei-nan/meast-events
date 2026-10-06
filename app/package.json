@@ -12,7 +12,9 @@
     "prebuild": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node scripts/build-event-pages.mjs",
     "lint": "oxlint",
+    "test": "node --test \"src/lib/*.test.js\" \"scripts/*.test.mjs\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -29,6 +31,7 @@
     "fontaine": "^1.0.0",
     "oxlint": "^1.86.0",
     "pagefind": "^1.5.2",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "wrangler": "4.147.0"
   }
 }

@@ -7,6 +7,98 @@ import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
+import { wikidataUrl } from "../lib/partOf.js";
+
+// Children shown before "Show all N".
+const INCLUDES_SHOWN = 8;
+
+const eventHref = (id) => `${import.meta.env.BASE_URL}?e=${encodeURIComponent(id)}`;
+
+// A link to another event in the app: a real link (new tab, copy link work), but a
+// plain click or Enter opens it in place through the app's own selection.
+function EventLink({ id, onSelectEvent, children }) {
+  return (
+    <a
+      href={eventHref(id)}
+      onClick={(e) => {
+        if (!onSelectEvent || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        onSelectEvent(id);
+      }}
+    >
+      {children}
+    </a>
+  );
+}
+
+// Wikidata's "part of" (P361), as Wikidata gives it (lib/partOf.js): its labels,
+// unchanged. A parent that is one of our events links to it; any other parent
+// is plain text with a small link to its Wikidata item.
+function PartOf({ parents, onSelectEvent }) {
+  if (!parents?.length) return null;
+  return (
+    <p className="event-detail-partof">
+      Part of:{" "}
+      {parents.map((p, i) => {
+        const wd = !p.id && wikidataUrl(p.qid);
+        return (
+          <span key={p.qid}>
+            {i > 0 && ", "}
+            {p.id ? (
+              <EventLink id={p.id} onSelectEvent={onSelectEvent}>
+                {p.label}
+              </EventLink>
+            ) : (
+              <>
+                {p.label}
+                {wd && (
+                  <>
+                    {" "}
+                    <a className="event-detail-wd" href={wd} target="_blank" rel="noreferrer">
+                      Wikidata<span aria-hidden="true"> ↗</span>
+                      <span className="sp-sr-status"> item for {p.label} (opens in a new tab)</span>
+                    </a>
+                  </>
+                )}
+              </>
+            )}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
+
+// The events in this dataset that Wikidata lists as part of this one, oldest first.
+function Includes({ event, onSelectEvent, showAll, onShowAll }) {
+  const list = event.includes;
+  if (!list?.length) return null;
+  const clamps = list.length > INCLUDES_SHOWN;
+  const shown = clamps && !showAll ? list.slice(0, INCLUDES_SHOWN) : list;
+  const listId = "event-detail-includes";
+  return (
+    <section className="event-detail-includes" aria-labelledby={`${listId}-title`}>
+      <h3 id={`${listId}-title`}>
+        Includes {list.length === 1 ? "1 event" : `${list.length} events`} in this dataset
+      </h3>
+      <ul id={listId}>
+        {shown.map((c) => (
+          <li key={c.id}>
+            <EventLink id={c.id} onSelectEvent={onSelectEvent}>
+              {c.title}
+            </EventLink>
+            {c.date_start && <span className="event-detail-includes-year"> {String(c.date_start).slice(0, 4)}</span>}
+          </li>
+        ))}
+      </ul>
+      {clamps && (
+        <button type="button" className="sp-btn" aria-expanded={showAll} aria-controls={listId} onClick={onShowAll}>
+          {showAll ? "Show fewer" : `Show all ${list.length}`}
+        </button>
+      )}
+    </section>
+  );
+}
 
 // What the map shades for an event without a precise location (see
 // countryHighlight.js): its listed countries, with the borders of its year.
@@ -39,14 +131,17 @@ function historyUrl(wikipediaUrl) {
  * `onBack` returns to the results list (the panel restores focus to the row).
  * `onShowOnMap` (optional) collapses the mobile sheet so the map is visible;
  * its button is shown on narrow screens only (SidePanel.css).
+ * `onSelectEvent(id)` opens another event (the "Part of" and "Includes" links).
  */
-export default function EventDetail({ event, onBack, onShowOnMap }) {
+export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent }) {
   const headingRef = useRef(null);
   const [copied, setCopied] = useState(false);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
   // The event whose full lead is open, so the next event starts collapsed.
   const [expandedId, setExpandedId] = useState(null);
+  // The event whose "Includes" list is shown in full.
+  const [allIncludesId, setAllIncludesId] = useState(null);
   // Set when "Read the review" opened the text, to scroll to the review once it has grown.
   const reviewAfterExpand = useRef(false);
 
@@ -174,6 +269,7 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
       <p className="event-detail-meta">
         {dateText} · {(event.countries ?? []).join(", ")}
       </p>
+      <PartOf parents={event.part_of} onSelectEvent={onSelectEvent} />
       {showClasses && (
         <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>
       )}
@@ -230,6 +326,12 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
         <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
       )}
       <FramingReview event={event} tab={reviewTab} onTab={openTab} />
+      <Includes
+        event={event}
+        onSelectEvent={onSelectEvent}
+        showAll={allIncludesId === event.id}
+        onShowAll={() => setAllIncludesId(allIncludesId === event.id ? null : event.id)}
+      />
       {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: this event isn&apos;t tied to a single known site, so its
@@ -265,6 +367,7 @@ export default function EventDetail({ event, onBack, onShowOnMap }) {
           " by Wikipedia contributors"
         )}
         .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
+        {event.part_of?.length > 0 && <> &ldquo;Part of&rdquo; is Wikidata&apos;s statement, in its labels (CC0).</>}
       </p>
     </article>
   );

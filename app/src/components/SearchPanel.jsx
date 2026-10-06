@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
 import ResultsList from "./ResultsList.jsx";
@@ -36,6 +37,8 @@ import "../SidePanel.css";
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
+ * @param {"playing"|"paused"|"stopped"} [props.playState] timeline Play: live announcements wait while
+ *                                          "playing"; "paused" (not a manual move) announces where it stopped
  * @param {string[]} [props.categoryOptions] category ids to offer (default: CATEGORY_COLORS keys)
  * @param {string[]} [props.countryOptions]  country names for the select (select hidden when empty)
  * @param {(q:string)=>void}       props.onQueryChange
@@ -45,6 +48,8 @@ import "../SidePanel.css";
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
+ * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
+ *                                          event heading (event open) or the search box: App's skip link
  */
 export default function SearchPanel({
   query,
@@ -61,6 +66,7 @@ export default function SearchPanel({
   selectedEvent,
   viewCount,
   range,
+  playState = "stopped",
   categoryOptions,
   countryOptions,
   onQueryChange,
@@ -70,6 +76,7 @@ export default function SearchPanel({
   onSelect,
   onHover,
   onBack,
+  ref,
 }) {
   const inputId = useId();
   const hintId = useId();
@@ -116,6 +123,20 @@ export default function SearchPanel({
     }
   }, [selectedEvent]);
 
+  // The skip link: on mobile the collapsed sheet hides the event, so open the
+  // sheet first (synchronously, so the target is visible) and then focus.
+  useImperativeHandle(
+    ref,
+    () => ({
+      skipTo() {
+        flushSync(() => setSheet("full"));
+        const target = selectedId ? document.getElementById("event-detail-title") : inputRef.current;
+        target?.focus();
+      },
+    }),
+    [selectedId]
+  );
+
   // Mobile: collapse the sheet to its peek bar so the map (already centred on
   // the event) shows; focus moves to the toggle, which reopens the event.
   function showOnMap() {
@@ -155,6 +176,8 @@ export default function SearchPanel({
   ];
   const activeCount = activeChips.length + (area ? 1 : 0);
   const focusFiltersBtn = () => filtersBtnRef.current?.focus();
+  // Stable, so the memoized ResultsList skips App's hover re-renders.
+  const focusInput = useCallback(() => inputRef.current?.focus(), []);
 
   function clearFilters() {
     onFiltersChange({ ...filters, categories: [], countries: [], inView: false, scope: "all" });
@@ -188,50 +211,64 @@ export default function SearchPanel({
   // with "in map view" on, since App only counts the view-trimmed scoped list.
   const allCount = filters.scope === "range" && !filters.inView ? (counts?.all ?? null) : null;
   const plural = (n) => `${n} result${n === 1 ? "" : "s"}`;
+  const settled = !eventsLoading && !loading && searching;
 
-  // statusText goes to the live region; statusExtra is screen-reader-only text
-  // inside it that repeats what the scope button next to it says, so a change
-  // is announced in full without the button itself sitting in the live region.
-  let statusText;
-  let statusExtra = "";
+  // `years` names the selected years: the visible line says "selected years"
+  // (the timeline shows them), the announcement below spells them out.
+  // `extra` repeats what the scope button next to the visible line says, as
+  // screen-reader-only text.
+  function describeStatus(years) {
+    const sel = years ?? "selected years";
+    if (eventsLoading) return { text: "Loading events…", extra: "" };
+    if (loading && interim && results.length > 0)
+      return { text: `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`, extra: "" };
+    if (loading && results.length === 0) return { text: "Searching…", extra: "" };
+    if (!searching) return { text: `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}`, extra: "" };
+    if (filters.scope === "range") return { text: `${plural(total)} in ${sel}`, extra: "" };
+    if (total === 0) return { text: "0 results", extra: "" };
+    if (shownInRange === 0) return { text: `${plural(total)} (none in ${sel})`, extra: "" };
+    if (shownInRange !== null && shownInRange !== total)
+      return { text: plural(total), extra: `, ${shownInRange} in ${sel}` };
+    return { text: plural(total), extra: "" };
+  }
+  const { text: statusText, extra: statusExtra } = describeStatus(null);
+
   // The relevance order is kept in both scopes; this button only switches
   // between listing every match and listing the ones in the selected years.
   let scopeAction = null;
-  const settled = !eventsLoading && !loading && searching;
-  if (eventsLoading) statusText = "Loading events…";
-  else if (loading && interim && results.length > 0)
-    statusText = `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`;
-  else if (loading && results.length === 0) statusText = "Searching…";
-  else if (!searching) statusText = `${total} event${total === 1 ? "" : "s"} in the selected years`;
-  else if (filters.scope === "range") {
-    statusText = `${plural(total)} in selected years`;
-    if (settled && (allCount === null || allCount > total)) {
-      scopeAction = {
-        label: allCount === null ? "show whole timeline" : `show all ${allCount}`,
-        aria: allCount === null ? "Show results from the whole timeline" : `Show all ${plural(allCount)}, whole timeline`,
-        scope: "all",
-      };
-    }
-  } else if (total === 0) statusText = "0 results";
-  else {
-    statusText = plural(total);
-    if (shownInRange === 0) statusText += " (none in selected years)";
-    else if (shownInRange !== null && shownInRange !== total) {
-      statusExtra = `, ${shownInRange} in selected years`;
-      if (settled) {
-        scopeAction = {
-          label: `show the ${shownInRange} in selected years`,
-          aria: null,
-          scope: "range",
-        };
-      }
-    }
+  if (settled && filters.scope === "range" && (allCount === null || allCount > total)) {
+    scopeAction = {
+      label: allCount === null ? "show whole timeline" : `show all ${allCount}`,
+      aria: allCount === null ? "Show results from the whole timeline" : `Show all ${plural(allCount)}, whole timeline`,
+      scope: "all",
+    };
+  } else if (settled && filters.scope !== "range" && total > 0 && shownInRange && shownInRange !== total) {
+    scopeAction = { label: `show the ${shownInRange} in selected years`, aria: null, scope: "range" };
   }
+
+  // Screen reader announcements. The visible status line is not a live region:
+  // Play changes it every 350 ms. This hidden one stays empty while Play runs
+  // and speaks once when it is paused ("Paused at 1967. ..."), and after
+  // manual changes (a slider moved during Play included), naming the years.
+  const playing = playState === "playing";
+  const rangeKey = `${range[0]}-${range[1]}`;
+  const [prevPlayState, setPrevPlayState] = useState(playState);
+  const [pausedAt, setPausedAt] = useState(null); // rangeKey where Play was paused
+  if (playState !== prevPlayState) {
+    setPrevPlayState(playState);
+    setPausedAt(playState === "paused" ? rangeKey : null);
+  }
+  const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
+  const spoken = describeStatus(yearsText);
+  const liveText = playing ? "" : (pausedAt === rangeKey ? `Paused at ${range[1]}. ` : "") + spoken.text + spoken.extra;
 
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}`;
 
   return (
     <aside className="side-panel" data-sheet={sheet} aria-label="Search and event details">
+      <p className="sp-sr-status" role="status">
+        {liveText}
+      </p>
       <button
         ref={toggleRef}
         type="button"
@@ -251,7 +288,7 @@ export default function SearchPanel({
               if (e.key === "Escape") onBack();
             }}
           >
-            <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} />
+            <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} onSelectEvent={onSelect} />
           </div>
         )}
 
@@ -319,7 +356,7 @@ export default function SearchPanel({
               Filters{activeCount > 0 ? ` (${activeCount})` : ""}
             </button>
             <div className="sp-statusline">
-              <p className="sp-status" role="status" aria-live="polite">
+              <p className="sp-status">
                 {statusText}
                 {statusExtra && <span className="sp-sr">{statusExtra}</span>}
               </p>
@@ -428,7 +465,7 @@ export default function SearchPanel({
                 selectedId={selectedEvent?.id ?? null}
                 onSelect={onSelect}
                 onHover={onHover}
-                onFocusInput={() => inputRef.current?.focus()}
+                onFocusInput={focusInput}
                 busy={loading}
                 browse={!searching}
               />

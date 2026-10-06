@@ -52,6 +52,40 @@ export function detectTitleChange(event, lead) {
   return { ...rec, kind, hold: null };
 }
 
+// Extract guard: a refreshed lead may replace the stored extract only when the fetched article belongs to the event's
+// own Wikidata item. When the stored URL leads (directly or via a redirect) to an article of ANOTHER item, its lead
+// describes a different subject (a mountain instead of the battle on it, a list article instead of the strike), so
+// the update is held: never applied, only listed. Returns a hold record or null (the update may proceed).
+// An event or article without a QID cannot be compared and is not held for this.
+export function detectExtractHold(event, lead) {
+  if (!lead?.extract || lead.extract === event.extract) return null;
+  if (!event.wikidata_qid || !lead.wikibase_item || lead.wikibase_item === event.wikidata_qid) return null;
+  return {
+    id: event.id,
+    title: event.title,
+    hold: "qid_mismatch",
+    wikidata_qid: event.wikidata_qid,
+    article_qid: lead.wikibase_item,
+    article_title: lead.title,
+    detail: `article "${lead.title}" is Wikidata ${lead.wikibase_item}, the event is ${event.wikidata_qid}; its lead was not copied`,
+  };
+}
+
+// Markdown lines for held extract updates (empty when there are none).
+export function extractHoldReport(held, { name = "curated" } = {}) {
+  if (!held.length) return "";
+  const L = [
+    `### ${name} extracts held: ${held.length}`,
+    "",
+    "Held, not changed: the fetched article belongs to a different Wikidata item than the event, so its lead describes " +
+      "another subject. These need a person's judgement.",
+  ];
+  for (const h of [...held].sort((a, b) => a.id.localeCompare(b.id))) {
+    L.push(`- \`${h.id}\` ("${h.title}"): ${HOLD_TEXT[h.hold]}. ${h.detail}`);
+  }
+  return L.join("\n");
+}
+
 // Second check for `title_stale`: does Wikipedia redirect the stored title to this very article? `oldTitleLead` is the
 // lead record fetched for the stored TITLE (not the URL). If the old title redirects (without a section anchor) to the
 // same page, it is a former name or an accepted alternative name of the article (Wikipedia leaves a redirect behind

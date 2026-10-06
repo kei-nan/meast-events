@@ -35,6 +35,7 @@ import {
   fetchCategories,
   fetchLabels,
   datePrecisionFor,
+  precisionName,
   yearsIn,
 } from "./lib/wiki.js";
 import {
@@ -43,8 +44,22 @@ import {
   dateFlags,
   coordinateFlag,
   duplicateHints,
+  pruneDuplicateHints,
+  monthPrecisionDayFlag,
+  MONTH_DAY_FLAG,
 } from "./lib/flags.js";
+import { keptDatePrecision } from "./lib/fixes.js";
 import { validateEvents } from "./lib/validate.js";
+
+const PRECISION_CODE = Object.fromEntries(Array.from({ length: 15 }, (_, c) => [precisionName(c), c]));
+// Replaces the review reason starting with `prefix` in place (keeps the list order stable across re-runs),
+// removes it when `text` is null, appends it when absent.
+function setReason(list, prefix, text) {
+  const i = list.findIndex((r) => r.startsWith(prefix));
+  if (i >= 0 && text) list[i] = text;
+  else if (i >= 0) list.splice(i, 1);
+  else if (text) list.push(text);
+}
 
 const ENRICH_VERSION = 3;
 const REUSABLE_VERSIONS = [2, 3]; // v2 entries are upgraded by the post-processing step (leads, classes, locations, flags)
@@ -371,14 +386,35 @@ ${m}      `),
     r.review_reasons = r._review;
     // events already merged into the curated file keep the dates as merged (no source reconciliation here)
     finalizeEvent(r, { ...ctx, reconcileDates: !curatedQids.has(r.wikidata_qid) });
+    // date_precision must describe the date actually KEPT (after source reconciliation and the fix ledger), not the
+    // discovery date it may have replaced (e.g. 1948 Arab-Israeli War: decade-precision P585 "1940" replaced by the
+    // day-precision P580 1948-05-15). If the kept date is no Wikidata P585/P580 value, the discovery precision still
+    // applies when the date is the discovery date; otherwise no precision can be derived (null).
+    const kept = keptDatePrecision(ctx.entities.get(r.wikidata_qid), r.date_start);
+    if (kept) r.date_precision = kept.name;
+    else if (!src || r.date_start !== src.date_start) r.date_precision = null;
+    const code = PRECISION_CODE[r.date_precision];
+    setReason(r.review_reasons, "date_precision_coarse",
+      code != null && code < 9 ? `date_precision_coarse: Wikidata records the date only to ${r.date_precision} precision` : null);
+    setReason(r.review_reasons, MONTH_DAY_FLAG, monthPrecisionDayFlag(r));
     r._review = r.review_reasons;
   }
 
   // ---- finalise ----
+  for (const r of results) if (!r.error) r.exclusion_reason = exclusionReason(r);
+  // Duplicate hints may only point at records that are published next to the event: curated events and proposed
+  // events that are neither excluded here nor left out by review (data/proposed-exclusions.json). A hint to a record
+  // that is never published is a dangling id (e.g. october-7-attacks -> ein-hashlosha-massacre, a redirect duplicate
+  // excluded by review).
+  const reviewExcluded = new Set((await loadJson("proposed-exclusions.json")).map((x) => x.id));
+  const published = new Set([
+    ...curated.map((e) => e.id),
+    ...results.filter((r) => !r.exclusion_reason && !reviewExcluded.has(r.id)).map((r) => r.id),
+  ]);
   for (const r of results) {
+    pruneDuplicateHints(r, published, "_review");
     r.review_reasons = r._review;
     r.needs_review = r.review_reasons.length > 0 || (r.date_flags?.length ?? 0) > 0;
-    if (!r.error) r.exclusion_reason = exclusionReason(r);
   }
   const strip = ({ _review, _part_of_qids, ...rest }) => rest;
   const persist = results.map((r) => ({ ...strip(r), _review: r._review, _part_of_qids: r._part_of_qids }));

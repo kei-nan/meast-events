@@ -113,3 +113,90 @@ put them outside the tracked set; the validator now rejects any event without a 
     "March 23 – April 1, 1921". The end agrees with P585, but the start differs (23 vs 26 March).
   - `iraqi-invasion-of-kuwait` (Q856650): Wikidata P580 is 2009-08-02, P582 1990-08-04, no P585; the infobox says "2–4 August 1990".
     Wikidata's start is wrong; with it, the event is not shown when the timeline is set to 1990-1991.
+
+## F7 - October 7 attacks dated 1 October 2023 (`october-7-attacks`, Q122976243)
+
+- Cause: the discovery query's start is COALESCE(P585, P580). The item's P585 (point in time) is `2023-10`, **month** precision;
+  Wikidata stores such a value as `+2023-10-00`, which the query returns as 2023-10-01. So the record said 1 October with
+  `date_precision: "month"`, although the item's own P580 has the day. The F2 rule (`reconcileStartDate`) does not catch it: it only
+  replaces a decade-or-coarser P585, or a P585 equal to the end time.
+- Evidence (checked live 2026-10-04, Wikidata `wbgetentities` and the English Wikipedia article, revision 1378396674):
+  - Wikidata Q122976243: P580 = `+2023-10-07T00:00:00Z` (precision 11, day); P582 = `+2023-10-09T00:00:00Z` (day); P585 = `+2023-10-00T00:00:00Z` (precision 10, month).
+  - Wikipedia infobox: `| date = October 7–8, 2023`; lead: "On October 7, 2023, a series of coordinated armed incursions from the blockaded Gaza Strip ...".
+- Wikipedia and Wikidata's P580 agree on 7 October against our record. -> `date_start: "2023-10-07"` (= P580), applied to both
+  `data/events.json` and `data/events.proposed.json`; `date_precision` follows the kept date (P580, day; see "date_precision" below).
+- Not changed: `date_end` 2023-10-09 (Wikidata P582) vs the infobox's 8 October. The two sources differ, so it stays as Wikidata gives it.
+
+## F8 - four more month-precision start dates pinned to the 1st (same cause as F7)
+
+- Found by the `month_precision_day_in_lead` flag. Same cause as F7: the item's P585 has month precision and won the discovery
+  query's COALESCE(P585, P580) over a day-precision P580.
+- Evidence (checked live 2026-10-04, Wikidata `wbgetentities` and the infobox `date` line of the English Wikipedia article):
+
+| Event (QID) | Stored | Wikidata P580 / P582 / P585 | Wikipedia infobox (revision) | Fix |
+|---|---|---|---|---|
+| Indian Airlines Flight 814 (Q2009640) | 1999-12-01 | 1999-12-24 (day) / 1999-12-31 / 1999-12 (month) | "24 December 1999 – 31 December 1999" (1373675196) | 1999-12-24 |
+| July 2023 Jenin incursion (Q120201630) | 2023-07-01 | 2023-07-03 (day) / 2023-07-05 / 2023-07 (month) | "3–5 July 2023" (1370625180) | 2023-07-03 |
+| Zikim attack (Q123014721) | 2023-10-01 | 2023-10-07 (day) / none / 2023-10 (month) | "7 October 2023" (1377889137) | 2023-10-07 |
+| Fall of Damascus (2024) (Q131401087) | 2024-12-01 | 2024-12-07 (day) / 2024-12-08 / 2024-12 (month) | "7–8 December 2024" (1370617734) | 2024-12-07 |
+
+- In each, Wikipedia and Wikidata's P580 agree on the day against our record. -> `date_start` = P580, applied to both
+  `data/events.json` and `data/events.proposed.json`; `date_precision` follows the kept date (day). `date_end` already matched both
+  sources and is unchanged. The `month_precision_day_in_lead` flag is removed from these four.
+- Not fixed: `2022-gaza-israel-clashes` and `may-2023-gaza-israel-clashes` (also flagged): Wikidata's P580 does not match the day the
+  lead names (per the data-fixes agent's check), so they stay flagged.
+
+## Checks of 2026-10-04 (no data value changed unless stated)
+
+### Three events show another article's lead (`musa-dagh-resistance`, `june-2025-israeli-strikes-on-iran`, `operation-marg-bar-sarmachar`): not fixed
+
+- How it happened: discovery found each item through its English sitelink title. That title is a Wikipedia **redirect** to an article
+  about another Wikidata item, and `enrich-candidates.js` stored the resolved article's URL and lead (it already flagged `qid_mismatch`).
+  The records were created that way in b1b52e9 (2026-09-26) and merged in f0f6c80; later refreshes kept copying the same article's lead.
+- Evidence (checked live 2026-10-04): each item's enwiki sitelink carries the Wikidata badge Q70893996 "sitelink to redirect", and the
+  MediaWiki API (`redirects=1`) resolves it to another item's article:
+
+| Event (QID) | enwiki sitelink | Wikipedia redirects to | That article's item |
+|---|---|---|---|
+| Musa Dagh Resistance (Q19831524, "Battle of Musa Dagh") | Musa Dagh Resistance | Musa Dagh (whole article) | Q1953975, the mountain |
+| June 2025 Israeli strikes on Iran (Q134884640, "Operation Rising Lion") | June 2025 Israeli strikes on Iran | List of attacks during the Twelve-Day War, section "Operation Rising Lion" | Q134961914, a list article |
+| Operation Marg Bar Sarmachar (Q124309366) | Operation Marg Bar Sarmachar | 2024 Iranian missile strikes in Pakistan (whole article) | Q124306685, Iran's strikes of 16 January 2024 |
+
+- So none of the three items has an English article of its own, and there is no lead "of the event's own QID" to restore. The stored
+  leads are the redirect targets' leads, which do describe the event in part (the mountain article: "In 1915, it was the location of a
+  successful Armenian resistance"; the strikes article: "On 18 January, Pakistan conducted retaliatory airstrikes in Iran's Sistan and
+  Baluchestan province"). Choosing a section, or dropping the events, is a judgement call for the owner; they stay flagged (`qid_mismatch`,
+  `title_differs_from_article`).
+- Pipeline guard: `scripts/refresh-extracts.js` now never copies a lead from an article whose Wikidata item differs from the event's QID;
+  such updates are listed as "held" (`detectExtractHold`, `scripts/lib/title-refresh.js`). Before, only the title was held.
+
+### date_precision now describes the kept date
+
+- Cause: `enrich-candidates.js` took the precision from the discovery date (P585 when present), before `reconcileStartDate` or the fix
+  ledger replaced that date. Example: `1948-arab-israeli-war` kept P580 1948-05-15 (day) but said "decade", from the discarded P585 "1940".
+- Pipeline: after source reconciliation and the ledger, `date_precision` is the precision of the item's P585/P580 statement whose value
+  is the kept `date_start` (`keptDatePrecision`, `scripts/lib/fixes.js`); the `date_precision_coarse` note follows it.
+- Regenerated from live Wikidata (2026-10-04) for events that already had the field and whose kept date is a P585/P580 value
+  (5 events, in both files): `1948-arab-israeli-war`, `2024-lebanon-war`, `2025-2026-iranian-protests` decade -> day (P580; their
+  `date_precision_coarse` note removed); `houthi-insurgency` day -> month (F5's P580 2004-06 is month precision); `october-7-attacks`
+  month -> day (F7). No date value changed.
+- Not changed: `german-ottoman-alliance` (1914-08-02) and `armistice-of-erzincan` (1917-12-18): their date is no current P585/P580 value
+  (Wikidata P585 is now 1914-07-20 and 1917-12-05; it was edited after discovery). The 112 legacy seed events have no `date_precision`
+  and none was added.
+
+### New flag: `month_precision_day_in_lead` (flag only)
+
+- A month-precision `date_start` (stored as the 1st) whose Wikipedia lead names an exact day of that same month in its first sentence.
+  In `review_reasons` (not `date_flags`, so the shown date is unchanged). Curated: 6 (`indian-airlines-flight-814`, `july-2023-jenin-incursion`,
+  `zikim-attack`, `fall-of-damascus-2024`, `2022-gaza-israel-clashes`, `may-2023-gaza-israel-clashes`); proposed: the same 6 plus
+  `operation-guardian-of-the-walls` (excluded by review). October 7 attacks would have been the seventh before F7.
+
+### Dangling `possible_duplicates` removed
+
+- `october-7-attacks` -> `ein-hashlosha-massacre`: the hint was computed against every enriched candidate, including the one later left
+  out by review (`proposed-exclusions.json`: a redirect to a section of "October 7 attacks"), and was merged with the event.
+- `2011-bahraini-uprising` -> `bahraini-uprising`: the hint pointed at the legacy seed event that f0f6c80 removed (disambiguation stub) in
+  the same commit that merged this one.
+- Pipeline: `enrich-candidates.js` now keeps only hints to published records (curated events and proposed events that are neither excluded
+  nor in `proposed-exclusions.json`; `pruneDuplicateHints`, `scripts/lib/flags.js`). The two hints and their `possible_duplicate:` notes
+  were removed with that function (curated: both; proposed: the October 7 one).

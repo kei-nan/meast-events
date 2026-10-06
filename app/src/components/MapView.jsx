@@ -6,12 +6,7 @@ import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 // bundle as a real asset (see the comment below and vite.config.js).
 import "maplibre-gl/dist/maplibre-gl-shared.mjs?url";
 import {
-  CATEGORY_COLORS,
-  CLUSTER_COUNT_TEXT,
-  CLUSTER_LABEL_PAINT,
-  CLUSTER_PAINT,
   EMPTY_FC,
-  POINT_PAINT,
   areaGeoJSON,
   eventsToGeoJSON,
   haversineKm,
@@ -20,7 +15,8 @@ import {
   oppositeCorner,
   pointFeature,
 } from "./mapLayers";
-import { BORDER_STYLE, DASHED_EXPR, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
+import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";
+import { readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
 import {
   BoundaryPopup,
   BordersList,
@@ -44,6 +40,7 @@ import {
 } from "../lib/dataClient";
 import { MAP_EXTENT } from "../lib/mapExtent";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
+import { reducedMotion } from "../lib/reducedMotion";
 
 // MapLibre GL resolves its worker script relative to its own module URL at
 // runtime (via a dynamic import.meta.url template), which Vite's static
@@ -67,10 +64,8 @@ if (import.meta.env.PROD) {
 // Our own base style: a sea-colored background and nothing else. Land, borders
 // and events are all added from our own data on load, so the map depends on no
 // third-party tile server, and no modern political layer can leak onto a
-// historical map. Label glyphs (Open Sans Semibold, Apache 2.0; see NOTICE) are
-// served from public/glyphs/ - only the ranges the labels use are shipped.
-// MapLibre needs an absolute glyphs URL.
-const LABEL_FONT = ["Open Sans Semibold"];
+// historical map. Label glyphs (see LABEL_FONT in mapInstallLayers.js) are
+// served from public/glyphs/; MapLibre needs an absolute glyphs URL.
 // A calm, slightly greyed sea (was a bright #d8f2ff). Keep in sync with
 // .map-placeholder in SidePanel.css, which stands in for the map while it loads.
 const SEA_COLOR = "#b9d5e3";
@@ -81,11 +76,6 @@ const BASE_STYLE = {
   layers: [{ id: "background", type: "background", paint: { "background-color": SEA_COLOR } }],
 };
 
-const reducedMotion = () =>
-  typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
-// Points stop clustering above this zoom; identical points then draw as one dot.
-const CLUSTER_MAX_ZOOM = 12;
 // The first-visit hint hides itself after this long (or on the first map interaction).
 const HINT_AUTO_HIDE_MS = 8000;
 
@@ -168,6 +158,8 @@ export default function MapView({
   // hatch React doesn't know to react to on its own.
   const boundaryCacheRef = useRef(new Map()); // decade -> features[]
   const [boundaryVersion, setBoundaryVersion] = useState(0);
+  // The boundary features last sent to the map, to skip identical updates.
+  const appliedBordersRef = useRef(null);
   // {decade|"land", phase: "retrying"|"final"} while a load is failing.
   const [borderError, setBorderError] = useState(null);
   const [displayedYear, setDisplayedYear] = useState(null);
@@ -252,6 +244,8 @@ export default function MapView({
     });
     mapRef.current = map;
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only
+    // Set on unmount; the async load handler checks it after each await.
+    let cancelled = false;
 
     map.on("load", async () => {
       // Land silhouette and the boundary decade covering the initial year are
@@ -265,292 +259,24 @@ export default function MapView({
       // after a backoff) never holds the whole map hostage: layers are built with
       // whatever has arrived and late data is applied by the effects/callback below.
       const landPromise = fetchLand().then((l) => {
-        if (l) map.getSource("land")?.setData(l);
+        if (l && !cancelled) map.getSource("land")?.setData(l);
         return l;
       });
       const [landResult] = await Promise.all([
         Promise.race([landPromise, sleep(1200).then(() => null)]),
         Promise.race([fetchDecade(initialDecade), sleep(1200)]),
       ]);
-      const initialLand = landResult ?? EMPTY_FC;
-      const initialBoundaries = { features: boundaryCacheRef.current.get(initialDecade) ?? [] };
-
-      // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
-      // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth 1:50m land
-      // polygons - pure physical geography with no political information at all, so it
-      // can't introduce modern-border anachronisms. Added first, so it sits below our
-      // own boundaries/events layers and reads as background context.
-      map.addSource("land", {
-        type: "geojson",
-        data: initialLand,
-      });
-
-      map.addLayer(
-        {
-          id: "land-fill",
-          type: "fill",
-          source: "land",
-          paint: { "fill-color": "#e4ded0", "fill-opacity": 0.65 },
-        }
-      );
-
-      map.addSource("boundaries", {
-        type: "geojson",
-        data: boundariesForYear(yearRef.current, initialBoundaries.features),
-      });
-
-      map.addLayer(
-        {
-          id: "boundaries-fill",
-          type: "fill",
-          source: "boundaries",
-          paint: { "fill-color": "#8a6f45", "fill-opacity": 0.08 },
-        }
-      );
-
-      map.addLayer({
-        id: "boundaries-line",
-        type: "line",
-        source: "boundaries",
-        paint: {
-          // Solid = source-dated geometry; dashed + darker amber + thicker = a
-          // status flag (mandate/occupation/annexation/dispute). See BORDER_STYLE
-          // and isDashedStatus for the "...-included" exception.
-          "line-color": ["case", DASHED_EXPR, BORDER_STYLE.flagged.color, BORDER_STYLE.solid.color],
-          "line-width": ["case", DASHED_EXPR, BORDER_STYLE.flagged.width, BORDER_STYLE.solid.width],
-          "line-dasharray": [
-            "case",
-            DASHED_EXPR,
-            ["literal", BORDER_STYLE.flagged.dash],
-            ["literal", [1, 0]],
-          ],
-        },
-      });
-
-      map.addSource("boundary-labels", {
-        type: "geojson",
-        data: boundaryLabelsForYear(yearRef.current, initialBoundaries.features),
-      });
-
-      // User-drawn search area: sits under the event markers so they stay clickable.
-      map.addSource("area", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "area-fill",
-        type: "fill",
-        source: "area",
-        paint: { "fill-color": "#2f6f9f", "fill-opacity": 0.16 },
-      });
-      map.addLayer({
-        id: "area-line",
-        type: "line",
-        source: "area",
-        paint: { "line-color": "#1f5a8a", "line-width": 2.5, "line-dasharray": [3, 2] },
-      });
-
-      map.addSource("events", {
-        type: "geojson",
-        data: eventsToGeoJSON(eventsRef.current, matchIdsRef.current),
-        cluster: true,
-        clusterRadius: 40,
-        clusterMaxZoom: CLUSTER_MAX_ZOOM,
-        // Number of search matches inside each cluster (m is 1 for every
-        // feature when no search is active, so nothing dims in that case).
-        // `searching` (s is the same on every feature) tells the count label
-        // whether to show matches or the plain total.
-        clusterProperties: { matches: ["+", ["get", "m"]], searching: ["max", ["get", "s"]] },
-      });
-
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "events",
-        filter: ["has", "point_count"],
-        paint: CLUSTER_PAINT,
-      });
-
-      map.addLayer({
-        id: "unclustered-point",
-        type: "circle",
-        source: "events",
-        filter: ["!", ["has", "point_count"]],
-        paint: POINT_PAINT,
-      });
-
-      // Country labels sit ABOVE the event markers (below only hover/selection) so
-      // markers never hide a state's name. Placement priority = state size (bigger
-      // first) and big states print larger.
-      map.addLayer({
-        id: "boundaries-label",
-        type: "symbol",
-        source: "boundary-labels",
-        layout: {
-          // boundary-labels' "name" property is already the period-appropriate
-          // display name, resolved at ingest time.
-          "text-field": ["get", "name"],
-          "text-font": LABEL_FONT,
-          "text-size": [
-            "interpolate",
-            ["linear"],
-            ["zoom"],
-            2,
-            ["+", 8, ["*", 3, ["get", "big"]]],
-            5,
-            ["+", 11, ["*", 6, ["get", "big"]]],
-            8,
-            ["+", 14, ["*", 8, ["get", "big"]]],
-          ],
-          "symbol-sort-key": ["-", 0, ["get", "area"]],
-          "text-max-width": 7,
-          "text-padding": 2,
-          "symbol-placement": "point",
-          "text-allow-overlap": false,
-          "text-ignore-placement": false,
-        },
-        paint: {
-          "text-color": "#f4f1ea",
-          "text-halo-color": "rgba(15,17,20,0.9)",
-          "text-halo-width": 1.6,
-          "text-halo-blur": 0.3,
-        },
-      });
-
-      // Cluster counts sit above the country labels, so they are placed first
-      // (symbols are placed top layer down) and always drawn: a cluster on
-      // "Syria" or "Kuwait" used to lose its number to the label. They still
-      // take part in collision detection, so a country label that would sit
-      // under a cluster's digits is dropped (it returns on zoom) instead of
-      // being overprinted. A 0-match cluster has no text, so it blocks nothing.
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "events",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": CLUSTER_COUNT_TEXT,
-          "text-font": LABEL_FONT,
-          "text-size": 12,
-          "text-allow-overlap": true,
-          "text-ignore-placement": false,
-        },
-        paint: CLUSTER_LABEL_PAINT,
-      });
-
-      // Hover and selection live in their own (unclustered) sources so the
-      // highlighted event is visible even while its marker sits inside a cluster.
-      map.addSource("hover", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "hover-ring",
-        type: "circle",
-        source: "hover",
-        paint: {
-          "circle-radius": 12,
-          "circle-color": "rgba(255,255,255,0)",
-          "circle-stroke-width": 3,
-          "circle-stroke-color": "#1b1b1b",
-        },
-      });
-
-      // Pointer feedback: a ring on whichever cluster/dot is under the cursor, and a
-      // short-lived flash on a clicked cluster (which then zooms in).
-      map.addSource("pointer-hover", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "pointer-hover",
-        type: "circle",
-        source: "pointer-hover",
-        paint: {
-          "circle-radius": ["get", "r"],
-          "circle-color": "rgba(255,210,90,0.18)",
-          "circle-stroke-width": 3,
-          "circle-stroke-color": "#ffd25a",
-        },
-      });
-      map.addSource("cluster-flash", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "cluster-flash",
-        type: "circle",
-        source: "cluster-flash",
-        paint: {
-          "circle-radius": ["get", "r"],
-          "circle-color": "rgba(255,210,90,0.4)",
-          "circle-stroke-width": 3,
-          "circle-stroke-color": "#ffffff",
-        },
-      });
-
-      map.addSource("selected", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "selected-halo",
-        type: "circle",
-        source: "selected",
-        paint: {
-          "circle-radius": 20,
-          "circle-color": "rgba(255,210,90,0.35)",
-          "circle-stroke-width": 2.5,
-          "circle-stroke-color": "#1b1b1b",
-        },
-      });
-      map.addLayer({
-        id: "selected-point",
-        type: "circle",
-        source: "selected",
-        paint: {
-          "circle-radius": 11,
-          "circle-color": [
-            "case",
-            ["==", ["get", "a"], 1],
-            "#f4f1ea",
-            [
-              "match",
-              ["get", "category"],
-              ...Object.entries(CATEGORY_COLORS).flatMap(([k, v]) => [k, v]),
-              "#6b6151",
-            ],
-          ],
-          "circle-stroke-width": 4,
-          "circle-stroke-color": [
-            "case",
-            ["==", ["get", "a"], 1],
-            [
-              "match",
-              ["get", "category"],
-              ...Object.entries(CATEGORY_COLORS).flatMap(([k, v]) => [k, v]),
-              "#6b6151",
-            ],
-            "#ffffff",
-          ],
-        },
-      });
-
-      map.addSource("area-handles", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "area-handles",
-        type: "circle",
-        source: "area-handles",
-        paint: {
-          "circle-radius": ["case", ["==", ["get", "kind"], "center"], 5, 8],
-          "circle-color": "#ffffff",
-          "circle-stroke-width": 3,
-          "circle-stroke-color": "#1f5a8a",
-        },
-      });
-      map.addSource("area-label", { type: "geojson", data: EMPTY_FC });
-      map.addLayer({
-        id: "area-label",
-        type: "symbol",
-        source: "area-label",
-        layout: {
-          "text-field": ["get", "text"],
-          "text-font": LABEL_FONT,
-          "text-size": 13,
-          "text-offset": [0, -2.1],
-          "text-allow-overlap": true,
-          "text-ignore-placement": true,
-        },
-        paint: {
-          "text-color": "#12385a",
-          "text-halo-color": "rgba(255,255,255,0.95)",
-          "text-halo-width": 2,
-        },
+      // Unmounted while the data was loading: the map is already removed.
+      if (cancelled) return;
+      const initialFeatures = boundaryCacheRef.current.get(initialDecade) ?? [];
+      const boundaries = boundariesForYear(yearRef.current, initialFeatures);
+      appliedBordersRef.current = boundaries.features;
+      installLayers(map, {
+        land: landResult ?? EMPTY_FC,
+        boundaries,
+        // Already filtered to the year, so the labels' own filter keeps them all.
+        labels: boundaryLabelsForYear(yearRef.current, boundaries.features),
+        events: eventsToGeoJSON(eventsRef.current, matchIdsRef.current),
       });
 
       const pointerCursor = (on) => () => {
@@ -621,6 +347,7 @@ export default function MapView({
         // lists its events instead of zooming in to a single unclickable dot.
         const leaves =
           count <= LIST_MAX ? await source.getClusterLeaves(clusterId, LIST_MAX, 0).catch(() => null) : null;
+        if (cancelled) return;
         const action = clusterClickAction({ count, expansionZoom: expansion, clusterMaxZoom: CLUSTER_MAX_ZOOM, leaves });
         if (action === "list" && leaves?.length) return openStack(e, leaves, count);
         map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 });
@@ -657,7 +384,10 @@ export default function MapView({
       setMapReady(true);
     });
 
-    return () => map.remove();
+    return () => {
+      cancelled = true;
+      map.remove();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -691,8 +421,19 @@ export default function MapView({
     const decade = decadeFloor(year);
     const features = boundaryCacheRef.current.get(decade);
     if (!features) return;
-    mapRef.current.getSource("boundaries")?.setData(boundariesForYear(year, features));
-    mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year, features));
+    // Most years (every Play step) leave the same borders active: re-sending
+    // identical data would make MapLibre re-tile every polygon for nothing. The
+    // cached feature objects are stable, so comparing them by identity is enough.
+    const active = boundariesForYear(year, features);
+    const prev = appliedBordersRef.current;
+    const unchanged =
+      prev && prev.length === active.features.length && active.features.every((f, i) => f === prev[i]);
+    if (!unchanged) {
+      appliedBordersRef.current = active.features;
+      mapRef.current.getSource("boundaries")?.setData(active);
+      // Already filtered to the year, so the labels' own filter keeps them all.
+      mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year, active.features));
+    }
     setDisplayedYear(year);
   }, [year, boundaryVersion, mapReady]);
 

@@ -31,6 +31,10 @@ const REGION_ENTITIES = [
   "Saudi Arabia",
   "Yemen (Arab Republic of Yemen)",
   "Yemen, People's Republic of",
+  // South Arabia under British rule, before South Yemen's independence in 1967.
+  "Aden",
+  "East Aden Protectorate",
+  "Federation of South Arabia",
   "Kuwait",
   "Bahrain",
   "Qatar",
@@ -223,8 +227,9 @@ async function main() {
       if (!main) throw new Error(`reshape: no piece of ${r.geometry} contains keepPoint`);
       shape = turf.polygon(main);
     }
-    // Rounding can make two neighbouring points identical (a zero-length edge); drop those.
-    correctionsGeometry[r.geometry] = turf.cleanCoords(turf.truncate(shape, { precision: 5, coordinates: 2 })).geometry;
+    // Coordinates keep full source precision - never rounded. cleanCoords only drops
+    // repeated or redundant vertices the cuts can leave behind.
+    correctionsGeometry[r.geometry] = turf.cleanCoords(shape).geometry;
   }
   for (const c of CORRECTIONS) {
     if (c.type !== "add") continue;
@@ -311,9 +316,72 @@ function cutBeyondCoastEnd(shape, countryGeometry, [border, coastEnd], keepPoint
   return turf.difference(turf.featureCollection([shape, far])) ?? shape;
 }
 
+// The polygon operations work in exact floating point, so a part they add can end up
+// touching the rest along an edge that is collinear only to ~1e-16 degrees: the result is
+// a MultiPolygon whose parts share an edge (drawn as a line inside the country), or keeps
+// zero-area there-and-back spikes. Coordinates are never rounded to fix this (border
+// precision rule). Instead: a vertex of one part lying within NODE_EPS_DEG of another
+// part's edge is inserted into that edge (its exact coordinates; the edge moves by less
+// than NODE_EPS_DEG), so the shared stretch becomes exactly shared and a union dissolves
+// it; then parts under SLIVER_MAX_M2 - zero-area spikes, not territory - are dropped.
+const NODE_EPS_DEG = 1e-9; // ~0.1 mm
+const SLIVER_MAX_M2 = 1;
+function segDistDeg(p, a, b) {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const len2 = dx * dx + dy * dy;
+  const t = len2 ? ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2 : 0;
+  if (t <= 0 || t >= 1) return Infinity; // only the edge's interior
+  return Math.hypot(a[0] + t * dx - p[0], a[1] + t * dy - p[1]);
+}
+function nodeRing(ring, points) {
+  const out = [ring[0]];
+  for (let i = 1; i < ring.length; i++) {
+    const a = ring[i - 1];
+    const b = ring[i];
+    const on = points
+      .filter((p) => !(p[0] === a[0] && p[1] === a[1]) && !(p[0] === b[0] && p[1] === b[1]) && segDistDeg(p, a, b) < NODE_EPS_DEG)
+      .sort((p, q) => Math.hypot(p[0] - a[0], p[1] - a[1]) - Math.hypot(q[0] - a[0], q[1] - a[1]));
+    out.push(...on, b);
+  }
+  return out;
+}
+function dissolveParts(geometry, label) {
+  let parts = geometry.type === "MultiPolygon" ? geometry.coordinates : [geometry.coordinates];
+  if (parts.length > 1) {
+    const noded = parts.map((rings, i) => {
+      const others = parts.flatMap((r, j) => (j === i ? [] : r.flat()));
+      return rings.map((ring) => nodeRing(ring, others));
+    });
+    const merged = turf.getGeom(turf.union(turf.featureCollection(noded.map((rings) => turf.polygon(rings)))));
+    parts = merged.type === "MultiPolygon" ? merged.coordinates : [merged.coordinates];
+  }
+  const kept = parts.filter((rings) => {
+    const m2 = turf.area(turf.polygon(rings));
+    if (m2 < SLIVER_MAX_M2 && parts.length > 1) {
+      console.log(`  ${label}: dropped a ${m2.toFixed(3)} m2 sliver ${JSON.stringify(rings)}`);
+      return false;
+    }
+    return true;
+  }).map(([outer, ...holes]) => [outer, ...holes.filter((hole) => {
+    const m2 = turf.area(turf.polygon([hole]));
+    if (m2 < SLIVER_MAX_M2) {
+      console.log(`  ${label}: dropped a ${m2.toFixed(3)} m2 sliver hole ${JSON.stringify(hole)}`);
+      return false;
+    }
+    return true;
+  })]);
+  return kept.length === 1 ? { type: "Polygon", coordinates: kept[0] } : { type: "MultiPolygon", coordinates: kept };
+}
+
 function fittedGeometry(neighbour, overlay, others, mode, maxGapKm, land, spec) {
+  const label = `${neighbour.properties.name} ${neighbour.properties.start_year}-${neighbour.properties.end_year}`;
+  return dissolveParts(fittedGeometryRaw(neighbour, overlay, others, mode, maxGapKm, land, spec), label);
+}
+
+function fittedGeometryRaw(neighbour, overlay, others, mode, maxGapKm, land, spec) {
   if (mode === "contain") {
-    return turf.truncate(turf.union(fc(neighbour, overlay)), { precision: 5, coordinates: 2 }).geometry;
+    return turf.getGeom(turf.union(fc(neighbour, overlay)));
   }
   let geom = turf.difference(fc(neighbour, overlay));
   if (!geom) throw new Error(`fit: ${neighbour.properties.name} vanished when clipped`);
@@ -344,7 +412,8 @@ function fittedGeometry(neighbour, overlay, others, mode, maxGapKm, land, spec) 
       : [];
     for (const piece of onLand) geom = turf.union(fc(geom, piece));
   }
-  return turf.truncate(geom, { precision: 5, coordinates: 2 }).geometry;
+  // Full precision: the fitted geometry is never rounded (see the border-precision rule).
+  return turf.getGeom(geom);
 }
 
 function applyFits(features, land) {

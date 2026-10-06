@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
-    "ingest": "node scripts/ingest.js",
+    "test": "node --test \"scripts/lib/*.test.js\"",
+    "validate-boundaries": "node --test scripts/lib/boundary-checks.test.js && node scripts/validate-boundaries.js",
     "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },
   "devDependencies": {

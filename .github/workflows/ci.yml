@@ -21,12 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
           cache-dependency-path: app/package-lock.json
 
@@ -39,25 +39,40 @@ jobs:
         run: npm run lint
 
       # Pure-logic unit tests for the frontend (ranking, geo, URL state, ...).
-      # No dependencies: node's built-in test runner, run from the repo root.
+      # node's built-in test runner; none of them imports the generated
+      # src/lib/dataVersion.js, so they run before the build creates it.
       - name: Unit tests (app/src/lib)
-        run: node --test app/src/lib/*.test.js
+        working-directory: app
+        run: npm test
+
+      # Workers Builds reads app/.nvmrc (its root directory is app/); CI reads
+      # the repo-root .nvmrc. Keep the two identical.
+      - name: Node version files agree
+        run: cmp .nvmrc app/.nvmrc
 
       - name: Build
         working-directory: app
         run: npm run build
+
+      # dist/ holds the content-hashed events file named by the generated
+      # dataVersion.js, consistent ids/meta, and every asset index.html loads.
+      - name: Check dist
+        working-directory: app
+        run: node scripts/check-dist.mjs
 
   data:
     name: Validate event data
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       # Structural checks only (schema, ids, dates, coordinates, extracts) on
       # data/events.json and data/events.proposed.json. No dependencies, no network.
@@ -66,7 +81,7 @@ jobs:
 
       # Pure-logic tests for the data pipeline (fix ledger, validator).
       - name: Unit tests (scripts/lib)
-        run: node --test scripts/lib/*.test.js
+        run: npm test
 
       # Borders vs independent Wikidata reference points (border crossings, tripoints) in
       # data/border-reference-points.json. Fails if any point is now more than 0.25 km
@@ -74,6 +89,11 @@ jobs:
       # years checked there. No network. Report: docs/border-verification.md.
       - name: Install repo-root dependencies (geometry library)
         run: npm ci
+      # data/boundaries.json: required properties, per-name year gaps, overlaps between shapes
+      # shown in the same year (with their unit tests, which need the geometry library).
+      # Fails only on structural errors; gaps and unexpected overlaps are listed as warnings.
+      - name: Validate boundaries
+        run: npm run validate-boundaries
       - name: Border check against reference points
         run: node scripts/verify-borders.js --check
 
@@ -86,12 +106,12 @@ jobs:
         dir: [".", app]
     steps:
       - name: Check out repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version-file: .nvmrc
 
       # BLOCKING for what ships/runs in production: runtime dependencies only
       # (--omit=dev), high or critical advisories only. `npm audit` reads the

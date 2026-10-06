@@ -2,6 +2,7 @@
   --tl-thumb: 28px;
   --tl-h: 34px;
   --tl-btn: 34px;
+  flex: none; /* .app is a fixed-height column: the map shrinks, not this */
   padding: 6px 22px 6px;
   border-top: 1px solid var(--border);
   background: var(--bg-1);
@@ -309,7 +310,7 @@
 
 .timeline-bound {
   flex: none;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
 }
@@ -622,9 +623,6 @@
     padding: 0;
   }
 
-  .timeline-bound {
-    font-size: 0.68rem;
-  }
 
   /* With the article sheet pulled up (SidePanel.css) the timeline shrinks to
      one row, Play, the years and the strip, leaving the reader more of the

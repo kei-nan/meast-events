@@ -46,7 +46,7 @@
 // script does NOT hide those from the output; it ranks by `sitelinks` (the number of
 // distinct Wikipedia-family sites with an article on the item - a real signal
 // Wikidata tracks, not a fabricated one) and separately flags whether an English
-// Wikipedia article exists at all (`has_en_wikipedia` - required for ingest.js to
+// Wikipedia article exists at all (`has_en_wikipedia` - required for enrich-candidates.js to
 // resolve an excerpt/coordinates anyway). MIN_SITELINKS below is a **starting
 // guess**, not a validated cutoff - see the discussion in the run report for why 5
 // was chosen and what it trades off. Candidates below the threshold are still
@@ -290,7 +290,7 @@ main();
 //   development turned up at least one item (the Iraqi invasion of Kuwait) carrying a
 //   P585 "point in time" statement dated to the wrong year entirely. This script does
 //   not attempt to sanity-check dates against Wikipedia prose; a human reviewer (or a
-//   future ingest.js-style cross-check against the Wikipedia summary) needs to.
+//   the date flags enrich-candidates.js adds from the Wikipedia lead) needs to.
 // - Sitelink count and "has an English Wikipedia article" are proxies for notability,
 //   not the thing itself - they favor internationally-reported events and modern
 //   events (more languages actively editing) over events that were significant

@@ -1,6 +1,25 @@
+# Line endings: text files are stored with LF in the repo and checked out with
+# LF on every platform (CI, Cloudflare's build and Windows clones alike).
+* text=auto eol=lf
+
+# Binary files: never converted or diffed as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pbf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.gz binary
+*.zip binary
+*.pdf binary
+
 # Files written by scripts rather than by hand. GitHub collapses their diffs by
 # default; the reviewable source is the script or the curated file named here.
-app/src/lib/dataVersion.js linguist-generated=true
 data/boundaries.json linguist-generated=true
 data/corrections-geometry.json linguist-generated=true
 app/src/data/land.json linguist-generated=true
