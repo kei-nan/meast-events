@@ -67,6 +67,36 @@ import * as shapefile from "shapefile";
 
 const dms = (deg, min, sec = 0) => deg + min / 60 + sec / 3600;
 
+// Rounds a (Multi)Polygon to 6 decimals (~10 cm) and drops the vertices that become
+// repeats, ring by ring; a ring left with fewer than 4 positions is dropped (with its
+// polygon, if it is an outer ring) and reported.
+function roundTo6Decimals(geometry, label) {
+  const polys = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+  const roundRing = (ring) => {
+    const rounded = turf.truncate(turf.lineString(ring), { precision: 6, coordinates: 2 }).geometry.coordinates;
+    try {
+      return turf.cleanCoords(turf.polygon([rounded])).geometry.coordinates[0];
+    } catch {
+      return null; // fewer than 4 positions left
+    }
+  };
+  const out = [];
+  polys.forEach((rings, p) => {
+    const kept = [];
+    for (const [r, ring] of rings.entries()) {
+      const clean = roundRing(ring);
+      if (!clean) {
+        console.log(`  ${label}: polygon ${p} ring ${r} (${ring.length} positions, at ${JSON.stringify(ring[0])}) collapsed at 6 decimals - dropped`);
+        if (r === 0) return; // the outer ring takes its polygon (and holes) with it
+        continue;
+      }
+      kept.push(clean);
+    }
+    out.push(kept);
+  });
+  return out.length === 1 ? { type: "Polygon", coordinates: out[0] } : { type: "MultiPolygon", coordinates: out };
+}
+
 function pointInRing(pt, ring) {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
@@ -331,19 +361,20 @@ async function main() {
     const merged = unionAll(feats);
     osloAreasKm2[key] = turf.area(merged) / 1e6;
     osloTotalKm2 += osloAreasKm2[key];
-    // ~0.001 degrees is ~100m, far below anything visible at this map's zoom levels.
-    // Keeps the three shapes to ~290KB combined while holding every area to within 0.5%
-    // of the unsimplified source (checked below).
-    const simplified = turf.simplify(merged, { tolerance: 0.001, highQuality: true, mutate: false });
-    osloGeometry[key] = turf.truncate(simplified, { precision: 5, coordinates: 2 }).geometry;
+    // Never simplified. Coordinates are rounded to 6 decimals (~10 cm, the precision
+    // CShapes itself uses): OCHA's 14-15 decimals past that are floating-point noise.
+    // Rounding can make neighbouring vertices identical - cleanCoords drops those - and
+    // a tiny ring can collapse below a valid polygon (4 positions); such rings are dropped
+    // and reported.
+    osloGeometry[key] = roundTo6Decimals(turf.getGeom(merged), key);
   }
 
-  console.log("Oslo II area shares (computed from the unsimplified OCHA geometry):");
+  console.log("Oslo II area shares (OCHA geometry; rounded shape's area in brackets):");
   for (const [key, km2] of Object.entries(osloAreasKm2)) {
-    const simplifiedKm2 = turf.area(turf.feature(osloGeometry[key])) / 1e6;
+    const roundedKm2 = turf.area(turf.feature(osloGeometry[key])) / 1e6;
     console.log(
       `  ${key}: ${km2.toFixed(1)} km2 = ${((km2 / osloTotalKm2) * 100).toFixed(1)}% of the West Bank ` +
-        `(${simplifiedKm2.toFixed(1)} km2 after simplification)`
+        `(${roundedKm2.toFixed(3)} km2 at 6 decimals)`
     );
   }
   console.log(`  total: ${osloTotalKm2.toFixed(1)} km2`);
