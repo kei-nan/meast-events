@@ -212,9 +212,9 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 
 The time-driven borders (`data/boundaries.json`) come from CShapes 2.0 plus our documented corrections (`scripts/boundary-corrections.js`).
 CShapes codes independent states and only some colonial dependencies, and the import (`REGION_ENTITIES` in `scripts/ingest-boundaries.js`) takes
-17 of its entities. A territory with no shape for a year is simply blank on the map that year: we do not draw a border we have no source for.
+20 of its entities. A territory with no shape for a year is simply blank on the map that year: we do not draw a border we have no source for.
 The map gives each year to the record in force on 1 July, so a state that CShapes starts in the second half of a year appears the next year.
-Checked on 2026-10-04 by testing a point in each place against every feature for every year 1900-2026:
+Checked on 2026-10-06 by testing a point in each place against every feature for every year 1900-2026:
 
 | Place | No shape in | What CShapes has |
 |---|---|---|
@@ -224,7 +224,7 @@ Checked on 2026-10-04 by testing a point in each place against every feature for
 | Kuwait | 1915-1960 | Inside the Ottoman Empire shape through 1914; Kuwait from 19 Jun 1961 (first map year 1961). The Saudi-Kuwaiti Neutral Zone (our addition) is drawn from 1922. |
 | Bahrain | 1900-1971 | Bahrain from 15 Aug 1971 (first map year 1972). |
 | Qatar | 1900-1916 | Qatar from 3 Nov 1916 (first map year 1917). |
-| Aden and South Arabia (Aden, Mukalla) | 1900-1967 | People's Republic of South Yemen from 30 Nov 1967 (first map year 1968). CShapes does have Aden and the East Aden Protectorate (Apr 1937 - Apr 1962) and the Federation of South Arabia (Apr 1962 - Nov 1967), but they are not among the imported entities, and it has nothing for the area before 1937. |
+| Aden and South Arabia (Aden, Lahij, Mukalla, Seiyun) | 1900-1936 | Nothing for the area before 1937. From 1937 its Aden unit (shown as Aden Colony and Western Aden Protectorate) and East Aden Protectorate (Apr 1937 - Apr 1962, map years 1937-1961), then its Federation of South Arabia (Apr 1962 - Nov 1967, map years 1962-1967; the shape also covers the Protectorate of South Arabia states that never joined), then the People's Republic of South Yemen from 30 Nov 1967 (first map year 1968). |
 
 Everywhere else among the 15 tracked countries a point is covered in every year: Turkey and Iran from before 1900, Egypt from 1899, Iraq, Syria,
 Lebanon, Jordan and Israel/Palestine by the Ottoman Empire shape through 1919 and by mandate or state shapes from 1920, the Trucial States

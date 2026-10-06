@@ -23,7 +23,7 @@ Not every point is a valid reference for every year: a crossing on a border draw
 | 1.59 | [Jordan River Crossing](https://www.wikidata.org/wiki/Q2671245) (Q2671245) | international bridge | Israel, Jordan | Israel / Jordan |
 | 1.34 | [Upper customs house](https://www.wikidata.org/wiki/Q6968100) (Q6968100) | custom house | Israel | Golan Heights (annexed by Israel) / Israel |
 | 0.94 | [Markaz Ḩudūd Jābir](https://www.wikidata.org/wiki/Q125947142) (Q125947142) | border checkpoint | Jordan | Jordan / Syria |
-| 0.92 | [Tarqumiyah Crossing](https://www.wikidata.org/wiki/Q68036408) (Q68036408) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.94 | [Tarqumiyah Crossing](https://www.wikidata.org/wiki/Q68036408) (Q68036408) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.88 | [Iraq–Jordan–Syria tripoint](https://www.wikidata.org/wiki/Q27404153) (Q27404153) | international tripoint | Iraq, Jordan, Syria | Jordan / Syria |
 | 0.76 | [Daughters of Jacob Bridge](https://www.wikidata.org/wiki/Q2916595) (Q2916595) | international bridge | Israel | Golan Heights (annexed by Israel) / Israel |
 | 0.70 | [Jbara checkpoint](https://www.wikidata.org/wiki/Q82015864) (Q82015864) | border checkpoint | Israel, Palestine | Israel / West Bank Area B (Palestinian civil, joint security) |
@@ -43,22 +43,22 @@ Not every point is a valid reference for every year: a crossing on a border draw
 | 0.21 | [Kerem Shalom border crossing](https://www.wikidata.org/wiki/Q6393780) (Q6393780) | border checkpoint | Israel, Palestine | Gaza Strip (ceasefire, divided at the Yellow Line) / Israel |
 | 0.17 | [Turaibil Border Crossing](https://www.wikidata.org/wiki/Q20422539) (Q20422539) | border crossing | Iraq | Iraq / Jordan |
 | 0.15 | [Nitzana Border Crossing](https://www.wikidata.org/wiki/Q2386965) (Q2386965) | international bridge | Egypt, Israel | Egypt / Israel |
+| 0.14 | [Taybeh crossing](https://www.wikidata.org/wiki/Q81216532) (Q81216532) | border checkpoint | Israel, Palestine | Israel / West Bank Area C (Israeli control) |
 | 0.14 | [Egypt–Gaza Strip–Israel tripoint](https://www.wikidata.org/wiki/Q27396528) (Q27396528) | international tripoint | Egypt, Gaza Strip, Israel | Egypt / Israel |
-| 0.13 | [Taybeh crossing](https://www.wikidata.org/wiki/Q81216532) (Q81216532) | border checkpoint | Israel, Palestine | Israel / West Bank Area C (Israeli control) |
 | 0.13 | [Menachem Begin-Taba Border Crossing](https://www.wikidata.org/wiki/Q2386953) (Q2386953) | border checkpoint | Egypt, Israel | Egypt / Israel |
 | 0.12 | [Wadi Araba Crossing](https://www.wikidata.org/wiki/Q2559756) (Q2559756) | border checkpoint | Israel, Jordan | Israel / Jordan |
-| 0.11 | [Mehola checkpoint](https://www.wikidata.org/wiki/Q68036403) (Q68036403) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
-| 0.10 | [King Abdullah Bridge](https://www.wikidata.org/wiki/Q6411207) (Q6411207) | border checkpoint | Jordan, Palestine | Jordan / West Bank Area C (Israeli control) |
+| 0.10 | [Mehola checkpoint](https://www.wikidata.org/wiki/Q68036403) (Q68036403) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.09 | [King Abdullah Bridge](https://www.wikidata.org/wiki/Q6411207) (Q6411207) | border checkpoint | Jordan, Palestine | Israel / West Bank Area C (Israeli control) |
 | 0.08 | [Mazmoria checkpoint](https://www.wikidata.org/wiki/Q133815419) (Q133815419) | border checkpoint | Israel | Israel / West Bank Area B (Palestinian civil, joint security) |
-| 0.06 | [Allenby Bridge](https://www.wikidata.org/wiki/Q712133) (Q712133) | international bridge | Jordan, Palestine | Jordan / West Bank Area C (Israeli control) |
-| 0.04 | [104 Border checkpoint (Tulkarm)](https://www.wikidata.org/wiki/Q85114905) (Q85114905) | border checkpoint | Israel, Palestine | Israel / West Bank Area C (Israeli control) |
 | 0.04 | [Israel–Jordan–West Bank South tripoint](https://www.wikidata.org/wiki/Q27391865) (Q27391865) | international tripoint | Israel, Jordan, Palestine | Israel / Jordan |
-| 0.04 | [Gilboa Crossing](https://www.wikidata.org/wiki/Q68036399) (Q68036399) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
-| 0.03 | [Mandelbaum Gate](https://www.wikidata.org/wiki/Q731063) (Q731063) | border checkpoint | Israel | Israel / West Bank Area C (Israeli control) |
-| 0.03 | [Israel–Jordan–West Bank North tripoint](https://www.wikidata.org/wiki/Q27391576) (Q27391576) | international tripoint | Israel, Jordan, Palestine | Israel / West Bank Area C (Israeli control) |
+| 0.03 | [104 Border checkpoint (Tulkarm)](https://www.wikidata.org/wiki/Q85114905) (Q85114905) | border checkpoint | Israel, Palestine | Israel / West Bank Area C (Israeli control) |
+| 0.02 | [Gilboa Crossing](https://www.wikidata.org/wiki/Q68036399) (Q68036399) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.02 | [Mandelbaum Gate](https://www.wikidata.org/wiki/Q731063) (Q731063) | border checkpoint | Israel | Israel / West Bank Area C (Israeli control) |
 | 0.02 | [Gate 96](https://www.wikidata.org/wiki/Q137572922) (Q137572922) | border checkpoint | Israel | Gaza Strip (ceasefire, divided at the Yellow Line) / Israel |
 | 0.02 | [Netafim Border Crossing](https://www.wikidata.org/wiki/Q2560585) (Q2560585) | border checkpoint | Egypt | Egypt / Israel |
-| 0.02 | [Meitar Crossing](https://www.wikidata.org/wiki/Q114243522) (Q114243522) | border checkpoint | Israel | Israel / West Bank Area C (Israeli control) |
+| 0.02 | [Allenby Bridge](https://www.wikidata.org/wiki/Q712133) (Q712133) | international bridge | Jordan, Palestine | Jordan / West Bank Area C (Israeli control) |
+| 0.01 | [Israel–Jordan–West Bank North tripoint](https://www.wikidata.org/wiki/Q27391576) (Q27391576) | international tripoint | Israel, Jordan, Palestine | Jordan / West Bank Area C (Israeli control) |
+| 0.00 | [Meitar Crossing](https://www.wikidata.org/wiki/Q114243522) (Q114243522) | border checkpoint | Israel | Israel / West Bank Area C (Israeli control) |
 
 ## All other independent points (CShapes borders as published), farthest first
 
@@ -217,49 +217,49 @@ Not every point is a valid reference for every year: a crossing on a border draw
 | - | [Azerbaijan Iran border crossing #2859](https://www.wikidata.org/wiki/Q68037018) (Q68037018) | border checkpoint | Azerbaijan, Iran |  |
 | - | [Azerbaijan Iran border crossing #2865](https://www.wikidata.org/wiki/Q68037019) (Q68037019) | border checkpoint | Azerbaijan, Iran |  |
 | - | [Azerbaijan Iran border crossing #2866](https://www.wikidata.org/wiki/Q68037021) (Q68037021) | border checkpoint | Azerbaijan, Iran |  |
-| 2.02 | [Israel West Bank border crossing #1548](https://www.wikidata.org/wiki/Q68036427) (Q68036427) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
-| 1.47 | [Israel West Bank border crossing #1508](https://www.wikidata.org/wiki/Q68036405) (Q68036405) | border checkpoint | Israel, West Bank | Israel / West Bank Area A (Palestinian Authority) |
-| 1.43 | [Israel West Bank border crossing #1553](https://www.wikidata.org/wiki/Q68036431) (Q68036431) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 2.03 | [Israel West Bank border crossing #1548](https://www.wikidata.org/wiki/Q68036427) (Q68036427) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 1.46 | [Israel West Bank border crossing #1508](https://www.wikidata.org/wiki/Q68036405) (Q68036405) | border checkpoint | Israel, West Bank | Israel / West Bank Area A (Palestinian Authority) |
+| 1.45 | [Israel West Bank border crossing #1553](https://www.wikidata.org/wiki/Q68036431) (Q68036431) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 1.05 | [Israel West Bank border crossing #1552](https://www.wikidata.org/wiki/Q68036428) (Q68036428) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
-| 0.91 | [Israel West Bank border crossing #1520](https://www.wikidata.org/wiki/Q68036413) (Q68036413) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.91 | [Israel West Bank border crossing #1520](https://www.wikidata.org/wiki/Q68036413) (Q68036413) | border checkpoint | Israel, West Bank | Israel / West Bank Area A (Palestinian Authority) |
 | 0.83 | [Jordan Syria border crossing #1598](https://www.wikidata.org/wiki/Q68036451) (Q68036451) | border checkpoint | Jordan, Syria | Israel / Jordan |
 | 0.75 | [Syria Turkey border crossing #2709](https://www.wikidata.org/wiki/Q68036972) (Q68036972) | border checkpoint | Turkey | Syria / Turkey |
 | 0.74 | [Jordan Saudi Arabia border crossing #1476](https://www.wikidata.org/wiki/Q68036391) (Q68036391) | border checkpoint | Jordan, Saudi Arabia | Jordan / Saudi Arabia |
-| 0.68 | [Israel West Bank border crossing #1536](https://www.wikidata.org/wiki/Q68036421) (Q68036421) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.71 | [Israel West Bank border crossing #1536](https://www.wikidata.org/wiki/Q68036421) (Q68036421) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.68 | [Qatar Saudi Arabia border crossing #1296](https://www.wikidata.org/wiki/Q68036275) (Q68036275) | border checkpoint | Qatar, Saudi Arabia | Qatar / Saudi Arabia |
 | 0.65 | [Israel Jordan border crossing #1408](https://www.wikidata.org/wiki/Q68036337) (Q68036337) | border checkpoint | Israel, Jordan | Israel / Jordan |
-| 0.56 | [Israel West Bank border crossing #1529](https://www.wikidata.org/wiki/Q68036420) (Q68036420) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.55 | [Syria Turkey border crossing #2715](https://www.wikidata.org/wiki/Q68036974) (Q68036974) | border checkpoint | Syria | Syria / Turkey |
+| 0.55 | [Israel West Bank border crossing #1529](https://www.wikidata.org/wiki/Q68036420) (Q68036420) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.51 | [Al-Mandhariyah border post](https://www.wikidata.org/wiki/Q68036490) (Q68036490) | border checkpoint | Iraq | Iran / Iraq |
 | 0.46 | [Israel Lebanon border crossing #1586](https://www.wikidata.org/wiki/Q68036447) (Q68036447) | border checkpoint | Israel, Lebanon | Israel / Lebanon |
-| 0.45 | [Israel West Bank border crossing #1540](https://www.wikidata.org/wiki/Q68036424) (Q68036424) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.46 | [Israel West Bank border crossing #1540](https://www.wikidata.org/wiki/Q68036424) (Q68036424) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.45 | [Yayladağı Gümrük Kapısı](https://www.wikidata.org/wiki/Q21031944) (Q21031944) | border checkpoint | Turkey | Syria / Turkey |
-| 0.39 | [Israel West Bank border crossing #1524](https://www.wikidata.org/wiki/Q68036415) (Q68036415) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
-| 0.35 | [Israel West Bank border crossing #1516](https://www.wikidata.org/wiki/Q68036411) (Q68036411) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.37 | [Israel West Bank border crossing #1524](https://www.wikidata.org/wiki/Q68036415) (Q68036415) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.35 | [Israel Jordan border crossing #1560](https://www.wikidata.org/wiki/Q68036432) (Q68036432) | border checkpoint | Israel, Jordan | Israel / Jordan |
+| 0.33 | [Israel West Bank border crossing #1516](https://www.wikidata.org/wiki/Q68036411) (Q68036411) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.32 | [Israel Lebanon border crossing #1587](https://www.wikidata.org/wiki/Q68036449) (Q68036449) | border checkpoint | Israel, Lebanon | Israel / Lebanon |
 | 0.26 | [Iraq Jordan border crossing #1606](https://www.wikidata.org/wiki/Q68036454) (Q68036454) | border checkpoint | Iraq, Jordan | Iraq / Jordan |
 | 0.19 | [Syria Turkey border crossing #2751](https://www.wikidata.org/wiki/Q68036983) (Q68036983) | border checkpoint | Turkey | Syria / Turkey |
+| 0.17 | [Israel West Bank border crossing #1544](https://www.wikidata.org/wiki/Q68036425) (Q68036425) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
+| 0.17 | [Israel West Bank border crossing #1500](https://www.wikidata.org/wiki/Q68036402) (Q68036402) | border checkpoint | Israel, West Bank | Israel / West Bank Area B (Palestinian civil, joint security) |
 | 0.16 | [Oman United Arab Emirates border crossing #1304](https://www.wikidata.org/wiki/Q68036279) (Q68036279) | border checkpoint | Oman, United Arab Emirates | Oman / United Arab Emirates |
-| 0.15 | [Israel West Bank border crossing #1544](https://www.wikidata.org/wiki/Q68036425) (Q68036425) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.14 | [Iraq Syria border crossing #2674](https://www.wikidata.org/wiki/Q68036964) (Q68036964) | border checkpoint | Syria | Iraq / Syria |
 | 0.14 | [Haji Omeran border post](https://www.wikidata.org/wiki/Q68036967) (Q68036967) | border checkpoint | Iraq | Iran / Iraq |
 | 0.13 | [Israel West Bank border crossing #1528](https://www.wikidata.org/wiki/Q68036418) (Q68036418) | border checkpoint | Israel, West Bank | Israel / West Bank Area C (Israeli control) |
 | 0.12 | [Israel Lebanon border crossing #1594](https://www.wikidata.org/wiki/Q68036450) (Q68036450) | border checkpoint | Israel, Lebanon | Israel / Lebanon |
-| 0.12 | [Israel West Bank border crossing #1500](https://www.wikidata.org/wiki/Q68036402) (Q68036402) | border checkpoint | Israel, West Bank | Israel / West Bank Area B (Palestinian civil, joint security) |
 | 0.11 | [Kuwait Saudi Arabia border crossing #1328](https://www.wikidata.org/wiki/Q68036292) (Q68036292) | border checkpoint | Kuwait, Saudi Arabia | Kuwait / Saudi Arabia |
 | 0.10 | [Kuwait Saudi Arabia border crossing #1336](https://www.wikidata.org/wiki/Q68036297) (Q68036297) | border checkpoint | Kuwait, Saudi Arabia | Kuwait / Saudi Arabia |
 | 0.05 | [Oman United Arab Emirates border crossing #1308](https://www.wikidata.org/wiki/Q68036281) (Q68036281) | border checkpoint | Oman, United Arab Emirates | Oman / United Arab Emirates |
 | 0.03 | [Lebanon Syria border crossing #1610](https://www.wikidata.org/wiki/Q68036455) (Q68036455) | border checkpoint | Lebanon, Syria | Lebanon / Syria |
 | 0.03 | [Iraq Syria border crossing #1686](https://www.wikidata.org/wiki/Q68036489) (Q68036489) | border checkpoint | Iraq, Syria | Iraq / Syria |
 | 0.02 | [Israel Jordan border crossing #1564](https://www.wikidata.org/wiki/Q68036435) (Q68036435) | border checkpoint | Israel, Jordan | Israel / Jordan |
+| 0.01 | [Jisr ed Damiye](https://www.wikidata.org/wiki/Q2916379) (Q2916379) | border checkpoint | Jordan, Palestine | Israel / Jordan |
 | 0.01 | [Iraq Syria border crossing #1682](https://www.wikidata.org/wiki/Q68036486) (Q68036486) | border checkpoint | Iraq, Syria | Iraq / Syria |
 | 0.00 | [Jordan Saudi Arabia border crossing #1472](https://www.wikidata.org/wiki/Q68036389) (Q68036389) | border checkpoint | Jordan, Saudi Arabia | Jordan / Saudi Arabia |
 | 0.00 | [Kuwait Saudi Arabia border crossing #1332](https://www.wikidata.org/wiki/Q68036294) (Q68036294) | border checkpoint | Kuwait, Saudi Arabia | Kuwait / Saudi Arabia |
 | 0.00 | [Iran Iraq border crossing #1698](https://www.wikidata.org/wiki/Q68036494) (Q68036494) | border checkpoint | Iran, Iraq | Iran / Iraq |
 | 0.00 | [Iraq Syria border crossing #2680](https://www.wikidata.org/wiki/Q68036965) (Q68036965) | border checkpoint | Iraq, Syria | Iraq / Syria |
 | 0.00 | [Iran Iraq border crossing #1702](https://www.wikidata.org/wiki/Q68036495) (Q68036495) | border checkpoint | Iran, Iraq | Iran / Iraq |
-| 0.00 | [Jisr ed Damiye](https://www.wikidata.org/wiki/Q2916379) (Q2916379) | border checkpoint | Jordan, Palestine | Israel / Jordan |
 | 0.00 | [Saudi Arabia Yemen border crossing #1284](https://www.wikidata.org/wiki/Q68036269) (Q68036269) | border checkpoint | Saudi Arabia, Yemen | Saudi Arabia / Yemen |
 | 0.00 | [Egypt Israel border crossing #1358](https://www.wikidata.org/wiki/Q68036313) (Q68036313) | border checkpoint | Egypt, Israel | Egypt / Israel |
 | 0.00 | [Egypt Israel border crossing #1357](https://www.wikidata.org/wiki/Q68036311) (Q68036311) | border checkpoint | Egypt, Israel | Egypt / Israel |

@@ -31,6 +31,10 @@ const REGION_ENTITIES = [
   "Saudi Arabia",
   "Yemen (Arab Republic of Yemen)",
   "Yemen, People's Republic of",
+  // South Arabia under British rule, before South Yemen's independence in 1967.
+  "Aden",
+  "East Aden Protectorate",
+  "Federation of South Arabia",
   "Kuwait",
   "Bahrain",
   "Qatar",
