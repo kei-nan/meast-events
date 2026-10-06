@@ -63,10 +63,39 @@ export const NEW_EVENT_CLASSES = [
   { qid: "Q43109", label: "referendum", category: "political" },
 ];
 
+// Added 2026-10-06 to close a modelling gap: well-known events that Wikidata types only with
+// these classes (e.g. Deir Yassin and the Farhud as "mass murder"/"pogrom", Operation Opera as
+// "airstrike", the Sbarro bombing as "suicide attack") were never found. Each QID's English label
+// was checked with wbsearchentities and each class probed in WDQS on 2026-10-06 (counts in
+// DATA_POLICY.md). Appended last, so a class above still decides the group of an item that
+// matches both.
+export const GAP_EVENT_CLASSES = [
+  { qid: "Q350604", label: "armed conflict", category: "war" },
+  { qid: "Q831663", label: "military campaign", category: "war" },
+  { qid: "Q188686", label: "military occupation", category: "war" },
+  { qid: "Q2380335", label: "airstrike", category: "war" },
+  { qid: "Q678146", label: "bombardment", category: "war" },
+  { qid: "Q6539177", label: "aircraft shootdown", category: "war" },
+  { qid: "Q217327", label: "suicide attack", category: "war" },
+  { qid: "Q177716", label: "pogrom", category: "atrocity" },
+  { qid: "Q750215", label: "mass murder", category: "atrocity" },
+  { qid: "Q124757", label: "riot", category: "protest" },
+  { qid: "Q3002772", label: "political crisis", category: "political" },
+  { qid: "Q5791104", label: "international crisis", category: "political" },
+];
+
+// Added 2026-10-06 for civic events the policy named as under-found (elections, protests, summits).
+export const CIVIC_EVENT_CLASSES = [
+  { qid: "Q40231", label: "public election", category: "political" },
+  { qid: "Q273120", label: "protest", category: "protest" },
+  { qid: "Q175331", label: "demonstration", category: "protest" },
+  { qid: "Q1072326", label: "summit", category: "diplomatic" },
+];
+
 // Objective inclusion threshold: Wikidata sitelinks (number of Wikimedia-project pages).
 export const INCLUSION_MIN_SITELINKS = 10;
 
-export const EVENT_CLASSES = [...ORIGINAL_EVENT_CLASSES, ...NEW_EVENT_CLASSES];
+export const EVENT_CLASSES = [...ORIGINAL_EVENT_CLASSES, ...NEW_EVENT_CLASSES, ...GAP_EVENT_CLASSES, ...CIVIC_EVENT_CLASSES];
 
 // Groups that override whatever group an event would otherwise get, checked in this order.
 // An item Wikidata types as both a "massacre" and a "terrorist attack" is shown as terrorism,

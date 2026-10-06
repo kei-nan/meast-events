@@ -2,6 +2,7 @@
 // only - it never judges whether an event is "right" (that would be editorial).
 import { createHash } from "node:crypto";
 import { COUNTRIES, EVENT_CLASSES } from "./event-classes.js";
+import { coordinatesChecked } from "./fixes.js";
 
 const ID_RE = /^[a-z0-9-]+$/;
 const QID_RE = /^Q[1-9][0-9]*$/;
@@ -148,8 +149,11 @@ export function validateEvents(events, { name = "events", lenient = false, other
       } else if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
         err(i, e, `coordinates out of range (${lat}, ${lon})`);
       } else if (!inRegion(lat, lon)) {
-        // Outside the region but inside it with lat/lon exchanged: almost certainly a swap.
-        if (inRegion(lon, lat)) err(i, e, `coordinates look swapped (lat ${lat}, lon ${lon}); (${lon}, ${lat}) would be in the region`);
+        // Outside the region but inside it with lat/lon exchanged: almost certainly a swap,
+        // unless this exact point was checked against both sources (fixes.js CHECKED_COORDINATES).
+        const checked = coordinatesChecked(e);
+        if (inRegion(lon, lat) && !checked) err(i, e, `coordinates look swapped (lat ${lat}, lon ${lon}); (${lon}, ${lat}) would be in the region`);
+        else if (checked) warn(i, e, `coordinates (${lat}, ${lon}) are outside the Middle East box; checked against Wikipedia and Wikidata, not swapped (docs/data-fixes.md ${checked.ref})`);
         else warn(i, e, `coordinates (${lat}, ${lon}) are outside the Middle East box (source: ${e.coordinate_source ?? "none"}); fine if the event happened abroad`);
       }
     }

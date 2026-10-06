@@ -200,3 +200,29 @@ put them outside the tracked set; the validator now rejects any event without a 
 - Pipeline: `enrich-candidates.js` now keeps only hints to published records (curated events and proposed events that are neither excluded
   nor in `proposed-exclusions.json`; `pruneDuplicateHints`, `scripts/lib/flags.js`). The two hints and their `possible_duplicate:` notes
   were removed with that function (curated: both; proposed: the October 7 one).
+
+## F9 - Mediterranean and Middle East theatre of World War II: coordinates checked, not swapped (`mediterranean-and-middle-east-theatre-of-world-war-ii`, Q696817)
+
+- Found by the validator: the point (35N, 18E) is outside the region box but would be inside it with latitude and longitude exchanged,
+  which the validator treats as a swap error.
+- Evidence (checked live 2026-10-07): the English Wikipedia article (revision 1378869230) has `{{Coord|35|N|18|E|...type:waterbody...}}`
+  and the API returns it as the primary coordinate; Wikidata Q696817 P625 = 35, 18. Both sources give this point, in the Ionian Sea,
+  as the marker for the whole theatre.
+- Nothing changed. The point is listed in `CHECKED_COORDINATES` (`scripts/lib/fixes.js`), so the validator reports it as the ordinary
+  "outside the Middle East box" warning; the entry is exact (item and point), so any other value on this item still fails as a swap.
+
+## F10 - three more month-precision start dates pinned to the 1st (same cause as F7, F8)
+
+- Found by the independent review of the events added by the classes of 2026-10-06. Same cause as F7: a month-precision P585 won the
+  discovery query's COALESCE(P585, P580) over a day-precision P580.
+- Evidence (checked live 2026-10-07, Wikidata entity JSON and the infobox `date` line of the English Wikipedia article):
+
+| Event (QID) | Stored | Wikidata P580 / P582 / P585 | Wikipedia infobox (revision) | Fix |
+|---|---|---|---|---|
+| April 2024 Iranian strikes on Israel (Q125464497) | 2024-04-01 | 2024-04-13 (day) / 2024-04-14 / 2024-04 (month) | "13–14 April 2024" (1373392805) | 2024-04-13 |
+| 2024 Homs offensive (Q131392292) | 2024-12-01 | 2024-12-05 (day) / 2024-12-08 / 2024-12 (month) | "5 December 2024 – 8 December 2024" (1375763415) | 2024-12-05 |
+| 2020 G20 Riyadh summit (Q33038478) | 2020-11-01 | 2020-11-21 (day) / 2020-11-22 / 2020-11 (month) | "21–23 November 2020" (1364101887) | 2020-11-21 |
+
+- In each, Wikipedia and Wikidata's P580 agree on the start day against our record. -> `date_start` = P580 in `data/events.proposed.json`
+  (ledger entry F10); `date_precision` follows the kept date (day); the `month_precision_day_in_lead` flag is removed where it was set.
+- Not changed: the G20 summit's `date_end` (Wikidata P582 22 November, infobox 23 November): the sources differ, so it stays as Wikidata gives it.

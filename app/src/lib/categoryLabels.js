@@ -5,6 +5,7 @@ export const CATEGORY_LABELS = {
   treaty: "Treaty",
   political: "Political",
   uprising: "Uprising",
+  protest: "Protest (protest, demonstration, riot)",
   migration: "Migration",
   diplomatic: "Diplomatic",
   economic: "Economic",

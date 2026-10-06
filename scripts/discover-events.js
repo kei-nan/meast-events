@@ -78,10 +78,15 @@ const MIN_SITELINKS = Number(argVal("min-sitelinks") ?? INCLUSION_MIN_SITELINKS)
 const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
 const REQUEST_DELAY_MS = 1500; // WDQS etiquette: no rapid-fire/parallel querying.
 
-function buildQuery(classQid, { transitive = true } = {}) {
+// classValues: query P31 instances of exactly these classes instead of classQid's tree
+// (the batched fallback below passes a slice of the class's subclass tree).
+function buildQuery(classQid, { transitive = true, classValues = null } = {}) {
   const countryValues = ALL_COUNTRY_QIDS.map((q) => `wd:${q}`).join(" ");
   const maxYear = new Date().getFullYear() + 1;
   const classPath = transitive ? "wdt:P31/wdt:P279*" : "wdt:P31";
+  const classTriple = classValues
+    ? `VALUES ?cls { ${classValues.map((q) => `wd:${q}`).join(" ")} }\n      ?item wdt:P31 ?cls .`
+    : `?item ${classPath} wd:${classQid} .`;
   return `
 SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?enwiki ?countries WHERE {
   {
@@ -93,7 +98,7 @@ SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?e
       (GROUP_CONCAT(DISTINCT ?country; separator="|") AS ?countries)
     WHERE {
       VALUES ?country { ${countryValues} }
-      ?item ${classPath} wd:${classQid} .
+      ${classTriple}
       {
         ?item wdt:P17 ?country .
       } UNION {
@@ -124,18 +129,40 @@ ORDER BY DESC(?nSitelinks)
 // expansion to finish inside WDQS's server-side timeout - "military operation"
 // (Q645883) 504'd consistently during development even though every other class
 // tried (including "battle", whose subclass tree is not obviously smaller) came
-// back fine. There's no way to know this in advance short of trying it, so on a 504
-// this retries once with plain P31 (no subclass expansion) instead of giving up -
-// less complete (misses instances of undiscovered subclasses of that class) but
-// far better than zero results for that class.
+// back fine; "public election" (Q40231, thousands of per-country election
+// subclasses) 504s too. There's no way to know this in advance short of trying it,
+// so on a 504 this:
+//   1. fetches the class's subclass tree once (P279*, cheap on its own) and queries
+//      P31 instances of SUBCLASS_BATCH subclasses at a time - the same rule as the
+//      transitive query, split into requests that finish in time;
+//   2. only if that fails too, retries with plain P31 (no subclass expansion) - less
+//      complete (misses instances of subclasses) but far better than zero results.
+const SUBCLASS_BATCH = 250;
+
+async function subclassTree(classQid) {
+  const rows = await runSparql(`SELECT DISTINCT ?sub WHERE { ?sub wdt:P279* wd:${classQid} . }`);
+  return rows.map((r) => qidFromUri(r.sub.value));
+}
+
 async function runQueryWithFallback(classQid) {
   try {
     return { rows: await runSparql(buildQuery(classQid, { transitive: true })), usedFallback: false };
   } catch (err) {
     if (!/504|timeout|Gateway/i.test(err.message)) throw err;
-    console.log(`    (P279* transitive query failed: ${err.message} - retrying with direct P31 only)`);
-    const rows = await runSparql(buildQuery(classQid, { transitive: false }));
-    return { rows, usedFallback: true };
+    try {
+      const subs = await subclassTree(classQid);
+      console.log(`    (P279* transitive query failed: ${err.message} - querying ${subs.length} subclasses in batches of ${SUBCLASS_BATCH})`);
+      const rows = [];
+      for (let i = 0; i < subs.length; i += SUBCLASS_BATCH) {
+        await sleep(REQUEST_DELAY_MS);
+        rows.push(...(await runSparql(buildQuery(classQid, { classValues: subs.slice(i, i + SUBCLASS_BATCH) }))));
+      }
+      return { rows, usedFallback: false };
+    } catch (err2) {
+      console.log(`    (batched subclass query failed: ${err2.message} - retrying with direct P31 only)`);
+      const rows = await runSparql(buildQuery(classQid, { transitive: false }));
+      return { rows, usedFallback: true };
+    }
   }
 }
 
