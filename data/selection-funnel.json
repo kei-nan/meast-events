@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T21:04:47.316Z",
+  "generated_at": "2026-10-06T21:28:07.763Z",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
@@ -559,13 +559,13 @@
     },
     "by_group": {
       "war": {
-        "raw": 1560,
-        "no_english_article": 223,
-        "fewer_than_min_sitelinks": 943,
-        "passed_filters": 394,
-        "proposed_location_none": 67,
-        "date_order_flagged": 2,
-        "in_curated": 363
+        "raw": 1497,
+        "no_english_article": 213,
+        "fewer_than_min_sitelinks": 898,
+        "passed_filters": 386,
+        "proposed_location_none": 66,
+        "date_order_flagged": 1,
+        "in_curated": 355
       },
       "political": {
         "raw": 1861,
@@ -622,13 +622,13 @@
         "in_curated": 12
       },
       "terrorism": {
-        "raw": 707,
-        "no_english_article": 180,
-        "fewer_than_min_sitelinks": 440,
-        "passed_filters": 87,
-        "proposed_location_none": 0,
-        "date_order_flagged": 0,
-        "in_curated": 86
+        "raw": 770,
+        "no_english_article": 190,
+        "fewer_than_min_sitelinks": 485,
+        "passed_filters": 95,
+        "proposed_location_none": 1,
+        "date_order_flagged": 1,
+        "in_curated": 94
       },
       "migration": {
         "raw": 19,

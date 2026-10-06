@@ -55,7 +55,7 @@ or "war" that the curated file used to carry as if they were Wikidata's are gone
 `category` is **our own coarse mapping**, not Wikidata's classification, and the UI labels it "Category (our grouping)". It is set by one rule applied to every
 event (`groupForEvent` in `scripts/lib/event-classes.js`):
 
-1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking), the category is terrorism.
+1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking, suicide attack), the category is terrorism.
 2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime, pogrom, mass murder), the category is atrocity.
 3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the 112 legacy events keep the
    group hand-assigned in `data/seed-events.json`.
@@ -96,7 +96,7 @@ The rule still passes Wikidata's typing through without judging it; the UI lists
 | airstrike | Q2380335 | war |
 | bombardment | Q678146 | war |
 | aircraft shootdown | Q6539177 | war |
-| suicide attack | Q217327 | war |
+| suicide attack | Q217327 | terrorism |
 | pogrom | Q177716 | atrocity |
 | mass murder | Q750215 | atrocity |
 | riot | Q124757 | protest |
@@ -108,9 +108,13 @@ The rule still passes Wikidata's typing through without judging it; the UI lists
 | summit | Q1072326 | diplomatic |
 
 The last 16 rows were added on 2026-10-06 (see "Event classes"). "Pogrom" and "mass murder" join the overriding atrocity group because Wikidata uses them for
-the same kind of event as "massacre"; adding them changed the group of none of the 571 events already shown. "Suicide attack" is a method used by armies as
-well as by groups Wikidata types as terrorist, so it is in the non-overriding war group: an attack Wikidata also types "terrorist attack" is still terrorism
-by step 1, and one it does not type that way is not labelled terrorism by us. "Protest" is a new group (protest, demonstration, riot); before, the only
+the same kind of event as "massacre"; adding them changed the group of none of the 571 events already shown. "Suicide attack" joins the overriding
+terrorism group. It was first placed in the war group (a suicide attack is a method armies use too), but the review of the new events showed what that
+did: seven bombings Wikidata types only as "suicide attack" (the Dolphinarium, Sbarro, Passover and Maxim restaurant attacks on Israeli civilians, and the
+2003 Istanbul, 2016 Saudi and January 2021 Baghdad bombings) would have been shown as war, while comparable bombings that Wikidata also types "terrorist
+attack" are terrorism - the same mechanism as the 2026-09-28 finding above. The owner chose terrorism (2026-10-07), so that the group no longer
+depends on whether a Wikidata editor added "terrorist attack" next to "suicide attack". It moved one event already shown, the 2011 southern Israel cross-border attacks, from war to terrorism.
+"Terrorism" remains our group name, not a Wikidata label: the UI lists the item's Wikidata classes next to it. "Protest" is a new group (protest, demonstration, riot); before, the only
 protests shown were those Wikidata also types as a revolution or rebellion (uprising). "International crisis" is in the political group like "political
 crisis": in Wikidata it is a subclass of "political crisis" (checked in WDQS on 2026-10-06), so every international crisis is found under "political crisis"
 first and a different group for it would never apply.
@@ -209,7 +213,7 @@ under each, so the column does not add up to the total.
 | airstrike | Q2380335 | war | 244 | 26 |
 | bombardment | Q678146 | war | 260 | 29 |
 | aircraft shootdown | Q6539177 | war | 9 | 4 |
-| suicide attack | Q217327 | war | 210 | 7 |
+| suicide attack | Q217327 | terrorism | 210 | 7 |
 | pogrom | Q177716 | atrocity | 12 | 7 |
 | mass murder | Q750215 | atrocity | 586 | 11 |
 | riot | Q124757 | protest | 56 | 14 |

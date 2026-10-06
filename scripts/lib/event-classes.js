@@ -76,7 +76,7 @@ export const GAP_EVENT_CLASSES = [
   { qid: "Q2380335", label: "airstrike", category: "war" },
   { qid: "Q678146", label: "bombardment", category: "war" },
   { qid: "Q6539177", label: "aircraft shootdown", category: "war" },
-  { qid: "Q217327", label: "suicide attack", category: "war" },
+  { qid: "Q217327", label: "suicide attack", category: "terrorism" },
   { qid: "Q177716", label: "pogrom", category: "atrocity" },
   { qid: "Q750215", label: "mass murder", category: "atrocity" },
   { qid: "Q124757", label: "riot", category: "protest" },
