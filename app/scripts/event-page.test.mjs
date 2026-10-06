@@ -83,6 +83,43 @@ test("an event with no dates, countries, extract, link or review still renders",
   assert.ok(!html.includes("framing-review"));
 });
 
+test("Part of links a curated parent and shows any other in Wikidata's label, escaped", () => {
+  const html = renderEventPage({
+    id: "zikim",
+    title: "Zikim attack",
+    part_of: [
+      { qid: "Q1", label: "Gaza War", id: "gaza-war" },
+      { qid: "Q2", label: `Raids <"&'>` },
+      { qid: "bad", label: "No item" },
+    ],
+  });
+  assert.match(
+    html,
+    /<p class="partof">Part of: <a href="\/event\/gaza-war">Gaza War<\/a>, Raids &lt;&quot;&amp;&#39;&gt; <a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q2" rel="noreferrer" aria-label="Wikidata item for Raids &lt;&quot;&amp;&#39;&gt;">Wikidata<\/a>, No item<\/p>/
+  );
+  assert.match(html, /“Part of” is Wikidata’s statement/);
+  assert.ok(!html.includes('class="includes"'));
+});
+
+test("Includes lists the children as links to their pages, with an escaped title and year", () => {
+  const html = renderEventPage({
+    id: "gaza-war",
+    title: "Gaza war",
+    includes: [
+      { id: "a", title: "Battle <A>", date_start: "2023-10-07" },
+      { id: "b", title: "Raid B", date_start: null },
+      { id: "../evil", title: "Skipped" },
+    ],
+  });
+  assert.match(html, /<h2 id="includes-title">Includes 2 events in this dataset<\/h2>/);
+  assert.match(html, /<li><a href="\/event\/a">Battle &lt;A&gt;<\/a> <span class="year">2023<\/span><\/li>/);
+  assert.match(html, /<li><a href="\/event\/b">Raid B<\/a><\/li>/);
+  assert.ok(!html.includes("Skipped"));
+  assert.ok(!html.includes('class="partof"'));
+  const one = renderEventPage({ id: "p", title: "P", includes: [{ id: "c", title: "C" }] });
+  assert.match(one, /Includes 1 event in this dataset/);
+});
+
 test("an invalid id is refused", () => {
   assert.throws(() => renderEventPage({ id: "../x", title: "X" }));
 });

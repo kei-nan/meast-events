@@ -1023,3 +1023,46 @@ button.sp-chip[aria-pressed="true"] {
     height: 40px;
   }
 }
+
+/* ---------- Event detail: Wikidata "part of" and its reverse ---------- */
+
+.event-detail-partof {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: -8px 0 14px;
+  overflow-wrap: anywhere;
+}
+
+.event-detail .event-detail-wd {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.event-detail-includes {
+  margin: 16px 0 4px;
+}
+
+.event-detail-includes h3 {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.event-detail-includes ul {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.event-detail-includes li {
+  margin: 0 0 3px;
+}
+
+.event-detail-includes-year {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}

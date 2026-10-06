@@ -20,7 +20,9 @@
 // events/full/<bucket>.json ({id: {extract, extract_retrieved_at, ...}}), 64 buckets
 // chosen by a hash of the id (src/lib/fullBucket.js, shared with the client),
 // fetched lazily when an event is opened. Offline text search therefore matches
-// title + snippet only.
+// title + snippet only. Wikidata's "part of" parents and the reverse list
+// (part_of / includes, src/lib/partOf.js) ride in the same full records, only on
+// events that have them.
 //
 // events/all.<hash>.json is the whole lite set (every event, coordinate-less
 // included) in ONE file: the app loads it once and does range/viewport/filter/
@@ -45,6 +47,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { FULL_BUCKETS, fullBucket } from "../src/lib/fullBucket.js";
 import { MAP_EXTENT } from "../src/lib/mapExtent.js";
+import { resolvePartOf } from "../src/lib/partOf.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -230,6 +233,8 @@ async function splitEvents() {
     throw new Error(`events outside MAP_EXTENT (src/lib/mapExtent.js): ${outside.map((e) => e.id).join(", ")}`);
   }
   const review = await loadFramingReview();
+  // Wikidata "part of" (P361) and its reverse, only for the detail view (see lib/partOf.js).
+  const relations = resolvePartOf(allEvents);
 
   // Full leads, bucketed by id hash (see header comment).
   const fullBuckets = Array.from({ length: FULL_BUCKETS }, () => ({}));
@@ -256,6 +261,21 @@ async function splitEvents() {
       date_precision: e.date_precision ?? null,
       framing_review: framing,
     };
+    // Only on events that have them, so the buckets stay small.
+    const rel = relations.get(e.id);
+    if (rel?.part_of.length) fullBuckets[fullBucket(e.id)][e.id].part_of = rel.part_of;
+    if (rel?.includes.length) fullBuckets[fullBucket(e.id)][e.id].includes = rel.includes;
+  }
+  {
+    let withParent = 0;
+    let curatedParent = 0;
+    let parents = 0;
+    for (const r of relations.values()) {
+      if (r.part_of.length) withParent++;
+      if (r.part_of.some((p) => p.id)) curatedParent++;
+      if (r.includes.length) parents++;
+    }
+    console.log(`part of: ${withParent} events name a parent, ${curatedParent} of them a curated event; ${parents} curated parents`);
   }
   if (review) {
     await writeJSON(path.join(OUT_DIR, "framing-review.json"), {

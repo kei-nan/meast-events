@@ -140,3 +140,11 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
   color: var(--text-tertiary);
   font-size: 0.85rem;
 }
+
+.partof, .includes { font-family: system-ui, -apple-system, sans-serif; }
+.partof { margin: 0.2rem 0 0; color: var(--text-secondary); overflow-wrap: anywhere; }
+.partof .wd { font-size: 0.8rem; }
+.includes { margin: 1.5rem 0; }
+.includes h2 { font-size: 1rem; }
+.includes ul { margin: 0; padding-left: 1.2rem; overflow-wrap: anywhere; }
+.includes .year { color: var(--text-tertiary); font-size: 0.85rem; }

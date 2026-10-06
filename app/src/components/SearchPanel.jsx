@@ -263,7 +263,7 @@ export default function SearchPanel({
               if (e.key === "Escape") onBack();
             }}
           >
-            <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} />
+            <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} onSelectEvent={onSelect} />
           </div>
         )}
 

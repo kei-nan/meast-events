@@ -7,6 +7,7 @@
 import { categoryLabel } from "../src/lib/categoryLabels.js";
 import { formatEventDate } from "../src/lib/eventDate.js";
 import { markSegments } from "../src/lib/highlights.js";
+import { wikidataUrl } from "../src/lib/partOf.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
 import { isValidEventId } from "../src/lib/urlState.js";
 
@@ -155,6 +156,40 @@ ${notes.join("\n")}
 </aside>`;
 }
 
+// Wikidata's "part of" (P361), in Wikidata's labels (src/lib/partOf.js): a parent
+// that is one of our events links to its page, any other is plain text with a
+// small link to its Wikidata item.
+function renderPartOf(parents) {
+  const list = (parents ?? []).filter((p) => p && typeof p.label === "string");
+  if (!list.length) return "";
+  const items = list.map((p) => {
+    if (p.id && isValidEventId(p.id)) return link(eventPath(p.id), escapeHtml(p.label));
+    const wd = wikidataUrl(p.qid);
+    return wd
+      ? `${escapeHtml(p.label)} <a class="wd" href="${escapeHtml(wd)}" rel="noreferrer" aria-label="Wikidata item for ${escapeHtml(p.label)}">Wikidata</a>`
+      : escapeHtml(p.label);
+  });
+  return `<p class="partof">Part of: ${items.join(", ")}</p>`;
+}
+
+// The events in this dataset that Wikidata lists as part of this one (oldest first).
+function renderIncludes(children) {
+  const list = (children ?? []).filter((c) => c && isValidEventId(c.id));
+  if (!list.length) return "";
+  const items = list
+    .map((c) => {
+      const year = c.date_start ? ` <span class="year">${escapeHtml(String(c.date_start).slice(0, 4))}</span>` : "";
+      return `<li>${link(eventPath(c.id), escapeHtml(c.title ?? c.id))}${year}</li>`;
+    })
+    .join("\n");
+  return `<section class="includes" aria-labelledby="includes-title">
+<h2 id="includes-title">Includes ${plural(list.length, "event", "events")} in this dataset</h2>
+<ul>
+${items}
+</ul>
+</section>`;
+}
+
 function locationNote(quality) {
   if (quality === "approximate") {
     return `<p class="note">Approximate location: this event isn’t tied to a single known site, so its marker on the map is placed at a national capital.</p>`;
@@ -203,7 +238,7 @@ export function eventDateText(event) {
 /**
  * One event's page. `event` is the lite record (split-data.mjs publicEvent) merged
  * with its full-lead record (extract, extract_retrieved_at, date_precision,
- * framing_review). Every field may be missing except id and title.
+ * framing_review, part_of, includes). Every field may be missing except id and title.
  */
 export function renderEventPage(event) {
   if (!isValidEventId(event?.id)) throw new Error(`invalid event id: ${JSON.stringify(event?.id)}`);
@@ -226,6 +261,7 @@ export function renderEventPage(event) {
     event.category && `<p class="category">Category (our grouping): ${escapeHtml(categoryLabel(event.category))}</p>`,
     `<h1>${escapeHtml(title)}</h1>`,
     meta && `<p class="meta">${meta}</p>`,
+    renderPartOf(event.part_of),
     showClasses && `<p class="classes">Wikidata classes: ${escapeHtml(classes.join(", "))}</p>`,
     flags.length > 0 && `<p class="note" role="note">Date unverified: ${escapeHtml(flags.join("; "))}. Dates are shown as Wikidata gives them.</p>`,
     `<p class="actions"><a class="open-map" href="${escapeHtml(mapPath(event.id))}">Open on the map</a>${
@@ -235,10 +271,13 @@ export function renderEventPage(event) {
     `<div class="extract">${paragraphs.length ? paragraphs.map((p) => renderParagraph(p, review?.highlights)).join("\n") : "<p>No summary available.</p>"}</div>`,
     retrieved && `<p class="asof">Text retrieved ${escapeHtml(retrieved)} from Wikipedia.</p>`,
     renderReview(event, review),
+    renderIncludes(event.includes),
     locationNote(event.location_quality),
     `<p class="attribution">Text from Wikipedia, licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
       wiki ? link(historyUrl(wiki), "Wikipedia contributors", { external: true }) : "Wikipedia contributors"
-    }${wiki ? `, from the article ${link(wiki, escapeHtml(title), { external: true })}` : ""}.${showClasses ? " Classes are Wikidata’s labels (CC0)." : ""}</p>`,
+    }${wiki ? `, from the article ${link(wiki, escapeHtml(title), { external: true })}` : ""}.${showClasses ? " Classes are Wikidata’s labels (CC0)." : ""}${
+      event.part_of?.length ? " “Part of” is Wikidata’s statement, in its labels (CC0)." : ""
+    }</p>`,
   ].filter(Boolean);
 
   return `<!doctype html>
