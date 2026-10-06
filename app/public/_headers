@@ -78,18 +78,24 @@
 /event/*
   Cache-Control: public, max-age=0, must-revalidate
 
-# /data/*: the static dataset. Un-hashed names (events/1900.json, land.json ...)
-# change on every data regeneration, so cache moderately and revalidate in the
-# background: events/meta.json, ids.json, events/full/*.json, the
-# decade chunks events/19xx.json, boundaries/*.json, land.json,
-# selection-funnel.json. The ONE content-hashed data file is
-# events/all.<12-hex-content-hash>.json (app/scripts/split-data.mjs): the hash
-# in the name is the cache key, so it is immutable. If more hashed names are
-# added, give them a distinctive prefix and add a rule like this one (a pattern
-# may contain only one splat, so the match is "prefix.*").
+# /data/*: the static dataset. Un-hashed names (land.json, boundaries/*.json,
+# events/meta.json, selection-funnel.json, framing-review.json) change on every
+# data regeneration, so cache moderately and revalidate in the background. All
+# event data (the lite list and every full record) lives in ONE versioned folder,
+# events/v.<12-hex-content-hash>/ (app/scripts/split-data.mjs): the hash covers
+# every file in it and is the cache key, so the whole folder is immutable and a
+# page never mixes two builds' files. If more hashed names are added, give them a
+# distinctive prefix and add a rule like this one (a pattern may contain only one
+# splat, which matches across "/", so the match is "prefix.*").
 /data/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-/data/events/all.*
+/data/events/v.*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+# Large boundary geometries stored once for several decades, named by a hash
+# of their content (split-data.mjs splitBoundaries), so immutable too.
+/data/boundaries/shared/*
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable

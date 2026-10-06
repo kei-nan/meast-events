@@ -8,6 +8,8 @@ import "maplibre-gl/dist/maplibre-gl-shared.mjs?url";
 import {
   EMPTY_FC,
   areaGeoJSON,
+  eventFeature,
+  eventSignature,
   eventsToGeoJSON,
   haversineKm,
   makeCircleArea,
@@ -26,6 +28,7 @@ import {
   YearToggle,
 } from "./MapUi";
 import useMediaQuery from "../hooks/useMediaQuery";
+import { diffById } from "../lib/sourceDiff";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "./useMapHoverLabel";
 import { LIST_MAX, allSameCoordinates, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
@@ -144,6 +147,8 @@ export default function MapView({
   const mapRef = useRef(null);
   const eventsRef = useRef(events);
   const matchIdsRef = useRef(matchIds);
+  // id -> signature of what the map's event source holds (lib/sourceDiff.js).
+  const sourceSigsRef = useRef(new Map());
   const yearRef = useRef(year);
   const focusRef = useRef(focus);
   const propsRef = useRef({});
@@ -278,6 +283,9 @@ export default function MapView({
         labels: boundaryLabelsForYear(yearRef.current, boundaries.features),
         events: eventsToGeoJSON(eventsRef.current, matchIdsRef.current),
       });
+      sourceSigsRef.current = new Map(
+        eventsRef.current.filter((e) => e.coordinates).map((e) => [e.id, eventSignature(e, matchIdsRef.current)])
+      );
 
       const pointerCursor = (on) => () => {
         if (propsRef.current.areaMode === "off" && !draggingRef.current) {
@@ -391,9 +399,24 @@ export default function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Send the map only what changed (lib/sourceDiff.js): a timeline step adds and
+  // removes the events entering and leaving the range; a full replacement is
+  // used when most features change (a search starts or ends).
   useEffect(() => {
     if (!mapReady) return;
-    mapRef.current.getSource("events")?.setData(eventsToGeoJSON(events, matchIds));
+    const source = mapRef.current.getSource("events");
+    if (!source) return;
+    const mapped = events.filter((e) => e.coordinates);
+    const byId = new Map(mapped.map((e) => [e.id, e]));
+    const diff = diffById(
+      sourceSigsRef.current,
+      mapped.map((e) => ({ id: e.id, sig: eventSignature(e, matchIds) }))
+    );
+    sourceSigsRef.current = diff.sigs;
+    if (diff.full) source.setData(eventsToGeoJSON(mapped, matchIds));
+    else if (diff.remove.length || diff.add.length) {
+      source.updateData({ remove: diff.remove, add: diff.add.map((id) => eventFeature(byId.get(id), matchIds)) });
+    }
   }, [events, matchIds, mapReady]);
 
   // Fetch trigger: only fires when the *settled* year lands in a decade that

@@ -1,16 +1,22 @@
 // Smoke check of a finished build (run after `npm run build`, in CI and in the
-// monthly data refresh). Catches a deploy that would load but show nothing:
-//   - the content-hashed events/all.<DATA_VERSION>.json the app requests exists,
-//     for the DATA_VERSION that split-data.mjs generated (src/lib/dataVersion.js),
-//     and the built JavaScript carries that same version;
-//   - events/meta.json agrees with it, and every decade chunk, full-lead bucket
-//     and ids.json entry it implies exists and is consistent;
-//   - every local script/stylesheet/icon index.html references exists in dist/;
-//   - the search index (Pagefind) was built.
+// monthly data refresh). Catches a deploy that would load but show nothing, or
+// that the host would refuse:
+//   - the versioned folder events/v.<DATA_VERSION>/ the app requests exists, for
+//     the DATA_VERSION that split-data.mjs generated (src/lib/dataVersion.js),
+//     with the bucket count it names, and the built JavaScript carries both;
+//   - events/meta.json agrees with it, the lite list has no duplicate ids, and
+//     every event's full record is in the bucket its id hashes to;
+//   - every local script/stylesheet/icon/preload index.html references exists in dist/;
+//   - the search index (Pagefind) was built;
+//   - dist/ has fewer files than the host allows per deploy (MAX_DIST_FILES,
+//     default 20,000: Cloudflare Workers static assets on the free plan,
+//     https://developers.cloudflare.com/workers/platform/limits/). Every event
+//     adds a page, so this is the limit the dataset reaches first.
 // Exits 1 with a list of problems, or prints a one-line summary.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { fullBucket } from "../src/lib/fullBucket.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(process.env.DIST_DIR ?? path.join(__dirname, "..", "dist"));
@@ -24,57 +30,62 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 
-// 1. The generated data version and the file it names.
+// 1. The generated data version and the folder it names.
 const versionFile = path.join(__dirname, "..", "src", "lib", "dataVersion.js");
 let DATA_VERSION = null;
+let FULL_BUCKETS = null;
 if (!existsSync(versionFile)) fail("src/lib/dataVersion.js is missing (split-data.mjs did not run)");
-else ({ DATA_VERSION } = await import(pathToFileURL(versionFile).href));
+else ({ DATA_VERSION, FULL_BUCKETS } = await import(pathToFileURL(versionFile).href));
 if (DATA_VERSION !== null && !/^[0-9a-f]{12}$/.test(DATA_VERSION)) fail(`DATA_VERSION ${JSON.stringify(DATA_VERSION)} is not 12 hex characters`);
+if (FULL_BUCKETS !== null && !(Number.isInteger(FULL_BUCKETS) && FULL_BUCKETS > 0)) fail(`FULL_BUCKETS ${FULL_BUCKETS} is not a positive integer`);
 
-const allFile = `all.${DATA_VERSION}.json`;
+const dir = `v.${DATA_VERSION}`;
 let all = null;
 if (DATA_VERSION) {
-  if (!existsSync(distFile(`data/events/${allFile}`))) fail(`data/events/${allFile} (named by dataVersion.js) is missing`);
-  else all = readJSON(`data/events/${allFile}`);
-  const stale = readdirSync(distFile("data/events")).filter((f) => /^all\..+\.json$/.test(f) && f !== allFile);
-  if (stale.length) fail(`other events/all.*.json files in dist: ${stale.join(", ")}`);
+  if (!existsSync(distFile(`data/events/${dir}/all.json`))) fail(`data/events/${dir}/all.json (named by dataVersion.js) is missing`);
+  else all = readJSON(`data/events/${dir}/all.json`);
+  const stale = readdirSync(distFile("data/events")).filter((f) => /^(v\..+|all\..+\.json|\d{4}\.json|ids\.json|full)$/.test(f) && f !== dir);
+  if (stale.length) fail(`other or old-layout event files in dist/data/events: ${stale.join(", ")}`);
   const assets = readdirSync(distFile("assets")).filter((f) => f.endsWith(".js"));
   if (!assets.some((f) => readFileSync(distFile(`assets/${f}`), "utf8").includes(DATA_VERSION))) {
     fail(`no dist/assets/*.js contains DATA_VERSION ${DATA_VERSION} (the bundle was built against another dataVersion.js)`);
   }
 }
 
-// 2. meta.json, ids.json and the chunks they name.
+// 2. meta.json and the files it implies.
 const meta = readJSON("data/events/meta.json");
-const ids = readJSON("data/events/ids.json");
 if (DATA_VERSION && meta.version !== DATA_VERSION) fail(`meta.json version ${meta.version} != DATA_VERSION ${DATA_VERSION}`);
-if (DATA_VERSION && meta.allFile !== allFile) fail(`meta.json allFile ${meta.allFile} != ${allFile}`);
-if (all) {
-  if (!Array.isArray(all)) fail(`${allFile} is not an array`);
-  else {
-    if (all.length !== meta.totalEvents) fail(`${allFile} has ${all.length} events, meta.json totalEvents is ${meta.totalEvents}`);
-    const allIds = all.map((e) => e.id);
-    if (new Set(allIds).size !== allIds.length) fail(`${allFile} has duplicate ids`);
-    const missing = allIds.filter((id) => !(id in ids));
-    if (missing.length) fail(`${missing.length} events in ${allFile} are not in ids.json (first: ${missing[0]})`);
-  }
-  if (all.length !== Object.keys(ids).length) fail(`ids.json has ${Object.keys(ids).length} ids, ${allFile} has ${all.length} events`);
-}
-// An event spanning several decades sits in each of their chunks; ids.json names
-// the chunk a deep link loads (the first), which must hold it.
-const inChunk = new Map(); // decade -> Set(id)
-for (const d of meta.decades) {
-  const rel = `data/events/${d}.json`;
-  if (!existsSync(distFile(rel))) fail(`${rel} (listed in meta.json decades) is missing`);
-  else inChunk.set(d, new Set(readJSON(rel).map((e) => e.id)));
-}
-const notInChunk = Object.entries(ids).filter(([id, d]) => !inChunk.get(d)?.has(id));
-if (notInChunk.length) fail(`${notInChunk.length} ids.json entries are not in the decade chunk they name (first: ${notInChunk[0].join(" -> ")})`);
-const chunkIds = new Set([...inChunk.values()].flatMap((s) => [...s]));
-const unlisted = [...chunkIds].filter((id) => !(id in ids));
-if (unlisted.length) fail(`${unlisted.length} events in decade chunks are not in ids.json (first: ${unlisted[0]})`);
+if (DATA_VERSION && meta.dir !== dir) fail(`meta.json dir ${meta.dir} != ${dir}`);
+if (FULL_BUCKETS && meta.fullBuckets !== FULL_BUCKETS) fail(`meta.json fullBuckets ${meta.fullBuckets} != FULL_BUCKETS ${FULL_BUCKETS}`);
+const buckets = [];
 for (let b = 0; b < meta.fullBuckets; b++) {
-  if (!existsSync(distFile(`data/events/full/${b}.json`))) fail(`data/events/full/${b}.json is missing (meta.json fullBuckets ${meta.fullBuckets})`);
+  const rel = `data/events/${meta.dir}/full/${b}.json`;
+  if (!existsSync(distFile(rel))) fail(`${rel} is missing (meta.json fullBuckets ${meta.fullBuckets})`);
+  else buckets.push(readJSON(rel));
+}
+if (all) {
+  if (!Array.isArray(all)) fail(`${dir}/all.json is not an array`);
+  else {
+    if (all.length !== meta.totalEvents) fail(`${dir}/all.json has ${all.length} events, meta.json totalEvents is ${meta.totalEvents}`);
+    const allIds = all.map((e) => e.id);
+    if (new Set(allIds).size !== allIds.length) fail(`${dir}/all.json has duplicate ids`);
+    if (buckets.length === meta.fullBuckets) {
+      const missing = allIds.filter((id) => !Object.hasOwn(buckets[fullBucket(id, meta.fullBuckets)], id));
+      if (missing.length) fail(`${missing.length} events have no full record in their bucket (first: ${missing[0]})`);
+      const records = buckets.reduce((n, b) => n + Object.keys(b).length, 0);
+      if (records !== allIds.length) fail(`${records} full records for ${allIds.length} events`);
+    }
+  }
+}
+
+// Boundary chunks: every shared geometry a chunk points to exists.
+const bmeta = readJSON("data/boundaries/meta.json");
+for (const d of bmeta.decades) {
+  for (const f of readJSON(`data/boundaries/${d}.json`).features) {
+    if (f.geometry_ref && !existsSync(distFile(`data/boundaries/shared/${f.geometry_ref}.json`))) {
+      fail(`data/boundaries/${d}.json points to missing shared geometry ${f.geometry_ref}`);
+    }
+  }
 }
 
 // 3. index.html's local references.
@@ -89,12 +100,20 @@ for (const u of refs) {
 // 4. Search index.
 if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is missing (build-search-index.mjs did not run)");
 
+// 5. File count against the host's per-deploy limit. _headers and _redirects are
+// configuration, not assets, but counting them keeps the margin honest.
+const MAX_DIST_FILES = Number(process.env.MAX_DIST_FILES) || 20000;
+const countFiles = (d) => readdirSync(d, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? countFiles(path.join(d, e.name)) : 1), 0);
+const fileCount = countFiles(DIST);
+if (fileCount >= MAX_DIST_FILES) fail(`dist/ has ${fileCount} files; the host allows ${MAX_DIST_FILES} per deploy (see docs/SCALING.md)`);
+else if (fileCount >= MAX_DIST_FILES * 0.75) console.warn(`check-dist: warning - ${fileCount} files, ${Math.round((100 * fileCount) / MAX_DIST_FILES)}% of the ${MAX_DIST_FILES}-file limit`);
+
 if (problems.length) {
   console.error(`check-dist: ${problems.length} problem(s) in ${DIST}`);
   for (const p of problems) console.error(`  - ${p}`);
   process.exit(1);
 }
 console.log(
-  `check-dist: OK - ${allFile}, ${meta.totalEvents} events in ${meta.decades.length} decade chunks, ` +
-    `${meta.fullBuckets} full-lead buckets, ${refs.length} index.html references, search index present`
+  `check-dist: OK - ${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
+    `${refs.length} index.html references, search index present, ${fileCount} files (limit ${MAX_DIST_FILES})`
 );

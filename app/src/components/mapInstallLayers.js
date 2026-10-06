@@ -112,6 +112,10 @@ export function installLayers(map, { land, boundaries, labels, events }) {
     // `searching` (s is the same on every feature) tells the count label
     // whether to show matches or the plain total.
     clusterProperties: { matches: ["+", ["get", "m"]], searching: ["max", ["get", "s"]] },
+    // The event id identifies each feature, so a timeline step can send the map
+    // only the events that entered or left the range (updateData, see
+    // lib/sourceDiff.js) instead of every feature.
+    promoteId: "id",
   });
 
   map.addLayer({

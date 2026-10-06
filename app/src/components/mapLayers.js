@@ -13,6 +13,10 @@ export const CATEGORY_COLORS = {
   treaty: "#5e9377", // verdigris green
   political: "#304876", // muted indigo
   uprising: "#c99a45", // antique gold
+  // Chosen 2026-10-06 by search: the muted mid-lightness ink farthest (CIEDE2000)
+  // from the others in normal vision, deuteranopia and protanopia (worst 14.6,
+  // above the rest of the palette's own worst pair, 13.1).
+  protest: "#4b69c3", // cobalt
   migration: "#a585ac", // dusty lilac
   diplomatic: "#36747d", // muted teal
   economic: "#8b7938", // olive mustard
@@ -79,25 +83,34 @@ export const CLUSTER_LABEL_PAINT = {
   "text-color": "#ece2c9",
 };
 
+// The map feature of one event (only events with coordinates have one).
+export function eventFeature(e, matchIds) {
+  return {
+    type: "Feature",
+    properties: {
+      id: e.id,
+      category: e.category,
+      title: e.title,
+      y: eventYearLabel(e), // year label for the hover label and stacked-event list
+      m: matchIds ? (matchIds.has(e.id) ? 1 : 0) : 1,
+      s: matchIds ? 1 : 0,
+      a: e.location_quality === "approximate" ? 1 : 0,
+    },
+    geometry: { type: "Point", coordinates: [e.coordinates.lon, e.coordinates.lat] },
+  };
+}
+
+// Everything eventFeature draws from that can change while the page is open:
+// the search flags (the event's own fields are fixed for the life of the page,
+// and a full lead arriving changes none of them). For lib/sourceDiff.js.
+export function eventSignature(e, matchIds) {
+  return matchIds ? (matchIds.has(e.id) ? "s1" : "s0") : "-";
+}
+
 export function eventsToGeoJSON(events, matchIds) {
-  const searching = matchIds ? 1 : 0;
   return {
     type: "FeatureCollection",
-    features: events
-      .filter((e) => e.coordinates)
-      .map((e) => ({
-        type: "Feature",
-        properties: {
-          id: e.id,
-          category: e.category,
-          title: e.title,
-          y: eventYearLabel(e), // year label for the hover label and stacked-event list
-          m: matchIds ? (matchIds.has(e.id) ? 1 : 0) : 1,
-          s: searching,
-          a: e.location_quality === "approximate" ? 1 : 0,
-        },
-        geometry: { type: "Point", coordinates: [e.coordinates.lon, e.coordinates.lat] },
-      })),
+    features: events.filter((e) => e.coordinates).map((e) => eventFeature(e, matchIds)),
   };
 }
 

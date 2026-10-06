@@ -12,8 +12,8 @@
 // stylesheet is public/event/event.css.
 //
 // The input is the data the build just shipped (dist/data/, written by
-// split-data.mjs and copied by Vite): the lite record from events/all.<hash>.json
-// merged with the full-lead record from events/full/<bucket>.json, the same merge
+// split-data.mjs and copied by Vite): the lite record from events/v.<version>/all.json
+// merged with the full record from events/v.<version>/full/<bucket>.json, the same merge
 // the app's detail view does. So a page shows exactly what the app shows,
 // including the framing review (the app shows it under every summary). Rendering
 // is in event-page.mjs. The search index (build-search-index.mjs) is built from
@@ -36,11 +36,12 @@ const readJSON = async (file) => JSON.parse(await readFile(file, "utf8"));
 
 async function main() {
   const meta = await readJSON(path.join(DATA, "meta.json"));
-  const lite = await readJSON(path.join(DATA, meta.allFile));
+  const dir = path.join(DATA, meta.dir);
+  const lite = await readJSON(path.join(dir, "all.json"));
   const buckets = new Map();
   const full = async (id) => {
-    const b = fullBucket(id);
-    if (!buckets.has(b)) buckets.set(b, await readJSON(path.join(DATA, "full", `${b}.json`)));
+    const b = fullBucket(id, meta.fullBuckets);
+    if (!buckets.has(b)) buckets.set(b, await readJSON(path.join(dir, "full", `${b}.json`)));
     return buckets.get(b)[id];
   };
 
