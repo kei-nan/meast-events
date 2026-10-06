@@ -10,7 +10,11 @@ html, body, #root {
 .app {
   display: flex;
   flex-direction: column;
+  /* Exactly the visible viewport: dvh follows a phone's collapsing address bar,
+     so nothing below (timeline, footer) is pushed off screen and the page never
+     scrolls under the map. vh is the fallback for browsers without dvh. */
   height: 100vh;
+  height: 100dvh;
   font-family: var(--font-sans);
   background: var(--bg-0);
   color: var(--text-primary);
@@ -98,11 +102,51 @@ html, body, #root {
   .app-header h1 {
     font-size: 1.05rem;
   }
+}
 
+/* Phones and short (landscape) screens: one line, "About the data · Credits:
+   Wikipedia, CShapes 2.0 (modified)". The full credit line opens below it from
+   the Credits button (App.jsx); on larger screens it is always shown. */
+.app-footer-compact {
+  display: none;
+}
+
+@media (max-width: 768px), (max-height: 500px) {
   .app-footer {
-    margin-top: auto;
-    padding: 4px 14px 8px;
-    font-size: 0.74rem;
+    padding: 0 14px;
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+
+  .app-footer-compact {
+    display: inline;
+  }
+
+  .app-credits {
+    display: none;
+  }
+
+  .app-footer[data-credits="open"] .app-credits {
+    display: block;
+    padding-bottom: 4px;
+  }
+
+  .app-credits-sep {
+    display: none;
+  }
+
+  /* 24px tall, the WCAG 2.2 minimum target size, without a taller footer. */
+  .app-footer-link {
+    padding: 5px 0;
+  }
+}
+
+/* Below 360px the compact line would wrap, so "About the data" shortens to
+   "About" and the version number is left to the full credits. "(modified)"
+   stays: CC BY-NC-SA asks for the note that the borders were changed. */
+@media (max-width: 359px) {
+  .app-footer-wide {
+    display: none;
   }
 }
 

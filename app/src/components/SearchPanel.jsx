@@ -31,7 +31,9 @@ import "../SidePanel.css";
  * @param {object[]} props.results          lite events {id,title,date_start,date_end,countries,category,
  *                                          location_quality,snippet}, already ordered
  * @param {number}   props.total            total matches (may exceed results.length)
- * @param {"fulltext"|"local"|"static"} props.source    "static" (full-text index unavailable) shows the "Matching is simpler in offline mode" banner
+ * @param {{all:number, inRange:number}} [props.counts] search matches over the whole timeline / in the
+ *                                          selected years (all is used for the "show all N" button)
+ * @param {"fulltext"|"local"|"static"} props.source   "static" (full-text index unavailable) shows the "Matching is simpler in offline mode" banner
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
@@ -60,6 +62,7 @@ export default function SearchPanel({
   source,
   eventsLoading = false,
   interim = false,
+  counts,
   selectedEvent,
   viewCount,
   range,
@@ -204,21 +207,44 @@ export default function SearchPanel({
       ? results.filter((e) => inRange(e, range)).length
       : null;
 
+  // Whole-timeline count while only the selected years are listed. Unknown
+  // with "in map view" on, since App only counts the view-trimmed scoped list.
+  const allCount = filters.scope === "range" && !filters.inView ? (counts?.all ?? null) : null;
+  const plural = (n) => `${n} result${n === 1 ? "" : "s"}`;
+  const settled = !eventsLoading && !loading && searching;
+
   // `years` names the selected years: the visible line says "selected years"
   // (the timeline shows them), the announcement below spells them out.
+  // `extra` repeats what the scope button next to the visible line says, as
+  // screen-reader-only text.
   function describeStatus(years) {
-    if (eventsLoading) return "Loading events…";
+    const sel = years ?? "selected years";
+    if (eventsLoading) return { text: "Loading events…", extra: "" };
     if (loading && interim && results.length > 0)
-      return `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`;
-    if (loading && results.length === 0) return "Searching…";
-    if (!searching) return `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}`;
-    if (total === 0) return "0 results";
-    return (
-      `${total} result${total === 1 ? "" : "s"}` +
-      (shownInRange !== null && shownInRange !== total ? ` (${shownInRange} in ${years ?? "selected years"})` : "")
-    );
+      return { text: `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`, extra: "" };
+    if (loading && results.length === 0) return { text: "Searching…", extra: "" };
+    if (!searching) return { text: `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}`, extra: "" };
+    if (filters.scope === "range") return { text: `${plural(total)} in ${sel}`, extra: "" };
+    if (total === 0) return { text: "0 results", extra: "" };
+    if (shownInRange === 0) return { text: `${plural(total)} (none in ${sel})`, extra: "" };
+    if (shownInRange !== null && shownInRange !== total)
+      return { text: plural(total), extra: `, ${shownInRange} in ${sel}` };
+    return { text: plural(total), extra: "" };
   }
-  const statusText = describeStatus(null);
+  const { text: statusText, extra: statusExtra } = describeStatus(null);
+
+  // The relevance order is kept in both scopes; this button only switches
+  // between listing every match and listing the ones in the selected years.
+  let scopeAction = null;
+  if (settled && filters.scope === "range" && (allCount === null || allCount > total)) {
+    scopeAction = {
+      label: allCount === null ? "show whole timeline" : `show all ${allCount}`,
+      aria: allCount === null ? "Show results from the whole timeline" : `Show all ${plural(allCount)}, whole timeline`,
+      scope: "all",
+    };
+  } else if (settled && filters.scope !== "range" && total > 0 && shownInRange && shownInRange !== total) {
+    scopeAction = { label: `show the ${shownInRange} in selected years`, aria: null, scope: "range" };
+  }
 
   // Screen reader announcements. The visible status line is not a live region:
   // Play changes it every 350 ms. This hidden one stays empty while Play runs
@@ -233,9 +259,8 @@ export default function SearchPanel({
     setPausedAt(playState === "paused" ? rangeKey : null);
   }
   const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
-  const liveText = playing
-    ? ""
-    : (pausedAt === rangeKey ? `Paused at ${range[1]}. ` : "") + describeStatus(yearsText);
+  const spoken = describeStatus(yearsText);
+  const liveText = playing ? "" : (pausedAt === rangeKey ? `Paused at ${range[1]}. ` : "") + spoken.text + spoken.extra;
 
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}`;
 
@@ -330,7 +355,24 @@ export default function SearchPanel({
               <span className="sp-caret" aria-hidden="true" />
               Filters{activeCount > 0 ? ` (${activeCount})` : ""}
             </button>
-            <p className="sp-status">{statusText}</p>
+            <div className="sp-statusline">
+              <p className="sp-status">
+                {statusText}
+                {statusExtra && <span className="sp-sr">{statusExtra}</span>}
+              </p>
+              {/* One button in a fixed place whose text flips between the two
+                  scopes, so keyboard focus stays on it after pressing it. */}
+              {scopeAction && (
+                <button
+                  type="button"
+                  className="sp-scope-link"
+                  aria-label={scopeAction.aria ?? undefined}
+                  onClick={() => onFiltersChange({ ...filters, scope: scopeAction.scope })}
+                >
+                  {scopeAction.label}
+                </button>
+              )}
+            </div>
           </div>
 
           {!filtersOpen && (activeCount > 0 || areaMode !== "off") && (
