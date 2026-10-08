@@ -78,7 +78,7 @@
 /event/*
   Cache-Control: public, max-age=0, must-revalidate
 
-# /data/*: the static dataset. Un-hashed names (land.json, boundaries/*.json,
+# /data/*: the static dataset. Un-hashed names (land.json, land-far.json, boundaries/*.json,
 # events/meta.json, selection-funnel.json, framing-review.json) change on every
 # data regeneration, so cache moderately and revalidate in the background. All
 # event data (the lite list and every full record) lives in ONE versioned folder,

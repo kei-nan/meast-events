@@ -88,6 +88,12 @@ for (const d of bmeta.decades) {
   }
 }
 
+// Land: the opening view's file and the rest (lib/mapExtent.js NEAR_LAND_EXTENT).
+for (const name of ["land.json", "land-far.json"]) {
+  if (!existsSync(distFile(`data/${name}`))) fail(`data/${name} is missing`);
+  else if (!Array.isArray(readJSON(`data/${name}`).features)) fail(`data/${name} is not a FeatureCollection`);
+}
+
 // 3. index.html's local references.
 const html = readFileSync(distFile("index.html"), "utf8");
 const refs = [...html.matchAll(/\b(?:src|href)="([^"]+)"/g)].map((m) => m[1]).filter((u) => u.startsWith("/") && !u.startsWith("//"));

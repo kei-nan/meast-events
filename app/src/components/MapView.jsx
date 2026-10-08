@@ -39,6 +39,7 @@ import {
   decadeFloor,
   loadBoundaryDecade,
   loadDeferredGeometry,
+  loadFarLand,
   loadLand,
   prefetchBoundaryDecade,
 } from "../lib/dataClient";
@@ -185,6 +186,12 @@ export default function MapView({
   const hoverLabelRef = useRef(null);
   const compact = useMediaQuery("(max-width: 768px)");
   const landFailedRef = useRef(false);
+  // The land source draws both files (lib/mapExtent.js NEAR_LAND_EXTENT).
+  const landRef = useRef({ near: null, far: null });
+  const landData = () => ({
+    type: "FeatureCollection",
+    features: [...(landRef.current.near?.features ?? []), ...(landRef.current.far?.features ?? [])],
+  });
   // Only the settled year triggers a new fetch; boundariesForYear/labels below
   // still run against the live `year` for instant filtering of whatever decade
   // is already cached, so scrubbing within a loaded decade has zero lag.
@@ -226,6 +233,7 @@ export default function MapView({
   const fetchLand = useCallback(async () => {
     try {
       const land = await withRetry(loadLand, () => setBorderError({ decade: "land", phase: "retrying" }));
+      landRef.current.near = land;
       landFailedRef.current = false;
       setBorderError((e) => (e && e.decade === "land" ? null : e));
       return land;
@@ -241,7 +249,7 @@ export default function MapView({
     setBorderError({ decade, phase: "retrying" });
     if (landFailedRef.current) {
       const land = await fetchLand();
-      if (land) mapRef.current?.getSource("land")?.setData(land);
+      if (land) mapRef.current?.getSource("land")?.setData(landData());
     }
     await fetchDecade(decade);
   }, [fetchDecade, fetchLand]);
@@ -273,7 +281,7 @@ export default function MapView({
       // after a backoff) never holds the whole map hostage: layers are built with
       // whatever has arrived and late data is applied by the effects/callback below.
       const landPromise = fetchLand().then((l) => {
-        if (l && !cancelled) map.getSource("land")?.setData(l);
+        if (l && !cancelled) map.getSource("land")?.setData(landData());
         return l;
       });
       const [landResult] = await Promise.all([
@@ -286,7 +294,7 @@ export default function MapView({
       const boundaries = boundariesForYear(yearRef.current, drawableBoundaries(initialFeatures));
       appliedBordersRef.current = boundaries.features;
       installLayers(map, {
-        land: landResult ?? EMPTY_FC,
+        land: landResult ? landData() : EMPTY_FC,
         boundaries,
         // Already filtered to the year, so the labels' own filter keeps them all.
         labels: boundaryLabelsForYear(yearRef.current, boundaries.features),
@@ -409,6 +417,24 @@ export default function MapView({
       });
 
       setMapReady(true);
+
+      // Land beyond the opening view loads once that view has drawn, so it never
+      // competes with it; a failed load is retried on the next pan or zoom.
+      const addFarLand = () => {
+        loadFarLand()
+          .then((far) => {
+            if (cancelled || landRef.current.far) return;
+            landRef.current.far = far;
+            map.off("moveend", addFarLand);
+            map.getSource("land")?.setData(landData());
+          })
+          .catch(() => {});
+      };
+      map.once("idle", () => {
+        if (cancelled) return;
+        addFarLand();
+        map.on("moveend", addFarLand);
+      });
     });
 
     return () => {

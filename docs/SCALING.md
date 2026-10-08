@@ -11,7 +11,7 @@ guards them in the build, and what to do when one is reached. Numbers were measu
 | `data/events/v.<version>/all.json` | on every page load, preloaded from `index.html` | **yes, linearly**: the lite record of every event (id, title, dates, countries, category, 160-character snippet, coordinates, location quality) |
 | `data/events/v.<version>/full/<bucket>.json` | when an event is opened | per bucket, no: the bucket count doubles as the dataset doubles, so a bucket stays around 32 events (~20 KB compressed) |
 | `pagefind/*` | on the first search | the index is chunked by Pagefind; `pagefind/ids.json` (~40 bytes per event) is loaded whole |
-| `data/boundaries/<decade>.json`, `data/boundaries/shared/<hash>.json`, `data/land.json` | when the map starts | no (borders, not events) |
+| `data/boundaries/<decade>.json`, `data/boundaries/shared/<hash>.json`, `data/land.json` | when the map starts; `data/land-far.json` once its first view has drawn | no (borders, not events) |
 | `/event/<id>` | search engines, shared links | one static page per event: **counts against the host's file limit** |
 
 `<version>` is a hash of every file in the folder, so the whole folder is cached immutably (`app/public/_headers`) and a page never mixes files from two builds.
