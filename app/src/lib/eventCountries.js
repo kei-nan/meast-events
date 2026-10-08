@@ -156,14 +156,16 @@ export function eventBorderYear(event, minYear, maxYear) {
 }
 
 // Active features of `year` (from the loaded decade chunk) that draw the
-// event's countries, as a FeatureCollection; empty when nothing matches.
+// event's countries, as a FeatureCollection; empty when nothing matches. A
+// placeholder outline (lib/deferredBoundaries.js) stands in for its members.
 export function countryHighlightFeatures(event, year, features) {
   const fc = { type: "FeatureCollection", features: [] };
   if (!event || year == null || !features) return fc;
   const { names } = countryShading(event.countries, year);
   if (!names.size) return fc;
+  const matches = (p) => names.has(p.name) || (p.placeholder_for ?? []).some((n) => names.has(n));
   fc.features = features.filter(
-    (f) => names.has(f.properties.name) && f.properties.start_year <= year && year <= f.properties.end_year
+    (f) => matches(f.properties) && f.properties.start_year <= year && year <= f.properties.end_year
   );
   return fc;
 }

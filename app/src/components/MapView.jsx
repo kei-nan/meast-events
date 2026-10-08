@@ -38,9 +38,18 @@ import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels"
 import {
   decadeFloor,
   loadBoundaryDecade,
+  loadDeferredGeometry,
   loadLand,
   prefetchBoundaryDecade,
 } from "../lib/dataClient";
+import {
+  deferredRefsInView,
+  drawableBoundaries,
+  isPlaceholder,
+  listedBoundaries,
+  placeholderMembers,
+  withGeometry,
+} from "../lib/deferredBoundaries";
 import { MAP_EXTENT } from "../lib/mapExtent";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
@@ -274,7 +283,7 @@ export default function MapView({
       // Unmounted while the data was loading: the map is already removed.
       if (cancelled) return;
       const initialFeatures = boundaryCacheRef.current.get(initialDecade) ?? [];
-      const boundaries = boundariesForYear(yearRef.current, initialFeatures);
+      const boundaries = boundariesForYear(yearRef.current, drawableBoundaries(initialFeatures));
       appliedBordersRef.current = boundaries.features;
       installLayers(map, {
         land: landResult ?? EMPTY_FC,
@@ -378,6 +387,7 @@ export default function MapView({
       });
 
       // Click on a border polygon (not on a marker): show its status/note/source.
+      // A placeholder outline is described by the areas it stands for.
       map.on("click", (e) => {
         if (!clickable()) return;
         const onMarker = map.queryRenderedFeatures(e.point, {
@@ -386,7 +396,16 @@ export default function MapView({
         if (onMarker.length) return;
         setStackList(null);
         const hits = map.queryRenderedFeatures(e.point, { layers: ["boundaries-fill"] });
-        setBorderPopup(hits.length ? { point: [e.point.x, e.point.y], items: uniqueBoundaries(hits) } : null);
+        const chunk = boundaryCacheRef.current.get(decadeFloor(yearRef.current)) ?? [];
+        let hint = null;
+        const items = hits.flatMap((h) => {
+          if (h.properties.placeholder_for == null) return [h];
+          const placeholder = chunk.find((f) => isPlaceholder(f) && f.properties.name === h.properties.name);
+          if (!placeholder) return [h];
+          hint = placeholder.properties.note;
+          return placeholderMembers(placeholder, chunk);
+        });
+        setBorderPopup(hits.length ? { point: [e.point.x, e.point.y], items: uniqueBoundaries(items), hint } : null);
       });
 
       setMapReady(true);
@@ -447,7 +466,7 @@ export default function MapView({
     // Most years (every Play step) leave the same borders active: re-sending
     // identical data would make MapLibre re-tile every polygon for nothing. The
     // cached feature objects are stable, so comparing them by identity is enough.
-    const active = boundariesForYear(year, features);
+    const active = boundariesForYear(year, drawableBoundaries(features));
     const prev = appliedBordersRef.current;
     const unchanged =
       prev && prev.length === active.features.length && active.features.every((f, i) => f === prev[i]);
@@ -459,6 +478,39 @@ export default function MapView({
     }
     setDisplayedYear(year);
   }, [year, boundaryVersion, mapReady]);
+
+  // Deferred geometries (lib/deferredBoundaries.js, the West Bank Areas A/B/C):
+  // fetched once the view is zoomed in over them, then swapped into every cached
+  // decade that has them; the apply trigger above then replaces the outline.
+  useEffect(() => {
+    if (!mapReady) return;
+    const map = mapRef.current;
+    const check = () => {
+      const features = boundaryCacheRef.current.get(decadeFloor(yearRef.current));
+      if (!features) return;
+      const b = map.getBounds();
+      const bounds = [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()];
+      for (const ref of deferredRefsInView(features, yearRef.current, map.getZoom(), bounds)) {
+        loadDeferredGeometry(ref)
+          .then((geometry) => {
+            const cache = boundaryCacheRef.current;
+            let changed = false;
+            for (const [decade, feats] of cache) {
+              const next = withGeometry(feats, ref, geometry);
+              if (next !== feats) {
+                cache.set(decade, next);
+                changed = true;
+              }
+            }
+            if (changed) setBoundaryVersion((v) => v + 1);
+          })
+          .catch(() => {}); // the outline stays; the next move retries
+      }
+    };
+    check();
+    map.on("moveend", check);
+    return () => map.off("moveend", check);
+  }, [mapReady, debouncedYear, boundaryVersion]);
 
   // Container size (for popup placement) and popup housekeeping.
   useEffect(() => {
@@ -506,7 +558,10 @@ export default function MapView({
   const decadeCached = boundaryCacheRef.current.has(decadeFloor(year));
   const shownBorderYear = decadeCached ? year : displayedYear;
   const yearFeatures = useMemo(
-    () => boundaryCacheRef.current.get(decadeFloor(year)) ?? null,
+    () => {
+      const feats = boundaryCacheRef.current.get(decadeFloor(year));
+      return feats ? drawableBoundaries(feats) : null;
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [year, boundaryVersion]
   );
@@ -517,7 +572,7 @@ export default function MapView({
     if (shownBorderYear == null) return [];
     const feats = boundaryCacheRef.current.get(decadeFloor(shownBorderYear));
     if (!feats) return [];
-    return uniqueBoundaries(boundariesForYear(shownBorderYear, feats).features);
+    return uniqueBoundaries(boundariesForYear(shownBorderYear, listedBoundaries(feats)).features);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shownBorderYear, boundaryVersion]);
   const relevantError =

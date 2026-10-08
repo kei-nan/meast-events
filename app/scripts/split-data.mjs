@@ -68,6 +68,31 @@ const MAX_LITE_GZIP_BYTES = Number(process.env.MAX_LITE_GZIP_BYTES) || 1024 * 10
 const SNIPPET_LENGTH = 160;
 // Multi-decade boundary geometries at least this large are stored once (see splitBoundaries).
 const SHARED_GEOMETRY_MIN_BYTES = 32 * 1024;
+// Geometries too heavy for a first visit, loaded only once the map is zoomed in
+// over them (src/lib/deferredBoundaries.js). OCHA's West Bank Areas A/B/C are
+// ~3 MB raw (~1 MB brotli), half of what a first visit to the default 2020s
+// view downloaded. Until they load, the map draws `placeholder`: an existing
+// source geometry for the same ground (CShapes' West Bank record, as drawn for
+// 1967-1999), never a simplified copy of the areas. The Borders list and the
+// popup still describe the members, whose properties ship in the chunk.
+const DEFERRED_GROUPS = [
+  {
+    members: [
+      "West Bank Area A (Palestinian Authority)",
+      "West Bank Area B (Palestinian civil, joint security)",
+      "West Bank Area C (Israeli control)",
+    ],
+    // Map zoom from which the members load (the West Bank is ~130 px wide at 7).
+    minzoom: 7,
+    placeholder: {
+      geometryFrom: "West Bank (Israeli occupation, phased Oslo transfers)",
+      name: "West Bank",
+      note:
+        "At this zoom the map draws only the West Bank's outline. Zoom in to draw the " +
+        "Oslo II Areas A, B and C it is divided into; each is described in this card.",
+    },
+  },
+];
 
 const DECADE_SIZE = 10;
 
@@ -158,6 +183,43 @@ async function writeJSON(filePath, data) {
   await writeFile(filePath, JSON.stringify(data));
 }
 
+// DEFERRED_GROUPS resolved against the source: each member feature with its
+// zoom threshold and bbox, and one placeholder feature per group. A name that no
+// longer matches fails the build, so a renamed area can't silently ship eagerly
+// or lose its placeholder.
+function deferredBoundaryGroups(features) {
+  const byName = (name) => {
+    const hits = features.filter((f) => f.properties.name === name);
+    if (hits.length !== 1) throw new Error(`DEFERRED_GROUPS: expected one boundary named "${name}", found ${hits.length}`);
+    return hits[0];
+  };
+  const members = new Map(); // feature -> {minzoom, bbox}
+  const placeholders = [];
+  for (const group of DEFERRED_GROUPS) {
+    const feats = group.members.map(byName);
+    const { start_year, end_year } = feats[0].properties;
+    if (feats.some((f) => f.properties.start_year !== start_year || f.properties.end_year !== end_year)) {
+      throw new Error(`DEFERRED_GROUPS: the members of "${group.placeholder.name}" must share their years`);
+    }
+    for (const f of feats) members.set(f, { minzoom: group.minzoom, bbox: geometryBbox(f.geometry) });
+    const from = byName(group.placeholder.geometryFrom);
+    placeholders.push({
+      type: "Feature",
+      properties: {
+        name: group.placeholder.name,
+        start_year,
+        end_year,
+        status: null,
+        source: from.properties.source,
+        note: group.placeholder.note,
+        placeholder_for: group.members,
+      },
+      geometry: from.geometry,
+    });
+  }
+  return { members, placeholders };
+}
+
 async function splitBoundaries() {
   const raw = JSON.parse(await readFile(BOUNDARIES_FILE, "utf8"));
   const byDecade = new Map();
@@ -176,25 +238,37 @@ async function splitBoundaries() {
   // (e.g. OCHA's West Bank areas, ~2.9 MB, in 2000, 2010 and 2020) up to three
   // times. The geometry is the source's, byte for byte; dataClient.js puts it
   // back before the map sees the feature.
+  // Deferred geometries (DEFERRED_GROUPS) are always shared, whatever their span.
+  const deferred = deferredBoundaryGroups(raw.features);
   const sharedRefs = new Map(); // feature -> hash
   let sharedBytes = 0;
   for (const feature of raw.features) {
     const { start_year, end_year } = feature.properties;
     const json = JSON.stringify(feature.geometry);
-    if (decadesFor(start_year, end_year).length < 2 || json.length < SHARED_GEOMETRY_MIN_BYTES) continue;
+    const large = decadesFor(start_year, end_year).length >= 2 && json.length >= SHARED_GEOMETRY_MIN_BYTES;
+    if (!large && !deferred.members.has(feature)) continue;
     const hash = createHash("sha256").update(json).digest("hex").slice(0, 12);
     sharedRefs.set(feature, hash);
     await writeFile(path.join(await ensureDir(path.join(OUT_DIR, "boundaries", "shared")), `${hash}.json`), json);
     sharedBytes += json.length;
   }
 
+  for (const placeholder of deferred.placeholders) {
+    const { start_year, end_year } = placeholder.properties;
+    for (const decade of decadesFor(start_year, end_year)) byDecade.get(decade).push(placeholder);
+  }
+
   let totalBytes = 0;
   for (const [decade, features] of byDecade) {
     const fc = {
       type: "FeatureCollection",
-      features: features.map((f) =>
-        sharedRefs.has(f) ? { type: "Feature", properties: f.properties, geometry: null, geometry_ref: sharedRefs.get(f) } : f
-      ),
+      features: features.map((f) => {
+        if (!sharedRefs.has(f)) return f;
+        const ref = { type: "Feature", properties: f.properties, geometry: null, geometry_ref: sharedRefs.get(f) };
+        // `bbox` is GeoJSON's own member; `minzoom` is ours (src/lib/deferredBoundaries.js).
+        const lazy = deferred.members.get(f);
+        return lazy ? { ...ref, bbox: lazy.bbox, minzoom: lazy.minzoom } : ref;
+      }),
     };
     const filePath = path.join(OUT_DIR, "boundaries", `${decade}.json`);
     await writeJSON(filePath, fc);
