@@ -79,9 +79,15 @@ function fetchJSONCached(url, { timeoutMs, cache } = {}) {
 
 const dataUrl = (relPath) => `${import.meta.env.BASE_URL}data/${relPath}`;
 
-// Pure physical geography (land/water silhouette) with no time dimension.
+// Pure physical geography (land/water silhouette) with no time dimension:
+// land.json for the opening view, land-far.json for the rest of the map
+// (NEAR_LAND_EXTENT in lib/mapExtent.js).
 export function loadLand() {
   return fetchJSONCached(dataUrl("land.json"));
+}
+
+export function loadFarLand() {
+  return fetchJSONCached(dataUrl("land-far.json"));
 }
 
 // A decade's FeatureCollection. Large geometries that span several decades are

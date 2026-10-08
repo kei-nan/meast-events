@@ -46,7 +46,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { fullBucket, fullBucketCount } from "../src/lib/fullBucket.js";
-import { MAP_EXTENT } from "../src/lib/mapExtent.js";
+import { MAP_EXTENT, NEAR_LAND_EXTENT } from "../src/lib/mapExtent.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 
@@ -495,15 +495,25 @@ function geometryBbox(geometry) {
 // such), but the map never shows land outside MAP_EXTENT. Polygons entirely
 // outside it are dropped from the shipped copy; polygons that cross the edge
 // are kept whole and unmodified, so every coordinate drawn is the source's own.
+// The kept polygons are split, whole, into land.json (touching
+// NEAR_LAND_EXTENT, needed by the first view) and land-far.json (the rest).
 async function copyLand() {
   const raw = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
-  const [minLon, minLat, maxLon, maxLat] = MAP_EXTENT;
-  const features = raw.features.filter((f) => {
+  const touches = (b, [minLon, minLat, maxLon, maxLat]) =>
+    b[2] >= minLon && b[0] <= maxLon && b[3] >= minLat && b[1] <= maxLat;
+  const near = [];
+  const far = [];
+  for (const f of raw.features) {
     const b = geometryBbox(f.geometry);
-    return b[2] >= minLon && b[0] <= maxLon && b[3] >= minLat && b[1] <= maxLat;
-  });
-  await writeJSON(path.join(OUT_DIR, "land.json"), { ...raw, features });
-  console.log(`land: ${features.length} of ${raw.features.length} polygons inside MAP_EXTENT, copied as one static asset`);
+    if (!touches(b, MAP_EXTENT)) continue;
+    (touches(b, NEAR_LAND_EXTENT) ? near : far).push(f);
+  }
+  await writeJSON(path.join(OUT_DIR, "land.json"), { ...raw, features: near });
+  await writeJSON(path.join(OUT_DIR, "land-far.json"), { ...raw, features: far });
+  console.log(
+    `land: ${near.length + far.length} of ${raw.features.length} polygons inside MAP_EXTENT: ` +
+      `${near.length} in land.json, ${far.length} in land-far.json`
+  );
 }
 
 async function copyFunnel() {
