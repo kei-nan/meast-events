@@ -24,10 +24,10 @@ const DRAW_MODES = [
   { mode: "circle", icon: "◯", label: "Draw circle", short: "Circle" },
 ];
 
-// Search-area drawing. Desktop: the shape buttons (and Clear area) sit in the
-// toolbar. Phones (compact): one "Draw" button opens them as a row under the
-// toolbar, so fewer controls float over a small map.
-function DrawTools({ areaMode, hasArea, onToggle, onClear, compact }) {
+// Search-area drawing: one "Draw area" button opens the shapes (and Clear area)
+// as a row under the toolbar, so fewer controls float over the map. Phones
+// show the button as its icon only (MapUi.css).
+function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
   useEffect(() => {
@@ -70,22 +70,13 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear, compact }) {
     </>
   );
 
-  if (!compact) {
-    return (
-      <div className="mu-draw-opts" role="group" aria-label="Draw a search area">
-        <span className="mu-draw-title" aria-hidden="true">
-          Draw area
-        </span>
-        {choices}
-      </div>
-    );
-  }
   const active = DRAW_MODES.find((d) => d.mode === areaMode);
   return (
     <div className="mu-draw" ref={wrapRef}>
       <ToolButton
         icon={active ? active.icon : "✎"}
-        label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw a search area"}
+        label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw area"}
+        aria-label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw a search area"}
         aria-expanded={open}
         aria-controls="mu-draw-menu"
         aria-pressed={!!active}
@@ -148,17 +139,16 @@ const pointerVerb = () =>
 
 const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// The one map toolbar (top-left): draw an area, zoom in/out (desktop; phones
-// pinch), reset view, legend - plus "Show N results on map" while a search or
-// filter has mapped matches.
+// The one map toolbar (top-left): draw an area, reset view, legend - plus
+// "Show N results on map" while a search or filter has mapped matches. There
+// are no zoom buttons: the wheel, pinch, double-click and MapLibre's keyboard
+// handler (+ / - with the map focused) zoom.
 export function MapToolbar({
   areaMode,
   hasArea,
   compact,
   onToggleMode,
   onClearArea,
-  onZoomIn,
-  onZoomOut,
   onReset,
   matchCount,
   matchTotal,
@@ -171,13 +161,7 @@ export function MapToolbar({
     // onInteract: any use of the toolbar also retires the first-visit tip.
     <div className="mu-toolbar-wrap" onClickCapture={onInteract}>
       <div className="mu-toolbar" role="group" aria-label="Map tools">
-        <DrawTools areaMode={areaMode} hasArea={hasArea} onToggle={onToggleMode} onClear={onClearArea} compact={compact} />
-        {!compact && (
-          <>
-            <ToolButton icon="+" label="Zoom in" className="mu-icon-only" onClick={onZoomIn} />
-            <ToolButton icon={"−"} label="Zoom out" className="mu-icon-only" onClick={onZoomOut} />
-          </>
-        )}
+        <DrawTools areaMode={areaMode} hasArea={hasArea} onToggle={onToggleMode} onClear={onClearArea} />
         <ToolButton icon={"↺"} label="Reset view" className="mu-icon-only" onClick={onReset} />
         <button
           type="button"
@@ -360,7 +344,7 @@ function LegendPanel() {
       <ul>
         <li>
           <span className="mu-swatch-area" aria-hidden="true" />
-          Blue dashed outline: area drawn with the Draw tools
+          Blue dashed outline: area drawn with Draw area
         </li>
       </ul>
     </div>

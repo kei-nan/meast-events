@@ -91,7 +91,6 @@ function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
 }
 
 const SITE_TITLE = "Middle East, 1900–present"; // as in index.html
-const BOUNDARY_CORRECTIONS_URL = "https://github.com/kei-nan/meast-events/blob/main/scripts/boundary-corrections.js";
 const DEEP_LINK_PAD_YEARS = 5;
 
 const clampYear = (y) => Math.min(MAX_YEAR, Math.max(MIN_YEAR, y));
@@ -133,7 +132,11 @@ export default function App() {
   const [area, setArea] = useState(initial.area);
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
-  const [creditsOpen, setCreditsOpen] = useState(false); // footer credits, folded on small screens only
+  const [aboutSection, setAboutSection] = useState(null); // "credits": the dialog opens at its credits
+  const openAbout = useCallback((section) => {
+    setAboutSection(section);
+    setAbout(true);
+  }, []);
 
   // The map mounts (and its downloads start) after the first paint; see
   // startMapDownloads.
@@ -364,6 +367,7 @@ export default function App() {
     pendingFocusRef.current = parsed.eventId;
     setNotFound(false);
     setSelectedEventId(parsed.eventId);
+    setAboutSection(null);
     setAbout(parsed.about);
   }, []);
 
@@ -548,54 +552,21 @@ export default function App() {
         onPlayStateChange={setPlayState}
         eventYear={eventYear}
       />
-      {about && <AboutData onClose={() => setAbout(false)} />}
-      <footer className="app-footer" data-credits={creditsOpen ? "open" : undefined}>
-        <button type="button" className="app-footer-link" aria-label="About the data" onClick={() => setAbout(true)}>
-          About<span className="app-footer-wide"> the data</span>
+      {about && <AboutData section={aboutSection} onClose={() => setAbout(false)} />}
+      {/* One short line on every page. The full credits (Wikipedia CC BY-SA 4.0;
+          CShapes 2.0, Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0, non-commercial
+          use, with our cited corrections) are one click away in the About
+          dialog's "Sources & licences" section; CC 4.0 licences (section
+          3(a)(2)) accept "a hyperlink to a resource that includes the required
+          information". */}
+      <footer className="app-footer">
+        <button type="button" className="app-footer-link" onClick={() => openAbout(null)}>
+          About the data
         </button>
-        {/* Phones and short screens: the full credits fold behind this button so
-            the footer is one line instead of two to four (App.css), and the
-            sources are still named on that line. The credits stay in the page,
-            one tap away; CC 4.0 licences (section 3(a)(2)) accept "a hyperlink
-            to a resource that includes the required information". */}
-        <span className="app-footer-compact">
-          <span aria-hidden="true">{" · "}</span>
-          <button
-            type="button"
-            className="app-footer-link"
-            aria-expanded={creditsOpen}
-            aria-controls="app-credits"
-            onClick={() => setCreditsOpen((o) => !o)}
-          >
-            Credits
-          </button>
-          {": Wikipedia, CShapes"}
-          <span className="app-footer-wide">{" 2.0"}</span>
-          {" (modified)"}
-        </span>
-        <span className="app-credits" id="app-credits">
-          <span className="app-credits-sep" aria-hidden="true">
-            {" · "}
-          </span>
-          Text:{" "}
-          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">
-            Wikipedia (CC BY-SA 4.0)
-          </a>
-          {" · "}
-          Borders:{" "}
-          <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer">
-            CShapes 2.0
-          </a>{" "}
-          {/* CC BY-NC-SA: authors, licence link and a note that the borders were changed, on every page. */}
-          (Schvitz et al., ETH Zurich,{" "}
-          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer">
-            CC BY-NC-SA 4.0
-          </a>
-          ), non-commercial use, with{" "}
-          <a href={BOUNDARY_CORRECTIONS_URL} target="_blank" rel="noreferrer">
-            our cited corrections
-          </a>
-        </span>
+        <span aria-hidden="true">{" · "}</span>
+        <button type="button" className="app-footer-link" onClick={() => openAbout("credits")}>
+          Sources &amp; licences
+        </button>
       </footer>
     </div>
   );

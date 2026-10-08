@@ -63,6 +63,14 @@
   color: var(--accent-strong);
   font-size: 1.1rem;
 }
+/* Opened from the footer's "Sources & licences": clear of the sticky head,
+   and focused only so screen readers start there (no outline). */
+#about-credits {
+  scroll-margin-top: 64px;
+}
+#about-credits:focus {
+  outline: none;
+}
 .about-inner h4 {
   margin: 1em 0 0.3em;
   font-size: 0.95rem;

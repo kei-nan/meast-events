@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient";
 import "./AboutData.css";
 
@@ -178,8 +178,11 @@ function FramingCounts({ state }) {
   );
 }
 
-/** "About the data" modal (native <dialog>: focus trap, Esc, focus restore). */
-export default function AboutData({ onClose }) {
+/**
+ * "About the data" modal (native <dialog>: focus trap, Esc, focus restore).
+ * section "credits" opens it scrolled to, and focused on, the credits.
+ */
+export default function AboutData({ section = null, onClose }) {
   const ref = useRef(null);
   const [funnel, setFunnel] = useState({ status: "loading", data: null });
   const [framing, setFraming] = useState({ status: "loading", data: null });
@@ -204,9 +207,28 @@ export default function AboutData({ onClose }) {
     // StrictMode re-runs this effect. Unmounting removes the dialog anyway.
     if (d && !d.open) {
       d.showModal();
-      d.querySelector("button")?.focus(); // start on Close, not the dialog element itself
+      const credits = section === "credits" ? d.querySelector("#about-credits") : null;
+      if (credits) {
+        credits.focus({ preventScroll: true });
+        credits.scrollIntoView({ block: "start" });
+      } else {
+        d.querySelector("button")?.focus(); // start on Close, not the dialog element itself
+      }
     }
+    // Only on opening: the dialog is mounted afresh each time it opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The review counts and the (long) funnel above the credits load after the
+  // dialog opens and push them down, so the credits are scrolled back into
+  // view as each arrives - until the reader scrolls or types themselves.
+  const keepCredits = useRef(section === "credits");
+  useLayoutEffect(() => {
+    if (keepCredits.current) ref.current?.querySelector("#about-credits")?.scrollIntoView({ block: "start" });
+  }, [funnel.status, framing.status]);
+  const releaseCredits = () => {
+    keepCredits.current = false;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -228,6 +250,9 @@ export default function AboutData({ onClose }) {
       className="about-dialog"
       aria-labelledby="about-title"
       onClose={onClose}
+      onWheel={releaseCredits}
+      onPointerDown={releaseCredits}
+      onKeyDown={releaseCredits}
       onClick={(e) => {
         if (e.target === ref.current) ref.current.close(); // backdrop click
       }}
@@ -352,7 +377,30 @@ export default function AboutData({ onClose }) {
           mandate, occupation, unrecognized annexation, or a since-resolved sovereignty dispute.
         </p>
 
-        <h3>Licensing</h3>
+        {/* The footer's "Sources & licences" opens the dialog here: these are
+            the site's required credits, so none of them may be dropped. */}
+        <h3 id="about-credits" tabIndex={-1}>
+          Sources &amp; licences
+        </h3>
+        <p>
+          Text:{" "}
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            Wikipedia (CC BY-SA 4.0)
+          </a>
+          . Borders:{" "}
+          <a href="https://icr.ethz.ch/data/cshapes/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            CShapes 2.0
+          </a>{" "}
+          (Schvitz et al., ETH Zurich,{" "}
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            CC BY-NC-SA 4.0
+          </a>
+          ), non-commercial use, with{" "}
+          <a href={`${REPO}/blob/main/scripts/boundary-corrections.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            our cited corrections
+          </a>
+          .
+        </p>
         <p>
           Source code: AGPL-3.0. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
           link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0), so the data is for

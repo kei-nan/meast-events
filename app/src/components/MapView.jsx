@@ -564,16 +564,19 @@ export default function MapView({
   });
 
   // The first-visit hint steps aside after a few seconds (for this visit only),
-  // or for good once the map is used.
+  // or for good once the map is used: a click, drag, wheel, pinch or a
+  // keyboard pan/zoom. Moves the app makes itself (flyTo, fitBounds) carry no
+  // originalEvent, so opening an event does not count as a use.
   useEffect(() => {
     if (!hintOpen || !mapReady) return;
     const map = mapRef.current;
     const timer = setTimeout(() => setHintOpen(false), HINT_AUTO_HIDE_MS);
-    const used = () => {
+    const used = (e) => {
+      if (e?.type === "movestart" && !e.originalEvent) return;
       setHintOpen(false);
       writeHintDismissed();
     };
-    const types = ["click", "dragstart", "wheel", "touchstart"];
+    const types = ["click", "dragstart", "wheel", "touchstart", "movestart"];
     for (const t of types) map.on(t, used);
     return () => {
       clearTimeout(timer);
@@ -609,15 +612,6 @@ export default function MapView({
     const map = mapRef.current;
     if (!map) return;
     map.fitBounds(DEFAULT_BOUNDS, { padding: 20, duration: reducedMotion() ? 0 : 600 });
-  };
-  // Zoom buttons for mouse users (MapLibre's own NavigationControl is not used,
-  // so the buttons match the rest of the toolbar).
-  const zoomBy = (dir) => {
-    const map = mapRef.current;
-    if (!map) return;
-    const opts = { duration: reducedMotion() ? 0 : 300 };
-    if (dir > 0) map.zoomIn(opts);
-    else map.zoomOut(opts);
   };
   const closePopup = useCallback(() => setBorderPopup(null), []);
   const closeStack = useCallback(() => setStackList(null), []);
@@ -897,8 +891,6 @@ export default function MapView({
         compact={compact}
         onToggleMode={toggle}
         onClearArea={() => onAreaChange?.(null)}
-        onZoomIn={() => zoomBy(1)}
-        onZoomOut={() => zoomBy(-1)}
         onReset={resetView}
         matchCount={matchBounds?.count ?? null}
         matchTotal={matchIds?.size ?? null}
