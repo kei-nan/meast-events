@@ -168,13 +168,33 @@
 }
 
 /* Small print; the handles' tooltips repeat it. Stays in the DOM everywhere
-   because both handles point at it (aria-describedby). Never cut: where the
-   presets need the room it is hidden whole (media queries below). */
+   because both handles point at it (aria-describedby). Never cut: the wrapper
+   takes only the room the presets leave and is one line tall; when the line
+   does not fit beside the zero-width ::before item it wraps to a second,
+   clipped line, so it is either shown whole or not at all. */
+.timeline-help-wrap {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  min-width: 0;
+  height: 1.3em;
+  overflow: hidden;
+  font-size: 0.75rem;
+}
+
+/* Full height, so the first line keeps the wrapper's height and a wrapped
+   help line lands below it, out of sight. */
+.timeline-help-wrap::before {
+  content: "";
+  height: 100%;
+}
+
 .timeline-help {
   flex: none;
   margin: 0;
+  line-height: 1.3;
   white-space: nowrap;
-  font-size: 0.75rem;
   color: var(--text-tertiary);
 }
 
@@ -184,7 +204,7 @@
 .timeline-presets {
   --tl-fade: 28px;
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 1 auto; /* their full width when there is room, else they shrink and scroll */
   min-width: 0;
   gap: 5px;
   overflow-x: auto;
@@ -462,17 +482,9 @@
   --tl-dot: radial-gradient(circle, var(--text-primary) 0 6px, var(--accent) 6.5px 9px, var(--accent-strong) 9.5px 12px, transparent 12.5px);
 }
 
-/* Below 1366px the presets need the help line's room: screen readers still
-   get it (aria-describedby), mouse users the handles' tooltips. */
+/* Below 1366px the controls sit closer so the presets (and the help line,
+   where it fits) keep their room. */
 @media (max-width: 1365px) {
-  .timeline-help {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-
   .timeline-top,
   .timeline-controls {
     gap: 8px;
@@ -529,9 +541,18 @@
     gap: 6px;
   }
 
+  /* No room for the help line on phones: screen readers still get it
+     (aria-describedby), as do the handles' tooltips. */
+  .timeline-help-wrap {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+  }
+
   .timeline-presets {
     --tl-fade: 22px;
-    flex-basis: 96px;
+    flex: 1 1 96px;
     padding: 2px 0;
   }
 

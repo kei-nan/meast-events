@@ -26,20 +26,6 @@
   box-shadow: none;
   border-width: 1px;
 }
-.mu-draw-opts {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding-right: 6px;
-  margin-right: 2px;
-  border-right: 1px solid #c9bfa8;
-}
-.mu-draw-title {
-  font: 600 12px/1 system-ui, sans-serif;
-  color: #5c4d38;
-  padding: 0 2px 0 4px;
-  white-space: nowrap;
-}
 .mu-tool {
   display: inline-flex;
   align-items: center;
@@ -431,10 +417,14 @@
   display: none;
 }
 
-/* Phone "Draw" menu: its button stays in the toolbar row and the choices open
+/* "Draw area" menu: its button stays in the toolbar row and the choices open
    as their own row under it (the wrapper only scopes the outside-click test). */
 .mu-draw {
   display: contents;
+}
+.mu-draw > .mu-tool[aria-expanded="true"] {
+  color: #f4f1ea;
+  background: #5c4d38;
 }
 .mu-draw-menu {
   order: 10;
@@ -497,10 +487,6 @@
   }
   .mu-tool-icon {
     font-size: 18px;
-  }
-  .mu-draw > .mu-tool[aria-expanded="true"] {
-    color: #f4f1ea;
-    background: #5c4d38;
   }
   .mu-legend-btn {
     padding-left: 9px;
