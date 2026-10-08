@@ -656,6 +656,20 @@ export default function MapView({
     };
   }, [mapReady, hasViewportCb, viewportCb]);
 
+  // The point sources' effects below re-run on every timeline step (`events`
+  // changes) while the point itself rarely does, and every setData makes
+  // MapLibre reload the source in its worker. So send only a changed point.
+  const pointDataRef = useRef({}); // source name -> JSON last sent
+  const setPointSource = useCallback((name, ev) => {
+    const source = mapRef.current.getSource(name);
+    if (!source) return;
+    const data = pointFeature(ev);
+    const json = JSON.stringify(data);
+    if (pointDataRef.current[name] === json) return;
+    pointDataRef.current[name] = json;
+    source.setData(data);
+  }, []);
+
   // Selected marker (own source: stays visible even inside a cluster).
   useEffect(() => {
     if (!mapReady) return;
@@ -663,14 +677,14 @@ export default function MapView({
     if (!ev && selectedEventId && focus && focus.id === selectedEventId && focus.lon != null) {
       ev = { id: focus.id, coordinates: { lon: focus.lon, lat: focus.lat } };
     }
-    mapRef.current.getSource("selected")?.setData(pointFeature(ev));
-  }, [selectedEventId, events, focus, mapReady]);
+    setPointSource("selected", ev);
+  }, [selectedEventId, events, focus, mapReady, setPointSource]);
 
   useEffect(() => {
     if (!mapReady) return;
     const ev = hoverId && hoverId !== selectedEventId ? events.find((e) => e.id === hoverId) : null;
-    mapRef.current.getSource("hover")?.setData(pointFeature(ev));
-  }, [hoverId, selectedEventId, events, mapReady]);
+    setPointSource("hover", ev);
+  }, [hoverId, selectedEventId, events, mapReady, setPointSource]);
 
   // Fly to a focused event. `nonce` lets the caller re-focus the same event.
   useEffect(() => {

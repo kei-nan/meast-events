@@ -32,6 +32,13 @@ test("matching: whole words, last token prefix (>=2 chars)", () => {
   assert.ok(matchesTokens(ev("b", "Été"), tokenize("ete")));
 });
 
+test("matching: an event that gains its extract later is matched on the new text", () => {
+  const e = ev("c", "Siege of Kut", { snippet: "The siege" });
+  assert.ok(!matchesTokens(e, tokenize("townshend")));
+  e.extract = "Townshend surrendered the garrison.";
+  assert.ok(matchesTokens(e, tokenize("townshend")));
+});
+
 test("filters: coordinate-less events match text but never areas; category/country/area, approximate excluded from areas", () => {
   const e = ev("a", "X");
   assert.ok(matchesFilters(e, {}));

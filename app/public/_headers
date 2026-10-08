@@ -56,8 +56,11 @@
 
 # /glyphs/*: map label glyphs (Open Sans Semibold, MapView.jsx BASE_STYLE).
 # Static files that change only if the font does, so cache like /data/*.
+# Workers serves .pbf with no Content-Type, and Cloudflare only compresses
+# responses whose type it knows: without this the 78 KB file ships raw.
 /glyphs/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Content-Type: application/x-protobuf
 
 # /pagefind/*: the full-text search index (app/scripts/build-search-index.mjs).
 # ids.json, the engine and the .pf_meta keep their names across data changes,

@@ -43,10 +43,19 @@ function addLayers(map) {
 export default function useCountryHighlight({ mapRef, mapReady, event, year, features, focus }) {
   const shaded = useMemo(() => countryHighlightFeatures(event, year, features), [event, year, features]);
 
+  // `shaded` is rebuilt on every year step, but its features are the loaded
+  // border objects themselves: when they are the same ones (most steps, and
+  // always when nothing is shaded) the source is left alone, since every
+  // setData makes MapLibre reload it.
+  const sentRef = useRef(null);
   useEffect(() => {
     if (!mapReady) return;
     const map = mapRef.current;
     if (!map.getSource(SOURCE)) addLayers(map);
+    const prev = sentRef.current;
+    const next = shaded.features;
+    if (prev && prev.length === next.length && next.every((f, i) => f === prev[i])) return;
+    sentRef.current = next;
     map.getSource(SOURCE).setData(shaded);
   }, [mapRef, mapReady, shaded]);
 

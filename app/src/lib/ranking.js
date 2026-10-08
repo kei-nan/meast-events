@@ -34,9 +34,23 @@ function tokenMatches(token, isLast, words) {
   return false;
 }
 
+// Words of an event's searchable text, cached per event object: every keystroke
+// matches all events, and tokenising them again each time was most of its cost.
+// The text is stored with its words, so an event that later gains its extract
+// is tokenised again.
+const wordCache = new WeakMap(); // event -> { text, words }
+function eventWords(event) {
+  const text = `${event.title ?? ""} ${event.extract ?? event.snippet ?? ""}`;
+  const hit = wordCache.get(event);
+  if (hit && hit.text === text) return hit.words;
+  const words = tokenize(text);
+  wordCache.set(event, { text, words });
+  return words;
+}
+
 export function matchesTokens(event, tokens) {
   if (tokens.length === 0) return true;
-  const words = tokenize(`${event.title ?? ""} ${event.extract ?? event.snippet ?? ""}`);
+  const words = eventWords(event);
   return tokens.every((t, i) => tokenMatches(t, i === tokens.length - 1, words));
 }
 
