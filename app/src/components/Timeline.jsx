@@ -1,4 +1,4 @@
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { playRestart, playStep } from "../lib/playback";
 import { checkTypedYear, handleForDirection, keyTarget, moveHandle, pickHandle } from "../lib/rangeSlider";
@@ -37,7 +37,10 @@ const PLAY_MODES = [
 
 const HANDLE_NAME = { start: "Start year", end: "End year" };
 
-const countText = (n) => `${n.toLocaleString("en-US")} ${n === 1 ? "event" : "events"}`;
+// One formatter for the whole module: Number#toLocaleString builds a new one per
+// call, and every render formats a count for each of the ~127 density bars.
+const COUNT_FORMAT = new Intl.NumberFormat("en-US");
+const countText = (n) => `${COUNT_FORMAT.format(n)} ${n === 1 ? "event" : "events"}`;
 
 // Memoized (export below): hovering a list row re-renders App, which must not
 // redraw ~130 density bars. The play state lives in App so the side panel can
@@ -384,7 +387,10 @@ function Presets({ startYear, endYear, onPick }) {
   const ref = useRef(null);
   const [edges, setEdges] = useState({ left: false, right: false });
 
-  useLayoutEffect(() => {
+  // A plain effect, not a layout effect: measuring the row before the first
+  // paint forced a layout that blocked a phone's main thread for ~170 ms. The
+  // fades may now appear one frame late, which is only cosmetic.
+  useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
     const update = () => {
