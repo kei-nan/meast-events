@@ -45,6 +45,15 @@ function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
         err.outage = res.status >= 500;
         throw err;
       }
+      // The host answers a missing file with the app's HTML page and status 200
+      // (wrangler.jsonc not_found_handling "single-page-application"), so an HTML
+      // answer to a data request means the file is not there: not an outage.
+      if (/text\/html/i.test(res.headers.get("content-type") ?? "")) {
+        const err = new Error(`Not found: ${url}`);
+        err.outage = false;
+        err.missing = true;
+        throw err;
+      }
       return res.json();
     })
     .catch((err) => {
@@ -192,9 +201,25 @@ export function loadFramingReviewSummary() {
 // only when an event is opened - lists never download it. Read from the same
 // versioned folder as the lite set. Resolves null if the id is not in its
 // bucket; rejects if the file is unreachable.
+//
+// A page left open across a deploy still points at the folder it loaded, which
+// the deploy removed (the host keeps only the current files). When that folder's
+// bucket is missing (a 4xx, not an outage), the current folder is read from
+// events/meta.json and the record is taken from there: ids are stable, so the
+// open page keeps working instead of showing "could not be loaded" until reload.
 export async function loadFullLead(id) {
   await loadAllLite();
-  const { version, buckets } = source;
-  const bucket = await fetchJSONCached(dataUrl(`events/v.${version}/full/${fullBucket(id, buckets)}.json`));
-  return Object.prototype.hasOwnProperty.call(bucket, id) ? bucket[id] : null;
+  const read = async ({ version, buckets }) => {
+    const bucket = await fetchJSONCached(dataUrl(`events/v.${version}/full/${fullBucket(id, buckets)}.json`));
+    return Object.prototype.hasOwnProperty.call(bucket, id) ? bucket[id] : null;
+  };
+  try {
+    return await read(source);
+  } catch (err) {
+    if (err.outage !== false) throw err;
+    const meta = await fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache" });
+    if (!meta?.version || meta.version === source.version) throw err;
+    source = { version: meta.version, buckets: meta.fullBuckets };
+    return read(source);
+  }
 }
