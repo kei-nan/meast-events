@@ -38,11 +38,17 @@ export function humaniseStatus(status) {
 export function isDashedStatus(status) {
   return Boolean(status) && !String(status).endsWith("-included");
 }
-// The same rule as a MapLibre expression, for the boundaries-line layer.
+// The same rule as a MapLibre expression, for the boundaries-line layer. A
+// placeholder outline (lib/deferredBoundaries.js) is dashed like the flagged
+// areas it stands for.
 export const DASHED_EXPR = [
-  "all",
-  ["!=", ["get", "status"], null],
-  ["!", ["in", "-included", ["coalesce", ["get", "status"], ""]]],
+  "any",
+  ["has", "placeholder_for"],
+  [
+    "all",
+    ["!=", ["get", "status"], null],
+    ["!", ["in", "-included", ["coalesce", ["get", "status"], ""]]],
+  ],
 ];
 export const BORDER_STYLE = {
   solid: { color: "#6f6148", width: 1.4 },

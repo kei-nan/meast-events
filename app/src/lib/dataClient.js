@@ -87,14 +87,16 @@ export function loadLand() {
 // A decade's FeatureCollection. Large geometries that span several decades are
 // stored once (boundaries/shared/<hash>.json, see split-data.mjs) and the chunk
 // names them in `geometry_ref`; they are put back here, so callers always get
-// plain features. Concurrent/repeat callers share one load per decade.
+// plain features - except deferred ones (a `minzoom`, lib/deferredBoundaries.js),
+// which stay pending until the map asks for them with loadDeferredGeometry.
+// Concurrent/repeat callers share one load per decade.
 const boundaryDecades = new Map(); // decade -> Promise<FeatureCollection>
 export function loadBoundaryDecade(decade) {
   if (!boundaryDecades.has(decade)) {
     const promise = fetchJSONCached(dataUrl(`boundaries/${decade}.json`)).then(async (fc) => {
       const features = await Promise.all(
         fc.features.map(async (f) => {
-          if (!f.geometry_ref) return f;
+          if (!f.geometry_ref || f.minzoom != null) return f;
           const { geometry_ref: ref, ...rest } = f;
           return { ...rest, geometry: await fetchJSONCached(dataUrl(`boundaries/shared/${ref}.json`)) };
         })
@@ -105,6 +107,10 @@ export function loadBoundaryDecade(decade) {
     boundaryDecades.set(decade, promise);
   }
   return boundaryDecades.get(decade);
+}
+
+export function loadDeferredGeometry(ref) {
+  return fetchJSONCached(dataUrl(`boundaries/shared/${ref}.json`));
 }
 
 // Fire-and-forget: warms the cache for a decade without callers waiting on it

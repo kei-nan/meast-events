@@ -246,6 +246,7 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
       <button type="button" className="mu-close" onClick={onClose} aria-label="Close border details">
         {"×"}
       </button>
+      {popup.hint && <p className="mu-b-note">{popup.hint}</p>}
       {popup.items.map((b) => (
         <section key={`${b.name}|${b.start_year}|${b.end_year}`} className="mu-b-item">
           <h3 className="mu-b-name">{b.name}</h3>

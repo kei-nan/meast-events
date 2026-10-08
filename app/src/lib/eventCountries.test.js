@@ -101,6 +101,18 @@ test("countryHighlightFeatures: exact name AND active in the year", () => {
   assert.equal(featuresBbox({ features: [] }), null);
 });
 
+test("countryHighlightFeatures: a placeholder outline shades for the areas it stands for", () => {
+  const geometry = { type: "Polygon", coordinates: [[[35, 31], [35.5, 31], [35.5, 32], [35, 31]]] };
+  const outline = {
+    type: "Feature",
+    properties: { name: "West Bank", start_year: 2000, end_year: 9999, placeholder_for: ["West Bank Area A (Palestinian Authority)"] },
+    geometry,
+  };
+  const out = countryHighlightFeatures({ countries: ["Israel/Palestine"] }, 2010, [outline]);
+  assert.deepEqual(out.features, [outline]);
+  assert.equal(countryHighlightFeatures({ countries: ["Jordan"] }, 2010, [outline]).features.length, 0);
+});
+
 test("geometry is passed through untouched (same objects as the loaded borders)", () => {
   const out = countryHighlightFeatures({ countries: ["Egypt"] }, 2000, boundaries);
   assert.equal(out.features.length, 1);
