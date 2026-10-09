@@ -47,8 +47,8 @@ Battle of Elli in between). The earlier text was mostly the first paragraph only
 
 The labels (English) of **all** the item's `P31` (instance of) statements, in the order Wikidata's entity JSON lists them (deprecated-rank statements
 excluded; a class without an English label shows its QID), followed - only if not already present - by the labels of the event classes discovery matched via
-subclass (`P279*`) below. Nothing is de-duplicated by our preference, re-ordered, or replaced by our own label. For the 112 hand-picked (legacy) events
-the classes come from live Wikidata too (for example Saddam Hussein: `human`, Fall of the Assad regime: `regime change`); the old labels such as "political"
+subclass (`P279*`) below. Nothing is de-duplicated by our preference, re-ordered, or replaced by our own label. For the hand-picked (legacy) events
+the classes come from live Wikidata too (for example Fall of the Assad regime: `regime change`); the old labels such as "political"
 or "war" that the curated file used to carry as if they were Wikidata's are gone. `category_label` is removed. Number of classes per event across the
 594 events (curated + proposed): 1 class 320, 2: 165, 3: 68, 4: 30, 5: 7, 6: 4.
 
@@ -130,7 +130,7 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
    A place only counts when at least as many of the present-day sovereign states it lists (its `P17`) are inside the region as outside it
    (`placeIsMostlyInRegion` in `scripts/lib/v21.js`). Seas and regions that mostly belong to other countries - the Mediterranean (6 in, 16 out), Black Sea,
    Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
-   are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the 112 hand-picked
+   are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the hand-picked
    events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`: 23 events on 2026-09-29, 5 more from the classes added on 2026-10-06).
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**.
@@ -176,6 +176,15 @@ The funnel from 5,063 raw candidates to what is shown, with breakdowns by countr
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
 Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).
+
+### Not events: people, organisations and states
+
+The site lists events. An entry whose Wikidata item is a **person, an organisation or a state** (by its `P31` classes, e.g. `human`, `political
+organization`, `historical country`) is not an event and is not included. The class rule above never finds such items; only the hand-picked list
+contained them. On 2026-10-09 this removed nine hand-picked entries: Saddam Hussein and Hafez al-Assad (`human`); Hamas, the Palestine Liberation
+Organization, Islamic State and the Central Treaty Organization (listed as "Baghdad Pact"; organisation classes); the Kingdom of Iraq, the United Arab
+Republic and Syrian independence (state classes). Events about them stay (for example the Execution of Saddam Hussein, the 14 July Revolution).
+The Iranian Green Movement (`social movement`, in practice the 2009 protests) is kept.
 
 ## Default order
 

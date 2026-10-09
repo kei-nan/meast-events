@@ -538,36 +538,6 @@
     "sitelinks_current": 68
   },
   {
-    "id": "kingdom-of-iraq",
-    "title": "Kingdom of Iraq",
-    "date_start": "1921-08-23",
-    "date_end": null,
-    "countries": [
-      "Iraq"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:28:28.077Z",
-    "wikidata_qid": "Q149805",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Kingdom_of_Iraq",
-    "extract": "The Hashemite Kingdom of Iraq was the Iraqi state located in the Middle East from 1932 to 1958. It was founded on 23 August 1921 as the Kingdom of Iraq, following the defeat of the Ottoman Empire in the Mesopotamian campaign of the World War I. Although a League of Nations mandate was awarded to the United Kingdom in 1920, the 1920 Iraqi revolt resulted in the scrapping of the original mandate plan in favour of a formally sovereign Iraqi kingdom, but one that was under effective British administration. The plan was formally established by the Anglo-Iraqi Treaty. The population of the Kingdom was 2.8 million at the founding in 1928, and by the end of the Kingdom in 1958 it was 6.5 million.\n\nThe role of the United Kingdom in the formal administration of the Kingdom of Iraq was ended in 1932, following the Anglo-Iraqi Treaty of 1930. Then officially a fully independent kingdom, it underwent a period of turbulence under its Hashemite rulers throughout its entire existence. Establishment of Sunni Islam in Iraq was followed by Assyrian, Yazidi and Shi'a unrests, which were all brutally suppressed. In 1936, the first military coup took place in the kingdom, as Bakr Sidqi succeeded in replacing the acting Prime Minister with his associate. Multiple coups followed in a period of political instability, peaking in 1941.\n\nDuring the World War II, the Iraqi government of the Prince-Regent, Abd al-Ilah, was overthrown in 1941 by the Golden Square officers, headed by Rashid Ali. The short-lived pro-Nazi government of Iraq was defeated in May 1941 by the Allied forces in the Anglo-Iraqi War. Iraq was later used as a base for Allied attacks on the Vichy French-held Mandate of Syria and support for the Anglo-Soviet invasion of Iran. At the same time, the Kurdish leader Mustafa Barzani led a rebellion against the central government in Baghdad. After the failure of the uprising, Barzani and his followers fled to the Soviet Union.\n\nIn 1945, during the final stages of World War II, Iraq joined the United Nations and became a founding member of the Arab League. In 1948, massive violent protests, known as the Al-Wathbah uprising, broke out across Baghdad as a popular demand against the government treaty with the British, and with support from the communists. More protests continued in the spring, but were interrupted in May, when martial law was imposed after Iraq entered the 1948 Arab–Israeli War with other members of the Arab League.\n\nIn February 1958, King Hussein of Jordan and Prince Abd al-Ilah proposed a union of Hashemite monarchies to counter the recently formed Egyptian–Syrian union. The resulting Arab Federation, formed on 14 February 1958, was short-lived and ended the same year with a military coup led by Abdul-Karim Qasim deposing the monarchy.",
-    "coordinates": {
-      "lat": 33.333333,
-      "lon": 44.383333
-    },
-    "coordinate_source": "wikidata",
-    "needs_manual_coordinates": false,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "historical country",
-      "kingdom"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "precise",
-    "sitelinks_current": 48
-  },
-  {
     "id": "emirate-of-transjordan",
     "title": "Emirate of Transjordan",
     "date_start": "1921-04-11",
@@ -951,38 +921,6 @@
     "sitelinks_current": 22
   },
   {
-    "id": "syrian-independence",
-    "title": "Syrian independence",
-    "date_start": "1946-04-17",
-    "date_end": null,
-    "countries": [
-      "Syria"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:28:42.898Z",
-    "wikidata_qid": "Q146885",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Second_Syrian_Republic",
-    "extract": "The Second Syrian Republic, officially the Syrian Republic from 1950 to 1958 and the Syrian Arab Republic from 1961 to 1963, succeeded the First Syrian Republic, which had become de facto independent from the French Mandate in April 1946. The Second Republic was established under the Syrian Constitution of 1950, which was suspended from 1950 to 1954 during Adib Shishakli's rule and later became inoperative when Syria joined with the Republic of Egypt to form the United Arab Republic in 1958. The Second Republic was restored when Syria withdrew from the union in 1961. In 1963, the Syrian Ba'athist Party came to power in a bloodless military coup, which laid the foundations for the political structure of Ba'athist Syria and ended the era of democratic experimentation in post-colonial Syria.\n\nThe green, white, black, and red flag was adopted by President Nazim al-Qudsi on 28 September 1961 to completely disassociate Syria from the United Arab Republic. It was later adopted by the Syrian opposition during the Syrian civil war. Following the fall of the Assad regime, the Hay'at Tahrir al-Sham-dominated Syrian caretaker government adopted and used the revolution flag, a modified version of the independence flag. The revolution flag became the official flag of Syria once again on 13 March 2025, when the Constitutional Declaration designated it as the national flag.",
-    "coordinates": {
-      "lat": 35,
-      "lon": 38
-    },
-    "coordinate_source": "wikidata",
-    "needs_manual_coordinates": false,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "state",
-      "historical country"
-    ],
-    "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Syrian independence\" differs from the Wikipedia article title \"Second Syrian Republic\" and does not appear in its lead"
-    ],
-    "needs_review": true,
-    "location_quality": "precise",
-    "sitelinks_current": 35
-  },
-  {
     "id": "jordanian-independence",
     "title": "Jordanian independence",
     "date_start": "1946-05-25",
@@ -1269,39 +1207,6 @@
     "sitelinks_current": 51
   },
   {
-    "id": "baghdad-pact",
-    "title": "Central Treaty Organization",
-    "date_start": "1955-02-24",
-    "date_end": null,
-    "countries": [
-      "Iraq",
-      "Turkey",
-      "Iran",
-      "regional"
-    ],
-    "category": "treaty",
-    "retrieved_at": "2026-09-13T14:28:54.645Z",
-    "wikidata_qid": "Q379850",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Central_Treaty_Organization",
-    "extract": "The Central Treaty Organization (CENTO), formerly known as the Middle East Treaty Organization (METO) and also known as the Baghdad Pact, was a military alliance of the Cold War. It was formed on 24 February 1955 by Iran, Iraq, Pakistan, Turkey, and the United Kingdom. The alliance was dissolved on 16 March 1979.\n\nU.S. pressure and promises of military and economic aid were key in the negotiations leading to the agreement, but the United States could not initially participate. John Foster Dulles, who was involved in the negotiations as United States Secretary of State under President Dwight D. Eisenhower, claimed that was due to \"the pro-Israel lobby and the difficulty of obtaining Congressional Approval.\" Others said that the reason was \"for purely technical reasons of budgeting procedures.\"\n\nIn 1958, the U.S. joined the military committee of the alliance. It is generally viewed as one of the least successful of the Cold War alliances.\n\nThe organization's headquarters was in Baghdad, Iraq from 1955 to 1958 and thereafter in Ankara, Turkey from 1958 to 1979. Cyprus was also an important location for CENTO due to the British military bases in Akrotiri and Dhekelia along with the island’s location in the Middle East.",
-    "coordinates": {
-      "lat": 33.3152,
-      "lon": 44.3661
-    },
-    "coordinate_source": "country-fallback:Iraq",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "organization",
-      "military alliance"
-    ],
-    "category_group": "treaty",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "approximate",
-    "sitelinks_current": 50
-  },
-  {
     "id": "suez-crisis",
     "title": "Suez Crisis",
     "date_start": "1956-10-29",
@@ -1330,40 +1235,6 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 87
-  },
-  {
-    "id": "united-arab-republic",
-    "title": "United Arab Republic",
-    "date_start": "1958-02-01",
-    "date_end": "1961-09-28",
-    "countries": [
-      "Egypt",
-      "Syria"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:28:57.079Z",
-    "wikidata_qid": "Q170468",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/United_Arab_Republic",
-    "extract": "The United Arab Republic was a country and sovereign state in the Middle East from 1958 to 1971. It was initially a short-lived political union between the Republic of Egypt (including Egyptian-governed Gaza) and the Second Syrian Republic from 1958 until Syria seceded from the union following the 1961 Syrian coup d'état. Egypt continued to be known officially as the United Arab Republic until it was formally dissolved by Anwar Sadat in September 1971.\n\nThe republic was led by Gamal Abdel Nasser as the Egyptian president. The UAR was a member of the United Arab States, a loose confederation with the Mutawakkilite Kingdom of Yemen, which was dissolved in 1961. It was a brief, small, example of a pan-Arab union. The republic is recognized as the first genuine integrated union between two Arab states in the modern era.",
-    "coordinates": {
-      "lat": 30.03333333,
-      "lon": 31.21666667
-    },
-    "coordinate_source": "wikipedia",
-    "needs_manual_coordinates": false,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "historical country",
-      "federal republic",
-      "sovereign state",
-      "transcontinental country",
-      "secular state"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "precise",
-    "sitelinks_current": 81
   },
   {
     "id": "14-july-revolution",
@@ -1425,36 +1296,6 @@
     "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 33
-  },
-  {
-    "id": "palestine-liberation-organization",
-    "title": "Palestine Liberation Organization",
-    "date_start": "1964-05-28",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:29:00.084Z",
-    "wikidata_qid": "Q26683",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Palestine_Liberation_Organization",
-    "extract": "The Palestine Liberation Organization (PLO; Arabic: منظمة التحرير الفلسطينية, romanized: ) is a Palestinian nationalist coalition that is internationally recognized as the official representative of the Palestinian people in the occupied Palestinian territories. It is currently represented by the Palestinian Authority based in the West Bank city of Al-Bireh.\n\nFounded in 1964, it initially sought to establish an Arab state over the entire territory of the former Mandatory Palestine, advocating the elimination of Israel. Mediated talks between the Israeli government and the PLO in 1993 (the Oslo I Accord) resulted in the PLO recognizing Israel's legitimacy and accepting United Nations Security Council Resolution 242, which mandated Israel's withdrawal from occupied territories, while Israel recognized the PLO as a legitimate authority representing the Palestinian people. Despite the Israel–PLO Letters of Mutual Recognition (1993), in which PLO leader Yasser Arafat renounced violence against Israel, the PLO engaged in militant activities during the Second Intifada (2000–2005). On 29 October 2018, the PLO Central Council suspended the Palestinian recognition of Israel.\n\nAs the officially recognized government of the State of Palestine, it has enjoyed United Nations observer status since 1974. Prior to the Oslo Accords, the PLO's militant wings engaged in acts of violence against both the Israeli military and civilians, within Israel and abroad. The United States designated it as a terrorist group in 1987, though a presidential waiver has permitted American–PLO contact since 1988.",
-    "coordinates": {
-      "lat": 31.7683,
-      "lon": 35.2137
-    },
-    "coordinate_source": "country-fallback:Israel/Palestine",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "political organization",
-      "political coalition"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "approximate",
-    "sitelinks_current": 90
   },
   {
     "id": "1966-syrian-coup-d-tat",
@@ -1669,35 +1510,6 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 45
-  },
-  {
-    "id": "hafez-al-assad",
-    "title": "Hafez al-Assad",
-    "date_start": "1970-11-13",
-    "date_end": null,
-    "countries": [
-      "Syria"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:29:08.418Z",
-    "wikidata_qid": "Q118725",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Hafez_al-Assad",
-    "extract": "Hafez al-Assad (6 October 1930 – 10 June 2000) was a Syrian politician and military officer who served as the president of Syria from 1971 until his death in 2000. He was previously the prime minister from 1970 to 1971 as well as the regional secretary of the regional command of the Syrian regional branch of the Arab Socialist Ba'ath Party and secretary general of the National Command of the Ba'ath Party from 1970 until his death. Assad was a key participant in the 1963 Syrian coup d'état, which brought the Syrian regional branch of the Arab Socialist Ba'ath Party to power. The party ruled for over six decades until it was overthrown in 2024, under the leadership of his son Bashar al-Assad.\n\nAfter the 1963 coup, the new leadership appointed Assad as the commander of the Syrian Arab Air Force. In February 1966, Assad participated in a second coup, which toppled the leaders of the Ba'ath Party. Assad was appointed defense minister by the new government. Four years later Assad initiated a third coup, which ousted the quasi-Marxist regime of Salah Jadid, and appointed himself as leader of Syria. Assad imposed various changes to the Ba'athist foreign policy after seizing power, such as abandoning Jadid's policy of exporting \"socialist revolution\" and strengthening Syria's foreign relations with countries that his predecessor had deemed reactionary. Assad made alliances with the Soviet Union and the Eastern Bloc during the Cold War in return for among other things, opposing Israel, while maintaining ties with some Western European and Gulf states. While he officially kept the pan-Arab concept of unifying the Arab world into one \"Arab nation\" as he termed it, such as being part of the Federation of Arab Republics, he sought to paint Syria as the defender of the Palestinians against Israel, though his support for the Palestinians, particularly the PLO in Lebanon, was weak.\n\nAssad quickly consolidated his power. Following the death of Gamal Abdel Nasser, the leader of Egypt, Assad sought to reconcile Syrian relations with other Arab countries, that were weakened by Jadid. He also tried to form new ties with countries from both sides in the Cold War. Syria received economic support from OPEC members during the 1973 oil embargo, in part for his hostility toward Israel in the 1973 Yom Kippur War. While Syria remained a one-party system, Ba'athist decision-making authority that had attempted to be collegial was eliminated in favor of absolute Presidential control of the country. To maintain his rule, a cult of personality centered on Assad and his family was created by the president and the Ba'ath party. Assad ordered an Arabization campaign of the Kurdish areas of Syria. Syria then invaded Lebanon with 30,000 troops in 1976, which resulted in the Syrian occupation of Lebanon. The Lebanon Invasion and occupation was an attempt to back the weakened Maronite Christians against the Palestine Liberation Organization (whom he previously claimed to back), and other far left militias. During his rule, his regime crushed an Islamist uprising led by the Syrian Muslim Brotherhood through a series of crackdowns that culminated in the Hama massacre, which led to two thirds of the city of Hama being destroyed. His regime committed numerous human rights violations, including the massacres of 30,000 men, women and children in Hama alone.\n\nAssad's initial preferred successor as president was his brother Rifaat, but he was exiled after attempting to seize power in 1984 in response to Hafez suffering a health scare. Assad's next choice of successor was his eldest son, Bassel. However, Bassel died in a high-speed car crash in 1994, and Assad turned to his third choice—his younger son Bashar, who at that time was a medical student in the UK, with no political experience. The move to appoint a member of his own family as his successor was met with criticism in some quarters of the Syrian ruling class, but Assad persisted with his plan and demoted officials who opposed this succession. Assad died in office on 11 June 2000 and Bashar succeeded him as president.",
-    "coordinates": {
-      "lat": 33.5138,
-      "lon": 36.2765
-    },
-    "coordinate_source": "country-fallback:Syria",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "human"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "approximate",
-    "sitelinks_current": 96
   },
   {
     "id": "yom-kippur-war",
@@ -1942,35 +1754,6 @@
     "sitelinks_current": 48
   },
   {
-    "id": "saddam-hussein",
-    "title": "Saddam Hussein",
-    "date_start": "1979-07-16",
-    "date_end": null,
-    "countries": [
-      "Iraq"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:29:18.239Z",
-    "wikidata_qid": "Q1316",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Saddam_Hussein",
-    "extract": "Saddam Hussein Abd al-Majid al-Tikriti (28 April 1937 – 30 December 2006) was an Iraqi politician and revolutionary who served as the fifth president of Iraq from 1979 until his overthrow in 2003. He also served as prime minister of Iraq from 1979 to 1991 and later from 1994 to 2003. He was a leading member of the revolutionary Arab Socialist Ba'ath Party, and later, the Baghdad-based Ba'ath Party and its regional organization, the Iraqi Ba'ath Party, which espoused Ba'athism, a mix of Arab nationalism and Arab socialism.\n\nSaddam was born in the village of Al-Awja, near Tikrit in northern Iraq, to a peasant Sunni Arab family. He joined the Arab Socialist Ba'ath Party in 1957, and the Baghdad-based Ba'ath Party and its regional organization, the Iraqi Ba'ath Party. He played a key role in the 17 July Revolution and was appointed vice president by Ahmed Hassan al-Bakr. During his time as vice president, Saddam nationalised the Iraq Petroleum Company, diversifying the Iraqi economy. He presided over the Second Iraqi–Kurdish War (1974–1975). Following al-Bakr's resignation in 1979, Saddam formally took power, although he had already been the de facto head of Iraq for several years. Positions of power in the country were mostly filled with Sunni Arabs, a minority that made up only a fifth of the population.\n\nUpon taking office, Saddam instituted the Ba'ath Party Purge. Saddam ordered the 1980 invasion of Iran in effort to purportedly capture Iran's Arab-majority Khuzistan province and thwart Iranian attempts to export their own 1979 revolution. The Iran–Iraq War ended after nearly eight years in a ceasefire after a gruelling stalemate that took somewhere around a total of a million lives and economic losses of $561 billion in Iraq. Later, Saddam accused its ally Kuwait of slant-drilling Iraqi oil fields and occupied Kuwait, initiating the Gulf War (1990–1991). Iraq was defeated by a multinational coalition led by the United States. The United Nations subsequently placed sanctions against Iraq. He suppressed the 1991 Iraqi uprisings of the Kurds and Shia Muslims, which sought to gain independence or overthrow the government. Saddam adopted an anti-American stance and established the Faith Campaign, pursuing an Islamist agenda in Iraq. Saddam's rule was marked by numerous human rights abuses, including an estimated 250,000 arbitrary deaths and disappearances.\n\nIn 2003, the United States and its allies invaded Iraq, falsely accusing Saddam of developing weapons of mass destruction and of having ties with al-Qaeda. The Ba'ath Party was banned and Saddam went into hiding. After his capture on 13 December 2003, his trial took place under the Iraqi Interim Government. On 5 November 2006, Saddam was convicted by the Iraqi High Tribunal of crimes against humanity related to the 1982 killing of 148 Iraqi Shi'a and sentenced to death by hanging. He was executed on 30 December 2006.\n\nSaddam has been accused of running a repressive authoritarian government, which several analysts have described as totalitarian, although the applicability of that label has been contested.",
-    "coordinates": {
-      "lat": 33.3152,
-      "lon": 44.3661
-    },
-    "coordinate_source": "country-fallback:Iraq",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "human"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "approximate",
-    "sitelinks_current": 171
-  },
-  {
     "id": "iran-iraq-war",
     "title": "Iran–Iraq War",
     "date_start": "1980-09-22",
@@ -2124,40 +1907,6 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 51
-  },
-  {
-    "id": "hamas",
-    "title": "Hamas",
-    "date_start": "1987-12-14",
-    "date_end": null,
-    "countries": [
-      "Israel/Palestine"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:29:24.206Z",
-    "wikidata_qid": "Q38799",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Hamas",
-    "extract": "The Islamic Resistance Movement, abbreviated Hamas (an acronym from the Arabic: حركة المقاومة الإسلامية, romanized: Ḥarakat al-Muqāwamah al-ʾIslāmiyyah), is a Sunni Islamist Palestinian nationalist political organisation with a military wing known as the al-Qassam Brigades. It has governed the Israeli-occupied Gaza Strip since 2007. In July 2026, it announced the resignation of its civilian administration under the Gaza peace plan and US President Donald Trump announced that his Board of Peace had reached an agreement to disarm Hamas.\n\nThe Hamas movement was founded by Palestinian Islamic scholar Ahmed Yassin in 1987 after the outbreak of the First Intifada against the Israeli occupation. It emerged from his 1973 Mujama al-Islamiya Islamic charity affiliated with the Muslim Brotherhood. Initially, Hamas was discreetly supported by Israel, as a counter-balance to the secular Palestine Liberation Organization (PLO) to prevent the creation of an independent Palestinian state. In the 2006 Palestinian legislative election, Hamas secured a majority in the Palestinian Legislative Council by campaigning on promises of a corruption-free government and advocating for resistance as a means to liberate Palestine from Israeli occupation. In the 2007 Battle of Gaza, Hamas seized control of the Gaza Strip from rival Palestinian faction Fatah. Hamas has since governed the territory separately from the Palestinian National Authority, and many countries and nongovernmental organizations have criticized it for human rights violations (Criticism of Hamas). After Hamas's takeover, Israel significantly intensified existing movement restrictions and imposed a complete blockade of the Gaza Strip. Egypt also began its blockade of Gaza at this time. This was followed by multiple wars with Israel, including those in 2008–09, 2012, 2014, 2021, and an ongoing one since 2023, which began with the October 7 attacks.\n\nHamas has promoted Palestinian nationalism in an Islamic context and initially sought a state in all of former Mandatory Palestine. It began acquiescing to 1967 borders in the agreements it signed with Fatah in 2005, 2006 and 2007. In 2017, Hamas released a new charter that supported a Palestinian state within the 1967 borders without recognizing Israel. Hamas's repeated offers of a truce (for a period of 10–100 years) based on the 1967 borders are seen by many as consistent with a two-state solution, while others state that Hamas retains the long-term objective of establishing one state in former Mandatory Palestine. While the 1988 Hamas charter was widely described as antisemitic, Hamas's 2017 charter removed the antisemitic language and declared Zionists, not Jews, the targets of their struggle. It has been debated whether the charter has reflected an actual change in policy.\n\nIn terms of foreign policy, Hamas has historically sought out relations with Egypt, Iran, Qatar, Saudi Arabia, Syria and Turkey; some of its relations have been impacted by the Arab Spring. Hamas and Israel have engaged in the protracted Gaza–Israel conflict, as part of the broader Israeli–Palestinian conflict. Hamas has attacked Israeli civilians, including through suicide bombings as well as launching rockets at Israeli cities. Australia, Canada, Costa Rica, Ecuador, Honduras, Israel, Japan, New Zealand, Paraguay, Trinidad and Tobago, the United Kingdom, the United States, and the European Union have designated Hamas as a terrorist organisation. In 2018 and 2023, motions at the United Nations to condemn Hamas as a terrorist organization failed to meet the two-thirds threshold.",
-    "coordinates": {
-      "lat": 31.7683,
-      "lon": 35.2137
-    },
-    "coordinate_source": "country-fallback:Israel/Palestine",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "Islamist movement",
-      "military organization",
-      "religious organization",
-      "terrorist organization",
-      "political organization",
-      "resistance movement"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "approximate",
-    "sitelinks_current": 150
   },
   {
     "id": "al-anfal-campaign",
@@ -2827,40 +2576,6 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 10
-  },
-  {
-    "id": "islamic-state",
-    "title": "Islamic State",
-    "date_start": "2014-06-29",
-    "date_end": null,
-    "countries": [
-      "Iraq",
-      "Syria"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:29:51.887Z",
-    "wikidata_qid": "Q2429253",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/Islamic_State",
-    "extract": "The Islamic State (IS), also known as the Islamic State of Iraq and the Levant (ISIL), the Islamic State of Iraq and Syria (ISIS), and by its Arabic acronym Da'esh, is a transnational Salafi jihadist militant organisation and internationally unrecognised former quasi-state. IS occupied a significant amount of territory in Syria during the Syrian Civil War and in Iraq after the U.S. troops withdrew. In 2014 the group proclaimed itself to be a worldwide caliphate and claimed religious and political authority over all Muslims worldwide, a claim not accepted by the vast majority of Muslims. It is designated as a terrorist organisation by the United Nations, making it subject to binding counterterrorism sanctions in every UN member state, including all Muslim countries.\n\nBy the end of 2015, its self-declared caliphate ruled an area with a population of about 12 million, where they enforced their extremist interpretation of Islamic law, managed an annual budget exceeding US$1 billion, and commanded more than 30,000 fighters. After a grinding conflict with American, Iraqi, and Kurdish forces, IS lost control of its Middle Eastern territories by 2019, subsequently reverting to insurgency from remote hideouts while continuing its propaganda efforts. These efforts have garnered a significant following in northern and Sahelian Africa, where IS still controls a significant territory.\n\nOriginating in the Jaish al-Ta'ifa al-Mansurah founded by Abu Omar al-Baghdadi in 2004, the organisation (primarily under the Islamic State of Iraq name) affiliated itself with al-Qaeda in Iraq and fought alongside them during the 2003–2006 phase of the Iraqi insurgency. The group later changed its name to Islamic State of Iraq and Levant for about a year, before declaring itself to be a worldwide caliphate, called simply the Islamic State (الدَّولةُ الإِسْلَامِيَّة, ad-Dawlah al-Islāmiyya).\n\nDuring its rule in Syria and Iraq, the group became notorious for its brutality. It committed genocides against Yazidis and Iraqi Turkmen; engaged in persecution of Christians, Shia Muslims, and Mandaeans; publicised videos of beheadings of soldiers, journalists, and aid workers; and destroyed cultural sites. The group has perpetrated terrorist massacres in territories outside of its control, such as the November 2015 Paris attacks, the 2024 Kerman bombings in Iran, and the 2024 Crocus City Hall attack in Russia. Lone wolf attacks inspired by the group have also taken place.\n\nAfter 2015, the Iraqi Armed Forces and the Syrian Democratic Forces pushed back IS and degraded its financial and military infrastructure, assisted by advisors, weapons, training, supplies, and airstrikes by the American-led coalition and Iranian proxy forces, and later by Russian airstrikes, bombings, cruise missile attacks, and scorched-earth tactics across Syria, which focused mostly on razing Syrian opposition strongholds rather than IS bases. By March 2019, IS lost the last of its territories in West Asia, although its affiliates maintain a significant territorial presence in Africa as of 2025.",
-    "coordinates": {
-      "lat": 33.3152,
-      "lon": 44.3661
-    },
-    "coordinate_source": "country-fallback:Iraq",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-10-01",
-    "wikidata_classes": [
-      "caliphate",
-      "armed organization",
-      "Islamic state",
-      "self-proclaimed state",
-      "quasi-state"
-    ],
-    "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
-    "location_quality": "approximate",
-    "sitelinks_current": 160
   },
   {
     "id": "yemeni-civil-war-2014-present",

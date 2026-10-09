@@ -179,12 +179,6 @@
       "fairness": null,
       "wording": []
     },
-    "kingdom-of-iraq": {
-      "text_sha1": "ad3dab2505aa",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
-      "wording": []
-    },
     "emirate-of-transjordan": {
       "text_sha1": "d812c22bb1cf",
       "text_retrieved_at": "2026-09-26",
@@ -290,13 +284,6 @@
       "fairness": null,
       "wording": []
     },
-    "syrian-independence": {
-      "text_sha1": "1bd8864b4044",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
-      "wording": [],
-      "data_note": "The summary shown is from the article on the Second Syrian Republic, not about the 1946 independence itself."
-    },
     "jordanian-independence": {
       "text_sha1": "bfa2a4e5dcfc",
       "text_retrieved_at": "2026-09-26",
@@ -380,20 +367,8 @@
       "fairness": null,
       "wording": []
     },
-    "baghdad-pact": {
-      "text_sha1": "bb16cb49e474",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
-      "wording": []
-    },
     "suez-crisis": {
       "text_sha1": "ce9aa0aebd6c",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
-      "wording": []
-    },
-    "united-arab-republic": {
-      "text_sha1": "e3c0fdddee26",
       "text_retrieved_at": "2026-09-26",
       "fairness": null,
       "wording": []
@@ -406,12 +381,6 @@
     },
     "north-yemen-civil-war": {
       "text_sha1": "1fbc8a31b4c7",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
-      "wording": []
-    },
-    "palestine-liberation-organization": {
-      "text_sha1": "6d2ef2a3daec",
       "text_retrieved_at": "2026-09-26",
       "fairness": null,
       "wording": []
@@ -456,17 +425,6 @@
       "text_sha1": "92ecc81808b8",
       "text_retrieved_at": "2026-09-26",
       "fairness": null,
-      "wording": []
-    },
-    "hafez-al-assad": {
-      "text_sha1": "b6c3c531834d",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": {
-        "note": "Gives the highest estimate of the Hama death toll (30,000) as fact; estimates range from about 10,000 to 40,000.",
-        "phrases": [
-          "massacres of 30,000 men, women and children in Hama alone"
-        ]
-      },
       "wording": []
     },
     "yom-kippur-war": {
@@ -517,17 +475,6 @@
       "fairness": null,
       "wording": []
     },
-    "saddam-hussein": {
-      "text_sha1": "b422ad8e843a",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": {
-        "note": "Says the US and its allies invaded while \"falsely accusing\" Iraq of having weapons of mass destruction. No stockpiles were found, but \"falsely\" implies deliberate deception, which is debated.",
-        "phrases": [
-          "falsely accusing"
-        ]
-      },
-      "wording": []
-    },
     "iran-iraq-war": {
       "text_sha1": "b5c146e777df",
       "text_retrieved_at": "2026-09-26",
@@ -568,18 +515,6 @@
           "note": "Uses \"terrorist\" for part of the uprising in Wikipedia's own voice, without saying who uses the label."
         }
       ]
-    },
-    "hamas": {
-      "text_sha1": "ff8b33400333",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": {
-        "note": "States contested claims as fact: that Israel supported Hamas \"to prevent the creation of an independent Palestinian state\", and that Gaza was \"Israeli-occupied\" while Hamas governed it. October 7 is mentioned only by name. It does list terrorist designations and attacks on civilians.",
-        "phrases": [
-          "to prevent the creation of an independent Palestinian state",
-          "the Israeli-occupied Gaza Strip"
-        ]
-      },
-      "wording": []
     },
     "al-anfal-campaign": {
       "text_sha1": "31d3391624b7",
@@ -779,23 +714,6 @@
           "guideline": "NPOV",
           "phrase": "the 3 July 2013 coup d'état against Morsi",
           "note": "Calls Morsi's removal a \"coup d'état\" in Wikipedia's own voice; his opponents call it a revolution (the 2011 revolution summary uses \"revolution\")."
-        }
-      ]
-    },
-    "islamic-state": {
-      "text_sha1": "c80b1d583fe4",
-      "text_retrieved_at": "2026-10-01",
-      "fairness": null,
-      "wording": [
-        {
-          "guideline": "LABEL",
-          "phrase": "their extremist interpretation of Islamic law",
-          "note": "Uses \"extremist\" for the group's interpretation of Islamic law in Wikipedia's own voice, without saying who uses the label."
-        },
-        {
-          "guideline": "LABEL",
-          "phrase": "terrorist massacres",
-          "note": "Uses \"terrorist\" for the group's attacks abroad in Wikipedia's own voice, without saying who uses the label."
         }
       ]
     },
