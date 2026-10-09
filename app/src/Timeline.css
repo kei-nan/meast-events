@@ -132,7 +132,7 @@
 .timeline-mode-btn[aria-pressed="true"] {
   position: relative; /* its accent border draws over the neighbour's */
   color: var(--text-primary);
-  background: rgba(201, 154, 69, 0.16);
+  background: var(--accent-tint);
   border-color: var(--accent);
 }
 
@@ -152,10 +152,11 @@
   border-color: var(--accent);
 }
 
+/* Pressed = accent outline + tint, the one "on" look of every toggle. */
 .timeline-preset[aria-pressed="true"],
 .timeline-play[aria-pressed="true"] {
-  color: #1d1a15;
-  background: var(--accent);
+  color: var(--text-primary);
+  background: var(--accent-tint);
   border-color: var(--accent);
 }
 
