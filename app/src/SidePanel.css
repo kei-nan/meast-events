@@ -1030,6 +1030,17 @@ button.sp-chip[aria-pressed="true"] {
     align-items: center;
   }
 
+  /* "← Back" so the action row fits one line; screen readers still hear
+     "Back to results". */
+  .event-detail-back-more {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .sp-seg-btn,
   .sp-chip,
   .sp-btn,
