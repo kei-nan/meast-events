@@ -255,12 +255,12 @@ export default function SearchPanel({
   let scopeAction = null;
   if (settled && filters.scope === "range" && (allCount === null || allCount > total)) {
     scopeAction = {
-      label: allCount === null ? "show whole timeline" : `show all ${allCount}`,
+      label: allCount === null ? "Show whole timeline" : `Show all ${allCount}`,
       aria: allCount === null ? "Show results from the whole timeline" : `Show all ${plural(allCount)}, whole timeline`,
       scope: "all",
     };
   } else if (settled && filters.scope !== "range" && total > 0 && shownInRange && shownInRange !== total) {
-    scopeAction = { label: `show the ${shownInRange} in selected years`, aria: null, scope: "range" };
+    scopeAction = { label: `Show the ${shownInRange} in selected years`, aria: null, scope: "range" };
   }
 
   // Screen reader announcements. The visible status line is not a live region:

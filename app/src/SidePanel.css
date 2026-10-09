@@ -502,22 +502,30 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--accent-strong);
 }
 
+/* The scope button changes the results, so it is a compact bordered button
+   (the same size as a sort segment), not link-styled text: in this panel
+   links take you somewhere, buttons change something. */
 .sp-scope-link {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   min-height: 28px;
-  padding: 2px 0;
-  background: none;
-  border: 0;
-  color: var(--link);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  margin-top: 4px;
+  padding: 0 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
   text-align: left;
   cursor: pointer;
 }
 
 .sp-scope-link:hover {
-  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.sp-scope-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 /* Touch-sized like the other panel controls (kept out of the shared mobile
