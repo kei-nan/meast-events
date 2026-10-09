@@ -10,6 +10,10 @@
 //     every event's full record is in the bucket its id hashes to;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - the search index (Pagefind) was built;
+//   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>)
+//     or one of the two MapLibre files in the versioned assets/maplibre-gl-<version>/
+//     folder: public/_headers marks all of /assets/* immutable, so an unhashed
+//     name there would be cached for a year and never updated;
 //   - dist/ has fewer files than the host allows per deploy (MAX_DIST_FILES,
 //     default 20,000: Cloudflare Workers static assets on the free plan,
 //     https://developers.cloudflare.com/workers/platform/limits/). Every event
@@ -108,7 +112,28 @@ for (const u of refs) {
 // 4. Search index.
 if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is missing (build-search-index.mjs did not run)");
 
-// 5. File count against the host's per-deploy limit. _headers and _redirects are
+// 5. Every asset's URL changes when its content does (public/_headers: /assets/* is
+// immutable). Vite names emitted files "<name>-<hash>.<ext>" with an 8-character
+// base64url hash (vite.config.js assetFileNames, Rollup's default chunk names). The
+// only exception is vite.config.js UNHASHED_ASSET_NAMES, kept by name inside a folder
+// named after the MapLibre version.
+const HASHED_ASSET = /^[^/]+-[A-Za-z0-9_-]{8}\.[a-z0-9]+$/;
+const VERSIONED_ASSET = /^maplibre-gl-\d+\.\d+\.\d+[^/]*\/maplibre-gl-(worker|shared)\.mjs$/;
+const listFiles = (d, prefix = "") =>
+  readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? listFiles(path.join(d, e.name), `${prefix}${e.name}/`) : [`${prefix}${e.name}`]
+  );
+const unhashed = existsSync(distFile("assets"))
+  ? listFiles(distFile("assets")).filter((f) => !HASHED_ASSET.test(f) && !VERSIONED_ASSET.test(f))
+  : [];
+if (unhashed.length) {
+  fail(
+    `dist/assets/ has files with no content hash outside the versioned MapLibre folder ` +
+      `(they would be cached as immutable): ${unhashed.join(", ")}`
+  );
+}
+
+// 6. File count against the host's per-deploy limit. _headers and _redirects are
 // configuration, not assets, but counting them keeps the margin honest.
 const MAX_DIST_FILES = Number(process.env.MAX_DIST_FILES) || 20000;
 const countFiles = (d) => readdirSync(d, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? countFiles(path.join(d, e.name)) : 1), 0);
@@ -123,5 +148,5 @@ if (problems.length) {
 }
 console.log(
   `check-dist: OK - ${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
-    `${refs.length} index.html references, search index present, ${fileCount} files (limit ${MAX_DIST_FILES})`
+    `${refs.length} index.html references, search index present, assets/ hashed, ${fileCount} files (limit ${MAX_DIST_FILES})`
 );
