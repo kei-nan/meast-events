@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
@@ -392,32 +392,30 @@ export default function SearchPanel({
               {/* Order of the browse list (no search or filters): search results keep their relevance order. */}
               {!searching && !eventsLoading && onSortChange && (
                 <div className="sp-sort" role="group" aria-label="Sort events">
-                  <span aria-hidden="true">Sort:</span>
-                  {SORT_KEYS.map(({ key, label, dirs, title }, i) => {
+                  <span className="sp-sort-label" aria-hidden="true">
+                    Sort
+                  </span>
+                  {SORT_KEYS.map(({ key, label, dirs, title }) => {
                     const active = sortKey === key;
                     // The active sort shows its direction; pressing it again reverses it.
                     const dir = active ? sortDir : null;
                     return (
-                      <Fragment key={key}>
-                        {i > 0 && <span aria-hidden="true">·</span>}
-                        <button
-                          type="button"
-                          className="sp-sort-btn"
-                          aria-pressed={active}
-                          aria-label={active ? `${label}, ${dirs[dir]}` : label}
-                          title={active ? `${title}. Press again to reverse.` : title}
-                          onClick={() =>
-                            onSortChange(active ? sortValue(key, dir === "asc" ? "desc" : "asc") : key)
-                          }
-                        >
-                          {label}
-                          {dir && (
-                            <span className="sp-sort-dir" aria-hidden="true">
-                              {dir === "asc" ? "↑" : "↓"}
-                            </span>
-                          )}
-                        </button>
-                      </Fragment>
+                      <button
+                        key={key}
+                        type="button"
+                        className="sp-sort-btn"
+                        aria-pressed={active}
+                        aria-label={active ? `${label}, ${dirs[dir]}` : label}
+                        title={active ? `${title}. Press again to reverse.` : title}
+                        onClick={() => onSortChange(active ? sortValue(key, dir === "asc" ? "desc" : "asc") : key)}
+                      >
+                        {label}
+                        {dir && (
+                          <span className="sp-sort-dir" aria-hidden="true">
+                            {dir === "asc" ? "↑" : "↓"}
+                          </span>
+                        )}
+                      </button>
                     );
                   })}
                 </div>

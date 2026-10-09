@@ -445,25 +445,39 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
-/* Browse order switch: quiet text under the count, the active order brighter
-   and underlined (a filled button would outweigh the results it orders). */
+/* Browse order switch under the count: a joined pair styled like the
+   timeline's Grow | Move (Timeline.css .timeline-mode-btn), the active one
+   outlined in the accent with a light tint, not filled. */
 .sp-sort {
   display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  font-size: 0.78rem;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.sp-sort-label {
+  margin-right: 8px;
+  font-size: 0.75rem;
   color: var(--text-tertiary);
 }
 
 .sp-sort-btn {
-  font-family: var(--font-sans);
-  font-size: inherit;
   min-height: 28px;
-  padding: 2px 0;
-  background: none;
-  border: 0;
+  padding: 0 9px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
   cursor: pointer;
+}
+
+.sp-sort-btn:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.sp-sort-btn:last-of-type {
+  margin-left: -1px;
+  border-radius: 0 6px 6px 0;
 }
 
 .sp-sort-btn:hover {
@@ -471,18 +485,21 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .sp-sort-btn[aria-pressed="true"] {
+  position: relative; /* its accent border draws over the neighbour's */
   color: var(--text-primary);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 3px;
+  background: rgba(201, 154, 69, 0.16);
+  border-color: var(--accent);
 }
 
-/* Direction of the active sort; outside the underline. */
+.sp-sort-btn:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* Direction of the active sort. */
 .sp-sort-dir {
-  display: inline-block;
-  margin-left: 3px;
+  margin-left: 4px;
   color: var(--accent-strong);
-  text-decoration: none;
 }
 
 .sp-scope-link {
