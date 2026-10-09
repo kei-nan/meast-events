@@ -133,7 +133,7 @@ export default function App() {
   const [area, setArea] = useState(initial.area);
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
-  const [sort, setSort] = useState(initial.sort); // browse list: "coverage" (default) | "date"
+  const [sort, setSort] = useState(initial.sort); // browse list order, lib/browseOrder.js SORTS ("coverage" = default)
   const [aboutSection, setAboutSection] = useState(null); // "credits": the dialog opens at its credits
   const openAbout = useCallback((section) => {
     setAboutSection(section);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
@@ -8,7 +8,19 @@ import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
 import { CATEGORY_COLORS } from "./mapLayers";
 import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
+import { parseSort, sortValue } from "../lib/browseOrder.js";
 import "../SidePanel.css";
+
+// The browse-list sort switch: each key's label and how its directions read aloud.
+const SORT_KEYS = [
+  {
+    key: "coverage",
+    label: "Coverage",
+    dirs: { desc: "most covered first", asc: "least covered first" },
+    title: "By the number of Wikimedia pages about the event (Wikipedia language versions and other projects, as counted by Wikidata)",
+  },
+  { key: "date", label: "Date", dirs: { asc: "oldest first", desc: "newest first" }, title: "By start date" },
+];
 
 /**
  * Right-hand side panel (bottom sheet on mobile): search, area, filters, status,
@@ -48,8 +60,8 @@ import "../SidePanel.css";
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
- * @param {"coverage"|"date"}      [props.sort]   order of the browse list (lib/browseOrder.js)
- * @param {(s:"coverage"|"date")=>void} [props.onSortChange]
+ * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
+ * @param {(s:string)=>void}       [props.onSortChange]
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -110,6 +122,7 @@ export default function SearchPanel({
     (filters.countries?.length ?? 0) > 0 ||
     !!filters.inView;
   const searching = query.trim() !== "" || hasFilters || !!area;
+  const { key: sortKey, dir: sortDir } = parseSort(sort);
 
   // Back restores focus to
   // the originating row (or the search box if that row is gone).
@@ -380,24 +393,33 @@ export default function SearchPanel({
               {!searching && !eventsLoading && onSortChange && (
                 <div className="sp-sort" role="group" aria-label="Sort events">
                   <span aria-hidden="true">Sort:</span>
-                  <button
-                    type="button"
-                    className="sp-sort-btn"
-                    aria-pressed={sort !== "date"}
-                    title="Events with the most Wikimedia pages first (Wikipedia language versions and other projects, as counted by Wikidata)"
-                    onClick={() => onSortChange("coverage")}
-                  >
-                    Most covered
-                  </button>
-                  <span aria-hidden="true">·</span>
-                  <button
-                    type="button"
-                    className="sp-sort-btn"
-                    aria-pressed={sort === "date"}
-                    onClick={() => onSortChange("date")}
-                  >
-                    Date
-                  </button>
+                  {SORT_KEYS.map(({ key, label, dirs, title }, i) => {
+                    const active = sortKey === key;
+                    // The active sort shows its direction; pressing it again reverses it.
+                    const dir = active ? sortDir : null;
+                    return (
+                      <Fragment key={key}>
+                        {i > 0 && <span aria-hidden="true">·</span>}
+                        <button
+                          type="button"
+                          className="sp-sort-btn"
+                          aria-pressed={active}
+                          aria-label={active ? `${label}, ${dirs[dir]}` : label}
+                          title={active ? `${title}. Press again to reverse.` : title}
+                          onClick={() =>
+                            onSortChange(active ? sortValue(key, dir === "asc" ? "desc" : "asc") : key)
+                          }
+                        >
+                          {label}
+                          {dir && (
+                            <span className="sp-sort-dir" aria-hidden="true">
+                              {dir === "asc" ? "↑" : "↓"}
+                            </span>
+                          )}
+                        </button>
+                      </Fragment>
+                    );
+                  })}
                 </div>
               )}
             </div>

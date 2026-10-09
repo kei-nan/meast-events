@@ -4,8 +4,10 @@
 //   q, cat (comma list), c (comma list of countries), y=start-end,
 //   scope=all|range, area=r:minLon,minLat,maxLon,maxLat | c:lon,lat,radiusKm,
 //   e=<event id>, about=1 (the "About the data" dialog is open),
-//   sort=date (the browse list in date order; the default, most covered first, is omitted)
+//   sort=coverage-asc|date|date-desc (browse list order, lib/browseOrder.js; the
+//   default, most covered first, is omitted)
 
+import { SORTS } from "./browseOrder.js";
 import { MAX_RADIUS_KM, makeCircleArea, makeRectArea } from "./geo.js";
 import { MAX_YEAR, MIN_YEAR } from "./years.js";
 
@@ -99,7 +101,7 @@ export function parseUrlState(search) {
     area: parseArea(p.get("area")),
     eventId: isValidEventId(e) ? e : null,
     about: p.get("about") === "1",
-    sort: p.get("sort") === "date" ? "date" : "coverage",
+    sort: SORTS.includes(p.get("sort")) ? p.get("sort") : "coverage",
   };
 }
 
@@ -127,7 +129,7 @@ export function serializeUrlState(state) {
   if (area) parts.push(`area=${enc(area)}`);
   if (isValidEventId(state.eventId)) parts.push(`e=${encodeURIComponent(state.eventId)}`);
   if (state.about) parts.push("about=1");
-  if (state.sort === "date") parts.push("sort=date");
+  if (SORTS.includes(state.sort) && state.sort !== "coverage") parts.push(`sort=${state.sort}`);
   return parts.length ? `?${parts.join("&")}` : "";
 }
 

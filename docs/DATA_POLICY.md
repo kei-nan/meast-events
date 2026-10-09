@@ -191,8 +191,8 @@ The Iranian Green Movement (`social movement`, in practice the 2009 protests) is
 With no search, filter or drawn area, the list shows the events of the selected years **most covered first**: by `sitelinks_current`, the same
 mechanical signal as the inclusion rule (the item's Wikidata sitelinks across all Wikimedia projects), highest first, equal counts in date order.
 Events that began before the selected years (still ongoing in them) follow those that began within them, so a single year does not open with every
-long conflict that overlaps it (`app/src/lib/browseOrder.js`). A **Date** switch next to the count lists the same events chronologically instead
-(`?sort=date` in the link). Search results are not affected: they keep their relevance order.
+long conflict that overlaps it (`app/src/lib/browseOrder.js`). A **Sort: Coverage · Date** switch under the count changes the order;
+pressing the active one reverses it (least covered first, or newest first). The link keeps the choice (`?sort=coverage-asc`, `date`, `date-desc`). Search results are not affected: they keep their relevance order.
 
 The order inherits the caveats of the inclusion rule above: sitelinks measure how many Wikimedia communities wrote about an item, not importance,
 and favour international, modern and widely covered events. It is a published rule applied to every event alike, not a per-event choice.

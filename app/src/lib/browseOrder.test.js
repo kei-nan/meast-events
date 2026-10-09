@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { eventStartYear, orderBrowseList, startedBefore } from "./browseOrder.js";
+import { eventStartYear, orderBrowseList, parseSort, sortValue, startedBefore } from "./browseOrder.js";
 
 const ev = (id, date_start, date_end) => ({ id, title: id, date_start, date_end });
 
@@ -55,4 +55,26 @@ test("coverage: most sitelinks first within each part, ties chronological, no co
     orderBrowseList(events, 1950, "date").map((e) => e.id),
     ["small", "nocount", "big", "tie-late", "old-big", "old-small"]
   );
+  // Fewest first: equal counts still chronological, no count still last.
+  assert.deepEqual(
+    orderBrowseList(events, 1950, "coverage-asc").map((e) => e.id),
+    ["small", "tie-late", "big", "nocount", "old-small", "old-big"]
+  );
+  // Newest first, still within each part.
+  assert.deepEqual(
+    orderBrowseList(events, 1950, "date-desc").map((e) => e.id),
+    ["tie-late", "big", "nocount", "small", "old-small", "old-big"]
+  );
+});
+
+test("parseSort / sortValue", () => {
+  assert.deepEqual(parseSort("coverage"), { key: "coverage", dir: "desc" });
+  assert.deepEqual(parseSort("coverage-asc"), { key: "coverage", dir: "asc" });
+  assert.deepEqual(parseSort("date"), { key: "date", dir: "asc" });
+  assert.deepEqual(parseSort("date-desc"), { key: "date", dir: "desc" });
+  assert.deepEqual(parseSort("bogus"), { key: "coverage", dir: "desc" });
+  assert.equal(sortValue("coverage", "desc"), "coverage");
+  assert.equal(sortValue("coverage", "asc"), "coverage-asc");
+  assert.equal(sortValue("date", "asc"), "date");
+  assert.equal(sortValue("date", "desc"), "date-desc");
 });

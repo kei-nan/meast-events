@@ -477,6 +477,14 @@ button.sp-chip[aria-pressed="true"] {
   text-underline-offset: 3px;
 }
 
+/* Direction of the active sort; outside the underline. */
+.sp-sort-dir {
+  display: inline-block;
+  margin-left: 3px;
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+
 .sp-scope-link {
   font-family: var(--font-sans);
   font-size: 0.82rem;
