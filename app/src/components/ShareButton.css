@@ -5,6 +5,42 @@
   display: inline-block;
 }
 
+.share > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.share-icon {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+/* Phones: the icon alone, as in phone apps; "Share" stays the button's
+   accessible name. */
+@media (max-width: 768px) {
+  .share > button {
+    min-width: 44px;
+    padding-inline: 10px;
+  }
+
+  .share-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .share-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 .share-panel {
   position: absolute;
   top: calc(100% + 6px);

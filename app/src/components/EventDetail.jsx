@@ -223,7 +223,7 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     <article className="event-detail" aria-labelledby="event-detail-title">
       <div className="event-detail-actions">
         <button type="button" className="sp-btn" onClick={onBack}>
-          <span aria-hidden="true">←</span> Back to results
+          <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
         </button>
         {onShowOnMap && quality !== "none" && (
           <button type="button" className="sp-btn event-detail-showmap" onClick={onShowOnMap}>

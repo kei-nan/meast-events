@@ -43,6 +43,30 @@ function downloadPng(data, filename) {
   }, "image/png");
 }
 
+// The share symbol people know from their own phone: Apple's box with an arrow
+// on Apple devices (iPadOS reports itself as a Mac), the three joined dots elsewhere.
+const APPLE = typeof navigator !== "undefined" && /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+
+function ShareIcon() {
+  return (
+    <svg className="share-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      {APPLE ? (
+        <g fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M8 10V1.5M5 4.5l3-3 3 3" />
+          <path d="M5.5 6.5H4.5a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7.5a1 1 0 0 0-1-1h-1" />
+        </g>
+      ) : (
+        <g fill="currentColor" stroke="currentColor" strokeWidth="1.4">
+          <circle cx="12" cy="3.5" r="2" stroke="none" />
+          <circle cx="4" cy="8" r="2" stroke="none" />
+          <circle cx="12" cy="12.5" r="2" stroke="none" />
+          <path d="M5.8 7l6.2-3.5M5.8 9l6.2 3.5" fill="none" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
 const slug = (s) =>
   String(s ?? "")
     .toLowerCase()
@@ -144,7 +168,8 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
         aria-controls={panelId}
         onClick={() => (open ? close(false) : setOpen(true))}
       >
-        Share
+        <ShareIcon />
+        <span className="share-label">Share</span>
       </button>
       {open && (
         <div className="share-panel" id={panelId} ref={panelRef} role="group" aria-label="Share this view">
