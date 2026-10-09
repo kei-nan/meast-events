@@ -49,3 +49,23 @@ test("each review fingerprints the text it rated (changed texts are reported)", 
   );
   if (stale.length) t.diagnostic(`${stale.length} review(s) out of date (text changed since review): ${stale.map((e) => e.id).join(", ")}`);
 });
+
+// docs/framing-review.md publishes counts from this data; keep them in step with it.
+test("the counts in docs/framing-review.md match the data", () => {
+  const doc = readFileSync(new URL("../../../docs/framing-review.md", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const results = doc.split(/^## Results$/m)[1]?.split(/^## /m)[0];
+  assert.ok(results, "no Results section");
+  const rows = Object.fromEntries(
+    [...results.matchAll(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$/gm)].map((m) => [m[1], m[2]])
+  );
+  const all = Object.values(review.events);
+  const n = all.length;
+  assert.equal(rows["Overall fairness: issue found"], `${all.filter((r) => r.fairness !== null).length} of ${n}`);
+  assert.equal(rows["Wording check: at least one wording point"], `${all.filter((r) => r.wording.length).length} of ${n}`);
+  assert.equal(rows["Either"], `${all.filter((r) => r.fairness !== null || r.wording.length).length} of ${n}`);
+  for (const [key, g] of Object.entries(review.guidelines)) {
+    const points = all.reduce((sum, r) => sum + r.wording.filter((x) => x.guideline === key).length, 0);
+    assert.equal(rows[g.name], String(points), `wording points for ${g.name}`);
+  }
+  assert.match(doc, new RegExp(`^All ${n} summaries were reviewed`, "m"));
+});

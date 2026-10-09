@@ -52,7 +52,7 @@ The monthly data refresh (see [DATA_POLICY.md](DATA_POLICY.md), "Refreshing extr
 
 ## Who reviewed it
 
-All 820 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: the first 571 on 2026-09-30 (updated to 2026-10-04), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
+All 811 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: 562 on 2026-09-30 (updated to 2026-10-04; reviewed as part of the first 571, of which 9 entries that are not events were later removed), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
 
 ## How it shows on the event page
 
@@ -64,13 +64,13 @@ All 820 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI mod
 
 | | Summaries |
 |---|---|
-| Overall fairness: issue found | 105 of 820 |
-| Wording check: at least one wording point | 100 of 820 |
-| Either | 184 of 820 |
+| Overall fairness: issue found | 102 of 811 |
+| Wording check: at least one wording point | 99 of 811 |
+| Either | 180 of 811 |
 
 | Guideline | Wording points |
 |---|---|
-| Contentious labels | 54 |
+| Contentious labels | 52 |
 | Synonyms for "said" | 24 |
 | Avoid stating opinions as facts | 13 |
 | Editorializing | 12 |
