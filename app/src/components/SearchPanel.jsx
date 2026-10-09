@@ -48,6 +48,8 @@ import "../SidePanel.css";
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
+ * @param {"coverage"|"date"}      [props.sort]   order of the browse list (lib/browseOrder.js)
+ * @param {(s:"coverage"|"date")=>void} [props.onSortChange]
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -76,6 +78,8 @@ export default function SearchPanel({
   onSelect,
   onHover,
   onBack,
+  sort = "coverage",
+  onSortChange,
   ref,
 }) {
   const inputId = useId();
@@ -371,6 +375,31 @@ export default function SearchPanel({
                 >
                   {scopeAction.label}
                 </button>
+              )}
+              {/* Order of the browse list (no search or filters): search results keep their relevance order. */}
+              {!searching && !eventsLoading && onSortChange && (
+                <div className="sp-seg sp-sort" role="group" aria-label="Sort events">
+                  <span className="sp-seg-label" aria-hidden="true">
+                    Sort
+                  </span>
+                  <button
+                    type="button"
+                    className="sp-seg-btn"
+                    aria-pressed={sort !== "date"}
+                    title="Events with the most Wikimedia pages first (Wikipedia language versions and other projects, as counted by Wikidata)"
+                    onClick={() => onSortChange("coverage")}
+                  >
+                    Most covered
+                  </button>
+                  <button
+                    type="button"
+                    className="sp-seg-btn"
+                    aria-pressed={sort === "date"}
+                    onClick={() => onSortChange("date")}
+                  >
+                    Date
+                  </button>
+                </div>
               )}
             </div>
           </div>

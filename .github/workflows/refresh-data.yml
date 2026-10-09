@@ -51,6 +51,13 @@ jobs:
       - name: Re-fetch the Wikipedia summaries and titles
         run: node scripts/refresh-extracts.js --apply --report="$RUNNER_TEMP/refresh-report.md"
 
+      # The counts behind the default "most covered" list order (docs/DATA_POLICY.md,
+      # "Default order"); the changed counts are appended to the report.
+      - name: Re-fetch the Wikidata sitelink counts
+        run: |
+          set -o pipefail
+          { echo; echo "## Sitelink counts"; echo; echo '```'; node scripts/refresh-sitelinks.js --apply; echo '```'; } | tee -a "$RUNNER_TEMP/refresh-report.md"
+
       - name: Check for changes
         id: diff
         run: |

@@ -36,3 +36,23 @@ test("startedBefore / eventStartYear", () => {
   assert.equal(startedBefore(ev("a", "1948-01-01"), 1948), false);
   assert.equal(startedBefore({ id: "nodate" }, 1948), false);
 });
+
+test("coverage: most sitelinks first within each part, ties chronological, no count last", () => {
+  const withCount = (id, date_start, sitelinks, date_end) => ({ ...ev(id, date_start, date_end), sitelinks });
+  const events = [
+    withCount("old-big", "1920-01-01", 90, "1960-01-01"),
+    withCount("small", "1950-01-01", 12),
+    withCount("big", "1956-01-01", 80),
+    withCount("tie-late", "1958-01-01", 12),
+    { ...ev("nocount", "1951-01-01") },
+    withCount("old-small", "1930-01-01", 20, "1970-01-01"),
+  ];
+  assert.deepEqual(
+    orderBrowseList(events, 1950, "coverage").map((e) => e.id),
+    ["big", "small", "tie-late", "nocount", "old-big", "old-small"]
+  );
+  assert.deepEqual(
+    orderBrowseList(events, 1950, "date").map((e) => e.id),
+    ["small", "nocount", "big", "tie-late", "old-big", "old-small"]
+  );
+});

@@ -32,6 +32,8 @@ rather than a second layer of ours. Concretely:
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
 | `date_flags`, `review_reasons`, `needs_review` | Advisory flags | ours (flags only) |
+| `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
+| `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
 
 ### Extract
 
@@ -174,6 +176,18 @@ The funnel from 5,063 raw candidates to what is shown, with breakdowns by countr
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
 Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).
+
+## Default order
+
+With no search, filter or drawn area, the list shows the events of the selected years **most covered first**: by `sitelinks_current`, the same
+mechanical signal as the inclusion rule (the item's Wikidata sitelinks across all Wikimedia projects), highest first, equal counts in date order.
+Events that began before the selected years (still ongoing in them) follow those that began within them, so a single year does not open with every
+long conflict that overlaps it (`app/src/lib/browseOrder.js`). A **Date** switch next to the count lists the same events chronologically instead
+(`?sort=date` in the link). Search results are not affected: they keep their relevance order.
+
+The order inherits the caveats of the inclusion rule above: sitelinks measure how many Wikimedia communities wrote about an item, not importance,
+and favour international, modern and widely covered events. It is a published rule applied to every event alike, not a per-event choice.
+The counts are refreshed monthly with the extracts (`scripts/refresh-sitelinks.js`, see "Refreshing extracts").
 
 ## Event classes
 
@@ -340,7 +354,8 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 
 1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
    `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes. The same run updates titles of
-   renamed articles (see "Titles" below).
+   renamed articles (see "Titles" below). It then runs `node scripts/refresh-sitelinks.js --apply`, which updates each event's
+   `sitelinks_current` (the count behind the default list order, see "Default order").
 2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists the title changes,
    the held title cases, and, for each changed lead, the removed and added sentences. It never merges.
 3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.

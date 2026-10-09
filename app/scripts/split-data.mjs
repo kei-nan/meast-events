@@ -159,6 +159,8 @@ function publicEvent(e) {
     snippet: makeSnippet(e.extract),
     coordinates: quality === "none" ? null : e.coordinates,
     location_quality: quality,
+    // Wikidata sitelink count (all projects), for the default "most covered" order.
+    sitelinks: Number.isFinite(e.sitelinks_current) ? e.sitelinks_current : null,
   };
 }
 

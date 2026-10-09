@@ -445,6 +445,12 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
+/* Browse order switch, at the right of the count (wraps under it when narrow). */
+.sp-sort {
+  margin-left: auto;
+  align-self: center;
+}
+
 .sp-scope-link {
   font-family: var(--font-sans);
   font-size: 0.82rem;

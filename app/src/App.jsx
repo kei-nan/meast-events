@@ -133,6 +133,7 @@ export default function App() {
   const [area, setArea] = useState(initial.area);
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
+  const [sort, setSort] = useState(initial.sort); // browse list: "coverage" (default) | "date"
   const [aboutSection, setAboutSection] = useState(null); // "credits": the dialog opens at its credits
   const openAbout = useCallback((section) => {
     setAboutSection(section);
@@ -312,13 +313,13 @@ export default function App() {
   }, [search.status, scopedResults]);
 
   // What the panel lists: idle => the browse list for the selected years
-  // (events starting in them first, then ones ongoing from earlier; see
-  // lib/browseOrder.js; capped for rendering, `total` stays exact); otherwise
-  // the ranked search results in the chosen scope.
+  // (events starting in them first, then ones ongoing from earlier, each most
+  // covered first or by date; see lib/browseOrder.js; capped for rendering,
+  // `total` stays exact); otherwise the ranked search results in the chosen scope.
   const BROWSE_CAP = 500;
   const browseList = useMemo(
-    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear)) : null),
-    [search.status, inViewFilter, visibleEvents, startYear]
+    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear, sort)) : null),
+    [search.status, inViewFilter, visibleEvents, startYear, sort]
   );
   // Memoized (like range below) so a hover re-render of App passes the memoized
   // ResultsList the same props and it skips rendering.
@@ -370,10 +371,11 @@ export default function App() {
     setSelectedEventId(parsed.eventId);
     setAboutSection(null);
     setAbout(parsed.about);
+    setSort(parsed.sort);
   }, []);
 
   const replaceNextUrl = useUrlState(
-    { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about },
+    { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort },
     handleNavigate
   );
 
@@ -539,6 +541,8 @@ export default function App() {
           onSelect={handleSelectFromList}
           onHover={setHoverId}
           onBack={handleBack}
+          sort={sort}
+          onSortChange={setSort}
           // Extras beyond the agreed props (ignored if unused):
           counts={counts}
           truncated={search.truncated}
