@@ -445,10 +445,36 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
-/* Browse order switch, at the right of the count (wraps under it when narrow). */
+/* Browse order switch: quiet text under the count, the active order brighter
+   and underlined (a filled button would outweigh the results it orders). */
 .sp-sort {
-  margin-left: auto;
-  align-self: center;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+.sp-sort-btn {
+  font-family: var(--font-sans);
+  font-size: inherit;
+  min-height: 28px;
+  padding: 2px 0;
+  background: none;
+  border: 0;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sp-sort-btn:hover {
+  color: var(--text-primary);
+}
+
+.sp-sort-btn[aria-pressed="true"] {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
 }
 
 .sp-scope-link {
@@ -472,7 +498,8 @@ button.sp-chip[aria-pressed="true"] {
 /* Touch-sized like the other panel controls (kept out of the shared mobile
    block further down). */
 @media (max-width: 768px) {
-  .sp-scope-link {
+  .sp-scope-link,
+  .sp-sort-btn {
     min-height: 44px;
   }
 }

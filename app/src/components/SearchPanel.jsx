@@ -378,22 +378,21 @@ export default function SearchPanel({
               )}
               {/* Order of the browse list (no search or filters): search results keep their relevance order. */}
               {!searching && !eventsLoading && onSortChange && (
-                <div className="sp-seg sp-sort" role="group" aria-label="Sort events">
-                  <span className="sp-seg-label" aria-hidden="true">
-                    Sort
-                  </span>
+                <div className="sp-sort" role="group" aria-label="Sort events">
+                  <span aria-hidden="true">Sort:</span>
                   <button
                     type="button"
-                    className="sp-seg-btn"
+                    className="sp-sort-btn"
                     aria-pressed={sort !== "date"}
                     title="Events with the most Wikimedia pages first (Wikipedia language versions and other projects, as counted by Wikidata)"
                     onClick={() => onSortChange("coverage")}
                   >
                     Most covered
                   </button>
+                  <span aria-hidden="true">·</span>
                   <button
                     type="button"
-                    className="sp-seg-btn"
+                    className="sp-sort-btn"
                     aria-pressed={sort === "date"}
                     onClick={() => onSortChange("date")}
                   >
