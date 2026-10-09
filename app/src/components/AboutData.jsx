@@ -3,6 +3,9 @@ import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient
 import "./AboutData.css";
 
 const REPO = "https://github.com/kei-nan/meast-events";
+// Credited in "Borders" and "Sources & licences" (NOTICE); event-page.test.mjs
+// checks that every border source in data/boundaries.json is credited here.
+const OCHA_AREAS_URL = "https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 
 const fmt = (v) => (typeof v === "number" ? v.toLocaleString("en-US") : String(v));
 const label = (k) => k.replace(/_/g, " ");
@@ -391,7 +394,12 @@ export default function AboutData({ section = null, onClose }) {
           <a href={`${REPO}/blob/main/scripts/boundary-corrections.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             corrections list
           </a>
-          ). The map draws the borders of the last year in the selected period. Dashed borders mark territory under a
+          ). The West Bank&apos;s Areas A, B and C (Oslo II) are UN OCHA&apos;s{" "}
+          <a href={OCHA_AREAS_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            &ldquo;State of Palestine &ndash; Oslo Agreement in the West Bank&rdquo;
+          </a>{" "}
+          (source: Palestinian Authority Ministry of Planning, published on HDX), used under its terms: non-commercial
+          use with credit to UN OCHA. The map draws the borders of the last year in the selected period. Dashed borders mark territory under a
           mandate, occupation, unrecognized annexation, or a since-resolved sovereignty dispute.
         </p>
 
@@ -417,12 +425,17 @@ export default function AboutData({ section = null, onClose }) {
           <a href={`${REPO}/blob/main/scripts/boundary-corrections.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             our cited corrections
           </a>
-          .
+          . West Bank Areas A, B and C:{" "}
+          <a href={OCHA_AREAS_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            UN OCHA (HDX)
+          </a>
+          , non-commercial use, credited to UN OCHA.
         </p>
         <p>
           Source code: AGPL-3.0. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
-          link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0), so the data is for
-          non-commercial use. Details:{" "}
+          link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0) and, for the West
+          Bank areas, from UN OCHA data whose terms allow non-commercial use only, so the data is for non-commercial
+          use. Details:{" "}
           <a href={`${REPO}/blob/main/docs/DATA_POLICY.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">data policy</a>,{" "}
           <a href={`${REPO}/blob/main/NOTICE`} target="_blank" rel="noreferrer" title="Opens in a new tab">NOTICE</a>,{" "}
           <a href={`${REPO}/blob/main/data/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">data license</a>.
