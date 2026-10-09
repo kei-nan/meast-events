@@ -59,7 +59,7 @@ event (`groupForEvent` in `scripts/lib/event-classes.js`):
 
 1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking, suicide attack), the category is terrorism.
 2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime, pogrom, mass murder), the category is atrocity.
-3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the 112 legacy events keep the
+3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the hand-picked (legacy) events keep the
    group hand-assigned in `data/seed-events.json`.
 
 Before 2026-09-28 steps 1-2 did not exist: an item Wikidata types as both a "massacre" and a "terrorist attack" was shown as "political" because "massacre"
@@ -166,7 +166,7 @@ The rule stays as coded (all projects); the documentation now says so.
 - **Wikidata modelling is uneven.** Only events that some editor has typed with a class, dated and located in a tracked country are found at all. Multi-country events
   carry only the countries Wikidata lists.
 - **English Wikipedia is required** for an extract, which biases toward what English Wikipedia covers.
-- **The hand-picked seed list** (112 events, 52 of them not reachable by the rule since the class additions of 2026-10-06, 61 before) is our own selection.
+- **The hand-picked seed list** (103 events, 43 of them not reachable by the rule; 112 before 2026-10-09, see "Not events" below) is our own selection.
   It is still the only source of economic events; the rule now also finds diplomatic ones (summits, ceasefires, peace conferences).
 - **Location is not required, but it changes visibility.** Events without coordinates are listed but have no marker; abstract and large-area events (wars, referendums,
   treaties) lack coordinates far more often than point-like ones.
