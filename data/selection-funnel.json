@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T21:28:07.763Z",
+  "generated_at": "2026-10-09T11:24:42.380Z",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
@@ -50,17 +50,17 @@
     "hard_excluded_no_wikipedia_summary_or_extract": 28
   },
   "shown_now": {
-    "curated_total": 820,
-    "seed_events_hand_picked": 112,
+    "curated_total": 811,
+    "seed_events_hand_picked": 103,
     "seed_events_also_found_by_discovery": 60,
-    "seed_events_not_reachable_by_discovery": 52,
+    "seed_events_not_reachable_by_discovery": 43,
     "discovered_events_merged": 708,
     "location_quality": {
-      "approximate": 80,
-      "precise": 364,
+      "approximate": 74,
+      "precise": 361,
       "none": 376
     },
-    "seed_file_entries": 112
+    "seed_file_entries": 103
   },
   "sitelink_measurement": {
     "rule_uses": "sitelinks across ALL Wikimedia projects (Wikidata wikibase:sitelinks: Wikipedias + Wikisource, Wikiquote, Commons, ...)",

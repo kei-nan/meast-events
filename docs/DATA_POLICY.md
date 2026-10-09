@@ -32,6 +32,8 @@ rather than a second layer of ours. Concretely:
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
 | `date_flags`, `review_reasons`, `needs_review` | Advisory flags | ours (flags only) |
+| `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
+| `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
 
 ### Extract
 
@@ -45,8 +47,8 @@ Battle of Elli in between). The earlier text was mostly the first paragraph only
 
 The labels (English) of **all** the item's `P31` (instance of) statements, in the order Wikidata's entity JSON lists them (deprecated-rank statements
 excluded; a class without an English label shows its QID), followed - only if not already present - by the labels of the event classes discovery matched via
-subclass (`P279*`) below. Nothing is de-duplicated by our preference, re-ordered, or replaced by our own label. For the 112 hand-picked (legacy) events
-the classes come from live Wikidata too (for example Saddam Hussein: `human`, Fall of the Assad regime: `regime change`); the old labels such as "political"
+subclass (`P279*`) below. Nothing is de-duplicated by our preference, re-ordered, or replaced by our own label. For the hand-picked (legacy) events
+the classes come from live Wikidata too (for example Fall of the Assad regime: `regime change`); the old labels such as "political"
 or "war" that the curated file used to carry as if they were Wikidata's are gone. `category_label` is removed. Number of classes per event across the
 594 events (curated + proposed): 1 class 320, 2: 165, 3: 68, 4: 30, 5: 7, 6: 4.
 
@@ -57,7 +59,7 @@ event (`groupForEvent` in `scripts/lib/event-classes.js`):
 
 1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking, suicide attack), the category is terrorism.
 2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime, pogrom, mass murder), the category is atrocity.
-3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the 112 legacy events keep the
+3. Otherwise discovered events get the group of the **first event class discovery matched** (the order of the table below), and the hand-picked (legacy) events keep the
    group hand-assigned in `data/seed-events.json`.
 
 Before 2026-09-28 steps 1-2 did not exist: an item Wikidata types as both a "massacre" and a "terrorist attack" was shown as "political" because "massacre"
@@ -128,7 +130,7 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
    A place only counts when at least as many of the present-day sovereign states it lists (its `P17`) are inside the region as outside it
    (`placeIsMostlyInRegion` in `scripts/lib/v21.js`). Seas and regions that mostly belong to other countries - the Mediterranean (6 in, 16 out), Black Sea,
    Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
-   are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the 112 hand-picked
+   are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the hand-picked
    events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`: 23 events on 2026-09-29, 5 more from the classes added on 2026-10-06).
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**.
@@ -164,7 +166,7 @@ The rule stays as coded (all projects); the documentation now says so.
 - **Wikidata modelling is uneven.** Only events that some editor has typed with a class, dated and located in a tracked country are found at all. Multi-country events
   carry only the countries Wikidata lists.
 - **English Wikipedia is required** for an extract, which biases toward what English Wikipedia covers.
-- **The hand-picked seed list** (112 events, 52 of them not reachable by the rule since the class additions of 2026-10-06, 61 before) is our own selection.
+- **The hand-picked seed list** (103 events, 43 of them not reachable by the rule; 112 before 2026-10-09, see "Not events" below) is our own selection.
   It is still the only source of economic events; the rule now also finds diplomatic ones (summits, ceasefires, peace conferences).
 - **Location is not required, but it changes visibility.** Events without coordinates are listed but have no marker; abstract and large-area events (wars, referendums,
   treaties) lack coordinates far more often than point-like ones.
@@ -174,6 +176,27 @@ The funnel from 5,063 raw candidates to what is shown, with breakdowns by countr
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
 Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).
+
+### Not events: people, organisations and states
+
+The site lists events. An entry whose Wikidata item is a **person, an organisation or a state** (by its `P31` classes, e.g. `human`, `political
+organization`, `historical country`) is not an event and is not included. The class rule above never finds such items; only the hand-picked list
+contained them. On 2026-10-09 this removed nine hand-picked entries: Saddam Hussein and Hafez al-Assad (`human`); Hamas, the Palestine Liberation
+Organization, Islamic State and the Central Treaty Organization (listed as "Baghdad Pact"; organisation classes); the Kingdom of Iraq, the United Arab
+Republic and Syrian independence (state classes). Events about them stay (for example the Execution of Saddam Hussein, the 14 July Revolution).
+The Iranian Green Movement (`social movement`, in practice the 2009 protests) is kept.
+
+## Default order
+
+With no search, filter or drawn area, the list shows the events of the selected years **most covered first**: by `sitelinks_current`, the same
+mechanical signal as the inclusion rule (the item's Wikidata sitelinks across all Wikimedia projects), highest first, equal counts in date order.
+Events that began before the selected years (still ongoing in them) follow those that began within them, so a single year does not open with every
+long conflict that overlaps it (`app/src/lib/browseOrder.js`). A **Sort: Coverage · Date** switch under the count changes the order;
+pressing the active one reverses it (least covered first, or newest first). The link keeps the choice (`?sort=coverage-asc`, `date`, `date-desc`). Search results are not affected: they keep their relevance order.
+
+The order inherits the caveats of the inclusion rule above: sitelinks measure how many Wikimedia communities wrote about an item, not importance,
+and favour international, modern and widely covered events. It is a published rule applied to every event alike, not a per-event choice.
+The counts are refreshed monthly with the extracts (`scripts/refresh-sitelinks.js`, see "Refreshing extracts").
 
 ## Event classes
 
@@ -340,7 +363,8 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 
 1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
    `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes. The same run updates titles of
-   renamed articles (see "Titles" below).
+   renamed articles (see "Titles" below). It then runs `node scripts/refresh-sitelinks.js --apply`, which updates each event's
+   `sitelinks_current` (the count behind the default list order, see "Default order").
 2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists the title changes,
    the held title cases, and, for each changed lead, the removed and added sentences. It never merges.
 3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.

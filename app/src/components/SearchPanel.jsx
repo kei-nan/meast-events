@@ -8,7 +8,19 @@ import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
 import { CATEGORY_COLORS } from "./mapLayers";
 import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
+import { parseSort, sortValue } from "../lib/browseOrder.js";
 import "../SidePanel.css";
+
+// The browse-list sort switch: each key's label and how its directions read aloud.
+const SORT_KEYS = [
+  {
+    key: "coverage",
+    label: "Coverage",
+    dirs: { desc: "most covered first", asc: "least covered first" },
+    title: "By the number of Wikimedia pages about the event (Wikipedia language versions and other projects, as counted by Wikidata)",
+  },
+  { key: "date", label: "Date", dirs: { asc: "oldest first", desc: "newest first" }, title: "By start date" },
+];
 
 /**
  * Right-hand side panel (bottom sheet on mobile): search, area, filters, status,
@@ -48,6 +60,8 @@ import "../SidePanel.css";
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
+ * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
+ * @param {(s:string)=>void}       [props.onSortChange]
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -76,6 +90,8 @@ export default function SearchPanel({
   onSelect,
   onHover,
   onBack,
+  sort = "coverage",
+  onSortChange,
   ref,
 }) {
   const inputId = useId();
@@ -106,6 +122,7 @@ export default function SearchPanel({
     (filters.countries?.length ?? 0) > 0 ||
     !!filters.inView;
   const searching = query.trim() !== "" || hasFilters || !!area;
+  const { key: sortKey, dir: sortDir } = parseSort(sort);
 
   // Back restores focus to
   // the originating row (or the search box if that row is gone).
@@ -238,12 +255,12 @@ export default function SearchPanel({
   let scopeAction = null;
   if (settled && filters.scope === "range" && (allCount === null || allCount > total)) {
     scopeAction = {
-      label: allCount === null ? "show whole timeline" : `show all ${allCount}`,
+      label: allCount === null ? "Show whole timeline" : `Show all ${allCount}`,
       aria: allCount === null ? "Show results from the whole timeline" : `Show all ${plural(allCount)}, whole timeline`,
       scope: "all",
     };
   } else if (settled && filters.scope !== "range" && total > 0 && shownInRange && shownInRange !== total) {
-    scopeAction = { label: `show the ${shownInRange} in selected years`, aria: null, scope: "range" };
+    scopeAction = { label: `Show the ${shownInRange} in selected years`, aria: null, scope: "range" };
   }
 
   // Screen reader announcements. The visible status line is not a live region:
@@ -371,6 +388,37 @@ export default function SearchPanel({
                 >
                   {scopeAction.label}
                 </button>
+              )}
+              {/* Order of the browse list (no search or filters): search results keep their relevance order. */}
+              {!searching && !eventsLoading && onSortChange && (
+                <div className="sp-sort" role="group" aria-label="Sort events">
+                  <span className="sp-sort-label" aria-hidden="true">
+                    Sort
+                  </span>
+                  {SORT_KEYS.map(({ key, label, dirs, title }) => {
+                    const active = sortKey === key;
+                    // The active sort shows its direction; pressing it again reverses it.
+                    const dir = active ? sortDir : null;
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        className="sp-sort-btn"
+                        aria-pressed={active}
+                        aria-label={active ? `${label}, ${dirs[dir]}` : label}
+                        title={active ? `${title}. Press again to reverse.` : title}
+                        onClick={() => onSortChange(active ? sortValue(key, dir === "asc" ? "desc" : "asc") : key)}
+                      >
+                        {label}
+                        {dir && (
+                          <span className="sp-sort-dir" aria-hidden="true">
+                            {dir === "asc" ? "↑" : "↓"}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>

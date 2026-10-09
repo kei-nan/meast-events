@@ -15,7 +15,18 @@ test("defaults serialize to empty and parse back to defaults", () => {
     area: null,
     eventId: null,
     about: false,
+    sort: "coverage",
   });
+});
+
+test("sort round trips; the default (coverage) and junk stay out of the URL", () => {
+  for (const s of ["coverage-asc", "date", "date-desc"]) {
+    assert.equal(parseUrlState(`?sort=${s}`).sort, s);
+    assert.equal(serializeUrlState({ ...base, sort: s }), `?sort=${s}`);
+  }
+  assert.equal(parseUrlState("?sort=bogus").sort, "coverage");
+  assert.equal(serializeUrlState({ ...base, sort: "coverage" }), "");
+  assert.equal(serializeUrlState({ ...base, sort: "bogus" }), "");
 });
 
 test("about=1 round trips", () => {

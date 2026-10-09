@@ -445,28 +445,94 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
+/* Browse order switch under the count: a joined pair styled like the
+   timeline's Grow | Move (Timeline.css .timeline-mode-btn), the active one
+   outlined in the accent with a light tint, not filled. */
+.sp-sort {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.sp-sort-label {
+  margin-right: 8px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.sp-sort-btn {
+  min-height: 28px;
+  padding: 0 9px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.sp-sort-btn:first-of-type {
+  border-radius: 6px 0 0 6px;
+}
+
+.sp-sort-btn:last-of-type {
+  margin-left: -1px;
+  border-radius: 0 6px 6px 0;
+}
+
+.sp-sort-btn:hover {
+  color: var(--text-primary);
+}
+
+.sp-sort-btn[aria-pressed="true"] {
+  position: relative; /* its accent border draws over the neighbour's */
+  color: var(--text-primary);
+  background: rgba(201, 154, 69, 0.16);
+  border-color: var(--accent);
+}
+
+.sp-sort-btn:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* Direction of the active sort. */
+.sp-sort-dir {
+  margin-left: 4px;
+  color: var(--accent-strong);
+}
+
+/* The scope button changes the results, so it is a compact bordered button
+   (the same size as a sort segment), not link-styled text: in this panel
+   links take you somewhere, buttons change something. */
 .sp-scope-link {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   min-height: 28px;
-  padding: 2px 0;
-  background: none;
-  border: 0;
-  color: var(--link);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  margin-top: 4px;
+  padding: 0 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
   text-align: left;
   cursor: pointer;
 }
 
 .sp-scope-link:hover {
-  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.sp-scope-link:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 /* Touch-sized like the other panel controls (kept out of the shared mobile
    block further down). */
 @media (max-width: 768px) {
-  .sp-scope-link {
+  .sp-scope-link,
+  .sp-sort-btn {
     min-height: 44px;
   }
 }
