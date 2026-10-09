@@ -16,6 +16,7 @@
 
   --accent: #c99a45;        /* antique gold - primary accent ink */
   --accent-strong: #ddb35f; /* lighter gold for hover/highlight */
+  --accent-tint: rgba(201, 154, 69, 0.16); /* fill of a pressed toggle (with an --accent border); docs/design-contract.md "Controls" */
   --link: #7badb0;          /* faded teal-blue, like old map ink */
 
   /* Self-hosted (src/main.jsx). Each "... fallback" is a local system font

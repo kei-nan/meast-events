@@ -36,3 +36,13 @@ Event fields (curated and proposed, and static output):
 - Events with `location_quality: "none"` ARE indexed/served/searchable/listed (list tag "No map location"), excluded from bbox/area queries (no lon/lat) and from map markers. `precise=1` still means precise only.
 - `date_flags`: string[] (e.g. "date_order_invalid: Wikidata start after end"); such events are kept and shown with a visible note "Date unverified: <reason>", dates displayed as Wikidata gives them.
 - Static chunks: keep coordinate-less events in decade chunks too.
+
+## Controls (visual style)
+
+One look per role, so a control's style says what it does (style audit, 2026-10-09):
+
+- **Buttons** (do something or open something): bordered box, 6px radius, `--border` border that turns `--accent` on hover. Height 34px (28px compact, e.g. in the panel's status line; 44px on touch screens).
+- **Toggles** (a setting that stays on: segmented pairs such as Grow | Move or Sort, timeline presets, category chips, Play while playing): the pressed one has an `--accent` border and an `--accent-tint` fill, text `--text-primary`. Never a solid gold fill; solid gold is for data (timeline bars, the drag bubble). Pills (999px) only for category chips and removable filter tags.
+- **Links** (take you somewhere: an article, another page or section): `--link` teal, underlined text. Anything that changes the results or the list is a button, not link-styled text.
+- **Labels that are not clickable** (e.g. "No map location"): small 3px outline tags, never shaped like a button or pill.
+- **Map controls** keep their own light style (cream fill, dark border) because they sit on the map.
