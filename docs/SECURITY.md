@@ -104,19 +104,37 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   deployed `workers.dev` response (the file is applied by the same
   mechanism, but it is not exercised here), Firefox/Safari.
 
-Caching (same file): `/assets/index-*` (Vite content-hashed JS/CSS)
-immutable for a year. The two unhashed MapLibre files
-(`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
-sit in `/assets/maplibre-gl-<version>/`, also immutable: the version in the
-folder name changes on every MapLibre upgrade.
-`/data/events/all.*` (content-hashed) is immutable; everything else under
-`/data/*` (`meta.json`, `ids.json`, `full/*.json`, decade
-chunks, `boundaries/*.json`, `land.json`, `selection-funnel.json`) is 1 h +
-`stale-while-revalidate=86400`. `/pagefind/*` revalidates on every visit
-(`no-cache`) except the content-hashed `/pagefind/index/*` chunks (immutable).
-HTML keeps Cloudflare's default (`max-age=0, must-revalidate`) so a deploy is
-picked up immediately. If a future hashed file has a different name prefix,
-add a rule for it; the hash alone cannot be matched by a glob.
+Caching (same file). "Immutable" below means `public, max-age=31536000,
+immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
+
+- `/assets/*`: 1 h by default. Immutable for the Vite content-hashed names
+  that have a rule: `index-*` (app JS/CSS), `MapView-*` (the lazy-loaded map
+  chunk), `inter-*` and `spectral-*` (web fonts), and `maplibre-gl-*`. The
+  last covers the folder `/assets/maplibre-gl-<version>/` with the two
+  unhashed MapLibre files (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`,
+  see `vite.config.js`), whose cache key is the version in the folder name.
+  A hashed chunk without a rule (the build currently also emits a
+  `dist-<hash>.js` chunk) gets the 1 h default: slower to cache, never stale.
+- `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
+  `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,
+  `land-far.json`, `selection-funnel.json`, `framing-review.json`).
+  Immutable: `/data/events/v.<hash>/*` (the event list `all.json` and every
+  `full/*.json` record, one folder per build named by a hash of all its files,
+  `app/scripts/split-data.mjs`) and `/data/boundaries/shared/*` (large
+  boundary geometries named by a hash of their content).
+- `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
+  the engine and the `.pf_meta` keep their names; the content-hashed
+  `/pagefind/index/*` chunks are immutable.
+- `/event/*` (the static event pages, the `/event/` index and `event.css`):
+  `public, max-age=0, must-revalidate`, set explicitly.
+- `/glyphs/*` (map label glyphs): 1 h, plus `Content-Type:
+  application/x-protobuf` so Cloudflare compresses the `.pbf` files.
+- Everything else, including the home page HTML, keeps Cloudflare's default
+  (`max-age=0, must-revalidate`), so a deploy is picked up immediately.
+
+If a future hashed file has a different name prefix, add a rule for it; the
+hash alone cannot be matched by a glob, and a pattern may contain only one
+splat.
 
 ## 3. Monitoring
 
