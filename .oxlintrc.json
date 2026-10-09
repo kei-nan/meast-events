@@ -1,0 +1,8 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["oxc", "unicorn", "import"],
+  "rules": {
+    "import/named": "error"
+  },
+  "ignorePatterns": ["app/**", "node_modules/**"]
+}

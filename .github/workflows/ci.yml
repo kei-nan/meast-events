@@ -87,8 +87,13 @@ jobs:
       # data/border-reference-points.json. Fails if any point is now more than 0.25 km
       # further from the drawn border than in data/border-check-baseline.json, for the
       # years checked there. No network. Report: docs/border-verification.md.
-      - name: Install repo-root dependencies (geometry library)
+      - name: Install repo-root dependencies (geometry library, oxlint)
         run: npm ci
+      # oxlint over scripts/ (.oxlintrc.json at the repo root). import/named is an
+      # error: a named import that the target module does not export fails here
+      # instead of at run time in the monthly refresh. Warnings do not fail.
+      - name: Lint (scripts/)
+        run: npm run lint
       # data/boundaries.json: required properties, per-name year gaps, overlaps between shapes
       # shown in the same year (with their unit tests, which need the geometry library).
       # Fails only on structural errors; gaps and unexpected overlaps are listed as warnings.
