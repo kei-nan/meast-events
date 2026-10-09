@@ -1,6 +1,8 @@
-// Smoke check of a finished build (run after `npm run build`, in CI and in the
-// monthly data refresh). Catches a deploy that would load but show nothing, or
-// that the host would refuse:
+// Smoke check of a finished build. `npm run build` runs it last (the postbuild
+// script in package.json), so a failure here fails the build in CI, in the
+// monthly data refresh and on Cloudflare Workers Builds, which then does not
+// deploy. It also runs on its own: node scripts/check-dist.mjs. Catches a deploy
+// that would load but show nothing, or that the host would refuse:
 //   - the versioned folder events/v.<DATA_VERSION>/ the app requests exists, for
 //     the DATA_VERSION that split-data.mjs generated (src/lib/dataVersion.js),
 //     with the bucket count it names, and the built JavaScript carries both;

@@ -9,10 +9,10 @@
   "scripts": {
     "split-data": "node scripts/split-data.mjs",
     "predev": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
-    "prebuild": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
+    "prebuild": "node ../scripts/validate-events.js ../data/events.json && node scripts/split-data.mjs && node scripts/build-search-index.mjs",
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node scripts/build-event-pages.mjs",
+    "postbuild": "node scripts/build-event-pages.mjs && node scripts/check-dist.mjs",
     "lint": "oxlint",
     "test": "node --test \"src/lib/*.test.js\" \"scripts/*.test.mjs\"",
     "preview": "vite preview"
