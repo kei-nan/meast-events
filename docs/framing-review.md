@@ -44,6 +44,12 @@ The overall fairness review covers one-sidedness that is not in any single liste
 - **Names of other events.** "During the Armenian genocide" or "the Gaza genocide" used as the name of another event is not re-judged; that label is reviewed in the other event's own entry.
 - **Vague attributions** ("it is believed", "has been described as"). Wikipedia's guideline on [unsupported attributions](https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Unsupported_attributions) is about vague sourcing rather than taking sides, and applying it would flag hundreds of ordinary sentences.
 
+## Guideline versions
+
+Wikipedia's guidelines are edited too. So that a wording point can always be checked against the text it applied, [`data/framing-review.json`](../data/framing-review.json) records for each guideline section the revision the reviews applied: the version current at the end of 30 September 2026, the day all summaries were reviewed. The link on each wording point opens the section as it read in that revision; Wikipedia's banner on that page links to the current version.
+
+The monthly data refresh (see [DATA_POLICY.md](DATA_POLICY.md), "Refreshing extracts") compares the text of each cited section with the reviewed version. Only the section itself counts, not edits elsewhere on the page. A section that changed is recorded as `changed_revision`, its changed lines are shown at the top of the refresh pull request, and the About page lists it as edited since the reviews. The reviews are not redone automatically: most edits are copy-editing that does not change what the wording check flags. When an edit does change it, the wording check is redone for that guideline and the new versions are recorded with `node scripts/refresh-guidelines.js --pin=YYYY-MM-DD`.
+
 ## Who reviewed it
 
 All 820 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: the first 571 on 2026-09-30 (updated to 2026-10-04), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.

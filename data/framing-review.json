@@ -9,32 +9,67 @@
     "LABEL": {
       "name": "Contentious labels",
       "shortcut": "MOS:LABEL",
-      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Contentious_labels"
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Contentious_labels",
+      "reviewed_revision": {
+        "revid": 1376702503,
+        "timestamp": "2026-09-25T19:23:26Z",
+        "section_sha1": "7877bec0c0a6"
+      }
     },
     "EDITORIAL": {
       "name": "Editorializing",
       "shortcut": "MOS:EDITORIAL",
-      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Editorializing"
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Editorializing",
+      "reviewed_revision": {
+        "revid": 1376702503,
+        "timestamp": "2026-09-25T19:23:26Z",
+        "section_sha1": "22c43df26b35"
+      }
     },
     "DOUBT": {
       "name": "Expressions of doubt",
       "shortcut": "MOS:DOUBT",
-      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Expressions_of_doubt"
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Expressions_of_doubt",
+      "reviewed_revision": {
+        "revid": 1376702503,
+        "timestamp": "2026-09-25T19:23:26Z",
+        "section_sha1": "1d954546b0f3"
+      },
+      "changed_revision": {
+        "revid": 1379085656,
+        "timestamp": "2026-10-07T21:27:53Z",
+        "section_sha1": "5a2749142789"
+      }
     },
     "SAID": {
       "name": "Synonyms for \"said\"",
       "shortcut": "MOS:SAID",
-      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Synonyms_for_said"
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Synonyms_for_said",
+      "reviewed_revision": {
+        "revid": 1376702503,
+        "timestamp": "2026-09-25T19:23:26Z",
+        "section_sha1": "2c9c21551950"
+      }
     },
     "PUFFERY": {
       "name": "Puffery",
       "shortcut": "MOS:PUFFERY",
-      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Puffery"
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Words_to_watch#Puffery",
+      "reviewed_revision": {
+        "revid": 1376702503,
+        "timestamp": "2026-09-25T19:23:26Z",
+        "section_sha1": "ca1fca5a594d"
+      }
     },
     "NPOV": {
       "name": "Avoid stating opinions as facts",
       "shortcut": "WP:YESPOV",
-      "url": "https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view#Explanation"
+      "url": "https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view#Explanation",
+      "reviewed_revision": {
+        "revid": 1370393267,
+        "timestamp": "2026-08-20T21:44:45Z",
+        "section_sha1": "51a8100aea06"
+      }
     }
   },
   "events": {

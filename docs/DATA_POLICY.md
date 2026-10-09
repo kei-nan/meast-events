@@ -364,10 +364,14 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
    `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes. The same run updates titles of
    renamed articles (see "Titles" below). It then runs `node scripts/refresh-sitelinks.js --apply`, which updates each event's
-   `sitelinks_current` (the count behind the default list order, see "Default order").
-2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description lists the title changes,
-   the held title cases, and, for each changed lead, the removed and added sentences. It never merges.
+   `sitelinks_current` (the count behind the default list order, see "Default order"). Last, `node scripts/refresh-guidelines.js --apply` compares
+   the Wikipedia guideline sections the framing review cites with the versions the reviews applied, and records a section that changed
+   (docs/framing-review.md, "Guideline versions").
+2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description starts with the
+   guideline sections that changed (with their changed lines), then lists the title changes, the held title cases, and, for each changed lead, the
+   removed and added sentences. It never merges.
 3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
+   For a changed guideline, the question is whether the edit changes what the wording check flags; if so, redo that part of the review.
 4. After merging, the site rebuilds itself, including the search index (Pagefind, built from `data/events.json`), so search uses the new titles and text. The framing review of each changed summary shows "may no longer
    apply" until it is re-reviewed.
 
