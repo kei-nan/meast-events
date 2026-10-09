@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchPanel from "./components/SearchPanel.jsx";
 import AboutData from "./components/AboutData.jsx";
+import ShareButton from "./components/ShareButton.jsx";
 import Timeline from "./components/Timeline";
 import useAllEvents, { RETRY_MS } from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
@@ -484,6 +485,8 @@ export default function App() {
             </span>
           )}
         </div>
+        {/* The URL holds the view (years, filters, area, open event), so this shares it as seen. */}
+        <ShareButton title={selectedEventRaw?.title ?? SITE_TITLE} align="end" className="sp-btn app-share-btn" />
       </header>
       <main className="app-body">
         {mapStarted ? (

@@ -1,0 +1,56 @@
+/* ---------- Share button and its panel (ShareButton.jsx) ---------- */
+
+.share {
+  position: relative;
+  display: inline-block;
+}
+
+.share-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 1001; /* over the map controls and the header */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: max-content;
+  min-width: 170px;
+  padding: 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.share--start .share-panel {
+  left: 0;
+}
+
+.share--end .share-panel {
+  right: 0;
+}
+
+.share-panel .sp-btn {
+  text-align: left;
+}
+
+.share-note {
+  margin: 0;
+  max-width: 200px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.share-qr {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+/* Always black on white, whatever the theme: scanners need the contrast. */
+.share-qr svg {
+  display: block;
+  width: 200px;
+  height: 200px;
+  border-radius: 4px;
+}

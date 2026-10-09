@@ -135,7 +135,6 @@ function historyUrl(wikipediaUrl) {
  */
 export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent }) {
   const headingRef = useRef(null);
-  const [copied, setCopied] = useState(false);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
   // The event whose full lead is open, so the next event starts collapsed.
@@ -148,12 +147,6 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
   }, [event.id]);
-
-  useEffect(() => {
-    if (!copied) return undefined;
-    const t = setTimeout(() => setCopied(false), 2500);
-    return () => clearTimeout(t);
-  }, [copied]);
 
   const quality =
     event.location_quality ??
@@ -197,15 +190,6 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
   };
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
 
-  async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-    } catch {
-      window.prompt("Copy this link", window.location.href);
-    }
-  }
-
   const renderParagraph = (segs, i) => (
     <p key={i}>
       {segs.map((s, j) =>
@@ -245,9 +229,6 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
             Show on map
           </button>
         )}
-        <button type="button" className="sp-btn" onClick={copyLink}>
-          Copy link
-        </button>
         {event.wikipedia_url && (
           <a className="sp-btn event-detail-wiki" href={event.wikipedia_url} target="_blank" rel="noreferrer">
             {/* "Read on" is for screen readers only, to keep the action row short. */}
@@ -255,10 +236,6 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
             <span className="sp-sr-status"> (opens in a new tab)</span>
           </a>
         )}
-        <span className="sp-sr-status" role="status">
-          {copied ? "Link copied" : ""}
-        </span>
-        {copied && <span className="event-detail-copied" aria-hidden="true">Link copied</span>}
       </div>
       {event.category && (
         <span className="event-detail-category">Category (our grouping): {categoryLabel(event.category)}</span>

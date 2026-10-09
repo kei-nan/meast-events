@@ -634,11 +634,6 @@ button.sp-chip[aria-pressed="true"] {
   text-decoration: none;
 }
 
-.event-detail-copied {
-  font-size: 0.78rem;
-  color: var(--accent-strong);
-}
-
 .event-detail-category {
   display: inline-block;
   text-transform: uppercase;
