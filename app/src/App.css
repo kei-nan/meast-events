@@ -61,6 +61,12 @@ html, body, #root {
   text-overflow: ellipsis;
 }
 
+/* Compact, so the header keeps its one-line height. */
+.app-share-btn.sp-btn {
+  min-height: 28px;
+  padding: 2px 12px;
+}
+
 .app-footer {
   flex: none;
   padding: 3px 22px 4px;
