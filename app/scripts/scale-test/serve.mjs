@@ -1,26 +1,40 @@
 // Serves a built dist/ with brotli and the single-page not-found handling, as
 // Cloudflare does, so the benchmark's transfer sizes and timings are realistic
 // (vite preview does not compress) and missing files behave as in production.
+// Listens on 127.0.0.1 only. Port 0 picks a free port (the log line says which).
 //   node app/scripts/scale-test/serve.mjs app/dist 5101
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import zlib from "node:zlib";
 
-const [root, port] = [path.resolve(process.argv[2] ?? "dist"), Number(process.argv[3] ?? 5101)];
+const HOST = "127.0.0.1";
 const TYPES = {
   ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
   ".json": "application/json", ".svg": "image/svg+xml", ".wasm": "application/wasm",
   ".woff2": "font/woff2", ".png": "image/png", ".pbf": "application/x-protobuf",
 };
-const compressed = new Map();
 
-http
-  .createServer((req, res) => {
-    let rel = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+/** True when `file` is `dir` itself or inside it (a sibling such as dist-old/ is not). */
+export function isInside(dir, file) {
+  const rel = path.relative(dir, file);
+  return rel === "" || (!path.isAbsolute(rel) && rel !== ".." && !rel.startsWith(`..${path.sep}`));
+}
+
+export function createServer(root) {
+  const compressed = new Map();
+  return http.createServer((req, res) => {
+    let rel;
+    try {
+      rel = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+    } catch {
+      return res.writeHead(400).end(); // malformed %-escape
+    }
     if (rel.endsWith("/")) rel += "index.html";
     let file = path.join(root, rel);
-    if (!file.startsWith(root)) return res.writeHead(403).end();
+    // The URL parser resolves "/../" but not an encoded "/..%2f", which decodes to "../".
+    if (!isInside(root, file)) return res.writeHead(403).end();
     if (!fs.existsSync(file) && fs.existsSync(`${file}.html`)) file += ".html";
     // Like the host (wrangler.jsonc not_found_handling "single-page-application"):
     // a missing path gets the app's index.html with status 200.
@@ -39,5 +53,12 @@ http
     }
     res.writeHead(200, headers);
     res.end(fs.readFileSync(file));
-  })
-  .listen(port, () => console.log(`serving ${root} on http://127.0.0.1:${port}/`));
+  });
+}
+
+// Started only when run as a script, so the test can import the module.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const [root, port] = [path.resolve(process.argv[2] ?? "dist"), Number(process.argv[3] ?? 5101)];
+  const server = createServer(root);
+  server.listen(port, HOST, () => console.log(`serving ${root} on http://${HOST}:${server.address().port}/`));
+}
