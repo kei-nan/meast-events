@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import FramingReview, { FramingPointer } from "./FramingReview.jsx";
+import ShareButton from "./ShareButton.jsx";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
@@ -229,6 +230,7 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
             Show on map
           </button>
         )}
+        <ShareButton title={event.title} />
         {event.wikipedia_url && (
           <a className="sp-btn event-detail-wiki" href={event.wikipedia_url} target="_blank" rel="noreferrer">
             {/* "Read on" is for screen readers only, to keep the action row short. */}

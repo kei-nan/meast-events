@@ -485,8 +485,9 @@ export default function App() {
             </span>
           )}
         </div>
-        {/* The URL holds the view (years, filters, area, open event), so this shares it as seen. */}
-        <ShareButton title={selectedEventRaw?.title ?? SITE_TITLE} align="end" className="sp-btn app-share-btn" />
+        {/* The URL holds the view (years, filters, area), so this shares it as seen. While
+            an event is open its own Share (EventDetail) takes over, so there is only ever one. */}
+        {!selectedEventRaw && <ShareButton title={SITE_TITLE} align="end" className="sp-btn app-share-btn" />}
       </header>
       <main className="app-body">
         {mapStarted ? (
