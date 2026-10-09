@@ -174,7 +174,25 @@ function FramingCounts({ state }) {
       {counts.stale > 0 && (
         <p className="about-muted">{fmt(counts.stale)} summaries have changed on Wikipedia since they were reviewed.</p>
       )}
+      <GuidelineChanges guidelines={guidelines} />
     </>
+  );
+}
+
+// The guideline sections edited on Wikipedia since the reviews applied them
+// (scripts/refresh-guidelines.js records `changed_revision`).
+function GuidelineChanges({ guidelines }) {
+  const all = Object.values(guidelines);
+  if (!all.some((g) => g.reviewed_revision)) return null;
+  const changed = all.filter((g) => g.changed_revision);
+  return (
+    <p className="about-muted">
+      Each wording point links to the guideline as it read when the review applied it.
+      {changed.length > 0 &&
+        ` Wikipedia has since edited ${changed.length === 1 ? "one of these sections" : `${changed.length} of these sections`}: ${changed
+          .map((g) => `${g.name} (${longDate(g.changed_revision.timestamp.slice(0, 10))})`)
+          .join(", ")}.`}
+    </p>
   );
 }
 

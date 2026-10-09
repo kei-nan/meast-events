@@ -8,6 +8,9 @@ name: Refresh Wikipedia summaries
 # applied in the PR; held cases (a redirect to a section of another article,
 # another Wikidata item, a stored title Wikipedia does not redirect to the
 # article) are not changed and are listed in the PR description for review.
+# The same run checks the Wikipedia guideline sections the framing review's
+# wording check cites; a section edited since the reviews is recorded in
+# data/framing-review.json and its diff shown at the top of the PR description.
 #
 # Needs: Settings -> Actions -> General -> "Allow GitHub Actions to create and
 # approve pull requests". Pull requests opened with the workflow token do not
@@ -58,12 +61,21 @@ jobs:
           set -o pipefail
           { echo; echo "## Sitelink counts"; echo; echo '```'; node scripts/refresh-sitelinks.js --apply; echo '```'; } | tee -a "$RUNNER_TEMP/refresh-report.md"
 
+      # Whether the guideline sections the wording check cites changed since the
+      # reviews applied them (docs/framing-review.md, "Guideline versions"). A
+      # failure here (say, the Wikipedia API is down) must not hold back the
+      # summaries: the PR then says the check did not run.
+      - name: Check the cited Wikipedia guidelines
+        id: guidelines
+        continue-on-error: true
+        run: node scripts/refresh-guidelines.js --apply --report="$RUNNER_TEMP/guidelines-report.md"
+
       - name: Check for changes
         id: diff
         run: |
-          if git diff --quiet -- data/events.json; then
+          if git diff --quiet -- data/events.json data/framing-review.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No summary or title changed; nothing to do."
+            echo "No summary, title or cited guideline changed; nothing to do."
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
@@ -97,7 +109,9 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: refresh-report
-          path: ${{ runner.temp }}/refresh-report.md
+          path: |
+            ${{ runner.temp }}/refresh-report.md
+            ${{ runner.temp }}/guidelines-report.md
           if-no-files-found: error
           retention-days: 90
 
@@ -106,14 +120,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPORT_URL: ${{ steps.report.outputs.artifact-url }}
+          GUIDELINES_OUTCOME: ${{ steps.guidelines.outcome }}
         run: |
           day="$(date -u +%Y-%m-%d)"
           branch="data-refresh/${day}-${GITHUB_RUN_NUMBER}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add data/events.json
-          git commit -m "Refresh Wikipedia summaries and titles (${day})"
+          git add data/events.json data/framing-review.json
+          git commit -m "Refresh Wikipedia summaries, titles and guideline versions (${day})"
           # Checkout ran with persist-credentials: false. Authenticate this one
           # push the way actions/checkout does (an http.extraheader), passed
           # through git's GIT_CONFIG_* environment so it is never written to
@@ -122,8 +137,10 @@ jobs:
             GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
             GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
             git push origin "$branch"
+          guidelines_bytes=0
+          if [ "$GUIDELINES_OUTCOME" = "success" ]; then guidelines_bytes=$(wc -c < "$RUNNER_TEMP/guidelines-report.md"); fi
           {
-            echo "Monthly refresh of the English Wikipedia summaries and titles (${day})."
+            echo "Monthly refresh of the English Wikipedia summaries and titles (${day}), and a check of the Wikipedia guidelines the framing review cites."
             echo
             echo "Only summaries whose text changed on Wikipedia are updated. Their framing reviews now show \"may no longer apply\" on the site until they are re-reviewed."
             echo
@@ -133,9 +150,18 @@ jobs:
             echo
             echo "Full report (this description stops at 60,000 bytes): ${REPORT_URL}"
             echo
-            # First 60,000 bytes, without splitting a multi-byte UTF-8 character.
-            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, 60000); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$RUNNER_TEMP/refresh-report.md"
+            # The guideline check first, whole: the cap below applies to the rest only.
+            if [ "$GUIDELINES_OUTCOME" = "success" ]; then
+              cat "$RUNNER_TEMP/guidelines-report.md"
+            else
+              echo "## Wikipedia guidelines"
+              echo
+              echo "**The guideline check did not run to the end** (see the workflow log); this PR does not say whether the cited guidelines changed."
+            fi
+            echo
+            # The rest of the 60,000 bytes, without splitting a multi-byte UTF-8 character.
+            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$RUNNER_TEMP/refresh-report.md" "$guidelines_bytes"
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base main --head "$branch" \
-            --title "Refresh Wikipedia summaries and titles (${day})" \
+            --title "Refresh Wikipedia summaries, titles and guideline versions (${day})" \
             --body-file "$RUNNER_TEMP/pr-body.md"

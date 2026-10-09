@@ -15,6 +15,9 @@ const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
+// x.url opens the guideline as it read when the review was made (app/scripts/split-data.mjs).
+const guidelineTitle = (x) => `${x.shortcut}, the version current when this review was made (opens in a new tab)`;
+
 function tabStatus(tab, r) {
   if (!r.found) return "Nothing found";
   return tab === "wording" ? plural(r.findings.length, "wording point", "wording points") : "Issue found";
@@ -73,7 +76,7 @@ function WordingPanel({ r }) {
         <ul className="framing-obs">
           {r.findings.map((x, i) => (
             <li key={i}>
-              <a href={x.url} target="_blank" rel="noreferrer" title={`${x.shortcut} (opens in a new tab)`} className="framing-obs-guideline">
+              <a href={x.url} target="_blank" rel="noreferrer" title={guidelineTitle(x)} className="framing-obs-guideline">
                 {x.guideline_name}
               </a>
               : <q>{x.phrase}</q>. {x.note}

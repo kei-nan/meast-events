@@ -308,6 +308,14 @@ async function loadFramingReview() {
   return doc;
 }
 
+// The guideline section as it read in the revision the reviews applied (the same link as
+// permalink() in scripts/lib/guidelines.js, which records `reviewed_revision`).
+function guidelineVersionUrl(url, revid) {
+  const u = new URL(url);
+  const title = decodeURIComponent(u.pathname.replace(/^\/wiki\//, ""));
+  return `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(title)}&oldid=${revid}${u.hash}`;
+}
+
 function framingFor(review, e) {
   const r = review?.events?.[e.id];
   if (!r) return null;
@@ -319,7 +327,15 @@ function framingFor(review, e) {
   const wording = (r.wording ?? []).map((x) => {
     const g = review.guidelines[x.guideline];
     if (!g) throw new Error(`framing review ${e.id}: unknown guideline ${x.guideline}`);
-    return { guideline: x.guideline, guideline_name: g.name, shortcut: g.shortcut, url: g.url, phrase: x.phrase, note: x.note };
+    const rev = g.reviewed_revision;
+    return {
+      guideline: x.guideline,
+      guideline_name: g.name,
+      shortcut: g.shortcut,
+      url: rev ? guidelineVersionUrl(g.url, rev.revid) : g.url,
+      phrase: x.phrase,
+      note: x.note,
+    };
   });
   // Phrases are only marked in the exact text that was reviewed.
   const marks = (list) => (stale ? [] : list.filter((p) => text.includes(p)));
