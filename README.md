@@ -27,10 +27,11 @@ pipeline), which the site build never installs.
 | Task | Command |
 |---|---|
 | Run the site locally | `cd app && npm run dev` (first regenerates `app/public/data/`, the search index and `app/src/lib/dataVersion.js` from `data/`) |
-| Unit tests | `npm test` (scripts/lib) and `npm test --prefix app` (app/src/lib) |
+| Unit tests | `npm test` (scripts/lib) and `npm test --prefix app` (app/src/lib and app/scripts) |
 | Lint | `npm run lint --prefix app` |
 | Production build | `cd app && npm run build && node scripts/check-dist.mjs` |
 | Validate the event data | `node scripts/validate-events.js` |
+| Validate the border data | `npm run validate-boundaries` (checks `data/boundaries.json`) |
 | Border check | `node scripts/verify-borders.js --check` (CI); `npm run verify-borders` also rewrites `docs/border-verification.md` |
 
 Everything under `app/public/data/`, `app/public/pagefind/` and
