@@ -12,6 +12,16 @@ name: Refresh Wikipedia summaries
 # wording check cites; a section edited since the reviews is recorded in
 # data/framing-review.json and its diff shown at the top of the PR description.
 #
+# Two jobs, so code from npm never runs where a write token exists:
+# - "refresh" runs the repo's scripts, `npm ci` (whose install scripts run
+#   arbitrary package code), the tests and the build with a READ-ONLY token.
+#   It hands the two data files and the reports to the next job as artifacts.
+# - "open-pr" holds the write token. It checks the repo out afresh, copies in
+#   just data/events.json and data/framing-review.json, commits, pushes a branch
+#   and opens the PR. It runs no npm and no repo code, and git with hooks off.
+# What a compromised dependency in "refresh" could still do is change those two
+# files' content, which lands only in the reviewed PR (as before), or fail the run.
+#
 # Needs: Settings -> Actions -> General -> "Allow GitHub Actions to create and
 # approve pull requests". Pull requests opened with the workflow token do not
 # trigger the CI workflow, so the same checks run here before the PR is opened.
@@ -20,9 +30,8 @@ on:
     - cron: "0 6 1 * *" # 06:00 UTC on the 1st of each month
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+# Nothing by default; each job asks for what it needs.
+permissions: {}
 
 concurrency:
   group: refresh-data
@@ -33,10 +42,14 @@ jobs:
     name: Refresh summaries
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+      report-url: ${{ steps.report.outputs.artifact-url }}
+      guidelines-outcome: ${{ steps.guidelines.outcome }}
     steps:
-      # The token is not left in .git/config: only the "Open a pull request"
-      # step gets it, so the refresh script, npm install scripts and the build
-      # cannot push.
+      # Read-only token, and not left in .git/config either.
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -92,7 +105,8 @@ jobs:
 
       # The same build Workers Builds runs after a merge: split-data's chunk
       # size limits, the search index (Pagefind) and the Vite build, then the
-      # dist/ smoke check. A refresh that would break the deploy fails here.
+      # dist/ smoke check. A refresh that would break the deploy fails here,
+      # and then no PR is opened.
       - name: Build the site
         if: steps.diff.outputs.changed == 'true'
         working-directory: app
@@ -115,20 +129,84 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Open a pull request
+      # The changed data for the "open-pr" job: whole files (both, changed or
+      # not), stored at the artifact's top level as events.json and
+      # framing-review.json.
+      - name: Upload the refreshed data
         if: steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: refresh-data
+          path: |
+            data/events.json
+            data/framing-review.json
+          if-no-files-found: error
+          retention-days: 7
+
+  open-pr:
+    name: Open a pull request
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      # The same commit "refresh" started from, so the PR changes only what the
+      # refresh changed. The token is not left in .git/config.
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Download the refreshed data
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: refresh-data
+          path: ${{ runner.temp }}/refresh-data
+
+      - name: Download the refresh report
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: refresh-report
+          path: ${{ runner.temp }}/reports
+
+      # Only these two paths are taken from the artifact; nothing else from the
+      # "refresh" job reaches the commit.
+      - name: Apply the refreshed data
+        run: |
+          for f in events.json framing-review.json; do
+            src="$RUNNER_TEMP/refresh-data/$f"
+            if [ ! -f "$src" ] || [ -L "$src" ]; then echo "::error::$f missing from the refresh-data artifact"; exit 1; fi
+            cp -- "$src" "data/$f"
+          done
+          git -c core.hooksPath=/dev/null status --short
+          if git -c core.hooksPath=/dev/null diff --quiet -- data/events.json data/framing-review.json; then
+            echo "::error::The refresh job reported changes but the artifact matches the repository."
+            exit 1
+          fi
+
+      # No npm and no script from the repository run in this job. git runs with
+      # hooks off (core.hooksPath=/dev/null), also set in .git/config so that the
+      # git commands gh runs internally skip hooks too. The node used for the PR
+      # description is the runner image's own, with an inline script.
+      - name: Open a pull request
         env:
           GH_TOKEN: ${{ github.token }}
-          REPORT_URL: ${{ steps.report.outputs.artifact-url }}
-          GUIDELINES_OUTCOME: ${{ steps.guidelines.outcome }}
+          REPORT_URL: ${{ needs.refresh.outputs.report-url }}
+          GUIDELINES_OUTCOME: ${{ needs.refresh.outputs.guidelines-outcome }}
         run: |
+          reports="$RUNNER_TEMP/reports"
           day="$(date -u +%Y-%m-%d)"
           branch="data-refresh/${day}-${GITHUB_RUN_NUMBER}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$branch"
-          git add data/events.json data/framing-review.json
-          git commit -m "Refresh Wikipedia summaries, titles and guideline versions (${day})"
+          git config --local core.hooksPath /dev/null
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -c core.hooksPath=/dev/null switch -c "$branch"
+          git -c core.hooksPath=/dev/null add data/events.json data/framing-review.json
+          git -c core.hooksPath=/dev/null commit -m "Refresh Wikipedia summaries, titles and guideline versions (${day})"
           # Checkout ran with persist-credentials: false. Authenticate this one
           # push the way actions/checkout does (an http.extraheader), passed
           # through git's GIT_CONFIG_* environment so it is never written to
@@ -136,9 +214,9 @@ jobs:
           GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
             GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
-            git push origin "$branch"
+            git -c core.hooksPath=/dev/null push origin "$branch"
           guidelines_bytes=0
-          if [ "$GUIDELINES_OUTCOME" = "success" ]; then guidelines_bytes=$(wc -c < "$RUNNER_TEMP/guidelines-report.md"); fi
+          if [ "$GUIDELINES_OUTCOME" = "success" ]; then guidelines_bytes=$(wc -c < "$reports/guidelines-report.md"); fi
           {
             echo "Monthly refresh of the English Wikipedia summaries and titles (${day}), and a check of the Wikipedia guidelines the framing review cites."
             echo
@@ -152,7 +230,7 @@ jobs:
             echo
             # The guideline check first, whole: the cap below applies to the rest only.
             if [ "$GUIDELINES_OUTCOME" = "success" ]; then
-              cat "$RUNNER_TEMP/guidelines-report.md"
+              cat "$reports/guidelines-report.md"
             else
               echo "## Wikipedia guidelines"
               echo
@@ -160,7 +238,7 @@ jobs:
             fi
             echo
             # The rest of the 60,000 bytes, without splitting a multi-byte UTF-8 character.
-            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$RUNNER_TEMP/refresh-report.md" "$guidelines_bytes"
+            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$reports/refresh-report.md" "$guidelines_bytes"
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base main --head "$branch" \
             --title "Refresh Wikipedia summaries, titles and guideline versions (${day})" \

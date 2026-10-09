@@ -160,7 +160,26 @@ add a rule for it; the hash alone cannot be matched by a glob.
   `wrangler` (the deploy command Workers Builds runs) is an exact-version
   devDependency in `app/package.json`, so a deploy uses the locked copy.
 - Workflow permissions: `ci.yml` is read-only (`contents: read`).
-  `refresh-data.yml` can write (it pushes a branch and opens a pull request)
-  but never merges; every data change goes through a reviewed pull request.
-  Its checkout does not persist the token (`persist-credentials: false`); only
-  the final step, which pushes the branch and opens the PR, receives it.
+  `refresh-data.yml` pushes a branch and opens a pull request but never
+  merges; every data change goes through a reviewed pull request. It is split
+  so that code from npm never runs next to a write token. `npm ci` runs
+  packages' install scripts, and those run as the job's user: in the same job
+  they could have added a `.git/hooks/*` script that a later `git commit` or
+  `git push` runs, or appended to `$GITHUB_ENV`/`$GITHUB_PATH` to change the
+  environment or the `git` binary of later steps, including the step that
+  holds the token. Hiding the token from earlier steps does not stop that.
+  - Job `refresh` (`contents: read`): runs the refresh scripts, `npm ci`, the
+    tests, the build and `check-dist.mjs`, and uploads `data/events.json`,
+    `data/framing-review.json` and the reports as workflow artifacts.
+  - Job `open-pr` (`contents: write`, `pull-requests: write`; only when
+    `refresh` succeeded and found changes): a fresh checkout of the same
+    commit (`persist-credentials: false`), the two data files copied in from
+    the artifact (nothing else from it reaches the commit), then commit, push
+    and `gh pr create`. It runs no npm and no repository script; git runs
+    with `core.hooksPath=/dev/null`. The token is passed only to that last
+    step, and only for the push through git's `GIT_CONFIG_*` environment
+    (never written to `.git/config`).
+  - Left over: a compromised dependency in `refresh` can still choose the
+    content of those two data files (or the PR description, from the
+    reports). That reaches only the unmerged pull request, which the owner
+    reviews; it cannot push elsewhere, change workflows, or merge.
