@@ -84,6 +84,10 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   compilation only, not JavaScript `eval` or inline scripts.
 - `static.cloudflareinsights.com` / `cloudflareinsights.com`: the Cloudflare
   Web Analytics beacon, injected by Cloudflare, and where it reports.
+  Cloudflare states that it "does not use any client-side state, such as
+  cookies or localStorage, to collect usage metrics" and does not
+  fingerprint visitors ([product page](https://www.cloudflare.com/web-analytics/),
+  read 2026-10-09; not tested here). The About dialog says so, with that link.
 - No other host: data, search index, fonts, glyphs and the base map style are
   all same-origin. Cloudflare's bot-detection inline script
   (`/cdn-cgi/challenge-platform`) stays blocked; its content changes per

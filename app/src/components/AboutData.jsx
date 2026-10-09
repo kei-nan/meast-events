@@ -6,6 +6,8 @@ const REPO = "https://github.com/kei-nan/meast-events";
 // Credited in "Borders" and "Sources & licences" (NOTICE); event-page.test.mjs
 // checks that every border source in data/boundaries.json is credited here.
 const OCHA_AREAS_URL = "https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
+// Cloudflare's privacy statement for Web Analytics (no cookies or localStorage).
+const CF_ANALYTICS_URL = "https://www.cloudflare.com/web-analytics/";
 
 const fmt = (v) => (typeof v === "number" ? v.toLocaleString("en-US") : String(v));
 const label = (k) => k.replace(/_/g, " ");
@@ -439,6 +441,13 @@ export default function AboutData({ section = null, onClose }) {
           <a href={`${REPO}/blob/main/docs/DATA_POLICY.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">data policy</a>,{" "}
           <a href={`${REPO}/blob/main/NOTICE`} target="_blank" rel="noreferrer" title="Opens in a new tab">NOTICE</a>,{" "}
           <a href={`${REPO}/blob/main/data/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">data license</a>.
+        </p>
+        <p>
+          Visits are counted with Cloudflare Web Analytics, which, according to{" "}
+          <a href={CF_ANALYTICS_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            Cloudflare
+          </a>
+          , uses no cookies or local storage to collect them and does not fingerprint visitors.
         </p>
       </div>
     </dialog>
