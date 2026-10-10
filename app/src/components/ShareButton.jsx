@@ -107,6 +107,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
     if (!open) return undefined;
     const onKey = (e) => {
       if (e.key === "Escape") {
+        e.preventDefault(); // handled: other Escape handlers skip it (lib/escapeKey.js)
         e.stopPropagation();
         close(true);
       }

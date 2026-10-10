@@ -15,6 +15,19 @@ export function haversineKm(lon1, lat1, lon2, lat2) {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(a)));
 }
 
+// The point `km` from [lon, lat] along the initial bearing `bearingDeg`
+// (degrees clockwise from north), on the sphere: [lon, lat].
+export function destination([lon, lat], bearingDeg, km) {
+  const d = km / EARTH_RADIUS_KM;
+  const b = toRad(bearingDeg);
+  const p1 = toRad(lat);
+  const l1 = toRad(lon);
+  const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(b));
+  const l2 =
+    l1 + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2));
+  return [toDeg(l2), toDeg(p2)];
+}
+
 // Valid {lon, lat} of an event, or null. Events without coordinates are never
 // shown anywhere, so every consumer goes through this.
 export function eventCoords(e) {

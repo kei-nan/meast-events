@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   circleBbox,
+  destination,
   eventCoords,
   haversineKm,
   inArea,
@@ -17,6 +18,22 @@ test("haversine: known distances", () => {
   assert.ok(d > 65 && d < 80, String(d));
   // one degree of latitude ~111.2 km
   assert.ok(Math.abs(haversineKm(0, 0, 0, 1) - 111.2) < 0.5);
+});
+
+test("destination: lands the given distance away along the bearing", () => {
+  const start = [35.2137, 31.7683];
+  for (const bearing of [0, 45, 90, 180, 270]) {
+    const [lon, lat] = destination(start, bearing, 100);
+    assert.ok(Math.abs(haversineKm(start[0], start[1], lon, lat) - 100) < 1e-6, String(bearing));
+  }
+  // due north keeps the longitude; due east and west mirror each other
+  assert.ok(Math.abs(destination(start, 0, 100)[0] - start[0]) < 1e-9);
+  assert.ok(destination(start, 0, 100)[1] > start[1]);
+  const east = destination(start, 90, 50);
+  const west = destination(start, 270, 50);
+  assert.ok(Math.abs(east[0] - start[0] - (start[0] - west[0])) < 1e-9);
+  const same = destination(start, 123, 0);
+  assert.ok(Math.abs(same[0] - start[0]) < 1e-9 && Math.abs(same[1] - start[1]) < 1e-9);
 });
 
 test("circleBbox contains the circle and is clamped", () => {

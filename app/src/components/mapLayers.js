@@ -1,5 +1,6 @@
 // Pure helpers and layer definitions for MapView: colours, GeoJSON builders,
 // geodesic area geometry (plain spherical maths - no extra dependencies).
+import { EARTH_RADIUS_KM, destination } from "../lib/geo.js";
 import { eventYearLabel } from "../lib/mapStack.js";
 
 // A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
@@ -34,6 +35,10 @@ export const CATEGORY_COLOR_EXPRESSION = [
 
 export const HOLLOW_FILL = "#f4f1ea";
 const STROKE_LIGHT = "rgba(236,226,201,0.85)";
+// Event dots sit on light land, where a cream edge vanished and the light inks
+// (antique gold, dusty lilac) had too little contrast (gold 1.8:1); a dark ink
+// edge sets every dot off the land. Clusters keep the light edge on their dark fill.
+const STROKE_DOT = "#3b3226";
 export const IS_APPROX = ["==", ["get", "a"], 1];
 const IS_MISS = ["==", ["get", "m"], 0];
 const IS_HIT_IN_SEARCH = ["all", ["==", ["get", "s"], 1], ["==", ["get", "m"], 1]];
@@ -51,7 +56,7 @@ export const POINT_PAINT = {
     CATEGORY_COLOR_EXPRESSION,
     IS_HIT_IN_SEARCH,
     "#ffffff",
-    STROKE_LIGHT,
+    STROKE_DOT,
   ],
   "circle-opacity": ["case", IS_MISS, 0.3, 1],
   "circle-stroke-opacity": ["case", IS_MISS, 0.3, 1],
@@ -134,38 +139,17 @@ export function pointFeature(event) {
   };
 }
 
-// ---- geodesy -------------------------------------------------------------
+// ---- geodesy (distances and bearings: lib/geo.js) ------------------------
 
-const R_KM = 6371.0088;
 const rad = (d) => (d * Math.PI) / 180;
 const deg = (r) => (r * 180) / Math.PI;
-
-export function haversineKm([lon1, lat1], [lon2, lat2]) {
-  const dLat = rad(lat2 - lat1);
-  const dLon = rad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R_KM * Math.asin(Math.min(1, Math.sqrt(a)));
-}
-
-export function destination([lon, lat], bearingDeg, km) {
-  const d = km / R_KM;
-  const b = rad(bearingDeg);
-  const p1 = rad(lat);
-  const l1 = rad(lon);
-  const p2 = Math.asin(Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(b));
-  const l2 =
-    l1 +
-    Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(p1), Math.cos(d) - Math.sin(p1) * Math.sin(p2));
-  return [deg(l2), deg(p2)];
-}
 
 const clampLat = (v) => Math.max(-85, Math.min(85, v));
 
 export function circleBbox(center, km) {
   const north = destination(center, 0, km)[1];
   const south = destination(center, 180, km)[1];
-  const dLon = deg(Math.asin(Math.min(1, Math.sin(km / R_KM) / Math.cos(rad(center[1])))));
+  const dLon = deg(Math.asin(Math.min(1, Math.sin(km / EARTH_RADIUS_KM) / Math.cos(rad(center[1])))));
   return [center[0] - dLon, clampLat(south), center[0] + dLon, clampLat(north)];
 }
 
