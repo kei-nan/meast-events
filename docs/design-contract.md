@@ -1,5 +1,13 @@
 # middleeast.events search-v2 contract (shared by all work packages)
 
+> **Historical, superseded.** This was the shared planning contract for the search-v2 work (September-October 2026), kept as a design record. Except for the "Controls (visual style)" section at the end, which is current and referenced from the CSS, it does not describe the site as it is now. For the current design see [SCALING.md](SCALING.md) (data layout and loading), [DATA_POLICY.md](DATA_POLICY.md) (what is included and how it is shown) and the code they name.
+>
+> **What changed since** (checked against the code, October 2026):
+> - The work is merged into `main`; the `integration/search-v2` branch and the "nothing is pushed to main" rule below no longer apply.
+> - There is no `events/all.<hash>.json`, no `events/ids.json` and no decade chunks for events. All event data is in one versioned folder, `events/v.<version>/`: `all.json` (the lite set, every event) and `full/<bucket>.json` (detail records, bucketed by a hash of the id, `app/src/lib/fullBucket.js`); `events/meta.json` names the current folder (`app/scripts/split-data.mjs`). A deep link finds its event in `all.json` and its details in the id's bucket. Only boundaries are still split per decade (`boundaries/<decade>.json`).
+> - URL state also has `about=1` (About dialog open) and `sort=coverage-asc|date|date-desc` (default `coverage`, omitted from the URL) (`app/src/lib/urlState.js`, `app/src/lib/browseOrder.js`).
+> - `CATEGORY_COLORS` is exported from `app/src/components/mapLayers.js`, not from MapView, and MapView takes more props than listed (e.g. `year`, `borderYear`, `highlightEvent`, `onViewportBounds`, `eventsLoading`; see `app/src/components/MapView.jsx`).
+
 Branch: `integration/search-v2`. NOTHING is pushed to `main` (pushing main auto-deploys the live site) until the user has seen it locally.
 
 Note (October 2026): the site no longer has an API or Redis. All data is static (built from `data/` by `app/scripts/split-data.mjs`) and full-text search runs in the browser on a Pagefind index (`app/scripts/build-search-index.mjs`). The API section below was replaced by the static equivalent; the old API code is in git history only.

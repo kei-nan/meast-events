@@ -342,3 +342,5 @@ Summary of differences (observations): Hebrew leads use the vocabulary of terror
 ## Reproducibility
 
 Scripts in `docs/bias-review/`: `sample.py` (seeded draw), `fetch_leads.py`, `fetch_xlang.py`, `fetch_supp.py`, `wd.py` and `wd2.py` (Wikidata checks), `assess.py` (my hand-written findings), `build.py` (generates the JSON and this file). Intermediate `_*.json/_*.txt` files hold raw API output.
+
+Those intermediates (`_sample_raw.json`, `_sample_live.json`, `_xlang.json`, `_supp.json`, `_wd.json`, `_wd2.json` and their `.txt` dumps) and the `_template.md` that `build.py` fills in are **not tracked in git**, so the scripts cannot be re-run as they stand: `fetch_leads.py`, `fetch_xlang.py`, `wd2.py` and `build.py` read files that only an earlier step creates, and `build.py` also needs `_template.md`. Re-creating them refetches live Wikipedia and Wikidata and samples the current `data/events.json` (394 events at the time; it has grown since), so the results would differ from those above.

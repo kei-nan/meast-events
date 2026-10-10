@@ -8,8 +8,8 @@ guards them in the build, and what to do when one is reached. Numbers were measu
 
 | File | When | Grows with events? |
 |---|---|---|
-| `data/events/v.<version>/all.json` | on every page load, preloaded from `index.html` | **yes, linearly**: the lite record of every event (id, title, dates, countries, category, 160-character snippet, coordinates, location quality) |
-| `data/events/v.<version>/full/<bucket>.json` | when an event is opened | per bucket, no: the bucket count doubles as the dataset doubles, so a bucket stays around 32 events (~20 KB compressed) |
+| `data/events/v.<version>/all.json` | on every page load, preloaded from `index.html` | **yes, linearly**: the lite record of every event (id, title, dates, countries, category, 160-character snippet, coordinates, location quality, Wikidata sitelink count) |
+| `data/events/v.<version>/full/<bucket>.json` | when an event is opened | per bucket, no: at least 64 buckets, doubling as the dataset doubles, so a bucket holds at most about 32 events (~20 KB compressed) on average (`app/src/lib/fullBucket.js`) |
 | `pagefind/*` | on the first search | the index is chunked by Pagefind; `pagefind/ids.json` (~40 bytes per event) is loaded whole |
 | `data/boundaries/<decade>.json`, `data/boundaries/shared/<hash>.json`, `data/land.json` | when the map starts; `data/land-far.json` once its first view has drawn | no (borders, not events) |
 | `/event/<id>` | search engines, shared links | one static page per event: **counts against the host's file limit** |
@@ -44,7 +44,9 @@ What changed:
   on the throttled CPU). Now only the events entering or leaving the range are sent (`updateData`, `app/src/lib/sourceDiff.js`); a full replacement is
   still used when most features change (a search starts or ends). Checked in the browser: after every move the map holds exactly the events of the
   selected years, and the clusters it draws are identical to a full reload of the same data.
-- **No re-sorting on timeline steps.** The browse list is in date order; the events are sorted once per data load and filtering keeps that order.
+- **No re-sorting on timeline steps.** The browse list was in date order; the events are sorted once per data load and filtering keeps that order.
+  Since 2026-10-09 the default browse list is most covered first (Wikidata sitelinks, `app/src/lib/browseOrder.js`), which sorts the events of the
+  selected years on every step again; only the date sorts (`?sort=date`, `date-desc`) still skip it. Not re-measured since that change.
 - **Decade chunks of events and `events/ids.json` removed.** They were only a fallback; the decade chunk guard (1 MB) would have failed the build at
   about 1,600 events in one decade.
 - **Detail files grow in number, not size.** With a fixed 64 buckets, opening one event would have downloaded ~300 KB at 10,000 events; now ~70 KB.
