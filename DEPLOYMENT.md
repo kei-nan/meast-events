@@ -7,7 +7,9 @@ generated from `data/` during `npm run build`:
 
 - `app/public/data/` - the event and border files (`app/scripts/split-data.mjs`);
 - `app/public/pagefind/` - the full-text search index, searched in the browser
-  with [Pagefind](https://pagefind.app/) (`app/scripts/build-search-index.mjs`).
+  with [Pagefind](https://pagefind.app/) (`app/scripts/build-search-index.mjs`);
+- `app/node_modules/.cache/subset-fonts/` - the web fonts, subset to the characters
+  the site shows (`app/scripts/subset-fonts.mjs`, see [Build steps](#build-steps-and-build-time-checks)).
 
 Both are gitignored and regenerated on every build, including Cloudflare's.
 
@@ -32,8 +34,10 @@ This project's map borders derive from [CShapes 2.0](https://icr.ethz.ch/data/cs
 - No ads, paywalls, or "pro tier" bolted onto this site.
 - No selling access, embedding it in a paid product, or using it to promote
   a commercial offering.
-- The attribution in the footer (`app/src/App.jsx`) must stay visible - don't
-  remove or bury it.
+- The footer's "Sources & licences" link (`app/src/App.jsx`, next to "About the
+  data") must stay visible - don't remove or bury it - and the dialog it opens
+  (`app/src/components/AboutData.jsx`) must credit CShapes 2.0, UN OCHA and
+  Wikipedia/Wikidata with their licences.
 
 Free/non-commercial hosting (as below) keeps the project compliant without
 anyone having to think about it.
@@ -49,8 +53,9 @@ from this GitHub repository. Setup (already done; for reference or a rebuild):
    repository (Workers Builds).
 2. Build settings:
    - **Root directory:** `app`
-   - **Build command:** `npm run build` (it runs `scripts/split-data.mjs` and
-     `scripts/build-search-index.mjs` first)
+   - **Build command:** `npm run build`. Its npm `prebuild` and `postbuild` scripts
+     validate the data first and check `dist/` last, so a bad build fails here and
+     is not deployed ([Build steps](#build-steps-and-build-time-checks)).
    - **Deploy command:** `npx wrangler deploy`
    - **Non-production branch builds:** `npx wrangler preview` (the default). It needs the
      `previews` block in `app/wrangler.jsonc`, which is there; each branch and pull
@@ -89,15 +94,55 @@ the dashboard, change `name` in `app/wrangler.jsonc` at the same time: Workers B
 when the two differ, and `wrangler deploy` with the old name would create a second, empty
 Worker.
 
+### Build steps and build-time checks
+
+Workers Builds deploys whatever `npm run build` produces on `main`, **whether or not CI
+passed** (CI does not gate it; see [Recommended repository settings](#recommended-repository-settings-manual)).
+So the checks that must stop a broken deploy are part of the build command itself
+(`app/package.json`). npm runs `prebuild` and `postbuild` around `npm run build`
+automatically, on Cloudflare as anywhere else; a failing step fails the build and
+Cloudflare does not deploy it.
+
+1. `prebuild`:
+   - `node ../scripts/validate-events.js ../data/events.json` - structural checks on the
+     curated events (schema, ids, dates, coordinates). It uses only Node built-ins, so it
+     needs no `node_modules` at the repo root (the build installs only `app/`).
+   - `scripts/split-data.mjs` - writes `app/public/data/`.
+   - `scripts/subset-fonts.mjs` - subsets Inter (variable, wght axis kept) and Spectral
+     600 from the fontsource packages to Basic Latin, Latin-1, General Punctuation and
+     every character in `app/public/data/` and the app's source, keeping fontsource's
+     per-script files and unicode-ranges. Output in `app/node_modules/.cache/subset-fonts/`,
+     imported by `app/src/main.jsx`. A character outside every subset (Arabic, Hebrew)
+     falls back to the system font, as before. In October 2026 this cut the default
+     view's font downloads from 156 KB to 67 KB.
+   - `scripts/build-search-index.mjs` - writes `app/public/pagefind/`.
+2. `vite build`.
+3. `postbuild`:
+   - `scripts/build-event-pages.mjs` - the static `/event/` pages and the sitemap.
+   - `scripts/check-dist.mjs` - fails if the versioned events folder named by
+     `src/lib/dataVersion.js` is missing or inconsistent with `meta.json`, an event has
+     no full record, a boundary chunk points to a missing shared geometry, a file
+     `index.html` loads is missing, the search index is missing, **a file under
+     `dist/assets/` has no content hash** (outside the version-named MapLibre folder;
+     `_headers` caches all of `/assets/` as immutable), or `dist/` has more files than
+     the host allows per deploy.
+
 ## CI and the data pipeline
 
 `.github/workflows/ci.yml` runs on every push and pull request to `main` and deploys
-nothing: it lints, unit-tests (`npm test` in `app/`) and builds `app/`, then checks the
-built `dist/` (`node app/scripts/check-dist.mjs`); validates `data/events.json` and
-`data/events.proposed.json` (`node scripts/validate-events.js`), runs the data-pipeline
-tests (`npm test` at the repo root) and the border check
-(`node scripts/verify-borders.js --check`); and runs `npm audit` for the repo root and
-`app/`.
+nothing. Its jobs (the names GitHub shows as status checks):
+
+- **Build app/** - lints `app/` (oxlint), runs its unit tests (`npm test`), checks that
+  `.nvmrc` and `app/.nvmrc` agree, and runs `npm run build`, i.e. the same build
+  Cloudflare runs, with all the checks above.
+- **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
+  (`node scripts/validate-events.js`), runs the data-pipeline tests (`npm test` at the
+  repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
+  plugin, `.oxlintrc.json`; `import/named` is an error, other findings are warnings),
+  validates `data/boundaries.json` (`npm run validate-boundaries`) and runs the border
+  check (`node scripts/verify-borders.js --check`).
+- **Dependency audit (.)** and **Dependency audit (app)** - `npm audit` of production
+  dependencies (high and critical block) plus a report-only audit of everything.
 
 The data pipeline lives in `scripts/` (ingestion, the cited border corrections, the
 proposed-events flow: pipeline output goes to `data/events.proposed.json` plus a report,
@@ -107,14 +152,29 @@ and `data/events.json` changes only through `node scripts/merge-proposed.js`). S
 ### Monthly refresh of the Wikipedia summaries
 
 `.github/workflows/refresh-data.yml` runs on the 1st of each month (and on demand from
-the Actions tab). It re-fetches every event's English Wikipedia lead and, if any changed,
-opens a pull request with the changed summaries and a list of events whose title is no
-longer the current article title. Before opening it, it validates the data, runs both
-unit-test suites and builds the site (`npm ci && npm run build` in `app/`, then
-`check-dist.mjs`), since pull requests opened with the workflow token do not trigger CI.
-The PR description holds the first 60,000 bytes of the refresh report; the full report is
-uploaded as the run's `refresh-report` artifact (kept 90 days) and linked from the PR. It
-never merges; merging the pull request rebuilds the site, including the search index.
+the Actions tab). It:
+
+- re-fetches every event's English Wikipedia lead and article title. Changed summaries
+  are applied, and so are plain title renames; held cases (a redirect to a section of
+  another article, another Wikidata item, a stored title Wikipedia does not redirect to)
+  are not changed but listed in the PR description for review;
+- refreshes the Wikidata sitelink counts behind the default "most covered" order;
+- checks whether the Wikipedia guideline sections the framing review's wording check
+  cites were edited since the reviews (recorded in `data/framing-review.json`, with the
+  diff at the top of the PR description; if the check cannot run, the PR says so).
+
+If `data/events.json` or `data/framing-review.json` changed, it validates the data, runs
+both unit-test suites and builds the site (`npm ci && npm run build` in `app/`, which
+includes the build-time checks above), since pull requests opened with the workflow token
+do not trigger CI, and then a pull request is opened. The workflow has two jobs: the
+**Refresh summaries** job (`refresh`) does all of the above with a read-only token and
+hands the two data files and the reports on as artifacts; the pull request is opened by
+a separate job, **Open a pull request** (`open-pr`), which holds the write token and runs
+no npm code and no repository scripts, so nothing the refresh installs or builds holds a
+token that can push. The PR description holds the start of the refresh report; the full
+report is uploaded as the run's `refresh-report` artifact (kept 90 days) and linked from
+the PR. It never merges; merging the pull request rebuilds the site, including the
+search index.
 
 It needs one repository setting, once:
 **Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"**.
@@ -125,11 +185,44 @@ opens the pull request.
 
 The static-assets Worker `meast-events` serves `dist/_headers` (copied from
 `app/public/_headers` by Vite): a CSP, `nosniff`, `X-Frame-Options`,
-`Referrer-Policy`, and cache rules (immutable for hashed files, 1 h +
-stale-while-revalidate for the dataset and the unhashed MapLibre worker
-files). If the site ever loads anything from another host, add it to the CSP
+`Referrer-Policy`, and cache rules: everything under `/assets/` is immutable for a
+year (every file there is content-hashed, or one of the two MapLibre worker files
+in the version-named `assets/maplibre-gl-<version>/` folder; `check-dist.mjs`
+fails the build otherwise), as are the content-hashed data folders and search
+index chunks; the other dataset files get 1 h + stale-while-revalidate, and HTML
+and the search entry files revalidate on every visit. If the site ever loads anything from another host, add it to the CSP
 in that file, or the browser will block it. Details and the verification
 notes: [docs/SECURITY.md](docs/SECURITY.md#2-static-site-headers-apppublic_headers).
+
+## Recommended repository settings (manual)
+
+These are settings for the owner to make by hand; nothing in the repo changes them.
+
+1. **Require CI before merging to `main`.** Workers Builds deploys every push to `main`
+   whether or not CI passed, so a pull request merged with a red check still deploys
+   (the build-time checks above catch a broken build, but not, say, a failing border check
+   or data-pipeline test). GitHub: **Settings -> Rules -> Rulesets** (or **Branches ->
+   Branch protection rules**) for `main` -> **Require status checks to pass**, with the
+   CI job names as they appear on a pull request:
+   - `Build app/`
+   - `Validate event data`
+   - optionally `Dependency audit (.)` and `Dependency audit (app)` - their blocking step
+     fails on a new high/critical advisory in a production dependency, which can turn an
+     unrelated pull request red until the dependency is upgraded.
+2. **No Workers Builds preview builds for Dependabot branches.** Every push to a
+   non-production branch runs a preview build (build command, then `npx wrangler preview`)
+   in Cloudflare, with the build's API token, for code from a dependency update nobody
+   has reviewed yet, and uses build minutes. Cloudflare's Workers Builds docs
+   ([build branches](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/),
+   read 2026-10-09) describe only an on/off **Enable Preview Builds** checkbox under
+   **Settings -> Build -> Branch control**, with no branch filter. If the dashboard shows
+   branch include/exclude rules there, exclude `dependabot/*`. Otherwise set the
+   **Preview command** (Settings -> Build) to skip them using the branch name Workers
+   Builds provides in `WORKERS_CI_BRANCH`
+   ([build configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)):
+   `case "$WORKERS_CI_BRANCH" in dependabot/*) echo "No preview for Dependabot branches";; *) npx wrangler preview;; esac`.
+   That skips the preview upload; the build command itself still runs. Dependabot pull
+   requests still get CI.
 
 ## Verifying a deploy
 
@@ -139,7 +232,8 @@ notes: [docs/SECURITY.md](docs/SECURITY.md#2-static-site-headers-apppublic_heade
    (the browser network tab shows requests to `/pagefind/`, all same-origin).
 3. Clicking a marker opens its detail panel with the full lead; panning updates the
    event count.
-4. The footer attribution and non-commercial notice are visible.
+4. The footer's "About the data · Sources & licences" links are visible, and "Sources
+   & licences" opens the dialog at the credits for CShapes 2.0, UN OCHA and Wikipedia.
 
 ## Free plan limits
 
