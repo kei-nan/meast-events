@@ -78,8 +78,14 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      # Structural checks only (schema, ids, dates, coordinates, extracts) on
-      # data/events.json and data/events.proposed.json. No dependencies, no network.
+      # Installed first so every step below has the geometry library (turf):
+      # validate-events' pin-in-country check and the geometry tests skip without it.
+      - name: Install repo-root dependencies (geometry library, oxlint)
+        run: npm ci
+
+      # Schema, ids, dates, coordinates and extracts on data/events.json and
+      # data/events.proposed.json; warnings (e.g. a pin outside its tagged
+      # countries) do not fail. No network.
       - name: Validate events
         run: node scripts/validate-events.js
 
@@ -87,12 +93,6 @@ jobs:
       - name: Unit tests (scripts/lib)
         run: npm test
 
-      # Borders vs independent Wikidata reference points (border crossings, tripoints) in
-      # data/border-reference-points.json. Fails if any point is now more than 0.25 km
-      # further from the drawn border than in data/border-check-baseline.json, for the
-      # years checked there. No network. Report: docs/border-verification.md.
-      - name: Install repo-root dependencies (geometry library, oxlint)
-        run: npm ci
       # oxlint over scripts/ (.oxlintrc.json at the repo root). import/named is an
       # error: a named import that the target module does not export fails here
       # instead of at run time in the monthly refresh. Warnings do not fail.
@@ -103,6 +103,10 @@ jobs:
       # Fails only on structural errors; gaps and unexpected overlaps are listed as warnings.
       - name: Validate boundaries
         run: npm run validate-boundaries
+      # Borders vs independent Wikidata reference points (border crossings, tripoints) in
+      # data/border-reference-points.json. Fails if any point is now more than 0.25 km
+      # further from the drawn border than in data/border-check-baseline.json, for the
+      # years checked there. No network. Report: docs/border-verification.md.
       - name: Border check against reference points
         run: node scripts/verify-borders.js --check
 
