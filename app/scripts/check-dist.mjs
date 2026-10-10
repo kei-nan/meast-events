@@ -10,9 +10,8 @@
 //     every event's full record is in the bucket its id hashes to;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - the search index (Pagefind) was built;
-//   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>)
-//     or one of the two MapLibre files in the versioned assets/maplibre-gl-<version>/
-//     folder: public/_headers marks all of /assets/* immutable, so an unhashed
+//   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>):
+//     public/_headers marks all of /assets/* immutable, so an unhashed
 //     name there would be cached for a year and never updated;
 //   - dist/ has fewer files than the host allows per deploy (MAX_DIST_FILES,
 //     default 20,000: Cloudflare Workers static assets on the free plan,
@@ -114,23 +113,19 @@ if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is
 
 // 5. Every asset's URL changes when its content does (public/_headers: /assets/* is
 // immutable). Vite names emitted files "<name>-<hash>.<ext>" with an 8-character
-// base64url hash (vite.config.js assetFileNames, Rollup's default chunk names). The
-// only exception is vite.config.js UNHASHED_ASSET_NAMES, kept by name inside a folder
-// named after the MapLibre version.
+// base64url hash (Vite's and Rollup's default asset and chunk names), MapLibre's
+// worker included: it is self-contained since MapLibre 6.13.0, so its name need not
+// be fixed.
 const HASHED_ASSET = /^[^/]+-[A-Za-z0-9_-]{8}\.[a-z0-9]+$/;
-const VERSIONED_ASSET = /^maplibre-gl-\d+\.\d+\.\d+[^/]*\/maplibre-gl-(worker|shared)\.mjs$/;
 const listFiles = (d, prefix = "") =>
   readdirSync(d, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? listFiles(path.join(d, e.name), `${prefix}${e.name}/`) : [`${prefix}${e.name}`]
   );
 const unhashed = existsSync(distFile("assets"))
-  ? listFiles(distFile("assets")).filter((f) => !HASHED_ASSET.test(f) && !VERSIONED_ASSET.test(f))
+  ? listFiles(distFile("assets")).filter((f) => !HASHED_ASSET.test(f))
   : [];
 if (unhashed.length) {
-  fail(
-    `dist/assets/ has files with no content hash outside the versioned MapLibre folder ` +
-      `(they would be cached as immutable): ${unhashed.join(", ")}`
-  );
+  fail(`dist/assets/ has files with no content hash (they would be cached as immutable): ${unhashed.join(", ")}`);
 }
 
 // 6. File count against the host's per-deploy limit. _headers and _redirects are

@@ -24,11 +24,8 @@
 
 # --- caching ----------------------------------------------------------------
 # /assets/*: every file has a content-addressed URL, so all of it is immutable.
-# Vite names emitted files <name>-<content hash>.<ext>; the only exceptions are
-# the two MapLibre files (vite.config.js UNHASHED_ASSET_NAMES: maplibre-gl-worker.mjs
-# and maplibre-gl-shared.mjs, whose names the worker imports at runtime). Those live
-# in assets/maplibre-gl-<version>/, so the folder name is their cache key and a
-# MapLibre upgrade gets a new URL. scripts/check-dist.mjs (run by npm run build)
+# Vite names emitted files <name>-<content hash>.<ext>, MapLibre's worker included.
+# scripts/check-dist.mjs (run by npm run build)
 # fails the build if any other file under dist/assets/ lacks a hash, so an
 # unhashed file can never be served with this header.
 # No other rule below matches /assets/, so nothing is comma-joined onto this

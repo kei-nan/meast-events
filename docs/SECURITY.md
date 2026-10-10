@@ -62,8 +62,9 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
 
 - `worker-src`/`child-src` no longer allow `blob:` (2026-10-04). Both web
   workers are same-origin files: MapLibre's
-  `/assets/maplibre-gl-<version>/maplibre-gl-worker.mjs` (set with
-  `setWorkerUrl`, MapView.jsx) and Pagefind's `/pagefind/pagefind-worker.js`.
+  `/assets/maplibre-gl-worker-<hash>.mjs` (set with
+  `setWorkerUrl`, MapView.jsx; before MapLibre 6.13.0 it was
+  `/assets/maplibre-gl-<version>/maplibre-gl-worker.mjs`) and Pagefind's `/pagefind/pagefind-worker.js`.
   Checked with Playwright + Chromium against `wrangler dev` (wrangler
   4.147.0) serving the built `dist/` with and without `blob:`: in both runs
   the only workers created were those two files, the map rendered (checked
@@ -112,11 +113,10 @@ Caching (same file). "Immutable" below means `public, max-age=31536000,
 immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
 
 - `/assets/*`: immutable, one rule. Every file there is a Vite
-  content-hashed name, or one of the two unhashed MapLibre files
-  (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
-  in the folder `/assets/maplibre-gl-<version>/`, whose cache key is the
-  version in the folder name. `app/scripts/check-dist.mjs` fails the build if
-  any other file appears under `assets/`, so nothing unhashed can get the
+  content-hashed name, MapLibre's worker included (self-contained since
+  MapLibre 6.13.0, so it no longer needs a fixed name).
+  `app/scripts/check-dist.mjs` fails the build if any file without a hash
+  appears under `assets/`, so nothing unhashed can get the
   immutable header.
 - `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
   `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,

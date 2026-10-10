@@ -5,7 +5,6 @@ import Timeline from "./components/Timeline";
 import useAllEvents, { RETRY_MS } from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
 import useUrlState from "./hooks/useUrlState";
-import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import {
   decadeFloor,
   eventOverlapsRange,
@@ -45,8 +44,8 @@ const MAP_PLACEHOLDER = <div className="map-view map-placeholder" aria-busy="tru
 // Opened from the footer or a link only, so its code loads on first use.
 const AboutData = lazy(() => import("./components/AboutData.jsx"));
 
-// Everything the map needs (its chunk, MapLibre's shared chunk, land, the
-// initial borders decade) starts downloading right after the FIRST PAINT, all
+// What the map needs first (land, the initial borders decade; the map chunk
+// itself is lazy-loaded) starts downloading right after the FIRST PAINT, all
 // in parallel. Not before it: on a slow connection these ~400 KB would share
 // bandwidth with index.js and delay the header, panel and timeline (Lighthouse
 // measured LCP 4.1 s -> 5.6 s with them preloaded from index.html). The data
@@ -54,14 +53,9 @@ const AboutData = lazy(() => import("./components/AboutData.jsx"));
 // yet (an event link without years shows the event's own year, which needs the
 // event list), so no borders decade is fetched ahead.
 function startMapDownloads(year) {
-  if (import.meta.env.PROD) {
-    // maplibre-gl.mjs imports this file only once it runs (vite.config.js
-    // shareMaplibreChunk); it sits next to the worker, whose URL Vite knows.
-    const link = document.createElement("link");
-    link.rel = "modulepreload";
-    link.href = new URL("maplibre-gl-shared.mjs", new URL(maplibreWorkerUrl, window.location.href)).href;
-    document.head.append(link);
-  }
+  // MapLibre's worker (self-contained since 6.13.0) is not preloaded: Chromium
+  // ignores <link rel=preload as=worker>, and modulepreload would parse it on
+  // the main thread. It downloads when the map starts it.
   const loads = [loadLand()];
   if (year != null) loads.push(loadBoundaryDecade(decadeFloor(year)));
   for (const load of loads) load.catch(() => {}); // MapView retries
