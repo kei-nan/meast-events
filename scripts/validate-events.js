@@ -15,6 +15,15 @@ const targets = cliFiles.length
   ? cliFiles.map((p) => ({ path: p, lenient: !/proposed/.test(p), required: true }))
   : defaults;
 
+// Pin-in-country check (warnings): needs data/boundaries.json and @turf/turf, a repo-root
+// devDependency. Without `npm ci` at the root the check is skipped, not failed.
+const turf = await import("@turf/turf").catch(() => null);
+const boundariesUrl = new URL("data/boundaries.json", root);
+const boundaries = turf && existsSync(boundariesUrl) ? JSON.parse(await readFile(boundariesUrl, "utf-8")) : null;
+if (!boundaries) {
+  console.log(`skip pin-in-country check (${turf ? "data/boundaries.json missing" : "@turf/turf not installed: run npm ci at the repo root"})`);
+}
+
 let failed = false;
 for (const t of targets) {
   const url = new URL(t.path, root);
@@ -39,7 +48,7 @@ for (const t of targets) {
     !t.lenient && existsSync(curatedUrl)
       ? new Set(JSON.parse(await readFile(curatedUrl, "utf-8")).map((e) => e?.id))
       : new Set();
-  const { errors, warnings } = validateEvents(events, { name: t.path, lenient: t.lenient, otherIds });
+  const { errors, warnings } = validateEvents(events, { name: t.path, lenient: t.lenient, otherIds, boundaries, turf });
   for (const w of warnings) console.warn(`warn ${w}`);
   if (errors.length) {
     failed = true;

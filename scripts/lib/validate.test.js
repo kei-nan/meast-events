@@ -5,6 +5,7 @@ import {
   validateEvents,
   checkFramingCoverage,
   textSha1,
+  findClashes,
   CATEGORIES,
   MIN_YEAR,
   MAX_YEAR,
@@ -148,4 +149,100 @@ test("checkFramingCoverage: missing, stale and orphaned reviews are reported", (
   assert.deepEqual([r.missing, r.stale, r.orphans], [1, 1, 1]);
   assert.equal(r.warnings.length, 3);
   assert.equal(textSha1("abc"), "a9993e364706"); // sha1("abc") = a9993e36 4706816a ...
+});
+
+test("validateEvents: a start date after the data was retrieved is a warning, not an error", () => {
+  const scheduled = event({ date_start: "2026-10-27", date_end: null, extract_retrieved_at: "2026-10-06T20:35:50Z" });
+  const r = validateEvents([scheduled]);
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.warnings.length, 1);
+  assert.match(r.warnings[0], /date_start \(2026-10-27\) is after the day its data was retrieved \(2026-10-06\)/);
+  // Same day, or earlier: nothing.
+  assert.deepEqual(validateEvents([event({ date_start: "2026-10-06", date_end: null, extract_retrieved_at: "2026-10-06" })]).warnings, []);
+  // No fetch date: compared with opts.today instead.
+  const undated = { ...scheduled, extract_retrieved_at: undefined };
+  assert.ok(validateEvents([undated], { lenient: true, today: "2026-10-01" }).warnings.some((w) => /was validated \(2026-10-01\)/.test(w)));
+  assert.ok(!validateEvents([undated], { lenient: true, today: "2026-11-01" }).warnings.some((w) => /after the day/.test(w)));
+});
+
+test("validateEvents: borrowed coordinates are one warning, merged with the article mismatch", () => {
+  const borrowed = event({ resolved_qid: "Q9", coordinate_source: "redirect_target" });
+  const r = validateEvents([borrowed]);
+  assert.deepEqual(r.errors, []); // redirect_target is an allowed precise source
+  assert.equal(r.warnings.length, 1, r.warnings.join("\n"));
+  assert.match(r.warnings[0], /coordinates are borrowed from another item \(coordinate_source "redirect_target"\).*belongs to Q9/);
+  // Older records: Wikipedia coordinates of an article that belongs to another item.
+  assert.match(validateEvents([event({ resolved_qid: "Q9" })]).warnings[0], /borrowed .*"wikipedia"/);
+  // Wikidata coordinates with another resolved item: ambiguous, only the article mismatch.
+  const wd = validateEvents([event({ resolved_qid: "Q9", coordinate_source: "wikidata" })]).warnings;
+  assert.equal(wd.length, 1);
+  assert.doesNotMatch(wd[0], /borrowed/);
+  // No coordinates: nothing borrowed.
+  const none = event({ resolved_qid: "Q9", location_quality: "none", coordinates: null, coordinate_source: null });
+  assert.doesNotMatch(validateEvents([none]).warnings[0], /borrowed/);
+});
+
+// Pin-in-country check: needs @turf/turf (repo-root devDependency), skipped without it as in
+// boundary-checks.test.js.
+const turf = await import("@turf/turf").catch(() => null);
+const needsTurf = { skip: !turf && "@turf/turf not installed (run npm ci at the repo root)" };
+const box = (name, from, to, [w, s, e, n]) => ({
+  type: "Feature",
+  properties: { name, start_year: from, end_year: to },
+  geometry: { type: "Polygon", coordinates: [[[w, s], [e, s], [e, n], [w, n], [w, s]]] },
+});
+
+test("validateEvents: a precise pin outside every tagged country's shape is one warning", needsTurf, () => {
+  const boundaries = {
+    type: "FeatureCollection",
+    features: [
+      box("Egypt", 1899, 9999, [25, 22, 35, 31.5]),
+      box("Israel", 1948, 9999, [34.3, 29.5, 35.9, 33.3]),
+      box("Turkey", 1924, 9999, [26, 36, 44.8, 42]),
+    ],
+  };
+  const opts = { boundaries, turf };
+  const at = (lat, lon, over = {}) => event({ date_start: "1990-01-01", date_end: null, coordinates: { lat, lon }, ...over });
+  // Inside, and just outside the edge (within the 5 km tolerance): fine.
+  assert.deepEqual(validateEvents([at(30, 30)], opts).warnings, []);
+  assert.deepEqual(validateEvents([at(25, 35.04)], opts).warnings, []); // ~4 km east of the edge
+  // Outside Egypt by tens of km: warned, with the distance.
+  const off = validateEvents([at(32, 30)], opts).warnings;
+  assert.equal(off.length, 1);
+  assert.match(off[0], /precise pin \(32, 30\) is [4-6]\d km outside the 1990 border shapes of every tagged country \(Egypt; tolerance 5 km/);
+  // Inside ANY tagged country is enough.
+  assert.deepEqual(validateEvents([at(39, 35, { countries: ["Egypt", "Turkey"] })], opts).warnings, []);
+  // The year matters: Turkey's shape starts in 1924, so a 1915 Turkey pin cannot be checked.
+  assert.deepEqual(validateEvents([at(39, 30, { countries: ["Turkey"], date_start: "1915-01-01" })], opts).warnings, []);
+  // A tagged country without a shape that year, or "regional": not checkable, no warning.
+  assert.deepEqual(validateEvents([at(39, 30, { countries: ["Egypt", "Kuwait"] })], opts).warnings, []);
+  assert.deepEqual(validateEvents([at(39, 30, { countries: ["regional"] })], opts).warnings, []);
+  // Approximate pins and points outside the Middle East box (already warned) are not checked again.
+  const capital = at(32, 30, { location_quality: "approximate", coordinate_source: "country-fallback:Egypt" });
+  assert.deepEqual(validateEvents([capital], opts).warnings, []);
+  assert.equal(validateEvents([at(38.9, -77.03)], opts).warnings.length, 1);
+  // Without boundaries/turf the check is off.
+  assert.deepEqual(validateEvents([at(32, 30)]).warnings, []);
+});
+
+test("findClashes: id and QID clashes with the base set, each reason listed", () => {
+  const base = [event({ id: "a", wikidata_qid: "Q1" }), event({ id: "b", wikidata_qid: null })];
+  const incoming = [
+    event({ id: "a", wikidata_qid: "Q7" }), // id only
+    event({ id: "x", wikidata_qid: "Q1" }), // QID only
+    event({ id: "a", wikidata_qid: "Q1" }), // both
+    event({ id: "y", wikidata_qid: "Q8" }), // new
+    event({ id: "z", wikidata_qid: null }), // no QID never clashes on QID (base has a null one)
+  ];
+  const r = findClashes(base, incoming);
+  assert.deepEqual(
+    r.map((c) => [c.event.id, c.event.wikidata_qid, c.reasons]),
+    [
+      ["a", "Q7", ["id"]],
+      ["x", "Q1", ["wikidata_qid"]],
+      ["a", "Q1", ["id", "wikidata_qid"]],
+    ]
+  );
+  assert.deepEqual(findClashes([], incoming), []);
+  assert.deepEqual(findClashes(base, []), []);
 });
