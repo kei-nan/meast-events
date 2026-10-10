@@ -84,6 +84,10 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   compilation only, not JavaScript `eval` or inline scripts.
 - `static.cloudflareinsights.com` / `cloudflareinsights.com`: the Cloudflare
   Web Analytics beacon, injected by Cloudflare, and where it reports.
+  Cloudflare states that it "does not use any client-side state, such as
+  cookies or localStorage, to collect usage metrics" and does not
+  fingerprint visitors ([product page](https://www.cloudflare.com/web-analytics/),
+  read 2026-10-09; not tested here). The About dialog says so, with that link.
 - No other host: data, search index, fonts, glyphs and the base map style are
   all same-origin. Cloudflare's bot-detection inline script
   (`/cdn-cgi/challenge-platform`) stays blocked; its content changes per
@@ -104,19 +108,37 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   deployed `workers.dev` response (the file is applied by the same
   mechanism, but it is not exercised here), Firefox/Safari.
 
-Caching (same file): `/assets/index-*` (Vite content-hashed JS/CSS)
-immutable for a year. The two unhashed MapLibre files
-(`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
-sit in `/assets/maplibre-gl-<version>/`, also immutable: the version in the
-folder name changes on every MapLibre upgrade.
-`/data/events/all.*` (content-hashed) is immutable; everything else under
-`/data/*` (`meta.json`, `ids.json`, `full/*.json`, decade
-chunks, `boundaries/*.json`, `land.json`, `selection-funnel.json`) is 1 h +
-`stale-while-revalidate=86400`. `/pagefind/*` revalidates on every visit
-(`no-cache`) except the content-hashed `/pagefind/index/*` chunks (immutable).
-HTML keeps Cloudflare's default (`max-age=0, must-revalidate`) so a deploy is
-picked up immediately. If a future hashed file has a different name prefix,
-add a rule for it; the hash alone cannot be matched by a glob.
+Caching (same file). "Immutable" below means `public, max-age=31536000,
+immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
+
+- `/assets/*`: 1 h by default. Immutable for the Vite content-hashed names
+  that have a rule: `index-*` (app JS/CSS), `MapView-*` (the lazy-loaded map
+  chunk), `inter-*` and `spectral-*` (web fonts), and `maplibre-gl-*`. The
+  last covers the folder `/assets/maplibre-gl-<version>/` with the two
+  unhashed MapLibre files (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`,
+  see `vite.config.js`), whose cache key is the version in the folder name.
+  A hashed chunk without a rule (the build currently also emits a
+  `dist-<hash>.js` chunk) gets the 1 h default: slower to cache, never stale.
+- `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
+  `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,
+  `land-far.json`, `selection-funnel.json`, `framing-review.json`).
+  Immutable: `/data/events/v.<hash>/*` (the event list `all.json` and every
+  `full/*.json` record, one folder per build named by a hash of all its files,
+  `app/scripts/split-data.mjs`) and `/data/boundaries/shared/*` (large
+  boundary geometries named by a hash of their content).
+- `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
+  the engine and the `.pf_meta` keep their names; the content-hashed
+  `/pagefind/index/*` chunks are immutable.
+- `/event/*` (the static event pages, the `/event/` index and `event.css`):
+  `public, max-age=0, must-revalidate`, set explicitly.
+- `/glyphs/*` (map label glyphs): 1 h, plus `Content-Type:
+  application/x-protobuf` so Cloudflare compresses the `.pbf` files.
+- Everything else, including the home page HTML, keeps Cloudflare's default
+  (`max-age=0, must-revalidate`), so a deploy is picked up immediately.
+
+If a future hashed file has a different name prefix, add a rule for it; the
+hash alone cannot be matched by a glob, and a pattern may contain only one
+splat.
 
 ## 3. Monitoring
 
@@ -160,7 +182,26 @@ add a rule for it; the hash alone cannot be matched by a glob.
   `wrangler` (the deploy command Workers Builds runs) is an exact-version
   devDependency in `app/package.json`, so a deploy uses the locked copy.
 - Workflow permissions: `ci.yml` is read-only (`contents: read`).
-  `refresh-data.yml` can write (it pushes a branch and opens a pull request)
-  but never merges; every data change goes through a reviewed pull request.
-  Its checkout does not persist the token (`persist-credentials: false`); only
-  the final step, which pushes the branch and opens the PR, receives it.
+  `refresh-data.yml` pushes a branch and opens a pull request but never
+  merges; every data change goes through a reviewed pull request. It is split
+  so that code from npm never runs next to a write token. `npm ci` runs
+  packages' install scripts, and those run as the job's user: in the same job
+  they could have added a `.git/hooks/*` script that a later `git commit` or
+  `git push` runs, or appended to `$GITHUB_ENV`/`$GITHUB_PATH` to change the
+  environment or the `git` binary of later steps, including the step that
+  holds the token. Hiding the token from earlier steps does not stop that.
+  - Job `refresh` (`contents: read`): runs the refresh scripts, `npm ci`, the
+    tests, the build and `check-dist.mjs`, and uploads `data/events.json`,
+    `data/framing-review.json` and the reports as workflow artifacts.
+  - Job `open-pr` (`contents: write`, `pull-requests: write`; only when
+    `refresh` succeeded and found changes): a fresh checkout of the same
+    commit (`persist-credentials: false`), the two data files copied in from
+    the artifact (nothing else from it reaches the commit), then commit, push
+    and `gh pr create`. It runs no npm and no repository script; git runs
+    with `core.hooksPath=/dev/null`. The token is passed only to that last
+    step, and only for the push through git's `GIT_CONFIG_*` environment
+    (never written to `.git/config`).
+  - Left over: a compromised dependency in `refresh` can still choose the
+    content of those two data files (or the PR description, from the
+    reports). That reaches only the unmerged pull request, which the owner
+    reviews; it cannot push elsewhere, change workflows, or merge.

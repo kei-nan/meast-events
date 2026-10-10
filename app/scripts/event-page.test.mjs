@@ -1,6 +1,47 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { escapeHtml, metaDescription, renderEventPage, renderSitemap, safeUrl } from "./event-page.mjs";
+import fs from "node:fs";
+import {
+  CSHAPES_URL,
+  OCHA_AREAS_URL,
+  escapeHtml,
+  metaDescription,
+  renderEventPage,
+  renderIndexPage,
+  renderSitemap,
+  safeUrl,
+} from "./event-page.mjs";
+
+// Border source families that NOTICE requires us to credit: how to spot one in a
+// feature's `source` in data/boundaries.json, and what the credit must contain.
+// (Natural Earth, also named in some sources, is public domain: no credit required.)
+const BORDER_CREDITS = [
+  { name: "CShapes", used: /CShapes 2\.0/, credit: ["CShapes 2.0", CSHAPES_URL] },
+  { name: "UN OCHA", used: /UN OCHA|OCHA's|data\.humdata\.org/, credit: ["UN OCHA", OCHA_AREAS_URL] },
+];
+
+test("every border source family in boundaries.json is credited on event pages and in the About dialog", () => {
+  const boundaries = JSON.parse(fs.readFileSync(new URL("../../data/boundaries.json", import.meta.url), "utf8"));
+  const sources = boundaries.features.map((f) => String(f.properties?.source ?? ""));
+  const used = BORDER_CREDITS.filter((family) => sources.some((s) => family.used.test(s)));
+  // Both are in the data today; if one disappears, update the list rather than pass vacuously.
+  assert.deepEqual(used.map((f) => f.name), ["CShapes", "UN OCHA"]);
+  // The OCHA link credited is the dataset the features name.
+  assert.ok(sources.some((s) => s.includes(OCHA_AREAS_URL)), "OCHA dataset URL matches boundaries.json");
+
+  const pages = {
+    "event page": renderEventPage({ id: "x", title: "X" }),
+    "event index": renderIndexPage([{ id: "x", title: "X" }]),
+    "AboutData.jsx": fs.readFileSync(new URL("../src/components/AboutData.jsx", import.meta.url), "utf8"),
+  };
+  for (const family of used) {
+    for (const [where, text] of Object.entries(pages)) {
+      for (const needle of family.credit) {
+        assert.ok(text.includes(needle), `${where} credits ${family.name}: missing ${JSON.stringify(needle)}`);
+      }
+    }
+  }
+});
 
 test("escapeHtml escapes every HTML-significant character", () => {
   assert.equal(escapeHtml(`<a href="x" title='y'>&</a>`), "&lt;a href=&quot;x&quot; title=&#39;y&#39;&gt;&amp;&lt;/a&gt;");

@@ -16,6 +16,10 @@ export const SITE_NAME = "Middle East, 1900–present";
 const REPO = "https://github.com/kei-nan/meast-events";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 const CC_BY_SA = "https://creativecommons.org/licenses/by-sa/4.0/";
+// Border credits (NOTICE): every source family in data/boundaries.json is named
+// in the footer; event-page.test.mjs checks it against the data.
+export const CSHAPES_URL = "https://icr.ethz.ch/data/cshapes/";
+export const OCHA_AREAS_URL = "https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 const OG_IMAGE = `${SITE}/og-image.png`;
 export const DESCRIPTION_LENGTH = 160;
 
@@ -228,7 +232,7 @@ ${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta 
 
 const siteHeader = `<header class="site-header"><a href="/" class="site-name">${escapeHtml(SITE_NAME)}</a> <a href="/event/" class="site-index">All events</a></header>`;
 
-const siteFooter = `<footer class="site-footer"><p>${escapeHtml(SITE_NAME)} is a non-commercial project: an interactive map and timeline of major Middle East events since 1900. Event text comes from Wikipedia and Wikidata; borders are adapted from CShapes 2.0. ${link(REPO, "Source and data documentation on GitHub", { external: true })}.</p></footer>`;
+const siteFooter = `<footer class="site-footer"><p>${escapeHtml(SITE_NAME)} is a non-commercial project: an interactive map and timeline of major Middle East events since 1900. Event text comes from Wikipedia and Wikidata; borders are adapted from ${link(CSHAPES_URL, "CShapes 2.0", { external: true })} (CC BY-NC-SA 4.0), and the West Bank&#39;s Areas A, B and C from ${link(OCHA_AREAS_URL, "UN OCHA", { external: true })} (non-commercial use, credited to UN OCHA). ${link(REPO, "Source and data documentation on GitHub", { external: true })}.</p></footer>`;
 
 export function eventDateText(event) {
   const flags = (event.date_flags ?? []).filter(Boolean);
