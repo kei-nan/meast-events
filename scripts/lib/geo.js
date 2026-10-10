@@ -27,8 +27,3 @@ export const COUNTRY_CAPITALS = {
   UAE: { lat: 24.4539, lon: 54.3773 },
   Oman: { lat: 23.5859, lon: 58.4059 },
 };
-
-export function countryFallbackCoordinates(countries) {
-  const country = countries?.find((c) => COUNTRY_CAPITALS[c]);
-  return country ? { ...COUNTRY_CAPITALS[country], approximate_for: country } : null;
-}

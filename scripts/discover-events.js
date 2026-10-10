@@ -55,7 +55,7 @@
 // blindly.
 import { readFile, writeFile } from "node:fs/promises";
 import { sleep } from "./lib/http.js";
-import { runSparql, qidFromUri } from "./lib/wdqs.js";
+import { runSparql, qidFromUri, compareQids } from "./lib/wdqs.js";
 import {
   ALL_COUNTRY_QIDS,
   QID_TO_COUNTRY,
@@ -73,6 +73,10 @@ import {
 //                               overwriting it. Without --classes all classes are queried and
 //                               the file is rewritten.
 //   --min-sitelinks=N           notable_enough threshold (default: the policy value, 10)
+//
+// A class query that fails (after the fallbacks below) makes the run write NOTHING and exit
+// non-zero, listing the failed classes: rewriting the file without them would silently drop
+// every candidate only that class finds. Re-run (or run the failed classes with --classes=).
 const argVal = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
 const MIN_SITELINKS = Number(argVal("min-sitelinks") ?? INCLUSION_MIN_SITELINKS);
 const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
@@ -91,8 +95,8 @@ function buildQuery(classQid, { transitive = true, classValues = null } = {}) {
 SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?enwiki ?countries WHERE {
   {
     SELECT ?item
-      (SAMPLE(?date) AS ?eventDate)
-      (SAMPLE(?dateEnd) AS ?eventDateEnd)
+      (MIN(?date) AS ?eventDate)
+      (MAX(?dateEnd) AS ?eventDateEnd)
       (SAMPLE(?sitelinks) AS ?nSitelinks)
       (SAMPLE(?enArticle) AS ?enwiki)
       (GROUP_CONCAT(DISTINCT ?country; separator="|") AS ?countries)
@@ -109,6 +113,9 @@ SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?e
       OPTIONAL { ?item wdt:P585 ?pit }
       OPTIONAL { ?item wdt:P580 ?start }
       OPTIONAL { ?item wdt:P582 ?dateEnd }
+      # Date rule (docs/DATA_POLICY.md): P585 point in time, else P580 start time; P582 end.
+      # An item with several values gets the earliest start and the latest end (MIN/MAX, not
+      # SAMPLE, so every run picks the same value).
       BIND(COALESCE(?pit, ?start) AS ?date)
       FILTER(BOUND(?date) && YEAR(?date) >= 1900 && YEAR(?date) <= ${maxYear})
       ?item wikibase:sitelinks ?sitelinks .
@@ -121,7 +128,7 @@ SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?e
   }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
-ORDER BY DESC(?nSitelinks)
+ORDER BY DESC(?nSitelinks) ?item
 `;
 }
 
@@ -214,6 +221,7 @@ async function main() {
     console.log(`Bounded run over ${classes.length} class(es); merging into ${byQid.size} existing candidates.`);
   }
 
+  const failed = [];
   for (let i = 0; i < classes.length; i++) {
     const cls = classes[i];
     process.stdout.write(`[${i + 1}/${classes.length}] querying "${cls.label}" (wd:${cls.qid})... `);
@@ -222,6 +230,8 @@ async function main() {
       ({ rows, usedFallback } = await runQueryWithFallback(cls.qid));
     } catch (err) {
       console.log(`FAILED (${err.message})`);
+      failed.push({ cls, message: err.message });
+      if (i < classes.length - 1) await sleep(REQUEST_DELAY_MS);
       continue;
     }
     console.log(`${rows.length} raw results${usedFallback ? " (via direct-P31 fallback, no subclass expansion)" : ""}`);
@@ -262,6 +272,13 @@ async function main() {
     if (i < classes.length - 1) await sleep(REQUEST_DELAY_MS);
   }
 
+  if (failed.length) {
+    console.error(`\n${failed.length} class quer${failed.length === 1 ? "y" : "ies"} failed; data/event-candidates.json was NOT written:`);
+    for (const f of failed) console.error(`  ${f.cls.label} (${f.cls.qid}): ${f.message}`);
+    console.error(`Re-run, or query just these with --classes=${failed.map((f) => f.cls.qid).join(",")} (merges into the existing file).`);
+    process.exit(1);
+  }
+
   const { titles: existingTitles, qids: existingQids } = await loadExistingTitlesAndQids();
 
   const all = [...byQid.values()].map((c) => ({
@@ -272,7 +289,7 @@ async function main() {
       (c.wikipedia_title ? existingTitles.has(c.wikipedia_title.toLowerCase()) : false),
   }));
 
-  all.sort((a, b) => b.sitelinks - a.sitelinks);
+  all.sort((a, b) => b.sitelinks - a.sitelinks || compareQids(a.wikidata_qid, b.wikidata_qid));
 
   await writeFile(outPath, JSON.stringify(all, null, 2));
 
@@ -291,7 +308,7 @@ async function main() {
   const byCat = {};
   for (const c of passed) byCat[c.category] = (byCat[c.category] ?? 0) + 1;
   for (const [cat, n] of Object.entries(byCat).sort((a, b) => b[1] - a[1])) console.log(`  ${cat}: ${n}`);
-  console.log(`\nWrote ${all.length} candidates to data/event-candidates.json (sorted by sitelinks desc).`);
+  console.log(`\nWrote ${all.length} candidates to data/event-candidates.json (sorted by sitelinks desc, then QID).`);
   console.log(`This file is for human review only - nothing here has been merged into seed-events.json.`);
 }
 

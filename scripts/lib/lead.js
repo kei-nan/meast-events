@@ -35,6 +35,47 @@ export function titleFromWikipediaUrl(url) {
   }
 }
 
+// One batch query, following the API's `continue` until it is complete. TextExtracts returns
+// extracts only up to a size limit per response and hands back `continue: { excontinue, ... }`
+// for the rest; without following it, the later pages of a batch would come back with no
+// extract at all. Each continued response repeats `normalized`/`redirects`; the page records
+// are merged by title (a field from a later part fills one that is still missing).
+export async function queryAllParts(titles, { maxParts = 50 } = {}) {
+  const base = {
+    action: "query",
+    prop: "extracts|pageprops|info",
+    exintro: "1",
+    explaintext: "1",
+    exlimit: "max",
+    ppprop: "wikibase_item",
+    inprop: "url",
+    redirects: "1",
+    format: "json",
+    formatversion: "2",
+    titles: titles.join("|"),
+  };
+  const normalized = new Map();
+  const redirects = new Map();
+  const pages = new Map();
+  let cont = null;
+  for (let part = 0; part < maxParts; part++) {
+    const res = await politeFetch(`${API}?${new URLSearchParams({ ...base, ...cont })}`);
+    if (!res.ok) throw new Error(`lead fetch HTTP ${res.status}`);
+    const data = await res.json();
+    const q = data.query ?? {};
+    for (const n of q.normalized ?? []) normalized.set(n.from, n);
+    for (const r of q.redirects ?? []) redirects.set(r.from, r);
+    for (const p of q.pages ?? []) {
+      const prev = pages.get(p.title);
+      if (!prev) pages.set(p.title, { ...p });
+      else for (const [k, v] of Object.entries(p)) if (prev[k] === undefined) prev[k] = v;
+    }
+    if (!data.continue) return { normalized: [...normalized.values()], redirects: [...redirects.values()], pages: [...pages.values()] };
+    cont = data.continue;
+  }
+  throw new Error(`lead fetch: still continuing after ${maxParts} parts (${titles.length} titles)`);
+}
+
 // Fetches leads for many titles. `cache` (see cache.js) is consulted/updated per requested
 // title, so an interrupted run resumes. Returns Map(requestedTitle -> record|null).
 // record: { title (canonical, after redirects), extract, wikibase_item, pageid, lastrevid,
@@ -49,14 +90,7 @@ export async function fetchLeads(titles, { cache = null, delayMs = 400, log = ()
   }
   for (let i = 0; i < todo.length; i += LEAD_BATCH) {
     const chunk = todo.slice(i, i + LEAD_BATCH);
-    const url =
-      `${API}?action=query&prop=extracts|pageprops|info&exintro=1&explaintext=1&exlimit=max` +
-      `&ppprop=wikibase_item&inprop=url&redirects=1&format=json&formatversion=2&titles=` +
-      encodeURIComponent(chunk.join("|"));
-    const res = await politeFetch(url);
-    if (!res.ok) throw new Error(`lead fetch HTTP ${res.status}`);
-    const data = await res.json();
-    const q = data.query ?? {};
+    const q = await queryAllParts(chunk);
     const norm = new Map((q.normalized ?? []).map((n) => [n.from, n.to]));
     const redir = new Map((q.redirects ?? []).map((r) => [r.from, r.to]));
     const redirFragment = new Map((q.redirects ?? []).filter((r) => r.tofragment).map((r) => [r.from, r.tofragment]));
