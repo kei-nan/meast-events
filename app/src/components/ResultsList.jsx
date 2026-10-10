@@ -93,6 +93,9 @@ function ResultsList({
   const [shown, setShown] = useState(PAGE);
   const [active, setActive] = useState(0);
   const visible = results.slice(0, shown);
+  // The list can shrink under a remembered row (the timeline narrowed): the last
+  // row then takes the tab stop, so the list always has one.
+  const tabStop = Math.min(active, visible.length - 1);
 
   function onKeyDown(e) {
     const btns = [...e.currentTarget.querySelectorAll("button.sp-row")];
@@ -144,7 +147,7 @@ function ResultsList({
                 outside={outside}
                 ongoing={ongoing}
                 selected={ev.id === selectedId}
-                tabbable={idx === active}
+                tabbable={idx === tabStop}
                 onFocusRow={setActive}
                 onSelect={onSelect}
                 onHover={onHover}

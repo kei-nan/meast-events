@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
 import { humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import { categoryLabel } from "../lib/categoryLabels";
+import { isUnhandledEscape } from "../lib/escapeKey";
 import "./MapUi.css";
 
 // ---- the map toolbar ----
@@ -30,14 +31,28 @@ const DRAW_MODES = [
 function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
+  const buttonRef = useRef(null);
+  // A choice (or Escape) removes the menu and the button that had focus, so
+  // focus goes back to the Draw button instead of being lost to the page.
+  const closeMenu = () => {
+    setOpen(false);
+    buttonRef.current?.focus();
+  };
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    const onKey = (e) => {
+      if (!isUnhandledEscape(e, wrapRef.current)) return;
+      e.preventDefault();
+      setOpen(false);
+      if (wrapRef.current?.contains(document.activeElement)) buttonRef.current?.focus();
+    };
     const onDown = (e) => !wrapRef.current?.contains(e.target) && setOpen(false);
-    window.addEventListener("keydown", onKey);
+    // Capture: an Escape in the menu is the menu's, before the map's draw-mode
+    // handler (MapView) would take it to leave the mode.
+    window.addEventListener("keydown", onKey, true);
     document.addEventListener("pointerdown", onDown);
     return () => {
-      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onKey, true);
       document.removeEventListener("pointerdown", onDown);
     };
   }, [open]);
@@ -53,7 +68,7 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
           aria-pressed={areaMode === d.mode}
           onClick={() => {
             onToggle(d.mode);
-            setOpen(false);
+            closeMenu();
           }}
         />
       ))}
@@ -63,7 +78,7 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
           label="Clear area"
           onClick={() => {
             onClear();
-            setOpen(false);
+            closeMenu();
           }}
         />
       )}
@@ -73,13 +88,15 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
   const active = DRAW_MODES.find((d) => d.mode === areaMode);
   return (
     <div className="mu-draw" ref={wrapRef}>
+      {/* A menu button: aria-expanded only. Its name already says when a mode is on. */}
       <ToolButton
+        ref={buttonRef}
+        className={active ? "is-on" : ""}
         icon={active ? active.icon : "✎"}
         label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw area"}
         aria-label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw a search area"}
         aria-expanded={open}
         aria-controls="mu-draw-menu"
-        aria-pressed={!!active}
         onClick={() => setOpen((v) => !v)}
       />
       {open && (
@@ -209,7 +226,11 @@ function BoundaryDetails({ b }) {
 export function BoundaryPopup({ popup, onClose, width, height }) {
   const ref = useRef(null);
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
+    const onKey = (e) => {
+      if (!isUnhandledEscape(e, ref.current)) return;
+      e.preventDefault();
+      onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);

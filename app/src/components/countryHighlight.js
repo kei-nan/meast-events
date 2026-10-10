@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { countryHighlightFeatures, featuresBbox } from "../lib/eventCountries";
 import { reducedMotion } from "../lib/reducedMotion";
+import { sheetCoversMap, stripOffset, toolbarInset } from "../lib/mapInsets";
 
 // Map layer that shades the listed countries of an event without a precise
 // location (lib/eventCountries.js decides which border shapes those are). The
@@ -71,18 +72,26 @@ export default function useCountryHighlight({ mapRef, mapReady, event, year, fea
     const map = mapRef.current;
     const bbox = featuresBbox(countryHighlightFeatures({ countries: p.countries }, year, features));
     const duration = reducedMotion() ? 0 : undefined;
+    // On phones the event's sheet leaves only a strip of the map in sight
+    // (lib/mapInsets.js); the camera's target goes in the middle of that strip.
+    const box = map.getContainer();
+    const offset = stripOffset(box.clientHeight, sheetCoversMap(), toolbarInset(box));
+    // easeTo with no duration, not jumpTo, which has no `offset`.
+    const move = (opts) => (duration === 0 ? map.easeTo({ ...opts, offset, duration }) : map.flyTo({ ...opts, offset }));
     if (bbox) {
-      map.fitBounds(
-        [
-          [bbox[0], bbox[1]],
-          [bbox[2], bbox[3]],
-        ],
-        { padding: 40, maxZoom: FIT_MAX_ZOOM, ...(duration === 0 ? { duration } : {}) }
-      );
+      const bounds = [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]],
+      ];
+      // The zoom that fits the countries in the whole map, centred on them.
+      // Under the sheet they are not fitted into the strip itself: a strip
+      // ~60 px tall fits a few countries only at a zoom out past the map's
+      // extent. Their middle shows in the strip, the rest above the sheet's edge.
+      const cam = offset[1] ? map.cameraForBounds(bounds, { padding: 40, maxZoom: FIT_MAX_ZOOM }) : null;
+      if (cam) move({ center: cam.center, zoom: cam.zoom });
+      else map.fitBounds(bounds, { padding: 40, maxZoom: FIT_MAX_ZOOM, ...(duration === 0 ? { duration } : {}) });
     } else if (p.lon != null && p.lat != null) {
-      const opts = { center: [p.lon, p.lat], zoom: Math.max(map.getZoom(), 5) };
-      if (duration === 0) map.jumpTo(opts);
-      else map.flyTo(opts);
+      move({ center: [p.lon, p.lat], zoom: Math.max(map.getZoom(), 5) });
     }
   }, [mapRef, mapReady, focus, year, features]);
 }

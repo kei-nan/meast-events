@@ -15,11 +15,9 @@ import { eventCoords } from "./geo.js";
 import { fullBucket } from "./fullBucket.js";
 import { DATA_VERSION, FULL_BUCKETS } from "./dataVersion.js";
 
-export const DECADE_SIZE = 10;
-
-export function decadeFloor(year) {
-  return Math.floor(year / DECADE_SIZE) * DECADE_SIZE;
-}
+// Pure year helpers live in eventYears.js (testable without the generated
+// dataVersion.js); re-exported for the existing importers.
+export { DECADE_SIZE, decadeFloor, eventOverlapsRange, eventYearRange } from "./eventYears.js";
 
 const inFlight = new Map(); // url -> Promise<data>, so concurrent callers share one fetch
 
@@ -127,17 +125,6 @@ export function prefetchBoundaryDecade(decade) {
   loadBoundaryDecade(decade).catch(() => {});
 }
 
-export function eventYearRange(e) {
-  const start = Number(e.date_start.slice(0, 4));
-  const end = e.date_end ? Number(e.date_end.slice(0, 4)) : start;
-  return [start, end];
-}
-
-export function eventOverlapsRange(e, startYear, endYear) {
-  const [s, en] = eventYearRange(e);
-  return s <= endYear && en >= startYear;
-}
-
 // Canonical event shape for everything downstream. Events without usable
 // coordinates are KEPT (location_quality "none", coordinates null): they are
 // listed and searchable but never get a map marker. Fields are only ever ADDED
@@ -219,10 +206,12 @@ export function loadFramingReviewSummary() {
 // bucket is missing (a 4xx, not an outage), the current folder is read from
 // events/meta.json and the record is taken from there: ids are stable, so the
 // open page keeps working instead of showing "could not be loaded" until reload.
+const bucketUrl = (id, { version, buckets }) => dataUrl(`events/v.${version}/full/${fullBucket(id, buckets)}.json`);
+
 export async function loadFullLead(id) {
   await loadAllLite();
-  const read = async ({ version, buckets }) => {
-    const bucket = await fetchJSONCached(dataUrl(`events/v.${version}/full/${fullBucket(id, buckets)}.json`));
+  const read = async (from) => {
+    const bucket = await fetchJSONCached(bucketUrl(id, from));
     return Object.prototype.hasOwnProperty.call(bucket, id) ? bucket[id] : null;
   };
   try {
@@ -234,4 +223,13 @@ export async function loadFullLead(id) {
     source = { version: meta.version, buckets: meta.fullBuckets };
     return read(source);
   }
+}
+
+// Fire-and-forget, for an event link: starts the event's bucket download in
+// parallel with all.json, from the folder this bundle names (where the lite set
+// comes from too, unless that folder is gone). loadFullLead then shares the
+// cached request; a failed one is dropped from the cache, so it retries.
+export function prefetchFullLead(id) {
+  if (source) return;
+  fetchJSONCached(bucketUrl(id, { version: DATA_VERSION, buckets: FULL_BUCKETS })).catch(() => {});
 }

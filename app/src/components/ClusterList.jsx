@@ -1,14 +1,19 @@
 import { useEffect, useRef } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
+import { isUnhandledEscape } from "../lib/escapeKey";
 
 // Events that share one spot on the map (capital-pinned "approximate" events,
 // or a cluster no zoom level can split): listed in a card at the click point.
 // Same placement rules as BoundaryPopup: clamped to the map, clear of the
-// phone results sheet, Escape closes.
+// phone results sheet, Escape closes (MapView then puts focus back).
 export default function ClusterList({ list, onSelect, onClose, width, height }) {
   const ref = useRef(null);
   useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
+    const onKey = (e) => {
+      if (!isUnhandledEscape(e, ref.current)) return;
+      e.preventDefault();
+      onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);

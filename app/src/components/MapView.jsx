@@ -11,7 +11,6 @@ import {
   eventFeature,
   eventSignature,
   eventsToGeoJSON,
-  haversineKm,
   makeCircleArea,
   makeRectArea,
   oppositeCorner,
@@ -54,6 +53,13 @@ import {
 import { MAP_EXTENT } from "../lib/mapExtent";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
+import { haversineKm } from "../lib/geo";
+import { isUnhandledEscape } from "../lib/escapeKey";
+import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
+import { sheetCoversMap, stripOffset, toolbarInset } from "../lib/mapInsets";
+
+// Distance between two [lon, lat] points (the drawing code works in pairs).
+const distanceKm = (a, b) => haversineKm(a[0], a[1], b[0], b[1]);
 
 // MapLibre GL resolves its worker script relative to its own module URL at
 // runtime (via a dynamic import.meta.url template), which Vite's static
@@ -151,6 +157,7 @@ export default function MapView({
   onViewportBounds,
   onSelectEvent,
   eventsLoading = false,
+  yearPending = false, // true while the year to show is not known yet: no borders are fetched (App.jsx)
 }) {
   const year = borderYear ?? timelineYear;
   const containerRef = useRef(null);
@@ -160,6 +167,7 @@ export default function MapView({
   // id -> signature of what the map's event source holds (lib/sourceDiff.js).
   const sourceSigsRef = useRef(new Map());
   const yearRef = useRef(year);
+  const yearPendingRef = useRef(yearPending);
   const focusRef = useRef(focus);
   const propsRef = useRef({});
   const draggingRef = useRef(false);
@@ -183,6 +191,7 @@ export default function MapView({
   const [hintOpen, setHintOpen] = useState(() => !readHintDismissed());
   // Events sharing one spot, listed after a click: {point, items, total}.
   const [stackList, setStackList] = useState(null);
+  const stackOpenerRef = useRef(null); // what had focus when the list opened
   const hoverLabelRef = useRef(null);
   const compact = useMediaQuery("(max-width: 768px)");
   const landFailedRef = useRef(false);
@@ -200,6 +209,7 @@ export default function MapView({
   eventsRef.current = events;
   matchIdsRef.current = matchIds;
   yearRef.current = year;
+  yearPendingRef.current = yearPending;
   focusRef.current = focus;
   propsRef.current = {
     areaMode,
@@ -286,7 +296,8 @@ export default function MapView({
       });
       const [landResult] = await Promise.all([
         Promise.race([landPromise, sleep(1200).then(() => null)]),
-        Promise.race([fetchDecade(initialDecade), sleep(1200)]),
+        // A year still unknown (yearPending) is fetched by the effect below once known.
+        yearPendingRef.current ? null : Promise.race([fetchDecade(initialDecade), sleep(1200)]),
       ]);
       // Unmounted while the data was loading: the map is already removed.
       if (cancelled) return;
@@ -343,6 +354,9 @@ export default function MapView({
 
       const openStack = (e, features, total) => {
         setBorderPopup(null);
+        // Escape or × puts focus back where it was (closeStack).
+        const active = document.activeElement;
+        stackOpenerRef.current = active && active !== document.body ? active : null;
         setStackList({
           point: [e.point.x, e.point.y],
           items: stackItems(features),
@@ -351,9 +365,7 @@ export default function MapView({
         });
       };
 
-      map.on("click", "clusters", async (e) => {
-        if (!clickable()) return;
-        const feature = e.features[0];
+      const clickCluster = async (e, feature) => {
         const center = feature.geometry.coordinates;
         const { cluster_id: clusterId, point_count: count } = feature.properties;
         const source = map.getSource("events");
@@ -376,32 +388,50 @@ export default function MapView({
         const action = clusterClickAction({ count, expansionZoom: expansion, clusterMaxZoom: CLUSTER_MAX_ZOOM, leaves });
         if (action === "list" && leaves?.length) return openStack(e, leaves, count);
         map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 });
-      });
+      };
 
       // A dot with others drawn under it (same spot, past CLUSTER_MAX_ZOOM)
       // lists them all; a lone dot selects its event.
-      map.on("click", "unclustered-point", (e) => {
-        if (!clickable()) return;
-        const here = map.queryRenderedFeatures(e.point, { layers: ["unclustered-point"] });
+      const clickDot = (e, feature) => {
+        const here = map.queryRenderedFeatures(map.project(feature.geometry.coordinates), {
+          layers: ["unclustered-point"],
+        });
         const distinct = stackItems(here).length;
         if (distinct > 1) return openStack(e, here, distinct);
-        propsRef.current.onSelectEvent?.(e.features[0].properties.id);
-      });
-      map.on("click", "selected-point", (e) => {
-        if (!clickable()) return;
-        // Over a regular dot, the handler above already handled this click.
-        if (map.queryRenderedFeatures(e.point, { layers: ["unclustered-point"] }).length) return;
-        propsRef.current.onSelectEvent?.(e.features[0].properties.id);
-      });
+        propsRef.current.onSelectEvent?.(feature.properties.id);
+      };
 
-      // Click on a border polygon (not on a marker): show its status/note/source.
-      // A placeholder outline is described by the areas it stands for.
+      // The marker a click is on; on a touch screen also the nearest one
+      // within TAP_SLOP_PX of a tap (lib/tapTarget.js), since a finger easily
+      // misses a 12-16 px dot and would otherwise open the border under it.
+      const markerLayers = ["clusters", "unclustered-point", "selected-point"];
+      const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+      const markerAt = (point) => {
+        const toPixel = (c) => map.project(c);
+        const exact = map.queryRenderedFeatures(point, { layers: markerLayers });
+        if (exact.length || !coarse) return pickMarker(exact, point, toPixel);
+        const r = TAP_SLOP_PX;
+        const near = map.queryRenderedFeatures(
+          [
+            [point.x - r, point.y - r],
+            [point.x + r, point.y + r],
+          ],
+          { layers: markerLayers }
+        );
+        return pickMarker(near, point, toPixel);
+      };
+
+      // One click handler: a marker (see markerAt), else a border polygon,
+      // which shows its status/note/source. A placeholder outline is described
+      // by the areas it stands for.
       map.on("click", (e) => {
         if (!clickable()) return;
-        const onMarker = map.queryRenderedFeatures(e.point, {
-          layers: ["clusters", "unclustered-point", "selected-point"],
-        });
-        if (onMarker.length) return;
+        const marker = markerAt(e.point);
+        if (marker) {
+          if (marker.layer.id === "clusters") clickCluster(e, marker);
+          else clickDot(e, marker);
+          return;
+        }
         setStackList(null);
         const hits = map.queryRenderedFeatures(e.point, { layers: ["boundaries-fill"] });
         const chunk = boundaryCacheRef.current.get(decadeFloor(yearRef.current)) ?? [];
@@ -466,19 +496,38 @@ export default function MapView({
 
   // Fetch trigger: only fires when the *settled* year lands in a decade that
   // isn't cached yet. Also opportunistically warms the neighboring decades, so
-  // crossing a decade boundary while scrubbing usually finds data already there.
+  // crossing a decade boundary while scrubbing usually finds data already there;
+  // those wait until this decade is in and the map has drawn it ("idle"), so
+  // they never compete with what is on screen. Nothing is fetched while the
+  // year is still unknown (`yearPending`: an event link waiting for its event).
   useEffect(() => {
+    if (yearPending) return undefined;
     const decade = decadeFloor(debouncedYear);
-    if (!boundaryCacheRef.current.has(decade)) fetchDecade(decade);
-    const prevDecade = decade - 10;
-    const nextDecade = decade + 10;
-    if (prevDecade >= decadeFloor(MIN_YEAR) && !boundaryCacheRef.current.has(prevDecade)) {
-      prefetchBoundaryDecade(prevDecade);
-    }
-    if (nextDecade <= decadeFloor(MAX_YEAR) && !boundaryCacheRef.current.has(nextDecade)) {
-      prefetchBoundaryDecade(nextDecade);
-    }
-  }, [debouncedYear, fetchDecade]);
+    let cancelled = false;
+    let onIdle = null;
+    const prefetchNeighbours = () => {
+      if (cancelled) return;
+      const prevDecade = decade - 10;
+      const nextDecade = decade + 10;
+      if (prevDecade >= decadeFloor(MIN_YEAR) && !boundaryCacheRef.current.has(prevDecade)) {
+        prefetchBoundaryDecade(prevDecade);
+      }
+      if (nextDecade <= decadeFloor(MAX_YEAR) && !boundaryCacheRef.current.has(nextDecade)) {
+        prefetchBoundaryDecade(nextDecade);
+      }
+    };
+    fetchDecade(decade).then((ok) => {
+      const map = mapRef.current;
+      if (cancelled || !ok || !mapReady || !map) return;
+      onIdle = prefetchNeighbours;
+      map.once("idle", onIdle);
+      map.triggerRepaint(); // an already idle map fires "idle" after this frame
+    });
+    return () => {
+      cancelled = true;
+      if (onIdle) mapRef.current?.off("idle", onIdle);
+    };
+  }, [debouncedYear, fetchDecade, mapReady, yearPending]);
 
   // Apply trigger: runs against the live (non-debounced) `year` so that once a
   // decade is cached, filtering/rendering it is instant with no debounce lag.
@@ -614,7 +663,14 @@ export default function MapView({
     map.fitBounds(DEFAULT_BOUNDS, { padding: 20, duration: reducedMotion() ? 0 : 600 });
   };
   const closePopup = useCallback(() => setBorderPopup(null), []);
-  const closeStack = useCallback(() => setStackList(null), []);
+  // Closing the list (× or Escape) removes the focused card: focus goes back to
+  // what had it before (or the map itself, which MapLibre makes focusable).
+  const closeStack = useCallback(() => {
+    setStackList(null);
+    const opener = stackOpenerRef.current;
+    stackOpenerRef.current = null;
+    (opener?.isConnected ? opener : mapRef.current?.getCanvas())?.focus({ preventScroll: true });
+  }, []);
   const selectFromStack = (id) => {
     setStackList(null);
     onSelectEvent?.(id);
@@ -722,8 +778,14 @@ export default function MapView({
     const w = map.getContainer().clientWidth;
     const target = 5 - (w < 700 ? 0.5 : 0) - (w < 360 ? 0.5 : 0) - (ev?.location_quality === "approximate" ? 0.5 : 0);
     const zoom = Math.min(Math.max(map.getZoom(), target), target + 2);
-    const opts = { center: [focus.lon, focus.lat], zoom };
-    if (reducedMotion()) map.jumpTo(opts);
+    // On phones the event's sheet covers the map but its top strip: the place
+    // goes in the middle of that strip, below the toolbar (lib/mapInsets.js),
+    // not under the sheet.
+    const box = map.getContainer();
+    const offset = stripOffset(box.clientHeight, sheetCoversMap(), toolbarInset(box));
+    const opts = { center: [focus.lon, focus.lat], zoom, offset };
+    // easeTo with no duration, not jumpTo, which has no `offset`.
+    if (reducedMotion()) map.easeTo({ ...opts, duration: 0 });
     else map.flyTo(opts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus?.nonce, mapReady]);
@@ -748,11 +810,13 @@ export default function MapView({
     applyInteractivity(mapRef.current, areaMode, !!area);
   }, [areaMode, area, mapReady]);
 
-  // Escape leaves draw mode.
+  // Escape leaves draw mode, unless something else took that Escape (lib/escapeKey.js).
   useEffect(() => {
     if (areaMode === "off") return;
     const onKey = (e) => {
-      if (e.key === "Escape") propsRef.current.onAreaModeChange?.("off");
+      if (!isUnhandledEscape(e)) return;
+      e.preventDefault();
+      propsRef.current.onAreaModeChange?.("off");
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -791,9 +855,9 @@ export default function MapView({
         case "rect":
           return makeRectArea(d.start, ll);
         case "circle":
-          return makeCircleArea(d.start, haversineKm(d.start, ll));
+          return makeCircleArea(d.start, distanceKm(d.start, ll));
         case "radius":
-          return makeCircleArea(d.area0.center, Math.max(0.1, haversineKm(d.area0.center, ll)));
+          return makeCircleArea(d.area0.center, Math.max(0.1, distanceKm(d.area0.center, ll)));
         case "center":
           return makeCircleArea(ll, d.area0.radiusKm);
         default:

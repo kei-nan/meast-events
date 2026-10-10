@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { parseUrlState, serializeUrlState, urlWriteMode } from "../lib/urlState";
+import { entryBeforePush, parseUrlState, serializeUrlState, urlWriteMode } from "../lib/urlState";
 
 const REPLACE_DEBOUNCE_MS = 400;
 
@@ -26,16 +26,28 @@ export default function useUrlState(state, onNavigate) {
     navigateRef.current = onNavigate;
   }, [onNavigate]);
 
+  // The latest state, for the write below (updated first: effects run in order).
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  });
+
   useEffect(() => {
     const mode = urlWriteMode(lastRef.current, serialized, { replace: replaceNextRef.current });
     if (!mode) return;
-    const write = (method) => {
-      const url = `${window.location.pathname}${serialized}${window.location.hash}`;
+    const write = (method, search = serialized) => {
+      const url = `${window.location.pathname}${search}${window.location.hash}`;
       window.history[method](null, "", url);
-      lastRef.current = serialized;
+      lastRef.current = search;
     };
     if (mode !== "debounce") {
       replaceNextRef.current = false;
+      if (mode === "push") {
+        // A debounced replace still pending was cancelled by this change: the
+        // current entry gets it first (lib/urlState.js entryBeforePush).
+        const carried = entryBeforePush(lastRef.current, stateRef.current);
+        if (carried != null) write("replaceState", carried);
+      }
       write(mode === "push" ? "pushState" : "replaceState");
       return;
     }
