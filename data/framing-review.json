@@ -6106,6 +6106,56 @@
       "text_retrieved_at": "2026-10-06",
       "fairness": null,
       "wording": []
+    },
+    "june-2025-iranian-strikes-on-israel": {
+      "text_sha1": "eaf0091cac84",
+      "text_retrieved_at": "2026-09-26",
+      "fairness": null,
+      "wording": []
+    },
+    "ein-hashlosha-massacre": {
+      "text_sha1": "aadde53fa18e",
+      "text_retrieved_at": "2026-10-01",
+      "fairness": {
+        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\", while the Hannibal Directive deaths are stated as fact. \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the summary no longer includes the aim given in an earlier version, that the attack was intended to induce a regional conflict. It also notes that 44 governments called the attack terrorism.",
+        "phrases": [
+          "illegal Israeli settlements",
+          "The day was labelled the bloodiest in Israel's history",
+          "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
+        ]
+      },
+      "wording": []
+    },
+    "israeli-invasion-of-the-gaza-strip": {
+      "text_sha1": "dd2e5059c1cf",
+      "text_retrieved_at": "2026-10-01",
+      "fairness": {
+        "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included."
+      },
+      "wording": []
+    },
+    "attack-on-the-united-states-embassy-in-baghdad": {
+      "text_sha1": "c4dd658de9a2",
+      "text_retrieved_at": "2026-10-06",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "an extremist Shi'ite militia",
+          "note": "Uses \"extremist\" for Kata'ib Hezbollah in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "operation-guardian-of-the-walls": {
+      "text_sha1": "9dfbd546e35e",
+      "text_retrieved_at": "2026-09-26",
+      "fairness": {
+        "note": "Describes Jerusalem Day as \"celebrating the occupation of East Jerusalem\" as fact (Israelis call it reunification). Casualties, rockets and the Hamas ultimatum are all reported.",
+        "phrases": [
+          "celebrating the occupation of East Jerusalem"
+        ]
+      },
+      "wording": []
     }
   }
 }

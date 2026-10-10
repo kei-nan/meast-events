@@ -7,6 +7,7 @@
 import { categoryLabel } from "../src/lib/categoryLabels.js";
 import { formatEventDate } from "../src/lib/eventDate.js";
 import { markSegments } from "../src/lib/highlights.js";
+import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
 import { isValidEventId } from "../src/lib/urlState.js";
@@ -271,6 +272,7 @@ export function renderEventPage(event) {
     `<p class="actions"><a class="open-map" href="${escapeHtml(mapPath(event.id))}">Open on the map</a>${
       wiki ? ` <a class="wiki" href="${escapeHtml(wiki)}" rel="noreferrer">Read on Wikipedia</a>` : ""
     }</p>`,
+    event.text_from_article && `<p class="note" role="note">${escapeHtml(otherArticleNote(event.text_from_article))}</p>`,
     renderPointer(review),
     `<div class="extract">${paragraphs.length ? paragraphs.map((p) => renderParagraph(p, review?.highlights)).join("\n") : "<p>No summary available.</p>"}</div>`,
     retrieved && `<p class="asof">Text retrieved ${escapeHtml(retrieved)} from Wikipedia.</p>`,

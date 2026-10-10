@@ -133,14 +133,30 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
    are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the hand-picked
    events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`: 23 events on 2026-09-29, 5 more from the classes added on 2026-10-06).
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
-4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**.
+4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**, or an English
+   Wikipedia title that redirects into one (see "Events without an article of their own" below).
 5. **Basic integrity.** Wikipedia returned a summary with a non-empty extract.
 
 Since data shape v2.1 two former conditions are **gone**: events **without real coordinates** are included (with `location_quality: "none"`,
 `coordinates: null`, no map marker, listed and searchable), and events whose Wikidata **dates are contradictory** (end before start) are included
 with the dates as Wikidata gives them and a `date_flags` reason. Nothing is dropped for either reason any more. Events already in the curated
-`data/events.json` are not re-proposed. Five proposed events were left out by review as redirect duplicates of an event already present
-(`data/proposed-exclusions.json`, each with its reason; counted 2026-10-10).
+`data/events.json` are not re-proposed.
+
+### Events without an article of their own
+
+Some Wikidata event items have no English Wikipedia article of their own: their English Wikipedia link is a redirect into a larger
+article (often a section of it) that belongs to another Wikidata item. They meet rule 4 through that link and **are included, all of them**
+(owner's rule, 2026-10-10). Before, the second such event to reach a shared article was left out as a duplicate of the first, so which of
+two events stayed depended only on the order they were merged in (for example "June 2025 Israeli strikes on Iran" was in and "June 2025
+Iranian strikes on Israel" was out; both redirect into "List of attacks during the Twelve-Day War").
+
+- Their text is the lead of the article the title leads to, shown as Wikipedia gives it, and their framing review is that text's review.
+  When another event already shows that article, both show the same text.
+- The site says so above the text: "This event has no Wikipedia article of its own: its Wikipedia title leads to the article "…", so the
+  text below is that article's and covers more than this event." (`app/src/lib/otherArticle.js`: `resolved_qid` differs from `wikidata_qid`.)
+- The map pin is the event's own Wikidata location only (see "Location quality"), never the larger article's.
+- The five that had been excluded were added on 2026-10-10 (`docs/data-fixes.md` F12); `data/proposed-exclusions.json` no longer lists
+  redirect duplicates. As of 2026-10-10, 8 curated events have no article of their own.
 
 ### What "10 sitelinks" really counts
 
@@ -295,7 +311,7 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 - `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (74 events on 2026-10-10, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
-  Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 376 of the 811 curated events and 185 of the 254 proposed events
+  Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 378 of the 816 curated events and 186 of the 254 proposed events
   (counted from `data/events.json` and `data/events.proposed.json`).
 - Validation (`scripts/lib/validate.js`): coordinates are required unless `location_quality` is `none` (then they must be `null`), and
   `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override` / `redirect_target`, `approximate` = `country-fallback:<tracked country>`,
