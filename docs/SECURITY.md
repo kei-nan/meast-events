@@ -111,14 +111,13 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
 Caching (same file). "Immutable" below means `public, max-age=31536000,
 immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
 
-- `/assets/*`: 1 h by default. Immutable for the Vite content-hashed names
-  that have a rule: `index-*` (app JS/CSS), `MapView-*` (the lazy-loaded map
-  chunk), `inter-*` and `spectral-*` (web fonts), and `maplibre-gl-*`. The
-  last covers the folder `/assets/maplibre-gl-<version>/` with the two
-  unhashed MapLibre files (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`,
-  see `vite.config.js`), whose cache key is the version in the folder name.
-  A hashed chunk without a rule (the build currently also emits a
-  `dist-<hash>.js` chunk) gets the 1 h default: slower to cache, never stale.
+- `/assets/*`: immutable, one rule. Every file there is a Vite
+  content-hashed name, or one of the two unhashed MapLibre files
+  (`maplibre-gl-worker.mjs`, `maplibre-gl-shared.mjs`, see `vite.config.js`)
+  in the folder `/assets/maplibre-gl-<version>/`, whose cache key is the
+  version in the folder name. `app/scripts/check-dist.mjs` fails the build if
+  any other file appears under `assets/`, so nothing unhashed can get the
+  immutable header.
 - `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
   `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,
   `land-far.json`, `selection-funnel.json`, `framing-review.json`).

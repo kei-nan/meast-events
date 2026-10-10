@@ -1,10 +1,14 @@
 name: CI
 
-# Build verification only - this does NOT deploy anything. Deployment is
-# handled by the hosting provider's own git integration (see DEPLOYMENT.md
-# at the repo root): once the repo is connected there, every push to main
-# that passes this workflow also triggers a new deploy on the host's side,
-# and every pull request gets its own preview deploy automatically.
+# Build verification only - this does NOT deploy anything, and it does NOT
+# gate deploys. Cloudflare Workers Builds (see DEPLOYMENT.md at the repo root)
+# deploys every push to main on its own, whether or not this workflow passed,
+# and builds a preview for every other branch. What stops a bad deploy is the
+# build itself: `npm run build` in app/ fails (so Cloudflare does not deploy)
+# when the event data is invalid or the built dist/ fails check-dist.mjs. The
+# other jobs here (data pipeline tests, lint, border checks, audit) only block
+# a merge if they are required status checks on main (DEPLOYMENT.md,
+# "Recommended repository settings").
 on:
   push:
     branches: [main]
@@ -50,15 +54,15 @@ jobs:
       - name: Node version files agree
         run: cmp .nvmrc app/.nvmrc
 
-      - name: Build
+      # The same command Workers Builds runs. Its npm hooks validate
+      # data/events.json first (prebuild: ../scripts/validate-events.js) and
+      # check the finished dist/ last (postbuild: scripts/check-dist.mjs: the
+      # content-hashed events folder named by dataVersion.js, consistent
+      # ids/meta, every asset index.html loads, hashed names under assets/),
+      # so a failure here also fails the deploy.
+      - name: Build (validates data before, checks dist/ after)
         working-directory: app
         run: npm run build
-
-      # dist/ holds the content-hashed events file named by the generated
-      # dataVersion.js, consistent ids/meta, and every asset index.html loads.
-      - name: Check dist
-        working-directory: app
-        run: node scripts/check-dist.mjs
 
   data:
     name: Validate event data
@@ -74,8 +78,14 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      # Structural checks only (schema, ids, dates, coordinates, extracts) on
-      # data/events.json and data/events.proposed.json. No dependencies, no network.
+      # Installed first so every step below has the geometry library (turf):
+      # validate-events' pin-in-country check and the geometry tests skip without it.
+      - name: Install repo-root dependencies (geometry library, oxlint)
+        run: npm ci
+
+      # Schema, ids, dates, coordinates and extracts on data/events.json and
+      # data/events.proposed.json; warnings (e.g. a pin outside its tagged
+      # countries) do not fail. No network.
       - name: Validate events
         run: node scripts/validate-events.js
 
@@ -83,17 +93,20 @@ jobs:
       - name: Unit tests (scripts/lib)
         run: npm test
 
-      # Borders vs independent Wikidata reference points (border crossings, tripoints) in
-      # data/border-reference-points.json. Fails if any point is now more than 0.25 km
-      # further from the drawn border than in data/border-check-baseline.json, for the
-      # years checked there. No network. Report: docs/border-verification.md.
-      - name: Install repo-root dependencies (geometry library)
-        run: npm ci
+      # oxlint over scripts/ (.oxlintrc.json at the repo root). import/named is an
+      # error: a named import that the target module does not export fails here
+      # instead of at run time in the monthly refresh. Warnings do not fail.
+      - name: Lint (scripts/)
+        run: npm run lint
       # data/boundaries.json: required properties, per-name year gaps, overlaps between shapes
       # shown in the same year (with their unit tests, which need the geometry library).
       # Fails only on structural errors; gaps and unexpected overlaps are listed as warnings.
       - name: Validate boundaries
         run: npm run validate-boundaries
+      # Borders vs independent Wikidata reference points (border crossings, tripoints) in
+      # data/border-reference-points.json. Fails if any point is now more than 0.25 km
+      # further from the drawn border than in data/border-check-baseline.json, for the
+      # years checked there. No network. Report: docs/border-verification.md.
       - name: Border check against reference points
         run: node scripts/verify-borders.js --check
 

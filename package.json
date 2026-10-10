@@ -8,11 +8,13 @@
   },
   "scripts": {
     "test": "node --test \"scripts/lib/*.test.js\"",
+    "lint": "oxlint scripts",
     "validate-boundaries": "node --test scripts/lib/boundary-checks.test.js && node scripts/validate-boundaries.js",
     "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },
   "devDependencies": {
     "@turf/turf": "^7.4.0",
+    "oxlint": "1.87.0",
     "shapefile": "^0.6.6"
   }
 }

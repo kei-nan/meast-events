@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { FontaineTransform } from 'fontaine'
 import { defineConfig } from 'vite'
@@ -87,10 +88,22 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      // Subset web fonts and their @font-face stylesheet, written by
+      // scripts/subset-fonts.mjs (prebuild/predev) and imported by src/main.jsx.
+      '@subset-fonts': fileURLToPath(new URL('./node_modules/.cache/subset-fonts', import.meta.url)),
+    },
+  },
   optimizeDeps: {
     exclude: ['maplibre-gl'],
   },
   build: {
+    // Never inline a font as a data: URL. Subsetting (scripts/subset-fonts.mjs) makes
+    // some faces smaller than Vite's 4 KB default limit, and an inlined face is
+    // downloaded with the main stylesheet on every first visit even when no character
+    // on the page needs it; as a file it is fetched only if its unicode-range is used.
+    assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
     rollupOptions: {
       output: {
         assetFileNames: (assetInfo) => {

@@ -23,35 +23,17 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # --- caching ----------------------------------------------------------------
-# /assets/*: Vite content-hashes everything EXCEPT the two MapLibre files
-# (vite.config.js UNHASHED_ASSET_NAMES: maplibre-gl-worker.mjs and
-# maplibre-gl-shared.mjs, whose names the worker imports at runtime). Those live
+# /assets/*: every file has a content-addressed URL, so all of it is immutable.
+# Vite names emitted files <name>-<content hash>.<ext>; the only exceptions are
+# the two MapLibre files (vite.config.js UNHASHED_ASSET_NAMES: maplibre-gl-worker.mjs
+# and maplibre-gl-shared.mjs, whose names the worker imports at runtime). Those live
 # in assets/maplibre-gl-<version>/, so the folder name is their cache key and a
-# MapLibre upgrade gets a new URL. The default here is a short revalidating
-# cache; hashed names and the versioned MapLibre folder opt in to immutable.
+# MapLibre upgrade gets a new URL. scripts/check-dist.mjs (run by npm run build)
+# fails the build if any other file under dist/assets/ lacks a hash, so an
+# unhashed file can never be served with this header.
+# No other rule below matches /assets/, so nothing is comma-joined onto this
+# Cache-Control (the /* rule above sets no Cache-Control).
 /assets/*
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
-
-/assets/index-*
-  ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
-
-# The lazy-loaded map chunk (App.jsx), content-hashed like index-*.
-/assets/MapView-*
-  ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
-
-# Self-hosted web fonts (src/main.jsx), content-hashed by Vite.
-/assets/inter-*
-  ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
-
-/assets/spectral-*
-  ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
-
-/assets/maplibre-gl-*
-  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
 # /glyphs/*: map label glyphs (Open Sans Semibold, MapView.jsx BASE_STYLE).

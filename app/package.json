@@ -8,11 +8,11 @@
   },
   "scripts": {
     "split-data": "node scripts/split-data.mjs",
-    "predev": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
-    "prebuild": "node scripts/split-data.mjs && node scripts/build-search-index.mjs",
+    "predev": "node scripts/split-data.mjs && node scripts/subset-fonts.mjs && node scripts/build-search-index.mjs",
+    "prebuild": "node ../scripts/validate-events.js ../data/events.json && node scripts/split-data.mjs && node scripts/subset-fonts.mjs && node scripts/build-search-index.mjs",
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node scripts/build-event-pages.mjs",
+    "postbuild": "node scripts/build-event-pages.mjs && node scripts/check-dist.mjs",
     "lint": "oxlint",
     "test": "node --test \"src/lib/*.test.js\" \"scripts/*.test.mjs\"",
     "preview": "vite preview"
@@ -32,6 +32,7 @@
     "fontaine": "^1.0.0",
     "oxlint": "^1.87.0",
     "pagefind": "^1.5.2",
+    "subset-font": "^2.9.0",
     "vite": "^8.3.3",
     "wrangler": "4.149.0"
   }
