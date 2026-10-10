@@ -15,6 +15,15 @@ import { readFile, writeFile } from "node:fs/promises";
 import { CORRECTIONS } from "./boundary-corrections.js";
 import * as turf from "@turf/turf";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
+import { pathToFileURL } from "node:url";
+import { resolve } from "node:path";
+
+// CLI (both optional; for checking a change without touching the committed files):
+//   --raw-dir=DIR   read cshapes-2.0.geojson / ne10-countries.geojson from DIR (default data/raw)
+//   --out=FILE      write the result to FILE instead of data/boundaries.json
+const argVal = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=").slice(1).join("=");
+const RAW_DIR = argVal("raw-dir") ? pathToFileURL(resolve(argVal("raw-dir")) + "/") : new URL("../data/raw/", import.meta.url);
+const OUT = argVal("out") ? pathToFileURL(resolve(argVal("out"))) : new URL("../data/boundaries.json", import.meta.url);
 
 const CSHAPES_CITATION = "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)";
 
@@ -118,18 +127,21 @@ function resolveProperties(cntry_name, intervalStartYear) {
   );
   if (flag) {
     if (flag.name) name = flag.name;
-    status = flag.status;
+    // A flag without a status (e.g. Egypt 1979-1981, a note only) keeps the status it had;
+    // assigning flag.status would make it undefined and drop the key from the output.
+    if ("status" in flag) status = flag.status;
     note = flag.note;
     source = `${CSHAPES_CITATION} geometry; ${flag.source}`;
   }
 
-  return { name, status, note, source, geometryKey };
+  // Every feature carries status and note keys (null when there is none); the validator warns otherwise.
+  return { name, status: status ?? null, note: note ?? null, source, geometryKey };
 }
 
 async function main() {
-  const sourcePath = new URL("../data/raw/cshapes-2.0.geojson", import.meta.url);
+  const sourcePath = new URL("cshapes-2.0.geojson", RAW_DIR);
   const geometryPath = new URL("../data/corrections-geometry.json", import.meta.url);
-  const outPath = new URL("../data/boundaries.json", import.meta.url);
+  const outPath = OUT;
 
   const raw = JSON.parse(await readFile(sourcePath, "utf-8"));
   const correctionsGeometry = JSON.parse(await readFile(geometryPath, "utf-8"));
@@ -193,7 +205,7 @@ async function main() {
   // several corrections-geometry shapes), loaded only if a reshape asks for them.
   let ne10 = null;
   const ne10Land = (area) => {
-    ne10 ??= JSON.parse(readFileSync(new URL("../data/raw/ne10-countries.geojson", import.meta.url), "utf-8"));
+    ne10 ??= JSON.parse(readFileSync(new URL("ne10-countries.geojson", RAW_DIR), "utf-8"));
     return area ? ne10.features.filter((f) => turf.booleanIntersects(f, area)).map((f) => asFeature(f.geometry)) : [];
   };
   for (const r of CORRECTIONS.filter((c) => c.type === "reshape")) {
@@ -242,11 +254,11 @@ async function main() {
         name: c.name,
         start_year: c.start_year,
         end_year: c.end_year,
-        status: c.status,
+        status: c.status ?? null,
         source: fromCshapes
           ? `${CSHAPES_CITATION} geometry (its "${c.geometry.slice("cshapes:".length)}" record); ${c.source}`
           : `Not in CShapes; ${c.source}${c.geometry_source ? `; ${c.geometry_source}` : ""}`,
-        note: c.note,
+        note: c.note ?? null,
       },
       geometry,
     });
@@ -264,7 +276,7 @@ async function main() {
   };
 
   await writeFile(outPath, stringifyFeatureCollection(out));
-  console.log(`Wrote ${fitted.length} boundary features to data/boundaries.json`);
+  console.log(`Wrote ${fitted.length} boundary features to ${argVal("out") ?? "data/boundaries.json"}`);
 
   const modified = fitted.filter((f) => f.properties.note);
   console.log(`${modified.length} features carry a correction:`);
@@ -282,6 +294,7 @@ async function main() {
 const asFeature = (geometry) => ({ type: "Feature", properties: {}, geometry });
 const fc = (...fs) => turf.featureCollection(fs);
 const activeIn = (f, y) => f.properties.start_year <= y && y <= f.properties.end_year;
+const bboxesTouch = (a, b) => !(a[0] > b[2] || b[0] > a[2] || a[1] > b[3] || b[1] > a[3]);
 
 // Detached pieces of a clipped shape smaller than this, lying within maxGapKm of the
 // overlay, are leftovers of the two sources disagreeing, not real territory.
@@ -434,6 +447,19 @@ function applyFits(features, land) {
         const cuts = new Set([lo]);
         for (const o of overlays) for (const y of [o.properties.start_year, o.properties.end_year + 1]) if (y > lo && y <= hi) cuts.add(y);
         for (const y of [spec.fromYear, spec.toYear != null ? spec.toYear + 1 : null]) if (y != null && y > lo && y <= hi) cuts.add(y);
+        // "snap" and "between" also depend on the OTHER shapes near the overlay (the sliver may
+        // only take land nobody else covers), and `others` is read at each piece's start year.
+        // So the neighbour is also cut where such a shape appears or ends: otherwise a piece
+        // fitted before that shape exists keeps land the shape later covers (Saudi Arabia's
+        // 1935-1969 snap kept 63.6 km2 that CShapes' Kuwait, from 1961, also covers).
+        if (spec.mode === "snap" || spec.between) {
+          const reach = turf.bbox(turf.buffer(fc(...overlays), fit.maxGapKm * 2));
+          for (const f of out) {
+            if (f === n || f.properties.name === spec.name || overlays.includes(f)) continue;
+            if (!bboxesTouch(turf.bbox(f), reach)) continue;
+            for (const y of [f.properties.start_year, f.properties.end_year + 1]) if (y > lo && y <= hi) cuts.add(y);
+          }
+        }
         const starts = [...cuts].sort((a, b) => a - b);
         starts.forEach((s, i) => {
           const e = i + 1 < starts.length ? starts[i + 1] - 1 : hi;

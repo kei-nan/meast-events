@@ -18,7 +18,10 @@ const seed = await read("seed-events.json");
 const exclusions = await read("proposed-exclusions.json");
 
 const MIN = INCLUSION_MIN_SITELINKS;
-const generatedAt = new Date().toISOString();
+// Dated by its inputs, not the wall clock, so re-running on unchanged data gives an identical
+// file: the newest retrieval time among the enriched candidates and the curated summaries.
+const dataAsOf =
+  [...enriched.map((e) => e.retrieved_at), ...curated.map((e) => e.extract_retrieved_at)].filter(Boolean).sort().at(-1) ?? null;
 const inc = (o, k, n = 1) => (o[k] = (o[k] ?? 0) + n);
 const group = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
@@ -61,7 +64,6 @@ const noEn = candidates.filter((c) => !c.has_en_wikipedia);
 const lt10 = candidates.filter((c) => c.has_en_wikipedia && c.sitelinks < MIN);
 const pass = candidates.filter((c) => c.has_en_wikipedia && c.sitelinks >= MIN);
 const passAlready = pass.filter((c) => c.already_curated);
-const passNew = pass.filter((c) => !c.already_curated);
 const curatedQids = new Set(curated.map((e) => e.wikidata_qid));
 const seedCount = curated.filter((e) => e.sitelinks === undefined).length; // legacy curated events carry no discovery sitelinks
 const candQids = new Set(candidates.map((c) => c.wikidata_qid));
@@ -92,7 +94,7 @@ const stages = [
 ];
 
 const funnel = {
-  generated_at: generatedAt,
+  data_as_of: dataAsOf,
   generated_by: "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   rule: `Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= ${MIN} sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.`,
   stages,

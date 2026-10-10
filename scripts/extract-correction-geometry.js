@@ -153,7 +153,6 @@ const MARKER_H = [dms(47, 42, 25.153), dms(28, 31, 26.526)];
 // 'Ayn al 'Abd, the one named point on the zone's southern side. GeoNames 108889.
 const AYN_AL_ABD = [48.2715, 28.2344];
 const RAS_AL_QULAYAH = [48.2917, 28.875]; // GeoNames 285242 (Ra's al Qulay'ah / Qali'ah)
-const RAS_AL_MISHAB = [48.6344, 28.1922]; // GeoNames 102585 (Ra's al Mish'ab)
 const SEAWARD_LON = 48.9; // east of any coastline here; trimmed off against Natural Earth
 
 // The 1969 dividing line, Article 1 of the Supplementary Agreement of 18 December 1969 as

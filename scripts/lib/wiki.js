@@ -85,6 +85,9 @@ export async function fetchCategories(title) {
   return (page?.categories ?? []).map((c) => c.title.replace(/^Category:/, ""));
 }
 
+// English labels of many items. A failed chunk throws (as fetchLabelsCached in wd-entities.js
+// does): skipping it would leave those labels null, and a part_of note would then show a bare
+// QID with nothing to say the label was not fetched.
 export async function fetchLabels(qids) {
   const out = {};
   for (let i = 0; i < qids.length; i += 50) {
@@ -93,7 +96,7 @@ export async function fetchLabels(qids) {
       "https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels&languages=en&format=json&ids=" +
       chunk.join("|");
     const res = await politeFetch(url);
-    if (!res.ok) continue;
+    if (!res.ok) throw new Error(`labels HTTP ${res.status}`);
     const data = await res.json();
     for (const [q, ent] of Object.entries(data.entities ?? {})) out[q] = ent.labels?.en?.value ?? null;
   }

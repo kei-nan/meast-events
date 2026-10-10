@@ -115,6 +115,73 @@ export function findOverlaps(features, { turf, minKm2 = OVERLAP_MIN_KM2 } = {}) 
   return { overlaps, slivers };
 }
 
+// ---- self-intersections ----
+//
+// A PROPER crossing: two segments of one ring whose interiors cross at a single point (each
+// segment's endpoints strictly on opposite sides of the other). Rings that only touch at a
+// vertex, segments that share an endpoint, and collinear overlaps are not counted. Such a ring
+// is invalid GeoJSON (a "bow tie"); renderers and polygon operations may fill or clip it
+// unpredictably. Pure arithmetic, no turf: runs in the plain-Node test step too.
+const orient = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+
+export function ringCrossings(ring) {
+  const n = ring.length - 1; // segments; the ring is closed (last position = first)
+  if (n < 4) return [];
+  const segs = [];
+  for (let i = 0; i < n; i++) {
+    const a = ring[i];
+    const b = ring[i + 1];
+    segs.push({ i, a, b, minX: Math.min(a[0], b[0]), maxX: Math.max(a[0], b[0]), minY: Math.min(a[1], b[1]), maxY: Math.max(a[1], b[1]) });
+  }
+  // Sweep along x: only segments whose x-ranges overlap are compared.
+  const order = [...segs].sort((p, q) => p.minX - q.minX);
+  const out = [];
+  for (let k = 0; k < order.length; k++) {
+    const s = order[k];
+    for (let m = k + 1; m < order.length && order[m].minX <= s.maxX; m++) {
+      const t = order[m];
+      if (t.minY > s.maxY || s.minY > t.maxY) continue;
+      const [lo, hi] = s.i < t.i ? [s, t] : [t, s];
+      if (hi.i - lo.i === 1 || (lo.i === 0 && hi.i === n - 1)) continue; // neighbours share a vertex
+      const d1 = orient(lo.a, lo.b, hi.a);
+      const d2 = orient(lo.a, lo.b, hi.b);
+      const d3 = orient(hi.a, hi.b, lo.a);
+      const d4 = orient(hi.a, hi.b, lo.b);
+      if (d1 * d2 < 0 && d3 * d4 < 0) {
+        const u = d1 / (d1 - d2); // where hi crosses lo's line, along hi
+        const at = [hi.a[0] + u * (hi.b[0] - hi.a[0]), hi.a[1] + u * (hi.b[1] - hi.a[1])];
+        out.push({ segments: [lo.i, hi.i], at });
+      }
+    }
+  }
+  return out.sort((p, q) => p.segments[0] - q.segments[0] || p.segments[1] - q.segments[1]);
+}
+
+// Every proper self-crossing per ring of every feature: [{ feature, crossings: [{ polygon,
+// ring, segments, at }] }] (features without any are left out).
+export function findSelfIntersections(features) {
+  const result = [];
+  for (const f of features) {
+    const g = f?.geometry;
+    if (!g || !["Polygon", "MultiPolygon"].includes(g.type)) continue;
+    const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+    const crossings = [];
+    polys.forEach((rings, p) => rings.forEach((ring, r) => {
+      for (const c of ringCrossings(ring)) crossings.push({ polygon: p, ring: r, ...c });
+    }));
+    if (crossings.length) result.push({ feature: f, crossings });
+  }
+  return result;
+}
+
+const round6 = (v) => Math.round(v * 1e6) / 1e6;
+export function selfIntersectionWarning({ feature, crossings }) {
+  const where = crossings
+    .map((c) => `polygon ${c.polygon} ring ${c.ring}${c.ring === 0 ? " (outer)" : " (hole)"} segments ${c.segments[0]}/${c.segments[1]} near (${round6(c.at[0])}, ${round6(c.at[1])})`)
+    .join("; ");
+  return `self-intersection: ${label(feature.properties)}: ${crossings.length} ring crossing(s): ${where}`;
+}
+
 // opts.turf: the @turf/turf module; without it the overlap check is skipped (overlaps: null).
 export function checkBoundaries(geojson, opts = {}) {
   if (geojson?.type !== "FeatureCollection" || !Array.isArray(geojson.features)) {
@@ -125,6 +192,7 @@ export function checkBoundaries(geojson, opts = {}) {
   const cont = checkNameContinuity(features);
   const errors = [...props.errors, ...cont.errors];
   const warnings = [...props.warnings, ...cont.warnings];
+  if (!props.errors.length) for (const s of findSelfIntersections(features)) warnings.push(selfIntersectionWarning(s));
   // Overlap geometry needs valid features; skip it when the structure is already broken.
   if (errors.length || !opts.turf) return { errors, warnings, overlaps: null, slivers: 0 };
   const { overlaps, slivers } = findOverlaps(features, opts);

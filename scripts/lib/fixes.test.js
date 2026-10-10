@@ -11,6 +11,31 @@ test("applyDataFix F7: October 7 attacks start = Wikidata P580, end untouched", 
   assert.match(ev.review_reasons[0], /^data_fix F7:/);
 });
 
+test("applyDataFix F11: a borrowed pin becomes the event's own P625 and its distance flag is recomputed", () => {
+  const ev = {
+    id: "operation-marg-bar-sarmachar", wikidata_qid: "Q124309366", countries: ["Iran"],
+    coordinates: { lat: 27.16666667, lon: 64.26666667 }, coordinate_source: "wikipedia", location_quality: "precise",
+    needs_manual_coordinates: false,
+    review_reasons: ["coordinate_far_from_countries: point is 1544 km from the nearest tagged country's reference point (Iran)"],
+  };
+  assert.deepEqual(applyDataFix(ev), ["coordinates", "coordinate_source"]);
+  assert.deepEqual(ev.coordinates, { lat: 27.370833333333334, lon: 62.3325 });
+  assert.equal(ev.coordinate_source, "wikidata");
+  assert.equal(ev.review_reasons.some((r) => r.startsWith("coordinate_far_from_countries")), false);
+  assert.match(ev.review_reasons.at(-1), /^data_fix F11:/);
+});
+
+test("applyDataFix F11: no own location means no pin", () => {
+  const ev = {
+    id: "operation-guardian-of-the-walls", wikidata_qid: "Q106786309", countries: ["Israel/Palestine"],
+    coordinates: { lat: 31, lon: 35 }, coordinate_source: "wikidata", location_quality: "precise", needs_manual_coordinates: false,
+  };
+  applyDataFix(ev);
+  assert.equal(ev.coordinates, null);
+  assert.equal(ev.coordinate_source, null);
+  assert.equal(ev.location_quality, "none");
+});
+
 test("keptDatePrecision: precision of the date actually kept, not of a discarded one", () => {
   // 1948 Arab-Israeli War: decade-precision P585 "1940" was replaced by P580 1948-05-15
   const war = { p585: [{ time: "1940-00-00", precision: 8 }], p580: [{ time: "1948-05-15", precision: 11 }] };

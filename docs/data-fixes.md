@@ -226,3 +226,24 @@ put them outside the tracked set; the validator now rejects any event without a 
 - In each, Wikipedia and Wikidata's P580 agree on the start day against our record. -> `date_start` = P580 in `data/events.proposed.json`
   (ledger entry F10); `date_precision` follows the kept date (day); the `month_precision_day_in_lead` flag is removed where it was set.
 - Not changed: the G20 summit's `date_end` (Wikidata P582 22 November, infobox 23 November): the sources differ, so it stays as Wikidata gives it.
+
+## F11 - pins that were another item's location (owner's rule: an event is pinned only at its own location)
+
+- Found by the "coordinates are borrowed" check (2026-10-09). In each case the event's Wikipedia title resolves to the article of a
+  **different** Wikidata item (`resolved_qid`), and `scripts/enrich-candidates.js` used that article's coordinates (or that item's `P625`).
+- Rule (owner's decision, 2026-10-10): the pin is the event item's **own** Wikidata `P625`; when it has none, the event has no location
+  (`location_quality: none`), like any other event without coordinates. `enrich-candidates.js` now applies this to new candidates:
+  a title that resolves to another item no longer contributes coordinates, and the other item's `P625` is never used.
+- Evidence: Wikidata `P625` of both items, fetched live 2026-10-10 (`wbgetentities`, claims):
+
+| Event (QID) | File | Stored pin, from | Event's own P625 | Fix |
+|---|---|---|---|---|
+| Operation Marg Bar Sarmachar (Q124309366) | curated | 27.1667, 64.2667 (Pakistan): article "2024 Iranian missile strikes in Pakistan" (Q124306685) | 27.370833, 62.3325 (Iran) | pin moved to the own P625 |
+| Musa Dagh Resistance (Q19831524) | curated | 36.25833333, 35.90361111: article "Musa Dagh" (the mountain, Q1953975) | 36.258333, 35.903611 | own P625 (same place); source `wikidata` |
+| Attack on the United States embassy in Baghdad (Q80438042) | proposed | 33.299, 44.396: article "December 2019 United States airstrikes in Iraq and Syria" (Q26847124) | 33.299, 44.396 | same point; source `wikidata` |
+| Operation Guardian of the Walls (Q106786309) | proposed | 31, 35: `P625` of Q106775117 (2021 Israel–Palestine crisis) | none | no location |
+
+- Checked and unchanged: `israeli-invasion-of-the-gaza-strip` (Q123036458) and `ein-hashlosha-massacre` (Q123027684), whose titles also
+  resolve to other items, store their own `P625`.
+- Ledger entry F11 (`scripts/lib/fixes.js`). When a fix moves a pin, the `coordinate_far_from_countries` flag is recomputed from the new
+  point (Marg Bar Sarmachar's "1544 km from Iran" flag no longer applies).

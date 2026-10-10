@@ -5,22 +5,28 @@
 //   node scripts/merge-proposed.js --skip-duplicate-hints
 //                                                  leave out proposed events that carry a possible_duplicates hint
 //                                                  (by default they are merged with the hint kept as a review note)
+//   node scripts/merge-proposed.js --data-dir=DIR  read/write events.json, events.proposed.json and
+//                                                  proposed-exclusions.json in DIR instead of data/ (tests)
 //
 // Nothing is rewritten: proposed events are appended exactly as proposed; curated events are untouched.
 // Proposed events whose id or wikidata_qid already exists in the curated file are skipped and listed.
 import { readFile, writeFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import { resolve } from "node:path";
 import { validateEvents, findClashes } from "./lib/validate.js";
 
 const APPLY = process.argv.includes("--apply");
 const SKIP_DUP = process.argv.includes("--skip-duplicate-hints");
+const dataDirArg = process.argv.find((a) => a.startsWith("--data-dir="))?.split("=").slice(1).join("=");
+const dataDir = dataDirArg ? pathToFileURL(resolve(dataDirArg) + "/") : new URL("../data/", import.meta.url);
 
-const curatedUrl = new URL("../data/events.json", import.meta.url);
-const proposedUrl = new URL("../data/events.proposed.json", import.meta.url);
+const curatedUrl = new URL("events.json", dataDir);
+const proposedUrl = new URL("events.proposed.json", dataDir);
 
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
 
 const curated = await read(curatedUrl);
-const exclusionsUrl = new URL("../data/proposed-exclusions.json", import.meta.url);
+const exclusionsUrl = new URL("proposed-exclusions.json", dataDir);
 const exclusions = await read(exclusionsUrl).catch(() => []);
 const excludedIds = new Set(exclusions.map((x) => x.id));
 // Reviewed duplicates (data/proposed-exclusions.json, each with a stated reason) are left out.

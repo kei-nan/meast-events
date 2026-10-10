@@ -3894,10 +3894,10 @@
     "wikipedia_url": "https://en.wikipedia.org/wiki/Musa_Dagh",
     "extract": "Musa Dagh (Turkish: Musa Dağı; Armenian: Մուսա լեռ, romanized: Musa leṛ; Arabic: جبل موسى, romanized: Jebel Musa; meaning \"Moses Mountain\") is a mountain in the Hatay Province of Turkey. In 1915, it was the location of a successful Armenian resistance to the Armenian genocide, an event that inspired Franz Werfel to write the novel The Forty Days of Musa Dagh.",
     "coordinates": {
-      "lat": 36.25833333,
-      "lon": 35.90361111
+      "lat": 36.258333,
+      "lon": 35.903611
     },
-    "coordinate_source": "wikipedia",
+    "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
@@ -3911,7 +3911,8 @@
     "review_reasons": [
       "qid_mismatch: title resolved to Q1953975, candidate was discovered under Q19831524 (possible redirect/disambiguation)",
       "part_of: Wikidata (P361) lists this event as part of \"Armenian Genocide\" (Q80034); it may overlap with that larger event",
-      "title_differs_from_article: record title \"Musa Dagh Resistance\" differs from the Wikipedia article title \"Musa Dagh\" and does not appear in its lead"
+      "title_differs_from_article: record title \"Musa Dagh Resistance\" differs from the Wikipedia article title \"Musa Dagh\" and does not appear in its lead",
+      "data_fix F11: Musa Dagh Resistance: pin was the article \"Musa Dagh\" (the mountain, Q1953975); the event's own P625 = 36.258333, 35.903611, the same place. coordinates = the event's own Wikidata P625 (fields: coordinates, coordinate_source; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "Armenian resistance during the Armenian genocide",
@@ -13564,10 +13565,10 @@
     "wikipedia_url": "https://en.wikipedia.org/wiki/2024_Iranian_missile_strikes_in_Pakistan",
     "extract": "On 16 January 2024, Iran carried out a series of missile and drone strikes within Pakistan's Balochistan province, claiming that it had targeted the Iranian Baloch Sunni militant group Jaysh al-Adl. According to Pakistan, the strikes resulted in the deaths of two children and injured four people.\n\nThe incident occurred one day after Iran carried out aerial and drone strikes within Iraq and Syria, claiming that it had targeted the regional headquarters of the Israeli intelligence agency Mossad within Iraqi semi-autonomous Kurdish region and several strongholds of terrorist groups, in Taltita, Syria, in response to the Kerman bombings on 3 January, for which the Islamic State took responsibility and December 2023 killing of IRGC general Seyed Razi Mousavi. The Pakistani government condemned the attack, stating that Iran had killed two Pakistani nationals and calling it an \"unprovoked violation\" of Pakistan's airspace.\n\nOn 18 January, Pakistan conducted retaliatory airstrikes in Iran's Sistan and Baluchestan province, claiming it had struck hideouts belonging to Baloch separatist insurgents engaged in conflict against Pakistan. The Iranian government stated nine foreign citizens, including three women and four children, were killed in the airstrikes.",
     "coordinates": {
-      "lat": 27.16666667,
-      "lon": 64.26666667
+      "lat": 27.370833333333334,
+      "lon": 62.3325
     },
-    "coordinate_source": "wikipedia",
+    "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
@@ -13575,8 +13576,8 @@
     "possible_duplicates": [],
     "review_reasons": [
       "qid_mismatch: title resolved to Q124306685, candidate was discovered under Q124309366 (possible redirect/disambiguation)",
-      "coordinate_far_from_countries: point is 1544 km from the nearest tagged country's reference point (Iran)",
-      "title_differs_from_article: record title \"Operation Marg Bar Sarmachar\" differs from the Wikipedia article title \"2024 Iranian missile strikes in Pakistan\" and does not appear in its lead"
+      "title_differs_from_article: record title \"Operation Marg Bar Sarmachar\" differs from the Wikipedia article title \"2024 Iranian missile strikes in Pakistan\" and does not appear in its lead",
+      "data_fix F11: Operation Marg Bar Sarmachar: pin 27.1667, 64.2667 (Pakistan) was the article \"2024 Iranian missile strikes in Pakistan\" (Q124306685); the operation's own P625 = 27.370833, 62.3325. coordinates = the event's own Wikidata P625 (fields: coordinates, coordinate_source; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "2024 Pakistani military operation in Iran",

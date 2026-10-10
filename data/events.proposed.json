@@ -7086,7 +7086,7 @@
       "lat": 33.299,
       "lon": 44.396
     },
-    "coordinate_source": "wikipedia",
+    "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
@@ -7108,7 +7108,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Persian Gulf crisis (2019–2020)\" (Q65920364); it may overlap with that larger event",
       "possible_duplicate: possible duplicate of \"December 2019 United States airstrikes in Iraq and Syria\" (december-2019-united-states-airstrikes-in-iraq-and-syria) - same Wikidata item (QID / resolved QID)",
       "extract_not_copied_qid_mismatch: article \"December 2019 United States airstrikes in Iraq and Syria\" is Wikidata Q26847124, the event is Q80438042; its lead was not copied",
-      "title_differs_from_article: record title \"Attack on the United States embassy in Baghdad\" differs from the Wikipedia article title \"December 2019 United States airstrikes in Iraq and Syria\" and does not appear in its lead"
+      "title_differs_from_article: record title \"Attack on the United States embassy in Baghdad\" differs from the Wikipedia article title \"December 2019 United States airstrikes in Iraq and Syria\" and does not appear in its lead",
+      "data_fix F11: Attack on the United States embassy in Baghdad: pin was the article \"December 2019 United States airstrikes in Iraq and Syria\" (Q26847124); the event's own P625 = 33.299, 44.396, the same point. coordinates = the event's own Wikidata P625 (fields: coordinate_source; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
@@ -7503,13 +7504,10 @@
     "resolved_qid": "Q106775117",
     "wikipedia_url": "https://en.wikipedia.org/wiki/2021_Israel%E2%80%93Palestine_crisis",
     "extract": "A major outbreak of violence in the Israeli–Palestinian conflict, sometimes called the Unity Intifada, mainly commenced on 10 May 2021 and continued until a ceasefire came into effect on 21 May. It was marked by protests and police riot control, rocket attacks on Israel by Hamas and Palestinian Islamic Jihad (PIJ), and Israeli airstrikes in the Gaza Strip. The crisis was triggered on 6 May, when Palestinians in East Jerusalem began protesting over an anticipated decision of the Supreme Court of Israel on the eviction of six Palestinian families in the East Jerusalem neighborhood of Sheikh Jarrah. Under international law, the area, effectively annexed by Israel in 1980, is a part of the Israeli-occupied West Bank. On 7 May, according to Israel's Channel 12, Palestinians threw stones at Israeli police forces, who then stormed the Al-Aqsa Mosque compound using tear gas, rubber bullets, and stun grenades. The crisis prompted protests around the world as well as official reactions from world leaders.\n\nThe violence coincided with Qadr Night (8 May), observed by Muslims, and Jerusalem Day (9–10 May), an Israeli national holiday celebrating the occupation of East Jerusalem in 1967. The confrontations occurred ahead of a planned Jerusalem Day parade known as the Dance of Flags by far-right Jewish nationalists, which was later canceled. More than 600 people were injured, mostly Palestinians, drawing international condemnation. Israel's Supreme Court ruling on evictions from Sheikh Jarrah was then delayed for 30 days as Avichai Mandelblit, the erstwhile attorney general of Israel, sought to reduce tensions.\n\nOn the afternoon of 10 May, Hamas gave Israel an ultimatum to withdraw its security forces from both the Temple Mount complex and Sheikh Jarrah by 6 p.m. When the ultimatum expired without a response, both Hamas and PIJ launched rockets from the Gaza Strip into Israel; some of these rockets hit Israeli residences and a school. Israel then began a campaign of airstrikes against Gaza; by 16 May, some 950 targets had been attacked, demolishing completely or partially 18 buildings, including four high-rise towers, 40 schools and four hospitals, while also striking the al-Shati refugee camp. Additionally, at least 19 medical facilities were damaged or destroyed by the Israeli bombardment. By 17 May, the United Nations estimated that Israeli airstrikes had destroyed 94 buildings in Gaza, comprising 461 housing and commercial units, including the al-Jalaa Highrise; housing offices of the Associated Press, the Al Jazeera Media Network, and other news outlets; and 60 condominiums.\n\nAs a result of the violence, at least 256 Palestinians, including 66 children, were killed (including at least seven from friendly fire). In Israel, at least 13 people were killed, including two children. The Gaza Ministry of Health reported that more than 1,900 Palestinians were injured, and as of 12 May, at least 200 Israelis were reported to have been injured. As of 19 May, at least 72,000 Palestinians have been displaced. Around 4,360 Palestinian rockets were fired towards Israel, of which 680 landed within the Gaza Strip, and over 90 percent of rockets bound towards populated areas were intercepted by Israel's Iron Dome. Israel conducted around 1,500 aerial, land, and sea strikes on the Gaza Strip. Calls for a ceasefire were first proposed on 13 May by Hamas, but rejected by Israeli prime minister Benjamin Netanyahu. On 18 May, France, along with Egypt and Jordan, announced the filing of a United Nations Security Council resolution for a ceasefire. Egypt mediated a ceasefire between Israel and Hamas, which came into effect on 21 May 2021, ending 11 days of fighting in which both sides claimed victory. On 16 June 2021, incendiary balloons were launched from Gaza into Israel, which the Israeli Air Force responded to with multiple airstrikes in the Gaza Strip, resuming the fighting.",
-    "coordinates": {
-      "lat": 31,
-      "lon": 35
-    },
-    "coordinate_source": "wikidata",
-    "location_quality": "precise",
-    "needs_manual_coordinates": false,
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
     "date_precision": "month",
     "part_of": [
       {
@@ -7534,7 +7532,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event",
       "possible_duplicate: possible duplicate of \"2021 Israel–Palestine crisis\" (2021-israel-palestine-crisis) - same Wikidata item (QID / resolved QID)",
       "title_differs_from_article: record title \"Operation Guardian of the Walls\" differs from the Wikipedia article title \"2021 Israel–Palestine crisis\" and does not appear in its lead",
-      "month_precision_day_in_lead: date_start 2021-05-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2021-05-10; the stored day is a placeholder"
+      "month_precision_day_in_lead: date_start 2021-05-01 has only month precision in Wikidata, but the first sentence of the Wikipedia lead names 2021-05-10; the stored day is a placeholder",
+      "data_fix F11: Operation Guardian of the Walls: pin 31, 35 was Wikidata P625 of Q106775117 (2021 Israel–Palestine crisis, the article its title resolves to); the operation's own item has no P625. No location of its own, so none is shown (fields: coordinates, coordinate_source, location_quality, needs_manual_coordinates; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-06",

@@ -139,8 +139,8 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
 Since data shape v2.1 two former conditions are **gone**: events **without real coordinates** are included (with `location_quality: "none"`,
 `coordinates: null`, no map marker, listed and searchable), and events whose Wikidata **dates are contradictory** (end before start) are included
 with the dates as Wikidata gives them and a `date_flags` reason. Nothing is dropped for either reason any more. Events already in the curated
-`data/events.json` are not re-proposed. Two proposed events were left out by review as redirect duplicates of an event already present
-(`data/proposed-exclusions.json`, each with its reason).
+`data/events.json` are not re-proposed. Five proposed events were left out by review as redirect duplicates of an event already present
+(`data/proposed-exclusions.json`, each with its reason; counted 2026-10-10).
 
 ### What "10 sitelinks" really counts
 
@@ -257,7 +257,10 @@ not a gap fix.
 Each class is queried separately. WDQS answers a class query that is too expensive with HTTP 504; the script then fetches the class's subclass tree (`P279*`)
 on its own and queries `P31` instances of 250 subclasses at a time, which is the same rule split into requests that finish in time ("public election", with
 thousands of per-country subclasses, needs this: plain `P31` found 3 of its 91 new items). Only if that fails too does it retry once with plain `P31` (no subclass expansion)
-and logs that it did so. 429/5xx responses on the other Wikimedia APIs are retried with exponential backoff honouring `Retry-After`. Requests are sequential, delayed
+and logs that it did so. If a class still fails, the run writes nothing and exits with an error naming the failed classes (rewriting the file without
+them would silently drop their candidates). An item with several date values gets the earliest start (`MIN` of P585, else of P580) and the latest
+end (`MAX` of P582), and every list is sorted with the QID as the final tiebreak, so a re-run on unchanged Wikidata gives an identical file.
+429/5xx responses on the other Wikimedia APIs are retried with exponential backoff honouring `Retry-After` (seconds or an HTTP date). Requests are sequential, delayed
 and identify themselves with the `MiddleEastEvents` User-Agent (`MiddleEastEvents/0.1 (data pipeline; +https://github.com/kei-nan/meast-events)`).
 
 ## Review flags (advisory only)
@@ -266,7 +269,7 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 
 | Flag | Where | Meaning |
 |---|---|---|
-| `date_order_invalid` | `date_flags` | Wikidata's `date_end` is before `date_start` (5 events, e.g. Iraqi invasion of Kuwait: start 2009-08-02, end 1990-08-04). Kept, shown as Wikidata gives them. Validation downgrades the order error to a warning only when this flag is present. |
+| `date_order_invalid` | `date_flags` | Wikidata's `date_end` is before `date_start` (4 curated events on 2026-10-10, e.g. Iraqi invasion of Kuwait: start 2009-08-02, end 1990-08-04). Kept, shown as Wikidata gives them. Validation downgrades the order error to a warning only when this flag is present. |
 | `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. |
 | `date_start_year_not_in_lead` | `date_flags` | Start year is not within 1 year of any year in the full lead. A heuristic on prose: "look", not "wrong". |
 | `date_source_adjusted` | `date_flags` | The discovery date came from an implausible P585; P580 was used instead (rule in `docs/data-fixes.md` F2, both values in the text). |
@@ -283,13 +286,19 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 ## Location quality
 
 - `precise`: coordinates from the English Wikipedia article or the item's Wikidata `P625` (`coordinate_source` = `wikipedia` / `wikidata` / `manual-override`).
-- `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (80 events, unchanged behaviour). They are labelled
+  **An event is pinned only at its own location** (owner's rule, 2026-10-10; `docs/data-fixes.md` F11). When the event's title redirects to the article
+  of a **different** item (its `resolved_qid` differs from `wikidata_qid`), that article's coordinates and that item's `P625` are not the event's, so
+  `scripts/enrich-candidates.js` uses only the event item's own `P625`, else the event has no location. `coordinate_source` = `redirect_target` (a point
+  from a different item) is no longer produced; the validator still warns about it, and about older records with `wikipedia` coordinates and a different
+  `resolved_qid`. A borrowed `wikidata` point cannot be told apart from the event's own `P625` in the stored data; the four known cases were checked
+  against Wikidata and fixed (F11).
+- `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (74 events on 2026-10-10, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
-  Discovered events never get a capital-fallback pin any more. As of 2026-10-04: 192 of the 571 curated events and 191 of the 461 proposed events
+  Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 376 of the 811 curated events and 185 of the 254 proposed events
   (counted from `data/events.json` and `data/events.proposed.json`).
 - Validation (`scripts/lib/validate.js`): coordinates are required unless `location_quality` is `none` (then they must be `null`), and
-  `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override`, `approximate` = `country-fallback:<tracked country>`,
+  `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override` / `redirect_target`, `approximate` = `country-fallback:<tracked country>`,
   `none` = `null`. Coordinates outside a generous Middle East box (lat 10-44, lon 24-65) are only a warning, because a few events really happened
   abroad (San Remo, Madrid, Algiers, Kandahar, Washington); coordinates that would fall inside the box with latitude and longitude exchanged are an error.
 - `data/missing-coordinates-report.md` lists every curated and candidate event lacking a precise location, sorted by sitelinks, with Wikipedia and Wikidata links, so
@@ -325,14 +334,19 @@ node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-can
 node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
-node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json
-node scripts/lib/verify-sample.js                       # -> data/import-verification-sample.md
+node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
+node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
+node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json (dated by its input data, not the clock)
+node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
-npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps (runs in CI; needs root npm ci)
+npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings (runs in CI; needs root npm ci)
 node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
+Cached entries do not expire by default; `--fresh` ignores the whole cache for a run, and `--cache-max-age=7d` (or `ATLAS_CACHE_MAX_AGE`) ignores entries
+older than that (units s, m, h, d; `scripts/lib/cache.js`). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
+is then retried like a dropped connection.
 
 Pipeline output never touches `data/events.json`. Only an explicit `merge-proposed.js --apply` run by a person does, plus `refresh-extracts.js --apply`
 (deliberate, and run monthly through a pull request). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
@@ -344,15 +358,22 @@ real calendar dates from 1900 to next year, `date_end >= date_start` unless `dat
 `location_quality` matching `coordinate_source` (see "Location quality"), no lat/lon swap, `category` and `category_group` equal and one of the groups in
 `scripts/lib/event-classes.js` (war, treaty, political, atrocity, terrorism, uprising, protest, migration, diplomatic, economic), `wikidata_classes` array,
 `extract_retrieved_at` date, no `category_label`, non-empty extract. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
-shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`,
+shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`
+(merged into one "coordinates are borrowed" warning when the pin is that other item's: `coordinate_source` `redirect_target`, or `wikipedia` with a different
+`resolved_qid`), a `date_start` later than the day the event's data was retrieved (`extract_retrieved_at`; a scheduled event such as an upcoming election),
+a `date_end` before `date_start` that `date_flags` explains, a **precise pin outside every tagged country**: more than 5 km outside all border shapes
+(`data/boundaries.json`) that stand for the event's countries in its start year, using the map's own country-to-shape table
+(`COUNTRY_SHAPES` in `app/src/lib/eventCountries.js`; not checked when a tagged country has no shape that year, for `regional`, or for a point already
+outside the Middle East box; needs the root `npm ci`, otherwise skipped with a note),
 `possible_duplicates` naming an id that is in neither the file nor (for the proposed file) the curated file, and, for the curated file, an event without a
 framing review or whose review is stale (its `text_sha1` is not the SHA-1 of the current extract, the same test the site uses to show "may no longer apply").
 Warnings are for a person to look at; nothing is changed automatically.
 
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
 `end_year` or `source`, a bad year range or geometry type, or two shapes with the same name in the same year. Warnings: a feature without a `status` or
-`note` key, a status value with no label in the app, a year gap between shapes of the same name, and an area of at least 0.5 km² covered by two shapes
-shown in the same year. Overlaps between a shape whose status ends in `-included` (for example Israel from 1967, `occupied-territory-included`) and a
+`note` key, a status value with no label in the app, a year gap between shapes of the same name, a ring that crosses itself (two of its segments
+cross at a point inside both; touching at a vertex is not counted; one warning per feature listing ring, segments and place), and an area of at
+least 0.5 km² covered by two shapes shown in the same year. Overlaps between a shape whose status ends in `-included` (for example Israel from 1967, `occupied-territory-included`) and a
 flagged shape drawn on top of it (the West Bank, Gaza Strip and Golan Heights) are intentional and not listed. Smaller slivers along shared borders
 (at most about 0.13 km² on the current data) come from two separately sourced lines not coinciding exactly and are only counted. It never edits geometry.
 

@@ -1,6 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkBoundaries, checkNameContinuity, checkProperties, findOverlaps } from "./boundary-checks.js";
+import {
+  checkBoundaries,
+  checkNameContinuity,
+  checkProperties,
+  findOverlaps,
+  ringCrossings,
+  findSelfIntersections,
+} from "./boundary-checks.js";
 
 // The overlap tests need @turf/turf (repo-root devDependency). CI's "Validate boundaries" step
 // runs this file after `npm ci`; the generic scripts/lib test step (and the refresh workflow)
@@ -21,7 +28,7 @@ const feature = (props, geometry = square(40, 30)) => ({
 const fc = (...features) => ({ type: "FeatureCollection", features });
 
 test("checkProperties: a missing status key is a warning, missing name/years/source an error", () => {
-  const { status, ...noStatus } = feature().properties;
+  const { status: _status, ...noStatus } = feature().properties;
   const r = checkProperties([{ ...feature(), properties: noStatus }]);
   assert.deepEqual(r.errors, []);
   assert.match(r.warnings[0], /no "status" key/);
@@ -82,4 +89,31 @@ test("checkBoundaries: unexpected overlaps become warnings, structure errors ski
   assert.deepEqual(r.errors, []);
   assert.match(r.warnings[0], /^overlap .* km2 in 1900-1950: X 1900-1950 x Y 1900-1950$/);
   assert.equal(checkBoundaries(fc(feature({ name: "" })), { turf }).overlaps, null);
+});
+
+test("ringCrossings: a bow tie crosses once; touching vertices and plain rings do not count", () => {
+  // Bow tie: 0,0 -> 2,2 -> 2,0 -> 0,2 -> 0,0 crosses itself at (1, 1).
+  const bowtie = [[0, 0], [2, 2], [2, 0], [0, 2], [0, 0]];
+  assert.deepEqual(ringCrossings(bowtie), [{ segments: [0, 2], at: [1, 1] }]);
+  assert.deepEqual(ringCrossings(square(40, 30).coordinates[0]), []);
+  // A ring that touches itself at a vertex (two lobes meeting at 1,1) is not a proper crossing.
+  const touching = [[0, 0], [1, 1], [2, 0], [2, 2], [1, 1], [0, 2], [0, 0]];
+  assert.deepEqual(ringCrossings(touching), []);
+  // A spike that runs back along itself (collinear overlap) is not counted either.
+  assert.deepEqual(ringCrossings([[0, 0], [2, 0], [1, 0], [1, 1], [0, 0]]), []);
+});
+
+test("findSelfIntersections / checkBoundaries: one warning per feature, listing ring, segments and place", () => {
+  const holed = {
+    type: "Polygon",
+    coordinates: [
+      [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
+      [[2, 2], [4, 4], [4, 2], [2, 4], [2, 2]], // a bow-tie hole
+    ],
+  };
+  const r = findSelfIntersections([feature({ name: "Ok" }), feature({ name: "Bad" }, holed)]);
+  assert.equal(r.length, 1);
+  assert.deepEqual(r[0].crossings, [{ polygon: 0, ring: 1, segments: [0, 2], at: [3, 3] }]);
+  const w = checkBoundaries(fc(feature({ name: "Bad" }, holed))).warnings;
+  assert.deepEqual(w, ["self-intersection: Bad 1900-1950: 1 ring crossing(s): polygon 0 ring 1 (hole) segments 0/2 near (3, 3)"]);
 });

@@ -3,12 +3,15 @@
 import { createHash } from "node:crypto";
 import { COUNTRIES, EVENT_CLASSES } from "./event-classes.js";
 import { coordinatesChecked } from "./fixes.js";
+// Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
+import { shapeNamesFor } from "../../app/src/lib/eventCountries.js";
 
 const ID_RE = /^[a-z0-9-]+$/;
 const QID_RE = /^Q[1-9][0-9]*$/;
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 // Inclusion rule 3 (docs/DATA_POLICY.md): events date from 1900 to the present. One year of
-// slack at the top for a scheduled end date; the bound moves with the clock (UTC).
+// slack at the top for a scheduled end date; the bound moves with the clock (UTC). A start date
+// after the day its data was fetched (a scheduled election, say) is valid but WARNED about.
 export const MIN_YEAR = 1900;
 export const MAX_YEAR = new Date().getUTCFullYear() + 1;
 export const LOCATION_QUALITIES = ["precise", "approximate", "none"];
@@ -20,9 +23,16 @@ export const CATEGORIES = [...new Set(EVENT_CLASSES.map((c) => c.category))];
 
 // Which coordinate_source goes with which location_quality, as the pipeline writes them:
 // scripts/ingest.js (wikipedia -> wikidata -> manual-override -> country-fallback:<country>),
-// scripts/enrich-candidates.js (wikipedia | wikidata, else none) and the shape-v2.1 rule
-// (country-fallback => approximate, no coordinates => none, otherwise precise).
-export const PRECISE_SOURCES = ["wikipedia", "wikidata", "manual-override"];
+// scripts/enrich-candidates.js (wikipedia | wikidata | redirect_target, else none) and the
+// shape-v2.1 rule (country-fallback => approximate, no coordinates => none, otherwise precise).
+// "redirect_target": the point is a real Wikipedia/Wikidata coordinate, but of a DIFFERENT item
+// (the article the event's title redirects to, or that article's P625), not the event's own.
+// Allowed, and always warned about (see BORROWED_SOURCE below).
+export const BORROWED_SOURCE = "redirect_target";
+export const PRECISE_SOURCES = ["wikipedia", "wikidata", "manual-override", BORROWED_SOURCE];
+// coordinate_source for a point read from the Wikipedia article at wikipedia_url: when that
+// article belongs to another item than the event's (otherItem), the point is borrowed.
+export const borrowedSource = (source, otherItem) => (otherItem && source === "wikipedia" ? BORROWED_SOURCE : source);
 const FALLBACK_RE = /^country-fallback:(.+)$/;
 
 // A generous box around the 15 tracked countries (Egypt's west edge ~25E, Iran's east
@@ -36,6 +46,66 @@ const inRegion = (lat, lon) =>
 // SNIPPET_LENGTH). A lead no longer than its own preview is suspicious (stub, truncated
 // fetch), so it is reported - as a warning only.
 export const MIN_EXTRACT_CHARS = 160;
+
+// A precise pin is checked against the border shapes of the event's tagged countries in its
+// start year (the same country -> shape table the map uses to shade countries,
+// app/src/lib/eventCountries.js COUNTRY_SHAPES). Points within this distance of a shape count
+// as inside it: coastal battles and border crossings sit on or just off the drawn line.
+export const PIN_TOLERANCE_KM = 5;
+
+const ISO_DAY_RE = /^\d{4}-\d{2}-\d{2}/;
+const todayUtc = () => new Date().toISOString().slice(0, 10);
+
+// Index of data/boundaries.json features by name, with bounding boxes, for pinCountryCheck.
+export function indexBoundaries(boundaries, turf) {
+  const features = Array.isArray(boundaries) ? boundaries : boundaries?.features ?? [];
+  const byName = new Map();
+  for (const f of features) {
+    const p = f?.properties;
+    if (!p?.name || !f.geometry) continue;
+    if (!byName.has(p.name)) byName.set(p.name, []);
+    byName.get(p.name).push({ f, bbox: turf.bbox(f), from: p.start_year, to: p.end_year });
+  }
+  return { byName, turf };
+}
+
+// Shortest distance (km) from a point to a polygon feature's rings.
+function distanceToRingsKm(turf, pt, f) {
+  const g = f.geometry;
+  const polys = g.type === "MultiPolygon" ? g.coordinates : [g.coordinates];
+  let best = Infinity;
+  for (const rings of polys) {
+    for (const ring of rings) best = Math.min(best, turf.pointToLineDistance(pt, turf.lineString(ring), { units: "kilometers" }));
+  }
+  return best;
+}
+
+// For a precise pin: null when the point lies inside (or within PIN_TOLERANCE_KM of) a shape of
+// at least one tagged country in the event's start year, or when that cannot be checked (no
+// tagged country, or one of them, has no shape that year: e.g. "regional", Kuwait before
+// 1961). Otherwise { year, km } with the distance to the nearest of those shapes.
+export function pinCountryCheck(e, index) {
+  const { byName, turf } = index;
+  const year = Number(String(e.date_start).slice(0, 4));
+  const countries = Array.isArray(e.countries) ? e.countries : [];
+  const perCountry = countries.map((c) =>
+    shapeNamesFor(c, year).flatMap((n) => (byName.get(n) ?? []).filter((s) => s.from <= year && year <= s.to))
+  );
+  if (!perCountry.length || perCountry.some((s) => !s.length)) return null;
+  const shapes = perCountry.flat();
+  const { lat, lon } = e.coordinates;
+  const pt = turf.point([lon, lat]);
+  // ~0.1 degree is more than the tolerance at these latitudes (>= 8 km east-west at 44N).
+  const pad = 0.1;
+  const near = (b) => lon >= b[0] - pad && lon <= b[2] + pad && lat >= b[1] - pad && lat <= b[3] + pad;
+  for (const s of shapes) {
+    if (!near(s.bbox)) continue;
+    if (turf.booleanPointInPolygon(pt, s.f)) return null;
+    if (distanceToRingsKm(turf, pt, s.f) <= PIN_TOLERANCE_KM) return null;
+  }
+  const km = Math.min(...shapes.map((s) => distanceToRingsKm(turf, pt, s.f)));
+  return { year, km };
+}
 
 export function isRealDate(s) {
   const m = DATE_RE.exec(s);
@@ -56,9 +126,16 @@ export function isRealDate(s) {
 //   (2014) are two seed titles that resolve to the same Wikipedia article.
 export const KNOWN_DUPLICATE_QIDS = new Set([]);
 
-export function validateEvents(events, { name = "events", lenient = false, otherIds = new Set() } = {}) {
+// opts.boundaries + opts.turf: data/boundaries.json and the @turf/turf module; with both, every
+// precise pin is checked against its tagged countries' shapes (pinCountryCheck; a warning).
+// opts.today (YYYY-MM-DD): "now" for events without extract_retrieved_at (default: today, UTC).
+export function validateEvents(
+  events,
+  { name = "events", lenient = false, otherIds = new Set(), boundaries = null, turf = null, today = todayUtc() } = {}
+) {
   const errors = [];
   const warnings = [];
+  const shapeIndex = boundaries && turf ? indexBoundaries(boundaries, turf) : null;
   const err = (i, e, msg) => errors.push(`${name}[${i}] ${e?.id ?? "(no id)"}: ${msg}`);
   const warn = (i, e, msg) => warnings.push(`${name}[${i}] ${e?.id ?? "(no id)"}: ${msg}`);
 
@@ -89,6 +166,16 @@ export function validateEvents(events, { name = "events", lenient = false, other
     } else warnings.push(`${name}[${i}] ${e.id}: no wikidata_qid`);
 
     if (!isRealDate(e.date_start)) err(i, e, `date_start invalid (${JSON.stringify(e.date_start)})`);
+    else {
+      // Dated after its data was fetched: a scheduled/planned event (valid up to MAX_YEAR, but
+      // what Wikipedia said then may no longer hold). Compared with the fetch day, so the
+      // result depends on the data, not on when validation runs.
+      const fetched = typeof e.extract_retrieved_at === "string" && ISO_DAY_RE.test(e.extract_retrieved_at);
+      const asOf = fetched ? e.extract_retrieved_at.slice(0, 10) : today;
+      if (e.date_start > asOf) {
+        warn(i, e, `date_start (${e.date_start}) is after the day its data was ${fetched ? "retrieved" : "validated"} (${asOf}): a scheduled or planned event; shown as Wikidata gives it`);
+      }
+    }
     if (e.date_flags != null && (!Array.isArray(e.date_flags) || e.date_flags.some((f) => typeof f !== "string" || !f))) {
       err(i, e, "date_flags must be an array of non-empty strings");
     }
@@ -155,6 +242,13 @@ export function validateEvents(events, { name = "events", lenient = false, other
         if (inRegion(lon, lat) && !checked) err(i, e, `coordinates look swapped (lat ${lat}, lon ${lon}); (${lon}, ${lat}) would be in the region`);
         else if (checked) warn(i, e, `coordinates (${lat}, ${lon}) are outside the Middle East box; checked against Wikipedia and Wikidata, not swapped (docs/data-fixes.md ${checked.ref})`);
         else warn(i, e, `coordinates (${lat}, ${lon}) are outside the Middle East box (source: ${e.coordinate_source ?? "none"}); fine if the event happened abroad`);
+      } else if (shapeIndex && e.location_quality === "precise" && isRealDate(e.date_start)) {
+        // Inside the box only: a point outside it is outside every tracked country anyway and
+        // already has its warning above (one warning per event).
+        const off = pinCountryCheck(e, shapeIndex);
+        if (off) {
+          warn(i, e, `precise pin (${lat}, ${lon}) is ${Math.round(off.km)} km outside the ${off.year} border shapes of every tagged country (${e.countries.join(", ")}; tolerance ${PIN_TOLERANCE_KM} km, source: ${e.coordinate_source ?? "none"}); fine if the event happened abroad`);
+        }
       }
     }
 
@@ -176,7 +270,26 @@ export function validateEvents(events, { name = "events", lenient = false, other
     }
     // resolved_qid = the Wikidata item of the article at wikipedia_url (enrich-candidates.js).
     // A different item means the URL points at another (often broader) article. Flag only.
-    if (typeof e.resolved_qid === "string" && typeof e.wikidata_qid === "string" && e.resolved_qid !== e.wikidata_qid) {
+    // Borrowed coordinates (one warning per event, merged with the above):
+    //  - coordinate_source "redirect_target": enrich-candidates.js took the point from that other
+    //    article/item;
+    //  - coordinate_source "wikipedia" with a different resolved_qid (records written before
+    //    "redirect_target" existed): the Wikipedia coordinates are by construction those of the
+    //    article at wikipedia_url, i.e. of the other item.
+    //  ("wikidata" with a different resolved_qid is ambiguous - the event's own P625 or the other
+    //  item's - and is not reported as borrowed.)
+    const otherItem = typeof e.resolved_qid === "string" && typeof e.wikidata_qid === "string" && e.resolved_qid !== e.wikidata_qid;
+    const borrowed =
+      e.coordinates != null && (e.coordinate_source === BORROWED_SOURCE || (otherItem && e.coordinate_source === "wikipedia"));
+    if (borrowed) {
+      warn(
+        i,
+        e,
+        `coordinates are borrowed from another item (coordinate_source ${JSON.stringify(e.coordinate_source)}): ${
+          otherItem ? `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}` : "taken from the redirect target"
+        }, not the event's wikidata_qid ${e.wikidata_qid}; the pin is that article's location`
+      );
+    } else if (otherItem) {
       warn(i, e, `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}, not the event's wikidata_qid ${e.wikidata_qid}`);
     }
   });
