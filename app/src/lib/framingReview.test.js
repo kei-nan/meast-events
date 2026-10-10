@@ -25,9 +25,15 @@ test("each summary has at most one concise fairness finding and wording points t
   }
 });
 
-test("every quoted or highlighted phrase appears word for word in the text", () => {
+const textSha1 = (text) => createHash("sha1").update(text).digest("hex").slice(0, 12);
+
+// Only for reviews of the current text. When a refresh has changed a summary since its review, the
+// quoted phrases may be gone; the site then shows no highlights and marks the review "may no longer
+// apply" (app/scripts/split-data.mjs), so a changed text must not fail the refresh.
+test("every quoted or highlighted phrase appears word for word in the text it reviewed", () => {
   const byId = Object.fromEntries(events.map((e) => [e.id, e]));
   for (const [id, r] of Object.entries(review.events)) {
+    if (r.text_sha1 !== textSha1(byId[id].extract)) continue;
     for (const p of [...(r.fairness?.phrases ?? []), ...r.wording.map((x) => x.phrase)]) {
       assert.ok(byId[id].extract.includes(p), `${id}: "${p}" not in the text`);
     }
@@ -44,9 +50,7 @@ test("no score or side is published", () => {
 // then marks the review "may no longer apply" until it is redone. So this reports, not fails.
 test("each review fingerprints the text it rated (changed texts are reported)", (t) => {
   for (const [id, r] of Object.entries(review.events)) assert.match(r.text_sha1 ?? "", /^[0-9a-f]{12}$/, `${id}: text fingerprint missing`);
-  const stale = events.filter(
-    (e) => review.events[e.id].text_sha1 !== createHash("sha1").update(e.extract).digest("hex").slice(0, 12)
-  );
+  const stale = events.filter((e) => review.events[e.id].text_sha1 !== textSha1(e.extract));
   if (stale.length) t.diagnostic(`${stale.length} review(s) out of date (text changed since review): ${stale.map((e) => e.id).join(", ")}`);
 });
 
