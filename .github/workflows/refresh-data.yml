@@ -103,17 +103,17 @@ jobs:
           npm test
           npm test --prefix app
 
-      # The same build Workers Builds runs after a merge: split-data's chunk
-      # size limits, the search index (Pagefind) and the Vite build, then the
-      # dist/ smoke check. A refresh that would break the deploy fails here,
-      # and then no PR is opened.
+      # The same build Workers Builds runs after a merge: event validation,
+      # split-data's chunk size limits, the search index (Pagefind) and the
+      # Vite build, then the dist/ smoke check (check-dist, run by postbuild).
+      # A refresh that would break the deploy fails here, and then no PR is
+      # opened.
       - name: Build the site
         if: steps.diff.outputs.changed == 'true'
         working-directory: app
         run: |
           npm ci
           npm run build
-          node scripts/check-dist.mjs
 
       # The PR description is capped (GitHub allows 65,536 characters), so the
       # full report is kept as a workflow artifact and linked from the PR.
