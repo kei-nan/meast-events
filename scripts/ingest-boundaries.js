@@ -289,8 +289,8 @@ async function main() {
 //
 // For each fit, every neighbour feature that is on the map in the same years as the overlay
 // is split at the overlay's year boundaries, and in the overlapping years its geometry
-// becomes: clip = neighbour minus overlay; snap = that, plus the land within maxGapKm of
-// both that no other feature covers (the sliver between the two lines).
+// becomes: clip = neighbour minus overlay; snap = that, plus the land between the two that
+// no other feature covers (the sliver between the two lines; see gapBetween).
 const asFeature = (geometry) => ({ type: "Feature", properties: {}, geometry });
 const fc = (...fs) => turf.featureCollection(fs);
 const activeIn = (f, y) => f.properties.start_year <= y && y <= f.properties.end_year;
@@ -387,6 +387,54 @@ function dissolveParts(geometry, label) {
   return kept.length === 1 ? { type: "Polygon", coordinates: kept[0] } : { type: "MultiPolygon", coordinates: kept };
 }
 
+// The land BETWEEN two shapes a and b: the gap that a disc of radius maxGapKm rolled
+// around the outside of both cannot enter (a morphological closing of a + b, minus a and
+// b), kept only where it touches both. Unlike "within maxGapKm of both", this never
+// reaches past either shape's outline into open land: where the gap opens onto land
+// that belongs to neither (Turkey north of the sanjak and Syria, or the later Kuwait
+// beside Saudi Arabia and the neutral zone), the fill stops inside the mouth instead of
+// bulging out as a 3-5 km round cap. The sea counts as a wall, so a sliver that runs
+// down to the coast is still filled. Buffers are only used to decide which land is a
+// gap; the edges the fill shares with a and b are their own sourced lines.
+const CLOSING_STEPS = 64; // segments per quarter circle: chord error ~0.2 m at 3-5 km
+const TOUCH_KM = 0.001;
+function gapBetween(a, b, maxGapKm, land) {
+  const near = turf.intersect(fc(turf.buffer(a, maxGapKm), turf.buffer(b, maxGapKm)));
+  if (!near) return null;
+  // Work in a window around the candidate area (3x the radius past it), so the closing
+  // only sees nearby edges and its window edge stays far from the area that is kept.
+  const [w, s, e, n] = turf.bbox(turf.buffer(near, maxGapKm * 3));
+  const win = turf.bboxPolygon([w, s, e, n]);
+  const clipA = turf.intersect(fc(asFeature(turf.getGeom(a)), win));
+  const clipB = turf.intersect(fc(asFeature(turf.getGeom(b)), win));
+  if (!clipA || !clipB) return null;
+  // The sea counts as a wall: a sliver between the two shapes that reaches the coast is
+  // still between them (land.json is the app's land; anything else in the window is sea).
+  const winBox = turf.bbox(win);
+  const landHere = land.features
+    .filter((l) => bboxesTouch(turf.bbox(l), winBox))
+    .map((l) => turf.intersect(fc(asFeature(l.geometry), win)))
+    .filter(Boolean);
+  const landUnion = landHere.length > 1 ? turf.union(fc(...landHere)) : landHere[0];
+  const sea = landUnion ? turf.difference(fc(win, landUnion)) : win;
+  const walls = [clipA, clipB, sea].filter(Boolean);
+  const grown = turf.buffer(turf.union(fc(...walls)), maxGapKm, { steps: CLOSING_STEPS });
+  const closed = grown && turf.buffer(grown, -maxGapKm, { steps: CLOSING_STEPS });
+  let gap = closed && turf.intersect(fc(closed, near));
+  gap = gap && turf.difference(fc(gap, clipA));
+  gap = gap && turf.difference(fc(gap, clipB));
+  if (!gap) return null;
+  const touchA = turf.buffer(clipA, TOUCH_KM);
+  const touchB = turf.buffer(clipB, TOUCH_KM);
+  const g = turf.getGeom(gap);
+  const parts = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]).filter((rings) => {
+    const part = turf.polygon(rings);
+    return turf.booleanIntersects(part, touchA) && turf.booleanIntersects(part, touchB);
+  });
+  if (!parts.length) return null;
+  return parts.length === 1 ? turf.polygon(parts[0]) : turf.multiPolygon(parts);
+}
+
 function fittedGeometry(neighbour, overlay, others, mode, maxGapKm, land, spec) {
   const label = `${neighbour.properties.name} ${neighbour.properties.start_year}-${neighbour.properties.end_year}`;
   return dissolveParts(fittedGeometryRaw(neighbour, overlay, others, mode, maxGapKm, land, spec), label);
@@ -404,7 +452,7 @@ function fittedGeometryRaw(neighbour, overlay, others, mode, maxGapKm, land, spe
     // shape (e.g. a Turkish strip between the sanjak and Syria) is not its own either.
     const between = spec.between && others.find((o) => o.properties.name === spec.between);
     if (between) {
-      const strip = turf.intersect(fc(near, turf.buffer(between, maxGapKm)));
+      const strip = gapBetween(overlay, between, maxGapKm, land);
       if (strip) geom = turf.difference(fc(geom, strip)) ?? geom;
     }
     const parts = turf.getGeom(geom).type === "MultiPolygon" ? turf.getGeom(geom).coordinates : [turf.getGeom(geom).coordinates];
@@ -415,8 +463,7 @@ function fittedGeometryRaw(neighbour, overlay, others, mode, maxGapKm, land, spe
     geom = kept.length === 1 ? turf.polygon(kept[0]) : turf.multiPolygon(kept);
   }
   if (mode === "snap") {
-    const between = turf.intersect(fc(turf.buffer(overlay, maxGapKm), turf.buffer(neighbour, maxGapKm)));
-    let sliver = between && turf.difference(fc(between, overlay));
+    let sliver = gapBetween(overlay, asFeature(turf.getGeom(geom)), maxGapKm, land);
     sliver = sliver && turf.difference(fc(sliver, neighbour));
     for (const o of others) sliver = sliver && turf.difference(fc(sliver, o));
     // Only land: the buffers also reach into the sea between two coastlines.

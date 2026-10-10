@@ -343,6 +343,12 @@ Lebanon, Jordan and Israel/Palestine by the Ottoman Empire shape through 1919 an
 (later the UAE) from 1892, Muscat and Oman from before 1900, and northern Yemen by the Ottoman Empire shape through 1918 and the Mutawakkilite Kingdom from 1919.
 Kuwait in 1990-1991 is drawn under the name "Kuwait (annexed by Iraq)", which `validate-boundaries.js` reports as a gap in the name "Kuwait".
 
+Where one of our added shapes (the Sanjak of Alexandretta, the Saudi-Kuwaiti Neutral Zone) meets a CShapes neighbour, the two sources' lines leave
+thin unclaimed slivers; the "fit" entries give such a sliver to the neighbour. Only land that lies between the two shapes is filled (the gap a
+3-5 km disc rolled around the outside of both cannot reach, the sea counting as a wall), so a fill never reaches past either shape's line into
+open land. Where a sliver opens onto land that belongs to neither, the fill stops inside that opening; the line across it is the only stretch
+not taken from a source (at most about 0.6 km from the nearest sourced line, checked 2026-10-10). Land outside every shape stays blank.
+
 ## Pipeline and workflow
 
 ```

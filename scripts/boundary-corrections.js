@@ -47,10 +47,12 @@
 //     "clip" removes the overlay's area from the neighbour; "trim" also drops the small
 //     detached leftovers that clipping strands next to the overlay (and, with `between`,
 //     its land in the narrow strip between the overlay and that named shape); "snap" also gives the
-//     neighbour the unclaimed land (within `maxGapKm`) between the two; "contain" is for
+//     neighbour the unclaimed land between the two (a gap a `maxGapKm` disc rolled around both
+//     cannot enter; never land beyond either line - see gapBetween in ingest-boundaries.js); "contain" is for
 //     a country whose shape is meant to include the overlay (Israel from 1967): it is
 //     widened to wrap the overlay fully. `trim: true` adds trim's clean-up to "snap". The overlay's own outline is never changed. Applied in ingest-boundaries.js after all other
-//     entries. This picks one sourced line over another; it invents no new line.
+//     entries. This picks one sourced line over another; the only line it draws itself is a
+//     short one across the mouth of a sliver that opens onto land belonging to neither shape.
 //
 // Every entry with historical content must cite a source. Nothing here should be
 // taken on my (the model's) say-so alone without a citation a reader can check.
