@@ -11,7 +11,15 @@ function mockFetch(steps) {
     calls.push({ url, options });
     const step = steps[Math.min(calls.length - 1, steps.length - 1)];
     if (step === "hang") {
-      return new Promise((_, reject) => options.signal.addEventListener("abort", () => reject(options.signal.reason)));
+      // A stalled request holds the event loop open the way a real open socket does. Without it, only
+      // AbortSignal.timeout's unref'd timer is left and Node may end the test before it fires (Linux CI).
+      return new Promise((_, reject) => {
+        const socket = setTimeout(() => {}, 60_000);
+        options.signal.addEventListener("abort", () => {
+          clearTimeout(socket);
+          reject(options.signal.reason);
+        });
+      });
     }
     if (step instanceof Error) return Promise.reject(step);
     return Promise.resolve(step());
