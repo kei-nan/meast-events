@@ -2,9 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Map as MaplibreMap, setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
-// Not used directly - imported so Vite includes this file in the production
-// bundle as a real asset (see the comment below and vite.config.js).
-import "maplibre-gl/dist/maplibre-gl-shared.mjs?url";
 import {
   EMPTY_FC,
   areaGeoJSON,
@@ -69,8 +66,10 @@ const distanceKm = (a, b) => haversineKm(a[0], a[1], b[0], b[1]);
 // bubble up as a page-level exception). This only matters for the built
 // app - Vite's dev server can already resolve maplibre-gl's own worker URL
 // straight out of node_modules, so leave dev mode alone and only override
-// the built app, where we explicitly ship the worker (and the shared chunk
-// it imports, see vite.config.js) as unhashed static assets.
+// the built app, where we ship the worker as a content-hashed asset. Since
+// MapLibre 6.13.0 the worker is self-contained (it no longer imports
+// maplibre-gl-shared.mjs, now an empty, deprecated file), so nothing needs a
+// fixed file name.
 if (import.meta.env.PROD) {
   setWorkerUrl(maplibreWorkerUrl);
 }

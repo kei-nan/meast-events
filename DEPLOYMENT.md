@@ -186,9 +186,8 @@ opens the pull request.
 The static-assets Worker `meast-events` serves `dist/_headers` (copied from
 `app/public/_headers` by Vite): a CSP, `nosniff`, `X-Frame-Options`,
 `Referrer-Policy`, and cache rules: everything under `/assets/` is immutable for a
-year (every file there is content-hashed, or one of the two MapLibre worker files
-in the version-named `assets/maplibre-gl-<version>/` folder; `check-dist.mjs`
-fails the build otherwise), as are the content-hashed data folders and search
+year (every file there is content-hashed, MapLibre's worker included;
+`check-dist.mjs` fails the build otherwise), as are the content-hashed data folders and search
 index chunks; the other dataset files get 1 h + stale-while-revalidate, and HTML
 and the search entry files revalidate on every visit. If the site ever loads anything from another host, add it to the CSP
 in that file, or the browser will block it. Details and the verification
