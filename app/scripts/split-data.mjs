@@ -47,6 +47,7 @@ import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { fullBucket, fullBucketCount } from "../src/lib/fullBucket.js";
 import { MAP_EXTENT, NEAR_LAND_EXTENT } from "../src/lib/mapExtent.js";
+import { otherArticleTitle } from "../src/lib/otherArticle.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
 import { DECADE_SIZE, decadeFloor } from "../src/lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
@@ -167,6 +168,8 @@ function detailFields(e) {
     wikidata_classes: strings(e.wikidata_classes),
     date_flags: strings(e.date_flags),
     coordinate_source: e.coordinate_source ?? null,
+    // Set when the text is the article of another Wikidata item (no article of its own).
+    text_from_article: otherArticleTitle(e),
   };
 }
 

@@ -2,6 +2,7 @@ import { Fragment, Suspense, lazy, useEffect, useRef, useState } from "react";
 import { FramingPointer } from "./FramingPointer.jsx";
 import ShareButton from "./ShareButton.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
+import { otherArticleNote } from "../lib/otherArticle.js";
 import { safeUrl } from "../lib/safeUrl.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
@@ -280,6 +281,11 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
       {flags.length > 0 && (
         <p className="event-detail-note" role="note">
           Date unverified: {flags.join("; ")}. Dates are shown as Wikidata gives them.
+        </p>
+      )}
+      {event.text_from_article && (
+        <p className="event-detail-note" role="note">
+          {otherArticleNote(event.text_from_article)}
         </p>
       )}
       {/* Going to the review opens the full text, so every highlight it refers to is on the page. */}

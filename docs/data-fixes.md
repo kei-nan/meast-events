@@ -247,3 +247,25 @@ put them outside the tracked set; the validator now rejects any event without a 
   resolve to other items, store their own `P625`.
 - Ledger entry F11 (`scripts/lib/fixes.js`). When a fix moves a pin, the `coordinate_far_from_countries` flag is recomputed from the new
   point (Marg Bar Sarmachar's "1544 km from Iran" flag no longer applies).
+
+## F12 - five events without an article of their own included (owner's rule: include all such events, with a note)
+
+- Before: a proposed event whose English Wikipedia title redirects into an article that a curated event already shows was left out as a
+  duplicate (`data/proposed-exclusions.json`). Which of the two stayed depended only on merge order; e.g. "June 2025 Israeli strikes on Iran"
+  was in and "June 2025 Iranian strikes on Israel" out, though both redirect into "List of attacks during the Twelve-Day War".
+- Rule (owner's decision, 2026-10-10): every such event is included and the site says above its text that it has no article of its own and
+  whose text it shows (`docs/DATA_POLICY.md`, "Events without an article of their own").
+- Done: the five exclusions were removed and the events merged with `scripts/merge-proposed.js --apply` (816 curated events). Each shows the
+  same Wikipedia article as a curated event, so it takes that event's stored text (`extract`, `extract_retrieved_at`) and framing review
+  verbatim, replacing the older, shorter summary it was discovered with; the `extract_not_copied_qid_mismatch` flag is replaced by
+  `text_from_redirect_target`. Their `sitelinks_current` was fetched from Wikidata on 2026-10-10 (equal to the discovery counts).
+
+| Added event (QID) | Its Wikipedia title leads to | Text and review taken from |
+|---|---|---|
+| June 2025 Iranian strikes on Israel (Q134890505) | List of attacks during the Twelve-Day War | `june-2025-israeli-strikes-on-iran` |
+| Ein HaShlosha massacre (Q123027684) | October 7 attacks | `october-7-attacks` |
+| Israeli invasion of the Gaza Strip (Q123036458) | Gaza war | `2023-israel-hamas-war` |
+| Attack on the United States embassy in Baghdad (Q80438042) | December 2019 United States airstrikes in Iraq and Syria | `december-2019-united-states-airstrikes-in-iraq-and-syria` |
+| Operation Guardian of the Walls (Q106786309) | 2021 Israel–Palestine crisis | `2021-israel-palestine-crisis` |
+
+- Their pins follow F11 (own Wikidata location only).
