@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { REVIEW_TABS, defaultReviewTab } from "./reviewTabs.js";
+import { REVIEW_TABS, defaultReviewTab, tabStatus } from "./reviewTabs.js";
 
 test("tab order: fairness first, then wording", () => {
   assert.deepEqual(REVIEW_TABS, ["fairness", "wording"]);
@@ -18,4 +18,11 @@ test("falls back to the first tab when nothing was found or the review is missin
   assert.equal(defaultReviewTab({}), "fairness");
   assert.equal(defaultReviewTab(null), "fairness");
   assert.equal(defaultReviewTab(undefined), "fairness");
+});
+
+test("tabStatus: nothing found, an issue, or the number of wording points", () => {
+  assert.equal(tabStatus("fairness", { found: false }), "Nothing found");
+  assert.equal(tabStatus("fairness", { found: true }), "Issue found");
+  assert.equal(tabStatus("wording", { found: true, findings: [{}] }), "1 wording point");
+  assert.equal(tabStatus("wording", { found: true, findings: [{}, {}] }), "2 wording points");
 });

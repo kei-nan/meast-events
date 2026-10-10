@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import FramingReview, { FramingPointer } from "./FramingReview.jsx";
+import { Fragment, Suspense, lazy, useEffect, useRef, useState } from "react";
+import { FramingPointer } from "./FramingPointer.jsx";
 import ShareButton from "./ShareButton.jsx";
+import { rtlRuns, splitBidi } from "../lib/bidi.js";
+import { safeUrl } from "../lib/safeUrl.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
@@ -9,6 +11,9 @@ import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { wikidataUrl } from "../lib/partOf.js";
+
+// The review below the text loads with the first opened event, not with the page.
+const FramingReview = lazy(() => import("./FramingReview.jsx"));
 
 // Children shown before "Show all N".
 const INCLUDES_SHOWN = 8;
@@ -163,15 +168,16 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     yearOnly: flags.length > 0,
   });
   const review = event.framing_review;
-  // Each paragraph as plain and highlighted pieces. Paragraphs past the first
-  // LEAD_PARAGRAPHS are hidden or shown whole, never cut or rewritten.
+  // Each paragraph as plain and highlighted pieces, with its right-to-left runs
+  // (lib/bidi.js). Paragraphs past the first LEAD_PARAGRAPHS are hidden or
+  // shown whole, never cut or rewritten.
   const paragraphs = (event.extract ?? "")
     .split(/\n+/)
     .filter((p) => p.trim())
-    .map((p) => markSegments(p, review?.highlights));
+    .map((p) => ({ segs: markSegments(p, review?.highlights), runs: rtlRuns(p) }));
   const clamps = paragraphs.length > LEAD_PARAGRAPHS;
   const expanded = expandedId === event.id;
-  const hiddenFlagged = clamps && paragraphs.slice(LEAD_PARAGRAPHS).some((segs) => segs.some((s) => s.flagged));
+  const hiddenFlagged = clamps && paragraphs.slice(LEAD_PARAGRAPHS).some(({ segs }) => segs.some((s) => s.flagged));
   const reviewTab = chosenTab?.id === event.id ? chosenTab.tab : defaultReviewTab(review);
   const openTab = (tab) => setChosenTab({ id: event.id, tab });
   // A highlight opens the tab of the review that flagged it (the fairness tab if both did).
@@ -189,12 +195,31 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     reviewAfterExpand.current = true;
     setExpandedId(event.id);
   };
+  // Linked only when it is a plain web address (lib/safeUrl.js).
+  const wikiUrl = safeUrl(event.wikipedia_url);
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
 
-  const renderParagraph = (segs, i) => (
+  // Names in Arabic, Hebrew or Persian script are isolated as right-to-left
+  // (<bdi>), so the punctuation around them stays in place; the text is
+  // unchanged. `at` is where the piece starts in its paragraph.
+  const bidi = (text, runs, at) =>
+    runs.length
+      ? splitBidi(text, runs, at).map((piece, k) =>
+          piece.rtl ? (
+            <bdi key={k} dir="rtl" lang={piece.lang ?? undefined}>
+              {piece.text}
+            </bdi>
+          ) : (
+            piece.text
+          )
+        )
+      : text;
+
+  const renderParagraph = ({ segs, runs }, i) => (
     <p key={i}>
-      {segs.map((s, j) =>
-        s.flagged ? (
+      {segs.map((s, j) => {
+        const at = segs.slice(0, j).reduce((n, x) => n + x.text.length, 0);
+        return s.flagged ? (
           <mark
             key={j}
             className={`framing-mark ${s.kinds.map((k) => `framing-mark--${k}`).join(" ")}`}
@@ -210,12 +235,12 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
             }}
             aria-label={`Flagged by the ${s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ")}: ${s.text}`}
           >
-            {s.text}
+            {bidi(s.text, runs, at)}
           </mark>
         ) : (
-          s.text
-        )
-      )}
+          <Fragment key={j}>{bidi(s.text, runs, at)}</Fragment>
+        );
+      })}
     </p>
   );
 
@@ -231,8 +256,8 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
           </button>
         )}
         <ShareButton title={event.title} />
-        {event.wikipedia_url && (
-          <a className="sp-btn event-detail-wiki" href={event.wikipedia_url} target="_blank" rel="noreferrer">
+        {wikiUrl && (
+          <a className="sp-btn event-detail-wiki" href={wikiUrl} target="_blank" rel="noreferrer">
             {/* "Read on" is for screen readers only, to keep the action row short. */}
             <span className="sp-sr-status">Read on </span>Wikipedia <span aria-hidden="true">↗</span>
             <span className="sp-sr-status"> (opens in a new tab)</span>
@@ -304,7 +329,11 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
       {retrieved && (
         <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
       )}
-      <FramingReview event={event} tab={reviewTab} onTab={openTab} />
+      {event.framing_review && (
+        <Suspense fallback={null}>
+          <FramingReview event={event} tab={reviewTab} onTab={openTab} />
+        </Suspense>
+      )}
       <Includes
         event={event}
         onSelectEvent={onSelectEvent}
@@ -334,11 +363,11 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
         >
           CC BY-SA 4.0
         </a>
-        {event.wikipedia_url ? (
+        {wikiUrl ? (
           <>
             {" "}
             by{" "}
-            <a href={historyUrl(event.wikipedia_url)} target="_blank" rel="noreferrer">
+            <a href={historyUrl(wikiUrl)} target="_blank" rel="noreferrer">
               Wikipedia contributors
             </a>
           </>

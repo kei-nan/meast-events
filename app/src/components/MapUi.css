@@ -126,6 +126,7 @@
 .mu-borders-panel,
 .mu-popup,
 .mu-notice,
+.mu-loading,
 .mu-tip {
   font: 12px/1.35 system-ui, sans-serif;
   color: #2b2418;
@@ -318,10 +319,9 @@
   border-color: #a13f2e;
   color: #6b1f12;
 }
+/* A card like the notices: bare light text was unreadable on the light land. */
 .mu-loading {
-  font: 12px/1.3 system-ui, sans-serif;
-  color: #f4f1ea;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  padding: 6px 8px;
 }
 .mu-loading:empty {
   display: none;
@@ -422,7 +422,9 @@
 .mu-draw {
   display: contents;
 }
-.mu-draw > .mu-tool[aria-expanded="true"] {
+/* Open, or a drawing mode on (the button's name says which). */
+.mu-draw > .mu-tool[aria-expanded="true"],
+.mu-draw > .mu-tool.is-on {
   color: #f4f1ea;
   background: #5c4d38;
 }

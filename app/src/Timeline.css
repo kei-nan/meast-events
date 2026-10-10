@@ -233,6 +233,12 @@
   flex: none;
 }
 
+/* Inside the button: the scrolling row (and its edge fades) would clip a ring
+   drawn outside it, on phones at both ends. */
+.timeline-preset:focus-visible {
+  outline-offset: -4px;
+}
+
 /* Right-aligned when they fit; an auto margin collapses to 0 when they
    overflow, so the first preset stays reachable by scrolling. */
 .timeline-preset:first-child {
@@ -290,7 +296,7 @@
   text-align: center;
   color: var(--text-primary);
   background: var(--bg-0);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-field);
   border-radius: 6px;
 }
 
