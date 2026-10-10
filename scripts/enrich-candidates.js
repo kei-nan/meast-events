@@ -130,24 +130,15 @@ async function resolveCandidate(candidate, index, total) {
   const cats = await fetchCategories(candidate.wikipedia_title);
   await sleep(REQUEST_DELAY_MS);
 
-  // When the title resolves to a different item (a redirect to a broader article), the summary is
-  // THAT article's, so its coordinates - like the other item's P625 below - are not the event's
-  // own: they are recorded as coordinate_source "redirect_target" (borrowedSource), which the
-  // validator always warns about. Whether to keep such pins is the owner's open decision.
+  // Only the event's OWN location is used (owner's rule, 2026-10-10; docs/data-fixes.md F11). When the
+  // title resolves to a different item (a redirect to a broader article), the summary is THAT article's,
+  // so its coordinates are not the event's: only the event item's own P625 counts, else no location.
   const otherItem = Boolean(resolvedQid && resolvedQid !== candidate.wikidata_qid);
-  let coordinates = summary.coordinates ? { lat: summary.coordinates.lat, lon: summary.coordinates.lon } : null;
-  let coordinateSource = coordinates ? borrowedSource("wikipedia", otherItem) : null;
+  let coordinates = summary.coordinates && !otherItem ? { lat: summary.coordinates.lat, lon: summary.coordinates.lon } : null;
+  let coordinateSource = coordinates ? "wikipedia" : null;
   if (!coordinates && entity?.coordinates) {
     coordinates = entity.coordinates;
     coordinateSource = "wikidata"; // the event's own item
-  }
-  if (!coordinates && otherItem) {
-    const other = await fetchEntity(resolvedQid);
-    await sleep(REQUEST_DELAY_MS);
-    if (other?.coordinates) {
-      coordinates = other.coordinates;
-      coordinateSource = BORROWED_SOURCE;
-    }
   }
   // v2.1: no capital-fallback pin for discovered events. No real coordinates => coordinates null and
   // location_quality "none" (never invented); the event is still proposed.
@@ -368,11 +359,14 @@ async function main() {
       r.coordinates = null;
       r.coordinate_source = null;
     }
-    // entries cached (--reuse) before "redirect_target" existed: Wikipedia coordinates of an article
-    // that belongs to another item are relabelled (the point itself is unchanged). A cached
-    // "wikidata" point with another resolved item cannot be told apart (own P625 or the other
-    // item's) and keeps its label.
-    if (r.coordinates) r.coordinate_source = borrowedSource(r.coordinate_source, Boolean(r.resolved_qid && r.resolved_qid !== r.wikidata_qid));
+    // entries cached (--reuse) by an older version may carry Wikipedia coordinates of an article that
+    // belongs to another item (or a "redirect_target" point): not the event's own location, so dropped.
+    // A cached "wikidata" point with another resolved item cannot be told apart (own P625 or the other
+    // item's) and is kept; re-run without --reuse to re-derive it.
+    if (r.coordinates && borrowedSource(r.coordinate_source, Boolean(r.resolved_qid && r.resolved_qid !== r.wikidata_qid)) === BORROWED_SOURCE) {
+      r.coordinates = null;
+      r.coordinate_source = null;
+    }
     if (!r.error) r.location_quality = r.coordinates ? "precise" : "none";
     if (!r.error) r.needs_manual_coordinates = !r.coordinates;
   }

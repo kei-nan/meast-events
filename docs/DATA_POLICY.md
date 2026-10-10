@@ -286,11 +286,12 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 ## Location quality
 
 - `precise`: coordinates from the English Wikipedia article or the item's Wikidata `P625` (`coordinate_source` = `wikipedia` / `wikidata` / `manual-override`).
-  `coordinate_source` = `redirect_target` marks a point that `scripts/enrich-candidates.js` took from a **different** item: the event's title redirects to
-  another article (its `resolved_qid` differs from `wikidata_qid`), and the point is that article's coordinates or that item's `P625`. It is a real
-  Wikipedia/Wikidata coordinate but not the event's own, so validation always warns about it (see below). Records written before this label existed carry
-  `wikipedia` there; the validator recognises those too (Wikipedia coordinates + a different `resolved_qid`). A borrowed `wikidata` point cannot be told
-  apart from the event's own `P625` in the stored data and is not reported.
+  **An event is pinned only at its own location** (owner's rule, 2026-10-10; `docs/data-fixes.md` F11). When the event's title redirects to the article
+  of a **different** item (its `resolved_qid` differs from `wikidata_qid`), that article's coordinates and that item's `P625` are not the event's, so
+  `scripts/enrich-candidates.js` uses only the event item's own `P625`, else the event has no location. `coordinate_source` = `redirect_target` (a point
+  from a different item) is no longer produced; the validator still warns about it, and about older records with `wikipedia` coordinates and a different
+  `resolved_qid`. A borrowed `wikidata` point cannot be told apart from the event's own `P625` in the stored data; the four known cases were checked
+  against Wikidata and fixed (F11).
 - `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (74 events on 2026-10-10, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.

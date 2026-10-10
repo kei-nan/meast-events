@@ -3,6 +3,7 @@
 // live Wikipedia + Wikidata (2026-09-26). Everything not listed is at most FLAGGED, never changed.
 // ids are never changed.
 import { precisionName } from "./wiki.js";
+import { coordinateFlag } from "./flags.js";
 export const DATA_FIXES = [
   {
     qid: "Q2479435",
@@ -133,6 +134,34 @@ for (const [qid, date, label, infobox] of [
   });
 }
 
+// F11: pins that were another item's location. The owner's rule (2026-10-10): an event is pinned only at its
+// OWN location - the event item's Wikidata P625 (or its own article's coordinates) - else it has no location.
+// Each title below resolves to a different item's article (resolved_qid), whose point enrich-candidates.js used.
+// Wikidata P625 of both items checked live 2026-10-10. enrich-candidates.js applies the same rule to new candidates.
+for (const [qid, coordinates, label, evidence] of [
+  ["Q124309366", { lat: 27.370833333333334, lon: 62.3325 }, "Operation Marg Bar Sarmachar",
+    "pin 27.1667, 64.2667 (Pakistan) was the article \"2024 Iranian missile strikes in Pakistan\" (Q124306685); the operation's own P625 = 27.370833, 62.3325"],
+  ["Q19831524", { lat: 36.258333, lon: 35.903611 }, "Musa Dagh Resistance",
+    "pin was the article \"Musa Dagh\" (the mountain, Q1953975); the event's own P625 = 36.258333, 35.903611, the same place"],
+  ["Q80438042", { lat: 33.299, lon: 44.396 }, "Attack on the United States embassy in Baghdad",
+    "pin was the article \"December 2019 United States airstrikes in Iraq and Syria\" (Q26847124); the event's own P625 = 33.299, 44.396, the same point"],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F11",
+    set: { coordinates, coordinate_source: "wikidata", location_quality: "precise", needs_manual_coordinates: false },
+    note: `${label}: ${evidence}. coordinates = the event's own Wikidata P625`,
+  });
+}
+DATA_FIXES.push({
+  qid: "Q106786309",
+  ref: "F11",
+  set: { coordinates: null, coordinate_source: null, location_quality: "none", needs_manual_coordinates: true },
+  note:
+    "Operation Guardian of the Walls: pin 31, 35 was Wikidata P625 of Q106775117 (2021 Israel–Palestine crisis, the article its title " +
+    "resolves to); the operation's own item has no P625. No location of its own, so none is shown",
+});
+
 export const FIXES_BY_QID =new Map(DATA_FIXES.map((f) => [f.qid, f]));
 
 // Coordinates that look swapped to the validator (outside the region, inside it with
@@ -164,6 +193,11 @@ export function applyDataFix(event) {
       event[k] = v;
       changed.push(k);
     }
+  }
+  if (changed.includes("coordinates")) {
+    // the distance flag was computed from the old point
+    const far = coordinateFlag(event.coordinates, event.countries);
+    event.review_reasons = [...(event.review_reasons ?? []).filter((r) => !r.startsWith("coordinate_far_from_countries")), ...(far ? [far] : [])];
   }
   if (changed.length) {
     const msg = `data_fix ${fix.ref}: ${fix.note} (fields: ${changed.join(", ")}; see docs/data-fixes.md)`;
