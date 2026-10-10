@@ -1,5 +1,9 @@
 # Import verification sample
 
+> **Dated snapshot (2026-09-26).** This report describes `data/events.proposed.json` as it was on 2026-09-26 (284 events). The file has
+> changed since (254 events on 2026-10-10), so the sample and the figures below are not those of the current file. The script is now
+> `node scripts/verify-sample.js`; re-running it replaces this report.
+
 Generated 2026-09-26T13:25:03.360Z by `node scripts/lib/verify-sample.js`.
 
 **Method.** A random sample of 40 of the 284 events in `data/events.proposed.json`, drawn with a seeded
