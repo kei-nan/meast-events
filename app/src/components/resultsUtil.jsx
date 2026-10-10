@@ -1,3 +1,5 @@
+import { eventOverlapsRange } from "../lib/eventYears.js";
+
 function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -24,14 +26,12 @@ export function highlight(text, query) {
   return out;
 }
 
-export function eventYears(e) {
-  const s = Number(e.date_start?.slice(0, 4));
-  const en = e.date_end ? Number(e.date_end.slice(0, 4)) : s;
-  return [s, Number.isFinite(en) ? en : s];
-}
+// The years as the dates give them, for labels (lib/eventYears.js).
+export { rawEventYears as eventYears } from "../lib/eventYears.js";
 
+// Overlap with the selected years: the span between the two years, whichever
+// order the data gives them in (lib/eventYears.js).
 export function inRange(e, range) {
   if (!range) return true;
-  const [s, en] = eventYears(e);
-  return s <= range[1] && en >= range[0];
+  return eventOverlapsRange(e, range[0], range[1]);
 }

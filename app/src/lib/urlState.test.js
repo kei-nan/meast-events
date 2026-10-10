@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { areaToParam, parseArea, parseUrlState, serializeUrlState, urlWriteMode, YEAR_MAX } from "./urlState.js";
+import { areaToParam, entryBeforePush, parseArea, parseUrlState, serializeUrlState, urlWriteMode, YEAR_MAX } from "./urlState.js";
 
 const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
 
@@ -114,4 +114,19 @@ test("urlWriteMode: pushes event changes, debounces the rest, replaces on reques
   assert.equal(urlWriteMode("?q=x&e=bogus", "?q=x", { replace: true }), "replace");
   // The flag only matters for event changes.
   assert.equal(urlWriteMode("?q=x", "?q=y", { replace: true }), "debounce");
+});
+
+test("entryBeforePush: carries a pending non-event change onto the current entry", () => {
+  const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, about: false };
+  // Typed "suez", then opened an event within the debounce: the current entry
+  // (still "?q=su") gets "?q=suez" before the event's entry is pushed.
+  assert.equal(entryBeforePush("?q=su", { ...base, q: "suez", eventId: "suez-crisis" }), "?q=suez");
+  // Closing the event after moving the years: the event's entry keeps the event.
+  assert.equal(
+    entryBeforePush("?e=suez-crisis", { ...base, startYear: 1956, endYear: 1957, eventId: null }),
+    "?y=1956-1957&e=suez-crisis"
+  );
+  // Nothing pending: nothing to write.
+  assert.equal(entryBeforePush("?q=suez", { ...base, q: "suez", eventId: "suez-crisis" }), null);
+  assert.equal(entryBeforePush("", { ...base, about: true }), null);
 });

@@ -23,3 +23,17 @@ test("restart: accumulate from the start year, slide from the first year with th
   assert.deepEqual(playRestart(MAX_YEAR - 10, MAX_YEAR, "slide"), [MIN_YEAR, MIN_YEAR + 10]);
   assert.deepEqual(playRestart(MIN_YEAR, MAX_YEAR, "slide"), [MIN_YEAR, MIN_YEAR]);
 });
+
+test("restart: accumulate with only the last year selected grows from the first year", () => {
+  assert.deepEqual(playRestart(MAX_YEAR, MAX_YEAR, "accumulate"), [MIN_YEAR, MIN_YEAR]);
+  assert.deepEqual(playRestart(MAX_YEAR, MAX_YEAR, "slide"), [MIN_YEAR, MIN_YEAR]);
+});
+
+test("restart always leaves a step to play", () => {
+  for (const mode of ["accumulate", "slide"]) {
+    for (const start of [MIN_YEAR, 1967, MAX_YEAR - 1, MAX_YEAR]) {
+      const [s, e] = playRestart(start, MAX_YEAR, mode);
+      assert.notEqual(playStep(s, e, mode), null, `${mode} from ${start}`);
+    }
+  }
+});

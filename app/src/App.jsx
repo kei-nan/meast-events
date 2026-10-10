@@ -1,6 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SearchPanel from "./components/SearchPanel.jsx";
-import AboutData from "./components/AboutData.jsx";
 import ShareButton from "./components/ShareButton.jsx";
 import Timeline from "./components/Timeline";
 import useAllEvents, { RETRY_MS } from "./hooks/useAllEvents";
@@ -14,7 +13,9 @@ import {
   loadBoundaryDecade,
   loadFullLead,
   loadLand,
+  prefetchFullLead,
 } from "./lib/dataClient";
+import { rawEventYears } from "./lib/eventYears";
 import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
@@ -41,13 +42,17 @@ const MapView = lazy(() =>
   )
 );
 const MAP_PLACEHOLDER = <div className="map-view map-placeholder" aria-busy="true" aria-label="Loading map" />;
+// Opened from the footer or a link only, so its code loads on first use.
+const AboutData = lazy(() => import("./components/AboutData.jsx"));
 
 // Everything the map needs (its chunk, MapLibre's shared chunk, land, the
 // initial borders decade) starts downloading right after the FIRST PAINT, all
 // in parallel. Not before it: on a slow connection these ~400 KB would share
 // bandwidth with index.js and delay the header, panel and timeline (Lighthouse
 // measured LCP 4.1 s -> 5.6 s with them preloaded from index.html). The data
-// loaders cache their requests, so MapView reuses these.
+// loaders cache their requests, so MapView reuses these. `year` null: not known
+// yet (an event link without years shows the event's own year, which needs the
+// event list), so no borders decade is fetched ahead.
 function startMapDownloads(year) {
   if (import.meta.env.PROD) {
     // maplibre-gl.mjs imports this file only once it runs (vite.config.js
@@ -57,7 +62,9 @@ function startMapDownloads(year) {
     link.href = new URL("maplibre-gl-shared.mjs", new URL(maplibreWorkerUrl, window.location.href)).href;
     document.head.append(link);
   }
-  for (const load of [loadLand(), loadBoundaryDecade(decadeFloor(year))]) load.catch(() => {}); // MapView retries
+  const loads = [loadLand()];
+  if (year != null) loads.push(loadBoundaryDecade(decadeFloor(year)));
+  for (const load of loads) load.catch(() => {}); // MapView retries
 }
 
 // Calls fn once the browser reports the First Contentful Paint. "The next frame"
@@ -146,11 +153,17 @@ export default function App() {
   useEffect(
     () =>
       afterFirstContentfulPaint(() => {
-        startMapDownloads(initial.years?.[1] ?? MAX_YEAR); // the map shows the range's end year
+        // The map shows the range's end year, or an opened event's own year.
+        startMapDownloads(initial.years?.[1] ?? (initial.eventId ? null : MAX_YEAR));
         setMapStarted(true);
       }),
     [initial]
   );
+  // An event link: the event's detail record downloads alongside the event
+  // list instead of after it.
+  useEffect(() => {
+    if (initial.eventId) prefetchFullLead(initial.eventId);
+  }, [initial]);
 
   // The whole lite event set is loaded ONCE from static data (no API call);
   // range, viewport, filter and area queries are all computed from this store.
@@ -279,12 +292,20 @@ export default function App() {
     if (!needsLead || leadRequestedRef.current.has(selectedEventId)) return;
     const id = selectedEventId;
     leadRequestedRef.current.add(id);
+    // A retry (re-opening after a failure) shows "loading" again, not the old error.
+    setLeads((m) => {
+      if (!(id in m)) return m;
+      const next = { ...m };
+      delete next[id];
+      return next;
+    });
+    const failed = () => {
+      leadRequestedRef.current.delete(id); // allow a retry on re-open
+      setLeads((m) => ({ ...m, [id]: "error" }));
+    };
     loadFullLead(id)
-      .then((lead) => setLeads((m) => ({ ...m, [id]: lead ?? "error" })))
-      .catch(() => {
-        leadRequestedRef.current.delete(id); // allow a retry on re-open
-        setLeads((m) => ({ ...m, [id]: "error" }));
-      });
+      .then((lead) => (lead ? setLeads((m) => ({ ...m, [id]: lead })) : failed()))
+      .catch(failed);
   }, [needsLead, selectedEventId]);
 
   const selectedEvent = useMemo(() => {
@@ -314,9 +335,9 @@ export default function App() {
 
   // What the panel lists: idle => the browse list for the selected years
   // (events starting in them first, then ones ongoing from earlier, each most
-  // covered first or by date; see lib/browseOrder.js; capped for rendering,
-  // `total` stays exact); otherwise the ranked search results in the chosen scope.
-  const BROWSE_CAP = 500;
+  // covered first or by date; see lib/browseOrder.js); otherwise the ranked
+  // search results in the chosen scope. ResultsList renders 50 rows at a time
+  // ("Show more"), so the whole list stays reachable.
   const browseList = useMemo(
     () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear, sort)) : null),
     [search.status, inViewFilter, visibleEvents, startYear, sort]
@@ -324,7 +345,7 @@ export default function App() {
   // Memoized (like range below) so a hover re-render of App passes the memoized
   // ResultsList the same props and it skips rendering.
   const panelResults = useMemo(
-    () => (browseList ? browseList.slice(0, BROWSE_CAP) : scopedResults),
+    () => browseList ?? scopedResults,
     [browseList, scopedResults]
   );
   const panelRange = useMemo(() => [startYear, endYear], [startYear, endYear]);
@@ -413,16 +434,23 @@ export default function App() {
   const handleChangeRange = useCallback((nextStart, nextEnd) => {
     setRange({ start: nextStart, end: nextEnd });
   }, []);
-  const handleBack = useCallback(() => setSelectedEventId(null), []);
+  // Opening or closing an event hides the row under the pointer, so its
+  // mouseleave never comes: the hover (and its map shading) is cleared here.
+  const handleBack = useCallback(() => {
+    setHoverId(null);
+    setSelectedEventId(null);
+  }, []);
 
   // Map click: select only. List click: select AND fly the map there.
   const handleSelectFromMap = useCallback((id) => {
     setNotFound(false);
+    setHoverId(null);
     setSelectedEventId(id);
   }, []);
   const handleSelectFromList = useCallback(
     (id) => {
       setNotFound(false);
+      setHoverId(null);
       setSelectedEventId(id);
       const ev = storeRef.current.get(id);
       const f = ev && focusFor(ev, focusNonceRef);
@@ -435,7 +463,7 @@ export default function App() {
   // Link previews still show the site title: crawlers do not run this script,
   // so per-event previews would need a server-side function.
   const selectedTitle = selectedEventRaw?.title;
-  const selectedYears = selectedEventRaw ? eventYearRange(selectedEventRaw) : null;
+  const selectedYears = selectedEventRaw ? rawEventYears(selectedEventRaw) : null; // as the dates give them
   const selectedYearText = selectedYears
     ? selectedYears[1] !== selectedYears[0]
       ? `${selectedYears[0]}–${selectedYears[1]}`
@@ -476,7 +504,8 @@ export default function App() {
               Events could not be loaded - retrying
             </span>
           )}
-          {degraded && search.textSearch && (
+          {/* Once its matches are listed the panel says this under the search box. */}
+          {degraded && search.textSearch && search.source !== "static" && (
             <span className="app-notice" role="status">
               Full-text search is unavailable - matching titles and summaries only
             </span>
@@ -498,6 +527,8 @@ export default function App() {
               events={mapEvents}
               matchIds={matchIds}
               eventsLoading={eventsLoading}
+              // An event link without years shows the event's year, known once the events load.
+              yearPending={Boolean(initial.eventId && !initial.years && eventsLoading && !eventsError)}
               year={endYear}
               borderYear={borderYear}
               eventYear={eventYear}
@@ -560,7 +591,11 @@ export default function App() {
         onPlayStateChange={setPlayState}
         eventYear={eventYear}
       />
-      {about && <AboutData section={aboutSection} onClose={() => setAbout(false)} />}
+      {about && (
+        <Suspense fallback={null}>
+          <AboutData section={aboutSection} onClose={() => setAbout(false)} />
+        </Suspense>
+      )}
       {/* One short line on every page. The full credits (Wikipedia CC BY-SA 4.0;
           CShapes 2.0, Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0, non-commercial
           use, with our cited corrections) are one click away in the About

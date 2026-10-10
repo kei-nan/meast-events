@@ -80,9 +80,14 @@ function Timeline({
     setTimeout(() => yearBtnRef.current?.focus(), 0);
   }
 
-  // Play advances one year per step (see playStep) and stops at MAX_YEAR.
+  // Play advances one year per step (see playStep) and stops at MAX_YEAR. It
+  // never stays "playing" there (that would hold the panel's announcements).
   useEffect(() => {
-    if (!playing || endYear >= MAX_YEAR) return undefined;
+    if (!playing) return undefined;
+    if (endYear >= MAX_YEAR) {
+      setPlayState("paused");
+      return undefined;
+    }
     const id = setTimeout(() => {
       const cur = latest.current;
       const next = playStep(cur.startYear, cur.endYear, playMode);
@@ -360,8 +365,9 @@ function Timeline({
                 role="slider"
                 tabIndex={0}
                 aria-label={HANDLE_NAME[h]}
-                aria-valuemin={MIN_YEAR}
-                aria-valuemax={MAX_YEAR}
+                // Each handle stops at the other one (moveHandle), so that is its limit.
+                aria-valuemin={h === "start" ? MIN_YEAR : startYear}
+                aria-valuemax={h === "start" ? endYear : MAX_YEAR}
                 aria-valuenow={value}
                 aria-valuetext={`${HANDLE_NAME[h]} ${value}, ${countText(eventCountsByYear[value] ?? 0)} starting that year`}
                 aria-orientation="horizontal"

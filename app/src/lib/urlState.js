@@ -146,3 +146,16 @@ export function urlWriteMode(prevSearch, nextSearch, { replace = false } = {}) {
   if (prev.eventId === next.eventId && prev.about === next.about) return "debounce";
   return replace ? "replace" : "push";
 }
+
+// Before a push (an event opened/closed, About toggled): the URL the CURRENT
+// entry should have first. A non-event change made just before (typing, a
+// filter, the years) is still waiting for its debounced replace, which the push
+// cancels; written here, Back returns to the view as it was left, not as it
+// was 400 ms earlier. null when the current entry is already up to date.
+// `prevSearch` is the current entry's URL, `state` the new state (as for
+// serializeUrlState).
+export function entryBeforePush(prevSearch, state) {
+  const prev = parseUrlState(prevSearch);
+  const carried = serializeUrlState({ ...state, eventId: prev.eventId, about: prev.about });
+  return carried === prevSearch ? null : carried;
+}

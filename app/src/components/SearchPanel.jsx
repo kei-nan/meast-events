@@ -9,7 +9,13 @@ import { CATEGORY_COLORS } from "./mapLayers";
 import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
+import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
+import useDebouncedValue from "../hooks/useDebouncedValue";
 import "../SidePanel.css";
+
+// The screen reader status waits this long for typing or slider steps to settle,
+// so it speaks the result once instead of after every key.
+const ANNOUNCE_DELAY_MS = 700;
 
 // The browse-list sort switch: each key's label and how its directions read aloud.
 const SORT_KEYS = [
@@ -37,15 +43,17 @@ const SORT_KEYS = [
  *                                          inView (restrict to current map view)
  * @param {Area|null} props.area            active drawn area, or null
  * @param {"off"|"rect"|"circle"} props.areaMode  current draw mode
- * @param {"idle"|"loading"|"ready"} props.status
- *        idle = no query/filters/area (results is then the browse list for the range);
+ * @param {"idle"|"loading"|"ready"} props.status  the search hook's status (useEventSearch):
+ *        idle = no query of at least 2 characters, no filters, no area (results is then
+ *        the browse list for the range);
  *        loading = keep previous `results` (dimmed)
  * @param {object[]} props.results          lite events {id,title,date_start,date_end,countries,category,
  *                                          location_quality,snippet}, already ordered
  * @param {number}   props.total            total matches (may exceed results.length)
  * @param {{all:number, inRange:number}} [props.counts] search matches over the whole timeline / in the
  *                                          selected years (all is used for the "show all N" button)
- * @param {"fulltext"|"local"|"static"} props.source   "static" (full-text index unavailable) shows the "Matching is simpler in offline mode" banner
+ * @param {"fulltext"|"local"|"static"} props.source   "static" (full-text index unavailable) shows a
+ *                                          notice under the search box
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
@@ -117,11 +125,12 @@ export default function SearchPanel({
 
   const loading = status === "loading";
   const offline = source === "static";
-  const hasFilters =
-    (filters.categories?.length ?? 0) > 0 ||
-    (filters.countries?.length ?? 0) > 0 ||
-    !!filters.inView;
-  const searching = query.trim() !== "" || hasFilters || !!area;
+  // What App lists follows the search hook: below 2 characters a query is no
+  // search and the browse list shows, so it is styled and counted as one.
+  // "In map view" is not part of the search, but trims the list like a filter.
+  const searching = status !== "idle" || !!filters.inView;
+  // The text being searched for (highlighted in the rows), "" while it is no search.
+  const textQuery = query.trim().length >= MIN_QUERY_LENGTH ? query.trim() : "";
   const { key: sortKey, dir: sortDir } = parseSort(sort);
 
   // Back restores focus to
@@ -210,10 +219,12 @@ export default function SearchPanel({
         first.focus();
       }
     } else if (e.key === "Escape") {
+      // Handled here only: the map's own Escape handlers skip a handled key.
       if (query) {
         e.preventDefault();
         onQueryChange("");
       } else if (sheet === "full") {
+        e.preventDefault();
         setSheet("peek");
       }
     }
@@ -277,14 +288,18 @@ export default function SearchPanel({
   }
   const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
   const spoken = describeStatus(yearsText);
-  const liveText = playing ? "" : (pausedAt === rangeKey ? `Paused at ${range[1]}. ` : "") + spoken.text + spoken.extra;
+  const paused = pausedAt === rangeKey;
+  const liveText = playing ? "" : (paused ? `Paused at ${range[1]}. ` : "") + spoken.text + spoken.extra;
+  // Settled text only (typing, slider arrows), except "Paused at", which is immediate.
+  const settledLiveText = useDebouncedValue(liveText, ANNOUNCE_DELAY_MS);
+  const announced = paused ? liveText : settledLiveText;
 
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}`;
 
   return (
     <aside className="side-panel" data-sheet={sheet} aria-label="Search and event details">
       <p className="sp-sr-status" role="status">
-        {liveText}
+        {announced}
       </p>
       <button
         ref={toggleRef}
@@ -302,7 +317,9 @@ export default function SearchPanel({
         {selectedEvent && (
           <div
             onKeyDown={(e) => {
-              if (e.key === "Escape") onBack();
+              if (e.key !== "Escape" || e.defaultPrevented) return;
+              e.preventDefault();
+              onBack();
             }}
           >
             <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} onSelectEvent={onSelect} />
@@ -323,9 +340,7 @@ export default function SearchPanel({
                 autoComplete="off"
                 spellCheck={false}
                 maxLength={100}
-                placeholder={
-                  offline ? "Search built-in dataset…" : "Search title, place or topic…"
-                }
+                placeholder="Search title, place or topic…"
                 aria-describedby={hintId}
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
@@ -356,7 +371,7 @@ export default function SearchPanel({
 
           {offline && (
             <p className="sp-banner" role="status">
-              Matching is simpler in offline mode
+              Full-text search didn&apos;t load. Matching titles and summaries only; retrying.
             </p>
           )}
 
@@ -490,8 +505,8 @@ export default function SearchPanel({
             ) : total === 0 && !loading && results.length === 0 ? (
               <div className="sp-empty">
                 <p>
-                  {query.trim()
-                    ? `No events in this atlas match “${query.trim()}”.`
+                  {textQuery
+                    ? `No events in this atlas match “${textQuery}”.`
                     : "No events in this atlas match these filters."}
                 </p>
                 <p className="sp-muted">
@@ -508,7 +523,7 @@ export default function SearchPanel({
               <ResultsList
                 key={resultsKey}
                 results={results}
-                query={query}
+                query={textQuery}
                 range={range}
                 selectedId={selectedEvent?.id ?? null}
                 onSelect={onSelect}

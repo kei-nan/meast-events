@@ -48,6 +48,7 @@ import { gzipSync } from "node:zlib";
 import { fullBucket, fullBucketCount } from "../src/lib/fullBucket.js";
 import { MAP_EXTENT, NEAR_LAND_EXTENT } from "../src/lib/mapExtent.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
+import { DECADE_SIZE, decadeFloor } from "../src/lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -93,12 +94,6 @@ const DEFERRED_GROUPS = [
     },
   },
 ];
-
-const DECADE_SIZE = 10;
-
-function decadeFloor(year) {
-  return Math.floor(year / DECADE_SIZE) * DECADE_SIZE;
-}
 
 const MIN_DECADE = decadeFloor(MIN_YEAR);
 const MAX_DECADE = decadeFloor(MAX_YEAR);
