@@ -1,4 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import MapLoading from "./components/MapLoading.jsx";
 import SearchPanel from "./components/SearchPanel.jsx";
 import ShareButton from "./components/ShareButton.jsx";
 import Timeline from "./components/Timeline";
@@ -40,7 +41,8 @@ const MapView = lazy(() =>
       }))
   )
 );
-const MAP_PLACEHOLDER = <div className="map-view map-placeholder" aria-busy="true" aria-label="Loading map" />;
+// Sea, then the land as soon as land.json is in (components/MapLoading.jsx).
+const MAP_PLACEHOLDER = <MapLoading />;
 // Opened from the footer or a link only, so its code loads on first use.
 const AboutData = lazy(() => import("./components/AboutData.jsx"));
 
@@ -55,7 +57,11 @@ const AboutData = lazy(() => import("./components/AboutData.jsx"));
 function startMapDownloads(year) {
   // MapLibre's worker (self-contained since 6.13.0) is not preloaded: Chromium
   // ignores <link rel=preload as=worker>, and modulepreload would parse it on
-  // the main thread. It downloads when the map starts it.
+  // the main thread. It downloads when the map starts it. A fetch() from here
+  // would fill the HTTP cache for the Worker (Chromium reuses it), but measured
+  // (2026-10) it took bandwidth from the panel's content on a slow phone
+  // connection (LCP 4.5 -> 5.2 s) to save ~0.25 s of map wait on desktop. The
+  // land MapLoading draws from land.json covers that wait instead.
   const loads = [loadLand()];
   if (year != null) loads.push(loadBoundaryDecade(decadeFloor(year)));
   for (const load of loads) load.catch(() => {}); // MapView retries

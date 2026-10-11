@@ -24,6 +24,7 @@ import {
   YearToggle,
 } from "./MapUi";
 import useMediaQuery from "../hooks/useMediaQuery";
+import MapLoading from "./MapLoading";
 import { diffById } from "../lib/sourceDiff";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "./useMapHoverLabel";
@@ -48,6 +49,7 @@ import {
   withGeometry,
 } from "../lib/deferredBoundaries";
 import { MAP_EXTENT } from "../lib/mapExtent";
+import { DEFAULT_BOUNDS, DEFAULT_PADDING, SEA_COLOR } from "../lib/mapBase";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
 import { haversineKm } from "../lib/geo";
@@ -84,9 +86,7 @@ if (import.meta.env.PROD) {
 // third-party tile server, and no modern political layer can leak onto a
 // historical map. Label glyphs (see LABEL_FONT in mapInstallLayers.js) are
 // served from public/glyphs/; MapLibre needs an absolute glyphs URL.
-// A calm, slightly greyed sea (was a bright #d8f2ff). Keep in sync with
-// .map-placeholder in SidePanel.css, which stands in for the map while it loads.
-const SEA_COLOR = "#b9d5e3";
+// SEA_COLOR: keep in sync with .map-placeholder in SidePanel.css.
 const BASE_STYLE = {
   version: 8,
   glyphs: `${window.location.origin}${import.meta.env.BASE_URL}glyphs/{fontstack}/{range}.pbf`,
@@ -117,11 +117,6 @@ function applyInteractivity(map, mode, hasArea) {
   map.getCanvas().style.cursor = drawing ? "crosshair" : "";
 }
 
-// Default view: the Middle East. Shared by the initial view and "Reset view".
-const DEFAULT_BOUNDS = [
-  [8, 6],
-  [72, 50],
-];
 const RETRY_DELAY_MS = 1500;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -172,6 +167,7 @@ export default function MapView({
   const draggingRef = useRef(false);
   const suppressClickRef = useRef(false);
   const [mapReady, setMapReady] = useState(false);
+  const [landDrawn, setLandDrawn] = useState(false); // the canvas shows the land: MapLoading can go
 
   // Boundary decade chunks are fetched (static files) on demand and cached forever here -
   // scrubbing the timeline back over an already-visited decade never re-fetches
@@ -268,7 +264,8 @@ export default function MapView({
       container: containerRef.current,
       style: BASE_STYLE,
       bounds: DEFAULT_BOUNDS,
-      fitBoundsOptions: { padding: 20 },
+      // MapLoading draws its stand-in in this same view (lib/mapBase.js defaultCamera).
+      fitBoundsOptions: { padding: DEFAULT_PADDING },
       // land.json is clipped to this extent (scripts/split-data.mjs), so panning
       // further would show a sea where land was dropped.
       maxBounds: [MAP_EXTENT.slice(0, 2), MAP_EXTENT.slice(2)],
@@ -446,6 +443,22 @@ export default function MapView({
       });
 
       setMapReady(true);
+
+      // The stand-in (MapLoading) stays over the canvas until a frame with the
+      // land and borders in it has been drawn: their tiles are cut in the
+      // worker after installLayers, and until then the canvas is bare sea.
+      // "idle" is the fallback (everything settled, whatever loaded).
+      const reveal = () => {
+        map.off("render", revealWhenDrawn);
+        map.off("idle", reveal);
+        setLandDrawn(true);
+      };
+      const revealWhenDrawn = () => {
+        if (map.isSourceLoaded("land") && map.isSourceLoaded("boundaries")) reveal();
+      };
+      map.on("render", revealWhenDrawn);
+      map.once("idle", reveal);
+      map.triggerRepaint();
 
       // Land beyond the opening view loads once that view has drawn, so it never
       // competes with it; a failed load is retried on the next pan or zoom.
@@ -659,7 +672,7 @@ export default function MapView({
   const resetView = () => {
     const map = mapRef.current;
     if (!map) return;
-    map.fitBounds(DEFAULT_BOUNDS, { padding: 20, duration: reducedMotion() ? 0 : 600 });
+    map.fitBounds(DEFAULT_BOUNDS, { padding: DEFAULT_PADDING, duration: reducedMotion() ? 0 : 600 });
   };
   const closePopup = useCallback(() => setBorderPopup(null), []);
   // Closing the list (× or Escape) removes the focused card: focus goes back to
@@ -948,6 +961,7 @@ export default function MapView({
   return (
     <div className="map-view" style={{ position: "relative" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
+      {!landDrawn && <MapLoading cover />}
       <MapToolbar
         areaMode={areaMode}
         hasArea={!!area}
