@@ -349,6 +349,13 @@ thin unclaimed slivers; the "fit" entries give such a sliver to the neighbour. O
 open land. Where a sliver opens onto land that belongs to neither, the fill stops inside that opening; the line across it is the only stretch
 not taken from a source (at most about 0.6 km from the nearest sourced line, checked 2026-10-10). Land outside every shape stays blank.
 
+The map's land layer (Natural Earth 1:50m) has its own coastline, which in places lies a little seaward of a shape's coast. Within the area a fit
+works on, such a coastal strip that no shape covers goes to the shape directly behind it (the one it shares the most boundary with), never to a
+shape it does not touch; elsewhere these strips are left as they are. In 1922-1969 this adds 54.7 km2 of coast to the Saudi-Kuwaiti Neutral
+Zone, and in 1922-1938 56.0 km2 to the Sanjak of Alexandretta. Land that CShapes draws as Kuwait (from 1961) is never given to Saudi Arabia:
+the 87 km2 west of the neutral zone (around 47.61E 28.69N), which Natural Earth's modern Kuwait also includes, and a 5 km2 strip by the zone's
+north-west corner are Kuwait from 1961 and blank before, like the rest of Kuwait (changed 2026-10-11; before, Saudi Arabia held them 1933-1969).
+
 ## Pipeline and workflow
 
 ```

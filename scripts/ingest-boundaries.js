@@ -144,6 +144,7 @@ async function main() {
   const outPath = OUT;
 
   const raw = JSON.parse(await readFile(sourcePath, "utf-8"));
+  RAW_RECORDS = raw.features;
   const correctionsGeometry = JSON.parse(await readFile(geometryPath, "utf-8"));
   const land = JSON.parse(await readFile(new URL("../app/src/data/land.json", import.meta.url), "utf-8"));
   const filtered = raw.features.filter(
@@ -264,7 +265,7 @@ async function main() {
     });
   }
 
-  const fitted = applyFits(features, land);
+  const fitted = applyCoastalGaps(applyFits(features, land), land);
 
   const out = {
     type: "FeatureCollection",
@@ -387,6 +388,20 @@ function dissolveParts(geometry, label) {
   return kept.length === 1 ? { type: "Polygon", coordinates: kept[0] } : { type: "MultiPolygon", coordinates: kept };
 }
 
+// Raw CShapes records (set in main), for `notOnCShapes`.
+let RAW_RECORDS = [];
+// A piece "touches the sea" if the sea (anything outside the land mask) is within this distance.
+const COAST_TOUCH_KM = 2;
+function touchesSea(part, land, km) {
+  const around = turf.buffer(part, km);
+  const box = turf.bbox(around);
+  const landHere = land.features.filter((l) => bboxesTouch(turf.bbox(l), box)).map((l) => turf.intersect(fc(asFeature(l.geometry), around))).filter(Boolean);
+  if (!landHere.length) return true;
+  const landUnion = landHere.length > 1 ? turf.union(fc(...landHere)) : landHere[0];
+  const sea = turf.difference(fc(around, landUnion));
+  return Boolean(sea) && turf.area(sea) > 1;
+}
+
 // The land BETWEEN two shapes a and b: the gap that a disc of radius maxGapKm rolled
 // around the outside of both cannot enter (a morphological closing of a + b, minus a and
 // b), kept only where it touches both. Unlike "within maxGapKm of both", this never
@@ -458,13 +473,22 @@ function fittedGeometryRaw(neighbour, overlay, others, mode, maxGapKm, land, spe
     const parts = turf.getGeom(geom).type === "MultiPolygon" ? turf.getGeom(geom).coordinates : [turf.getGeom(geom).coordinates];
     const kept = parts.filter((rings) => {
       const part = turf.polygon(rings);
-      return turf.area(part) / 1e6 >= TRIM_MAX_PIECE_KM2 || !turf.booleanIntersects(part, near);
+      if (turf.area(part) / 1e6 >= TRIM_MAX_PIECE_KM2 || !turf.booleanIntersects(part, near)) return true;
+      // `keepInland`: only pieces stranded along the coast are dropped; a piece inland is
+      // the neighbour's own land on the far side of the overlay (Kuwait's wedge west of the
+      // Saudi-Kuwaiti zone) and stays.
+      return Boolean(spec.keepInland) && !touchesSea(part, land, COAST_TOUCH_KM);
     });
     geom = kept.length === 1 ? turf.polygon(kept[0]) : turf.multiPolygon(kept);
   }
   if (mode === "snap") {
     let sliver = gapBetween(overlay, asFeature(turf.getGeom(geom)), maxGapKm, land);
     sliver = sliver && turf.difference(fc(sliver, neighbour));
+    // `notOnCShapes`: never fill land that CShapes gives that country in any of its records
+    // (Saudi Arabia never takes land CShapes draws as Kuwait, even before Kuwait is on the map).
+    if (spec.notOnCShapes) {
+      for (const r of RAW_RECORDS.filter((f) => f.properties.cntry_name === spec.notOnCShapes)) sliver = sliver && turf.difference(fc(sliver, asFeature(r.geometry)));
+    }
     for (const o of others) sliver = sliver && turf.difference(fc(sliver, o));
     // Only land: the buffers also reach into the sea between two coastlines.
     const onLand = sliver
@@ -526,6 +550,122 @@ function applyFits(features, land) {
     }
   }
   return out;
+}
+
+// --- coastal gaps -----------------------------------------------------------------------
+//
+// The map's land mask (app/src/data/land.json, Natural Earth 1:50m) has its own coastline,
+// which in places runs a little seaward of the shapes' coasts (CShapes, Natural Earth 1:10m,
+// hand-digitized zones), leaving thin strips of land that no shape covers. Where a "fit"
+// works this is fixed by one rule: in each year, a piece of land-mask land that no shape
+// covers, that touches the sea and lies wholly within a fit's area (maxGapKm around the
+// fit's overlay, in the overlay's years) goes to the shape it shares the most boundary with
+// - the shape directly behind it - never to a shape it does not touch. A piece that reaches
+// out of the area (a long coastal strip, or a country CShapes does not draw that year) stays
+// blank. Every piece the rule adds is logged. Along the rest of the coast the strips are
+// left as they are: applied everywhere, the rule would change almost every coastal shape.
+const TOUCH_M = 1;
+function ringSegments(geom) {
+  const rings = geom.type === "Polygon" ? geom.coordinates : geom.coordinates.flat();
+  const out = [];
+  for (const r of rings) for (let i = 1; i < r.length; i++) out.push([r[i - 1], r[i]]);
+  return out;
+}
+// Metres from point p to segment [a, b] (local equirectangular; fine at these distances).
+function segMetres(p, a, b) {
+  const k = Math.cos((p[1] * Math.PI) / 180);
+  const ax = (a[0] - p[0]) * k, ay = a[1] - p[1], bx = (b[0] - p[0]) * k, by = b[1] - p[1];
+  const dx = bx - ax, dy = by - ay;
+  const l2 = dx * dx + dy * dy;
+  const t = l2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / l2)) : 0;
+  return Math.hypot(ax + t * dx, ay + t * dy) * 111320;
+}
+// Length (m) of the piece's outline that runs along the shape's outline (within TOUCH_M).
+function sharedBoundaryMetres(piece, shapeSegs) {
+  let total = 0;
+  const near = (p) => shapeSegs.some(([c, d]) => segMetres(p, c, d) <= TOUCH_M);
+  for (const [a, b] of ringSegments(turf.getGeom(piece))) {
+    if (near([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]) && near(a) && near(b)) total += turf.distance(a, b, { units: "kilometers" }) * 1000;
+  }
+  return total;
+}
+function applyCoastalGaps(features, land) {
+  const zones = CORRECTIONS.filter((c) => c.type === "fit").flatMap((fit) =>
+    features.filter((f) => f.properties.name.startsWith(fit.overlay)).map((o) => {
+      const area = turf.buffer(o, fit.maxGapKm);
+      // A slightly larger window, so a blank piece that reaches out of the area is seen whole.
+      const win = turf.bboxPolygon(turf.bbox(turf.buffer(area, 1)));
+      const landHere = land.features.filter((l) => bboxesTouch(turf.bbox(l), turf.bbox(win)));
+      return { o, area, win, box: turf.bbox(win), land: landHere, coast: landHere.flatMap((l) => ringSegments(l.geometry)) };
+    }));
+  const years = [...new Set(features.flatMap((f) => [f.properties.start_year, f.properties.end_year + 1]))].sort((a, b) => a - b);
+  const added = new Map(); // feature -> Map(segment start year -> [pieces])
+  for (let i = 0; i < years.length - 1; i++) {
+    const y = years[i];
+    if (y > 2026) break;
+    for (const z of zones.filter((z) => activeIn(z.o, y))) {
+      const shapes = features.filter((f) => activeIn(f, y) && bboxesTouch(turf.bbox(f), z.box));
+      const clipped = shapes.map((f) => [f, turf.intersect(fc(asFeature(f.geometry), z.win))]).filter(([, c]) => c);
+      for (const l of z.land) {
+        let blank = turf.intersect(fc(asFeature(l.geometry), z.win));
+        for (const [, c] of clipped) blank = blank && turf.difference(fc(blank, c));
+        if (!blank) continue;
+        const g = turf.getGeom(blank);
+        const raws = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]).map((rings) => turf.polygon(rings));
+        for (const piece of raws) {
+          if (turf.area(piece) < 1) continue;
+          if (!turf.booleanWithin(piece, z.area)) continue; // reaches out of the fit's area
+          if (!(sharedBoundaryMetres(piece, z.coast) > 0)) continue; // no stretch on the coast: an inland hole
+          const share = clipped.map(([f, c]) => [f, sharedBoundaryMetres(piece, ringSegments(turf.getGeom(c)))]).filter(([, m]) => m > 0).sort((a, b) => b[1] - a[1]);
+          const at = turf.centroid(piece).geometry.coordinates.map((v) => v.toFixed(4)).join(",");
+          if (!share.length) continue;
+          if (share.length > 1 && share[1][1] >= share[0][1] * 0.99) {
+            console.log(`  coastal gap ${y}: ${(turf.area(piece) / 1e6).toFixed(3)} km2 at ${at} left blank: ${share[0][0].properties.name} and ${share[1][0].properties.name} border it equally`);
+            continue;
+          }
+          const owner = share[0][0];
+          if (!added.has(owner)) added.set(owner, new Map());
+          const list = added.get(owner).get(y) ?? [];
+          // The same piece can be found from two overlapping fit areas.
+          if (!list.some((q) => JSON.stringify(q.geometry) === JSON.stringify(piece.geometry))) list.push(piece);
+          added.get(owner).set(y, list);
+        }
+      }
+    }
+  }
+  const out = [];
+  for (const f of features) {
+    const byYear = added.get(f);
+    if (!byYear) { out.push(f); continue; }
+    const lo = f.properties.start_year, hi = f.properties.end_year;
+    const cuts = years.filter((y) => y >= lo && y <= hi);
+    cuts.forEach((s, i) => {
+      const e = i + 1 < cuts.length ? cuts[i + 1] - 1 : hi;
+      const piece = { ...f, properties: { ...f.properties, start_year: s, end_year: e } };
+      SPLIT_FROM.set(piece, SPLIT_FROM.get(f) ?? f);
+      const pieces = byYear.get(s) ?? [];
+      if (pieces.length) {
+        let geom = asFeature(f.geometry);
+        for (const q of pieces) {
+          // Node each side's vertices into the other's edges first (as dissolveParts does), so
+          // the shared stretch is exactly shared and the union leaves no crossing there.
+          const gG = turf.getGeom(geom);
+          const shapeRings = gG.type === "Polygon" ? [gG.coordinates] : gG.coordinates;
+          const qRings = turf.getGeom(q).coordinates;
+          const shapePts = shapeRings.flat(2);
+          const qPts = qRings.flat();
+          const nodedShape = shapeRings.map((rings) => rings.map((r) => nodeRing(r, qPts)));
+          const nodedQ = qRings.map((r) => nodeRing(r, shapePts));
+          geom = turf.union(fc(nodedShape.length === 1 ? turf.polygon(nodedShape[0]) : turf.multiPolygon(nodedShape), turf.polygon(nodedQ)));
+        }
+        piece.geometry = dissolveParts(turf.getGeom(geom), `${f.properties.name} ${s}-${e}`);
+        piece.properties.source = `${piece.properties.source}; coastal strip of the map's land mask between this shape and the sea added (no source draws that coast)`;
+        for (const q of pieces) console.log(`  coastal gap ${s}-${e}: ${(turf.area(q) / 1e6).toFixed(3)} km2 at ${turf.centroid(q).geometry.coordinates.map((v) => v.toFixed(4)).join(",")} -> ${f.properties.name}`);
+      }
+      out.push(piece);
+    });
+  }
+  return mergeRuns(out);
 }
 
 // Splitting at every overlay period leaves consecutive pieces that came out identical

@@ -50,7 +50,8 @@
 //     neighbour the unclaimed land between the two (a gap a `maxGapKm` disc rolled around both
 //     cannot enter; never land beyond either line - see gapBetween in ingest-boundaries.js); "contain" is for
 //     a country whose shape is meant to include the overlay (Israel from 1967): it is
-//     widened to wrap the overlay fully. `trim: true` adds trim's clean-up to "snap". The overlay's own outline is never changed. Applied in ingest-boundaries.js after all other
+//     widened to wrap the overlay fully. `trim: true` adds trim's clean-up to "snap". The overlay's own outline is never changed by a fit (only the coastal-gap rule in
+//     ingest-boundaries.js adds the map's coastal strips in front of it). Applied in ingest-boundaries.js after all other
 //     entries. This picks one sourced line over another; the only line it draws itself is a
 //     short one across the mouth of a sliver that opens onto land belonging to neither shape.
 //
@@ -814,11 +815,15 @@ export const CORRECTIONS = [
     type: "fit",
     overlay: "Saudi-Kuwaiti Neutral Zone",
     neighbours: [
-      { name: "Kuwait", mode: "trim" },
-      // CShapes' Kuwait also reaches a few km past the zone's western edge (about 87 km2,
-      // south of Kuwait's own border and west of the zone, i.e. Najd); once cut from Kuwait,
-      // Saudi Arabia's edge is snapped to the zone so that wedge is not left unclaimed.
-      { name: "Saudi Arabia", mode: "snap", trim: true },
+      // CShapes' Kuwait (1961-2019) reaches a few km past the zone's western edge: an 87 km2
+      // wedge around 47.61E 28.69N that the zone's outline cuts off from the rest of Kuwait,
+      // plus a 5 km2 strip by the zone's NW corner. Natural Earth's modern Kuwait includes
+      // both too, so both follow CShapes: Kuwait from 1961, blank before (like the rest of
+      // Kuwait, which CShapes does not draw before independence). `keepInland` keeps the
+      // wedge in Kuwait; only pieces stranded along the coast are trimmed.
+      { name: "Kuwait", mode: "trim", keepInland: true },
+      // Saudi Arabia's edge is snapped to the zone, but never onto land CShapes draws as Kuwait.
+      { name: "Saudi Arabia", mode: "snap", trim: true, notOnCShapes: "Kuwait" },
     ],
     maxGapKm: 5,
     note: "the zone was shared territory until its partition took effect in December 1969",
