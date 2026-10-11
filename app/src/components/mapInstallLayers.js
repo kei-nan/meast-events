@@ -12,6 +12,7 @@ import {
   POINT_PAINT,
 } from "./mapLayers";
 import { BORDER_STYLE, DASHED_EXPR } from "./mapBorders";
+import { LAND_COLOR, LAND_OPACITY } from "../lib/mapBase";
 
 // Label glyphs (Open Sans Semibold, Apache 2.0; see NOTICE) are served from
 // public/glyphs/ - only the ranges the labels use are shipped.
@@ -44,7 +45,8 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       id: "land-fill",
       type: "fill",
       source: "land",
-      paint: { "fill-color": "#e4ded0", "fill-opacity": 0.65 },
+      // MapLoading draws the same land before MapLibre has loaded (lib/mapBase.js).
+      paint: { "fill-color": LAND_COLOR, "fill-opacity": LAND_OPACITY },
     }
   );
 

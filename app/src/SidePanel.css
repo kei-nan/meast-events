@@ -16,14 +16,40 @@
   min-width: 0;
 }
 
-/* Stands in for the lazy-loaded map (App.jsx): same box and sea colour as the
-   map's own background (MapView BASE_STYLE), so nothing shifts when it loads. */
+/* Stands in for the lazy-loaded map (components/MapLoading.jsx): same box and
+   sea colour as the map's own background (lib/mapBase.js SEA_COLOR), so nothing
+   shifts when it loads. */
 .map-placeholder {
   background: #b9d5e3;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #1d1a15;
+  position: relative;
+}
+/* MapView's copy, over its canvas until that has drawn the land. */
+.map-cover {
+  position: absolute;
+  inset: 0;
+}
+.map-placeholder-land {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Where the map's own "Loading map data…" card appears (MapUi.css .mu-loading). */
+.map-placeholder-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 6px 8px;
+  font: 12px/1.35 system-ui, sans-serif;
+  color: #2b2418;
+  background: rgba(244, 241, 234, 0.98);
+  border: 1px solid #5c4d38;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .side-panel {
