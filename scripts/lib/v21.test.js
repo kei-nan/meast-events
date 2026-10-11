@@ -7,6 +7,7 @@ import {
   hasTrackedCountry,
   titleMismatch,
   dateOrderFlags,
+  wikipediaLeadDates,
   finalizeEvent,
 } from "./v21.js";
 import { FIXES_BY_QID } from "./fixes.js";
@@ -102,6 +103,16 @@ test("dateOrderFlags: only for an end before the start, with what the lead says"
   assert.doesNotMatch(dateOrderFlags({ date_start: "1949-01-01", date_end: "1948-05-15", extract: "In 1948." })[1], /not in lead/);
 });
 
+test("wikipediaLeadDates: the lead's full dates as YYYY-MM-DD, else its years, in date order", () => {
+  assert.deepEqual(wikipediaLeadDates("It began on April 1, 1921 and ended 2 August 1990, then 2 August 1990."), [
+    "1921-04-01",
+    "1990-08-02",
+  ]);
+  assert.deepEqual(wikipediaLeadDates("From 1979 to 1952, then 1970."), ["1952", "1970", "1979"]);
+  assert.deepEqual(wikipediaLeadDates("No dates here."), []);
+  assert.deepEqual(wikipediaLeadDates(null), []);
+});
+
 test("finalizeEvent: copies the lead, regroups by class and removes tags that came only from an outside sea", () => {
   const ev = {
     id: "operation-pedestal",
@@ -132,6 +143,7 @@ test("finalizeEvent: copies the lead, regroups by class and removes tags that ca
   assert.equal(ev.review_reasons.length, 1);
   assert.match(ev.review_reasons[0], /^country_from_outside_place_removed: Lebanon, Egypt /);
   assert.equal("date_flags" in ev, false, "1942 is in the lead and the dates are in order");
+  assert.equal("wikipedia_lead_dates" in ev, false);
   assert.equal(ev.needs_review, true);
 
   const once = structuredClone(ev);
@@ -185,6 +197,7 @@ test("finalizeEvent: date, title and country flags are recomputed from the lead 
     "wikipedia_dates_note",
   ]);
   assert.equal(ev.date_flags.filter((f) => f.includes("stale")).length, 0, "stale flags are replaced, not duplicated");
+  assert.deepEqual(ev.wikipedia_lead_dates, ["1935"]);
   assert.equal(ev.needs_review, true);
 });
 

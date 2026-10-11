@@ -2103,6 +2103,14 @@
       "date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions years 1952, 1956, 1979, 1962, 1970, 1967; Wikidata gives 1979-02-11 to 1970-01-01"
     ],
+    "wikipedia_lead_dates": [
+      "1952",
+      "1956",
+      "1962",
+      "1967",
+      "1970",
+      "1979"
+    ],
     "needs_review": true,
     "wikidata_description": "period of political rivalry in the Arab world"
   },
@@ -3084,6 +3092,9 @@
     "date_flags": [
       "date_order_invalid: Wikidata start (2002-03-27) is after end (2002-01-01); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions 27 March 2002; Wikidata gives 2002-03-27 to 2002-01-01"
+    ],
+    "wikipedia_lead_dates": [
+      "2002-03-27"
     ],
     "needs_review": true,
     "wikidata_description": "2002 Hamas suicide bombing in Israel"

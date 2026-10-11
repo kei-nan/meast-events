@@ -48,6 +48,23 @@ export function wikipediaDatesNote({ date_start, date_end, extract }) {
   );
 }
 
+// The same lead dates the note lists, as data for the UI's date-order note: "YYYY-MM-DD" dates,
+// or "YYYY" years when the lead gives no full date, in date order. [] when the lead offers none.
+export function wikipediaLeadDates(extract) {
+  if (!extract) return [];
+  const months = MONTHS.split("|");
+  const iso = (text) => {
+    const dm = /^(\d{1,2}) (\w+) (\d{4})$/.exec(text);
+    const md = /^(\w+) (\d{1,2}), (\d{4})$/.exec(text);
+    const [day, month, year] = dm ? [dm[1], dm[2], dm[3]] : [md[2], md[1], md[3]];
+    return `${year}-${String(months.indexOf(month) + 1).padStart(2, "0")}-${day.padStart(2, "0")}`;
+  };
+  const full = [];
+  for (const re of DATE_RES) for (const m of extract.matchAll(re)) full.push(m[0]);
+  const out = full.length ? full.slice(0, 4).map(iso) : yearsIn(extract).slice(0, 6).map(String);
+  return [...new Set(out)].sort();
+}
+
 export function dateOrderFlags({ date_start, date_end, extract }) {
   if (!(date_start && date_end && date_end < date_start)) return [];
   const flags = [`date_order_invalid: Wikidata start (${date_start}) is after end (${date_end}); shown as Wikidata gives them`];
@@ -190,6 +207,9 @@ export function finalizeEvent(ev, ctx) {
     );
   }
   dateFlags.push(...dateOrderFlags(ev));
+  const leadDates = dateFlags.some((f) => f.startsWith("date_order_invalid")) ? wikipediaLeadDates(ev.extract) : [];
+  if (leadDates.length) ev.wikipedia_lead_dates = leadDates;
+  else delete ev.wikipedia_lead_dates;
   if (titleMismatch(ev, urlTitle, ev.extract)) {
     ev.review_reasons.push(
       `title_differs_from_article: record title "${ev.title}" differs from the Wikipedia article title "${urlTitle}" and does not appear in its lead`

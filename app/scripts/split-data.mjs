@@ -167,6 +167,8 @@ function detailFields(e) {
     wikidata_qid: e.wikidata_qid,
     wikidata_classes: strings(e.wikidata_classes),
     date_flags: strings(e.date_flags),
+    // Dates the Wikipedia lead gives, set only next to a date_order_invalid flag.
+    wikipedia_lead_dates: strings(e.wikipedia_lead_dates),
     coordinate_source: e.coordinate_source ?? null,
     // Set when the text is the article of another Wikidata item (no article of its own).
     text_from_article: otherArticleTitle(e),

@@ -5,6 +5,7 @@
 // classes as given, and our framing review boxed off as ours. Driven by
 // build-event-pages.mjs; tested in event-page.test.mjs.
 import { categoryLabel } from "../src/lib/categoryLabels.js";
+import { dateOrderNote } from "../src/lib/dateOrderNote.js";
 import { formatEventDate } from "../src/lib/eventDate.js";
 import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
@@ -257,7 +258,7 @@ export function renderEventPage(event) {
   const countries = (event.countries ?? []).filter((c) => typeof c === "string" && c);
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
   const showClasses = classes.some((c) => c.toLowerCase() !== String(event.category ?? "").toLowerCase());
-  const flags = (event.date_flags ?? []).filter(Boolean);
+  const dateNote = dateOrderNote(event);
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
   const paragraphs = extract.split(/\n+/).filter((p) => p.trim());
 
@@ -268,7 +269,7 @@ export function renderEventPage(event) {
     meta && `<p class="meta">${meta}</p>`,
     renderPartOf(event.part_of),
     showClasses && `<p class="classes">Wikidata classes: ${escapeHtml(classes.join(", "))}</p>`,
-    flags.length > 0 && `<p class="note" role="note">Date unverified: ${escapeHtml(flags.join("; "))}. Dates are shown as Wikidata gives them.</p>`,
+    dateNote && `<p class="note" role="note">${escapeHtml(dateNote)}</p>`,
     `<p class="actions"><a class="open-map" href="${escapeHtml(mapPath(event.id))}">Open on the map</a>${
       wiki ? ` <a class="wiki" href="${escapeHtml(wiki)}" rel="noreferrer">Read on Wikipedia</a>` : ""
     }</p>`,
