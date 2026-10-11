@@ -11,6 +11,7 @@ import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
+import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
 
 // The review below the text loads with the first opened event, not with the page.
@@ -168,6 +169,8 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     precision: event.date_precision,
     yearOnly: flags.length > 0,
   });
+  // Only an end before the start gets a note; the other date flags are not shown.
+  const dateNote = dateOrderNote(event);
   const review = event.framing_review;
   // Each paragraph as plain and highlighted pieces, with its right-to-left runs
   // (lib/bidi.js). Paragraphs past the first LEAD_PARAGRAPHS are hidden or
@@ -278,9 +281,9 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
       {showClasses && (
         <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>
       )}
-      {flags.length > 0 && (
+      {dateNote && (
         <p className="event-detail-note" role="note">
-          Date unverified: {flags.join("; ")}. Dates are shown as Wikidata gives them.
+          {dateNote}
         </p>
       )}
       {event.text_from_article && (

@@ -32,6 +32,7 @@ rather than a second layer of ours. Concretely:
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
 | `date_flags`, `review_reasons`, `needs_review` | Advisory flags | ours (flags only) |
+| `wikipedia_lead_dates` | Only next to a `date_order_invalid` flag: the dates (or years) the lead mentions, for the shown note (see "Review flags") | Wikipedia |
 | `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
 | `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
 
@@ -281,12 +282,15 @@ and identify themselves with the `MiddleEastEvents` User-Agent (`MiddleEastEvent
 
 ## Review flags (advisory only)
 
-Each event may carry `review_reasons` (strings) and `date_flags`; none of them changes the data. The UI shows `date_flags` as "Date unverified: <reason>".
+Each event may carry `review_reasons` (strings) and `date_flags`; none of them changes the data. The event panel and the static event pages show a note only for
+`date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), e.g. "Wikidata gives this event's end
+(1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002." The other date flags stay in the data and the checks
+but are not shown; an event with any date flag still shows only the years in its date line.
 
 | Flag | Where | Meaning |
 |---|---|---|
 | `date_order_invalid` | `date_flags` | Wikidata's `date_end` is before `date_start` (4 curated events on 2026-10-10, e.g. Iraqi invasion of Kuwait: start 2009-08-02, end 1990-08-04). Kept, shown as Wikidata gives them. Validation downgrades the order error to a warning only when this flag is present. |
-| `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. |
+| `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. The same dates, as data, are in `wikipedia_lead_dates` ("YYYY-MM-DD", or "YYYY" years when the lead gives no full date; `wikipediaLeadDates`), set only next to `date_order_invalid`, for the shown note. |
 | `date_start_year_not_in_lead` | `date_flags` | Start year is not within 1 year of any year in the full lead. A heuristic on prose: "look", not "wrong". |
 | `date_source_adjusted` | `date_flags` | The discovery date came from an implausible P585; P580 was used instead (rule in `docs/data-fixes.md` F2, both values in the text). |
 | `date_precision_coarse`, `unverified_date`, `category_year_mismatch` | `review_reasons` | Date precision coarser than a year; no year in the lead and no confirming year category; Wikipedia year categories disagree. |

@@ -161,6 +161,22 @@ test("Includes lists the children as links to their pages, with an escaped title
   assert.match(one, /Includes 1 event in this dataset/);
 });
 
+test("only an end before the start gets a date note, in plain language", () => {
+  const page = renderEventPage({
+    id: "passover-massacre",
+    title: "Passover massacre",
+    date_start: "2002-03-27",
+    date_end: "2002-01-01",
+    date_precision: "day",
+    date_flags: ["date_order_invalid: x", "wikipedia_dates_note: y"],
+    wikipedia_lead_dates: ["2002-03-27"],
+  });
+  assert.ok(page.includes("Wikidata gives this event’s end (1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002."));
+  assert.doesNotMatch(page, /date_order_invalid|wikipedia_dates_note|Date unverified/);
+  const other = renderEventPage({ id: "w", title: "W", date_start: "1930-01-01", date_flags: ["date_start_year_not_in_lead: z"] });
+  assert.doesNotMatch(other, /date_start_year_not_in_lead|Date unverified|role="note"/);
+});
+
 test("an invalid id is refused", () => {
   assert.throws(() => renderEventPage({ id: "../x", title: "X" }));
 });

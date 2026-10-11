@@ -15511,6 +15511,9 @@
       "date_order_invalid: Wikidata start (1921-04-01) is after end (1921-03-31); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions April 1, 1921; Wikidata gives 1921-04-01 to 1921-03-31"
     ],
+    "wikipedia_lead_dates": [
+      "1921-04-01"
+    ],
     "wikidata_description": "1921 battle of the Turkish War of Independence",
     "sitelinks_current": 12
   },
@@ -19099,6 +19102,12 @@
       "date_start_year_not_in_lead: start year 2009 (2009-08-02) is not within 1 year of any year in the Wikipedia lead [1990, 1991]",
       "date_order_invalid: Wikidata start (2009-08-02) is after end (1990-08-04); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions 2 August 1990; 4 August 1990; 28 August 1990; 15 January 1991; Wikidata gives 2009-08-02 to 1990-08-04 (start year 2009 not in lead)"
+    ],
+    "wikipedia_lead_dates": [
+      "1990-08-02",
+      "1990-08-04",
+      "1990-08-28",
+      "1991-01-15"
     ],
     "wikidata_description": "1990 major conflict between the Ba'athist Iraq and the state of Kuwait",
     "sitelinks_current": 45
@@ -24341,6 +24350,14 @@
       "date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions years 1952, 1956, 1979, 1962, 1970, 1967; Wikidata gives 1979-02-11 to 1970-01-01"
     ],
+    "wikipedia_lead_dates": [
+      "1952",
+      "1956",
+      "1962",
+      "1967",
+      "1970",
+      "1979"
+    ],
     "needs_review": true,
     "wikidata_description": "period of political rivalry in the Arab world",
     "sitelinks_current": 18
@@ -25348,6 +25365,9 @@
     "date_flags": [
       "date_order_invalid: Wikidata start (2002-03-27) is after end (2002-01-01); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions 27 March 2002; Wikidata gives 2002-03-27 to 2002-01-01"
+    ],
+    "wikipedia_lead_dates": [
+      "2002-03-27"
     ],
     "needs_review": true,
     "wikidata_description": "2002 Hamas suicide bombing in Israel",

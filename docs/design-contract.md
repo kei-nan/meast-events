@@ -42,7 +42,7 @@ Event fields (curated and proposed, and static output):
 - `wikidata_classes`: string[] of ALL Wikidata class labels found for the item, in Wikidata's order; shown as-is in the UI ("Wikidata classes: a, b"). `category` remains the coarse colour/filter group (our own grouping - the UI labels it "Category (our grouping)"); `category_label` is deprecated and removed.
 - `location_quality`: "precise" | "approximate" (capital fallback pin, unchanged) | "none" (no coordinates; `coordinates: null`, NO map marker, never invent a location).
 - Events with `location_quality: "none"` ARE indexed/served/searchable/listed (list tag "No map location"), excluded from bbox/area queries (no lon/lat) and from map markers. `precise=1` still means precise only.
-- `date_flags`: string[] (e.g. "date_order_invalid: Wikidata start after end"); such events are kept and shown with a visible note "Date unverified: <reason>", dates displayed as Wikidata gives them.
+- `date_flags`: string[] (e.g. "date_order_invalid: Wikidata start after end"); such events are kept, dates displayed as Wikidata gives them. Only `date_order_invalid` gets a visible note, in plain language without flag codes ("Wikidata gives this event's end (1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002.", from `date_start`, `date_end` and `wikipedia_lead_dates`); the other date flags are not shown.
 - Static chunks: keep coordinate-less events in decade chunks too.
 
 ## Controls (visual style)
