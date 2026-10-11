@@ -2,7 +2,7 @@
   "about": "Framing review: two review types per Wikipedia summary, shown separately. Overall fairness is the reviewer's judgement of emphasis, balance and omissions; the wording check cites Wikipedia's own neutrality and wording guidelines. Shown next to the summary, never merged into it. Not a fact-check and not a verdict on the events.",
   "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
   "reviewed_on": "2026-09-30",
-  "updated_on": "2026-10-07",
+  "updated_on": "2026-10-11",
   "rubric_version": 5,
   "method": "docs/framing-review.md",
   "guidelines": {
@@ -98,14 +98,14 @@
       "wording": []
     },
     "armenian-genocide": {
-      "text_sha1": "5cc096818a90",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "86224de7fb55",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": [
         {
           "guideline": "NPOV",
           "phrase": "the systematic destruction of the Armenian people and identity",
-          "note": "The defining sentence states the genocide characterisation in Wikipedia's own voice. The summary itself attributes it to \"the academic consensus\" and 36 countries, and gives the Turkish government's position."
+          "note": "The defining sentence states the genocide characterisation in Wikipedia's own voice. The summary itself attributes it (\"almost all historians and scholars outside of Turkey\", \"the academic consensus\", 36 countries) and gives the Turkish government's position."
         }
       ]
     },
@@ -244,8 +244,8 @@
       "wording": []
     },
     "great-syrian-revolt": {
-      "text_sha1": "ccb859005380",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "d583f8a28be9",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "Uses the rebels' vocabulary (\"French occupation\", \"local collaborators\") as fact.",
         "phrases": [
@@ -308,9 +308,14 @@
       "wording": []
     },
     "syria-lebanon-campaign": {
-      "text_sha1": "a61777b831e0",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "03e26b93310e",
+      "text_retrieved_at": "2026-10-10",
+      "fairness": {
+        "note": "Defines the campaign as \"the liberation of Syria and Lebanon from German control\" in its own voice, although the rest of the summary describes Vichy French forces holding and defending the territories; the framing is the Allied one.",
+        "phrases": [
+          "the liberation of Syria and Lebanon from German control"
+        ]
+      },
       "wording": []
     },
     "national-pact": {
@@ -338,9 +343,15 @@
       "wording": []
     },
     "1948-palestine-war": {
-      "text_sha1": "b7c215a37d7b",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "c90c24271671",
+      "text_retrieved_at": "2026-10-10",
+      "fairness": {
+        "note": "Names massacres and a \"campaign\" of violence only against the Arab population; violence against Jews appears only in \"both sides\", and the Arab rejection of the Partition Plan is not mentioned.",
+        "phrases": [
+          "A campaign of massacres and violence against the Arab population",
+          "massacres and acts of terror were conducted by both sides"
+        ]
+      },
       "wording": [
         {
           "guideline": "LABEL",
@@ -397,10 +408,22 @@
       "wording": []
     },
     "1953-iranian-coup-d-tat": {
-      "text_sha1": "7daca200b6d1",
-      "text_retrieved_at": "2026-10-01",
-      "fairness": null,
-      "wording": []
+      "text_sha1": "534c831ba932",
+      "text_retrieved_at": "2026-10-10",
+      "fairness": {
+        "note": "Settles the historians' debate about the role of Iranian domestic actors in Wikipedia's own voice: the CIA's statement \"confirmed\" one view, and the other is described as argued \"on the basis of incomplete evidence\".",
+        "phrases": [
+          "this confirmed what many historians had already concluded before",
+          "on the basis of incomplete evidence"
+        ]
+      },
+      "wording": [
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "on the basis of incomplete evidence",
+          "note": "Adds an argument against one historiographical view in Wikipedia's own voice rather than attributing the assessment."
+        }
+      ]
     },
     "suez-crisis": {
       "text_sha1": "ce9aa0aebd6c",
@@ -433,8 +456,8 @@
       "wording": []
     },
     "khartoum-resolution": {
-      "text_sha1": "752ebd00a5ad",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "392338e322c5",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -605,8 +628,8 @@
       "wording": []
     },
     "second-intifada": {
-      "text_sha1": "6029037e4d6b",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "1bd8609046bc",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "Calls Sharon's visit \"provocative\" and says Israeli security \"responded with extreme violence\" as fact; it does cover the roughly 138 suicide bombings, mainly against civilians.",
         "phrases": [
@@ -759,8 +782,8 @@
       "wording": []
     },
     "saudi-arabian-led-intervention-in-yemen": {
-      "text_sha1": "cbc010274b16",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "2dfdce095411",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -875,8 +898,8 @@
       "wording": []
     },
     "adana-massacre": {
-      "text_sha1": "64958ab23bfd",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "005911721987",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -1609,8 +1632,8 @@
       "wording": []
     },
     "assassination-of-anwar-sadat": {
-      "text_sha1": "c2a9425cda99",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c463c4e183c1",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "Names Egyptian Islamic Jihad as the assassins but attributes the motive to \"communist, socialist, and Islamist groups\", which is confusing and unsupported.",
         "phrases": [
@@ -1967,8 +1990,8 @@
       "wording": []
     },
     "2006-israeli-operation-in-beit-hanoun": {
-      "text_sha1": "103504e50ed8",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "98bda3b02cb5",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -2604,14 +2627,14 @@
       "wording": []
     },
     "october-7-attacks": {
-      "text_sha1": "aadde53fa18e",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "719cf521fd5c",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
-        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\", while the Hannibal Directive deaths are stated as fact. \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the summary no longer includes the aim given in an earlier version, that the attack was intended to induce a regional conflict. It also notes that 44 governments called the attack terrorism.",
+        "note": "Hedges claims about the attack itself: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\". \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the aim some analysts give, that the attack was meant to set off a wider regional conflict, is not mentioned. It also notes that 44 governments called the attack terrorism.",
         "phrases": [
           "illegal Israeli settlements",
           "The day was labelled the bloodiest in Israel's history",
-          "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
+          "Numerous sources have reported dozens of cases of rape and sexual assault"
         ]
       },
       "wording": []
@@ -2623,8 +2646,8 @@
       "wording": []
     },
     "nova-music-festival-massacre": {
-      "text_sha1": "37fe53230200",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "9d8365d6a28a",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": [
         {
@@ -2951,8 +2974,8 @@
       "wording": []
     },
     "world-war-i": {
-      "text_sha1": "8c708347d2ad",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "625327b97564",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -2993,8 +3016,8 @@
       "wording": []
     },
     "menemen-massacre": {
-      "text_sha1": "59335d1f9a0d",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7e0e25b09479",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": [],
       "data_note": "The start date (1916) comes from Wikidata; the summary dates the massacre to June 1919."
@@ -3175,8 +3198,8 @@
       "wording": []
     },
     "dersim-massacre": {
-      "text_sha1": "fb03179a85b8",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "9279acbd3d90",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -3187,8 +3210,8 @@
       "wording": []
     },
     "world-war-ii": {
-      "text_sha1": "79483f2c938c",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "4782daaff070",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -3357,10 +3380,14 @@
       "wording": []
     },
     "palestinian-insurgency-in-south-lebanon": {
-      "text_sha1": "fd4c32df25fe",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "d02f3fe4f17d",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
-        "note": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency."
+        "note": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency. It also states in its own voice that the PLO \"established a dictatorship and oppressed the local population\", causing the flight of over 300,000 Shia, without saying who holds that view.",
+        "phrases": [
+          "established a dictatorship and oppressed the local population",
+          "leading the flight of over 300,000 Shia muslims alone"
+        ]
       },
       "wording": []
     },
@@ -3597,14 +3624,14 @@
       "category_note": "Shown as \"terrorism\" because Wikidata types it as a hostage taking; the airliner and its passengers were seized by Iraqi forces during the invasion of Kuwait."
     },
     "1991-iraqi-uprisings": {
-      "text_sha1": "b4fb19dac794",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "e5bceaf03ec2",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
     "battle-of-norfolk": {
-      "text_sha1": "38460040620e",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "620c328caeea",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "Superlatives from the US side; Iraqi losses appear only as counts."
       },
@@ -3707,8 +3734,8 @@
       ]
     },
     "battle-of-samarra-2004": {
-      "text_sha1": "e67649a1697a",
-      "text_retrieved_at": "2026-10-03",
+      "text_sha1": "2793e6e6f456",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -3774,9 +3801,14 @@
       ]
     },
     "turkish-involvement-in-the-syrian-civil-war": {
-      "text_sha1": "35c97848051a",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "51e290b368a8",
+      "text_retrieved_at": "2026-10-10",
+      "fairness": {
+        "note": "Describes the 2016 intervention as mainly targeting ISIL and Turkey's support for the opposition, but does not mention Kurdish-led forces (the YPG and SDF), against which the 2016–20 and 2022 interventions were also, and later mainly, directed, or Turkey's stated reason for fighting them.",
+        "phrases": [
+          "mainly targeting the Islamic State of Iraq and the Levant (ISIL)"
+        ]
+      },
       "wording": []
     },
     "syrian-revolution": {
@@ -3904,8 +3936,8 @@
       ]
     },
     "operation-inherent-resolve": {
-      "text_sha1": "febcc0d20b66",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "871209c4076e",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": [
         {
@@ -3934,8 +3966,8 @@
       "wording": []
     },
     "2016-turkish-coup-d-etat-attempt": {
-      "text_sha1": "e5365978dc46",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "8f667488b867",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "Gives extended space to the theory that the coup was staged (a \"Reichstag Fire\", its \"overall absurdity\") and uses \"Erdogan regime\" as fact. The government's case appears mainly as Erdoğan's allegation.",
         "phrases": [
@@ -3954,6 +3986,11 @@
           "guideline": "SAID",
           "phrase": "Turkish government claimed that many government buildings",
           "note": "The Turkish government \"claimed\" the bombing of government buildings, while the journalist who disputes it \"argued\"."
+        },
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "In contrast, the Erdoğan government did not agree even to a proposal",
+          "note": "\"In contrast\" and \"even\" set the government's refusal against Gülen's offer of an inquiry in Wikipedia's own voice."
         }
       ]
     },
@@ -4106,8 +4143,8 @@
       "wording": []
     },
     "gaza-genocide": {
-      "text_sha1": "f1f4213b16e1",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "9d092e92794d",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "The opening sentence defines it as \"the ongoing, intentional, and systematic destruction of the Palestinian people ... carried out by Israel\". The finding is supported by a UN commission and genocide scholars, but Israel, the US and some scholars reject it and the International Court of Justice has not ruled. Israel's position gets one sentence near the end.",
         "phrases": [
@@ -4136,10 +4173,15 @@
       "wording": []
     },
     "kidnapping-and-killing-of-the-bibas-family": {
-      "text_sha1": "b1727d862f9f",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "0af703dbe2b0",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "Palestinian terrorists kidnapped",
+          "note": "Uses \"terrorists\" for the kidnappers in Wikipedia's own voice, without saying who uses the label."
+        },
         {
           "guideline": "SAID",
           "phrase": "Hamas claimed that Shiri Bibas and her children had been killed",
@@ -4148,16 +4190,16 @@
       ]
     },
     "sexual-and-gender-based-violence-in-the-october-7-attacks": {
-      "text_sha1": "ae9d07af1775",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "6ede44c92b35",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
-        "note": "Hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas."
+        "note": "Apart from the opening sentence, which states the sexual violence as fact, hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas."
       },
       "wording": []
     },
     "red-sea-crisis": {
-      "text_sha1": "fb3ab6b92486",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "5d3040cb38ce",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -4294,25 +4336,33 @@
       "wording": []
     },
     "2025-2026-iranian-protests": {
-      "text_sha1": "78a2186298b1",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "39eeb5980660",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
     "2025-2026-iran-massacres": {
-      "text_sha1": "048ab44bde7e",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "9535ed8b80b9",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
-        "note": "Gives the highest estimate the most weight: Iran International's figure of over 36,500 deaths appears three times, and the opening range of \"most death toll estimates\" starts at 5,000, above the government's own figure of 3,117 given later. The government's figures and its account (\"terrorists\", blame on the US and Israel) are included and attributed.",
+        "note": "Gives the highest estimate the most weight: Iran International's figure of over 36,500 deaths appears three times, and the opening range of \"most death toll estimates\" starts at 5,000, above the government's own figure of 3,117 given later. The government's figures and its account (\"terrorists\", blame on the US and Israel) are included and attributed. It also states as fact that the government imported foreign militias and acted on Khamenei's orders.",
         "phrases": [
-          "According to documents, Iran International reported that more than 36,500 Iranians were killed"
+          "According to documents, Iran International reported that more than 36,500 Iranians were killed",
+          "importing foreign militias",
+          "The crackdown was initiated in pursuit of orders from Supreme Leader Ali Khamenei"
         ]
       },
-      "wording": []
+      "wording": [
+        {
+          "guideline": "SAID",
+          "phrase": "alleged that foreign-backed \"terrorists\" were responsible for killings",
+          "note": "The president's account of who did the killing is introduced with \"alleged\", while Iran International's account that security forces did it is given with \"reported\" and \"stated\"."
+        }
+      ]
     },
     "2026-iran-war": {
-      "text_sha1": "b61901815121",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "0c80c353aa76",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
         "note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
         "phrases": [
@@ -4328,8 +4378,8 @@
       "wording": []
     },
     "mecca-joint-defence-agreement": {
-      "text_sha1": "90d11633683d",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "339286c64210",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -4446,8 +4496,8 @@
       "wording": []
     },
     "1991-iraqi-missile-attacks-against-israel": {
-      "text_sha1": "445b1b68856a",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "125737ada30d",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -5135,13 +5185,13 @@
       "wording": []
     },
     "2022-abu-dhabi-attack": {
-      "text_sha1": "d08e3f8df0b1",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "4e39a0cb5c05",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": [
         {
           "guideline": "LABEL",
-          "phrase": "an terrorist attack",
+          "phrase": "conducted a terrorist attack",
           "note": "Uses \"terrorist\" for the Houthi attack, in the defining sentence, in Wikipedia's own voice, without saying who uses the label."
         }
       ]
@@ -5218,8 +5268,8 @@
       "wording": []
     },
     "2026-lebanon-war": {
-      "text_sha1": "b9bd5506cda4",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "b017fd220d60",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -5635,8 +5685,8 @@
       "wording": []
     },
     "2025-2026-turkish-protests": {
-      "text_sha1": "29cad8cce587",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "4cd8220780d4",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -5652,20 +5702,20 @@
       "wording": []
     },
     "2026-northeastern-syria-offensive": {
-      "text_sha1": "cc707f4cd0b2",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "643be82b59e0",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
     "sinking-of-iris-dena": {
-      "text_sha1": "42967a693bb6",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "e5af8a0f0104",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
     "2026-yemen-offensives": {
-      "text_sha1": "c2b776c3c4ad",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "077903b1c031",
+      "text_retrieved_at": "2026-10-10",
       "fairness": null,
       "wording": []
     },
@@ -6114,14 +6164,14 @@
       "wording": []
     },
     "ein-hashlosha-massacre": {
-      "text_sha1": "aadde53fa18e",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "719cf521fd5c",
+      "text_retrieved_at": "2026-10-10",
       "fairness": {
-        "note": "Treats contested claims about the two sides unevenly: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\", while the Hannibal Directive deaths are stated as fact. \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the summary no longer includes the aim given in an earlier version, that the attack was intended to induce a regional conflict. It also notes that 44 governments called the attack terrorism.",
+        "note": "Hedges claims about the attack itself: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\". \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the aim some analysts give, that the attack was meant to set off a wider regional conflict, is not mentioned. It also notes that 44 governments called the attack terrorism.",
         "phrases": [
           "illegal Israeli settlements",
           "The day was labelled the bloodiest in Israel's history",
-          "At least 14 Israeli civilians were killed by the IDF's use of the Hannibal Directive."
+          "Numerous sources have reported dozens of cases of rape and sexual assault"
         ]
       },
       "wording": []
