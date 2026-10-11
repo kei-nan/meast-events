@@ -2,10 +2,20 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { mirrorPairs } from "../../../scripts/lib/mirrors.js";
 
 const read = (rel) => JSON.parse(readFileSync(new URL(`../../../data/${rel}`, import.meta.url), "utf8"));
 const events = read("events.json");
 const review = read("framing-review.json");
+
+// An event that shows another event's article (scripts/lib/mirrors.js) carries the same review
+// whenever the two show the same text, so the two can never be judged differently.
+test("an event that shows another event's article has that event's review", () => {
+  for (const { mirror, source } of mirrorPairs(events)) {
+    if (mirror.extract !== source.extract) continue;
+    assert.deepEqual(review.events[mirror.id], review.events[source.id], `${mirror.id} vs ${source.id}`);
+  }
+});
 
 test("every event has exactly one framing review and no review is orphaned", () => {
   const ids = new Set(events.map((e) => e.id));
