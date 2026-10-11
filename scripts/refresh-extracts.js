@@ -14,6 +14,8 @@
 // written. Apart from titles (below), nothing else in an event is touched. A lead is never copied when the fetched
 // article belongs to a different Wikidata item than the event's wikidata_qid (the stored URL leads to another
 // subject's article); such updates are held and listed under "held" (lib/title-refresh.js detectExtractHold).
+// The exception is an event without an article of its own whose article is another event's: with --apply it
+// takes that event's (just refreshed) stored text, so the two show the same text (lib/mirrors.js).
 //
 // Titles follow Wikipedia the same way: the same fetch tells whether each event's `title` is still the current
 // article title (an article renamed on Wikipedia, or a stored URL that now redirects; lib/title-refresh.js).
@@ -30,6 +32,7 @@ import {
   detectExtractHold,
   extractHoldReport,
 } from "./lib/title-refresh.js";
+import { syncMirrorTexts } from "./lib/mirrors.js";
 
 const APPLY = process.argv.includes("--apply");
 const PROPOSED = process.argv.includes("--proposed");
@@ -124,6 +127,9 @@ const say = (s = "") => {
 
 const curated = await read(curatedUrl);
 const res = await refresh(curated, "curated", "curated");
+// An event without an article of its own that shows another event's article (its "source") follows that
+// event's text (lib/mirrors.js); its framing review is redone together with the source's.
+const mirrored = APPLY ? syncMirrorTexts(curated) : [];
 const propRes = PROPOSED ? { events: await read(proposedUrl) } : null;
 if (propRes) propRes.res = await refresh(propRes.events, "proposed", "proposed");
 
@@ -141,6 +147,10 @@ for (const [name, r] of results) {
     if (c.d.added.length > MAX_LINES) say(`    + ... ${c.d.added.length - MAX_LINES} more added`);
   }
   if (r.missing.length) say(`\nNo lead returned for: ${r.missing.join(", ")}`);
+}
+if (mirrored.length) {
+  say(`\n## Events that show another event's article: ${mirrored.length} now follow its new text`);
+  for (const id of mirrored) say(`- ${id}`);
 }
 
 if (APPLY) {
