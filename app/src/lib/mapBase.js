@@ -10,6 +10,16 @@ export const SEA_COLOR = "#b9d5e3";
 // Land (mapInstallLayers.js "land-fill"): drawn at LAND_OPACITY over the sea.
 export const LAND_COLOR = "#e4ded0";
 export const LAND_OPACITY = 0.65;
+// The land as ONE opaque colour: LAND_COLOR at LAND_OPACITY over the sea (nothing else is
+// drawn below the land). Opaque, pieces of land that meet along a cut (cells, tiles) show
+// no seam: a translucent fill darkens or lightens the antialiased pixels on a shared edge.
+const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+export const LAND_ON_SEA = (() => {
+  const land = rgb(LAND_COLOR);
+  const sea = rgb(SEA_COLOR);
+  const mixed = land.map((c, i) => Math.round(c * LAND_OPACITY + sea[i] * (1 - LAND_OPACITY)));
+  return `rgb(${mixed.join(",")})`;
+})();
 
 // Default view: the Middle East. Shared by the initial view and "Reset view".
 export const DEFAULT_BOUNDS = [

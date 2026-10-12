@@ -12,7 +12,7 @@ import {
   POINT_PAINT,
 } from "./mapLayers";
 import { BORDER_STYLE, DASHED_EXPR } from "./mapBorders";
-import { LAND_COLOR, LAND_OPACITY } from "../lib/mapBase";
+import { LAND_ON_SEA } from "../lib/mapBase";
 
 // Label glyphs (Open Sans Semibold, Apache 2.0; see NOTICE) are served from
 // public/glyphs/ - only the ranges the labels use are shipped.
@@ -31,13 +31,15 @@ export const CLUSTER_MAX_ZOOM = 12;
  */
 export function installLayers(map, { land, boundaries, labels, events }) {
   // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
-  // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth 1:50m land
+  // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth land
   // polygons - pure physical geography with no political information at all, so it
   // can't introduce modern-border anachronisms. Added first, so it sits below our
   // own boundaries/events layers and reads as background context.
   map.addSource("land", {
     type: "geojson",
     data: land,
+    // Cells swap in place (lib/landStore.js, GeoJSONSource.updateData), which needs
+    // an id on every feature; the store sets them.
   });
 
   map.addLayer(
@@ -46,7 +48,9 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       type: "fill",
       source: "land",
       // MapLoading draws the same land before MapLibre has loaded (lib/mapBase.js).
-      paint: { "fill-color": LAND_COLOR, "fill-opacity": LAND_OPACITY },
+      // One opaque colour (lib/mapBase.js LAND_ON_SEA): the land is made of pieces cut
+      // into cells, and a translucent fill would show a line where two pieces meet.
+      paint: { "fill-color": LAND_ON_SEA, "fill-opacity": 1 },
     }
   );
 

@@ -146,7 +146,7 @@ async function main() {
   const raw = JSON.parse(await readFile(sourcePath, "utf-8"));
   RAW_RECORDS = raw.features;
   const correctionsGeometry = JSON.parse(await readFile(geometryPath, "utf-8"));
-  const land = JSON.parse(await readFile(new URL("../app/src/data/land.json", import.meta.url), "utf-8"));
+  const land = JSON.parse(await readFile(new URL("../data/land-mask.json", import.meta.url), "utf-8"));
   const filtered = raw.features.filter(
     (f) => REGION_ENTITIES.includes(f.properties.cntry_name) && f.properties.gweyear >= 1900
   );
@@ -424,7 +424,7 @@ function gapBetween(a, b, maxGapKm, land) {
   const clipB = turf.intersect(fc(asFeature(turf.getGeom(b)), win));
   if (!clipA || !clipB) return null;
   // The sea counts as a wall: a sliver between the two shapes that reaches the coast is
-  // still between them (land.json is the app's land; anything else in the window is sea).
+  // still between them (data/land-mask.json is the land; anything else in the window is sea).
   const winBox = turf.bbox(win);
   const landHere = land.features
     .filter((l) => bboxesTouch(turf.bbox(l), winBox))
@@ -554,8 +554,8 @@ function applyFits(features, land) {
 
 // --- coastal gaps -----------------------------------------------------------------------
 //
-// The map's land mask (app/src/data/land.json, Natural Earth 1:50m) has its own coastline,
-// which in places runs a little seaward of the shapes' coasts (CShapes, Natural Earth 1:10m,
+// The land mask (data/land-mask.json: Natural Earth 1:10m in the region, scripts/build-land.js)
+// has its own coastline, which in places runs a little seaward of the shapes' coasts (CShapes,
 // hand-digitized zones), leaving thin strips of land that no shape covers. Where a "fit"
 // works this is fixed by one rule: in each year, a piece of land-mask land that no shape
 // covers, that touches the sea and lies wholly within a fit's area (maxGapKm around the

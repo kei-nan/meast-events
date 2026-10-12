@@ -1,0 +1,3 @@
+{"type":"FeatureCollection","features":[
+{"type":"Feature","properties":{"cell":"45_15"},"geometry":{"type":"Polygon","coordinates":[[[45,15],[50,15],[50,20],[45,20],[45,15]]]}}
+]}

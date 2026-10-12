@@ -98,6 +98,12 @@ for (const name of ["land.json", "land-far.json"]) {
   if (!existsSync(distFile(`data/${name}`))) fail(`data/${name} is missing`);
   else if (!Array.isArray(readJSON(`data/${name}`).features)) fail(`data/${name} is not a FeatureCollection`);
 }
+// ...and the Middle East's 1:10m cells land.json lists (lib/landStore.js).
+if (existsSync(distFile("data/land.json"))) {
+  const cells = readJSON("data/land.json").cells;
+  if (!Array.isArray(cells) || !cells.length) fail("data/land.json lists no land cells");
+  else for (const c of cells) if (!existsSync(distFile(`data/land-cells/${c}.json`))) fail(`data/land-cells/${c}.json is missing`);
+}
 
 // 3. index.html's local references.
 const html = readFileSync(distFile("index.html"), "utf8");

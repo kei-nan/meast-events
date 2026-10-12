@@ -84,6 +84,11 @@ export function loadLand() {
   return fetchJSONCached(dataUrl("land.json"));
 }
 
+// One cell's Natural Earth 1:10m land (scripts/build-land.js, lib/landStore.js).
+export function loadLandCell(cell) {
+  return fetchJSONCached(dataUrl(`land-cells/${cell}.json`));
+}
+
 export function loadFarLand() {
   return fetchJSONCached(dataUrl("land-far.json"));
 }
