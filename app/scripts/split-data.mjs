@@ -509,28 +509,35 @@ function geometryBbox(geometry) {
   return b;
 }
 
-// The source covers the whole world (scripts/ingest-boundaries.js reads it as
-// such), but the map never shows land outside MAP_EXTENT. Polygons entirely
-// outside it are dropped from the shipped copy; polygons that cross the edge
-// are kept whole and unmodified, so every coordinate drawn is the source's own.
-// The kept polygons are split, whole, into land.json (touching
-// NEAR_LAND_EXTENT, needed by the first view) and land-far.json (the rest).
+// The light land (src/data/land.json, built by scripts/build-land.js) covers the whole
+// world, but the map never shows land outside MAP_EXTENT. Polygons entirely outside it
+// are dropped from the shipped copy; the rest are split, whole, into land.json (touching
+// NEAR_LAND_EXTENT, needed by the first view) and land-far.json. land.json also carries
+// the list of Middle East cells, whose Natural Earth 1:10m files (src/data/land-cells/)
+// are copied as they are to data/land-cells/<cell>.json (lib/landStore.js).
 async function copyLand() {
-  const raw = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
+  const { features, ...manifest } = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
+  const cellsOut = path.join(OUT_DIR, "land-cells");
+  await rm(cellsOut, { recursive: true, force: true });
+  await mkdir(cellsOut, { recursive: true });
+  for (const cell of manifest.cells) {
+    const fc = JSON.parse(await readFile(path.join(SRC_DIR, "land-cells", `${cell}.json`), "utf8"));
+    await writeJSON(path.join(cellsOut, `${cell}.json`), fc);
+  }
   const touches = (b, [minLon, minLat, maxLon, maxLat]) =>
     b[2] >= minLon && b[0] <= maxLon && b[3] >= minLat && b[1] <= maxLat;
   const near = [];
   const far = [];
-  for (const f of raw.features) {
+  for (const f of features) {
     const b = geometryBbox(f.geometry);
     if (!touches(b, MAP_EXTENT)) continue;
     (touches(b, NEAR_LAND_EXTENT) ? near : far).push(f);
   }
-  await writeJSON(path.join(OUT_DIR, "land.json"), { ...raw, features: near });
-  await writeJSON(path.join(OUT_DIR, "land-far.json"), { ...raw, features: far });
+  await writeJSON(path.join(OUT_DIR, "land.json"), { ...manifest, features: near });
+  await writeJSON(path.join(OUT_DIR, "land-far.json"), { type: "FeatureCollection", features: far });
   console.log(
-    `land: ${near.length + far.length} of ${raw.features.length} polygons inside MAP_EXTENT: ` +
-      `${near.length} in land.json, ${far.length} in land-far.json`
+    `land: ${near.length + far.length} of ${features.length} polygons inside MAP_EXTENT: ` +
+      `${near.length} in land.json, ${far.length} in land-far.json; ${manifest.cells.length} 1:10m cells`
   );
 }
 

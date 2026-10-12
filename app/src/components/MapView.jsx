@@ -38,6 +38,7 @@ import {
   loadDeferredGeometry,
   loadFarLand,
   loadLand,
+  loadLandCell,
   prefetchBoundaryDecade,
 } from "../lib/dataClient";
 import {
@@ -49,6 +50,7 @@ import {
   withGeometry,
 } from "../lib/deferredBoundaries";
 import { MAP_EXTENT } from "../lib/mapExtent";
+import { cellsInBounds, createLandStore, wantsBackgroundDetail } from "../lib/landStore";
 import { DEFAULT_BOUNDS, DEFAULT_PADDING, SEA_COLOR } from "../lib/mapBase";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
@@ -190,12 +192,13 @@ export default function MapView({
   const hoverLabelRef = useRef(null);
   const compact = useMediaQuery("(max-width: 768px)");
   const landFailedRef = useRef(false);
-  // The land source draws both files (lib/mapExtent.js NEAR_LAND_EXTENT).
+  // The land source draws both light files (lib/mapExtent.js NEAR_LAND_EXTENT) and,
+  // inside the Middle East, each cell's 1:10m coast once loaded (lib/landStore.js).
   const landRef = useRef({ near: null, far: null });
-  const landData = () => ({
-    type: "FeatureCollection",
-    features: [...(landRef.current.near?.features ?? []), ...(landRef.current.far?.features ?? [])],
-  });
+  const landAppliedRef = useRef(false); // the land source holds the light land
+  const landStoreRef = useRef(null);
+  landStoreRef.current ??= createLandStore();
+  const landData = () => landStoreRef.current.data();
   // Only the settled year triggers a new fetch; boundariesForYear/labels below
   // still run against the live `year` for instant filtering of whatever decade
   // is already cached, so scrubbing within a loaded decade has zero lag.
@@ -238,6 +241,7 @@ export default function MapView({
   const fetchLand = useCallback(async () => {
     try {
       const land = await withRetry(loadLand, () => setBorderError({ decade: "land", phase: "retrying" }));
+      if (!landRef.current.near) landStoreRef.current.addLow(land);
       landRef.current.near = land;
       landFailedRef.current = false;
       setBorderError((e) => (e && e.decade === "land" ? null : e));
@@ -287,7 +291,10 @@ export default function MapView({
       // after a backoff) never holds the whole map hostage: layers are built with
       // whatever has arrived and late data is applied by the effects/callback below.
       const landPromise = fetchLand().then((l) => {
-        if (l && !cancelled) map.getSource("land")?.setData(landData());
+        if (l && !cancelled && map.getSource("land")) {
+          map.getSource("land").setData(landData());
+          landAppliedRef.current = true;
+        }
         return l;
       });
       const [landResult] = await Promise.all([
@@ -297,6 +304,7 @@ export default function MapView({
       ]);
       // Unmounted while the data was loading: the map is already removed.
       if (cancelled) return;
+      if (landResult) landAppliedRef.current = true;
       const initialFeatures = boundaryCacheRef.current.get(initialDecade) ?? [];
       const boundaries = boundariesForYear(yearRef.current, drawableBoundaries(initialFeatures));
       appliedBordersRef.current = boundaries.features;
@@ -447,17 +455,22 @@ export default function MapView({
       // The stand-in (MapLoading) stays over the canvas until a frame with the
       // land and borders in it has been drawn: their tiles are cut in the
       // worker after installLayers, and until then the canvas is bare sea.
-      // "idle" is the fallback (everything settled, whatever loaded).
+      // "idle" is the fallback (everything settled, whatever loaded) - but never
+      // before the land is in: its request may outlast installLayers' 1.2 s wait,
+      // and "idle" would then uncover bare sea. A failed land load reveals the map
+      // with its notice.
       const reveal = () => {
         map.off("render", revealWhenDrawn);
-        map.off("idle", reveal);
+        map.off("idle", revealOnIdle);
         setLandDrawn(true);
       };
+      const landIn = () => landAppliedRef.current || landFailedRef.current;
       const revealWhenDrawn = () => {
-        if (map.isSourceLoaded("land") && map.isSourceLoaded("boundaries")) reveal();
+        if (landIn() && map.isSourceLoaded("land") && map.isSourceLoaded("boundaries")) reveal();
       };
       map.on("render", revealWhenDrawn);
-      map.once("idle", reveal);
+      const revealOnIdle = () => (landIn() ? reveal() : map.once("idle", revealOnIdle));
+      map.once("idle", revealOnIdle);
       map.triggerRepaint();
 
       // Land beyond the opening view loads once that view has drawn, so it never
@@ -468,7 +481,8 @@ export default function MapView({
             if (cancelled || landRef.current.far) return;
             landRef.current.far = far;
             map.off("moveend", addFarLand);
-            map.getSource("land")?.setData(landData());
+            const { add } = landStoreRef.current.addLow(far);
+            map.getSource("land")?.updateData({ add });
           })
           .catch(() => {});
       };
@@ -476,7 +490,67 @@ export default function MapView({
         if (cancelled) return;
         addFarLand();
         map.on("moveend", addFarLand);
+        startLandDetail();
       });
+
+      // The Middle East's Natural Earth 1:10m coast, one cell at a time (lib/landStore.js,
+      // scripts/build-land.js): first the cells in and around the view once zoomed in past
+      // DETAIL_FETCH_ZOOM, then - unless the visitor asked to save data - all the others in
+      // the background, nearest first, so a zoom-in finds its coast already drawn.
+      const DETAIL_FETCH_ZOOM = 5;
+      const store = landStoreRef.current;
+      const requested = new Set();
+      const manifest = () => landRef.current.near ?? { cells: [], cellSize: 5 };
+      // Fetch cells and swap them in together, in one update of the source.
+      const loadCells = (cells) => {
+        const todo = cells.filter((c) => !requested.has(c));
+        if (!todo.length) return Promise.resolve();
+        for (const c of todo) requested.add(c);
+        const fetches = todo.map((c) =>
+          loadLandCell(c).then(
+            (fc) => [c, fc],
+            () => (requested.delete(c), null) // retried on a later pan or zoom
+          )
+        );
+        return Promise.all(fetches).then(async (got) => {
+          if (cancelled) return;
+          const add = [];
+          const remove = [];
+          for (const [c, fc] of got.filter(Boolean)) {
+            const d = store.addDetail(c, fc);
+            add.push(...d.add);
+            remove.push(...d.remove);
+          }
+          if (add.length || remove.length) await map.getSource("land")?.updateData({ add, remove });
+        });
+      };
+      const onView = () => {
+        if (map.getZoom() < DETAIL_FETCH_ZOOM) return;
+        const { cells, cellSize } = manifest();
+        const b = map.getBounds();
+        const mx = (b.getEast() - b.getWest()) * 0.25;
+        const my = (b.getNorth() - b.getSouth()) * 0.25;
+        loadCells(cellsInBounds(cells, cellSize, [b.getWest() - mx, b.getSouth() - my, b.getEast() + mx, b.getNorth() + my]));
+      };
+      const backgroundFill = async () => {
+        const { cells, cellSize } = manifest();
+        const c = map.getCenter();
+        const dist = (id) => {
+          const [x, y] = id.split("_").map(Number);
+          return Math.hypot(x + cellSize / 2 - c.lng, y + cellSize / 2 - c.lat);
+        };
+        const order = [...cells].sort((a, b) => dist(a) - dist(b));
+        // A few cells per batch, each when the browser is idle, so no update of the source is large.
+        for (let i = 0; i < order.length && !cancelled; i += 8) {
+          await new Promise((r) => (window.requestIdleCallback ?? setTimeout)(r));
+          await loadCells(order.slice(i, i + 8));
+        }
+      };
+      const startLandDetail = () => {
+        map.on("moveend", onView);
+        onView();
+        if (wantsBackgroundDetail(navigator.connection)) backgroundFill();
+      };
     });
 
     return () => {

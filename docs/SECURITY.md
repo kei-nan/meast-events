@@ -120,7 +120,7 @@ immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
   immutable header.
 - `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
   `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,
-  `land-far.json`, `selection-funnel.json`, `framing-review.json`).
+  `land-far.json`, `land-cells/*`, `selection-funnel.json`, `framing-review.json`).
   Immutable: `/data/events/v.<hash>/*` (the event list `all.json` and every
   `full/*.json` record, one folder per build named by a hash of all its files,
   `app/scripts/split-data.mjs`) and `/data/boundaries/shared/*` (large
