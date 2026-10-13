@@ -29,8 +29,8 @@ import "./App.css";
 
 // MapLibre is ~1.1 MB of JS (about 80% of the app's code), so the map is loaded
 // as its own chunk: the header, panel and timeline paint without waiting for it.
-// If the chunk cannot be downloaded, the map area says so instead of the whole
-// app failing (lib/importOr.js).
+// If the chunk cannot be downloaded (retried once), the map area says so instead
+// of the whole app failing (lib/importOr.js).
 const MapViewFailed = () => (
   <div className="map-view map-placeholder" role="alert">
     The map could not be loaded. Please reload the page.

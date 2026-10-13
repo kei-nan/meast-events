@@ -36,6 +36,12 @@ export function createServer(root) {
     // The URL parser resolves "/../" but not an encoded "/..%2f", which decodes to "../".
     if (!isInside(root, file)) return res.writeHead(403).end();
     if (!fs.existsSync(file) && fs.existsSync(`${file}.html`)) file += ".html";
+    // Like the host (html_handling "auto-trailing-slash", the default): a folder
+    // asked for without its slash is redirected to it (/event -> /event/).
+    if (fs.existsSync(file) && fs.statSync(file).isDirectory() && fs.existsSync(path.join(file, "index.html"))) {
+      const { search } = new URL(req.url, "http://localhost");
+      return res.writeHead(307, { Location: `${encodeURI(rel)}/${search}` }).end();
+    }
     // Like the host (wrangler.jsonc not_found_handling "404-page"): a missing path
     // gets 404.html with status 404 (an empty 404 if the build has none).
     let status = 200;

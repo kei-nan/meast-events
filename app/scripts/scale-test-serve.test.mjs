@@ -25,7 +25,9 @@ function get(port, rawPath) {
       let body = "";
       res.setEncoding("utf8");
       res.on("data", (c) => (body += c));
-      res.on("end", () => resolve({ status: res.statusCode, body }));
+      res.on("end", () =>
+        resolve({ status: res.statusCode, body, ...(res.headers.location ? { location: res.headers.location } : {}) })
+      );
     }).on("error", reject);
   });
 }
@@ -48,6 +50,12 @@ test("the server refuses an encoded ../ into a sibling folder and listens on 127
     fs.writeFileSync(path.join(dist, "404.html"), "NOT FOUND");
     assert.deepEqual(await get(port, "/missing"), { status: 404, body: "NOT FOUND" });
     assert.deepEqual(await get(port, "/"), { status: 200, body: "INDEX" });
+    fs.mkdirSync(path.join(dist, "event"));
+    fs.writeFileSync(path.join(dist, "event", "index.html"), "EVENTS");
+    assert.deepEqual(await get(port, "/event/"), { status: 200, body: "EVENTS" });
+    const redirect = await get(port, "/event?x=1");
+    assert.equal(redirect.status, 307);
+    assert.equal(redirect.location, "/event/?x=1");
     for (const p of ["/..%2fdist-old/secret.txt", "/..%5cdist-old%5csecret.txt", "/%2e%2e%2fdist-old%2fsecret.txt"]) {
       const r = await get(port, p);
       assert.notEqual(r.body, "SECRET", p);

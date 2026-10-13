@@ -17,7 +17,8 @@ import { wikidataUrl } from "../lib/partOf.js";
 import { importOr } from "../lib/importOr.js";
 
 // The review below the text loads with the first opened event, not with the page.
-// If its code cannot be downloaded, a note says so in its place (lib/importOr.js).
+// If its code cannot be downloaded (retried once), a note says so in its place
+// (lib/importOr.js).
 const FramingReview = lazy(() => importOr(() => import("./FramingReview.jsx"), FramingReviewFailed));
 
 // Children shown before "Show all N".
