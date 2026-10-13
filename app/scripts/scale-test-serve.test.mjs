@@ -44,7 +44,10 @@ test("the server refuses an encoded ../ into a sibling folder and listens on 127
     const { address, port } = server.address();
     assert.equal(address, "127.0.0.1");
     assert.equal((await get(port, "/a.json")).body, "{}");
-    assert.equal((await get(port, "/missing")).body, "INDEX");
+    assert.deepEqual(await get(port, "/missing"), { status: 404, body: "" }); // no 404.html yet
+    fs.writeFileSync(path.join(dist, "404.html"), "NOT FOUND");
+    assert.deepEqual(await get(port, "/missing"), { status: 404, body: "NOT FOUND" });
+    assert.deepEqual(await get(port, "/"), { status: 200, body: "INDEX" });
     for (const p of ["/..%2fdist-old/secret.txt", "/..%5cdist-old%5csecret.txt", "/%2e%2e%2fdist-old%2fsecret.txt"]) {
       const r = await get(port, p);
       assert.notEqual(r.body, "SECRET", p);

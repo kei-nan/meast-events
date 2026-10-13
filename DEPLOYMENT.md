@@ -45,7 +45,7 @@ anyone having to think about it.
 ## The frontend as a static-assets Worker
 
 The frontend is a Worker with only static assets (`app/wrangler.jsonc`: name
-`meast-events`, assets from `./dist`, single-page-app fallback), built and deployed by
+`meast-events`, assets from `./dist`, `dist/404.html` with status 404 for any other path), built and deployed by
 Cloudflare [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/)
 from this GitHub repository. Setup (already done; for reference or a rebuild):
 

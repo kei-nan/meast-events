@@ -36,9 +36,14 @@ export function createServer(root) {
     // The URL parser resolves "/../" but not an encoded "/..%2f", which decodes to "../".
     if (!isInside(root, file)) return res.writeHead(403).end();
     if (!fs.existsSync(file) && fs.existsSync(`${file}.html`)) file += ".html";
-    // Like the host (wrangler.jsonc not_found_handling "single-page-application"):
-    // a missing path gets the app's index.html with status 200.
-    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(root, "index.html");
+    // Like the host (wrangler.jsonc not_found_handling "404-page"): a missing path
+    // gets 404.html with status 404 (an empty 404 if the build has none).
+    let status = 200;
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+      status = 404;
+      file = path.join(root, "404.html");
+      if (!fs.existsSync(file)) return res.writeHead(404).end();
+    }
     const ext = path.extname(file);
     const type = TYPES[ext] ?? "application/octet-stream";
     const headers = { "Content-Type": type, "Cache-Control": "no-store" };
@@ -48,10 +53,10 @@ export function createServer(root) {
       if (!compressed.has(key)) {
         compressed.set(key, zlib.brotliCompressSync(fs.readFileSync(file), { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 5 } }));
       }
-      res.writeHead(200, { ...headers, "Content-Encoding": "br" });
+      res.writeHead(status, { ...headers, "Content-Encoding": "br" });
       return res.end(compressed.get(key));
     }
-    res.writeHead(200, headers);
+    res.writeHead(status, headers);
     res.end(fs.readFileSync(file));
   });
 }

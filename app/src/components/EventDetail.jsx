@@ -1,5 +1,6 @@
 import { Fragment, Suspense, lazy, useEffect, useRef, useState } from "react";
 import { FramingPointer } from "./FramingPointer.jsx";
+import { FramingReviewFailed } from "./LoadFailed.jsx";
 import ShareButton from "./ShareButton.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
@@ -13,9 +14,11 @@ import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
+import { importOr } from "../lib/importOr.js";
 
 // The review below the text loads with the first opened event, not with the page.
-const FramingReview = lazy(() => import("./FramingReview.jsx"));
+// If its code cannot be downloaded, a note says so in its place (lib/importOr.js).
+const FramingReview = lazy(() => importOr(() => import("./FramingReview.jsx"), FramingReviewFailed));
 
 // Children shown before "Show all N".
 const INCLUDES_SHOWN = 8;
