@@ -43,9 +43,10 @@ function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
         err.outage = res.status >= 500;
         throw err;
       }
-      // The host answers a missing file with the app's HTML page and status 200
-      // (wrangler.jsonc not_found_handling "single-page-application"), so an HTML
-      // answer to a data request means the file is not there: not an outage.
+      // The host answers a missing file with status 404 (wrangler.jsonc
+      // not_found_handling "404-page"), handled above. An HTML answer with 200 to
+      // a data request (a host or dev server falling back to a page) still means
+      // the file is not there: not an outage.
       if (/text\/html/i.test(res.headers.get("content-type") ?? "")) {
         const err = new Error(`Not found: ${url}`);
         err.outage = false;

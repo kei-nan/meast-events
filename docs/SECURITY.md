@@ -35,8 +35,9 @@ Workers static assets read a `_headers` file from the asset directory
 summarised): up to 100 rules, 2,000 chars/line, splats and placeholders,
 matching rules merge and duplicated headers are comma-joined, `! Name`
 detaches. **Verified locally with `wrangler dev`** (2026-09-26, wrangler
-4.141): the rules apply to the assets and the SPA fallback (`/nonexistent` ->
-index.html); a pattern with **two splats is silently ignored**; `! Cache-Control`
+4.141): the rules apply to the assets and to what is served for a missing path
+(then the SPA fallback; since 2026-10-13 `dist/404.html` with status 404, whose
+response on the live site was checked to carry every header listed below); a pattern with **two splats is silently ignored**; `! Cache-Control`
 followed by a new `Cache-Control` in the same rule replaces the value.
 
 Sent on every response: `Strict-Transport-Security: max-age=31536000;

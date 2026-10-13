@@ -117,9 +117,12 @@ for (const u of refs) {
 
 // 4. Search index.
 if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is missing (build-search-index.mjs did not run)");
+
+// 5. The page the host serves for a missing path (wrangler.jsonc not_found_handling
+// "404-page"), written by build-event-pages.mjs.
 if (!existsSync(distFile("404.html"))) fail("404.html is missing (build-event-pages.mjs did not run)");
 
-// 5. Every asset's URL changes when its content does (public/_headers: /assets/* is
+// 6. Every asset's URL changes when its content does (public/_headers: /assets/* is
 // immutable). Vite names emitted files "<name>-<hash>.<ext>" with an 8-character
 // base64url hash (Vite's and Rollup's default asset and chunk names), MapLibre's
 // worker included: it is self-contained since MapLibre 6.13.0, so its name need not
@@ -136,7 +139,7 @@ if (unhashed.length) {
   fail(`dist/assets/ has files with no content hash (they would be cached as immutable): ${unhashed.join(", ")}`);
 }
 
-// 6. File count against the host's per-deploy limit. _headers and _redirects are
+// 7. File count against the host's per-deploy limit. _headers and _redirects are
 // configuration, not assets, but counting them keeps the margin honest.
 const MAX_DIST_FILES = Number(process.env.MAX_DIST_FILES) || 20000;
 const countFiles = (d) => readdirSync(d, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? countFiles(path.join(d, e.name)) : 1), 0);

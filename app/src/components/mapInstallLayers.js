@@ -168,15 +168,17 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       "text-padding": 2,
       "symbol-placement": "point",
       // Centred on the state when there is room. When a cluster's number sits
-      // there (cluster-count below takes the spot first), a state of 0.5 deg^2
-      // or more (Qatar, Lebanon and up) tries just below or above it instead of
-      // dropping the name: at the opening zoom that used to hide Iran, Iraq,
-      // Saudi Arabia and Egypt. ~2 em clears the largest cluster circle (24 px,
-      // mapLayers.js CLUSTER_PAINT). Smaller territories (islands, zones with
-      // long names) stay centred or hidden, so they never land on a neighbour.
+      // there (cluster-count below takes the spot first), a state of 5 deg^2 or
+      // more tries ~2 em below or above its centre instead of dropping the name:
+      // at the opening zoom that used to hide Iran, Iraq, Saudi Arabia and Egypt.
+      // Collision keeps the name off the cluster's number; it may still cross the
+      // edge of a cluster circle (circles take no part in collision), and is
+      // drawn above it with its halo. The cut-off (UAE 6.2, Jordan 8.5 move;
+      // Israel 2.7, Kuwait, Lebanon, Qatar, the West Bank areas and the neutral
+      // zones do not) keeps a moved name inside its own state at that zoom.
       "text-variable-anchor-offset": [
         "case",
-        [">=", ["get", "area"], 0.5],
+        [">=", ["get", "area"], 5],
         ["literal", ["center", [0, 0], "top", [0, 1.9], "bottom", [0, -1.9]]],
         ["literal", ["center", [0, 0]]],
       ],

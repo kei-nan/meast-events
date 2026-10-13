@@ -1,4 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AboutDataFailed } from "./components/LoadFailed.jsx";
+import { importOr } from "./lib/importOr.js";
 import MapLoading from "./components/MapLoading.jsx";
 import SearchPanel from "./components/SearchPanel.jsx";
 import ShareButton from "./components/ShareButton.jsx";
@@ -27,24 +29,18 @@ import "./App.css";
 
 // MapLibre is ~1.1 MB of JS (about 80% of the app's code), so the map is loaded
 // as its own chunk: the header, panel and timeline paint without waiting for it.
-// A failed chunk download is retried once; after that the map area says so
-// instead of the whole app crashing.
-const MapView = lazy(() =>
-  import("./components/MapView").catch(
-    () =>
-      new Promise((resolve) => setTimeout(resolve, 1500)).then(() => import("./components/MapView")).catch(() => ({
-        default: () => (
-          <div className="map-view map-placeholder" role="alert">
-            The map could not be loaded. Please reload the page.
-          </div>
-        ),
-      }))
-  )
+// If the chunk cannot be downloaded, the map area says so instead of the whole
+// app failing (lib/importOr.js).
+const MapViewFailed = () => (
+  <div className="map-view map-placeholder" role="alert">
+    The map could not be loaded. Please reload the page.
+  </div>
 );
+const MapView = lazy(() => importOr(() => import("./components/MapView"), MapViewFailed));
 // Sea, then the land as soon as land.json is in (components/MapLoading.jsx).
 const MAP_PLACEHOLDER = <MapLoading />;
 // Opened from the footer or a link only, so its code loads on first use.
-const AboutData = lazy(() => import("./components/AboutData.jsx"));
+const AboutData = lazy(() => importOr(() => import("./components/AboutData.jsx"), AboutDataFailed));
 
 // What the map needs first (land, the initial borders decade; the map chunk
 // itself is lazy-loaded) starts downloading right after the FIRST PAINT, all
