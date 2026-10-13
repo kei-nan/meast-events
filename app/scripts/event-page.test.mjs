@@ -8,6 +8,7 @@ import {
   metaDescription,
   renderEventPage,
   renderIndexPage,
+  renderNotFoundPage,
   renderSitemap,
   safeUrl,
 } from "./event-page.mjs";
@@ -185,4 +186,20 @@ test("the sitemap lists home, the index and every event", () => {
   const xml = renderSitemap([{ id: "a" }, { id: "b" }]);
   assert.equal((xml.match(/<loc>/g) ?? []).length, 4);
   assert.match(xml, /<loc>https:\/\/middleeast\.events\/event\/b<\/loc>/);
+});
+
+test("the 404 page is not indexed, names no canonical address and links home with absolute paths", () => {
+  const html = renderNotFoundPage();
+  assert.match(html, /<meta name="robots" content="noindex">/);
+  assert.doesNotMatch(html, /rel="canonical"|og:url/);
+  assert.match(html, /<link rel="stylesheet" href="\/event\/event\.css">/);
+  assert.match(html, /href="\/event\/"/);
+  assert.doesNotMatch(html, /href="(?!\/|https:)/);
+});
+
+test("pages with an address still name it as canonical and og:url", () => {
+  const html = renderIndexPage([{ id: "x", title: "X" }]);
+  assert.match(html, /<link rel="canonical" href="https:\/\/middleeast\.events\/event\/">/);
+  assert.match(html, /<meta property="og:url" content="https:\/\/middleeast\.events\/event\/">/);
+  assert.doesNotMatch(html, /noindex/);
 });

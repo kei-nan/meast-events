@@ -6,6 +6,8 @@
 //                         /event/<id>.html and /event/<id>/ redirect there)
 //   dist/event/index.html served at /event/
 //   dist/sitemap.xml      home + /event/ + every event page
+//   dist/404.html         served with status 404 for any other path
+//                         (wrangler.jsonc not_found_handling "404-page")
 //
 // The app itself still lives at /?e=<id> (src/lib/urlState.js); each page links
 // there ("Open on the map") and has no script, so the CSP needs no change. Its
@@ -25,7 +27,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fullBucket } from "../src/lib/fullBucket.js";
-import { renderEventPage, renderIndexPage, renderSitemap } from "./event-page.mjs";
+import { renderEventPage, renderIndexPage, renderNotFoundPage, renderSitemap } from "./event-page.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = process.env.EVENT_PAGES_DIST ? path.resolve(process.env.EVENT_PAGES_DIST) : path.join(__dirname, "..", "dist");
@@ -66,10 +68,11 @@ async function main() {
   const index = renderIndexPage(events);
   await writeFile(path.join(OUT, "index.html"), index);
   await writeFile(path.join(DIST, "sitemap.xml"), renderSitemap(events));
+  await writeFile(path.join(DIST, "404.html"), renderNotFoundPage());
   if (events.length !== meta.totalEvents) throw new Error(`event pages: ${events.length} pages for ${meta.totalEvents} events`);
   console.log(
     `event pages: ${events.length} pages + index -> ${path.relative(process.cwd(), OUT)} ` +
-      `(${((bytes + Buffer.byteLength(index)) / 1024).toFixed(0)}KB), sitemap.xml with ${events.length + 2} URLs`
+      `(${((bytes + Buffer.byteLength(index)) / 1024).toFixed(0)}KB), sitemap.xml with ${events.length + 2} URLs, 404.html`
   );
 }
 

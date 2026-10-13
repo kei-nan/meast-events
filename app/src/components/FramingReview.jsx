@@ -89,8 +89,10 @@ export default function FramingReview({ event, tab, onTab }) {
   }
 
   const r = review[tab];
+  // A section, not an aside: it sits inside the side panel, which is already a
+  // complementary landmark, and landmarks of that kind must not nest.
   return (
-    <aside id="framing-review" className="framing-review" aria-labelledby="framing-review-title" tabIndex={-1}>
+    <section id="framing-review" className="framing-review" aria-labelledby="framing-review-title" tabIndex={-1}>
       <h3 id="framing-review-title">
         Framing review <span className="framing-review-owner">our reading, not Wikipedia&apos;s</span>
       </h3>
@@ -152,6 +154,6 @@ export default function FramingReview({ event, tab, onTab }) {
           Disagree with this review?
         </a>
       </p>
-    </aside>
+    </section>
   );
 }
