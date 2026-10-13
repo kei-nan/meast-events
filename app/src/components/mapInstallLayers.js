@@ -167,6 +167,19 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       "text-max-width": 7,
       "text-padding": 2,
       "symbol-placement": "point",
+      // Centred on the state when there is room. When a cluster's number sits
+      // there (cluster-count below takes the spot first), a state of 0.5 deg^2
+      // or more (Qatar, Lebanon and up) tries just below or above it instead of
+      // dropping the name: at the opening zoom that used to hide Iran, Iraq,
+      // Saudi Arabia and Egypt. ~2 em clears the largest cluster circle (24 px,
+      // mapLayers.js CLUSTER_PAINT). Smaller territories (islands, zones with
+      // long names) stay centred or hidden, so they never land on a neighbour.
+      "text-variable-anchor-offset": [
+        "case",
+        [">=", ["get", "area"], 0.5],
+        ["literal", ["center", [0, 0], "top", [0, 1.9], "bottom", [0, -1.9]]],
+        ["literal", ["center", [0, 0]]],
+      ],
       "text-allow-overlap": false,
       "text-ignore-placement": false,
     },

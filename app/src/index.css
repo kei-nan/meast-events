@@ -36,3 +36,41 @@
 body {
   margin: 0;
 }
+
+/* components/ErrorBoundary.jsx: shown instead of the app after a render error. */
+.app-error {
+  min-height: 100%;
+  padding: 15vh 16px 0;
+  background: var(--bg-0);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+.app-error > * {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+.app-error h1 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+.app-error a {
+  color: var(--link);
+}
+.app-error button {
+  font: inherit;
+  color: var(--text-primary);
+  background: var(--bg-2);
+  border: 1px solid var(--border-field);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.app-error button:hover {
+  border-color: var(--accent);
+}
+.app-error button:focus-visible,
+.app-error a:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}

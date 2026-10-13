@@ -10,6 +10,7 @@
 //     every event's full record is in the bucket its id hashes to;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - the search index (Pagefind) was built;
+//   - 404.html exists (wrangler.jsonc not_found_handling "404-page" serves it);
 //   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>):
 //     public/_headers marks all of /assets/* immutable, so an unhashed
 //     name there would be cached for a year and never updated;
@@ -116,6 +117,7 @@ for (const u of refs) {
 
 // 4. Search index.
 if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is missing (build-search-index.mjs did not run)");
+if (!existsSync(distFile("404.html"))) fail("404.html is missing (build-event-pages.mjs did not run)");
 
 // 5. Every asset's URL changes when its content does (public/_headers: /assets/* is
 // immutable). Vite names emitted files "<name>-<hash>.<ext>" with an 8-character
@@ -149,5 +151,5 @@ if (problems.length) {
 }
 console.log(
   `check-dist: OK - ${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
-    `${refs.length} index.html references, search index present, assets/ hashed, ${fileCount} files (limit ${MAX_DIST_FILES})`
+    `${refs.length} index.html references, search index present, 404.html, assets/ hashed, ${fileCount} files (limit ${MAX_DIST_FILES})`
 );

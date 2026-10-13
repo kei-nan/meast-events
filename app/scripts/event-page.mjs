@@ -206,23 +206,22 @@ function locationNote(quality) {
   return "";
 }
 
-function head({ title, description, canonical, type }) {
+// `canonical` null (the 404 page, served at any path) leaves out canonical and og:url.
+function head({ title, description, canonical, type, noindex = false }) {
   const t = escapeHtml(title);
   const d = escapeHtml(description);
-  const c = escapeHtml(canonical);
+  const c = canonical ? escapeHtml(canonical) : null;
   return `<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${t}</title>
-${description ? `<meta name="description" content="${d}">\n` : ""}<link rel="canonical" href="${c}">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+${noindex ? `<meta name="robots" content="noindex">\n` : ""}${description ? `<meta name="description" content="${d}">\n` : ""}${c ? `<link rel="canonical" href="${c}">\n` : ""}<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="stylesheet" href="/event/event.css">
 <meta name="theme-color" content="#1d1a15">
 <meta property="og:type" content="${type}">
 <meta property="og:site_name" content="${escapeHtml(SITE_NAME)}">
 <meta property="og:title" content="${t}">
-${description ? `<meta property="og:description" content="${d}">\n` : ""}<meta property="og:url" content="${c}">
-<meta property="og:image" content="${OG_IMAGE}">
+${description ? `<meta property="og:description" content="${d}">\n` : ""}${c ? `<meta property="og:url" content="${c}">\n` : ""}<meta property="og:image" content="${OG_IMAGE}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Map of the Middle East with the title ${escapeHtml(SITE_NAME)}">
@@ -323,6 +322,30 @@ ${siteHeader}
 <ol class="event-index">
 ${items}
 </ol>
+</main>
+${siteFooter}
+</body>
+</html>
+`;
+}
+
+/**
+ * dist/404.html: what the host serves, with status 404, for any path that is not a
+ * file (wrangler.jsonc not_found_handling "404-page"). The app lives at / and reads
+ * only the query string (src/lib/urlState.js), so no other path is the app; a
+ * mistyped /event/<id> lands here instead of on the map with nothing selected.
+ * Links are absolute because the page is served at whatever path was asked for.
+ */
+export function renderNotFoundPage() {
+  return `<!doctype html>
+<html lang="en">
+${head({ title: `Page not found · ${SITE_NAME}`, description: "", canonical: null, type: "website", noindex: true })}
+<body>
+${siteHeader}
+<main>
+<h1>Page not found</h1>
+<p>There is no page at this address. It may have been mistyped, or the event may have been renamed or removed.</p>
+<p><a class="open-map" href="/">Open the map</a> or browse <a href="/event/">all events</a>.</p>
 </main>
 ${siteFooter}
 </body>
