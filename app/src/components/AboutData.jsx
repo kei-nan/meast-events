@@ -189,9 +189,9 @@ function Coverage({ state }) {
           </tbody>
         </table>
       </div>
-      <h4>By decade of the start date</h4>
+      <h4 className="about-sentence-case">By decade of the start date</h4>
       <BarList rows={Object.entries(c.by_decade).map(([k, v]) => ({ label: k, count: v }))} />
-      <h4>By category (our grouping)</h4>
+      <h4 className="about-sentence-case">By category (our grouping)</h4>
       <BarList rows={Object.entries(c.by_category).map(([k, v]) => ({ label: k, count: v }))} />
       {eco && (
         <p>
