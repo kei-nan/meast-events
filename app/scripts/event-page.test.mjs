@@ -10,6 +10,9 @@ import {
   renderIndexPage,
   renderNotFoundPage,
   renderSitemap,
+  eventJsonLd,
+  eventPageTitle,
+  jsonLdScript,
   safeUrl,
 } from "./event-page.mjs";
 
@@ -102,7 +105,9 @@ test("an event page escapes data, keeps the title exactly and links to itself, t
     location_quality: "precise",
     framing_review: review,
   });
-  assert.match(html, /<title>War &amp; &quot;Peace&quot; &lt;1&gt;<\/title>/);
+  assert.match(html, /<title>War &amp; &quot;Peace&quot; &lt;1&gt; \(1967\) – Middle East, 1900–present<\/title>/);
+  assert.match(html, /<h1>War &amp; &quot;Peace&quot; &lt;1&gt;<\/h1>/);
+  assert.match(html, /<meta property="og:title" content="War &amp; &quot;Peace&quot; &lt;1&gt;">/);
   assert.match(html, /<link rel="canonical" href="https:\/\/middleeast\.events\/event\/a-b">/);
   assert.match(html, /<a class="open-map" href="\/\?e=a-b">Open on the map<\/a>/);
   assert.match(html, /5 June 1967 \(ended 1967\) · Egypt, Israel/);
@@ -111,7 +116,8 @@ test("an event page escapes data, keeps the title exactly and links to itself, t
   assert.match(html, /Our framing review found something in this summary/);
   assert.match(html, /action=history/);
   assert.match(html, /<meta name="description" content="It was fought &lt;quickly&gt;\.">/);
-  assert.ok(!/<script/i.test(html), "no scripts (CSP)");
+  // The only script is the JSON-LD data block, which is never run (CSP script-src does not apply).
+  assert.deepEqual(html.match(/<script[^>]*>/gi), ['<script type="application/ld+json">']);
   assert.ok(!html.includes("<quickly>"));
 });
 
@@ -202,4 +208,78 @@ test("pages with an address still name it as canonical and og:url", () => {
   assert.match(html, /<link rel="canonical" href="https:\/\/middleeast\.events\/event\/">/);
   assert.match(html, /<meta property="og:url" content="https:\/\/middleeast\.events\/event\/">/);
   assert.doesNotMatch(html, /noindex/);
+});
+
+const ldOf = (html) => JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+
+test("names in Arabic, Hebrew or Persian script are isolated with <bdi>, the text unchanged and escaped", () => {
+  const extract = "The revolt (Arabic: ثورة البراق, Thawrat al-Burāq; Hebrew: מאורעות תרפ\"ט) <began>.";
+  const html = renderEventPage({ id: "r", title: "R", extract });
+  assert.match(html, /\(Arabic: <bdi dir="rtl" lang="ar">ثورة البراق<\/bdi>, Thawrat/);
+  assert.match(html, /Hebrew: <bdi dir="rtl" lang="he">מאורעות תרפ&quot;ט<\/bdi>\) &lt;began&gt;\./);
+  const text = html.match(/<div class="extract"><p>([\s\S]*?)<\/p>/)[1].replace(/<\/?bdi[^>]*>/g, "");
+  assert.equal(text, escapeHtml(extract));
+  // An unlabelled run gets dir but no lang; Persian is labelled "fa".
+  assert.match(renderEventPage({ id: "u", title: "U", extract: "Said ثورة here." }), /<bdi dir="rtl">ثورة<\/bdi>/);
+  assert.match(renderEventPage({ id: "f", title: "F", extract: "(Persian: کودتا)" }), /<bdi dir="rtl" lang="fa">کودتا<\/bdi>/);
+});
+
+test("a highlight that covers a right-to-left name keeps both the mark and the <bdi>", () => {
+  const html = renderEventPage({
+    id: "m",
+    title: "M",
+    extract: "Known as ثورة البراق today.",
+    framing_review: { ...review, highlights: [{ text: "as ثورة", kind: "wording" }] },
+  });
+  assert.match(html, /<mark class="framing-mark framing-mark--wording"[^>]*>as <bdi dir="rtl">ثورة<\/bdi><\/mark><bdi dir="rtl"> البراق<\/bdi> today\./);
+});
+
+test("the tab title has the years as the app shows them and the site name", () => {
+  assert.equal(eventPageTitle({ id: "b", title: "Balkan Wars", date_start: "1912-10-08", date_end: "1913-08-10" }), "Balkan Wars (1912–1913) – Middle East, 1900–present");
+  assert.equal(eventPageTitle({ id: "s", title: "S", date_start: "1967-06-05", date_end: "1967-06-10" }), "S (1967) – Middle East, 1900–present");
+  // A reversed range stays in the order given, like the app.
+  assert.equal(eventPageTitle({ id: "r", title: "R", date_start: "2002-03-27", date_end: "2001-01-01" }), "R (2002–2001) – Middle East, 1900–present");
+  assert.equal(eventPageTitle({ id: "n", title: "N" }), "N – Middle East, 1900–present");
+});
+
+test("JSON-LD: a WebPage about an Event, dates at the recorded precision, location only when precise", () => {
+  const base = { id: "e", title: "E", wikipedia_url: "https://en.wikipedia.org/wiki/E", wikidata_qid: "Q1", extract: "Text." };
+  const day = eventJsonLd({ ...base, date_start: "1967-06-05", date_end: "1967-06-10", date_precision: "day", location_quality: "precise", coordinates: { lat: 31.5, lon: 34.4 } });
+  assert.equal(day["@type"], "WebPage");
+  assert.equal(day.url, "https://middleeast.events/event/e");
+  assert.equal(day.isBasedOn, "https://en.wikipedia.org/wiki/E");
+  assert.equal(day.license, "https://creativecommons.org/licenses/by-sa/4.0/");
+  assert.equal(day.description, "Text.");
+  assert.deepEqual(day.about, {
+    "@type": "Event",
+    name: "E",
+    startDate: "1967-06-05",
+    endDate: "1967", // the page's "(ended 1967)": no precision is recorded for an end date
+    location: { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: 31.5, longitude: 34.4 } },
+    sameAs: ["https://en.wikipedia.org/wiki/E", "https://www.wikidata.org/wiki/Q1"],
+  });
+  const month = eventJsonLd({ ...base, date_start: "1948-05-01", date_end: "1949-03-10", date_precision: "month", location_quality: "approximate", coordinates: { lat: 1, lon: 2 } });
+  assert.equal(month.about.startDate, "1948-05");
+  assert.equal(month.about.endDate, "1949");
+  assert.equal(month.about.location, undefined, "a capital-city fallback is not a location");
+  assert.equal(eventJsonLd({ ...base, date_start: "1910-01-01", date_precision: "decade" }).about.startDate, "1910");
+  assert.equal(eventJsonLd({ ...base, date_start: "1930-05-04", date_precision: "day", date_flags: ["x"] }).about.startDate, "1930");
+  const reversed = eventJsonLd({ ...base, date_start: "2002-03-27", date_end: "2002-01-01", date_precision: "day" });
+  assert.equal(reversed.about.startDate, "2002");
+  assert.equal(reversed.about.endDate, undefined);
+  const bare = eventJsonLd({ id: "bare", title: "Bare", location_quality: "none" });
+  assert.deepEqual(bare.about, { "@type": "Event", name: "Bare" });
+  assert.equal(bare.isBasedOn, undefined);
+  assert.equal(eventJsonLd({ ...base, wikipedia_url: "javascript:alert(1)" }).isBasedOn, undefined);
+});
+
+test("JSON-LD cannot close its script element, and parses back to the data", () => {
+  const event = { id: "x", title: "</script><script>alert(1)</script> & <!-- \u2028", extract: "a </SCRIPT> b" };
+  const block = jsonLdScript(eventJsonLd(event));
+  const inner = block.slice('<script type="application/ld+json">'.length, -"</script>".length);
+  assert.doesNotMatch(inner, /[<>&\u2028\u2029]/);
+  assert.deepEqual(JSON.parse(inner), eventJsonLd(event));
+  const html = renderEventPage(event);
+  assert.equal((html.match(/<\/script>/gi) ?? []).length, 1);
+  assert.equal(ldOf(html).name, event.title);
 });
