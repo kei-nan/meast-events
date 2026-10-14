@@ -291,6 +291,7 @@ but are not shown; an event with any date flag still shows only the years in its
 |---|---|---|
 | `date_order_invalid` | `date_flags` | Wikidata's `date_end` is before `date_start` (4 curated events on 2026-10-10, e.g. Iraqi invasion of Kuwait: start 2009-08-02, end 1990-08-04). Kept, shown as Wikidata gives them. Validation downgrades the order error to a warning only when this flag is present. |
 | `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. The same dates, as data, are in `wikipedia_lead_dates` ("YYYY-MM-DD", or "YYYY" years when the lead gives no full date; `wikipediaLeadDates`), set only next to `date_order_invalid`, for the shown note. |
+| `date_end_precision_coarse` | `date_flags` | Wikidata's end time is coarser than a day (e.g. the year "2002", stored as 2002-01-01) and the stored `date_end` is before `date_start` only because of that: the whole year (month, decade, century) reaches the start, so the dates are not reversed. Replaces `date_order_invalid` in that case (Passover massacre: P585 27 March 2002, P582 "2002"; added 2026-10-14, `dateOrderFlags` in `scripts/lib/v21.js`). When a coarse end is reversed even at its precision, `date_order_invalid` names the precision. Not shown; the stored dates are unchanged. |
 | `date_start_year_not_in_lead` | `date_flags` | Start year is not within 1 year of any year in the full lead. A heuristic on prose: "look", not "wrong". |
 | `date_source_adjusted` | `date_flags` | The discovery date came from an implausible P585; P580 was used instead (rule in `docs/data-fixes.md` F2, both values in the text). |
 | `date_precision_coarse`, `unverified_date`, `category_year_mismatch` | `review_reasons` | Date precision coarser than a year; no year in the lead and no confirming year category; Wikipedia year categories disagree. |
@@ -321,8 +322,10 @@ but are not shown; an event with any date flag still shows only the years in its
   `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override` / `redirect_target`, `approximate` = `country-fallback:<tracked country>`,
   `none` = `null`. Coordinates outside a generous Middle East box (lat 10-44, lon 24-65) are only a warning, because a few events really happened
   abroad (San Remo, Madrid, Algiers, Kandahar, Washington); coordinates that would fall inside the box with latitude and longitude exchanged are an error.
-- `data/missing-coordinates-report.md` lists every curated and candidate event lacking a precise location, sorted by sitelinks, with Wikipedia and Wikidata links, so
-  contributions can be made upstream (Wikidata `P625`).
+- `data/missing-coordinates-report.md` lists every curated event lacking a precise location (no coordinates or a capital fallback) and every proposed event without a
+  location that is not curated yet, sorted by the stored sitelink counts, with Wikipedia and Wikidata links, so contributions can be made upstream (Wikidata `P625`).
+  It is generated from the two event files without network (`node scripts/build-missing-coordinates-report.js`; `enrich-candidates.js` writes the same), and CI fails
+  when the committed copy no longer matches them (`--check`; the monthly refresh regenerates it).
 
 ## Map borders: where there is no shape
 
@@ -373,9 +376,11 @@ node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candi
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
-node scripts/build-selection-funnel.js                  # -> data/selection-funnel.json (dated by its input data, not the clock)
+node scripts/build-selection-funnel.js [--check]        # -> data/selection-funnel.json (dated by its input data, not the clock)
+node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
+                                                        # CI also runs both builders above with --check: a report that no longer matches the data fails
 npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings (runs in CI; needs root npm ci)
 node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
 ```
@@ -398,12 +403,17 @@ real calendar dates from 1900 to next year, `date_end >= date_start` unless `dat
 shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`
 (merged into one "coordinates are borrowed" warning when the pin is that other item's: `coordinate_source` `redirect_target`, or `wikipedia` with a different
 `resolved_qid`), a `date_start` later than the day the event's data was retrieved (`extract_retrieved_at`; a scheduled event such as an upcoming election),
-a `date_end` before `date_start` that `date_flags` explains, a **precise pin outside every tagged country**: more than 5 km outside all border shapes
+a `date_end` before `date_start` that `date_flags` explains (`date_order_invalid`, or `date_end_precision_coarse` when the end's precision-wide period really reaches the start), a **precise pin outside every tagged country**: more than 5 km outside all border shapes
 (`data/boundaries.json`) that stand for the event's countries in its start year, using the map's own country-to-shape table
 (`COUNTRY_SHAPES` in `app/src/lib/eventCountries.js`; not checked when a tagged country has no shape that year, for `regional`, or for a point already
 outside the Middle East box; needs the root `npm ci`, otherwise skipped with a note),
 `possible_duplicates` naming an id that is in neither the file nor (for the proposed file) the curated file, and, for the curated file, an event without a
 framing review or whose review is stale (its `text_sha1` is not the SHA-1 of the current extract, the same test the site uses to show "may no longer apply").
+Since 2026-10-14 also: a `wikipedia_url` that is not on English Wikipedia (rule 4); for discovered events (those with a discovery `sitelinks` count; the hand-picked
+seed events are exempt) a discovery count below the rule's 10, a `sitelinks_current` that has since fallen below 10, and a missing `date_precision`; a
+`date_precision` that is not a Wikidata precision name; a decade-or-coarser `date_start` with no `date_end` (e.g. `israeli-lebanese-conflict`, Wikidata
+P580 "+2000" at century precision, i.e. the 20th century, stored as 2000-01-01); an event tagged with 8 or more countries; and two events sharing a
+`wikipedia_url` or an identical extract, unless all but one of them are events without an article of their own (their `resolved_qid` differs, see above).
 Warnings are for a person to look at; nothing is changed automatically.
 
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,

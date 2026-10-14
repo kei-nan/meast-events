@@ -1,0 +1,17 @@
+# DRAFT: FOR HUMAN REVIEW BEFORE SUBMITTING. Not submitted anywhere. QuickStatements V1: [-]Qid<TAB>Pnnn<TAB>+YYYY-MM-DDT00:00:00Z/precision[<TAB>S143<TAB>Q328<TAB>S4656<TAB>"source url"]
+# A line starting with "-" removes that statement; the next line adds the replacement, referenced as imported from English Wikipedia (S143 Q328) with the revision read (S4656).
+# Wikidata values fetched live 2026-10-14 (wbgetentities); Wikipedia infobox "date" lines read 2026-10-14 at the revisions named. Remove all comment lines (starting with #) before pasting into QuickStatements.
+# Context: these are the Wikidata dates behind the date_order_invalid / century-precision events in data/events.json (docs/data-fixes.md, "Checks of 2026-10-14"). middleeast.events never edits Wikidata; these are suggestions for the owner's own account.
+#
+# Iraqi invasion of Kuwait (Q856650): P580 start time 2009-08-02 (day) is after its own P582 1990-08-04; infobox "2–4 August 1990" (rev 1375300033). The year looks mistyped. Confidence: high.
+-Q856650	P580	+2009-08-02T00:00:00Z/11
+Q856650	P580	+1990-08-02T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1375300033"
+# Second Battle of İnönü (Q2659746): P582 end time 1921-03-31 is before P585 1921-04-01; infobox "March 23 – April 1, 1921" (rev 1379641867) agrees with P585 for the end. Confidence: medium (P580 1921-03-26 vs the infobox's 23 March is a second disagreement; not suggested, the two sources differ).
+-Q2659746	P582	+1921-03-31T00:00:00Z/11
+Q2659746	P582	+1921-04-01T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1379641867"
+# Israeli–Lebanese conflict (Q3241199): only date is P580 +2000-00-00 at century precision (Wikibase formats it "20. century", 1901–2000); infobox "15 May 1948 – present" (rev 1370624531). Confidence: high for the year; the infobox's start day is Wikipedia's choice of origin (1948 war).
+-Q3241199	P580	+2000-00-00T00:00:00Z/7
+Q3241199	P580	+1948-05-15T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1370624531"
+# Arab Cold War (Q4783165): P585 point in time 1979-02-11 (day) sits on a period item that also has P580 1952 and P582 1970 (both year precision), and is after that end. The infobox says "23 July 1952 – 6 September 1991" with a note that sources variously end it c. 1979, 1990 or 1991 (rev 1380203502).
+# NOT suggested as a statement: which end is right is a matter of sources, not a typo. A Wikidata editor could remove or deprecate the P585 (a point in time on a decades-long period) and give P582 the sourced alternatives; ask on the item's talk page first.
+# Passover massacre (Q2660905): no error. P585 2002-03-27 (day) plus P580 and P582 "2002" (year precision); our pipeline used to read the year-precision end as 1 January 2002 and flag the event as reversed (fixed in scripts/lib/v21.js dateOrderFlags, 2026-10-14). Nothing to suggest.

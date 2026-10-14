@@ -225,6 +225,38 @@ export function keptDatePrecision(entity, dateStart) {
   return { code: hit.precision, name: precisionName(hit.precision), property: hit.property };
 }
 
+// Precision of the stored date_end: the item's P582 (end time) statement whose value it is (exact match first,
+// then after the "-00" -> "-01" normalisation). Same shape as keptDatePrecision; null when no P582 has that value.
+export function keptEndPrecision(entity, dateEnd) {
+  if (!entity || !dateEnd) return null;
+  const vals = entity.p582 ?? [];
+  const hit = vals.find((v) => v.time === dateEnd) ?? vals.find((v) => normWdTime(v.time) === dateEnd);
+  return hit ? { code: hit.precision, name: precisionName(hit.precision), property: "P582" } : null;
+}
+
+// The last day (YYYY-MM-DD) of the period a stored Wikidata date stands for at precision `code`
+// (11 day, 10 month, 9 year, 8 decade, 7 century, 6 millennium). The pipeline stores a coarse value
+// such as "+2002-00-00" (year) as 2002-01-01; as an END bound it means "some time in 2002", so it is
+// before a start only when the whole period is. Wikibase counts centuries 1901-2000 (it formats
+// +2000 and +1901 at precision 7 both as "20. century", checked 2026-10-14 with wbformatvalue), and
+// millennia likewise. null for an unparseable date or a precision coarser than a millennium.
+export function lastDayOfPeriod(date, code) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date ?? ""));
+  if (!m) return null;
+  const y = Number(m[1]);
+  const pad = (n) => String(n).padStart(4, "0");
+  if (code == null || code >= 11) return date;
+  if (code === 10) {
+    const dim = new Date(Date.UTC(y, Number(m[2]), 0)).getUTCDate();
+    return `${m[1]}-${m[2]}-${String(dim).padStart(2, "0")}`;
+  }
+  if (code === 9) return `${m[1]}-12-31`;
+  if (code === 8) return `${pad(Math.floor(y / 10) * 10 + 9)}-12-31`;
+  if (code === 7) return `${pad(Math.ceil(y / 100) * 100)}-12-31`;
+  if (code === 6) return `${pad(Math.ceil(y / 1000) * 1000)}-12-31`;
+  return null;
+}
+
 // Rule for Wikidata "point in time" (P585) mis-used as a range bound. The pipeline's date is
 // COALESCE(P585, P580). Use the item's own P580 (start time) instead when EITHER
 //   (a) P585 is only decade-or-coarser precise while P580 is year-or-finer, or
