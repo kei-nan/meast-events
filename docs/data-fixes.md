@@ -292,3 +292,8 @@ put them outside the tracked set; the validator now rejects any event without a 
   `scripts/lib/fixes.js`), so "2002" is no longer called earlier than 27 March 2002; such a case gets `date_end_precision_coarse` instead of
   `date_order_invalid`, and a reversal at year precision (Arab Cold War) says the precision in its flag. The stored dates are unchanged. The
   stored flags of `passover-massacre` change on the next enrichment run (proposed file) and, for the curated file, only on a re-merge.
+- Applied 2026-10-15 by the pipeline, not by hand: `node scripts/enrich-candidates.js --reuse --keep-existing` re-derived the date-order
+  flags of the proposed copies, and `node scripts/merge-proposed.js --apply --no-add` carried them to the curated records whose dates and
+  extract match (`scripts/lib/order-flags.js`). Two curated records changed, only in `date_flags` / `wikipedia_lead_dates`:
+  `passover-massacre` (`date_order_invalid` + note + lead dates -> `date_end_precision_coarse`, so the site no longer shows a reversed-date
+  note) and `arab-cold-war` (its `date_order_invalid` text now names the end's year precision; still shown).

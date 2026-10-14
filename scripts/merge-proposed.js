@@ -14,11 +14,16 @@
 // Rules applied to the curated file on every run (listed in the dry run, written with --apply):
 //   - "Not events" (docs/DATA_POLICY.md; NOT_EVENT_CLASSES in lib/event-classes.js): a curated entry whose Wikidata
 //     classes include a person, organisation, state or country-history class is removed; a proposed one is not added.
+//   - Re-derived date-order flags (lib/order-flags.js): a curated event that is also in the proposed file (same id and
+//     QID, same dates and extract) takes the proposed record's date_order_invalid / date_end_precision_coarse /
+//     wikipedia_dates_note flags and wikipedia_lead_dates, so a pipeline fix to those flags reaches the curated record.
+//     Nothing else of the curated record changes.
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { validateEvents, findClashes } from "./lib/validate.js";
 import { notEventClasses } from "./lib/event-classes.js";
+import { refreshOrderFlags } from "./lib/order-flags.js";
 
 const APPLY = process.argv.includes("--apply");
 const SKIP_DUP = process.argv.includes("--skip-duplicate-hints");
@@ -49,6 +54,12 @@ if (pv.errors.length) {
   process.exit(1);
 }
 
+const proposedById = new Map(proposed.map((e) => [e.id, e]));
+const flagsRefreshed = curated.filter((e) => {
+  const p = proposedById.get(e.id);
+  return p && p.wikidata_qid === e.wikidata_qid && refreshOrderFlags(e, p);
+});
+
 const clashes = findClashes(curated, proposed);
 const clashIds = new Set(clashes.map((c) => c.event.id));
 const proposedNotEvents = proposed.filter((e) => !clashIds.has(e.id) && notEvent(e).length);
@@ -72,6 +83,8 @@ console.log(`${APPLY ? "APPLY" : "DRY RUN"} - merge-proposed`);
 console.log(`  curated events now:              ${curatedIn.length}`);
 console.log(`  removed, not events (rule):      ${removedNotEvents.length}`);
 for (const e of removedNotEvents) console.log(`      ${e.id} (${notEvent(e).join(", ")})`);
+console.log(`  date-order flags re-derived:     ${flagsRefreshed.length}`);
+for (const e of flagsRefreshed) console.log(`      ${e.id}: ${(e.date_flags ?? []).map((f) => f.split(":")[0]).join(", ") || "(none)"}`);
 if (proposedNotEvents.length) console.log(`  proposed, not events (not added): ${proposedNotEvents.map((e) => e.id).join(", ")}`);
 console.log(`  proposed events:                 ${proposed.length}`);
 console.log(`  skipped (id/QID already curated): ${clashes.length}`);

@@ -53,6 +53,7 @@ import {
 } from "./lib/flags.js";
 import { keptDatePrecision } from "./lib/fixes.js";
 import { renderMissingReport } from "./lib/missing-report.js";
+import { refreshOrderFlags } from "./lib/order-flags.js";
 import { validateEvents, borrowedSource, BORROWED_SOURCE } from "./lib/validate.js";
 
 const PRECISION_CODE = Object.fromEntries(Array.from({ length: 15 }, (_, c) => [precisionName(c), c]));
@@ -216,9 +217,10 @@ async function writeMissingReport({ curated, proposed }) {
   return { curated: nc, candidates: np };
 }
 
-// --keep-existing: records already in data/events.proposed.json / data/enriched-candidates.json stay exactly as
-// they are; only candidates new to the files are added (proposed: at their place in the date order; enriched: at
-// the end). A full run re-derives every record, which also re-derives what was applied at merge time (data fixes,
+// --keep-existing: records already in data/events.proposed.json / data/enriched-candidates.json stay as they are,
+// except their date-order flags (date_order_invalid, date_end_precision_coarse, wikipedia_dates_note,
+// wikipedia_lead_dates), which take this run's values when the dates and text are the same (lib/order-flags.js);
+// only candidates new to the files are added (proposed: at their place in the date order; enriched: at the end). A full run re-derives every record, which also re-derives what was applied at merge time (data fixes,
 // redirect notes), so a bounded addition uses this.
 async function keepExisting({ proposed, persist }) {
   const oldProposed = await loadJson(outName("events.proposed", "json"));
@@ -226,6 +228,11 @@ async function keepExisting({ proposed, persist }) {
   const inProposed = new Set(oldProposed.map((e) => e.wikidata_qid));
   const inEnriched = new Set(oldEnriched.map((e) => e.wikidata_qid));
   const byDate = (a, b) => a.date_start.localeCompare(b.date_start) || compareQids(a.wikidata_qid, b.wikidata_qid);
+  const freshProposed = new Map(proposed.map((e) => [e.wikidata_qid, e]));
+  const freshEnriched = new Map(persist.map((r) => [r.wikidata_qid, r]));
+  const refreshed = oldProposed.filter((e) => refreshOrderFlags(e, freshProposed.get(e.wikidata_qid))).map((e) => e.id);
+  for (const r of oldEnriched) refreshOrderFlags(r, freshEnriched.get(r.wikidata_qid));
+  if (refreshed.length) console.log(`--keep-existing: date-order flags re-derived for ${refreshed.join(", ")}`);
   const outProposed = [...oldProposed];
   const added = proposed.filter((e) => !inProposed.has(e.wikidata_qid));
   for (const e of added) {

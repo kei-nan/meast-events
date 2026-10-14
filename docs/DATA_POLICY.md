@@ -457,7 +457,9 @@ node scripts/verify-sample.js                           # -> data/import-verific
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
 npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings (runs in CI; needs root npm ci)
-node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
+node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --apply writes data/events.json. Every run also
+                                                        #    applies the "Not events" rule and carries re-derived date-order
+                                                        #    flags to curated records (--no-add: only that, nothing added)
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.

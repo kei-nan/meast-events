@@ -113,3 +113,21 @@ test("merge-proposed: not events are removed from the curated file and never add
     rmSync(t.dir, { recursive: true, force: true });
   }
 });
+
+const COARSE = "date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it";
+test("merge-proposed: re-derived date-order flags reach the curated record, nothing else does", () => {
+  const order = { date_start: "2002-03-27", date_end: "2002-01-01", review_reasons: ["part_of: x"], needs_review: true };
+  const old = event("p", "Q7", { ...order, date_flags: ["date_order_invalid: old", "wikipedia_dates_note: old"], wikipedia_lead_dates: ["2002-03-27"] });
+  const fresh = event("p", "Q7", { ...order, title: "renamed upstream", date_flags: [COARSE] });
+  const t = setup({ curated: [...curated, old], proposed: [fresh] });
+  try {
+    assert.match(run(t.dir), /date-order flags re-derived:\s+1\s+p: date_end_precision_coarse/);
+    run(t.dir, "--apply", "--no-add");
+    const out = JSON.parse(t.read());
+    const { wikipedia_lead_dates: _lead, ...rest } = old;
+    assert.deepEqual(out.at(-1), { ...rest, date_flags: [COARSE] }, "title and the rest stay curated");
+    assert.deepEqual(out.slice(0, 2), curated);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});

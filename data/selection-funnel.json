@@ -42,7 +42,7 @@
   "proposed_breakdown": {
     "proposed_total": 255,
     "location_quality_none_no_map_marker": 187,
-    "date_order_invalid_flagged_and_kept": 2,
+    "date_order_invalid_flagged_and_kept": 1,
     "excluded_as_redirect_duplicates_by_review": 0,
     "already_merged_into_curated": 254,
     "pending_merge_new_events": 1,
@@ -83,7 +83,7 @@
         "fewer_than_min_sitelinks": 493,
         "passed_filters": 231,
         "proposed_location_none": 53,
-        "date_order_flagged": 2,
+        "date_order_flagged": 1,
         "in_curated": 211
       },
       "Lebanon": {
@@ -382,7 +382,7 @@
         "fewer_than_min_sitelinks": 157,
         "passed_filters": 37,
         "proposed_location_none": 1,
-        "date_order_flagged": 1,
+        "date_order_flagged": 0,
         "in_curated": 37
       },
       "airstrike": {
@@ -627,7 +627,7 @@
         "fewer_than_min_sitelinks": 485,
         "passed_filters": 95,
         "proposed_location_none": 1,
-        "date_order_flagged": 1,
+        "date_order_flagged": 0,
         "in_curated": 95
       },
       "migration": {
@@ -710,7 +710,7 @@
         "fewer_than_min_sitelinks": 427,
         "passed_filters": 88,
         "proposed_location_none": 27,
-        "date_order_flagged": 1,
+        "date_order_flagged": 0,
         "in_curated": 83
       },
       "1960s": {
