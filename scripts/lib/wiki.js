@@ -7,6 +7,8 @@ const PRECISION_NAMES = {
   8: "decade", 9: "year", 10: "month", 11: "day", 12: "hour", 13: "minute", 14: "second",
 };
 export const precisionName = (p) => PRECISION_NAMES[p] ?? null;
+const PRECISION_CODES = Object.fromEntries(Object.entries(PRECISION_NAMES).map(([c, n]) => [n, Number(c)]));
+export const precisionCode = (name) => PRECISION_CODES[name] ?? null;
 
 export async function fetchSummary(title) {
   const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;

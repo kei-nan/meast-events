@@ -1,6 +1,8 @@
 // Recomputes data/selection-funnel.json (machine readable; rendered by the app's "About the data" page)
 // from the repository's own data files - nothing is copied from the review documents.
 //   node scripts/build-selection-funnel.js [--cache-dir=...]
+//   node scripts/build-selection-funnel.js --check   no network: recompute everything except sitelink_measurement (kept
+//                                                    from the committed file) and exit 1 if the file differs (CI)
 // Inputs: data/event-candidates.json (raw discovery), data/enriched-candidates.json + data/events.proposed.json
 // (enrichment result), data/events.json (curated, shown), data/seed-events.json, data/proposed-exclusions.json.
 // Network: only to measure Wikipedia-editions-only sitelink counts (Wikidata wbgetentities, cached; see lib/cache.js).
@@ -18,6 +20,9 @@ const seed = await read("seed-events.json");
 const exclusions = await read("proposed-exclusions.json");
 
 const MIN = INCLUSION_MIN_SITELINKS;
+const CHECK = process.argv.includes("--check");
+const OUT = new URL("../data/selection-funnel.json", import.meta.url);
+const committed = CHECK ? await readFile(OUT, "utf-8").catch(() => "") : null;
 // Dated by its inputs, not the wall clock, so re-running on unchanged data gives an identical
 // file: the newest retrieval time among the enriched candidates and the curated summaries.
 const dataAsOf =
@@ -26,36 +31,41 @@ const inc = (o, k, n = 1) => (o[k] = (o[k] ?? 0) + n);
 const group = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
 // ---- sitelink measurement: all Wikimedia projects (what the rule uses) vs Wikipedia editions only ----
-const ents = await fetchEntities(candidates.map((c) => c.wikidata_qid), {
-  cache: openCache("entities"),
-  props: "sitelinks/urls",
-  log: (m) => process.stdout.write(`\r${m}      `),
-});
-console.log();
-const ruleSitelinks = (c) => c.sitelinks; // from the discovery query: wikibase:sitelinks = all Wikimedia projects
-const wpEditions = (c) => ents.get(c.wikidata_qid)?.wikipedia_editions ?? null;
-const measured = candidates.filter((c) => wpEditions(c) !== null);
-const withEn = measured.filter((c) => c.has_en_wikipedia);
-const sitelinkMeasurement = {
-  rule_uses: "sitelinks across ALL Wikimedia projects (Wikidata wikibase:sitelinks: Wikipedias + Wikisource, Wikiquote, Commons, ...)",
-  threshold: MIN,
-  candidates_measured: measured.length,
-  candidates_with_english_article: withEn.length,
-  pass_by_all_projects: withEn.filter((c) => ruleSitelinks(c) >= MIN).length,
-  pass_by_wikipedia_editions_only: withEn.filter((c) => wpEditions(c) >= MIN).length,
-  pass_by_all_projects_but_not_wikipedia_only: withEn.filter((c) => ruleSitelinks(c) >= MIN && wpEditions(c) < MIN).length,
-  pass_by_wikipedia_only_but_not_all_projects: withEn.filter((c) => ruleSitelinks(c) < MIN && wpEditions(c) >= MIN).length,
-  median_all_projects_of_passing: null,
-  median_wikipedia_editions_of_passing: null,
-  mismatch_between_discovery_sitelinks_and_fresh_count: withEn.filter((c) => (ents.get(c.wikidata_qid)?.sitelinks_all ?? c.sitelinks) !== c.sitelinks).length,
-};
-const med = (a) => {
-  const s = [...a].sort((x, y) => x - y);
-  return s.length ? s[Math.floor(s.length / 2)] : null;
-};
-const passing = withEn.filter((c) => ruleSitelinks(c) >= MIN);
-sitelinkMeasurement.median_all_projects_of_passing = med(passing.map(ruleSitelinks));
-sitelinkMeasurement.median_wikipedia_editions_of_passing = med(passing.map(wpEditions));
+// The only part that needs the network; --check keeps the committed block.
+async function measureSitelinks() {
+  const ents = await fetchEntities(candidates.map((c) => c.wikidata_qid), {
+    cache: openCache("entities"),
+    props: "sitelinks/urls",
+    log: (m) => process.stdout.write(`\r${m}      `),
+  });
+  console.log();
+  const ruleSitelinks = (c) => c.sitelinks; // from the discovery query: wikibase:sitelinks = all Wikimedia projects
+  const wpEditions = (c) => ents.get(c.wikidata_qid)?.wikipedia_editions ?? null;
+  const measured = candidates.filter((c) => wpEditions(c) !== null);
+  const withEn = measured.filter((c) => c.has_en_wikipedia);
+  const sitelinkMeasurement = {
+    rule_uses: "sitelinks across ALL Wikimedia projects (Wikidata wikibase:sitelinks: Wikipedias + Wikisource, Wikiquote, Commons, ...)",
+    threshold: MIN,
+    candidates_measured: measured.length,
+    candidates_with_english_article: withEn.length,
+    pass_by_all_projects: withEn.filter((c) => ruleSitelinks(c) >= MIN).length,
+    pass_by_wikipedia_editions_only: withEn.filter((c) => wpEditions(c) >= MIN).length,
+    pass_by_all_projects_but_not_wikipedia_only: withEn.filter((c) => ruleSitelinks(c) >= MIN && wpEditions(c) < MIN).length,
+    pass_by_wikipedia_only_but_not_all_projects: withEn.filter((c) => ruleSitelinks(c) < MIN && wpEditions(c) >= MIN).length,
+    median_all_projects_of_passing: null,
+    median_wikipedia_editions_of_passing: null,
+    mismatch_between_discovery_sitelinks_and_fresh_count: withEn.filter((c) => (ents.get(c.wikidata_qid)?.sitelinks_all ?? c.sitelinks) !== c.sitelinks).length,
+  };
+  const med = (a) => {
+    const s = [...a].sort((x, y) => x - y);
+    return s.length ? s[Math.floor(s.length / 2)] : null;
+  };
+  const passing = withEn.filter((c) => ruleSitelinks(c) >= MIN);
+  sitelinkMeasurement.median_all_projects_of_passing = med(passing.map(ruleSitelinks));
+  sitelinkMeasurement.median_wikipedia_editions_of_passing = med(passing.map(wpEditions));
+  return sitelinkMeasurement;
+}
+const sitelinkMeasurement = CHECK ? (JSON.parse(committed || "{}").sitelink_measurement ?? null) : await measureSitelinks();
 
 // ---- funnel ----
 const enrichedByQid = new Map(enriched.map((e) => [e.wikidata_qid, e]));
@@ -149,5 +159,14 @@ funnel.breakdowns.notes = [
 ];
 funnel.tracked_countries = Object.keys(COUNTRIES);
 
-await writeFile(new URL("../data/selection-funnel.json", import.meta.url), JSON.stringify(funnel, null, 2) + "\n");
+const text = JSON.stringify(funnel, null, 2) + "\n";
+if (CHECK) {
+  if (committed.replace(/\r\n/g, "\n") !== text) {
+    console.error("FAIL data/selection-funnel.json is stale: run node scripts/build-selection-funnel.js and commit the result");
+    process.exit(1);
+  }
+  console.log(`ok   data/selection-funnel.json is current (curated_total ${curated.length}; sitelink_measurement not re-measured)`);
+  process.exit(0);
+}
+await writeFile(OUT, text);
 console.log(JSON.stringify({ stages: stages.map((s) => [s.stage, s.count, s.removed]), proposed: funnel.proposed_breakdown, shown: funnel.shown_now, sitelinks: sitelinkMeasurement }, null, 1));

@@ -1,8 +1,11 @@
 // Structural validation for event files. This checks FORMAT and internal consistency
 // only - it never judges whether an event is "right" (that would be editorial).
 import { createHash } from "node:crypto";
-import { COUNTRIES, EVENT_CLASSES } from "./event-classes.js";
-import { coordinatesChecked } from "./fixes.js";
+import { COUNTRIES, EVENT_CLASSES, INCLUSION_MIN_SITELINKS } from "./event-classes.js";
+import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
+import { precisionName, precisionCode } from "./wiki.js";
+// Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
+const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
 // Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
 import { shapeNamesFor } from "../../app/src/lib/eventCountries.js";
 
@@ -52,6 +55,12 @@ export const MIN_EXTRACT_CHARS = 160;
 // app/src/lib/eventCountries.js COUNTRY_SHAPES). Points within this distance of a shape count
 // as inside it: coastal battles and border crossings sit on or just off the drawn line.
 export const PIN_TOLERANCE_KM = 5;
+
+// Warnings only. An event tagged with this many countries counts in each of them (per-country figures); the
+// region-wide events (world wars, regional conflicts) carry 8-15 tags. lib/flags.js already flags > 4 as
+// many_countries in review_reasons; this is the validator's listing of the extreme ones.
+export const MANY_COUNTRIES_WARN = 8;
+const ENGLISH_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
 
 const ISO_DAY_RE = /^\d{4}-\d{2}-\d{2}/;
 const todayUtc = () => new Date().toISOString().slice(0, 10);
@@ -184,8 +193,16 @@ export function validateEvents(
       else if (isRealDate(e.date_start) && e.date_end < e.date_start) {
         // v2.1: Wikidata's own date-order errors are kept and flagged, not dropped. The order problem is
         // only tolerated (as a warning) when date_flags carries a date_order_invalid reason explaining it.
-        const explained = Array.isArray(e.date_flags) && e.date_flags.some((f) => String(f).startsWith("date_order_invalid"));
+        const flags = Array.isArray(e.date_flags) ? e.date_flags.map(String) : [];
+        const explained = flags.some((f) => f.startsWith("date_order_invalid"));
+        // A coarse Wikidata end (e.g. the year "2002", stored as 2002-01-01) is not before the start when its
+        // whole period reaches it; the pipeline then writes date_end_precision_coarse naming the precision
+        // (lib/v21.js dateOrderFlags). Checked here against the stored dates, so the flag cannot excuse a real reversal.
+        const coarse = flags.find((f) => f.startsWith(`${DATE_END_COARSE_FLAG}:`));
+        const coarseCode = coarse ? precisionCode(/has only (.+?) precision/.exec(coarse)?.[1]) : null;
+        const coarseOk = coarseCode != null && (lastDayOfPeriod(e.date_end, coarseCode) ?? "") >= e.date_start;
         if (explained) warnings.push(`${name}[${i}] ${e.id}: date_end (${e.date_end}) precedes date_start (${e.date_start}) - flagged in date_flags`);
+        else if (coarseOk) warn(i, e, `date_end (${e.date_end}) is a coarse Wikidata end (${precisionName(coarseCode)} precision) that reaches date_start (${e.date_start}) - flagged ${DATE_END_COARSE_FLAG}`);
         else err(i, e, `date_end (${e.date_end}) precedes date_start (${e.date_start}) and date_flags has no date_order_invalid reason`);
       }
     }
@@ -267,6 +284,38 @@ export function validateEvents(
 
     if (e.wikipedia_url != null && !/^https:\/\/[a-z-]+\.wikipedia\.org\/wiki\//.test(e.wikipedia_url)) {
       err(i, e, `wikipedia_url not a Wikipedia article URL (${e.wikipedia_url})`);
+    } else if (e.wikipedia_url != null && !e.wikipedia_url.startsWith(ENGLISH_WIKIPEDIA)) {
+      // Inclusion rule 4 and the extract both need the English article.
+      warn(i, e, `wikipedia_url is not an English Wikipedia article (${e.wikipedia_url}); inclusion rule 4 needs one`);
+    }
+
+    // Discovered events (they carry `sitelinks`, the count discovery saw) met inclusion rule 4 when found. The
+    // hand-picked seed events (data/seed-events.json; no `sitelinks`) are the allow-list: they were chosen by
+    // hand, not by the rule, so neither count is checked for them (docs/DATA_POLICY.md, "Honest caveat").
+    const discovered = e.sitelinks !== undefined;
+    if (discovered) {
+      if (typeof e.sitelinks !== "number" || e.sitelinks < INCLUSION_MIN_SITELINKS) {
+        warn(i, e, `sitelinks at discovery (${JSON.stringify(e.sitelinks)}) below the inclusion threshold of ${INCLUSION_MIN_SITELINKS} (rule 4), and it is not a hand-picked seed event`);
+      } else if (typeof e.sitelinks_current === "number" && e.sitelinks_current < INCLUSION_MIN_SITELINKS) {
+        warn(i, e, `sitelinks_current (${e.sitelinks_current}) has fallen below the inclusion threshold of ${INCLUSION_MIN_SITELINKS} (it had ${e.sitelinks} at discovery); kept, events are never dropped automatically`);
+      }
+      // date_precision: the Wikidata precision of the kept date_start (lib/fixes.js keptDatePrecision). null is
+      // written when the kept date is no Wikidata value (a ledger date from the infobox).
+      if (!("date_precision" in e)) warn(i, e, "date_precision missing (discovered events record the Wikidata precision of date_start)");
+      else if (e.date_precision !== null && precisionCode(e.date_precision) === null) {
+        warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
+      }
+    } else if (e.date_precision != null && precisionCode(e.date_precision) === null) {
+      warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
+    }
+    // A decade/century date stored as its first day, with no end: shown as a single year that Wikidata never gave
+    // (e.g. "+2000-00-00" at century precision is the 20th century, 1901-2000, stored as 2000-01-01).
+    const pc = precisionCode(e.date_precision);
+    if (pc !== null && pc <= 8 && e.date_end == null) {
+      warn(i, e, `date_start ${e.date_start} has only ${e.date_precision} precision and there is no date_end: Wikidata gives only the ${e.date_precision} ending ${String(lastDayOfPeriod(e.date_start, pc)).slice(0, 4)}, not this year or day`);
+    }
+    if (Array.isArray(e.countries) && e.countries.length >= MANY_COUNTRIES_WARN) {
+      warn(i, e, `tagged with ${e.countries.length} countries (>= ${MANY_COUNTRIES_WARN}): it counts once in each of them in per-country figures`);
     }
     // resolved_qid = the Wikidata item of the article at wikipedia_url (enrich-candidates.js).
     // A different item means the URL points at another (often broader) article. Flag only.
@@ -293,6 +342,29 @@ export function validateEvents(
       warn(i, e, `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}, not the event's wikidata_qid ${e.wikidata_qid}`);
     }
   });
+
+  // Two events with the same wikipedia_url or the same extract. Expected only for events without an English
+  // article of their own (docs/DATA_POLICY.md, "Events without an article of their own"): their resolved_qid
+  // differs from their wikidata_qid, and they already carry that warning above. A group is explained when
+  // at most one member is the article's own item; anything else is listed.
+  const ownItem = (e) => !(typeof e.resolved_qid === "string" && e.resolved_qid !== e.wikidata_qid);
+  for (const [field, label] of [["wikipedia_url", "wikipedia_url"], ["extract", "extract"]]) {
+    const groups = new Map();
+    events.forEach((e, i) => {
+      const v = e && typeof e === "object" && typeof e[field] === "string" ? e[field].trim() : "";
+      if (!v) return;
+      if (!groups.has(v)) groups.set(v, []);
+      groups.get(v).push(i);
+    });
+    for (const idx of groups.values()) {
+      if (idx.length < 2) continue;
+      const members = idx.map((i) => events[i]);
+      const sameUrl = new Set(members.map((e) => e.wikipedia_url)).size === 1;
+      if (sameUrl && members.filter(ownItem).length <= 1) continue;
+      const others = (i) => idx.filter((j) => j !== i).map((j) => events[j].id).join(", ");
+      for (const i of idx) warn(i, events[i], `same ${label} as ${others(i)}${sameUrl ? "" : " (different wikipedia_url)"}, and not explained as an event without an article of its own`);
+    }
+  }
 
   // possible_duplicates hints must name an existing event: one in this file, or in
   // opts.otherIds (the curated ids, for the proposed file, whose hints may point there).
