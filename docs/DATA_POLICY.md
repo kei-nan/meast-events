@@ -351,6 +351,32 @@ but are not shown; an event with any date flag still shows only the years in its
   against Wikidata and fixed (F11).
 - `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (74 events on 2026-10-10, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
+
+  **A fallback pin marks the country, not the event's place.** It is the same point for every event of that country, taken from
+  `COUNTRY_CAPITALS` in `scripts/lib/geo.js` (also the reference point of the `coordinate_far_from_countries` flag), whatever the event's date:
+  a Turkey event from before 1923 sits at Ankara, which became the capital only in 1923, and a Saudi event before 1932 at Riyadh. The event
+  panel and the static event page say so ("The marker shows the country, not where the event happened").
+
+  | Country tag | Point (lat, lon) | Where it is |
+  |---|---|---|
+  | Turkey | 39.9334, 32.8597 | Ankara |
+  | Iran | 35.6892, 51.389 | Tehran |
+  | Iraq | 33.3152, 44.3661 | Baghdad |
+  | Syria | 33.5138, 36.2765 | Damascus |
+  | Lebanon | 33.8938, 35.5018 | Beirut |
+  | Jordan | 31.9454, 35.9284 | Amman |
+  | Israel/Palestine | 31.7683, 35.2137 | Jerusalem: the city's conventional coordinate, which lies in West Jerusalem |
+  | Egypt | 30.0444, 31.2357 | Cairo |
+  | Saudi Arabia | 24.7136, 46.6753 | Riyadh |
+  | Yemen | 15.3694, 44.191 | Sanaa |
+  | Kuwait | 29.3759, 47.9774 | Kuwait City |
+  | Bahrain | 26.2285, 50.586 | Manama |
+  | Qatar | 25.2854, 51.531 | Doha |
+  | UAE | 24.4539, 54.3773 | Abu Dhabi |
+  | Oman | 23.5859, 58.4059 | Muscat |
+
+  The Israel/Palestine point is one point for the combined tag. It is not a statement about the city's status; it is the coordinate commonly
+  given for Jerusalem, and it falls in West Jerusalem. The coordinates are unchanged (owner's decision, 2026-10-15); only this description is new.
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
   Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 378 of the 816 curated events and 186 of the 254 proposed events
   (counted from `data/events.json` and `data/events.proposed.json`).
