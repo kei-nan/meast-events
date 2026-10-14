@@ -207,6 +207,10 @@ The rule stays as coded (all projects); the documentation now says so.
 
 The funnel from 5,063 raw candidates to what is shown, with breakdowns by country, class, group and decade, is machine readable in `data/selection-funnel.json`
 (recomputed from the data files by `scripts/build-selection-funnel.js`, not copied from documents) so the app's About page can render it.
+Its `coverage` block (added 2026-10-15) counts what is shown (`data/events.json`): per country as tagged and again without the events tagged
+with 8 or more countries (17 on 2026-10-15: the world wars and other region-wide conflicts, which otherwise count in each of their countries),
+per decade of the start date, and per category; the About page shows it under "Coverage". It also records that the economic category holds one
+event, the 1973 oil crisis, which comes from the hand-picked list. CI keeps the file current (`--check`).
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
 Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).

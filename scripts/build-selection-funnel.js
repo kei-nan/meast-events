@@ -159,6 +159,39 @@ funnel.breakdowns.notes = [
 ];
 funnel.tracked_countries = Object.keys(COUNTRIES);
 
+// ---- coverage of what is shown (data/events.json), offline: counts only, nothing judged ----
+const MANY = 8; // the validator's MANY_COUNTRIES_WARN: region-wide events (world wars, regional conflicts) carry 8-15 tags
+const sortedCounts = (o, byKey = false) =>
+  Object.fromEntries(Object.entries(o).sort((a, b) => (byKey ? a[0].localeCompare(b[0]) : b[1] - a[1] || a[0].localeCompare(b[0]))));
+const countBy = (events, keysOf) => {
+  const o = {};
+  for (const e of events) for (const k of keysOf(e)) inc(o, k);
+  return o;
+};
+const many = curated.filter((e) => (e.countries ?? []).length >= MANY);
+const economic = curated.filter((e) => e.category === "economic");
+funnel.coverage = {
+  scope: "Events shown on the site (data/events.json). An event tagged with several countries counts once in each.",
+  shown_total: curated.length,
+  by_country: sortedCounts(countBy(curated, (e) => e.countries ?? [])),
+  events_tagged_with_8_or_more_countries: many.length,
+  by_country_without_events_tagged_with_8_or_more_countries: sortedCounts(
+    countBy(curated.filter((e) => (e.countries ?? []).length < MANY), (e) => e.countries ?? [])
+  ),
+  by_decade: sortedCounts(countBy(curated, (e) => [`${Math.floor(Number(e.date_start.slice(0, 4)) / 10) * 10}s`]), true),
+  by_category: sortedCounts(countBy(curated, (e) => [e.category])),
+  economic_events: {
+    total: economic.length,
+    from_hand_picked_list: economic.filter((e) => e.sitelinks === undefined).length,
+    titles: economic.map((e) => e.title),
+  },
+  notes: [
+    `"regional" is a hand-assigned tag of a few hand-picked events that concern the whole region; it is not a country.`,
+    `by_country_without_events_tagged_with_8_or_more_countries: the same count leaving out the ${many.length} events tagged with ${MANY} or more countries (world wars, region-wide conflicts), which otherwise count in each of their 8 to 15 countries.`,
+    "by_decade: the decade of the event's start date. by_category: our coarse grouping (docs/DATA_POLICY.md, Category); hand-picked events count in the group assigned to them.",
+  ],
+};
+
 const text = JSON.stringify(funnel, null, 2) + "\n";
 if (CHECK) {
   if (committed.replace(/\r\n/g, "\n") !== text) {

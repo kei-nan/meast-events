@@ -160,6 +160,10 @@
   padding: 3px 8px;
   text-align: left;
 }
+/* Country names stay whole (the dialog's overflow-wrap: anywhere would split "Lebanon"). */
+.about-coverage-table th[scope="row"] {
+  white-space: nowrap;
+}
 @media (max-width: 600px) {
   .about-inner {
     padding: 12px 14px 20px;
