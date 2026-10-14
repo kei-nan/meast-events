@@ -65,9 +65,14 @@ function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
     });
 }
 
-function fetchJSONCached(url, { timeoutMs, cache } = {}) {
+// `check(data)` throws on a file of the wrong shape; it runs before the answer
+// counts as a success, so a bad file is evicted like a failed fetch.
+function fetchJSONCached(url, { timeoutMs, cache, check } = {}) {
   if (!inFlight.has(url)) {
-    const promise = fetchJSON(url, { timeoutMs, cache });
+    const promise = fetchJSON(url, { timeoutMs, cache }).then((data) => {
+      check?.(data);
+      return data;
+    });
     // A failed fetch shouldn't be cached forever - let a later retry try again.
     promise.catch(() => inFlight.delete(url));
     inFlight.set(url, promise);
@@ -102,7 +107,10 @@ export function loadFarLand() {
 const boundaryDecades = new Map(); // decade -> Promise<FeatureCollection>
 export function loadBoundaryDecade(decade) {
   if (!boundaryDecades.has(decade)) {
-    const promise = fetchJSONCached(dataUrl(`boundaries/${decade}.json`)).then(async (fc) => {
+    const check = (fc) => {
+      if (!Array.isArray(fc?.features)) throw new Error("boundaries file has no features");
+    };
+    const promise = fetchJSONCached(dataUrl(`boundaries/${decade}.json`), { check }).then(async (fc) => {
       const features = await Promise.all(
         fc.features.map(async (f) => {
           if (!f.geometry_ref || f.minzoom != null) return f;
@@ -173,9 +181,11 @@ let allLitePromise = null;
 let source = null; // {version, buckets} of the folder the lite set came from
 export function loadAllLite() {
   if (!allLitePromise) {
+    const check = (list) => {
+      if (!Array.isArray(list)) throw new Error("events file is not an array");
+    };
     const load = (version, buckets) =>
-      fetchJSONCached(dataUrl(`events/v.${version}/all.json`)).then((list) => {
-        if (!Array.isArray(list)) throw new Error("events file is not an array");
+      fetchJSONCached(dataUrl(`events/v.${version}/all.json`), { check }).then((list) => {
         source = { version, buckets };
         return normalizeEvents(list);
       });

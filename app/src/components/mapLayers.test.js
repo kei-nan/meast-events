@@ -113,11 +113,13 @@ test("formatKm and oppositeCorner", () => {
   assert.deepEqual(oppositeCorner(b, "nw"), [40, 25]);
 });
 
-test("circleBbox matches lib/geo.js away from the poles", () => {
+test("circleBbox matches lib/geo.js", () => {
   for (const [c, r] of [
     [[35, 31], 250],
     [[51, 25], 1200],
     [[-5, 36], 40],
+    [[35, 31], 7000],
+    [[115, 20], 3000],
   ]) {
     const a = circleBbox(c, r);
     const b = geoMakeCircleArea(c, r).bbox;
@@ -125,18 +127,15 @@ test("circleBbox matches lib/geo.js away from the poles", () => {
   }
 });
 
-// BUG (reported, not fixed here): MapView draws circles with THIS
-// makeCircleArea, whose bbox goes wrong once the circle reaches past the North
-// Pole: north = destination(center, 0, km) wraps over the pole and comes back
-// DOWN, and longitude is capped at +-90 deg instead of widening to the world.
-// lib/ranking.js prefilters on area.bbox (geo.inArea), so events inside the
-// drawn circle are dropped, and the same circle read back from the URL
-// (urlState -> geo.makeCircleArea) matches them: the result changes on reload.
-test("a circle over the pole keeps every point inside it", { todo: "polar circle bbox" }, () => {
+// MapView draws circles with this makeCircleArea and urlState restores them
+// with geo.makeCircleArea; lib/ranking.js prefilters on area.bbox, so both must
+// give the same box, also for a circle that reaches past the North Pole.
+test("a circle over the pole keeps every point inside it", () => {
   const drawn = makeCircleArea([40, 70], 4000);
   const fromUrl = geoMakeCircleArea([40, 70], 4000);
   const dueNorth = { lon: 40, lat: 75 }; // 556 km from the centre
   assert.ok(haversineKm(40, 70, dueNorth.lon, dueNorth.lat) < 600);
   assert.equal(inArea(dueNorth, fromUrl), true);
-  assert.equal(inArea(dueNorth, drawn), true); // fails: bbox north is 74.03
+  assert.equal(inArea(dueNorth, drawn), true);
+  assert.deepEqual(drawn.bbox, fromUrl.bbox);
 });

@@ -33,7 +33,7 @@ const bucket = (v, id, n) => `/data/events/v.${v}/full/${fullBucket(id, n)}.json
 const META = "/data/events/meta.json";
 const LITE = [{ id: "e1", date_start: "1948-05-14", coordinates: { lon: 35, lat: 31 } }];
 
-test("failure classes: 4xx is not an outage, 5xx and network errors are, an HTML 200 is a missing file", async () => {
+test("failure classes: 4xx and an HTML 200 are not outages, 5xx and network errors are", async () => {
   const { loadLand, loadFarLand, loadSelectionFunnel, loadFramingReviewSummary } = await freshClient();
   stubFetch({
     "/data/land.json": () => json({}, 404),
@@ -43,9 +43,9 @@ test("failure classes: 4xx is not an outage, 5xx and network errors are, an HTML
       throw new TypeError("fetch failed");
     },
   });
-  await assert.rejects(loadLand(), (e) => e.outage === false && !e.missing && /404/.test(e.message));
+  await assert.rejects(loadLand(), (e) => e.outage === false && /404/.test(e.message));
   await assert.rejects(loadFarLand(), (e) => e.outage === true && /503/.test(e.message));
-  await assert.rejects(loadSelectionFunnel(), (e) => e.outage === false && e.missing === true);
+  await assert.rejects(loadSelectionFunnel(), (e) => e.outage === false && /Not found/.test(e.message));
   await assert.rejects(loadFramingReviewSummary(), (e) => e.outage === true && e instanceof TypeError);
 });
 
@@ -112,11 +112,9 @@ test("loadAllLite: a missing versioned folder falls back to events/meta.json (no
   assert.deepEqual(await loadFullLead("e1"), { extract: "from v2" });
 });
 
-// BUG (reported, not fixed here): the non-array check runs after
-// fetchJSONCached has cached the parsed file, so the bad answer stays in the
-// request cache and every later loadAllLite (the app's retry) rejects without
-// fetching again. Marked todo so it is reported but does not fail the run.
-test("loadAllLite: a non-array file is an error and the next call tries again", { todo: "bad all.json stays cached" }, async () => {
+// The shape check runs before the file is cached, so a bad answer is evicted
+// and useAllEvents' retry fetches again.
+test("loadAllLite: a non-array file is an error and the next call tries again", async () => {
   const { loadAllLite } = await freshClient();
   let good = false;
   const calls = stubFetch({
@@ -164,7 +162,7 @@ test("loadFullLead: an outage is not retried via meta.json; same version rethrow
       [bucket(V1, "e1", B1)]: () => html(200),
       [META]: () => json({ version: V1, fullBuckets: B1 }),
     });
-    await assert.rejects(loadFullLead("e1"), (e) => e.missing === true && e.outage === false);
+    await assert.rejects(loadFullLead("e1"), (e) => e.outage === false && /Not found/.test(e.message));
   }
 });
 
@@ -220,6 +218,18 @@ test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shar
   assert.equal(count(calls, "/data/boundaries/shared/h2.json"), 0);
   assert.deepEqual(await loadDeferredGeometry("h2"), geom);
   assert.equal(count(calls, "/data/boundaries/1990.json"), 2);
+});
+
+test("loadBoundaryDecade: a file without features is evicted and refetched", async () => {
+  const { loadBoundaryDecade } = await freshClient();
+  let good = false;
+  const calls = stubFetch({
+    "/data/boundaries/2000.json": () => json(good ? { type: "FeatureCollection", features: [] } : { type: "FeatureCollection" }),
+  });
+  await assert.rejects(loadBoundaryDecade(2000), /no features/);
+  good = true;
+  assert.deepEqual((await loadBoundaryDecade(2000)).features, []);
+  assert.equal(count(calls, "/data/boundaries/2000.json"), 2);
 });
 
 test("BASE_URL prefixes every data path", async () => {
