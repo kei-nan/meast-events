@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { areaToParam, entryBeforePush, parseArea, parseUrlState, serializeUrlState, urlWriteMode, YEAR_MAX } from "./urlState.js";
+import { areaToParam, entryBeforePush, parseArea, parseUrlState, serializeUrlState, shareLink, urlWriteMode, YEAR_MAX } from "./urlState.js";
 
 const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
 
@@ -129,4 +129,23 @@ test("entryBeforePush: carries a pending non-event change onto the current entry
   // Nothing pending: nothing to write.
   assert.equal(entryBeforePush("?q=suez", { ...base, q: "suez", eventId: "suez-crisis" }), null);
   assert.equal(entryBeforePush("", { ...base, about: true }), null);
+});
+
+test("shareLink: an open event shares its static page, without the view's other state", () => {
+  const state = { ...base, q: "suez", startYear: 1950, endYear: 1960, eventId: "Q1" };
+  assert.equal(shareLink("https://middleeast.events", "/", state), "https://middleeast.events/event/Q1");
+  // Encoded as scripts/event-page.mjs eventPath encodes it.
+  assert.equal(shareLink("https://x.test", "/", { ...base, eventId: "a:b" }), "https://x.test/event/a%3Ab");
+  // The dev server has no event pages: the map link instead.
+  assert.equal(shareLink("http://localhost:5173", "/", state, { eventPages: false }), "http://localhost:5173/?e=Q1");
+});
+
+test("shareLink: without an event, the view as it is now (not as the debounced URL last had it)", () => {
+  assert.equal(shareLink("https://x.test", "/", base), "https://x.test/");
+  assert.equal(
+    shareLink("https://x.test", "/", { ...base, q: "suez", startYear: 1956, endYear: 1957 }),
+    "https://x.test/?q=suez&y=1956-1957"
+  );
+  // An invalid id is not shared (serializeUrlState drops it too).
+  assert.equal(shareLink("https://x.test", "/", { ...base, eventId: "a b" }), "https://x.test/");
 });

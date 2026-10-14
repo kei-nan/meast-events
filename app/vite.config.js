@@ -32,8 +32,27 @@ function preloadEventList() {
   }
 }
 
+// The last year the data was split for (scripts/split-data.mjs writes it into
+// dataVersion.js), compiled into the bundle as __DATA_MAX_YEAR__: src/lib/years.js
+// keeps the timeline within the years the shipped data covers. A build without
+// it fails; the dev server and preview fall back to the visitor's clock.
+function dataMaxYear(command) {
+  let year = null
+  try {
+    const source = readFileSync(new URL('./src/lib/dataVersion.js', import.meta.url), 'utf8')
+    year = Number(source.match(/MAX_YEAR = (\d{4});/)?.[1]) || null
+  } catch {
+    // missing: handled below
+  }
+  if (!year && command === 'build') {
+    throw new Error('vite.config.js: no MAX_YEAR in src/lib/dataVersion.js (run scripts/split-data.mjs)')
+  }
+  return year ? { __DATA_MAX_YEAR__: JSON.stringify(year) } : {}
+}
+
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  define: dataMaxYear(command),
   plugins: [
     react(),
     preloadEventList(),
@@ -66,4 +85,4 @@ export default defineConfig({
     // on the page needs it; as a file it is fetched only if its unicode-range is used.
     assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
   },
-})
+}))
