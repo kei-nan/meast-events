@@ -95,3 +95,21 @@ test("merge-proposed: an invalid proposed file is refused, even with --apply", (
     rmSync(t.dir, { recursive: true, force: true });
   }
 });
+
+test("merge-proposed: not events are removed from the curated file and never added; --no-add adds nothing", () => {
+  const history = event("x", "Q9", { wikidata_classes: ["history of a country or state"] });
+  const t = setup({ curated: [...curated, history], proposed: [event("c", "Q3"), event("y", "Q8", { wikidata_classes: ["human"] })] });
+  try {
+    const dry = run(t.dir);
+    assert.match(dry, /removed, not events \(rule\):\s+1/);
+    assert.match(dry, /x \(history of a country or state\)/);
+    assert.match(dry, /proposed, not events \(not added\): y/);
+    assert.equal(t.read(), t.text, "dry run writes nothing");
+    run(t.dir, "--apply", "--no-add");
+    assert.deepEqual(JSON.parse(t.read()), curated, "x removed, c not added, the rest byte-identical records");
+    run(t.dir, "--apply");
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c"]);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});

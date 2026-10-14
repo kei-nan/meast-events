@@ -200,7 +200,7 @@ The rule stays as coded (all projects); the documentation now says so.
 - **Wikidata modelling is uneven.** Only events that some editor has typed with a class, dated and located in a tracked country are found at all. Multi-country events
   carry only the countries Wikidata lists.
 - **English Wikipedia is required** for an extract, which biases toward what English Wikipedia covers.
-- **The hand-picked seed list** (103 events, 43 of them not reachable by the rule; 112 before 2026-10-09, see "Not events" below) is our own selection.
+- **The hand-picked seed list** (102 events, 42 of them not reachable by the rule; 112 before 2026-10-09 and 103 before 2026-10-15, see "Not events" below) is our own selection.
   It is still the only source of economic events; the rule now also finds diplomatic ones (summits, ceasefires, peace conferences).
 - **Location is not required, but it changes visibility.** Events without coordinates are listed but have no marker; abstract and large-area events (wars, referendums,
   treaties) lack coordinates far more often than point-like ones.
@@ -226,6 +226,7 @@ Armenian genocide and the Young Turk Revolution are the two of them that are sho
 | Greek genocide (Q911233) | 36 | `P17` and `P276` Ottoman Empire; no `P625`. |
 | Taif Agreement (Q321936) | 24 | No `P17`, `P276`, `P131` or `P625` at all (a "peace treaty", dated 1989 at year precision). |
 | 1913 Ottoman coup d'état (Q4559693) | 17 | `P17` Ottoman Empire; no `P276` or `P625`. |
+| Treaty of London (1946) (Q541293) | 10 | Meets the class (treaty), date (1946, year precision), English-article and sitelink (exactly 10) conditions, but `P17` is the United Kingdom and `P276` is London: no tracked country. Checked 2026-10-15, when "Jordanian independence" was removed. |
 
 Each of these would be found by the rule once Wikidata records a place (`P276`) whose present-day country is tracked; for those whose `P17`
 is the Ottoman Empire, coordinates (`P625`) inside a tracked country would also do. That is an upstream edit, which this project does not make.
@@ -238,6 +239,16 @@ contained them. On 2026-10-09 this removed nine hand-picked entries: Saddam Huss
 Organization, Islamic State and the Central Treaty Organization (listed as "Baghdad Pact"; organisation classes); the Kingdom of Iraq, the United Arab
 Republic and Syrian independence (state classes). Events about them stay (for example the Execution of Saddam Hussein, the 14 July Revolution).
 The Iranian Green Movement (`social movement`, in practice the 2009 protests) is kept.
+
+On 2026-10-15 the rule was extended to the **history of a country** (Wikidata class `history of a country or state`, Q17544377) and is now
+applied by code instead of by hand: `NOT_EVENT_CLASSES` in `scripts/lib/event-classes.js` lists the classes (human; organization, political,
+military, terrorist and armed organization; historical country, state, sovereign state, self-proclaimed state, quasi-state; history of a country
+or state), matched against the stored `wikidata_classes`. `scripts/merge-proposed.js` removes a curated entry that has one of them (listed in its
+dry run; `--no-add` applies the rules without adding proposed events), `scripts/enrich-candidates.js` never proposes one (`exclusion_reason:
+not_an_event`), and `validate-events.js` warns about any it finds. The run of 2026-10-15 (`merge-proposed.js --apply --no-add`) removed one
+hand-picked entry, "Jordanian independence", whose Wikidata item (Q1639050) and Wikipedia link are the *history of Jordan*; its seed line and
+framing review were removed with it. No other curated or proposed event has one of these classes. The Emirate of Transjordan (classes `League
+of Nations mandate`, `British protectorate`) does not match the list and is kept.
 
 ## Default order
 

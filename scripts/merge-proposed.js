@@ -5,18 +5,24 @@
 //   node scripts/merge-proposed.js --skip-duplicate-hints
 //                                                  leave out proposed events that carry a possible_duplicates hint
 //                                                  (by default they are merged with the hint kept as a review note)
+//   node scripts/merge-proposed.js --no-add         add no proposed event; only apply the rules below to the curated file
 //   node scripts/merge-proposed.js --data-dir=DIR  read/write events.json, events.proposed.json and
 //                                                  proposed-exclusions.json in DIR instead of data/ (tests)
 //
-// Nothing is rewritten: proposed events are appended exactly as proposed; curated events are untouched.
-// Proposed events whose id or wikidata_qid already exists in the curated file are skipped and listed.
+// Nothing is rewritten: proposed events are appended exactly as proposed. Proposed events whose id or wikidata_qid
+// already exists in the curated file are skipped and listed.
+// Rules applied to the curated file on every run (listed in the dry run, written with --apply):
+//   - "Not events" (docs/DATA_POLICY.md; NOT_EVENT_CLASSES in lib/event-classes.js): a curated entry whose Wikidata
+//     classes include a person, organisation, state or country-history class is removed; a proposed one is not added.
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { validateEvents, findClashes } from "./lib/validate.js";
+import { notEventClasses } from "./lib/event-classes.js";
 
 const APPLY = process.argv.includes("--apply");
 const SKIP_DUP = process.argv.includes("--skip-duplicate-hints");
+const NO_ADD = process.argv.includes("--no-add");
 const dataDirArg = process.argv.find((a) => a.startsWith("--data-dir="))?.split("=").slice(1).join("=");
 const dataDir = dataDirArg ? pathToFileURL(resolve(dataDirArg) + "/") : new URL("../data/", import.meta.url);
 
@@ -25,7 +31,10 @@ const proposedUrl = new URL("events.proposed.json", dataDir);
 
 const read = async (u) => JSON.parse(await readFile(u, "utf-8"));
 
-const curated = await read(curatedUrl);
+const curatedIn = await read(curatedUrl);
+const notEvent = (e) => notEventClasses(e.wikidata_classes).map((c) => c.label);
+const removedNotEvents = curatedIn.filter((e) => notEvent(e).length);
+const curated = curatedIn.filter((e) => !notEvent(e).length);
 const exclusionsUrl = new URL("proposed-exclusions.json", dataDir);
 const exclusions = await read(exclusionsUrl).catch(() => []);
 const excludedIds = new Set(exclusions.map((x) => x.id));
@@ -42,7 +51,8 @@ if (pv.errors.length) {
 
 const clashes = findClashes(curated, proposed);
 const clashIds = new Set(clashes.map((c) => c.event.id));
-let incoming = proposed.filter((e) => !clashIds.has(e.id));
+const proposedNotEvents = proposed.filter((e) => !clashIds.has(e.id) && notEvent(e).length);
+let incoming = NO_ADD ? [] : proposed.filter((e) => !clashIds.has(e.id) && !notEvent(e).length);
 const dupHinted = incoming.filter((e) => e.possible_duplicates?.length);
 if (SKIP_DUP) incoming = incoming.filter((e) => !e.possible_duplicates?.length);
 
@@ -59,13 +69,16 @@ const byCat = {};
 for (const e of incoming) byCat[e.category] = (byCat[e.category] ?? 0) + 1;
 
 console.log(`${APPLY ? "APPLY" : "DRY RUN"} - merge-proposed`);
-console.log(`  curated events now:              ${curated.length}`);
+console.log(`  curated events now:              ${curatedIn.length}`);
+console.log(`  removed, not events (rule):      ${removedNotEvents.length}`);
+for (const e of removedNotEvents) console.log(`      ${e.id} (${notEvent(e).join(", ")})`);
+if (proposedNotEvents.length) console.log(`  proposed, not events (not added): ${proposedNotEvents.map((e) => e.id).join(", ")}`);
 console.log(`  proposed events:                 ${proposed.length}`);
 console.log(`  skipped (id/QID already curated): ${clashes.length}`);
 for (const c of clashes) console.log(`      ${c.event.id} (${c.reasons.join(", ")})`);
 console.log(`  with possible-duplicate hints:   ${dupHinted.length}${SKIP_DUP ? " (skipped by --skip-duplicate-hints)" : " (merged; hint kept in review_reasons)"}`);
 console.log(`  with any review flag:            ${incoming.filter((e) => e.needs_review).length}`);
-console.log(`  would add:                       ${incoming.length}  -> total ${merged.length}`);
+console.log(`  would add:                       ${incoming.length}${NO_ADD ? " (--no-add)" : ""}  -> total ${merged.length}`);
 console.log(`  by category:`, byCat);
 
 if (!APPLY) {

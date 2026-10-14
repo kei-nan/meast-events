@@ -31,7 +31,7 @@ import { sleep } from "./lib/http.js";
 import { compareQids } from "./lib/wdqs.js";
 import { buildContext } from "./lib/context.js";
 import { finalizeEvent, hasTrackedCountry } from "./lib/v21.js";
-import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES } from "./lib/event-classes.js";
+import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES, notEventClasses } from "./lib/event-classes.js";
 import {
   fetchSummary,
   fetchEntity,
@@ -199,6 +199,7 @@ function exclusionReason(r) {
   if (r.error) return "no_wikipedia_summary";
   if (!r.extract || !r.extract.trim()) return "empty_extract";
   if (!hasTrackedCountry(r)) return "no_tracked_country"; // inclusion rule 2, after the location rule and fixes
+  if (notEventClasses(r.wikidata_classes).length) return "not_an_event"; // a person, organisation, state or country history
   return null; // v2.1: no-coordinate and date-order-invalid events are kept (flagged), not excluded
 }
 

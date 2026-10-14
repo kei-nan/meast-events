@@ -50,17 +50,17 @@
     "hard_excluded_no_wikipedia_summary_or_extract": 28
   },
   "shown_now": {
-    "curated_total": 816,
-    "seed_events_hand_picked": 103,
+    "curated_total": 815,
+    "seed_events_hand_picked": 102,
     "seed_events_also_found_by_discovery": 60,
-    "seed_events_not_reachable_by_discovery": 43,
+    "seed_events_not_reachable_by_discovery": 42,
     "discovered_events_merged": 713,
     "location_quality": {
-      "approximate": 74,
+      "approximate": 73,
       "precise": 364,
       "none": 378
     },
-    "seed_file_entries": 103
+    "seed_file_entries": 102
   },
   "sitelink_measurement": {
     "rule_uses": "sitelinks across ALL Wikimedia projects (Wikidata wikibase:sitelinks: Wikipedias + Wikisource, Wikiquote, Commons, ...)",
