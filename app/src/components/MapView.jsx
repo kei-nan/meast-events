@@ -150,7 +150,6 @@ export default function MapView({
   onAreaModeChange,
   onAreaChange,
   onViewportChange,
-  onViewportBounds,
   onSelectEvent,
   eventsLoading = false,
   yearPending = false, // true while the year to show is not known yet: no borders are fetched (App.jsx)
@@ -215,7 +214,6 @@ export default function MapView({
     onAreaChange,
     onAreaModeChange,
     onSelectEvent,
-    onViewport: onViewportChange ?? onViewportBounds,
   };
 
   // Fetch one boundary decade into the cache: one automatic retry with backoff,
@@ -249,6 +247,10 @@ export default function MapView({
     } catch {
       landFailedRef.current = true;
       setBorderError({ decade: "land", phase: "final" });
+      // The loading cover waits for a frame with the land in, or its failure
+      // (the reveal in the load handler): a map that went idle while the land was
+      // still loading draws no further frame by itself.
+      mapRef.current?.triggerRepaint();
       return null;
     }
   }, []);
@@ -792,16 +794,14 @@ export default function MapView({
   // Reports the settled viewport ([west, south, east, north]) after each
   // pan/zoom so the parent can count events in view (computed client-side
   // from the static event store).
-  const hasViewportCb = !!(onViewportChange ?? onViewportBounds);
-  const viewportCb = onViewportChange ?? onViewportBounds;
   useEffect(() => {
-    if (!mapReady || !hasViewportCb) return;
+    if (!mapReady || !onViewportChange) return;
     const map = mapRef.current;
     let timeoutId;
 
     function report() {
       const b = map.getBounds();
-      viewportCb([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]);
+      onViewportChange([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]);
     }
 
     function handleMoveEnd() {
@@ -816,7 +816,7 @@ export default function MapView({
       clearTimeout(timeoutId);
       map.off("moveend", handleMoveEnd);
     };
-  }, [mapReady, hasViewportCb, viewportCb]);
+  }, [mapReady, onViewportChange]);
 
   // The point sources' effects below re-run on every timeline step (`events`
   // changes) while the point itself rarely does, and every setData makes
@@ -888,7 +888,6 @@ export default function MapView({
   useEffect(() => {
     if (!mapReady || draggingRef.current) return;
     setAreaSources(area, areaMode === "off");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, areaMode, mapReady]);
 
   useEffect(() => {
@@ -1021,7 +1020,6 @@ export default function MapView({
       el.removeEventListener("pointerup", onUp);
       el.removeEventListener("pointercancel", onCancel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady]);
 
   const toggle = (mode) => onAreaModeChange?.(areaMode === mode ? "off" : mode);

@@ -61,5 +61,5 @@ export default function useAllEvents() {
     return () => clearInterval(id);
   }, [error]);
 
-  return { storeRef, version, addEvents, loading, error };
+  return { storeRef, version, loading, error };
 }

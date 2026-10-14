@@ -23,7 +23,8 @@ import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
 import { orderBrowseList } from "./lib/browseOrder";
 import { rankEvents } from "./lib/ranking";
-import { parseUrlState } from "./lib/urlState";
+import { ShareLinkContext } from "./lib/shareLinkContext.js";
+import { parseUrlState, shareLink } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
 
@@ -95,9 +96,6 @@ function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
 }
 
 const SITE_TITLE = "Middle East, 1900–present"; // as in index.html
-const DEEP_LINK_PAD_YEARS = 5;
-
-const clampYear = (y) => Math.min(MAX_YEAR, Math.max(MIN_YEAR, y));
 
 // Map focus for an opened event: fly to its marker, or - for an event without
 // a precise location - fit the map to its shaded countries (MapView's
@@ -375,8 +373,10 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [version]);
 
-  // Back/forward: re-apply the parsed URL to every piece of state.
+  // Back/forward: re-apply the parsed URL to every piece of state. Play pauses:
+  // its next step would move the restored years and overwrite the entry.
   const handleNavigate = useCallback((parsed) => {
+    setPlayState((p) => (p === "playing" ? "paused" : p));
     setQuery(parsed.q);
     setCategories(parsed.categories);
     setCountries(parsed.countries);
@@ -391,13 +391,28 @@ export default function App() {
     setSort(parsed.sort);
   }, []);
 
-  const replaceNextUrl = useUrlState(
-    { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort },
-    handleNavigate
+  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort };
+  const replaceNextUrl = useUrlState(urlState, handleNavigate);
+
+  // Share links come from the state as it is now, not the address bar: URL
+  // writes are debounced (hooks/useUrlState.js) and Play steps faster than that.
+  // An open event shares its static page /event/<id> (lib/urlState.js shareLink).
+  const urlStateRef = useRef(urlState);
+  useEffect(() => {
+    urlStateRef.current = urlState;
+  });
+  const getShareLink = useCallback(
+    () =>
+      shareLink(window.location.origin, window.location.pathname, urlStateRef.current, {
+        eventPages: !import.meta.env.DEV, // built by postbuild (scripts/build-event-pages.mjs)
+      }),
+    []
   );
 
   // Deep link / selection resolution: make sure the selected event is in the
-  // store with its full record, and (for links) move the range + focus it.
+  // store with its full record, and (for links and Back/Forward) focus it. The
+  // range is the URL's own and is left alone: the map shows the event's year
+  // (borderYear) and its marker whatever the range (mapEvents).
   // An id that cannot be resolved is cleared by REPLACING the URL, so Back does
   // not lead to the dead link again.
   useEffect(() => {
@@ -411,13 +426,6 @@ export default function App() {
     const ev = storeRef.current.get(selectedEventId);
     if (ev && pendingFocusRef.current === selectedEventId) {
       pendingFocusRef.current = null;
-      const [s] = eventYearRange(ev);
-      const y = clampYear(s);
-      setRange((r) =>
-        eventOverlapsRange(ev, r.start, r.end)
-          ? r
-          : { start: clampYear(y - DEEP_LINK_PAD_YEARS), end: clampYear(y + DEEP_LINK_PAD_YEARS) }
-      );
       const f = focusFor(ev, focusNonceRef);
       if (f) setFocus(f);
     }
@@ -456,8 +464,8 @@ export default function App() {
   );
 
   // The tab title names the open event (and is restored when it closes).
-  // Link previews still show the site title: crawlers do not run this script,
-  // so per-event previews would need a server-side function.
+  // Crawlers do not run this script: the per-event link previews come from the
+  // static /event/<id> pages (scripts/event-page.mjs), the link Share hands out.
   const selectedTitle = selectedEventRaw?.title;
   const selectedYears = selectedEventRaw ? rawEventYears(selectedEventRaw) : null; // as the dates give them
   const selectedYearText = selectedYears
@@ -470,143 +478,142 @@ export default function App() {
   }, [selectedTitle, selectedYearText]);
 
   return (
-    <div className="app">
-      {/* Skips the map controls: to the search box, or - while an event is open
-          and the search is hidden - to the event's heading. SearchPanel's
-          skipTo first opens the mobile sheet if it is collapsed. */}
-      <a
-        className="app-skip"
-        href={selectedEventRaw ? "#event-detail-title" : "#sp-body"}
-        onClick={(e) => {
-          if (!panelRef.current) return;
-          e.preventDefault();
-          panelRef.current.skipTo();
-        }}
-      >
-        {selectedEventRaw ? "Skip to panel" : "Skip to search"}
-      </a>
-      <header className="app-header">
-        <h1>{SITE_TITLE}</h1>
-        {/* Status notices share the title's line; the in-view count is in the panel. */}
-        <div className="app-search">
-          {eventsLoading && (
-            <span className="app-loading" role="status">
-              <span className="app-loading-spinner" aria-hidden="true" />
-              Loading events…
-            </span>
+    <ShareLinkContext.Provider value={getShareLink}>
+      <div className="app">
+        {/* Skips the map controls: to the search box, or - while an event is open
+            and the search is hidden - to the event's heading. SearchPanel's
+            skipTo first opens the mobile sheet if it is collapsed. */}
+        <a
+          className="app-skip"
+          href={selectedEventRaw ? "#event-detail-title" : "#sp-body"}
+          onClick={(e) => {
+            if (!panelRef.current) return;
+            e.preventDefault();
+            panelRef.current.skipTo();
+          }}
+        >
+          {selectedEventRaw ? "Skip to panel" : "Skip to search"}
+        </a>
+        <header className="app-header">
+          <h1>{SITE_TITLE}</h1>
+          {/* Status notices share the title's line; the in-view count is in the panel. */}
+          <div className="app-search">
+            {eventsLoading && (
+              <span className="app-loading" role="status">
+                <span className="app-loading-spinner" aria-hidden="true" />
+                Loading events…
+              </span>
+            )}
+            {eventsError && !eventsLoading && (
+              <span className="app-notice" role="status">
+                Events could not be loaded - retrying
+              </span>
+            )}
+            {/* Once its matches are listed the panel says this under the search box. */}
+            {degraded && search.textSearch && search.source !== "static" && (
+              <span className="app-notice" role="status">
+                Full-text search is unavailable - matching titles and summaries only
+              </span>
+            )}
+            {notFound && (
+              <span className="app-notice" role="status">
+                That event could not be found.
+              </span>
+            )}
+          </div>
+          {/* The URL holds the view (years, filters, area), so this shares it as seen. While
+              an event is open its own Share (EventDetail) takes over, so there is only ever one. */}
+          {!selectedEventRaw && <ShareButton title={SITE_TITLE} align="end" className="sp-btn app-share-btn" />}
+        </header>
+        <main className="app-body">
+          {mapStarted ? (
+            <Suspense fallback={MAP_PLACEHOLDER}>
+              <MapView
+                events={mapEvents}
+                matchIds={matchIds}
+                eventsLoading={eventsLoading}
+                // An event link without years shows the event's year, known once the events load.
+                yearPending={Boolean(initial.eventId && !initial.years && eventsLoading && !eventsError)}
+                year={endYear}
+                borderYear={borderYear}
+                eventYear={eventYear}
+                onToggleEventYear={toggleEventYear}
+                highlightEvent={highlightEvent}
+                selectedEventId={selectedEventId}
+                hoverId={hoverId}
+                focus={focus}
+                areaMode={areaMode}
+                area={area}
+                onAreaModeChange={setAreaMode}
+                onAreaChange={setArea}
+                onViewportChange={handleViewportChange}
+                onSelectEvent={handleSelectFromMap}
+              />
+            </Suspense>
+          ) : (
+            MAP_PLACEHOLDER
           )}
-          {eventsError && !eventsLoading && (
-            <span className="app-notice" role="status">
-              Events could not be loaded - retrying
-            </span>
-          )}
-          {/* Once its matches are listed the panel says this under the search box. */}
-          {degraded && search.textSearch && search.source !== "static" && (
-            <span className="app-notice" role="status">
-              Full-text search is unavailable - matching titles and summaries only
-            </span>
-          )}
-          {notFound && (
-            <span className="app-notice" role="status">
-              That event could not be found.
-            </span>
-          )}
-        </div>
-        {/* The URL holds the view (years, filters, area), so this shares it as seen. While
-            an event is open its own Share (EventDetail) takes over, so there is only ever one. */}
-        {!selectedEventRaw && <ShareButton title={SITE_TITLE} align="end" className="sp-btn app-share-btn" />}
-      </header>
-      <main className="app-body">
-        {mapStarted ? (
-          <Suspense fallback={MAP_PLACEHOLDER}>
-            <MapView
-              events={mapEvents}
-              matchIds={matchIds}
-              eventsLoading={eventsLoading}
-              // An event link without years shows the event's year, known once the events load.
-              yearPending={Boolean(initial.eventId && !initial.years && eventsLoading && !eventsError)}
-              year={endYear}
-              borderYear={borderYear}
-              eventYear={eventYear}
-              onToggleEventYear={toggleEventYear}
-              highlightEvent={highlightEvent}
-              selectedEventId={selectedEventId}
-              hoverId={hoverId}
-              focus={focus}
-              areaMode={areaMode}
-              area={area}
-              onAreaModeChange={setAreaMode}
-              onAreaChange={setArea}
-              onViewportChange={handleViewportChange}
-              onSelectEvent={handleSelectFromMap}
-            />
-          </Suspense>
-        ) : (
-          MAP_PLACEHOLDER
-        )}
-        <SearchPanel
-          ref={panelRef}
-          query={query}
-          filters={filters}
-          area={area}
-          areaMode={areaMode}
-          status={search.status}
-          results={panelResults}
-          total={panelTotal}
-          source={search.source ?? "fulltext"}
-          eventsLoading={eventsLoading}
-          selectedEvent={selectedEvent}
-          viewCount={viewportEventCount}
-          range={panelRange}
+          <SearchPanel
+            ref={panelRef}
+            query={query}
+            filters={filters}
+            area={area}
+            areaMode={areaMode}
+            status={search.status}
+            results={panelResults}
+            total={panelTotal}
+            source={search.source ?? "fulltext"}
+            eventsLoading={eventsLoading}
+            selectedEvent={selectedEvent}
+            viewCount={viewportEventCount}
+            range={panelRange}
+            playState={playState}
+            categoryOptions={categoryOptions}
+            countryOptions={countryOptions}
+            onQueryChange={setQuery}
+            onFiltersChange={handleFiltersChange}
+            onAreaModeChange={setAreaMode}
+            onAreaChange={setArea}
+            onSelect={handleSelectFromList}
+            onHover={setHoverId}
+            onBack={handleBack}
+            sort={sort}
+            onSortChange={setSort}
+            counts={counts}
+            interim={search.interim}
+          />
+        </main>
+        <Timeline
+          startYear={startYear}
+          endYear={endYear}
+          onChangeRange={handleChangeRange}
+          eventCountsByYear={eventCountsByYear}
+          borderYear={borderYear}
           playState={playState}
-          categoryOptions={categoryOptions}
-          countryOptions={countryOptions}
-          onQueryChange={setQuery}
-          onFiltersChange={handleFiltersChange}
-          onAreaModeChange={setAreaMode}
-          onAreaChange={setArea}
-          onSelect={handleSelectFromList}
-          onHover={setHoverId}
-          onBack={handleBack}
-          sort={sort}
-          onSortChange={setSort}
-          // Extras beyond the agreed props (ignored if unused):
-          counts={counts}
-          truncated={search.truncated}
-          interim={search.interim}
-          selectedEventId={selectedEventId}
+          onPlayStateChange={setPlayState}
+          eventYear={eventYear}
         />
-      </main>
-      <Timeline
-        startYear={startYear}
-        endYear={endYear}
-        onChangeRange={handleChangeRange}
-        eventCountsByYear={eventCountsByYear}
-        borderYear={borderYear}
-        playState={playState}
-        onPlayStateChange={setPlayState}
-        eventYear={eventYear}
-      />
-      {about && (
-        <Suspense fallback={null}>
-          <AboutData section={aboutSection} onClose={() => setAbout(false)} />
-        </Suspense>
-      )}
-      {/* One short line on every page. The full credits (Wikipedia CC BY-SA 4.0;
-          CShapes 2.0, Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0, non-commercial
-          use, with our cited corrections) are one click away in the About
-          dialog's "Sources & licences" section; CC 4.0 licences (section
-          3(a)(2)) accept "a hyperlink to a resource that includes the required
-          information". */}
-      <footer className="app-footer">
-        <button type="button" className="app-footer-link" onClick={() => openAbout(null)}>
-          About the data
-        </button>
-        <span aria-hidden="true">{" · "}</span>
-        <button type="button" className="app-footer-link" onClick={() => openAbout("credits")}>
-          Sources &amp; licences
-        </button>
-      </footer>
-    </div>
+        {about && (
+          <Suspense fallback={null}>
+            <AboutData section={aboutSection} onClose={() => setAbout(false)} />
+          </Suspense>
+        )}
+        {/* One short line on every page. The full credits (Wikipedia CC BY-SA 4.0;
+            CShapes 2.0, Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0, non-commercial
+            use, with our cited corrections) are one click away in the About
+            dialog's "Sources & licences" section; CC 4.0 licences (section
+            3(a)(2)) accept "a hyperlink to a resource that includes the required
+            information". */}
+        <footer className="app-footer">
+          <button type="button" className="app-footer-link" onClick={() => openAbout(null)}>
+            About the data
+          </button>
+          <span aria-hidden="true">{" · "}</span>
+          <button type="button" className="app-footer-link" onClick={() => openAbout("credits")}>
+            Sources &amp; licences
+          </button>
+        </footer>
+      </div>
+    </ShareLinkContext.Provider>
   );
 }

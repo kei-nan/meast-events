@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
+import { ShareLinkContext } from "../lib/shareLinkContext.js";
 import "./ShareButton.css";
 
 // The QR library is only downloaded when someone opens a QR code.
@@ -76,8 +77,10 @@ const slug = (s) =>
     .slice(0, 60);
 
 /**
- * "Share" for the page's current link (the URL carries the open event, years,
- * filters and area, so the link reopens the same view). Opens a small panel:
+ * "Share" for the current view: the app's link for it (ShareLinkContext, built
+ * from the state as it is now - an open event's own page /event/<id>, else the
+ * map link with the years, filters and area; lib/urlState.js shareLink), or the
+ * address bar without a provider. Opens a small panel:
  * the device's own share sheet where the browser offers one (phones, some
  * desktops), "Copy link", and a QR code that can be saved as a PNG. The QR is
  * drawn here; the link is never sent to any service.
@@ -95,6 +98,8 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
   const panelRef = useRef(null);
   const panelId = useId();
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  const getLink = useContext(ShareLinkContext);
+  const link = () => getLink?.() ?? window.location.href;
 
   const close = (returnFocus) => {
     setOpen(false);
@@ -132,7 +137,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
 
   async function shareNative() {
     try {
-      await navigator.share({ title, url: window.location.href });
+      await navigator.share({ title, url: link() });
       close(true);
     } catch {
       // Cancelled by the user, or refused: the panel stays open for the other options.
@@ -140,16 +145,17 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
   }
 
   async function copyLink() {
+    const url = link();
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(url);
       setCopied(true);
     } catch {
-      window.prompt("Copy this link", window.location.href);
+      window.prompt("Copy this link", url);
     }
   }
 
   async function showQr() {
-    const url = window.location.href;
+    const url = link();
     setQr("loading");
     try {
       const { encode } = await loadQr();
