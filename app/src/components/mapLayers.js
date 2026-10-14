@@ -1,6 +1,6 @@
 // Pure helpers and layer definitions for MapView: colours, GeoJSON builders,
 // geodesic area geometry (plain spherical maths - no extra dependencies).
-import { EARTH_RADIUS_KM, destination } from "../lib/geo.js";
+import { circleBbox, destination } from "../lib/geo.js";
 import { eventYearLabel } from "../lib/mapStack.js";
 
 // A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
@@ -141,17 +141,9 @@ export function pointFeature(event) {
 
 // ---- geodesy (distances and bearings: lib/geo.js) ------------------------
 
-const rad = (d) => (d * Math.PI) / 180;
-const deg = (r) => (r * 180) / Math.PI;
-
-const clampLat = (v) => Math.max(-85, Math.min(85, v));
-
-export function circleBbox(center, km) {
-  const north = destination(center, 0, km)[1];
-  const south = destination(center, 180, km)[1];
-  const dLon = deg(Math.asin(Math.min(1, Math.sin(km / EARTH_RADIUS_KM) / Math.cos(rad(center[1])))));
-  return [center[0] - dLon, clampLat(south), center[0] + dLon, clampLat(north)];
-}
+// One bounding box for drawn circles and circles read from the URL
+// (lib/urlState.js), so both match the same events.
+export { circleBbox };
 
 export function makeCircleArea(center, radiusKm) {
   return { type: "circle", center, radiusKm, bbox: circleBbox(center, radiusKm) };
