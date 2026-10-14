@@ -133,6 +133,23 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
    Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
    are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the hand-picked
    events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`: 23 events on 2026-09-29, 5 more from the classes added on 2026-10-06).
+
+   **Predecessor states** (owner's rule, 2026-10-15). If an item's country (`P17`) is a historical state that Wikidata links to a tracked country
+   via *replaced by* / *replaces* (`P1366` / `P1365`, one step: "X replaced by Turkey" or "Turkey replaces X"), it counts only when the item's own
+   coordinates (`P625`) fall in a tracked country, or its place's (`P276`) present-day country is a tracked country; it is then tagged with that
+   country. "Fall in" means inside the country's present-day border shape in `data/boundaries.json` (the map's own country-to-shape table,
+   no tolerance). A place's present-day country is a tracked country in its `P17` that is not itself such a predecessor (so a place whose only
+   `P17` is the Ottoman Empire, or Mandatory Palestine, lends none). Present-day sovereign states are never predecessors. The rule is strict:
+   a historical `P17` alone never places an event. On 2026-10-15 Wikidata linked 42 such states (among them the Ottoman Empire, the Kingdom of
+   Egypt, Pahlavi Iran, the Trucial States, the Yemen Arab Republic, South Yemen, the United Arab Republic and some Ottoman vilayets); 256 items
+   had one of them as `P17` and a date from 1900, and 130 of those were dated instances of an event class. 73 of the 130 were already found
+   through rule 2's other paths, 47 are not located in a tracked country by this rule and are not counted, and 10 were new: one of them
+   has 10+ sitelinks and an English article, the Koçgiri rebellion (`P17` Ottoman Empire, `P276` Sivas Province, Turkey), now in
+   `data/events.proposed.json` (not merged; `scripts/enrich-candidates.js --keep-existing` added it without re-deriving the other proposed records).
+   Its place would also qualify it through the ordinary `P276` path, but the 2026-10-06 discovery run did not return it (the item was last
+   edited on 2026-08-07, so the cause is on the query side; it was not traced further). Code: `scripts/lib/predecessor.js`, run by
+   `scripts/discover-events.js` (`--predecessors-only` adds only that pass's new items to `data/event-candidates.json`); such events carry
+   the review note `country_via_predecessor_state`, which names the state and the evidence.
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**, or an English
    Wikipedia title that redirects into one (see "Events without an article of their own" below).
@@ -193,6 +210,25 @@ The funnel from 5,063 raw candidates to what is shown, with breakdowns by countr
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
 Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).
+
+### Known gaps: major events the rule does not reach
+
+Some well-known events fail the rule because of how Wikidata models them, not because of their significance. They are listed here, with the
+reason read from their Wikidata items (wbgetentities, 2026-10-15), and they are **not** added by hand: no seeds are added for them. The
+Armenian genocide and the Young Turk Revolution are the two of them that are shown, only because they are on the hand-picked list from before the rule.
+
+| Event (QID) | Sitelinks | Why the rule misses it |
+|---|---|---|
+| Armenian genocide (Q80034) | 125 | `P17` Ottoman Empire; `P276` Ottoman Empire, Western Armenia (no `P17`) and the Six vilayets (`P17` Ottoman Empire); no `P625`. No present-day place, so the predecessor rule does not place it. Shown because it is a hand-picked event. |
+| Sayfo (Q852236) | 53 | `P17` Ottoman Empire; `P276` West Asia, which has no `P17`; no `P625`. |
+| Young Turk Revolution (Q4298662) | 46 | `P17` and `P276` Ottoman Empire; no `P625`. Shown because it is a hand-picked event. |
+| Population exchange between Greece and Turkey (Q131017) | 42 | No `P17`, `P276`, `P131` or `P625` at all. |
+| Greek genocide (Q911233) | 36 | `P17` and `P276` Ottoman Empire; no `P625`. |
+| Taif Agreement (Q321936) | 24 | No `P17`, `P276`, `P131` or `P625` at all (a "peace treaty", dated 1989 at year precision). |
+| 1913 Ottoman coup d'état (Q4559693) | 17 | `P17` Ottoman Empire; no `P276` or `P625`. |
+
+Each of these would be found by the rule once Wikidata records a place (`P276`) whose present-day country is tracked; for those whose `P17`
+is the Ottoman Empire, coordinates (`P625`) inside a tracked country would also do. That is an upstream edit, which this project does not make.
 
 ### Not events: people, organisations and states
 
@@ -371,7 +407,9 @@ north-west corner are Kuwait from 1961 and blank before, like the rest of Kuwait
 
 ```
 node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-candidates.json (bounded runs merge)
-node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candidates.json, data/events.proposed.json,
+node scripts/discover-events.js --predecessors-only     # only the predecessor-state pass; adds its new items (rule 2)
+node scripts/enrich-candidates.js [--reuse] [--limit=N] [--keep-existing]
+                                                        # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below

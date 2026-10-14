@@ -26,7 +26,7 @@ const committed = CHECK ? await readFile(OUT, "utf-8").catch(() => "") : null;
 // Dated by its inputs, not the wall clock, so re-running on unchanged data gives an identical
 // file: the newest retrieval time among the enriched candidates and the curated summaries.
 const dataAsOf =
-  [...enriched.map((e) => e.retrieved_at), ...curated.map((e) => e.extract_retrieved_at)].filter(Boolean).sort().at(-1) ?? null;
+  [...enriched.map((e) => e.retrieved_at), ...curated.map((e) => e.extract_retrieved_at)].filter(Boolean).map((d) => d.slice(0, 10)).sort().at(-1) ?? null;
 const inc = (o, k, n = 1) => (o[k] = (o[k] ?? 0) + n);
 const group = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 

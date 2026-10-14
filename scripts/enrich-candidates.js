@@ -23,6 +23,8 @@
 //   --no-report          skip data/missing-coordinates-report.md (no network; the same report
 //                        node scripts/build-missing-coordinates-report.js writes)
 //   --out-suffix=.test   write *.test.json variants instead of the real output files
+//   --keep-existing      keep every record already in the output files as it is and only add new candidates
+//                        (see keepExisting below)
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { sleep } from "./lib/http.js";
@@ -71,6 +73,7 @@ const flag = (n) => process.argv.includes(`--${n}`);
 const LIMIT = argVal("limit") ? Number(argVal("limit")) : null;
 const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
 const SUFFIX = argVal("out-suffix") ?? "";
+const KEEP_EXISTING = flag("keep-existing");
 
 const path = (name) => new URL(`../data/${name}`, import.meta.url);
 const outName = (base, ext) => `${base}${SUFFIX}.${ext}`;
@@ -212,6 +215,27 @@ async function writeMissingReport({ curated, proposed }) {
   return { curated: nc, candidates: np };
 }
 
+// --keep-existing: records already in data/events.proposed.json / data/enriched-candidates.json stay exactly as
+// they are; only candidates new to the files are added (proposed: at their place in the date order; enriched: at
+// the end). A full run re-derives every record, which also re-derives what was applied at merge time (data fixes,
+// redirect notes), so a bounded addition uses this.
+async function keepExisting({ proposed, persist }) {
+  const oldProposed = await loadJson(outName("events.proposed", "json"));
+  const oldEnriched = await loadJson(outName("enriched-candidates", "json"));
+  const inProposed = new Set(oldProposed.map((e) => e.wikidata_qid));
+  const inEnriched = new Set(oldEnriched.map((e) => e.wikidata_qid));
+  const byDate = (a, b) => a.date_start.localeCompare(b.date_start) || compareQids(a.wikidata_qid, b.wikidata_qid);
+  const outProposed = [...oldProposed];
+  const added = proposed.filter((e) => !inProposed.has(e.wikidata_qid));
+  for (const e of added) {
+    const at = outProposed.findIndex((o) => byDate(e, o) < 0);
+    outProposed.splice(at < 0 ? outProposed.length : at, 0, e);
+  }
+  const outEnriched = [...oldEnriched, ...persist.filter((r) => !inEnriched.has(r.wikidata_qid))];
+  console.log(`--keep-existing: kept ${oldProposed.length} proposed records; added ${added.map((e) => e.id).join(", ") || "none"}`);
+  return { proposed: outProposed, persist: outEnriched };
+}
+
 async function main() {
   const allCandidates = await loadJson("event-candidates.json");
   let batch = allCandidates.filter(
@@ -261,7 +285,7 @@ async function main() {
   // An id already held by the SAME Wikidata item (already merged into the curated file) is kept as is (ids are
   // stable); only a clash with a different item is disambiguated with the QID.
   const takenIds = new Map(curated.map((e) => [e.id, e.wikidata_qid]));
-  const curatedQids = new Set(curated.map((e) => e.wikidata_qid));
+  const curatedByQid = new Map(curated.map((e) => [e.wikidata_qid, e]));
   for (const r of results) {
     if (takenIds.has(r.id) && takenIds.get(r.id) !== r.wikidata_qid) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
     takenIds.set(r.id, r.wikidata_qid);
@@ -329,10 +353,22 @@ ${m}      `),
       r.date_start = src.date_start;
       r.date_end = src.date_end;
     }
+    // Countries from the predecessor-state rule (discover-events.js, lib/predecessor.js): the evidence travels with the
+    // record so finalizeEvent counts those tags as Wikidata-supported and names the rule in review_reasons.
+    if (src?.predecessor_rule) r.predecessor_rule = src.predecessor_rule;
+    else delete r.predecessor_rule;
     delete r.date_flags;
+    // Events already merged into the curated file keep the dates as merged (no source reconciliation here): their
+    // stored dates, and the date_source_adjusted note that explains a reconciled start, come from the curated record.
+    const merged = curatedByQid.get(r.wikidata_qid);
+    if (merged) {
+      r.date_start = merged.date_start;
+      r.date_end = merged.date_end;
+      const adjusted = (merged.date_flags ?? []).filter((f) => f.startsWith("date_source_adjusted"));
+      if (adjusted.length) r.date_flags = adjusted;
+    }
     r.review_reasons = r._review;
-    // events already merged into the curated file keep the dates as merged (no source reconciliation here)
-    finalizeEvent(r, { ...ctx, reconcileDates: !curatedQids.has(r.wikidata_qid) });
+    finalizeEvent(r, { ...ctx, reconcileDates: !merged });
     // date_precision must describe the date actually KEPT (after source reconciliation and the fix ledger), not the
     // discovery date it may have replaced (e.g. 1948 Arab-Israeli War: decade-precision P585 "1940" replaced by the
     // day-precision P580 1948-05-15). If the kept date is no Wikidata P585/P580 value, the discovery precision still
@@ -364,9 +400,9 @@ ${m}      `),
     r.needs_review = r.review_reasons.length > 0 || (r.date_flags?.length ?? 0) > 0;
   }
   const strip = ({ _review, _part_of_qids, ...rest }) => rest;
-  const persist = results.map((r) => ({ ...strip(r), _review: r._review, _part_of_qids: r._part_of_qids }));
+  let persist = results.map((r) => ({ ...strip(r), _review: r._review, _part_of_qids: r._part_of_qids }));
 
-  const proposed = results
+  let proposed = results
     .filter((r) => !r.exclusion_reason)
     .map((r) => {
       const {
@@ -376,6 +412,7 @@ ${m}      `),
         _part_of_qids,
         source_qid: _sourceQid,
         enrich_version: _enrichVersion,
+        predecessor_rule: _predecessorRule, // kept in enriched-candidates.json; the proposed record carries the flag
         wikidata_description,
         ...ev
       } = r;
@@ -383,11 +420,13 @@ ${m}      `),
     })
     .sort((a, b) => a.date_start.localeCompare(b.date_start) || compareQids(a.wikidata_qid, b.wikidata_qid));
 
+  if (KEEP_EXISTING) ({ proposed, persist } = await keepExisting({ proposed, persist }));
+
   const { errors } = validateEvents(proposed, { name: "events.proposed" });
   if (errors.length) console.warn(`WARNING: proposed set failed validation:\n  ${errors.slice(0, 20).join("\n  ")}`);
 
   await writeFile(path(outName("enriched-candidates", "json")), JSON.stringify(persist, null, 2));
-  await writeFile(path(outName("events.proposed", "json")), JSON.stringify(proposed, null, 2));
+  await writeFile(path(outName("events.proposed", "json")), JSON.stringify(proposed, null, 2) + "\n");
 
   let report = null;
   if (!flag("no-report")) {

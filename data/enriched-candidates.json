@@ -13626,5 +13626,69 @@
     "exclusion_reason": null,
     "_review": [],
     "_part_of_qids": []
+  },
+  {
+    "id": "kocgiri-rebellion",
+    "title": "Koçgiri rebellion",
+    "date_start": "1921-06-17",
+    "date_end": null,
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "revolt",
+      "military operation"
+    ],
+    "retrieved_at": "2026-10-14T22:12:51.849Z",
+    "source_qid": "Q1758033",
+    "sitelinks": 14,
+    "wikidata_description": "Kurdish uprising against the Turkish National Movement",
+    "enrich_version": 3,
+    "wikidata_qid": "Q1758033",
+    "resolved_qid": "Q1758033",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Ko%C3%A7giri_rebellion",
+    "extract": "The Koçgiri rebellion (Kurdish: Serhildana Qoçgiriyê; Turkish: Koçgiri isyanı) was a Kurdish uprising, that began in the overwhelmingly militant Koçgiri region in present-day eastern Sivas Province in February 1921. The rebellion was initially Alevi, but it succeeded in gathering support from nearby Sunni tribes. The tribal leaders had a close relationship with the Society for the Rise of Kurdistan (SAK). The rebellion was defeated in June 1921.\n\nAfter the rebellion, massacres, rapes and other crimes against Kurds began being committed by the Turkish Army and Topal Osman's paramilitaries.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q6445763",
+        "label": "Kurdish–Turkish conflict"
+      }
+    ],
+    "possible_duplicates": [],
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q483100",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Kurdish–Turkish conflict\" (Q6445763); it may overlap with that larger event",
+      "country_via_predecessor_state: Wikidata P17 is Ottoman Empire (Q12560), a predecessor state of a tracked country (P1366/P1365); tagged from the item's own location: P276 Q483100 -> Turkey"
+    ],
+    "extract_retrieved_at": "2026-10-14",
+    "needs_review": true,
+    "exclusion_reason": null,
+    "_review": [
+      "part_of: Wikidata (P361) lists this event as part of \"Kurdish–Turkish conflict\" (Q6445763); it may overlap with that larger event",
+      "country_via_predecessor_state: Wikidata P17 is Ottoman Empire (Q12560), a predecessor state of a tracked country (P1366/P1365); tagged from the item's own location: P276 Q483100 -> Turkey"
+    ],
+    "_part_of_qids": [
+      "Q6445763"
+    ]
   }
 ]
