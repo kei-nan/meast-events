@@ -18,6 +18,15 @@ import { LAND_ON_SEA } from "../lib/mapBase";
 // public/glyphs/ - only the ranges the labels use are shipped.
 const LABEL_FONT = ["Open Sans Semibold"];
 
+// A country label's anchors (boundaries-label below): centred, or 1.9 em below
+// or above when its state has at least `room` degrees of latitude both ways.
+const labelMoveIf = (room) => [
+  "case",
+  [">=", ["get", "room"], room],
+  ["literal", ["center", [0, 0], "top", [0, 1.9], "bottom", [0, -1.9]]],
+  ["literal", ["center", [0, 0]]],
+];
+
 // Points stop clustering above this zoom; identical points then draw as one dot.
 export const CLUSTER_MAX_ZOOM = 12;
 
@@ -168,19 +177,38 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       "text-padding": 2,
       "symbol-placement": "point",
       // Centred on the state when there is room. When a cluster's number sits
-      // there (cluster-count below takes the spot first), a state of 5 deg^2 or
-      // more tries ~2 em below or above its centre instead of dropping the name:
-      // at the opening zoom that used to hide Iran, Iraq, Saudi Arabia and Egypt.
-      // Collision keeps the name off the cluster's number; it may still cross the
-      // edge of a cluster circle (circles take no part in collision), and is
-      // drawn above it with its halo. The cut-off (UAE 6.2, Jordan 8.5 move;
-      // Israel 2.7, Kuwait, Lebanon, Qatar, the West Bank areas and the neutral
-      // zones do not) keeps a moved name inside its own state at that zoom.
+      // there (cluster-count below takes the spot first), the name tries 1.9 em
+      // below or above its centre instead of being dropped: at the opening zoom
+      // that used to hide Iran, Iraq, Saudi Arabia and Egypt. Collision keeps
+      // the name off the cluster's number; it may still cross the edge of a
+      // cluster circle (circles take no part in collision), drawn above it.
+      // Only a state whose largest part reaches far enough above and below the
+      // anchor (`room`, degrees, lib/boundaryLabels.js) may move, so a moved name
+      // stays on its own state: the move plus the text is ~2.9x text-size px, and
+      // a degree of latitude here is ~1.6 * 2^zoom px (512 px tiles, Mercator
+      // at ~28N), so the room needed about halves with each zoom level. Each
+      // step is the need at the low end of its band, for a small state's text
+      // size. At the opening desktop zoom (~3.6) Israel (1.8), Jordan (2.1) and
+      // up may move, not the UAE (1.3), Kuwait, Lebanon, Qatar, the West Bank
+      // areas or the neutral zones; on a phone (~2.6) only Egypt and larger.
       "text-variable-anchor-offset": [
-        "case",
-        [">=", ["get", "area"], 5],
-        ["literal", ["center", [0, 0], "top", [0, 1.9], "bottom", [0, -1.9]]],
-        ["literal", ["center", [0, 0]]],
+        "step",
+        ["zoom"],
+        labelMoveIf(3.8),
+        3,
+        labelMoveIf(2.2),
+        3.5,
+        labelMoveIf(1.65),
+        4,
+        labelMoveIf(1.25),
+        4.5,
+        labelMoveIf(0.9),
+        5,
+        labelMoveIf(0.7),
+        6,
+        labelMoveIf(0.4),
+        7,
+        labelMoveIf(0.2),
       ],
       "text-allow-overlap": false,
       "text-ignore-placement": false,

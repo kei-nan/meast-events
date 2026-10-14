@@ -25,7 +25,7 @@ test("ringAreaAndCentroid: a collinear ring falls back to the average point", ()
 
 test("labelAnchor: a MultiPolygon is labelled at its largest part", () => {
   const geometry = { type: "MultiPolygon", coordinates: [[square(0, 0, 1)], [square(10, 10, 3)]] };
-  assert.deepEqual(labelAnchor(geometry), { area: 9, centroid: [11.5, 11.5] });
+  assert.deepEqual(labelAnchor(geometry), { area: 9, centroid: [11.5, 11.5], room: 1.5 });
   assert.equal(labelAnchor({ type: "Polygon", coordinates: [[[0, 0], [1, 1]]] }), null);
 });
 
@@ -47,6 +47,15 @@ test("boundaryLabelsForYear: one point per active territory, degenerate shapes d
   assert.deepEqual(labels[0].geometry, { type: "Point", coordinates: [10, 10] });
   assert.equal(labels[0].properties.name, "Big");
   assert.equal(labels[0].properties.big, 1); // sqrt(400) / 20, capped at 1
+  assert.equal(labels[0].properties.room, 10); // the 20-degree square's centre, 10 to each edge
+});
+
+test("labelAnchor: room is the smaller reach above or below the anchor, on the largest part", () => {
+  // A triangle: centroid at a third of its height, so less room below than above.
+  const tri = [[0, 0], [6, 0], [3, 9], [0, 0]];
+  const a = labelAnchor({ type: "MultiPolygon", coordinates: [[tri], [square(50, 50, 30)]] });
+  assert.equal(a.room, 15); // the 30-degree square wins on area
+  assert.equal(labelAnchor({ type: "Polygon", coordinates: [tri] }).room, 3);
 });
 
 test("isDashedStatus: an '...-included' status keeps the outline solid", async () => {

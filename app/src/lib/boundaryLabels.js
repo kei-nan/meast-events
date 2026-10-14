@@ -45,7 +45,9 @@ export function ringAreaAndCentroid(ring) {
 // far-flung imperial holdings). Placing one label per part, as MapLibre's
 // default "point" symbol placement does for MultiPolygons, produces many
 // repeated labels for the same territory. Instead, pick a single anchor
-// point: the centroid of the largest part by area.
+// point: the centroid of the largest part by area. `room` is how far (degrees
+// of latitude) that part reaches above and below the anchor, the smaller of the
+// two: how far the label can move up or down and stay on it (mapInstallLayers.js).
 export function labelAnchor(geometry) {
   const polygons =
     geometry.type === "MultiPolygon" ? geometry.coordinates : [geometry.coordinates];
@@ -54,9 +56,17 @@ export function labelAnchor(geometry) {
     const outerRing = polygon[0];
     if (!outerRing || outerRing.length < 3) continue;
     const { area, centroid } = ringAreaAndCentroid(outerRing);
-    if (!best || area > best.area) best = { area, centroid };
+    if (!best || area > best.area) best = { area, centroid, ring: outerRing };
   }
-  return best ?? null;
+  if (!best) return null;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+  for (const [, lat] of best.ring) {
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+  }
+  const lat = best.centroid[1];
+  return { area: best.area, centroid: best.centroid, room: Math.max(0, Math.min(lat - minLat, maxLat - lat)) };
 }
 
 // A separate point source (one feature per territory, at a single anchor
@@ -82,6 +92,7 @@ export function boundaryLabelsForYear(year, features) {
             name: f.properties.name,
             area: best.area,
             big: Math.min(1, Math.sqrt(best.area) / 20),
+            room: best.room,
           },
           geometry: { type: "Point", coordinates: anchor },
         };

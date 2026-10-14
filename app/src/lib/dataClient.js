@@ -50,7 +50,6 @@ function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
       if (/text\/html/i.test(res.headers.get("content-type") ?? "")) {
         const err = new Error(`Not found: ${url}`);
         err.outage = false;
-        err.missing = true;
         throw err;
       }
       return res.json();
