@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef } from "react";
-import { entryBeforePush, parseUrlState, serializeUrlState, urlWriteMode } from "../lib/urlState";
+import { entryBeforePush, parseUrl, stateUrl, urlWriteMode } from "../lib/urlState";
 
 const REPLACE_DEBOUNCE_MS = 400;
+
+// The current entry's URL as stateUrl writes it: path and query (an open event
+// is the path, /event/<id>; lib/urlState.js).
+const currentUrl = () => (typeof window === "undefined" ? "/" : `${window.location.pathname}${window.location.search}`);
 
 // Mirrors app state into the URL with the History API.
 //  - Selecting/deselecting an event PUSHES a history entry (Back walks
@@ -16,10 +20,10 @@ const REPLACE_DEBOUNCE_MS = 400;
 // overwrite the current entry instead of pushing one (clearing a link to an
 // unknown event, so Back does not return to the dead URL).
 //
-// state: {q, categories, countries, startYear, endYear, scope, area, eventId}
+// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort}
 export default function useUrlState(state, onNavigate) {
-  const serialized = serializeUrlState(state);
-  const lastRef = useRef(typeof window === "undefined" ? "" : window.location.search);
+  const url = stateUrl(state);
+  const lastRef = useRef(currentUrl());
   const replaceNextRef = useRef(false);
   const navigateRef = useRef(onNavigate);
   useEffect(() => {
@@ -33,12 +37,11 @@ export default function useUrlState(state, onNavigate) {
   });
 
   useEffect(() => {
-    const mode = urlWriteMode(lastRef.current, serialized, { replace: replaceNextRef.current });
+    const mode = urlWriteMode(lastRef.current, url, { replace: replaceNextRef.current });
     if (!mode) return;
-    const write = (method, search = serialized) => {
-      const url = `${window.location.pathname}${search}${window.location.hash}`;
-      window.history[method](null, "", url);
-      lastRef.current = search;
+    const write = (method, next = url) => {
+      window.history[method](null, "", `${next}${window.location.hash}`);
+      lastRef.current = next;
     };
     if (mode !== "debounce") {
       replaceNextRef.current = false;
@@ -53,13 +56,13 @@ export default function useUrlState(state, onNavigate) {
     }
     const timer = setTimeout(() => write("replaceState"), REPLACE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [serialized]);
+  }, [url]);
 
   useEffect(() => {
     const onPop = () => {
-      lastRef.current = window.location.search;
+      lastRef.current = currentUrl();
       replaceNextRef.current = false;
-      navigateRef.current(parseUrlState(window.location.search));
+      navigateRef.current(parseUrl(lastRef.current));
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);

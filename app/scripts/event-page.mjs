@@ -1,9 +1,15 @@
-// Renders the static, crawlable per-event pages (/event/<id>), the /event/ index
-// and sitemap.xml. Pure functions over the records split-data.mjs writes (the lite
-// record merged with its full-lead record), so the page shows exactly what the app's
-// detail view shows: Wikipedia's title and lead unchanged, Wikidata's dates and
-// classes as given, and our framing review boxed off as ours. Driven by
+// Renders the per-event pages (/event/<id>), the /event/ index and sitemap.xml.
+// Pure functions over the records split-data.mjs writes (the lite record merged
+// with its full-lead record), so the page shows exactly what the app's detail view
+// shows: Wikipedia's title and lead unchanged, Wikidata's dates and classes as
+// given, and our framing review boxed off as ours. Driven by
 // build-event-pages.mjs; tested in event-page.test.mjs.
+//
+// An event's page IS the app (fillAppShell): the built index.html with the
+// event's own title and link-preview tags in its <head>, and the event as plain
+// HTML inside #root for readers without JavaScript and crawlers that do not run
+// it. The app replaces that content when it starts, reads the event from the path
+// (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
 import { categoryLabel } from "../src/lib/categoryLabels.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
@@ -13,7 +19,9 @@ import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
-import { isValidEventId } from "../src/lib/urlState.js";
+import { eventPath, isValidEventId } from "../src/lib/urlState.js";
+
+export { eventPath };
 
 export const SITE = "https://middleeast.events";
 export const SITE_NAME = "Middle East, 1900–present";
@@ -44,8 +52,6 @@ export function safeUrl(url) {
   return typeof url === "string" && /^https?:\/\//i.test(url) ? url : null;
 }
 
-export const eventPath = (id) => `/event/${encodeURIComponent(id)}`;
-export const mapPath = (id) => `/?e=${encodeURIComponent(id)}`;
 
 /**
  * The meta description: the lead's first paragraph, cut at a word boundary to at
@@ -223,21 +229,16 @@ function locationNote(quality) {
   return "";
 }
 
-// `canonical` null (the 404 page, served at any path) leaves out canonical and og:url.
-// `pageTitle` is the tab title (default `title`, which og:/twitter:title keep).
-// `jsonLd` is an already-serialized jsonLdScript() block.
-function head({ title, pageTitle = title, description, canonical, type, noindex = false, jsonLd = "" }) {
+// The page's own <head> tags: title, description, canonical, link-preview tags
+// and structured data. `canonical` null (the 404 page, served at any path) leaves
+// out canonical and og:url. `pageTitle` is the tab title (default `title`, which
+// og:/twitter:title keep). `jsonLd` is an already-serialized jsonLdScript() block.
+function pageMeta({ title, pageTitle = title, description, canonical, type, noindex = false, jsonLd = "" }) {
   const t = escapeHtml(title);
   const d = escapeHtml(description);
   const c = canonical ? escapeHtml(canonical) : null;
-  return `<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(pageTitle)}</title>
-${noindex ? `<meta name="robots" content="noindex">\n` : ""}${description ? `<meta name="description" content="${d}">\n` : ""}${c ? `<link rel="canonical" href="${c}">\n` : ""}<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="/event/event.css">
-<meta name="theme-color" content="#1d1a15">
-<meta property="og:type" content="${type}">
+  return `<title>${escapeHtml(pageTitle)}</title>
+${noindex ? `<meta name="robots" content="noindex">\n` : ""}${description ? `<meta name="description" content="${d}">\n` : ""}${c ? `<link rel="canonical" href="${c}">\n` : ""}<meta property="og:type" content="${type}">
 <meta property="og:site_name" content="${escapeHtml(SITE_NAME)}">
 <meta property="og:title" content="${t}">
 ${description ? `<meta property="og:description" content="${d}">\n` : ""}${c ? `<meta property="og:url" content="${c}">\n` : ""}<meta property="og:image" content="${OG_IMAGE}">
@@ -246,8 +247,54 @@ ${description ? `<meta property="og:description" content="${d}">\n` : ""}${c ? `
 <meta property="og:image:alt" content="Map of the Middle East with the title ${escapeHtml(SITE_NAME)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${t}">
-${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta name="twitter:image" content="${OG_IMAGE}">
-${jsonLd ? `${jsonLd}\n` : ""}</head>`;
+${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta name="twitter:image" content="${OG_IMAGE}">${jsonLd ? `\n${jsonLd}` : ""}`;
+}
+
+// A whole <head> for the pages that are not the app (the /event/ index, 404.html).
+function head(meta) {
+  return `<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/event/event.css">
+<meta name="theme-color" content="#1d1a15">
+${pageMeta(meta)}
+</head>`;
+}
+
+// The two regions of index.html an event's page replaces, each between a pair of
+// comment markers (Vite keeps comments): the site's own <head> tags, and the
+// body's #root with the <noscript> note for the map.
+export const SHELL_MARKERS = {
+  meta: ["<!-- page-meta -->", "<!-- /page-meta -->"],
+  body: ["<!-- page-body -->", "<!-- /page-body -->"],
+};
+
+function replaceRegion(html, [open, close], content) {
+  const count = (m) => html.split(m).length - 1;
+  if (count(open) !== 1 || count(close) !== 1) {
+    throw new Error(`app shell: expected "${open}" and "${close}" exactly once each in index.html`);
+  }
+  const i = html.indexOf(open);
+  const j = html.indexOf(close);
+  if (j < i) throw new Error(`app shell: "${close}" comes before "${open}" in index.html`);
+  return html.slice(0, i) + content + html.slice(j + close.length);
+}
+
+/**
+ * index.html (`template`, as Vite built it) with the page's own <head> tags
+ * (`meta`, as pageMeta takes them) and `content` inside #root. The event page's
+ * stylesheet applies only without JavaScript (media "scripting: none"), so it
+ * never touches the app; with JavaScript the app's CSS keeps `content` hidden
+ * until React replaces it (src/index.css .static-page).
+ */
+export function fillAppShell(template, meta, content) {
+  const withMeta = replaceRegion(
+    template,
+    SHELL_MARKERS.meta,
+    `${pageMeta(meta)}\n<link rel="stylesheet" href="/event/event.css" media="(scripting: none)">`
+  );
+  return replaceRegion(withMeta, SHELL_MARKERS.body, `<div id="root"><div class="static-page">\n${content}\n</div></div>`);
 }
 
 const siteHeader = `<header class="site-header"><a href="/" class="site-name">${escapeHtml(SITE_NAME)}</a> <a href="/event/" class="site-index">All events</a></header>`;
@@ -344,11 +391,12 @@ export function jsonLdScript(data) {
 }
 
 /**
- * One event's page. `event` is the lite record (split-data.mjs publicEvent) merged
- * with its full-lead record (extract, extract_retrieved_at, date_precision,
+ * One event's page: the app shell `template` (dist/index.html) filled with the
+ * event (fillAppShell). `event` is the lite record (split-data.mjs publicEvent)
+ * merged with its full-lead record (extract, extract_retrieved_at, date_precision,
  * framing_review, part_of, includes). Every field may be missing except id and title.
  */
-export function renderEventPage(event) {
+export function renderEventPage(event, template) {
   if (!isValidEventId(event?.id)) throw new Error(`invalid event id: ${JSON.stringify(event?.id)}`);
   const title = String(event.title ?? event.id);
   const canonical = SITE + eventPath(event.id);
@@ -372,9 +420,7 @@ export function renderEventPage(event) {
     renderPartOf(event.part_of),
     showClasses && `<p class="classes">Wikidata classes: ${escapeHtml(classes.join(", "))}</p>`,
     dateNote && `<p class="note" role="note">${escapeHtml(dateNote)}</p>`,
-    `<p class="actions"><a class="open-map" href="${escapeHtml(mapPath(event.id))}">Open on the map</a>${
-      wiki ? ` <a class="wiki" href="${escapeHtml(wiki)}" rel="noreferrer">Read on Wikipedia</a>` : ""
-    }</p>`,
+    wiki && `<p class="actions"><a class="wiki" href="${escapeHtml(wiki)}" rel="noreferrer">Read on Wikipedia</a></p>`,
     event.text_from_article && `<p class="note" role="note">${escapeHtml(otherArticleNote(event.text_from_article))}</p>`,
     renderPointer(review),
     `<div class="extract">${paragraphs.length ? paragraphs.map((p) => renderParagraph(p, review?.highlights)).join("\n") : "<p>No summary available.</p>"}</div>`,
@@ -389,20 +435,17 @@ export function renderEventPage(event) {
     }</p>`,
   ].filter(Boolean);
 
-  return `<!doctype html>
-<html lang="en">
-${head({ title, pageTitle: eventPageTitle(event), description, canonical, type: "article", jsonLd: jsonLdScript(eventJsonLd(event)) })}
-<body>
-${siteHeader}
+  return fillAppShell(
+    template,
+    { title, pageTitle: eventPageTitle(event), description, canonical, type: "article", jsonLd: jsonLdScript(eventJsonLd(event)) },
+    `${siteHeader}
 <main>
 <article>
 ${body.join("\n")}
 </article>
 </main>
-${siteFooter}
-</body>
-</html>
-`;
+${siteFooter}`
+  );
 }
 
 /** /event/: every event as a plain link, oldest first (the order given). */
@@ -434,9 +477,9 @@ ${siteFooter}
 
 /**
  * dist/404.html: what the host serves, with status 404, for any path that is not a
- * file (wrangler.jsonc not_found_handling "404-page"). The app lives at / and reads
- * only the query string (src/lib/urlState.js), so no other path is the app; a
- * mistyped /event/<id> lands here instead of on the map with nothing selected.
+ * file (wrangler.jsonc not_found_handling "404-page"). The app is served only at /
+ * and at the event pages, so a mistyped /event/<id> lands here instead of on the
+ * map with nothing selected.
  * Links are absolute because the page is served at whatever path was asked for.
  */
 export function renderNotFoundPage() {

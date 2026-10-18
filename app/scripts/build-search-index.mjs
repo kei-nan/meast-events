@@ -16,6 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import * as pagefind from "pagefind";
+import { eventPath } from "../src/lib/urlState.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // ATLAS_DATA_DIR overrides the repo-root data/ (as in split-data.mjs).
@@ -36,7 +37,7 @@ async function main() {
     // The title is part of the content so it is searchable like the lead
     // (as the old search API did: title|extract). Ranking is done by the app.
     const res = await index.addCustomRecord({
-      url: `/?e=${encodeURIComponent(e.id)}`,
+      url: eventPath(e.id), // unused by the app, which needs only meta.id (ids.json below)
       content: `${e.title}\n\n${e.extract ?? ""}`,
       language: "en",
       meta: { title: e.title, id: e.id },

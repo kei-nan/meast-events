@@ -5,8 +5,9 @@
   // Branches other than main run `npx wrangler preview`, which needs the
   // `previews` block; empty because the site has no bindings or secrets.
   // A path that is not a file gets dist/404.html with status 404 (written by
-  // scripts/build-event-pages.mjs). The app is only ever served at / (it reads
-  // the query string, src/lib/urlState.js), so it needs no SPA fallback.
+  // scripts/build-event-pages.mjs). The app is served at / and at each event's
+  // page, /event/<id> (a file per event, written by that script), so it needs no
+  // SPA fallback.
   "name": "meast-events",
   "compatibility_date": "2026-09-26",
   "assets": {

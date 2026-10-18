@@ -53,10 +53,12 @@
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
 
-# /event/*: the static per-event pages, the /event/ index and event.css
+# /event/*: the per-event pages, the /event/ index and event.css
 # (app/scripts/build-event-pages.mjs). Un-hashed HTML that changes with the data,
 # so it revalidates on every visit like the home page (Cloudflare's default for
-# HTML, set explicitly here).
+# HTML, set explicitly here). An event's page is the app (index.html filled in):
+# like the home page it names the deploy's hashed /assets/, so it must never be
+# served from a cache once those files are replaced.
 /event/*
   Cache-Control: public, max-age=0, must-revalidate
 

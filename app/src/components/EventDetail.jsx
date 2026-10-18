@@ -5,6 +5,7 @@ import ShareButton from "./ShareButton.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
 import { safeUrl } from "../lib/safeUrl.js";
+import { eventPath } from "../lib/urlState.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
@@ -24,14 +25,12 @@ const FramingReview = lazy(() => importOr(() => import("./FramingReview.jsx"), F
 // Children shown before "Show all N".
 const INCLUDES_SHOWN = 8;
 
-const eventHref = (id) => `${import.meta.env.BASE_URL}?e=${encodeURIComponent(id)}`;
-
 // A link to another event in the app: a real link (new tab, copy link work), but a
 // plain click or Enter opens it in place through the app's own selection.
 function EventLink({ id, onSelectEvent, children }) {
   return (
     <a
-      href={eventHref(id)}
+      href={eventPath(id)}
       onClick={(e) => {
         if (!onSelectEvent || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         e.preventDefault();

@@ -24,7 +24,7 @@ import { countInBbox } from "./lib/localSearch";
 import { orderBrowseList } from "./lib/browseOrder";
 import { rankEvents } from "./lib/ranking";
 import { ShareLinkContext } from "./lib/shareLinkContext.js";
-import { parseUrlState, shareLink } from "./lib/urlState";
+import { canonicalPath, parseUrlState, shareLink } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
 
@@ -110,7 +110,7 @@ function focusFor(ev, nonceRef) {
 
 export default function App() {
   // Initial state comes from the (validated) URL so links are shareable.
-  const [initial] = useState(() => parseUrlState(window.location.search));
+  const [initial] = useState(() => parseUrlState(window.location.search, window.location.pathname));
   const [range, setRange] = useState(() => ({
     start: initial.years?.[0] ?? MIN_YEAR,
     end: initial.years?.[1] ?? MAX_YEAR,
@@ -396,18 +396,27 @@ export default function App() {
 
   // Share links come from the state as it is now, not the address bar: URL
   // writes are debounced (hooks/useUrlState.js) and Play steps faster than that.
-  // An open event shares its static page /event/<id> (lib/urlState.js shareLink).
+  // An open event's link is its own page, /event/<id> (lib/urlState.js shareLink).
   const urlStateRef = useRef(urlState);
   useEffect(() => {
     urlStateRef.current = urlState;
   });
-  const getShareLink = useCallback(
-    () =>
-      shareLink(window.location.origin, window.location.pathname, urlStateRef.current, {
-        eventPages: !import.meta.env.DEV, // built by postbuild (scripts/build-event-pages.mjs)
-      }),
-    []
-  );
+  const getShareLink = useCallback(() => shareLink(window.location.origin, urlStateRef.current), []);
+
+  // <link rel="canonical"> and og:url follow the open event, as a fresh load of
+  // the URL would have them (index.html, or the event's page written by
+  // scripts/build-event-pages.mjs): some share menus (Chrome on Android) send the
+  // canonical link instead of the address bar. Their origin is the one the page
+  // was served with (the production site, also on branch previews).
+  const canonical = canonicalPath({ eventId: selectedEventId });
+  useEffect(() => {
+    const link = document.querySelector('link[rel="canonical"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (!link) return;
+    const href = new URL(canonical, link.href).href;
+    link.href = href;
+    ogUrl?.setAttribute("content", href);
+  }, [canonical]);
 
   // Deep link / selection resolution: make sure the selected event is in the
   // store with its full record, and (for links and Back/Forward) focus it. The
@@ -463,9 +472,8 @@ export default function App() {
     [storeRef]
   );
 
-  // The tab title names the open event (and is restored when it closes).
-  // Crawlers do not run this script: the per-event link previews come from the
-  // static /event/<id> pages (scripts/event-page.mjs), the link Share hands out.
+  // The tab title names the open event (and is restored when it closes), as the
+  // event's page has it (scripts/event-page.mjs eventPageTitle).
   const selectedTitle = selectedEventRaw?.title;
   const selectedYears = selectedEventRaw ? rawEventYears(selectedEventRaw) : null; // as the dates give them
   const selectedYearText = selectedYears
