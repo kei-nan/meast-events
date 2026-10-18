@@ -282,7 +282,7 @@ and identify themselves with the `MiddleEastEvents` User-Agent (`MiddleEastEvent
 
 ## Review flags (advisory only)
 
-Each event may carry `review_reasons` (strings) and `date_flags`; none of them changes the data. The event panel and the static event pages show a note only for
+Each event may carry `review_reasons` (strings) and `date_flags`; none of them changes the data. The event panel and the event pages' plain-HTML copy show a note only for
 `date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), e.g. "Wikidata gives this event's end
 (1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002." The other date flags stay in the data and the checks
 but are not shown; an event with any date flag still shows only the years in its date line.

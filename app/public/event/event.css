@@ -1,5 +1,8 @@
-/* Static event pages (/event/<id>, /event/), written by scripts/build-event-pages.mjs.
-   Colours follow the app (src/index.css, src/SidePanel.css); system fonts, no JS. */
+/* The plain-HTML pages written by scripts/build-event-pages.mjs: the /event/
+   index and 404.html, and on each event's page (/event/<id>, which is the app)
+   the copy of the event shown without JavaScript - there it is linked with
+   media="(scripting: none)", so these global rules never reach the app.
+   Colours follow the app (src/index.css, src/SidePanel.css); system fonts. */
 :root {
   --bg: #1d1a15;
   --bg-2: #2d2721;

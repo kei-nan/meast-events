@@ -9,6 +9,7 @@
 //   - events/meta.json agrees with it, the lite list has no duplicate ids, and
 //     every event's full record is in the bucket its id hashes to;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
+//   - every event has its page, and each is the app: the same /assets/ as index.html;
 //   - the search index (Pagefind) was built;
 //   - 404.html exists (wrangler.jsonc not_found_handling "404-page" serves it);
 //   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>):
@@ -115,6 +116,30 @@ for (const u of refs) {
   if (rel && !existsSync(distFile(rel))) fail(`index.html references ${u}, which is not in dist/`);
 }
 
+// 3b. Every event's page is the app (scripts/event-page.mjs fillAppShell): it
+// loads exactly the /assets/ files index.html loads, plus the stylesheet for its
+// plain-HTML copy of the event, names itself as canonical, and kept none of
+// index.html's region markers.
+const assetRefs = (page) => [...new Set(page.match(/\/assets\/[^"'\s)]+/g) ?? [])].sort().join(" ");
+const shellAssets = assetRefs(html);
+let eventPages = 0;
+for (const e of all ?? []) {
+  const rel = `event/${e.id}.html`;
+  if (!existsSync(distFile(rel))) {
+    fail(`${rel} is missing (build-event-pages.mjs)`);
+    continue;
+  }
+  const page = readFileSync(distFile(rel), "utf8");
+  const where = `${rel} (an event page is index.html filled in, scripts/event-page.mjs)`;
+  if (assetRefs(page) !== shellAssets) fail(`${where} does not load the same /assets/ files as index.html`);
+  if (!page.includes(`href="/event/event.css" media="(scripting: none)"`)) fail(`${where} lacks its no-JavaScript stylesheet`);
+  if (!page.includes(`<link rel="canonical" href="https://middleeast.events/event/${encodeURIComponent(e.id)}">`)) {
+    fail(`${where} does not name itself as canonical`);
+  }
+  if (/<!-- \/?page-(meta|body) -->/.test(page)) fail(`${where} still has an index.html region marker`);
+  eventPages++;
+}
+
 // 4. Search index.
 if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is missing (build-search-index.mjs did not run)");
 
@@ -154,5 +179,5 @@ if (problems.length) {
 }
 console.log(
   `check-dist: OK - ${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
-    `${refs.length} index.html references, search index present, 404.html, assets/ hashed, ${fileCount} files (limit ${MAX_DIST_FILES})`
+    `${refs.length} index.html references, ${eventPages} event pages, search index present, 404.html, assets/ hashed, ${fileCount} files (limit ${MAX_DIST_FILES})`
 );

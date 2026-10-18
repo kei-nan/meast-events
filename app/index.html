@@ -4,12 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1d1a15" />
+    <!-- page-meta -->
+    <!-- An event's page (/event/<id>) is this file with the region between each pair
+         of markers replaced: scripts/event-page.mjs fillAppShell. -->
     <title>Middle East, 1900–present</title>
     <meta
       name="description"
       content="An interactive map and timeline of major Middle East events since 1900, with historical borders sourced from CShapes 2.0 and UN OCHA. Non-commercial project."
     />
-    <meta name="theme-color" content="#1d1a15" />
     <link rel="canonical" href="https://middleeast.events/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Middle East, 1900–present" />
@@ -30,8 +33,10 @@
       content="An interactive map and timeline of major Middle East events since 1900, with historical borders sourced from CShapes 2.0 and UN OCHA. Non-commercial project."
     />
     <meta name="twitter:image" content="https://middleeast.events/og-image.png" />
+    <!-- /page-meta -->
   </head>
   <body>
+    <!-- page-body -->
     <div id="root"></div>
     <noscript>
       <main style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #ece2c9; background: #1d1a15">
@@ -49,6 +54,7 @@
         </p>
       </main>
     </noscript>
+    <!-- /page-body -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

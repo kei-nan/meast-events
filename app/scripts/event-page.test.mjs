@@ -4,7 +4,9 @@ import fs from "node:fs";
 import {
   CSHAPES_URL,
   OCHA_AREAS_URL,
+  SHELL_MARKERS,
   escapeHtml,
+  fillAppShell,
   metaDescription,
   renderEventPage,
   renderIndexPage,
@@ -15,6 +17,11 @@ import {
   jsonLdScript,
   safeUrl,
 } from "./event-page.mjs";
+
+// The app's own index.html (its source; the build fills in the built one, which
+// differs only in the script and style tags Vite writes).
+const TEMPLATE = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const page = (event) => renderEventPage(event, TEMPLATE);
 
 // Border source families that NOTICE requires us to credit: how to spot one in a
 // feature's `source` in data/boundaries.json, and what the credit must contain.
@@ -34,7 +41,7 @@ test("every border source family in boundaries.json is credited on event pages a
   assert.ok(sources.some((s) => s.includes(OCHA_AREAS_URL)), "OCHA dataset URL matches boundaries.json");
 
   const pages = {
-    "event page": renderEventPage({ id: "x", title: "X" }),
+    "event page": page({ id: "x", title: "X" }),
     "event index": renderIndexPage([{ id: "x", title: "X" }]),
     "AboutData.jsx": fs.readFileSync(new URL("../src/components/AboutData.jsx", import.meta.url), "utf8"),
   };
@@ -90,8 +97,8 @@ const review = {
   stale: false,
 };
 
-test("an event page escapes data, keeps the title exactly and links to itself, the map and Wikipedia", () => {
-  const html = renderEventPage({
+test("an event page escapes data, keeps the title exactly and links to itself and Wikipedia", () => {
+  const html = page({
     id: "a-b",
     title: `War & "Peace" <1>`,
     date_start: "1967-06-05",
@@ -109,20 +116,21 @@ test("an event page escapes data, keeps the title exactly and links to itself, t
   assert.match(html, /<h1>War &amp; &quot;Peace&quot; &lt;1&gt;<\/h1>/);
   assert.match(html, /<meta property="og:title" content="War &amp; &quot;Peace&quot; &lt;1&gt;">/);
   assert.match(html, /<link rel="canonical" href="https:\/\/middleeast\.events\/event\/a-b">/);
-  assert.match(html, /<a class="open-map" href="\/\?e=a-b">Open on the map<\/a>/);
+  assert.match(html, /<a class="wiki" href="https:\/\/en\.wikipedia\.org\/wiki\/Six-Day_War" rel="noreferrer">Read on Wikipedia<\/a>/);
+  assert.doesNotMatch(html, /open-map|\?e=/); // the page is the map
   assert.match(html, /5 June 1967 \(ended 1967\) · Egypt, Israel/);
   assert.match(html, /It was <mark class="framing-mark framing-mark--fairness"[^>]*>fought<\/mark> &lt;quickly&gt;\./);
   assert.match(html, /Note &lt;b&gt;about&lt;\/b&gt; balance\./);
   assert.match(html, /Our framing review found something in this summary/);
   assert.match(html, /action=history/);
   assert.match(html, /<meta name="description" content="It was fought &lt;quickly&gt;\.">/);
-  // The only script is the JSON-LD data block, which is never run (CSP script-src does not apply).
-  assert.deepEqual(html.match(/<script[^>]*>/gi), ['<script type="application/ld+json">']);
+  // The app's script, and the JSON-LD data block, which is never run (CSP script-src does not apply).
+  assert.deepEqual(html.match(/<script[^>]*>/gi), ['<script type="application/ld+json">', '<script type="module" src="/src/main.jsx">']);
   assert.ok(!html.includes("<quickly>"));
 });
 
 test("an event with no dates, countries, extract, link or review still renders", () => {
-  const html = renderEventPage({ id: "bare", title: "Bare", location_quality: "none" });
+  const html = page({ id: "bare", title: "Bare", location_quality: "none" });
   assert.match(html, /<h1>Bare<\/h1>/);
   assert.match(html, /No summary available\./);
   assert.match(html, /No map location/);
@@ -132,7 +140,7 @@ test("an event with no dates, countries, extract, link or review still renders",
 });
 
 test("Part of links a curated parent and shows any other in Wikidata's label, escaped", () => {
-  const html = renderEventPage({
+  const html = page({
     id: "zikim",
     title: "Zikim attack",
     part_of: [
@@ -150,7 +158,7 @@ test("Part of links a curated parent and shows any other in Wikidata's label, es
 });
 
 test("Includes lists the children as links to their pages, with an escaped title and year", () => {
-  const html = renderEventPage({
+  const html = page({
     id: "gaza-war",
     title: "Gaza war",
     includes: [
@@ -164,12 +172,12 @@ test("Includes lists the children as links to their pages, with an escaped title
   assert.match(html, /<li><a href="\/event\/b">Raid B<\/a><\/li>/);
   assert.ok(!html.includes("Skipped"));
   assert.ok(!html.includes('class="partof"'));
-  const one = renderEventPage({ id: "p", title: "P", includes: [{ id: "c", title: "C" }] });
+  const one = page({ id: "p", title: "P", includes: [{ id: "c", title: "C" }] });
   assert.match(one, /Includes 1 event in this dataset/);
 });
 
 test("only an end before the start gets a date note, in plain language", () => {
-  const page = renderEventPage({
+  const html = page({
     id: "passover-massacre",
     title: "Passover massacre",
     date_start: "2002-03-27",
@@ -178,14 +186,14 @@ test("only an end before the start gets a date note, in plain language", () => {
     date_flags: ["date_order_invalid: x", "wikipedia_dates_note: y"],
     wikipedia_lead_dates: ["2002-03-27"],
   });
-  assert.ok(page.includes("Wikidata gives this event’s end (1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002."));
-  assert.doesNotMatch(page, /date_order_invalid|wikipedia_dates_note|Date unverified/);
-  const other = renderEventPage({ id: "w", title: "W", date_start: "1930-01-01", date_flags: ["date_start_year_not_in_lead: z"] });
+  assert.ok(html.includes("Wikidata gives this event’s end (1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002."));
+  assert.doesNotMatch(html, /date_order_invalid|wikipedia_dates_note|Date unverified/);
+  const other = page({ id: "w", title: "W", date_start: "1930-01-01", date_flags: ["date_start_year_not_in_lead: z"] });
   assert.doesNotMatch(other, /date_start_year_not_in_lead|Date unverified|role="note"/);
 });
 
 test("an invalid id is refused", () => {
-  assert.throws(() => renderEventPage({ id: "../x", title: "X" }));
+  assert.throws(() => page({ id: "../x", title: "X" }));
 });
 
 test("the sitemap lists home, the index and every event", () => {
@@ -214,18 +222,18 @@ const ldOf = (html) => JSON.parse(html.match(/<script type="application\/ld\+jso
 
 test("names in Arabic, Hebrew or Persian script are isolated with <bdi>, the text unchanged and escaped", () => {
   const extract = "The revolt (Arabic: ثورة البراق, Thawrat al-Burāq; Hebrew: מאורעות תרפ\"ט) <began>.";
-  const html = renderEventPage({ id: "r", title: "R", extract });
+  const html = page({ id: "r", title: "R", extract });
   assert.match(html, /\(Arabic: <bdi dir="rtl" lang="ar">ثورة البراق<\/bdi>, Thawrat/);
   assert.match(html, /Hebrew: <bdi dir="rtl" lang="he">מאורעות תרפ&quot;ט<\/bdi>\) &lt;began&gt;\./);
   const text = html.match(/<div class="extract"><p>([\s\S]*?)<\/p>/)[1].replace(/<\/?bdi[^>]*>/g, "");
   assert.equal(text, escapeHtml(extract));
   // An unlabelled run gets dir but no lang; Persian is labelled "fa".
-  assert.match(renderEventPage({ id: "u", title: "U", extract: "Said ثورة here." }), /<bdi dir="rtl">ثورة<\/bdi>/);
-  assert.match(renderEventPage({ id: "f", title: "F", extract: "(Persian: کودتا)" }), /<bdi dir="rtl" lang="fa">کودتا<\/bdi>/);
+  assert.match(page({ id: "u", title: "U", extract: "Said ثورة here." }), /<bdi dir="rtl">ثورة<\/bdi>/);
+  assert.match(page({ id: "f", title: "F", extract: "(Persian: کودتا)" }), /<bdi dir="rtl" lang="fa">کودتا<\/bdi>/);
 });
 
 test("a highlight that covers a right-to-left name keeps both the mark and the <bdi>", () => {
-  const html = renderEventPage({
+  const html = page({
     id: "m",
     title: "M",
     extract: "Known as ثورة البراق today.",
@@ -279,7 +287,36 @@ test("JSON-LD cannot close its script element, and parses back to the data", () 
   const inner = block.slice('<script type="application/ld+json">'.length, -"</script>".length);
   assert.doesNotMatch(inner, /[<>&\u2028\u2029]/);
   assert.deepEqual(JSON.parse(inner), eventJsonLd(event));
-  const html = renderEventPage(event);
-  assert.equal((html.match(/<\/script>/gi) ?? []).length, 1);
+  const html = page(event);
+  assert.equal((html.match(/<\/script>/gi) ?? []).length, 2); // and the app's own script
   assert.equal(ldOf(html).name, event.title);
+});
+
+test("an event page is index.html with the event's head tags and the event inside #root", () => {
+  const html = page({ id: "a-b", title: "T", extract: "Lead." });
+  // index.html's own tags outside the two regions stay; the site-wide ones inside go.
+  assert.match(html, /<meta charset="UTF-8" \/>/);
+  assert.match(html, /<meta name="theme-color" content="#1d1a15" \/>/);
+  assert.match(html, /<script type="module" src="\/src\/main\.jsx"><\/script>/);
+  assert.equal((html.match(/<title>/g) ?? []).length, 1);
+  assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1);
+  assert.equal((html.match(/property="og:url"/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /https:\/\/middleeast\.events\/" \/>/); // the home page's canonical/og:url
+  assert.doesNotMatch(html, /<noscript>/); // the event itself is the no-JavaScript content
+  assert.doesNotMatch(html, /<!-- \/?page-(meta|body) -->/);
+  // The event, inside #root (React replaces it), styled only without JavaScript.
+  assert.match(html, /<div id="root"><div class="static-page">\n<header class="site-header">[\s\S]*<h1>T<\/h1>[\s\S]*<\/footer>\n<\/div><\/div>/);
+  assert.match(html, /<link rel="stylesheet" href="\/event\/event\.css" media="\(scripting: none\)">/);
+  assert.equal((html.match(/event\.css/g) ?? []).length, 1);
+});
+
+test("fillAppShell refuses a template whose markers are missing, repeated or out of order", () => {
+  const [mo, mc] = SHELL_MARKERS.meta;
+  const [bo, bc] = SHELL_MARKERS.body;
+  const meta = { title: "T", description: "", canonical: null, type: "website" };
+  const ok = `<head>${mo}x${mc}</head><body>${bo}<div id="root"></div>${bc}</body>`;
+  assert.match(fillAppShell(ok, meta, "C"), /<title>T<\/title>[\s\S]*<div id="root"><div class="static-page">\nC\n<\/div><\/div>/);
+  assert.throws(() => fillAppShell(ok.replace(mo, ""), meta, "C"), /exactly once/);
+  assert.throws(() => fillAppShell(ok.replace(bc, bc + bc), meta, "C"), /exactly once/);
+  assert.throws(() => fillAppShell(`${mc}${mo}${bo}${bc}`, meta, "C"), /comes before/);
 });

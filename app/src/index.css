@@ -37,6 +37,31 @@ body {
   margin: 0;
 }
 
+/* An event's page (/event/<id>) carries the event as plain HTML inside #root
+   (scripts/event-page.mjs fillAppShell), for readers without JavaScript and
+   crawlers that do not run it; React replaces it when the app starts. Where
+   scripting is on it stays hidden and takes no space meanwhile, so the page
+   does not show the article and then swap it for the app. It is shown after
+   8 s in case the app never starts (its script blocked or failed to load):
+   later than the largest paint Lighthouse measured on a throttled phone
+   connection (4-5.6 s, App.jsx), which comes after the app has started. */
+@media (scripting: enabled) {
+  .static-page {
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    animation: static-page-reveal 0s 8s forwards;
+  }
+}
+
+@keyframes static-page-reveal {
+  to {
+    visibility: visible;
+    height: auto;
+    overflow: visible;
+  }
+}
+
 /* components/ErrorBoundary.jsx: shown instead of the app after a render error. */
 .app-error {
   min-height: 100%;

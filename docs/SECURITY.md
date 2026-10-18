@@ -129,8 +129,10 @@ immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
 - `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
   the engine and the `.pf_meta` keep their names; the content-hashed
   `/pagefind/index/*` chunks are immutable.
-- `/event/*` (the static event pages, the `/event/` index and `event.css`):
-  `public, max-age=0, must-revalidate`, set explicitly.
+- `/event/*` (the event pages, the `/event/` index and `event.css`):
+  `public, max-age=0, must-revalidate`, set explicitly. An event's page is the
+  app's `index.html` filled in, so like the home page it names the deploy's
+  hashed `/assets/` files.
 - `/glyphs/*` (map label glyphs): 1 h, plus `Content-Type:
   application/x-protobuf` so Cloudflare compresses the `.pbf` files.
 - Everything else, including the home page HTML, keeps Cloudflare's default

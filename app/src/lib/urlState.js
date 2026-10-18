@@ -1,11 +1,20 @@
 // Shareable URL state via the History API (no router). Pure parse/serialize
 // with strict validation: anything malformed is dropped, never trusted.
 //
+// An open event is the PATH, /event/<id> (eventPath): the build writes that
+// page as the app itself with the event's own title and link-preview tags
+// (scripts/event-page.mjs), so the address bar and Share both hand out a link
+// that previews as the event and opens on the map. Without an event: /.
+// Everything else is the query string:
+//
 //   q, cat (comma list), c (comma list of countries), y=start-end,
 //   scope=all|range, area=r:minLon,minLat,maxLon,maxLat | c:lon,lat,radiusKm,
-//   e=<event id>, about=1 (the "About the data" dialog is open),
+//   about=1 (the "About the data" dialog is open),
 //   sort=coverage-asc|date|date-desc (browse list order, lib/browseOrder.js; the
 //   default, most covered first, is omitted)
+//
+// Older links put the event in the query, /?e=<id>: still read (the path wins
+// if both are given), and rewritten to /event/<id> by the next URL write.
 
 import { SORTS } from "./browseOrder.js";
 import { MAX_RADIUS_KM, makeCircleArea, makeRectArea } from "./geo.js";
@@ -23,6 +32,24 @@ const CTRL_RE = /[\u0000-\u001f\u007f]/;
 
 export function isValidEventId(id) {
   return typeof id === "string" && ID_RE.test(id);
+}
+
+/** The event's URL path; scripts/build-event-pages.mjs writes its page there. */
+export const eventPath = (id) => `/event/${encodeURIComponent(id)}`;
+
+const EVENT_PATH_RE = /^\/event\/([^/]+)\/?$/;
+
+/** The event id in a /event/<id> path (a trailing slash allowed), else null. */
+export function eventIdFromPath(pathname) {
+  const m = EVENT_PATH_RE.exec(pathname ?? "");
+  if (!m) return null;
+  let id;
+  try {
+    id = decodeURIComponent(m[1]);
+  } catch {
+    return null; // malformed %-escape
+  }
+  return isValidEventId(id) ? id : null;
 }
 
 function parseList(raw) {
@@ -78,7 +105,7 @@ export function areaToParam(area) {
 }
 
 // -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort}
-export function parseUrlState(search) {
+export function parseUrlState(search, pathname = "/") {
   const p = new URLSearchParams(search);
   let q = p.get("q") ?? "";
   q = CTRL_RE.test(q) || q.length > MAX_Q_LENGTH ? "" : q;
@@ -91,7 +118,7 @@ export function parseUrlState(search) {
     if (s >= YEAR_MIN && e <= YEAR_MAX && s <= e) years = [s, e];
   }
 
-  const e = p.get("e");
+  const e = p.get("e"); // an older link (see the top of the file)
   return {
     q,
     categories: parseList(p.get("cat")),
@@ -99,7 +126,7 @@ export function parseUrlState(search) {
     years,
     scope: p.get("scope") === "range" ? "range" : "all",
     area: parseArea(p.get("area")),
-    eventId: isValidEventId(e) ? e : null,
+    eventId: eventIdFromPath(pathname) ?? (isValidEventId(e) ? e : null),
     about: p.get("about") === "1",
     sort: SORTS.includes(p.get("sort")) ? p.get("sort") : "coverage",
   };
@@ -107,8 +134,9 @@ export function parseUrlState(search) {
 
 const enc = (v) => encodeURIComponent(v).replace(/%2C/g, ",").replace(/%3A/g, ":");
 
-// state: {q, categories, countries, startYear, endYear, scope, area, eventId}
-// -> "" or "?a=b&..." (defaults omitted so the bare URL stays clean).
+// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort}
+// -> the query string: "" or "?a=b&..." (defaults omitted so the bare URL stays
+// clean). The event is not in it: it is the path (stateUrl).
 export function serializeUrlState(state) {
   const parts = [];
   const q = (state.q ?? "").trim();
@@ -127,22 +155,34 @@ export function serializeUrlState(state) {
   if (state.scope === "range") parts.push("scope=range");
   const area = areaToParam(state.area);
   if (area) parts.push(`area=${enc(area)}`);
-  if (isValidEventId(state.eventId)) parts.push(`e=${encodeURIComponent(state.eventId)}`);
   if (state.about) parts.push("about=1");
   if (SORTS.includes(state.sort) && state.sort !== "coverage") parts.push(`sort=${state.sort}`);
   return parts.length ? `?${parts.join("&")}` : "";
 }
 
-// How useUrlState writes `nextSearch` over `prevSearch`: null = nothing to do;
-// "push" = an event was opened/closed or the About dialog toggled (a history
-// entry of its own, written at once); "replace" = the same change, but
-// overwriting the current entry (`replace`: e.g. clearing a link to an event
-// that does not exist, so Back does not return to the dead URL); "debounce" =
-// any other change, replaced after a pause.
-export function urlWriteMode(prevSearch, nextSearch, { replace = false } = {}) {
-  if (nextSearch === prevSearch) return null;
-  const prev = parseUrlState(prevSearch);
-  const next = parseUrlState(nextSearch);
+/** The URL (path and query, no origin) for `state`: /event/<id>?... or /?... */
+export function stateUrl(state) {
+  return `${isValidEventId(state.eventId) ? eventPath(state.eventId) : "/"}${serializeUrlState(state)}`;
+}
+
+/** parseUrlState for a URL as stateUrl writes it (path and query). */
+export function parseUrl(url) {
+  const u = new URL(url, "http://localhost");
+  return parseUrlState(u.search, u.pathname);
+}
+
+// How useUrlState writes the URL `nextUrl` over `prevUrl` (both path and
+// query, as stateUrl gives them): null = nothing to do; "push" = an event was
+// opened/closed or the About dialog toggled (a history entry of its own,
+// written at once); "replace" = the same change, but overwriting the current
+// entry (`replace`: e.g. clearing a link to an event that does not exist, so
+// Back does not return to the dead URL); "debounce" = any other change,
+// replaced after a pause. An older /?e=<id> link rewritten to /event/<id> is
+// "debounce": the same event, so the entry is replaced, not pushed.
+export function urlWriteMode(prevUrl, nextUrl, { replace = false } = {}) {
+  if (nextUrl === prevUrl) return null;
+  const prev = parseUrl(prevUrl);
+  const next = parseUrl(nextUrl);
   if (prev.eventId === next.eventId && prev.about === next.about) return "debounce";
   return replace ? "replace" : "push";
 }
@@ -152,29 +192,26 @@ export function urlWriteMode(prevSearch, nextSearch, { replace = false } = {}) {
 // filter, the years) is still waiting for its debounced replace, which the push
 // cancels; written here, Back returns to the view as it was left, not as it
 // was 400 ms earlier. null when the current entry is already up to date.
-// `prevSearch` is the current entry's URL, `state` the new state (as for
-// serializeUrlState).
-export function entryBeforePush(prevSearch, state) {
-  const prev = parseUrlState(prevSearch);
-  const carried = serializeUrlState({ ...state, eventId: prev.eventId, about: prev.about });
-  return carried === prevSearch ? null : carried;
+// `prevUrl` is the current entry's URL, `state` the new state (as for stateUrl).
+export function entryBeforePush(prevUrl, state) {
+  const prev = parseUrl(prevUrl);
+  const carried = stateUrl({ ...state, eventId: prev.eventId, about: prev.about });
+  return carried === prevUrl ? null : carried;
 }
 
-// The page a Share button hands out for `state` (as for serializeUrlState),
-// built from the state itself rather than window.location: URL writes are
-// debounced (hooks/useUrlState.js), so the address bar can lag the view by
-// 400 ms - and Play moves the years every 350 ms.
-//  - An open event: its static page, /event/<id> (scripts/event-page.mjs
-//    eventPath), whose link preview names the event; its "Open on the map"
-//    leads back to /?e=<id>. The view's years and filters are not carried: the
-//    map opened from that page shows the event at its own year.
-//    `eventPages` false (the dev server, which has no such pages): /?e=<id>.
-//  - Otherwise the map view: `pathname` + the serialized state.
-export function shareLink(origin, pathname, state, { eventPages = true } = {}) {
-  if (isValidEventId(state.eventId)) {
-    return eventPages
-      ? `${origin}/event/${encodeURIComponent(state.eventId)}`
-      : `${origin}/?e=${encodeURIComponent(state.eventId)}`;
-  }
-  return `${origin}${pathname}${serializeUrlState(state)}`;
+// The link a Share button hands out for `state`: the view as it is now, built
+// from the state rather than window.location, since URL writes are debounced
+// (hooks/useUrlState.js) and the address bar can lag the view by 400 ms - Play
+// moves the years every 350 ms. An open event's link is its own page,
+// /event/<id>, so it previews as the event and opens on the map.
+export function shareLink(origin, state) {
+  return `${origin}${stateUrl(state)}`;
+}
+
+// The page's canonical path for `state`, as a fresh load of its URL has it in
+// <link rel="canonical"> and og:url: /event/<id> for an open event (the view's
+// other state left out), else /. Kept current by App.jsx: some share menus
+// (Chrome on Android) send the canonical link, not the address bar.
+export function canonicalPath(state) {
+  return isValidEventId(state.eventId) ? eventPath(state.eventId) : "/";
 }

@@ -1,5 +1,5 @@
-// Writes one static, crawlable HTML page per curated event into dist/ after the
-// Vite build (wired in as "postbuild"), plus the /event/ index and sitemap.xml:
+// Writes one HTML page per curated event into dist/ after the Vite build (wired
+// in as "postbuild"), plus the /event/ index and sitemap.xml:
 //
 //   dist/event/<id>.html  served at /event/<id>  (Workers static assets,
 //                         html_handling "auto-trailing-slash", the default:
@@ -9,9 +9,12 @@
 //   dist/404.html         served with status 404 for any other path
 //                         (wrangler.jsonc not_found_handling "404-page")
 //
-// The app itself still lives at /?e=<id> (src/lib/urlState.js); each page links
-// there ("Open on the map") and has no script, so the CSP needs no change. Its
-// stylesheet is public/event/event.css.
+// An event's page is the app: dist/index.html, as Vite just built it (the same
+// hashed script and styles), with the event's own <head> tags and the event as
+// plain HTML for readers without JavaScript (event-page.mjs fillAppShell). The
+// app reads the event from the path and opens it on the map. That HTML's
+// stylesheet, public/event/event.css, applies only without JavaScript. The
+// /event/ index and 404.html are plain pages with no script.
 //
 // The input is the data the build just shipped (dist/data/, written by
 // split-data.mjs and copied by Vite): the lite record from events/v.<version>/all.json
@@ -19,8 +22,8 @@
 // the app's detail view does. So a page shows exactly what the app shows,
 // including the framing review (the app shows it under every summary). Rendering
 // is in event-page.mjs. The search index (build-search-index.mjs) is built from
-// custom records pointing at /?e=<id>, not by crawling dist/, so these pages are
-// never indexed a second time.
+// custom records, not by crawling dist/, so these pages are never indexed a
+// second time.
 //
 // Run via `npm run build` or `node scripts/build-event-pages.mjs` after `vite build`.
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -40,6 +43,7 @@ async function main() {
   const meta = await readJSON(path.join(DATA, "meta.json"));
   const dir = path.join(DATA, meta.dir);
   const lite = await readJSON(path.join(dir, "all.json"));
+  const template = await readFile(path.join(DIST, "index.html"), "utf8");
   const buckets = new Map();
   const full = async (id) => {
     const b = fullBucket(id, meta.fullBuckets);
@@ -61,7 +65,7 @@ async function main() {
   await mkdir(OUT, { recursive: true });
   let bytes = 0;
   for (const e of events) {
-    const html = renderEventPage(e);
+    const html = renderEventPage(e, template);
     bytes += Buffer.byteLength(html);
     await writeFile(path.join(OUT, `${e.id}.html`), html);
   }

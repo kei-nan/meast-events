@@ -118,7 +118,7 @@ Cloudflare does not deploy it.
    - `scripts/build-search-index.mjs` - writes `app/public/pagefind/`.
 2. `vite build`.
 3. `postbuild`:
-   - `scripts/build-event-pages.mjs` - the static `/event/` pages and the sitemap.
+   - `scripts/build-event-pages.mjs` - the `/event/` pages (each event's is the app's `index.html` with the event's own head tags and text) and the sitemap.
    - `scripts/check-dist.mjs` - fails if the versioned events folder named by
      `src/lib/dataVersion.js` is missing or inconsistent with `meta.json`, an event has
      no full record, a boundary chunk points to a missing shared geometry, a file
