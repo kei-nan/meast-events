@@ -42,10 +42,11 @@ jobs:
         working-directory: app
         run: npm run lint
 
-      # Pure-logic unit tests for the frontend (ranking, geo, URL state, ...).
-      # node's built-in test runner; none of them imports the generated
-      # src/lib/dataVersion.js, so they run before the build creates it.
-      - name: Unit tests (app/src/lib)
+      # Unit tests for the frontend (src/lib, src/components, scripts): node's
+      # built-in test runner. They run before the build creates the generated
+      # src/lib/dataVersion.js: tests that need it stub it (and Vite's
+      # import.meta.env) with src/lib/testing/viteNodeHooks.mjs.
+      - name: Unit tests (app/src and app/scripts)
         working-directory: app
         run: npm test
 
