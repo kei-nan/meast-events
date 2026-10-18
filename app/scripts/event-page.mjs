@@ -4,9 +4,11 @@
 // detail view shows: Wikipedia's title and lead unchanged, Wikidata's dates and
 // classes as given, and our framing review boxed off as ours. Driven by
 // build-event-pages.mjs; tested in event-page.test.mjs.
+import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
 import { categoryLabel } from "../src/lib/categoryLabels.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
 import { formatEventDate } from "../src/lib/eventDate.js";
+import { rawEventYears } from "../src/lib/eventYears.js";
 import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
@@ -99,13 +101,28 @@ function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
 }
 
+// Names in Arabic, Hebrew or Persian script are isolated as right-to-left (<bdi>,
+// as EventDetail.jsx does), so the punctuation around them stays in place and
+// screen readers get their language (WCAG 3.1.2). The text is unchanged and
+// escaped; `at` is where the piece starts in its paragraph.
+function bidiHtml(text, runs, at) {
+  if (!runs.length) return escapeHtml(text);
+  return splitBidi(text, runs, at)
+    .map((p) => (p.rtl ? `<bdi dir="rtl"${p.lang ? ` lang="${p.lang}"` : ""}>${escapeHtml(p.text)}</bdi>` : escapeHtml(p.text)))
+    .join("");
+}
+
 function renderParagraph(paragraph, highlights) {
+  const runs = rtlRuns(paragraph);
+  let at = 0;
   const html = markSegments(paragraph, highlights)
     .map((s) => {
-      if (!s.flagged) return escapeHtml(s.text);
+      const text = bidiHtml(s.text, runs, at);
+      at += s.text.length;
+      if (!s.flagged) return text;
       const cls = ["framing-mark", ...s.kinds.map((k) => `framing-mark--${k}`)].join(" ");
       const by = s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ");
-      return `<mark class="${cls}" title="Flagged by the ${escapeHtml(by || "framing review")}. See the review below.">${escapeHtml(s.text)}</mark>`;
+      return `<mark class="${cls}" title="Flagged by the ${escapeHtml(by || "framing review")}. See the review below.">${text}</mark>`;
     })
     .join("");
   return `<p>${html}</p>`;
@@ -207,14 +224,16 @@ function locationNote(quality) {
 }
 
 // `canonical` null (the 404 page, served at any path) leaves out canonical and og:url.
-function head({ title, description, canonical, type, noindex = false }) {
+// `pageTitle` is the tab title (default `title`, which og:/twitter:title keep).
+// `jsonLd` is an already-serialized jsonLdScript() block.
+function head({ title, pageTitle = title, description, canonical, type, noindex = false, jsonLd = "" }) {
   const t = escapeHtml(title);
   const d = escapeHtml(description);
   const c = canonical ? escapeHtml(canonical) : null;
   return `<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${t}</title>
+<title>${escapeHtml(pageTitle)}</title>
 ${noindex ? `<meta name="robots" content="noindex">\n` : ""}${description ? `<meta name="description" content="${d}">\n` : ""}${c ? `<link rel="canonical" href="${c}">\n` : ""}<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="stylesheet" href="/event/event.css">
 <meta name="theme-color" content="#1d1a15">
@@ -228,7 +247,7 @@ ${description ? `<meta property="og:description" content="${d}">\n` : ""}${c ? `
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${t}">
 ${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta name="twitter:image" content="${OG_IMAGE}">
-</head>`;
+${jsonLd ? `${jsonLd}\n` : ""}</head>`;
 }
 
 const siteHeader = `<header class="site-header"><a href="/" class="site-name">${escapeHtml(SITE_NAME)}</a> <a href="/event/" class="site-index">All events</a></header>`;
@@ -238,6 +257,90 @@ const siteFooter = `<footer class="site-footer"><p>${escapeHtml(SITE_NAME)} is a
 export function eventDateText(event) {
   const flags = (event.date_flags ?? []).filter(Boolean);
   return formatEventDate(event.date_start, event.date_end, { precision: event.date_precision ?? null, yearOnly: flags.length > 0 });
+}
+
+/**
+ * The tab title, as the app sets it (App.jsx): "Title (1912–1913) – site", with
+ * the years as the dates give them (rawEventYears). No dates: "Title – site".
+ */
+export function eventPageTitle(event) {
+  const title = String(event.title ?? event.id);
+  const [s, e] = rawEventYears(event);
+  const years = event.date_start && Number.isFinite(s) ? (e !== s ? `${s}–${e}` : `${s}`) : "";
+  return `${title}${years ? ` (${years})` : ""} – ${SITE_NAME}`;
+}
+
+const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+// A Wikidata date as ISO 8601 at no more precision than the data records (the
+// same rule as formatEventDate): a day, a month, or else the year.
+function isoDate(date, precision) {
+  const m = DATE_RE.exec(String(date ?? ""));
+  if (!m) return null;
+  if (precision === "day" && Number(m[2]) && Number(m[3])) return `${m[1]}-${m[2]}-${m[3]}`;
+  if ((precision === "day" || precision === "month") && Number(m[2])) return `${m[1]}-${m[2]}`;
+  return m[1];
+}
+
+/**
+ * schema.org structured data for an event page: the WebPage, based on the
+ * Wikipedia article under its licence, about an Event with the dates at the
+ * precision recorded. The Event is the page's subject ("about"), not the page
+ * itself, so search engines are not invited to list a historical event as one
+ * to attend. A location is given only for a precise pin: a capital-city
+ * fallback is not where the event happened. Name and description are
+ * Wikipedia's, unchanged (the description is the meta description).
+ */
+export function eventJsonLd(event) {
+  const title = String(event.title ?? event.id);
+  const canonical = SITE + eventPath(event.id);
+  const wiki = safeUrl(event.wikipedia_url);
+  const wd = wikidataUrl(event.wikidata_qid);
+  const flagged = (event.date_flags ?? []).filter(Boolean).length > 0;
+  const reversed = Boolean(event.date_start && event.date_end && String(event.date_end) < String(event.date_start));
+  // Flagged (unverified) or reversed dates: years only, as the page shows them.
+  const startDate = isoDate(event.date_start, flagged || reversed ? "year" : (event.date_precision ?? null));
+  // No precision is recorded for an end date: the year only. A reversed range is
+  // not valid structured data, so it gets no endDate; the page shows both dates
+  // and a note.
+  const endDate = event.date_end && !reversed ? isoDate(event.date_end, "year") : null;
+  const c = event.coordinates;
+  const precise = event.location_quality === "precise" && Number.isFinite(c?.lat) && Number.isFinite(c?.lon);
+  const description = metaDescription(event.extract);
+  const sameAs = [wiki, wd].filter(Boolean);
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": canonical,
+    url: canonical,
+    name: title,
+    ...(description && { description }),
+    inLanguage: "en",
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: `${SITE}/` },
+    ...(wiki && { isBasedOn: wiki }),
+    license: CC_BY_SA,
+    about: {
+      "@type": "Event",
+      name: title,
+      ...(startDate && { startDate }),
+      ...(endDate && endDate !== startDate && { endDate }),
+      ...(precise && {
+        location: { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: c.lat, longitude: c.lon } },
+      }),
+      ...(sameAs.length && { sameAs }),
+    },
+  };
+}
+
+/**
+ * A JSON-LD <script> block. It is a data block, never run, so the CSP's
+ * script-src does not apply. "<", ">" and "&" are written as \u escapes so no
+ * value can close the element ("</script>") or open a comment; U+2028 and
+ * U+2029 too. JSON.parse of the content gives back `data`.
+ */
+export function jsonLdScript(data) {
+  const json = JSON.stringify(data).replace(/[<>&\u2028\u2029]/g, (ch) => `\\u${ch.charCodeAt(0).toString(16).padStart(4, "0")}`);
+  return `<script type="application/ld+json">${json}</script>`;
 }
 
 /**
@@ -288,7 +391,7 @@ export function renderEventPage(event) {
 
   return `<!doctype html>
 <html lang="en">
-${head({ title, description, canonical, type: "article" })}
+${head({ title, pageTitle: eventPageTitle(event), description, canonical, type: "article", jsonLd: jsonLdScript(eventJsonLd(event)) })}
 <body>
 ${siteHeader}
 <main>
