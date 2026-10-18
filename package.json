@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "test": "node --test \"scripts/lib/*.test.js\"",
-    "lint": "oxlint scripts",
+    "lint": "oxlint scripts --deny-warnings",
     "validate-boundaries": "node --test scripts/lib/boundary-checks.test.js && node scripts/validate-boundaries.js",
     "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },

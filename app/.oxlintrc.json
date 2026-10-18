@@ -1,9 +1,57 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "oxc"],
+  "plugins": ["react", "oxc", "jsx-a11y", "import"],
   "rules": {
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "warn",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    // As at the repo root: a named import the target module does not export fails
+    // lint instead of the build (or a lazy chunk at run time).
+    "import/named": "error",
+    // Asks for <output> over role="status", <section> over role="region", and so on.
+    // The ARIA roles here are deliberate (a live <p role="status"> is not form
+    // output; a role="group" toolbar is not a <fieldset>), so this rule is off.
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
+  // Reviewed jsx-a11y findings that are false positives for these exact files.
+  // The rules stay on everywhere else, so a new case in another file still fails.
+  "overrides": [
+    {
+      // Native <dialog>: the click handler closes it on a backdrop click (a mouse
+      // convenience; Esc and the Close button are the keyboard path), the
+      // keydown/wheel/pointer handlers only stop the credits auto-scroll.
+      "files": ["src/components/LoadFailed.jsx", "src/components/AboutData.jsx"],
+      "rules": {
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off"
+      }
+    },
+    {
+      // A horizontally scrolling table region needs tabIndex={0} to be scrollable
+      // from the keyboard (axe: scrollable-region-focusable).
+      "files": ["src/components/AboutData.jsx"],
+      "rules": { "jsx-a11y/no-noninteractive-tabindex": "off" }
+    },
+    {
+      // role="tablist" with roving focus on its tabs: the tabs are focusable, the
+      // list itself need not be (WAI-ARIA APG tabs pattern).
+      "files": ["src/components/FramingReview.jsx"],
+      "rules": { "jsx-a11y/interactive-supports-focus": "off" }
+    },
+    {
+      // Delegated keyboard handling: arrow keys between the result buttons, and
+      // Escape anywhere in the year editor or the event panel.
+      "files": ["src/components/ResultsList.jsx", "src/components/Timeline.jsx", "src/components/SearchPanel.jsx"],
+      "rules": {
+        "jsx-a11y/no-noninteractive-element-interactions": "off",
+        "jsx-a11y/no-static-element-interactions": "off"
+      }
+    },
+    {
+      // A highlighted phrase is a focusable <mark role="button"> with Enter/Space
+      // handlers: usable, but a <button> inside the <mark> would keep both meanings.
+      "files": ["src/components/EventDetail.jsx"],
+      "rules": { "jsx-a11y/no-noninteractive-element-to-interactive-role": "off" }
+    }
+  ]
 }
