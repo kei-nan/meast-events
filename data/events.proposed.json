@@ -460,6 +460,46 @@
     "wikidata_description": "1921 riots in Jaffa, Mandate Palestine"
   },
   {
+    "id": "kocgiri-rebellion",
+    "title": "Koçgiri rebellion",
+    "date_start": "1921-06-17",
+    "date_end": null,
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "revolt",
+      "military operation"
+    ],
+    "retrieved_at": "2026-10-14T22:12:51.849Z",
+    "sitelinks": 14,
+    "wikidata_qid": "Q1758033",
+    "resolved_qid": "Q1758033",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Ko%C3%A7giri_rebellion",
+    "extract": "The Koçgiri rebellion (Kurdish: Serhildana Qoçgiriyê; Turkish: Koçgiri isyanı) was a Kurdish uprising, that began in the overwhelmingly militant Koçgiri region in present-day eastern Sivas Province in February 1921. The rebellion was initially Alevi, but it succeeded in gathering support from nearby Sunni tribes. The tribal leaders had a close relationship with the Society for the Rise of Kurdistan (SAK). The rebellion was defeated in June 1921.\n\nAfter the rebellion, massacres, rapes and other crimes against Kurds began being committed by the Turkish Army and Topal Osman's paramilitaries.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q6445763",
+        "label": "Kurdish–Turkish conflict"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Kurdish–Turkish conflict\" (Q6445763); it may overlap with that larger event",
+      "country_via_predecessor_state: Wikidata P17 is Ottoman Empire (Q12560), a predecessor state of a tracked country (P1366/P1365); tagged from the item's own location: P276 Q483100 -> Turkey"
+    ],
+    "extract_retrieved_at": "2026-10-14",
+    "needs_review": true,
+    "wikidata_description": "Kurdish uprising against the Turkish National Movement"
+  },
+  {
     "id": "chanak-crisis",
     "title": "Chanak crisis",
     "date_start": "1922-09-01",
@@ -2100,7 +2140,7 @@
     ],
     "extract_retrieved_at": "2026-10-06",
     "date_flags": [
-      "date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01); shown as Wikidata gives them",
+      "date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01, year precision); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions years 1952, 1956, 1979, 1962, 1970, 1967; Wikidata gives 1979-02-11 to 1970-01-01"
     ],
     "wikipedia_lead_dates": [
@@ -3090,11 +3130,7 @@
     ],
     "extract_retrieved_at": "2026-10-06",
     "date_flags": [
-      "date_order_invalid: Wikidata start (2002-03-27) is after end (2002-01-01); shown as Wikidata gives them",
-      "wikipedia_dates_note: Wikipedia lead mentions 27 March 2002; Wikidata gives 2002-03-27 to 2002-01-01"
-    ],
-    "wikipedia_lead_dates": [
-      "2002-03-27"
+      "date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it"
     ],
     "needs_review": true,
     "wikidata_description": "2002 Hamas suicide bombing in Israel"

@@ -315,3 +315,11 @@ test("validateEvents: shared wikipedia_url or extract is a warning unless explai
   const d = found({ id: "d", wikidata_qid: "Q4", wikipedia_url: "https://en.wikipedia.org/wiki/Other" });
   assert.match(validateEvents([a, d]).warnings.join("\n"), /same extract as d \(different wikipedia_url\)/);
 });
+
+test("validateEvents: an entry typed as a person, organisation, state or country history is warned about (not an error)", () => {
+  const { errors, warnings } = validateEvents([event({ wikidata_classes: ["history of a country or state"] })]);
+  assert.deepEqual(errors, []);
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /not an event by its Wikidata classes \(history of a country or state\)/);
+  assert.deepEqual(validateEvents([event({ wikidata_classes: ["military operation", "revolt"] })]).warnings, []);
+});

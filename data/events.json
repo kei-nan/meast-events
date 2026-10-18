@@ -921,37 +921,6 @@
     "sitelinks_current": 22
   },
   {
-    "id": "jordanian-independence",
-    "title": "Jordanian independence",
-    "date_start": "1946-05-25",
-    "date_end": null,
-    "countries": [
-      "Jordan"
-    ],
-    "category": "political",
-    "retrieved_at": "2026-09-13T14:28:43.824Z",
-    "wikidata_qid": "Q1639050",
-    "wikipedia_url": "https://en.wikipedia.org/wiki/History_of_Jordan",
-    "extract": "The history of Jordan refers to the history of the Hashemite Kingdom of Jordan and the background period of the Emirate of Transjordan under the British Mandate as well as the general history of the region of Transjordan.\n\nThere is evidence of human activity in Transjordan as early as the Paleolithic period. The area was settled by nomadic tribes in the Bronze Age, which consolidated in small kingdoms during the Iron Age. In the classic period, Transjordan came under Greek and later Roman influence. Under the Romans and the Byzantines, Transjordan was home to the Decapolis in the north, with much of the region being designated as Byzantine Arabia. Classical kingdoms located in the region of Transjordan, such as the Roman-era Nabatean kingdom, which had its capital at Petra, left dramatic ruins popular today with tourists and filmmakers. The history of Transjordan continued with the Muslim empires starting in the 7th century, partial crusader control in the mid-Middle Ages (country of Oultrejordain) and finally, Mamluk rule from the 13th century and Ottoman rule between the 16th century and the First World War.\n\nWith the Great Arab Revolt in 1916 and the consequent British invasion, the area came under the Anglo-Arab ruled Occupied Enemy Territory Administration in 1917, which was declared as the Arab Kingdom of Syria in 1920. Following the French occupation of only the northern part of the Syrian Kingdom, Transjordan was left in a period of interregnum. A few months later, Abdullah, the second son of Sharif Hussein, arrived in Transjordan. With the Transjordan memorandum to the Mandate for Palestine in the early 1920s, it became the Emirate of Transjordan under the Hashemite Emir. In 1946, independent Hashemite Kingdom of Transjordan was formed and admitted to the United Nations in 1955 and the Arab League. In 1948, Jordan fought with the newly born state of Israel over lands of former Mandatory Palestine, effectively gaining control of the West Bank and annexing it with its Palestinian population. Jordan lost the West Bank in the 1967 War with Israel, and since became the central base of the Palestine Liberation Organization (PLO) in its struggle against Israel. The alliance between the PLO and the Jordanians, active during the War of Attrition, came to an end in the bloody Black September in Jordan in 1970, when a civil war between Jordanians and Palestinians (with Syrian Ba'athist support) took thousands of lives. In the aftermath, the defeated PLO was forced out of Jordan together with tens of thousands of its fighters and their Palestinian families, relocating to South Lebanon.",
-    "coordinates": {
-      "lat": 31.9454,
-      "lon": 35.9284
-    },
-    "coordinate_source": "country-fallback:Jordan",
-    "needs_manual_coordinates": true,
-    "extract_retrieved_at": "2026-09-26",
-    "wikidata_classes": [
-      "history of a country or state"
-    ],
-    "category_group": "political",
-    "review_reasons": [
-      "title_differs_from_article: record title \"Jordanian independence\" differs from the Wikipedia article title \"History of Jordan\" and does not appear in its lead"
-    ],
-    "needs_review": true,
-    "location_quality": "approximate",
-    "sitelinks_current": 35
-  },
-  {
     "id": "united-nations-partition-plan-for-palestine",
     "title": "United Nations Partition Plan for Palestine",
     "date_start": "1947-11-29",
@@ -24347,7 +24316,7 @@
     ],
     "extract_retrieved_at": "2026-10-06",
     "date_flags": [
-      "date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01); shown as Wikidata gives them",
+      "date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01, year precision); shown as Wikidata gives them",
       "wikipedia_dates_note: Wikipedia lead mentions years 1952, 1956, 1979, 1962, 1970, 1967; Wikidata gives 1979-02-11 to 1970-01-01"
     ],
     "wikipedia_lead_dates": [
@@ -25363,11 +25332,7 @@
     ],
     "extract_retrieved_at": "2026-10-06",
     "date_flags": [
-      "date_order_invalid: Wikidata start (2002-03-27) is after end (2002-01-01); shown as Wikidata gives them",
-      "wikipedia_dates_note: Wikipedia lead mentions 27 March 2002; Wikidata gives 2002-03-27 to 2002-01-01"
-    ],
-    "wikipedia_lead_dates": [
-      "2002-03-27"
+      "date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it"
     ],
     "needs_review": true,
     "wikidata_description": "2002 Hamas suicide bombing in Israel",

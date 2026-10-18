@@ -9471,6 +9471,39 @@
     "already_curated": false
   },
   {
+    "wikidata_qid": "Q1758033",
+    "wikipedia_title": "Koçgiri rebellion",
+    "wikidata_label": "Koçgiri Rebellion",
+    "wikidata_description": "Kurdish uprising against the Turkish National Movement",
+    "date_start": "1921-06-17",
+    "date_end": null,
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 14,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q483100",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
+    "notable_enough": true,
+    "already_curated": false
+  },
+  {
     "wikidata_qid": "Q135319143",
     "wikipedia_title": "Southern Syria clashes (July–September 2025)",
     "wikidata_label": "Southern Syria clashes",
@@ -24666,6 +24699,39 @@
     "already_curated": false
   },
   {
+    "wikidata_qid": "Q4572721",
+    "wikipedia_title": "1967 Kurdish revolt in Iran",
+    "wikidata_label": "1967 Kurdish revolt in Iran",
+    "wikidata_description": "Iranian-Kurdish conflict",
+    "date_start": "1967-01-01",
+    "date_end": "1968-01-01",
+    "countries": [
+      "Iran"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 6,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q107258515"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q2041508",
+          "countries": [
+            "Iran"
+          ]
+        }
+      ]
+    },
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
     "wikidata_qid": "Q135955109",
     "wikipedia_title": "2025 Sulaymaniyah clashes",
     "wikidata_label": "2025 Sulaymaniyah clashes",
@@ -36510,6 +36576,138 @@
     "already_curated": false
   },
   {
+    "wikidata_qid": "Q4088288",
+    "wikipedia_title": null,
+    "wikidata_label": "Q4088288",
+    "wikidata_description": null,
+    "date_start": "1915-01-01",
+    "date_end": "1917-01-01",
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 4,
+    "has_en_wikipedia": false,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q166",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q12203913",
+    "wikipedia_title": "Karak revolt",
+    "wikidata_label": "Karak revolt",
+    "wikidata_description": "1910 Arab revolt against the Ottoman Empire in modern-day Jordan",
+    "date_start": "1910-12-04",
+    "date_end": "1910-12-10",
+    "countries": [
+      "Jordan"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 4,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q31572",
+          "countries": [
+            "Jordan"
+          ]
+        }
+      ]
+    },
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q85850270",
+    "wikipedia_title": "Bitlis uprising (1907)",
+    "wikidata_label": "Bitlis uprising",
+    "wikidata_description": "1907 Kurdish revolt against the Ottoman Empire",
+    "date_start": "1907-06-22",
+    "date_end": "1907-07-30",
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 4,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q83531",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q85850271",
+    "wikipedia_title": "Bitlis uprising (1914)",
+    "wikidata_label": "Bitlis uprising",
+    "wikidata_description": "1914 Kurdish revolt against the Ottoman Empire",
+    "date_start": "1914-03-01",
+    "date_end": "1914-04-04",
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 4,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q83531",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
     "wikidata_qid": "Q115819674",
     "wikipedia_title": "Capture of Wejh",
     "wikidata_label": "Capture of Wejh",
@@ -44280,6 +44478,41 @@
     ],
     "sitelinks": 4,
     "has_en_wikipedia": true,
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q20987846",
+    "wikipedia_title": "Jafar Sultan revolt",
+    "wikidata_label": "Jafar Sultan revolt",
+    "wikidata_description": "1931 Kurdish uprising in Iran",
+    "date_start": "1931-01-01",
+    "date_end": null,
+    "countries": [
+      "Iran",
+      "Iraq"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 3,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q107258515"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q1585478",
+          "countries": [
+            "Iran",
+            "Iraq"
+          ]
+        }
+      ]
+    },
     "notable_enough": false,
     "already_curated": false
   },
@@ -53389,6 +53622,39 @@
     ],
     "sitelinks": 2,
     "has_en_wikipedia": false,
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q137710627",
+    "wikipedia_title": "Ali Batı Rebellion",
+    "wikidata_label": "Ali Batı Revolt",
+    "wikidata_description": "1919 revolt in Turkey",
+    "date_start": "1919-05-11",
+    "date_end": "1919-08-18",
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "sitelinks": 2,
+    "has_en_wikipedia": true,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q1553052",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
     "notable_enough": false,
     "already_curated": false
   },
@@ -63519,6 +63785,41 @@
     ],
     "sitelinks": 2,
     "has_en_wikipedia": true,
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q16366968",
+    "wikipedia_title": null,
+    "wikidata_label": "Q16366968",
+    "wikidata_description": null,
+    "date_start": "1905-10-01",
+    "date_end": null,
+    "countries": [
+      "Turkey"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "battle",
+      "military operation",
+      "armed conflict"
+    ],
+    "sitelinks": 1,
+    "has_en_wikipedia": false,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q12560"
+      ],
+      "via": [
+        {
+          "property": "P276",
+          "value": "Q3668351",
+          "countries": [
+            "Turkey"
+          ]
+        }
+      ]
+    },
     "notable_enough": false,
     "already_curated": false
   },
@@ -98121,6 +98422,41 @@
     ],
     "sitelinks": 1,
     "has_en_wikipedia": false,
+    "notable_enough": false,
+    "already_curated": false
+  },
+  {
+    "wikidata_qid": "Q126951346",
+    "wikipedia_title": null,
+    "wikidata_label": "Battle of Nalos",
+    "wikidata_description": "1947 battle in present-day iran",
+    "date_start": "1947-01-01",
+    "date_end": null,
+    "countries": [
+      "Iran"
+    ],
+    "category": "war",
+    "wikidata_classes": [
+      "battle",
+      "military operation",
+      "armed conflict"
+    ],
+    "sitelinks": 0,
+    "has_en_wikipedia": false,
+    "predecessor_rule": {
+      "predecessors": [
+        "Q107258515"
+      ],
+      "via": [
+        {
+          "property": "P625",
+          "value": "36.983333333333334,45.14388888888889",
+          "countries": [
+            "Iran"
+          ]
+        }
+      ]
+    },
     "notable_enough": false,
     "already_curated": false
   },

@@ -30,7 +30,6 @@
   {"wikipedia_title": "Anglo-Iraqi War", "date_start": "1941-05-02", "date_end": "1941-05-31", "countries": ["Iraq"], "category": "war"},
   {"wikipedia_title": "Syria–Lebanon campaign", "date_start": "1941-06-08", "date_end": "1941-07-14", "countries": ["Syria", "Lebanon"], "category": "war"},
   {"wikipedia_title": "National Pact", "date_start": "1943-11-22", "date_end": null, "countries": ["Lebanon"], "category": "political"},
-  {"wikipedia_title": "Jordanian independence", "date_start": "1946-05-25", "date_end": null, "countries": ["Jordan"], "category": "political"},
   {"wikipedia_title": "United Nations Partition Plan for Palestine", "date_start": "1947-11-29", "date_end": null, "countries": ["Israel/Palestine"], "category": "diplomatic"},
   {"wikipedia_title": "1948 Palestine war", "date_start": "1947-11-30", "date_end": "1949-03-10", "countries": ["Israel/Palestine", "Jordan", "Egypt", "Syria", "Lebanon"], "category": "war"},
   {"wikipedia_title": "Israeli Declaration of Independence", "date_start": "1948-05-14", "date_end": null, "countries": ["Israel/Palestine"], "category": "political"},

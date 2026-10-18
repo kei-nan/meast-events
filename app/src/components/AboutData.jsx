@@ -129,7 +129,8 @@ function Funnel({ state }) {
       </p>
     );
   }
-  const data = state.data;
+  // "coverage" has its own section (Coverage below).
+  const data = Object.fromEntries(Object.entries(state.data).filter(([k]) => k !== "coverage"));
   const scalars = Object.entries(data).filter(([, v]) => isPlain(v));
   const rest = Object.entries(data).filter(([, v]) => !isPlain(v));
   return (
@@ -142,6 +143,65 @@ function Funnel({ state }) {
         </dl>
       )}
       {rest.map(([k, v]) => <Section key={k} name={k} value={v} />)}
+    </>
+  );
+}
+
+// What is shown, counted by the pipeline (selection-funnel.json "coverage"): per country as tagged and without the
+// region-wide events, per decade and per category. Numbers come from the file; nothing is computed here.
+function Coverage({ state }) {
+  if (state.status === "loading") return <p role="status">Loading the coverage counts…</p>;
+  const c = state.status === "ready" ? state.data.coverage : null;
+  if (!c) {
+    return (
+      <p className="about-unavailable" role="status">
+        Coverage unavailable: the published selection-funnel file could not be loaded or has no coverage counts.
+      </p>
+    );
+  }
+  const without = c.by_country_without_events_tagged_with_8_or_more_countries ?? {};
+  const eco = c.economic_events;
+  return (
+    <>
+      <p>
+        Counts of the {fmt(c.shown_total)} events shown. An event tagged with several countries counts once in each
+        of them, so the country rows add up to more than the total. {fmt(c.events_tagged_with_8_or_more_countries)} events
+        (world wars and other region-wide conflicts) are tagged with 8 or more countries; the second column leaves
+        them out. &ldquo;Regional&rdquo; is a tag of some hand-picked events that concern the whole region, not a country.
+      </p>
+      <div className="about-scroll" tabIndex={0} role="region" aria-label="Events by country">
+        <table className="about-table about-coverage-table">
+          <thead>
+            <tr>
+              <th scope="col">Country</th>
+              <th scope="col">Events as tagged</th>
+              <th scope="col">Without events tagged with 8+ countries</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(c.by_country).map(([k, v]) => (
+              <tr key={k}>
+                <th scope="row">{k === "regional" ? "Regional" : k}</th>
+                <td>{fmt(v)}</td>
+                <td>{fmt(without[k] ?? 0)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <h4 className="about-sentence-case">By decade of the start date</h4>
+      <BarList rows={Object.entries(c.by_decade).map(([k, v]) => ({ label: k, count: v }))} />
+      <h4 className="about-sentence-case">By category (our grouping)</h4>
+      <BarList rows={Object.entries(c.by_category).map(([k, v]) => ({ label: k, count: v }))} />
+      {eco && (
+        <p>
+          {eco.total === 1 ? "Only one event is" : `${fmt(eco.total)} events are`} in the economic category
+          {eco.titles?.length ? ` (${eco.titles.join(", ")})` : ""}
+          {eco.total > 0 && eco.from_hand_picked_list === eco.total
+            ? `, and ${eco.total === 1 ? "it comes" : "all come"} from the hand-picked list, not from the inclusion rule.`
+            : "."}
+        </p>
+      )}
     </>
   );
 }
@@ -366,6 +426,9 @@ export default function AboutData({ section = null, onClose }) {
           </a>{" "}
           gives the rules, the limits and the history of changes. Each review box has a link to contest it.
         </p>
+
+        <h3>Coverage</h3>
+        <Coverage state={funnel} />
 
         <h3>Selection funnel</h3>
         <p className="about-muted">

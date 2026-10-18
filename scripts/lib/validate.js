@@ -1,7 +1,7 @@
 // Structural validation for event files. This checks FORMAT and internal consistency
 // only - it never judges whether an event is "right" (that would be editorial).
 import { createHash } from "node:crypto";
-import { COUNTRIES, EVENT_CLASSES, INCLUSION_MIN_SITELINKS } from "./event-classes.js";
+import { COUNTRIES, EVENT_CLASSES, INCLUSION_MIN_SITELINKS, notEventClasses } from "./event-classes.js";
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode } from "./wiki.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
@@ -230,6 +230,9 @@ export function validateEvents(
     // v2.1 shape fields
     if (!Array.isArray(e.wikidata_classes) || e.wikidata_classes.some((c) => typeof c !== "string" || !c)) {
       err(i, e, "wikidata_classes must be an array of non-empty strings");
+    } else if (notEventClasses(e.wikidata_classes).length) {
+      // "Not events" (docs/DATA_POLICY.md): merge-proposed.js removes such an entry; listed here until it does.
+      warn(i, e, `not an event by its Wikidata classes (${notEventClasses(e.wikidata_classes).map((c) => c.label).join(", ")}): merge-proposed.js removes it`);
     }
     if (typeof e.extract_retrieved_at !== "string" || !/^\d{4}-\d{2}-\d{2}/.test(e.extract_retrieved_at)) {
       err(i, e, "extract_retrieved_at must be an ISO date");
