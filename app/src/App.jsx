@@ -227,15 +227,17 @@ export default function App() {
   const [viewportBbox, setViewportBbox] = useState(null);
 
   // "Only in current map view" is a client-side trim of whatever list is shown.
+  // With it off the view is not read, so panning does not rebuild the lists.
+  const inViewBbox = inView ? viewportBbox : null;
   const inViewFilter = useCallback(
     (list) => {
-      if (!inView || !viewportBbox) return list;
+      if (!inViewBbox) return list;
       return list.filter((e) => {
         const c = eventCoords(e);
-        return c && inBbox(c, viewportBbox);
+        return c && inBbox(c, inViewBbox);
       });
     },
-    [inView, viewportBbox]
+    [inViewBbox]
   );
   const scopedResults = useMemo(
     () => inViewFilter(scope === "range" ? resultsInRange : search.results),

@@ -96,6 +96,10 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
   const rootRef = useRef(null);
   const buttonRef = useRef(null);
   const panelRef = useRef(null);
+  // Counts QR requests and closes: a QR whose (lazy) library arrives after the
+  // panel closed, or after a newer request, is dropped, so reopening never
+  // shows a code for an older link.
+  const qrRequestRef = useRef(0);
   const panelId = useId();
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
   const getLink = useContext(ShareLinkContext);
@@ -103,6 +107,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
 
   const close = (returnFocus) => {
     setOpen(false);
+    qrRequestRef.current++;
     setQr(null);
     if (returnFocus) buttonRef.current?.focus();
   };
@@ -156,12 +161,14 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
 
   async function showQr() {
     const url = link();
+    const request = ++qrRequestRef.current;
     setQr("loading");
     try {
       const { encode } = await loadQr();
+      if (request !== qrRequestRef.current) return;
       setQr({ url, data: encode(url, { ecc: "M", border: QR_BORDER }).data });
     } catch {
-      setQr("error");
+      if (request === qrRequestRef.current) setQr("error");
     }
   }
 
