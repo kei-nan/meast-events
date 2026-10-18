@@ -5,6 +5,7 @@ import ShareButton from "./ShareButton.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
 import { safeUrl } from "../lib/safeUrl.js";
+import { eventPageUrl } from "../lib/urlState.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
@@ -263,7 +264,8 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
             Show on map
           </button>
         )}
-        <ShareButton title={event.title} />
+        {/* The event's static page, whose meta tags give link previews its title and summary. */}
+        <ShareButton title={event.title} url={eventPageUrl(event.id, window.location.origin)} />
         {wikiUrl && (
           <a className="sp-btn event-detail-wiki" href={wikiUrl} target="_blank" rel="noreferrer">
             {/* "Read on" is for screen readers only, to keep the action row short. */}

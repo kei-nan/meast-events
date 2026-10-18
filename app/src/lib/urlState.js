@@ -25,6 +25,16 @@ export function isValidEventId(id) {
   return typeof id === "string" && ID_RE.test(id);
 }
 
+/**
+ * The event's static page (/event/<id>, written by scripts/build-event-pages.mjs
+ * with the same path as its eventPath). Shared instead of /?e=<id> because link
+ * previews come from a page's meta tags and crawlers do not run the app: this
+ * page has the event's own title and summary, and links to the map.
+ */
+export function eventPageUrl(id, origin) {
+  return `${origin}/event/${encodeURIComponent(id)}`;
+}
+
 function parseList(raw) {
   if (!raw) return [];
   const out = [];

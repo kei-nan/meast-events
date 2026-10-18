@@ -77,7 +77,8 @@ const slug = (s) =>
 
 /**
  * "Share" for the page's current link (the URL carries the open event, years,
- * filters and area, so the link reopens the same view). Opens a small panel:
+ * filters and area, so the link reopens the same view), or for `url` when
+ * given. Opens a small panel:
  * the device's own share sheet where the browser offers one (phones, some
  * desktops), "Copy link", and a QR code that can be saved as a PNG. The QR is
  * drawn here; the link is never sent to any service.
@@ -85,8 +86,9 @@ const slug = (s) =>
  * @param {object} props
  * @param {string} props.title  shared as the title, and names the PNG
  * @param {"start"|"end"} [props.align]  which edge of the button the panel lines up with
+ * @param {string} [props.url]  the link to share instead of the page's own
  */
-export default function ShareButton({ title, align = "start", className = "sp-btn" }) {
+export default function ShareButton({ title, align = "start", className = "sp-btn", url: fixedUrl }) {
   const [open, setOpen] = useState(false);
   const [qr, setQr] = useState(null); // {url, data} | "loading" | "error" | null
   const [copied, setCopied] = useState(false);
@@ -95,6 +97,8 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
   const panelRef = useRef(null);
   const panelId = useId();
   const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  // Read when used: the page's own link changes with the view while the panel is open.
+  const shareUrl = () => fixedUrl ?? window.location.href;
 
   const close = (returnFocus) => {
     setOpen(false);
@@ -132,7 +136,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
 
   async function shareNative() {
     try {
-      await navigator.share({ title, url: window.location.href });
+      await navigator.share({ title, url: shareUrl() });
       close(true);
     } catch {
       // Cancelled by the user, or refused: the panel stays open for the other options.
@@ -141,15 +145,15 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
 
   async function copyLink() {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(shareUrl());
       setCopied(true);
     } catch {
-      window.prompt("Copy this link", window.location.href);
+      window.prompt("Copy this link", shareUrl());
     }
   }
 
   async function showQr() {
-    const url = window.location.href;
+    const url = shareUrl();
     setQr("loading");
     try {
       const { encode } = await loadQr();
@@ -173,7 +177,13 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
         <span className="share-label">Share</span>
       </button>
       {open && (
-        <div className="share-panel" id={panelId} ref={panelRef} role="group" aria-label="Share this view">
+        <div
+          className="share-panel"
+          id={panelId}
+          ref={panelRef}
+          role="group"
+          aria-label={fixedUrl ? "Share this link" : "Share this view"}
+        >
           {canShare && (
             <button type="button" className="sp-btn" onClick={shareNative}>
               Share via…
@@ -195,7 +205,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
                 viewBox={`0 0 ${qr.data.length} ${qr.data.length}`}
                 shapeRendering="crispEdges"
                 role="img"
-                aria-label="QR code for the link to this view"
+                aria-label={fixedUrl ? "QR code for this link" : "QR code for the link to this view"}
               >
                 <rect width="100%" height="100%" fill="#fff" />
                 <path d={qrPath(qr.data)} fill="#000" />

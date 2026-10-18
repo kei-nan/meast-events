@@ -456,8 +456,8 @@ export default function App() {
   );
 
   // The tab title names the open event (and is restored when it closes).
-  // Link previews still show the site title: crawlers do not run this script,
-  // so per-event previews would need a server-side function.
+  // Crawlers do not run this script, so link previews of /?e=<id> show the site
+  // title; the event's Share links its static page instead (lib/urlState.js eventPageUrl).
   const selectedTitle = selectedEventRaw?.title;
   const selectedYears = selectedEventRaw ? rawEventYears(selectedEventRaw) : null; // as the dates give them
   const selectedYearText = selectedYears
@@ -570,11 +570,8 @@ export default function App() {
           onBack={handleBack}
           sort={sort}
           onSortChange={setSort}
-          // Extras beyond the agreed props (ignored if unused):
           counts={counts}
-          truncated={search.truncated}
           interim={search.interim}
-          selectedEventId={selectedEventId}
         />
       </main>
       <Timeline

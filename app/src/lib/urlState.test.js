@@ -1,6 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { areaToParam, entryBeforePush, parseArea, parseUrlState, serializeUrlState, urlWriteMode, YEAR_MAX } from "./urlState.js";
+import {
+  areaToParam,
+  entryBeforePush,
+  eventPageUrl,
+  parseArea,
+  parseUrlState,
+  serializeUrlState,
+  urlWriteMode,
+  YEAR_MAX,
+} from "./urlState.js";
+import { eventPath } from "../../scripts/event-page.mjs";
+
+test("eventPageUrl is the path the build writes the event's page to", () => {
+  for (const id of ["six-day-war", "Q12345", "a:b.c~d"]) {
+    assert.equal(eventPageUrl(id, "https://middleeast.events"), `https://middleeast.events${eventPath(id)}`);
+  }
+});
 
 const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
 
