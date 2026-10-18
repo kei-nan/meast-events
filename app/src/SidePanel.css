@@ -708,12 +708,21 @@ button.sp-chip[aria-pressed="true"] {
 
 /* ---------- Event detail ---------- */
 
+/* Stays at the top of the panel while the article scrolls, so Back is always
+   in reach (on a phone the article is long and the row scrolled away). The
+   offset is .sp-scroll's top padding, so no text shows above the row. */
 .event-detail-actions {
+  position: sticky;
+  top: -16px;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
+  margin: 0 0 6px;
+  padding: 8px 0;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
 }
 
 /* Mobile only: the sheet covers the map, so this collapses it. */
@@ -1105,6 +1114,10 @@ button.sp-chip[aria-pressed="true"] {
 
   .sp-scroll {
     padding: 0 14px 16px;
+  }
+
+  .event-detail-actions {
+    top: 0;
   }
 
   .side-panel[data-sheet="peek"] .sp-scroll {
