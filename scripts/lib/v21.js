@@ -1,9 +1,9 @@
 // Data-shape v2.1 helpers shared by enrich-candidates.js and refresh-extracts.js.
 // Nothing here rewrites Wikipedia/Wikidata content: it copies it, or FLAGS a discrepancy.
 import { EVENT_CLASSES, COUNTRIES, QID_TO_COUNTRY, groupForEvent } from "./event-classes.js";
-import { yearsIn, yearOf } from "./wiki.js";
+import { yearsIn, yearOf, precisionName } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
-import { applyDataFix, reconcileStartDate } from "./fixes.js";
+import { applyDataFix, reconcileStartDate, keptEndPrecision, lastDayOfPeriod } from "./fixes.js";
 import { detectExtractHold } from "./title-refresh.js";
 
 export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
@@ -65,9 +65,22 @@ export function wikipediaLeadDates(extract) {
   return [...new Set(out)].sort();
 }
 
-export function dateOrderFlags({ date_start, date_end, extract }) {
+// endPrecision: Wikidata precision code of the end date's P582 statement (keptEndPrecision), when known.
+// A coarse end is compared by its whole period: Wikidata's end "2002" (year precision, stored as
+// 2002-01-01) is not before a start of 27 March 2002 (Passover massacre: P585 2002-03-27, P582 2002).
+// Such an end gets the note-only DATE_END_COARSE_FLAG instead of date_order_invalid.
+export const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
+export function dateOrderFlags({ date_start, date_end, extract, endPrecision = null }) {
   if (!(date_start && date_end && date_end < date_start)) return [];
-  const flags = [`date_order_invalid: Wikidata start (${date_start}) is after end (${date_end}); shown as Wikidata gives them`];
+  const coarse = endPrecision != null && endPrecision < 11 ? precisionName(endPrecision) : null;
+  const periodEnd = coarse ? lastDayOfPeriod(date_end, endPrecision) : null;
+  if (periodEnd && periodEnd >= date_start) {
+    return [
+      `${DATE_END_COARSE_FLAG}: Wikidata end time ${date_end} has only ${coarse} precision (the ${coarse} runs to ${periodEnd}), so it is not before the start (${date_start}); stored as Wikidata gives it`,
+    ];
+  }
+  const endText = coarse ? `${date_end}, ${coarse} precision` : date_end;
+  const flags = [`date_order_invalid: Wikidata start (${date_start}) is after end (${endText}); shown as Wikidata gives them`];
   const note = wikipediaDatesNote({ date_start, date_end, extract });
   if (note) flags.push(`wikipedia_dates_note: ${note}`);
   return flags;
@@ -198,7 +211,7 @@ export function finalizeEvent(ev, ctx) {
     "date_order_invalid", "date_year_mismatch", "date_end_year_mismatch",
     "title_differs_from_article", "country_not_supported_by_wikidata", "country_via_place_only",
   ]);
-  dateFlags = dateFlags.filter((f) => !/^(date_order_invalid|wikipedia_dates_note|date_start_year_not_in_lead)/.test(f));
+  dateFlags = dateFlags.filter((f) => !/^(date_order_invalid|date_end_precision_coarse|wikipedia_dates_note|date_start_year_not_in_lead)/.test(f));
   const years = yearsIn(ev.extract);
   const sy = yearOf(ev.date_start);
   if (years.length && sy !== null && !years.some((y) => Math.abs(y - sy) <= 1)) {
@@ -206,7 +219,7 @@ export function finalizeEvent(ev, ctx) {
       `date_start_year_not_in_lead: start year ${sy} (${ev.date_start}) is not within 1 year of any year in the Wikipedia lead [${years.slice(0, 8).join(", ")}]`
     );
   }
-  dateFlags.push(...dateOrderFlags(ev));
+  dateFlags.push(...dateOrderFlags({ ...ev, endPrecision: keptEndPrecision(entity, ev.date_end)?.code ?? null }));
   const leadDates = dateFlags.some((f) => f.startsWith("date_order_invalid")) ? wikipediaLeadDates(ev.extract) : [];
   if (leadDates.length) ev.wikipedia_lead_dates = leadDates;
   else delete ev.wikipedia_lead_dates;

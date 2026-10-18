@@ -269,3 +269,26 @@ put them outside the tracked set; the validator now rejects any event without a 
 | Operation Guardian of the Walls (Q106786309) | 2021 Israel–Palestine crisis | `2021-israel-palestine-crisis` |
 
 - Their pins follow F11 (own Wikidata location only).
+
+## Checks of 2026-10-14: the remaining reversed and coarse dates (no data value changed)
+
+- Evidence: Wikidata `wbgetentities` (live 2026-10-14) and the infobox `date` line of the English article at the revision named. The pipeline's
+  start is COALESCE(P585, P580) and its end P582 (discovery query, `scripts/discover-events.js`); WDQS returns a coarse value such as
+  `+2002-00-00` as 2002-01-01.
+
+| Event (QID) | Stored start / end | Wikidata P585 / P580 / P582 (precision) | Infobox (revision) | Cause |
+|---|---|---|---|---|
+| Iraqi invasion of Kuwait (Q856650) | 2009-08-02 / 1990-08-04 | - / 2009-08-02 (day) / 1990-08-04 (day) | 2–4 August 1990 (1375300033) | Wikidata: P580 year mistyped |
+| Second Battle of İnönü (Q2659746) | 1921-04-01 / 1921-03-31 | 1921-04-01 (day) / 1921-03-26 (day) / 1921-03-31 (day) | March 23 – April 1, 1921 (1379641867) | Wikidata: P585 after P582 (the F6 pattern) |
+| Arab Cold War (Q4783165) | 1979-02-11 / 1970-01-01 | 1979-02-11 (day) / 1952 (year) / 1970 (year) | 23 July 1952 – 6 September 1991, sources vary (1380203502) | Wikidata: a point in time on a period, after its end even at year precision |
+| Passover massacre (Q2660905) | 2002-03-27 / 2002-01-01 | 2002-03-27 (day) / 2002 (year) / 2002 (year) | 27 March 2002 (1365841580) | **ours**: a year-precision end read as 1 January |
+| Israeli–Lebanese conflict (Q3241199) | 2000-01-01 / - | - / +2000 (century) / - | 15 May 1948 – present (1370624531) | Wikidata: only a century; Wikibase formats +2000 at precision 7 as "20. century" (wbformatvalue), i.e. 1901–2000 |
+
+- Not fixed here (no F-number): F-fixes need Wikipedia and Wikidata to agree against our record. For Kuwait, İnönü (end) and the
+  Israeli–Lebanese conflict the infobox disagrees with Wikidata itself, so the correction belongs upstream: drafted, not submitted, in
+  `data/wikidata-date-suggestions.tsv` (QuickStatements V1, for the owner's own account). The Arab Cold War's end is a matter of sources and is
+  only described there.
+- Pipeline (Passover massacre): `dateOrderFlags` now compares a coarse end by its whole period (`lastDayOfPeriod`, `keptEndPrecision` in
+  `scripts/lib/fixes.js`), so "2002" is no longer called earlier than 27 March 2002; such a case gets `date_end_precision_coarse` instead of
+  `date_order_invalid`, and a reversal at year precision (Arab Cold War) says the precision in its flag. The stored dates are unchanged. The
+  stored flags of `passover-massacre` change on the next enrichment run (proposed file) and, for the curated file, only on a re-merge.

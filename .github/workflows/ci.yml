@@ -90,6 +90,16 @@ jobs:
       - name: Validate events
         run: node scripts/validate-events.js
 
+      # The published reports must match the data they are generated from:
+      # data/missing-coordinates-report.md (from the event files) and
+      # data/selection-funnel.json (all but its sitelink_measurement block,
+      # the only part that needs the network, which --check keeps). No network.
+      # Fix a failure by re-running the two scripts without --check.
+      - name: Generated reports are current
+        run: |
+          node scripts/build-missing-coordinates-report.js --check
+          node scripts/build-selection-funnel.js --check
+
       # Pure-logic tests for the data pipeline (fix ledger, validator).
       - name: Unit tests (scripts/lib)
         run: npm test

@@ -120,9 +120,9 @@ test("validateEvents: location_quality and coordinate_source must agree", () => 
 test("validateEvents: dangling possible_duplicates, short extract and QID/article mismatch are warnings", () => {
   const r = validateEvents([
     event({ possible_duplicates: [{ id: "gone", title: "Gone", reason: "x" }, { id: "six-day-war" }] }),
-    event({ id: "b", wikidata_qid: "Q2", extract: "Too short." }),
+    event({ id: "b", wikidata_qid: "Q2", extract: "Too short.", wikipedia_url: "https://en.wikipedia.org/wiki/B" }),
     event({ id: "c", wikidata_qid: "Q3", resolved_qid: "Q9" }),
-    event({ id: "d", wikidata_qid: "Q4", resolved_qid: "Q4" }),
+    event({ id: "d", wikidata_qid: "Q4", resolved_qid: "Q4", wikipedia_url: "https://en.wikipedia.org/wiki/D", extract: "D ".repeat(100) }),
   ]);
   assert.deepEqual(r.errors, []);
   assert.equal(r.warnings.length, 3, r.warnings.join("\n"));
@@ -245,4 +245,73 @@ test("findClashes: id and QID clashes with the base set, each reason listed", ()
   );
   assert.deepEqual(findClashes([], incoming), []);
   assert.deepEqual(findClashes(base, []), []);
+});
+
+// Discovered events carry `sitelinks` (the count discovery saw); the fixture above is a hand-picked one.
+const found = (over = {}) => event({ sitelinks: 12, sitelinks_current: 12, date_precision: "day", ...over });
+
+test("validateEvents: inclusion-rule warnings for discovered events; hand-picked seed events are exempt", () => {
+  const r = validateEvents([
+    found({ id: "low", wikidata_qid: "Q1", sitelinks: 9, wikipedia_url: "https://en.wikipedia.org/wiki/Low", extract: "L ".repeat(90) }),
+    found({ id: "fell", wikidata_qid: "Q2", sitelinks_current: 8, wikipedia_url: "https://en.wikipedia.org/wiki/Fell", extract: "F ".repeat(90) }),
+    found({ id: "fr", wikidata_qid: "Q3", wikipedia_url: "https://fr.wikipedia.org/wiki/Guerre_des_Six_Jours", extract: "G ".repeat(90) }),
+    found({ id: "noprec", wikidata_qid: "Q4", date_precision: undefined, wikipedia_url: "https://en.wikipedia.org/wiki/N", extract: "N ".repeat(90) }),
+    found({ id: "badprec", wikidata_qid: "Q5", date_precision: "fortnight", wikipedia_url: "https://en.wikipedia.org/wiki/P", extract: "P ".repeat(90) }),
+    // seed event: no sitelinks key, low current count, no precision - none of the above applies
+    event({ id: "seed", wikidata_qid: "Q6", sitelinks_current: 8, wikipedia_url: "https://en.wikipedia.org/wiki/S", extract: "S ".repeat(90) }),
+  ].map((e) => {
+    if (e.id === "noprec") delete e.date_precision;
+    return e;
+  }));
+  assert.deepEqual(r.errors, []);
+  const w = (id) => r.warnings.filter((x) => x.includes(` ${id}: `));
+  assert.match(w("low").join(), /sitelinks at discovery \(9\) below the inclusion threshold of 10/);
+  assert.match(w("fell").join(), /sitelinks_current \(8\) has fallen below/);
+  assert.match(w("fr").join(), /not an English Wikipedia article/);
+  assert.match(w("noprec").join(), /date_precision missing/);
+  assert.match(w("badprec").join(), /"fortnight" is not a Wikidata precision name/);
+  assert.deepEqual(w("seed"), []);
+  assert.equal(r.warnings.length, 5, r.warnings.join("\n"));
+  // null precision (a ledger date that is no Wikidata value) is allowed
+  assert.deepEqual(validateEvents([found({ date_precision: null })]).warnings, []);
+});
+
+test("validateEvents: a decade/century start without an end, and >= 8 countries, are warnings", () => {
+  const century = found({ date_start: "2000-01-01", date_end: null, date_precision: "century" });
+  assert.match(validateEvents([century]).warnings.join(), /only century precision and there is no date_end: .*century ending 2000/);
+  assert.deepEqual(validateEvents([found({ date_start: "1940-01-01", date_end: "1949-05-01", date_precision: "decade" })]).warnings, []);
+  assert.deepEqual(validateEvents([found({ date_start: "1948-01-01", date_end: null, date_precision: "year" })]).warnings, []);
+  const many = ["Turkey", "Iran", "Iraq", "Syria", "Lebanon", "Jordan", "Egypt", "Yemen"];
+  assert.match(validateEvents([found({ countries: many })]).warnings.join(), /tagged with 8 countries/);
+  assert.deepEqual(validateEvents([found({ countries: many.slice(0, 7) })]).warnings, []);
+});
+
+test("validateEvents: a coarse end that reaches the start is a warning only with its flag, and only if true", () => {
+  // Passover massacre: P585 2002-03-27 (day), P582 "2002" (year precision, stored as 2002-01-01).
+  const passover = found({ date_start: "2002-03-27", date_end: "2002-01-01" });
+  assert.equal(validateEvents([passover]).errors.length, 1);
+  const flag = "date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it";
+  const ok = validateEvents([{ ...passover, date_flags: [flag] }]);
+  assert.deepEqual(ok.errors, []);
+  assert.match(ok.warnings.join(), /coarse Wikidata end \(year precision\) that reaches date_start/);
+  // The flag cannot excuse a real reversal (Arab Cold War: start 1979-02-11, end "1970", year precision).
+  const real = found({ date_start: "1979-02-11", date_end: "1970-01-01", date_flags: [flag.replace(/2002/g, "1970")] });
+  assert.equal(validateEvents([real]).errors.length, 1);
+});
+
+test("validateEvents: shared wikipedia_url or extract is a warning unless explained by a redirect", () => {
+  const a = found({ id: "a", wikidata_qid: "Q1" });
+  // b's title redirects into a's article (resolved_qid = a's item): the documented case, no new warning.
+  const b = found({ id: "b", wikidata_qid: "Q2", resolved_qid: "Q1", coordinate_source: "wikidata" });
+  const explained = validateEvents([a, b]).warnings;
+  assert.equal(explained.length, 1, explained.join("\n"));
+  assert.match(explained[0], /b: wikipedia_url .* belongs to Q1/);
+  // Two events that are each the article's own item: listed.
+  const c = found({ id: "c", wikidata_qid: "Q3" });
+  const r = validateEvents([a, c]).warnings;
+  assert.equal(r.filter((w) => /same wikipedia_url as/.test(w)).length, 2);
+  assert.equal(r.filter((w) => /same extract as/.test(w)).length, 2);
+  // Same text under different URLs: listed.
+  const d = found({ id: "d", wikidata_qid: "Q4", wikipedia_url: "https://en.wikipedia.org/wiki/Other" });
+  assert.match(validateEvents([a, d]).warnings.join("\n"), /same extract as d \(different wikipedia_url\)/);
 });

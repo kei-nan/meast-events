@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { DATA_FIXES, applyDataFix, reconcileStartDate, keptDatePrecision } from "./fixes.js";
+import { DATA_FIXES, applyDataFix, reconcileStartDate, keptDatePrecision, keptEndPrecision, lastDayOfPeriod } from "./fixes.js";
 
 test("applyDataFix F7: October 7 attacks start = Wikidata P580, end untouched", () => {
   const ev = { id: "october-7-attacks", wikidata_qid: "Q122976243", date_start: "2023-10-01", date_end: "2023-10-09", review_reasons: [] };
@@ -98,4 +98,26 @@ test("reconcileStartDate: leaves ordinary dates alone", () => {
   const entity = { p585: [{ time: "1967-06-05", precision: 11 }], p580: [{ time: "1967-06-05", precision: 11 }] };
   assert.equal(reconcileStartDate("1967-06-05", entity), null);
   assert.equal(reconcileStartDate("1967-06-05", null), null);
+});
+
+test("keptEndPrecision: precision of the P582 statement behind date_end", () => {
+  // Passover massacre (Q2660905), live 2026-10-14: P582 +2002-00-00, precision 9 (year).
+  const passover = { p582: [{ time: "2002-00-00", precision: 9 }] };
+  assert.deepEqual(keptEndPrecision(passover, "2002-01-01"), { code: 9, name: "year", property: "P582" });
+  assert.equal(keptEndPrecision(passover, "2003-01-01"), null);
+  assert.equal(keptEndPrecision(null, "2002-01-01"), null);
+  assert.equal(keptEndPrecision(passover, null), null);
+});
+
+test("lastDayOfPeriod: the end of the period a coarse Wikidata date stands for", () => {
+  assert.equal(lastDayOfPeriod("2002-03-27", 11), "2002-03-27");
+  assert.equal(lastDayOfPeriod("2024-02-01", 10), "2024-02-29");
+  assert.equal(lastDayOfPeriod("2002-01-01", 9), "2002-12-31");
+  assert.equal(lastDayOfPeriod("1940-01-01", 8), "1949-12-31");
+  // Wikibase centuries run 1901-2000: +2000 and +1901 at precision 7 are both "20. century".
+  assert.equal(lastDayOfPeriod("2000-01-01", 7), "2000-12-31");
+  assert.equal(lastDayOfPeriod("1901-01-01", 7), "2000-12-31");
+  assert.equal(lastDayOfPeriod("2001-01-01", 7), "2100-12-31");
+  assert.equal(lastDayOfPeriod("not a date", 9), null);
+  assert.equal(lastDayOfPeriod("2000-01-01", 3), null);
 });

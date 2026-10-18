@@ -103,6 +103,20 @@ test("dateOrderFlags: only for an end before the start, with what the lead says"
   assert.doesNotMatch(dateOrderFlags({ date_start: "1949-01-01", date_end: "1948-05-15", extract: "In 1948." })[1], /not in lead/);
 });
 
+test("dateOrderFlags: a coarse end is compared by its whole period", () => {
+  // Passover massacre: P585 2002-03-27 (day) vs P582 "2002" (year, stored 2002-01-01): not reversed at that precision.
+  const passover = dateOrderFlags({ date_start: "2002-03-27", date_end: "2002-01-01", extract: "27 March 2002", endPrecision: 9 });
+  assert.deepEqual(passover, [
+    "date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it",
+  ]);
+  // Arab Cold War: P585 1979-02-11 vs P582 "1970" (year): reversed even at year precision; the flag says the precision.
+  const acw = dateOrderFlags({ date_start: "1979-02-11", date_end: "1970-01-01", extract: "1952 to 1970", endPrecision: 9 });
+  assert.ok(acw[0].startsWith("date_order_invalid: Wikidata start (1979-02-11) is after end (1970-01-01, year precision);"), acw[0]);
+  // Day precision, or unknown precision: as before.
+  assert.ok(dateOrderFlags({ date_start: "1921-04-01", date_end: "1921-03-31", endPrecision: 11 })[0].includes("end (1921-03-31);"));
+  assert.match(dateOrderFlags({ date_start: "2002-03-27", date_end: "2002-01-01" })[0], /^date_order_invalid/);
+});
+
 test("wikipediaLeadDates: the lead's full dates as YYYY-MM-DD, else its years, in date order", () => {
   assert.deepEqual(wikipediaLeadDates("It began on April 1, 1921 and ended 2 August 1990, then 2 August 1990."), [
     "1921-04-01",
@@ -242,4 +256,34 @@ test("finalizeEvent: reconcileDates swaps a decade-precision P585 for the item's
   assert.equal(candidate.date_start, "1941-06-08");
   assert.deepEqual(candidate.date_flags.map((f) => f.split(":")[0]), ["date_source_adjusted"]);
   assert.match(candidate.date_flags[0], /P585 1930-00-00 is only decade-or-coarser precision; used P580 start time 1941-06-08/);
+});
+
+test("finalizeEvent: a year-precision Wikidata end in the start's year is not flagged as reversed", () => {
+  // Shape of Passover massacre (Q2660905, live 2026-10-14): P585 2002-03-27 (day), P580 and P582 "2002" (year).
+  const ev = {
+    id: "passover-massacre",
+    title: "Passover massacre",
+    wikipedia_url: "https://en.wikipedia.org/wiki/Passover_massacre",
+    wikidata_qid: SANDBOX_QID,
+    date_start: "2002-03-27",
+    date_end: "2002-01-01",
+    countries: ["Lebanon"],
+    category: "massacre",
+    sitelinks: 20,
+  };
+  const ctx = ctxWith({
+    leads: { "Passover massacre": { extract: "The Passover massacre was a suicide bombing on 27 March 2002.", retrieved_at: "2026-10-01T00:00:00Z" } },
+    entities: {
+      [SANDBOX_QID]: {
+        p31: [Q.massacre], p17: [Q.lebanon],
+        p585: [{ time: "2002-03-27", precision: 11 }], p580: [{ time: "2002-00-00", precision: 9 }], p582: [{ time: "2002-00-00", precision: 9 }],
+      },
+    },
+    labels: { [Q.massacre]: "massacre" },
+  });
+  finalizeEvent(ev, ctx);
+  assert.equal(ev.date_end, "2002-01-01", "the stored date is unchanged");
+  assert.equal(ev.date_flags.some((f) => f.startsWith("date_order_invalid")), false, ev.date_flags.join("\n"));
+  assert.ok(ev.date_flags.some((f) => f.startsWith("date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision")));
+  assert.equal(ev.wikipedia_lead_dates, undefined);
 });

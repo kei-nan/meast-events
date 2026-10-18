@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-09T11:24:42.380Z",
+  "data_as_of": "2026-10-10",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
@@ -41,24 +41,24 @@
   ],
   "proposed_breakdown": {
     "proposed_total": 254,
-    "location_quality_none_no_map_marker": 185,
+    "location_quality_none_no_map_marker": 186,
     "date_order_invalid_flagged_and_kept": 2,
-    "excluded_as_redirect_duplicates_by_review": 5,
-    "already_merged_into_curated": 249,
+    "excluded_as_redirect_duplicates_by_review": 0,
+    "already_merged_into_curated": 254,
     "pending_merge_new_events": 0,
     "pending_merge_new_events_without_location": 0,
     "hard_excluded_no_wikipedia_summary_or_extract": 28
   },
   "shown_now": {
-    "curated_total": 811,
+    "curated_total": 816,
     "seed_events_hand_picked": 103,
     "seed_events_also_found_by_discovery": 60,
     "seed_events_not_reachable_by_discovery": 43,
-    "discovered_events_merged": 708,
+    "discovered_events_merged": 713,
     "location_quality": {
       "approximate": 74,
-      "precise": 361,
-      "none": 376
+      "precise": 364,
+      "none": 378
     },
     "seed_file_entries": 103
   },
@@ -84,7 +84,7 @@
         "passed_filters": 231,
         "proposed_location_none": 53,
         "date_order_flagged": 2,
-        "in_curated": 207
+        "in_curated": 211
       },
       "Lebanon": {
         "raw": 315,
@@ -102,7 +102,7 @@
         "passed_filters": 41,
         "proposed_location_none": 10,
         "date_order_flagged": 1,
-        "in_curated": 40
+        "in_curated": 41
       },
       "Turkey": {
         "raw": 1594,
@@ -138,7 +138,7 @@
         "passed_filters": 135,
         "proposed_location_none": 27,
         "date_order_flagged": 1,
-        "in_curated": 134
+        "in_curated": 135
       },
       "Egypt": {
         "raw": 309,
@@ -230,7 +230,7 @@
         "passed_filters": 362,
         "proposed_location_none": 61,
         "date_order_flagged": 1,
-        "in_curated": 342
+        "in_curated": 345
       },
       "political crisis": {
         "raw": 109,
@@ -239,7 +239,7 @@
         "passed_filters": 34,
         "proposed_location_none": 17,
         "date_order_flagged": 0,
-        "in_curated": 33
+        "in_curated": 34
       },
       "international crisis": {
         "raw": 68,
@@ -248,7 +248,7 @@
         "passed_filters": 30,
         "proposed_location_none": 15,
         "date_order_flagged": 0,
-        "in_curated": 29
+        "in_curated": 30
       },
       "revolution": {
         "raw": 10,
@@ -284,7 +284,7 @@
         "passed_filters": 92,
         "proposed_location_none": 5,
         "date_order_flagged": 0,
-        "in_curated": 81
+        "in_curated": 82
       },
       "military campaign": {
         "raw": 46,
@@ -311,7 +311,7 @@
         "passed_filters": 93,
         "proposed_location_none": 5,
         "date_order_flagged": 0,
-        "in_curated": 92
+        "in_curated": 93
       },
       "treaty": {
         "raw": 42,
@@ -347,7 +347,7 @@
         "passed_filters": 11,
         "proposed_location_none": 6,
         "date_order_flagged": 0,
-        "in_curated": 10
+        "in_curated": 11
       },
       "massacre": {
         "raw": 496,
@@ -356,7 +356,7 @@
         "passed_filters": 66,
         "proposed_location_none": 0,
         "date_order_flagged": 0,
-        "in_curated": 65
+        "in_curated": 66
       },
       "terrorist attack": {
         "raw": 687,
@@ -365,7 +365,7 @@
         "passed_filters": 80,
         "proposed_location_none": 0,
         "date_order_flagged": 0,
-        "in_curated": 79
+        "in_curated": 80
       },
       "declaration of independence": {
         "raw": 5,
@@ -392,7 +392,7 @@
         "passed_filters": 43,
         "proposed_location_none": 12,
         "date_order_flagged": 0,
-        "in_curated": 42
+        "in_curated": 43
       },
       "bombardment": {
         "raw": 260,
@@ -401,7 +401,7 @@
         "passed_filters": 48,
         "proposed_location_none": 14,
         "date_order_flagged": 0,
-        "in_curated": 47
+        "in_curated": 48
       },
       "hostage taking": {
         "raw": 16,
@@ -565,7 +565,7 @@
         "passed_filters": 386,
         "proposed_location_none": 66,
         "date_order_flagged": 1,
-        "in_curated": 355
+        "in_curated": 358
       },
       "political": {
         "raw": 1861,
@@ -610,7 +610,7 @@
         "passed_filters": 30,
         "proposed_location_none": 19,
         "date_order_flagged": 0,
-        "in_curated": 29
+        "in_curated": 30
       },
       "diplomatic": {
         "raw": 61,
@@ -628,7 +628,7 @@
         "passed_filters": 95,
         "proposed_location_none": 1,
         "date_order_flagged": 1,
-        "in_curated": 94
+        "in_curated": 95
       },
       "migration": {
         "raw": 19,
@@ -675,7 +675,7 @@
         "passed_filters": 162,
         "proposed_location_none": 50,
         "date_order_flagged": 0,
-        "in_curated": 158
+        "in_curated": 162
       },
       "1940s": {
         "raw": 238,
@@ -693,7 +693,7 @@
         "passed_filters": 193,
         "proposed_location_none": 60,
         "date_order_flagged": 0,
-        "in_curated": 189
+        "in_curated": 190
       },
       "1990s": {
         "raw": 377,
