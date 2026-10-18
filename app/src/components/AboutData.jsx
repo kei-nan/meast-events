@@ -436,8 +436,16 @@ export default function AboutData({ section = null, onClose }) {
         <p>
           Source code: AGPL-3.0. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
           link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0) and, for the West
-          Bank areas, from UN OCHA data whose terms allow non-commercial use only, so the data is for non-commercial
-          use. Details:{" "}
+          Bank areas, from UN OCHA data whose terms allow non-commercial use only, so the border data is for
+          non-commercial use. Some corrected border points are located with{" "}
+          <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            GeoNames
+          </a>{" "}
+          (CC BY 4.0). Software in the site, such as MapLibre GL JS (BSD-3-Clause) and React (MIT):{" "}
+          <a href="/third-party-licenses.txt" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            third-party licences
+          </a>
+          . Details:{" "}
           <a href={`${REPO}/blob/main/docs/DATA_POLICY.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">data policy</a>,{" "}
           <a href={`${REPO}/blob/main/NOTICE`} target="_blank" rel="noreferrer" title="Opens in a new tab">NOTICE</a>,{" "}
           <a href={`${REPO}/blob/main/data/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">data license</a>.
