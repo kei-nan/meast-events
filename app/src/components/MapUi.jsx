@@ -21,14 +21,16 @@ function ToolButton({ icon, label, className = "", ...rest }) {
 }
 
 const DRAW_MODES = [
-  { mode: "rect", icon: "▭", label: "Draw rectangle", short: "Rectangle" },
-  { mode: "circle", icon: "◯", label: "Draw circle", short: "Circle" },
+  { mode: "rect", icon: "▭", short: "Rectangle" },
+  { mode: "circle", icon: "◯", short: "Circle" },
 ];
 
 // Search-area drawing: one "Draw area" button opens the shapes (and Clear area)
 // as a row under the toolbar, so fewer controls float over the map. Phones
-// show the button as its icon only (MapUi.css).
-function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
+// show the button as its icon only (MapUi.css). The shapes are drawn by
+// dragging; "Use map view" sets the area without one (keyboard, or a single
+// tap), as a rectangle of what the map shows.
+function DrawTools({ areaMode, hasArea, onToggle, onClear, onUseView }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
   const buttonRef = useRef(null);
@@ -64,7 +66,6 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
           key={d.mode}
           icon={d.icon}
           label={d.short}
-          aria-label={d.label}
           aria-pressed={areaMode === d.mode}
           onClick={() => {
             onToggle(d.mode);
@@ -72,6 +73,15 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
           }}
         />
       ))}
+      <ToolButton
+        icon={"⛶"}
+        label="Use map view"
+        aria-label="Use map view as the search area"
+        onClick={() => {
+          onUseView();
+          closeMenu();
+        }}
+      />
       {hasArea && (
         <ToolButton
           icon={"✕"}
@@ -88,13 +98,13 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear }) {
   const active = DRAW_MODES.find((d) => d.mode === areaMode);
   return (
     <div className="mu-draw" ref={wrapRef}>
-      {/* A menu button: aria-expanded only. Its name already says when a mode is on. */}
+      {/* A menu button: aria-expanded only. Its name (the visible text, which
+          voice control users say) already says when a mode is on. */}
       <ToolButton
         ref={buttonRef}
         className={active ? "is-on" : ""}
         icon={active ? active.icon : "✎"}
         label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw area"}
-        aria-label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw a search area"}
         aria-expanded={open}
         aria-controls="mu-draw-menu"
         onClick={() => setOpen((v) => !v)}
@@ -157,15 +167,17 @@ const pointerVerb = () =>
 const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 // The one map toolbar (top-left): draw an area, reset view, legend - plus
-// "Show N results on map" while a search or filter has mapped matches. There
-// are no zoom buttons: the wheel, pinch, double-click and MapLibre's keyboard
-// handler (+ / - with the map focused) zoom.
+// "Show N results on map" while a search or filter has mapped matches. Zoom
+// has its own buttons (ZoomButtons, with the Borders control), besides the
+// wheel, pinch, double-click and MapLibre's keyboard handler (+ / - with the
+// map focused).
 export function MapToolbar({
   areaMode,
   hasArea,
   compact,
   onToggleMode,
   onClearArea,
+  onUseView,
   onReset,
   matchCount,
   matchTotal,
@@ -178,7 +190,13 @@ export function MapToolbar({
     // onInteract: any use of the toolbar also retires the first-visit tip.
     <div className="mu-toolbar-wrap" onClickCapture={onInteract}>
       <div className="mu-toolbar" role="group" aria-label="Map tools">
-        <DrawTools areaMode={areaMode} hasArea={hasArea} onToggle={onToggleMode} onClear={onClearArea} />
+        <DrawTools
+          areaMode={areaMode}
+          hasArea={hasArea}
+          onToggle={onToggleMode}
+          onClear={onClearArea}
+          onUseView={onUseView}
+        />
         <ToolButton icon={"↺"} label="Reset view" className="mu-icon-only" onClick={onReset} />
         <button
           type="button"
@@ -193,12 +211,21 @@ export function MapToolbar({
       {matchCount != null && (
         <ShowMatchesButton count={matchCount} total={matchTotal} compact={compact} onClick={onShowMatches} />
       )}
-      {drawHint && (
-        <div className="mu-draw-hint" role="status">
-          {drawHint}
-        </div>
-      )}
+      {/* Always in the page, so screen readers announce a hint when it appears. */}
+      <div className="mu-draw-status" role="status">
+        {drawHint && <div className="mu-draw-hint">{drawHint}</div>}
+      </div>
       {legendOpen && <LegendPanel />}
+    </div>
+  );
+}
+
+// Zoom in / out by one level, animated unless reduced motion is asked for (MapView).
+export function ZoomButtons({ onZoomIn, onZoomOut }) {
+  return (
+    <div className="mu-zoom" role="group" aria-label="Zoom">
+      <ToolButton icon="+" label="Zoom in" className="mu-icon-only" onClick={onZoomIn} />
+      <ToolButton icon="−" label="Zoom out" className="mu-icon-only" onClick={onZoomOut} />
     </div>
   );
 }
@@ -375,14 +402,18 @@ function LegendPanel() {
 export function MapNotices({ loading, borderError, onRetry }) {
   return (
     <div className="mu-notices">
-      {borderError && (
-        <div className="mu-notice is-error" role="alert">
-          <span>{borderError === "final" ? "Borders failed to load." : "Borders failed to load - retrying"}</span>
-          <button type="button" className="mu-btn mu-btn-small" onClick={onRetry}>
-            Retry
-          </button>
-        </div>
-      )}
+      {/* The alert is always in the page and its text changes, so screen
+          readers announce it; the notice (with its Retry) shows only on failure. */}
+      <div role="alert" className="mu-alert">
+        {borderError && (
+          <div className="mu-notice is-error">
+            <span>{borderError === "final" ? "Borders failed to load." : "Borders failed to load - retrying"}</span>
+            <button type="button" className="mu-btn mu-btn-small" onClick={onRetry}>
+              Retry
+            </button>
+          </div>
+        )}
+      </div>
       <div className="mu-loading" role="status" aria-live="polite">
         {loading && !borderError ? "Loading map data…" : ""}
       </div>

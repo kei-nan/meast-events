@@ -223,7 +223,8 @@ function Timeline({
         <div className="timeline-controls">
           <button
             type="button"
-            className="timeline-play"
+            // Its name says Play or Pause (no aria-pressed), so the "on" look is a class.
+            className={"timeline-play" + (playing ? " timeline-play--on" : "")}
             onClick={togglePlay}
             aria-label={
               playMode === "slide"

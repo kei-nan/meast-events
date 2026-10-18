@@ -12,7 +12,8 @@
   gap: 6px;
   max-width: calc(100% - 230px); /* leaves room for the Borders control */
 }
-.mu-toolbar {
+.mu-toolbar,
+.mu-zoom {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -22,9 +23,14 @@
   background: rgba(244, 241, 234, 0.92);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
-.mu-toolbar .mu-btn {
+.mu-toolbar .mu-btn,
+.mu-zoom .mu-btn {
   box-shadow: none;
   border-width: 1px;
+}
+/* Zoom in / out: stacked under the Borders control (side by side on phones). */
+.mu-zoom {
+  flex-direction: column;
 }
 .mu-tool {
   display: inline-flex;
@@ -52,6 +58,11 @@
 }
 .mu-icon-only .mu-tool-icon {
   font-size: 18px;
+}
+/* The hint's live region stays in the page; empty, it takes no room (the
+   column's gap included). */
+.mu-draw-status:empty {
+  margin-top: -6px;
 }
 .mu-draw-hint {
   font: 12px/1.3 system-ui, sans-serif;
@@ -309,6 +320,9 @@
   align-items: flex-end;
   gap: 6px;
 }
+.mu-alert:empty {
+  margin-bottom: -6px;
+}
 .mu-notice {
   display: flex;
   align-items: center;
@@ -462,16 +476,30 @@
   border-radius: 50%;
 }
 
-/* Mobile: the results sheet covers the lower ~45% of the map, so everything
-   stays at the top; tools fold into 44px icon buttons and zoom is left to pinch. */
-@media (max-width: 768px) {
-  .mu-toolbar-wrap {
-    max-width: calc(100% - 20px);
-  }
+/* Touch screens (and phones): 44px targets. */
+@media (max-width: 768px), (pointer: coarse) {
   .mu-toolbar .mu-btn,
   .mu-toolbar-wrap > .mu-btn,
   .mu-ctrl-right .mu-btn {
     min-height: 44px;
+  }
+  .mu-icon-only {
+    min-width: 44px;
+  }
+  .mu-borders-btn {
+    min-height: 44px;
+  }
+  .mu-tip .mu-close {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Mobile: the results sheet covers the lower ~45% of the map, so everything
+   stays at the top; tools fold into icon buttons. */
+@media (max-width: 768px) {
+  .mu-toolbar-wrap {
+    max-width: calc(100% - 20px);
   }
   .mu-tool {
     justify-content: center;
@@ -524,8 +552,13 @@
   .mu-ctrl-right > .mu-notices {
     order: 6;
   }
+  /* Zoom: side by side, under the chips (in the strip the open event's sheet
+     leaves in sight). */
+  .mu-zoom {
+    flex-direction: row;
+    order: 4;
+  }
   .mu-borders-btn {
-    min-height: 44px;
     padding: 5px 8px;
   }
   .mu-borders-main,
@@ -540,20 +573,29 @@
   .mu-borders-panel {
     max-height: 34dvh;
   }
-  /* Under the toolbar, clear of the sheet; the × stays a 44px target. */
+  /* Under the toolbar, clear of the sheet and left of the zoom buttons; the ×
+     stays a 44px target. */
   .mu-tip {
     top: 64px;
     bottom: auto;
     left: 10px;
-    right: 10px;
+    right: 112px;
     transform: none;
     max-width: none;
     z-index: 1; /* an opened draw row or legend goes over it */
     border-radius: 8px;
     font-size: 12px;
   }
-  .mu-tip .mu-close {
-    width: 44px;
-    height: 44px;
+}
+
+/* Windows high contrast (forced colours): a pressed tool keeps a visible
+   "on" state in the system's selection colours. */
+@media (forced-colors: active) {
+  .mu-btn[aria-pressed="true"],
+  .mu-draw > .mu-tool.is-on {
+    forced-color-adjust: none; /* else the text keeps the forced ButtonText, unreadable on Highlight */
+    color: HighlightText;
+    background: Highlight;
+    border-color: Highlight;
   }
 }

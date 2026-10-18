@@ -42,8 +42,10 @@ html, body, #root {
   color: var(--text-primary);
 }
 
-/* Notices never wrap (a long one is cut with an ellipsis), so one appearing
-   never changes the header's height or resizes the map. */
+/* On wide screens notices never wrap (a long one is cut with an ellipsis), so
+   one appearing never changes the header's height or resizes the map. Phones
+   give them their own line instead (below), where they wrap: cut there, they
+   lost most of their words. */
 .app-search {
   display: flex;
   justify-content: flex-end;
@@ -65,6 +67,21 @@ html, body, #root {
 .app-share-btn.sp-btn {
   min-height: 28px;
   padding: 2px 12px;
+}
+
+/* Touch screens (and phones): the compact button still takes a 44px tall
+   touch, through an invisible margin around it that the header's padding
+   holds (8px on phones, below). */
+@media (max-width: 768px), (pointer: coarse) {
+  .app-share-btn.sp-btn {
+    position: relative;
+  }
+
+  .app-share-btn.sp-btn::before {
+    content: "";
+    position: absolute;
+    inset: -9px 0; /* from the padding box: the 1px border, then the header's 8px */
+  }
 }
 
 .app-footer {
@@ -90,12 +107,36 @@ html, body, #root {
 
 @media (max-width: 768px) {
   .app-header {
-    gap: 10px;
-    padding: 6px 14px;
+    flex-wrap: wrap;
+    gap: 0 10px;
+    padding: 8px 14px;
   }
 
   .app-header h1 {
     font-size: 1.05rem;
+  }
+
+  /* Title and Share on the first line, the notices (when there are any) on
+     their own full-width line under them, wrapping instead of cut short. */
+  .app-header > .share {
+    margin-left: auto;
+  }
+
+  .app-search {
+    order: 1;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 2px 14px;
+  }
+
+  .app-search > * {
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .app-search:not(:empty) {
+    padding-top: 2px;
   }
 }
 

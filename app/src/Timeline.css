@@ -154,7 +154,7 @@
 
 /* Pressed = accent outline + tint, the one "on" look of every toggle. */
 .timeline-preset[aria-pressed="true"],
-.timeline-play[aria-pressed="true"] {
+.timeline-play--on {
   color: var(--text-primary);
   background: var(--accent-tint);
   border-color: var(--accent);
@@ -670,6 +670,57 @@
   .app:has(.side-panel[data-sheet="full"]) .timeline:not(:has(.timeline-edit)) .timeline-strip {
     flex: 1;
     min-width: 0;
+  }
+}
+
+/* Windows high contrast (forced colours): the forced palette would paint the
+   density bars, the track, the event marker and the handles' dots in the
+   background colour, and drop the tint of a pressed toggle, so they are given
+   system colours: bars in GrayText, the selected years' bars in Highlight. */
+@media (forced-colors: active) {
+  .timeline-tick-bar,
+  .timeline-track,
+  .timeline-event-marker,
+  .timeline-handle {
+    forced-color-adjust: none;
+  }
+
+  .timeline-tick-bar {
+    background: GrayText;
+  }
+
+  .timeline-tick--active .timeline-tick-bar,
+  .timeline-tick:hover .timeline-tick-bar {
+    background: Highlight;
+  }
+
+  .timeline-track {
+    background: CanvasText;
+  }
+
+  .timeline-event-marker {
+    background: LinkText;
+  }
+
+  .timeline-event-marker::before {
+    border-top-color: LinkText;
+  }
+
+  .timeline-handle {
+    --tl-dot: radial-gradient(circle, CanvasText 0 6px, Highlight 6.5px 9px, Canvas 9.5px 11px, transparent 11.5px);
+  }
+
+  .timeline-handle:focus-visible {
+    --tl-dot: radial-gradient(circle, CanvasText 0 6px, Highlight 6.5px 9px, CanvasText 9.5px 12px, transparent 12.5px);
+  }
+
+  .timeline-mode-btn[aria-pressed="true"],
+  .timeline-preset[aria-pressed="true"],
+  .timeline-play--on {
+    forced-color-adjust: none; /* else the text keeps the forced ButtonText, unreadable on Highlight */
+    color: HighlightText;
+    background: Highlight;
+    border-color: Highlight;
   }
 }
 

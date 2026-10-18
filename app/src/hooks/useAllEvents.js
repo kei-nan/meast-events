@@ -9,8 +9,10 @@ export const RETRY_MS = 20000;
 // events/all.<hash>.json - no API call. Everything else (range, viewport,
 // filters, drawn areas) is derived from this store locally.
 //
-// `loading` is true until the lite set has loaded; `error` if it could not be
-// loaded (static hosting unreachable) - it is retried every 20 s.
+// `loading` is true until the first attempt to load the lite set has ended;
+// `error` if it could not be loaded (static hosting unreachable) - it is then
+// retried every 20 s, with `loading` left false, so the page keeps its outage
+// state (not a loading skeleton) during each retry.
 // Mutating the Map doesn't re-render, so `version` changes whenever it gains
 // entries: use it as a dependency for derived data.
 export default function useAllEvents() {
@@ -54,10 +56,7 @@ export default function useAllEvents() {
 
   useEffect(() => {
     if (!error) return;
-    const id = setInterval(() => {
-      setLoading(true);
-      setRetryTick((t) => t + 1);
-    }, RETRY_MS);
+    const id = setInterval(() => setRetryTick((t) => t + 1), RETRY_MS);
     return () => clearInterval(id);
   }, [error]);
 
