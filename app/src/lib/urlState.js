@@ -159,3 +159,22 @@ export function entryBeforePush(prevSearch, state) {
   const carried = serializeUrlState({ ...state, eventId: prev.eventId, about: prev.about });
   return carried === prevSearch ? null : carried;
 }
+
+// The page a Share button hands out for `state` (as for serializeUrlState),
+// built from the state itself rather than window.location: URL writes are
+// debounced (hooks/useUrlState.js), so the address bar can lag the view by
+// 400 ms - and Play moves the years every 350 ms.
+//  - An open event: its static page, /event/<id> (scripts/event-page.mjs
+//    eventPath), whose link preview names the event; its "Open on the map"
+//    leads back to /?e=<id>. The view's years and filters are not carried: the
+//    map opened from that page shows the event at its own year.
+//    `eventPages` false (the dev server, which has no such pages): /?e=<id>.
+//  - Otherwise the map view: `pathname` + the serialized state.
+export function shareLink(origin, pathname, state, { eventPages = true } = {}) {
+  if (isValidEventId(state.eventId)) {
+    return eventPages
+      ? `${origin}/event/${encodeURIComponent(state.eventId)}`
+      : `${origin}/?e=${encodeURIComponent(state.eventId)}`;
+  }
+  return `${origin}${pathname}${serializeUrlState(state)}`;
+}
