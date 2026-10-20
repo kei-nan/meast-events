@@ -13,8 +13,12 @@
 //   - the search index (Pagefind) was built;
 //   - 404.html exists (wrangler.jsonc not_found_handling "404-page" serves it);
 //   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>):
-//     public/_headers marks all of /assets/* immutable, so an unhashed
-//     name there would be cached for a year and never updated;
+//     each gets an immutable rule in _headers, so an unhashed name there would
+//     be cached for a year and never updated;
+//   - dist/_headers was expanded (scripts/expand-headers.mjs): no splat rule is
+//     immutable (it would apply to the 404 for a missing file too), the entry
+//     script has its own immutable rule, and there are no more rules than the
+//     host reads;
 //   - dist/ has fewer files than the host allows per deploy (MAX_DIST_FILES,
 //     default 20,000: Cloudflare Workers static assets on the free plan,
 //     https://developers.cloudflare.com/workers/platform/limits/). Every event
@@ -24,6 +28,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { fullBucket } from "../src/lib/fullBucket.js";
+import { IMMUTABLE, MARKER, MAX_RULES, hasMarker, parseRules } from "./expand-headers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(process.env.DIST_DIR ?? path.join(__dirname, "..", "dist"));
@@ -156,11 +161,11 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   // "404-page"), written by build-event-pages.mjs.
   if (!existsSync(distFile("404.html"))) fail("404.html is missing (build-event-pages.mjs did not run)");
 
-  // 6. Every asset's URL changes when its content does (public/_headers: /assets/* is
-  // immutable). Vite names emitted files "<name>-<hash>.<ext>" with an 8-character
-  // base64url hash (Vite's and Rollup's default asset and chunk names), MapLibre's
-  // worker included: it is self-contained since MapLibre 6.13.0, so its name need not
-  // be fixed.
+  // 6. Every asset's URL changes when its content does (each file under /assets/
+  // gets an immutable rule, 6b). Vite names emitted files "<name>-<hash>.<ext>"
+  // with an 8-character base64url hash (Vite's and Rollup's default asset and chunk
+  // names), MapLibre's worker included: it is self-contained since MapLibre 6.13.0,
+  // so its name need not be fixed.
   const HASHED_ASSET = /^[^/]+-[A-Za-z0-9_-]{8}\.[a-z0-9]+$/;
   const listFiles = (d, prefix = "") =>
     readdirSync(d, { withFileTypes: true }).flatMap((e) =>
@@ -173,6 +178,28 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     fail(`dist/assets/ has files with no content hash (they would be cached as immutable): ${unhashed.join(", ")}`);
   }
 
+  // 6b. The cache rules (scripts/expand-headers.mjs). Workers matches a rule
+  // against the requested path, so a splat rule's headers also go on the 404 for a
+  // missing file under it: an immutable splat would keep that 404 for a year. The
+  // one exception is this build's events folder: its hash covers all of it, so a
+  // file missing there is missing for good.
+  let headerRules = 0;
+  if (!existsSync(distFile("_headers"))) fail("_headers is missing (Vite copies it from public/)");
+  else {
+    const text = readFileSync(distFile("_headers"), "utf8");
+    const rules = parseRules(text);
+    headerRules = rules.length;
+    if (hasMarker(text)) fail(`_headers still has "${MARKER}" lines (expand-headers.mjs did not run)`);
+    if (rules.length > MAX_RULES) fail(`_headers has ${rules.length} rules; the host reads only the first ${MAX_RULES}`);
+    const immutable = (r) => r.headers.some((h) => /^cache-control:.*\bimmutable\b/i.test(h));
+    const splat = (r) => r.pattern.includes("*") && r.pattern !== `/data/events/${dir}/*`;
+    for (const r of rules) if (splat(r) && immutable(r)) fail(`_headers: the splat rule ${r.pattern} is immutable, so a missing file's 404 would be too`);
+    const entry = refs.find((u) => /^\/assets\/index-.*\.js$/.test(u));
+    if (entry && !rules.some((r) => r.pattern === entry && r.headers.includes(`Cache-Control: ${IMMUTABLE}`))) {
+      fail(`_headers has no immutable rule for the entry script ${entry}`);
+    }
+  }
+
   // 7. File count against the host's per-deploy limit. _headers and _redirects are
   // configuration, not assets, but counting them keeps the margin honest.
   const countFiles = (d) => readdirSync(d, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? countFiles(path.join(d, e.name)) : 1), 0);
@@ -182,7 +209,7 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
 
   const summary =
     `${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
-    `${refs.length} index.html references, ${eventPages} event pages, search index present, 404.html, assets/ hashed, ${fileCount} files (limit ${maxFiles})`;
+    `${refs.length} index.html references, ${eventPages} event pages, search index present, 404.html, assets/ hashed, ${headerRules} header rules, ${fileCount} files (limit ${maxFiles})`;
   return { problems, warnings, summary };
 }
 

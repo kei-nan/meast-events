@@ -115,22 +115,35 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
 Caching (same file). "Immutable" below means `public, max-age=31536000,
 immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
 
-- `/assets/*`: immutable, one rule. Every file there is a Vite
+Hashed files are immutable through one rule PER FILE, never a splat: rules
+match the requested path, so a splat's headers also go on the 404 (`404.html`)
+for a missing file under it, and an immutable splat let a browser keep that 404
+for a year (seen on the live site during a deploy: a page and the other build's
+hashed files). `public/_headers` marks each such splat with `#! immutable-per-file`
+and gives it the header for a missing file (revalidate);
+`app/scripts/expand-headers.mjs` (in `npm run build`) adds an immutable rule
+after it for each file that exists. Workers reads at most 100 rules; a marked
+splat whose files would not fit stays as it is (its files revalidate) and the
+build warns. `check-dist.mjs` fails the build on an immutable splat, a missing
+expansion or more than 100 rules.
+
+- `/assets/*`: immutable, a rule per file. Every file there is a Vite
   content-hashed name, MapLibre's worker included (self-contained since
   MapLibre 6.13.0, so it no longer needs a fixed name).
   `app/scripts/check-dist.mjs` fails the build if any file without a hash
   appears under `assets/`, so nothing unhashed can get the
-  immutable header.
+  immutable header. A missing file revalidates.
 - `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
   `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,
   `land-far.json`, `land-cells/*`, `selection-funnel.json`, `framing-review.json`).
-  Immutable: `/data/events/v.<hash>/*` (the event list `all.json` and every
-  `full/*.json` record, one folder per build named by a hash of all its files,
-  `app/scripts/split-data.mjs`) and `/data/boundaries/shared/*` (large
-  boundary geometries named by a hash of their content).
+  Immutable: this build's `/data/events/v.<hash>/*` (the event list `all.json`
+  and every `full/*.json` record, one folder per build named by a hash of all
+  its files, `app/scripts/split-data.mjs`; any other `v.*` revalidates) and each
+  file in `/data/boundaries/shared/` (large boundary geometries named by a hash
+  of their content).
 - `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
-  the engine and the `.pf_meta` keep their names; the content-hashed
-  `/pagefind/index/*` chunks are immutable.
+  the engine and the `.pf_meta` keep their names; each content-hashed
+  `/pagefind/index/*` chunk is immutable.
 - `/event/*` (the event pages, the `/event/` index and `event.css`):
   `public, max-age=0, must-revalidate`, set explicitly. An event's page is the
   app's `index.html` filled in, so like the home page it names the deploy's
@@ -140,8 +153,8 @@ immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
 - Everything else, including the home page HTML, keeps Cloudflare's default
   (`max-age=0, must-revalidate`), so a deploy is picked up immediately.
 
-If a future hashed file has a different name prefix, add a rule for it; the
-hash alone cannot be matched by a glob, and a pattern may contain only one
+If a future hashed file has a different name prefix, add a marked rule for it;
+the hash alone cannot be matched by a glob, and a pattern may contain only one
 splat.
 
 ## 3. Monitoring

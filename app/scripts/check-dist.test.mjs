@@ -17,6 +17,21 @@ const BUCKETS = 2;
 const IDS = ["suez-crisis", "six-day-war", "oslo-i-accord"];
 const ENTRY = "/assets/index-AbCd_-12.js";
 
+// dist/_headers as expand-headers.mjs leaves it: the splat revalidates, each file is immutable.
+const HEADERS = (entryRule = ENTRY) =>
+  [
+    "/assets/*",
+    "  Cache-Control: public, max-age=0, must-revalidate",
+    "",
+    entryRule,
+    "  ! Cache-Control",
+    "  Cache-Control: public, max-age=31536000, immutable",
+    "",
+    `/data/events/${DIR}/*`,
+    "  Cache-Control: public, max-age=31536000, immutable",
+    "",
+  ].join("\n");
+
 const shell = (extra = "") => `<!doctype html><html><head><script type="module" src="${ENTRY}"></script>${extra}</head><body></body></html>`;
 const eventPage = (id) =>
   shell(
@@ -54,6 +69,7 @@ function fixture() {
   for (const id of IDS) write(`event/${id}.html`, eventPage(id));
   write("pagefind/pagefind.js", "");
   write("404.html", "");
+  write("_headers", HEADERS());
   const remove = (rel) => fs.rmSync(path.join(dist, ...rel.split("/")), { recursive: true, force: true });
   return { root, dist, versionFile, write, remove, cleanup: () => fs.rmSync(root, { recursive: true, force: true }) };
 }
@@ -158,6 +174,18 @@ test("search index and 404 page missing", async () => {
 test("an unhashed file under assets/ (it would be cached as immutable)", async () => {
   await assertProblem((f) => f.write("assets/maplibre-gl-worker.js", ""), /no content hash.*maplibre-gl-worker\.js/);
   await assertProblem((f) => f.write("assets/fonts/inter-latin-AbCdEf12.woff2", ""), /no content hash.*fonts\/inter-latin-AbCdEf12\.woff2/);
+});
+
+test("_headers: missing, not expanded, an immutable splat, no rule for the entry script, too many rules", async () => {
+  await assertProblem((f) => f.remove("_headers"), /_headers is missing/);
+  await assertProblem((f) => f.write("_headers", "#! immutable-per-file\n" + HEADERS()), /still has "#! immutable-per-file" lines/);
+  await assertProblem(
+    (f) => f.write("_headers", "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n" + HEADERS()),
+    /the splat rule \/assets\/\* is immutable/
+  );
+  await assertProblem((f) => f.write("_headers", HEADERS("/assets/other-ZZZZZZZZ.js")), /no immutable rule for the entry script \/assets\/index-/);
+  const many = Array.from({ length: 100 }, (_, i) => `/p${i}\n  X: 1\n`).join("");
+  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 103 rules; the host reads only the first 100/);
 });
 
 test("file count: a problem at the host's limit, a warning from 75% of it", async () => {

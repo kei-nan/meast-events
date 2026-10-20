@@ -23,15 +23,25 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # --- caching ----------------------------------------------------------------
+# Content-hashed files are immutable, but NOT through a splat rule: rules match the
+# requested path, so a missing file's 404 (404.html, wrangler.jsonc) gets the
+# headers of every rule matching it, and "/assets/* immutable" kept a 404 for a
+# year (seen on the live site during a deploy). Each rule marked
+# "#! immutable-per-file" below holds the header for a MISSING file (revalidate);
+# scripts/expand-headers.mjs (npm run build) adds after it, in dist/_headers, an
+# immutable rule per file (or per hashed folder) that exists. That counts toward
+# the 100-rule limit; a marked rule that would not fit stays a splat (its files
+# revalidate) and the build warns. scripts/check-dist.mjs checks the result.
+#
 # /assets/*: every file has a content-addressed URL, so all of it is immutable.
 # Vite names emitted files <name>-<content hash>.<ext>, MapLibre's worker included.
-# scripts/check-dist.mjs (run by npm run build)
-# fails the build if any other file under dist/assets/ lacks a hash, so an
-# unhashed file can never be served with this header.
-# No other rule below matches /assets/, so nothing is comma-joined onto this
+# scripts/check-dist.mjs fails the build if any other file under dist/assets/
+# lacks a hash, so an unhashed file can never get an immutable rule.
+# No other rule matches /assets/, so nothing is comma-joined onto this
 # Cache-Control (the /* rule above sets no Cache-Control).
+#! immutable-per-file
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=0, must-revalidate
 
 # /glyphs/*: map label glyphs (Open Sans Semibold, MapView.jsx BASE_STYLE).
 # Static files that change only if the font does, so cache like /data/*.
@@ -45,13 +55,15 @@
 # ids.json, the engine and the .pf_meta keep their names across data changes,
 # and a stale ids.json would silently drop results for changed events, so they
 # revalidate on every visit (a 304 when unchanged). The index chunks are named
-# by content hash, so they are immutable.
+# by content hash, so they are immutable (one rule per chunk, see above; a
+# missing chunk keeps no-cache).
 /pagefind/*
   Cache-Control: public, no-cache
 
+#! immutable-per-file
 /pagefind/index/*
   ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, no-cache
 
 # /event/*: the per-event pages, the /event/ index and event.css
 # (app/scripts/build-event-pages.mjs). Un-hashed HTML that changes with the data,
@@ -67,19 +79,25 @@
 # data regeneration, so cache moderately and revalidate in the background. All
 # event data (the lite list and every full record) lives in ONE versioned folder,
 # events/v.<12-hex-content-hash>/ (app/scripts/split-data.mjs): the hash covers
-# every file in it and is the cache key, so the whole folder is immutable and a
-# page never mixes two builds' files. If more hashed names are added, give them a
-# distinctive prefix and add a rule like this one (a pattern may contain only one
-# splat, which matches across "/", so the match is "prefix.*").
+# every file in it and is the cache key, so the whole folder is immutable (one
+# rule for the build's folder, see above) and a page never mixes two builds'
+# files. A request into another build's folder (a page older or newer than the
+# deploy) is a 404 that must not outlive the deploy, so the splat revalidates.
+# If more hashed names are added, give them a distinctive prefix and add a
+# marked rule like this one (a pattern may contain only one splat, which matches
+# across "/", so the match is "prefix.*").
 /data/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
+#! immutable-per-file
 /data/events/v.*
   ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=0, must-revalidate
 
 # Large boundary geometries stored once for several decades, named by a hash
-# of their content (split-data.mjs splitBoundaries), so immutable too.
+# of their content (split-data.mjs splitBoundaries), so immutable too (a rule
+# per file; a missing one revalidates).
+#! immutable-per-file
 /data/boundaries/shared/*
   ! Cache-Control
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=0, must-revalidate
