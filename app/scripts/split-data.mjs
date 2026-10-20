@@ -34,9 +34,17 @@
 // Sizes are bounded: the build fails if any full file exceeds MAX_FULL_BYTES
 // (default 1 MB) or the gzipped lite file exceeds MAX_LITE_GZIP_BYTES (default 1 MB).
 //
-// BOUNDARIES are split per decade (boundaries/<decade>.json): the map needs only
+// BOUNDARIES are split per decade (boundaries/<decade>.tbin): the map needs only
 // the year shown. MIN_YEAR/MAX_YEAR (src/lib/years.js, shared with the app) bound
 // which decade chunks are ever requested.
+//
+// GEOMETRY files (boundaries and land) are written in the binary topology format of
+// src/lib/geoCodec.js (.tbin), not JSON: about half the bytes for the same vertices.
+// Every coordinate is rounded to 6 decimal places (~10 cm; a few hundred source
+// values carried more), nothing else changes: no vertex is moved, dropped or
+// reordered. writeGeo decodes each file it writes and fails the build unless that
+// gives back the source document exactly (every key, property and vertex, with
+// coordinates compared as doubles).
 //
 // data/selection-funnel.json (written by the data pipeline) is copied to
 // public/data/ for the "About the data" page; missing is a warning, not an error.
@@ -45,7 +53,9 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
+import { topology } from "topojson-server";
 import { fullBucket, fullBucketCount } from "../src/lib/fullBucket.js";
+import { countPositions, decodeGeo, encodeGeo, forEachCoordinate, geoMismatch, MAX_SCALE, roundedTo6 } from "../src/lib/geoCodec.js";
 import { MAP_EXTENT, NEAR_LAND_EXTENT } from "../src/lib/mapExtent.js";
 import { otherArticleTitle } from "../src/lib/otherArticle.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
@@ -68,8 +78,6 @@ const MAX_FULL_BYTES = Number(process.env.MAX_FULL_BYTES) || 1024 * 1024;
 // next step is to split the lite file (see docs/SCALING.md), not to raise this.
 const MAX_LITE_GZIP_BYTES = Number(process.env.MAX_LITE_GZIP_BYTES) || 1024 * 1024;
 const SNIPPET_LENGTH = 160;
-// Multi-decade boundary geometries at least this large are stored once (see splitBoundaries).
-const SHARED_GEOMETRY_MIN_BYTES = 32 * 1024;
 // Geometries too heavy for a first visit, loaded only once the map is zoomed in
 // over them (src/lib/deferredBoundaries.js). OCHA's West Bank Areas A/B/C are
 // ~3 MB raw (~1 MB brotli), half of what a first visit to the default 2020s
@@ -175,14 +183,47 @@ export function detailFields(e) {
   };
 }
 
-async function ensureDir(dir) {
-  await mkdir(dir, { recursive: true });
-  return dir;
-}
-
 async function writeJSON(filePath, data) {
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, JSON.stringify(data));
+}
+
+// Totals over every .tbin written, for the summary line.
+const geoTotals = { files: 0, positions: 0, rounded: 0, jsonBytes: 0, bytes: 0 };
+
+// `doc` (a FeatureCollection) as .tbin bytes (src/lib/geoCodec.js), checked: the
+// build fails unless decoding them gives back `doc` with its coordinates rounded to
+// 6 decimal places, compared exactly (keys, properties, array lengths and every
+// number as a double), with the same number of vertices.
+export function encodeGeoChecked(name, doc) {
+  const bytes = encodeGeo(doc, { topology });
+  let back;
+  try {
+    back = decodeGeo(bytes);
+  } catch (err) {
+    throw new Error(`${name}: the encoded file does not decode (${err.message})`);
+  }
+  const diff = geoMismatch(roundedTo6(doc), back);
+  if (diff) throw new Error(`${name}: decoding does not give the source back: ${diff}`);
+  const positions = countPositions(doc);
+  if (countPositions(back) !== positions) throw new Error(`${name}: vertex count changed`);
+  let rounded = 0;
+  forEachCoordinate(doc, (v) => {
+    if (Math.round(v * MAX_SCALE) / MAX_SCALE !== v) rounded++;
+  });
+  return { bytes, positions, rounded };
+}
+
+async function writeGeo(filePath, doc, encoded = encodeGeoChecked(path.relative(OUT_DIR, filePath), doc)) {
+  const { bytes, positions, rounded } = encoded;
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(filePath, bytes);
+  geoTotals.files++;
+  geoTotals.positions += positions;
+  geoTotals.rounded += rounded;
+  geoTotals.jsonBytes += Buffer.byteLength(JSON.stringify(doc));
+  geoTotals.bytes += bytes.length;
+  return bytes;
 }
 
 // DEFERRED_GROUPS resolved against the source: each member feature with its
@@ -195,15 +236,15 @@ export function deferredBoundaryGroups(features, groups = DEFERRED_GROUPS) {
     if (hits.length !== 1) throw new Error(`DEFERRED_GROUPS: expected one boundary named "${name}", found ${hits.length}`);
     return hits[0];
   };
-  const members = new Map(); // feature -> {minzoom, bbox}
+  const members = new Map(); // feature -> {minzoom, bbox, group: index in groups}
   const placeholders = [];
-  for (const group of groups) {
+  for (const [index, group] of groups.entries()) {
     const feats = group.members.map(byName);
     const { start_year, end_year } = feats[0].properties;
     if (feats.some((f) => f.properties.start_year !== start_year || f.properties.end_year !== end_year)) {
       throw new Error(`DEFERRED_GROUPS: the members of "${group.placeholder.name}" must share their years`);
     }
-    for (const f of feats) members.set(f, { minzoom: group.minzoom, bbox: geometryBbox(f.geometry) });
+    for (const f of feats) members.set(f, { minzoom: group.minzoom, bbox: geometryBbox(f.geometry), group: index });
     const from = byName(group.placeholder.geometryFrom);
     placeholders.push({
       type: "Feature",
@@ -233,26 +274,31 @@ async function splitBoundaries() {
     }
   }
 
-  // A large geometry that spans several decades is written ONCE, to
-  // boundaries/shared/<content hash>.json, and each decade chunk points to it
-  // (geometry_ref) instead of repeating it: the map loads the shown decade and
-  // prefetches its neighbours, which would otherwise download the same geometry
-  // (e.g. OCHA's West Bank areas, ~2.9 MB, in 2000, 2010 and 2020) up to three
-  // times. The geometry is the source's, byte for byte; dataClient.js puts it
-  // back before the map sees the feature.
-  // Deferred geometries (DEFERRED_GROUPS) are always shared, whatever their span.
+  // The geometries of each deferred group (DEFERRED_GROUPS) are written together,
+  // ONCE, to boundaries/shared/<hash of the file>.tbin, and each decade chunk names
+  // its member as geometry_ref "<hash>#<index in the file>" instead of carrying it:
+  // the map loads them only when zoomed in over them (lib/deferredBoundaries.js
+  // waits for every member, so they come in one request), and 2000, 2010 and 2020
+  // share the one file. The name hashes the encoded bytes, so a format change is a
+  // new name, never a stale immutable copy.
+  // Every other geometry is in each decade chunk that shows it. Storing the other
+  // multi-decade ones once too (Jordan and Israel 2000-2020, the Ottoman Empire
+  // 1900-1910) saved 15 KB over a scrub through all 13 decades (452 vs 467 KB
+  // brotli), but cost the opening 2020 view 10 KB (53 vs 43 KB: in the chunk, the
+  // edges they share with their neighbours are stored once) and a second request
+  // that could only start once the chunk had arrived (October 2026).
   const deferred = deferredBoundaryGroups(raw.features);
-  const sharedRefs = new Map(); // feature -> hash
+  const sharedRefs = new Map(); // feature -> "<hash>#<index>"
   let sharedBytes = 0;
-  for (const feature of raw.features) {
-    const { start_year, end_year } = feature.properties;
-    const json = JSON.stringify(feature.geometry);
-    const large = decadesFor(start_year, end_year).length >= 2 && json.length >= SHARED_GEOMETRY_MIN_BYTES;
-    if (!large && !deferred.members.has(feature)) continue;
-    const hash = createHash("sha256").update(json).digest("hex").slice(0, 12);
-    sharedRefs.set(feature, hash);
-    await writeFile(path.join(await ensureDir(path.join(OUT_DIR, "boundaries", "shared")), `${hash}.json`), json);
-    sharedBytes += json.length;
+  const groups = new Map(); // group index -> its member features
+  for (const [f, { group }] of deferred.members) (groups.get(group) ?? groups.set(group, []).get(group)).push(f);
+  for (const feats of groups.values()) {
+    const doc = { type: "FeatureCollection", features: feats.map((f) => ({ type: "Feature", properties: {}, geometry: f.geometry })) };
+    const encoded = encodeGeoChecked(`the deferred group of ${feats[0].properties.name}`, doc);
+    const hash = createHash("sha256").update(encoded.bytes).digest("hex").slice(0, 12);
+    await writeGeo(path.join(OUT_DIR, "boundaries", "shared", `${hash}.tbin`), doc, encoded);
+    feats.forEach((f, i) => sharedRefs.set(f, `${hash}#${i}`));
+    sharedBytes += encoded.bytes.length;
   }
 
   for (const placeholder of deferred.placeholders) {
@@ -266,15 +312,12 @@ async function splitBoundaries() {
       type: "FeatureCollection",
       features: features.map((f) => {
         if (!sharedRefs.has(f)) return f;
-        const ref = { type: "Feature", properties: f.properties, geometry: null, geometry_ref: sharedRefs.get(f) };
         // `bbox` is GeoJSON's own member; `minzoom` is ours (src/lib/deferredBoundaries.js).
         const lazy = deferred.members.get(f);
-        return lazy ? { ...ref, bbox: lazy.bbox, minzoom: lazy.minzoom } : ref;
+        return { type: "Feature", properties: f.properties, geometry: null, geometry_ref: sharedRefs.get(f), bbox: lazy.bbox, minzoom: lazy.minzoom };
       }),
     };
-    const filePath = path.join(OUT_DIR, "boundaries", `${decade}.json`);
-    await writeJSON(filePath, fc);
-    totalBytes += JSON.stringify(fc).length;
+    totalBytes += (await writeGeo(path.join(OUT_DIR, "boundaries", `${decade}.tbin`), fc)).length;
   }
   totalBytes += sharedBytes;
 
@@ -286,7 +329,8 @@ async function splitBoundaries() {
   });
 
   console.log(
-    `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks + ${sharedRefs.size} shared geometries, ` +
+    `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks + ${groups.size} deferred group file(s) ` +
+      `(${sharedRefs.size} geometries), ` +
       `${(totalBytes / 1024).toFixed(0)}KB total (source was ${(
         (await readFile(BOUNDARIES_FILE)).length / 1024
       ).toFixed(0)}KB)`
@@ -516,7 +560,9 @@ export function geometryBbox(geometry) {
 // are dropped from the shipped copy; the rest are split, whole, into land.json (touching
 // NEAR_LAND_EXTENT, needed by the first view) and land-far.json. land.json also carries
 // the list of Middle East cells, whose Natural Earth 1:10m files (src/data/land-cells/)
-// are copied as they are to data/land-cells/<cell>.json (lib/landStore.js).
+// are written as they are to data/land-cells/<cell>.tbin (lib/landStore.js). All of
+// them are .tbin (writeGeo), as land.tbin and land-far.tbin are; land-far's
+// 2-decimal source fits the codec's scale 100 exactly.
 async function copyLand() {
   const { features, ...manifest } = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
   const cellsOut = path.join(OUT_DIR, "land-cells");
@@ -524,7 +570,7 @@ async function copyLand() {
   await mkdir(cellsOut, { recursive: true });
   for (const cell of manifest.cells) {
     const fc = JSON.parse(await readFile(path.join(SRC_DIR, "land-cells", `${cell}.json`), "utf8"));
-    await writeJSON(path.join(cellsOut, `${cell}.json`), fc);
+    await writeGeo(path.join(cellsOut, `${cell}.tbin`), fc);
   }
   const touches = (b, [minLon, minLat, maxLon, maxLat]) =>
     b[2] >= minLon && b[0] <= maxLon && b[3] >= minLat && b[1] <= maxLat;
@@ -535,11 +581,11 @@ async function copyLand() {
     if (!touches(b, MAP_EXTENT)) continue;
     (touches(b, NEAR_LAND_EXTENT) ? near : far).push(f);
   }
-  await writeJSON(path.join(OUT_DIR, "land.json"), { ...manifest, features: near });
-  await writeJSON(path.join(OUT_DIR, "land-far.json"), { type: "FeatureCollection", features: far });
+  await writeGeo(path.join(OUT_DIR, "land.tbin"), { ...manifest, features: near });
+  await writeGeo(path.join(OUT_DIR, "land-far.tbin"), { type: "FeatureCollection", features: far });
   console.log(
     `land: ${near.length + far.length} of ${features.length} polygons inside MAP_EXTENT: ` +
-      `${near.length} in land.json, ${far.length} in land-far.json; ${manifest.cells.length} 1:10m cells`
+      `${near.length} in land.tbin, ${far.length} in land-far.tbin; ${manifest.cells.length} 1:10m cells`
   );
 }
 
@@ -562,6 +608,11 @@ async function main() {
   await splitEvents();
   await copyLand();
   await copyFunnel();
+  const t = geoTotals;
+  console.log(
+    `geometry: ${t.files} .tbin files, ${t.positions} vertices, each file decoded and identical to its source ` +
+      `(${t.rounded} coordinate values rounded to 6 decimals); ${(t.bytes / 1024).toFixed(0)}KB (${(t.jsonBytes / 1024).toFixed(0)}KB as JSON)`
+  );
   console.log(`\nWrote chunked data to ${path.relative(process.cwd(), OUT_DIR)}`);
 }
 

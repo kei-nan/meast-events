@@ -12,6 +12,7 @@ import {
   DEFERRED_GROUPS,
   decadesFor,
   deferredBoundaryGroups,
+  encodeGeoChecked,
   framingFor,
   geometryBbox,
   guidelineVersionUrl,
@@ -21,6 +22,7 @@ import {
 } from "./split-data.mjs";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 import { decadeFloor } from "../src/lib/eventYears.js";
+import { decodeGeo } from "../src/lib/geoCodec.js";
 
 const SCRIPT = fileURLToPath(new URL("./split-data.mjs", import.meta.url));
 
@@ -117,6 +119,16 @@ test("deferredBoundaryGroups: fails when the members of a group differ in years"
   assert.throws(() => deferredBoundaryGroups(f), /must share their years/);
 });
 
+test("encodeGeoChecked: bytes that decode to the source; fails, naming the file, on what it cannot store", () => {
+  const doc = { type: "FeatureCollection", features: [boundary("A", 2000, 2010, square(35.1234567, 31))] };
+  const { bytes, positions, rounded } = encodeGeoChecked("x.tbin", doc);
+  assert.equal(positions, 5);
+  assert.equal(rounded, 5); // the western x (in three vertices) and the eastern one (in two)
+  assert.equal(decodeGeo(bytes).features[0].geometry.coordinates[0][0][0], 35.123457);
+  const bad = { type: "FeatureCollection", features: [boundary("B", 2000, 2010, { type: "GeometryCollection", geometries: [] })] };
+  assert.throws(() => encodeGeoChecked("y.tbin", bad), /unsupported geometry/);
+});
+
 test("guidelineVersionUrl: the permalink of the reviewed revision, keeping the section", () => {
   assert.equal(
     guidelineVersionUrl("https://en.wikipedia.org/wiki/Wikipedia:Neutral_point_of_view#Due_and_undue_weight", 123),
@@ -189,7 +201,18 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     const all = JSON.parse(fs.readFileSync(path.join(r.out, "events", meta.dir, "all.json"), "utf8"));
     assert.deepEqual(all.map((e) => e.id), ["a", "b"]);
     assert.ok(fs.existsSync(path.join(r.out, "boundaries", "meta.json")));
-    assert.ok(fs.existsSync(path.join(r.out, "land.json")));
+    assert.ok(Array.isArray(decodeGeo(fs.readFileSync(path.join(r.out, "land.tbin"))).cells));
+    // Geometry is .tbin only; a deferred group's members are one shared file, "<hash>#<index>".
+    const files = fs.readdirSync(r.out, { recursive: true }).filter((p) => /^(land|boundaries)/.test(p) && fs.statSync(path.join(r.out, p)).isFile());
+    assert.deepEqual(files.filter((p) => !p.endsWith(".tbin")), [path.join("boundaries", "meta.json")]);
+    const chunk = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", "2020.tbin")));
+    const members = chunk.features.filter((f) => f.geometry_ref);
+    assert.equal(members.length, DEFERRED_GROUPS[0].members.length);
+    const [hash] = members[0].geometry_ref.split("#");
+    assert.deepEqual(members.map((f) => f.geometry_ref), members.map((_, i) => `${hash}#${i}`));
+    assert.ok(members.every((f) => f.geometry === null && f.minzoom === DEFERRED_GROUPS[0].minzoom && f.bbox.length === 4));
+    const shared = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", "shared", `${hash}.tbin`)));
+    assert.deepEqual(shared.features.map((f) => f.geometry), members.map(() => square(35, 31)));
   } finally {
     r.cleanup();
   }

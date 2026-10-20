@@ -3,13 +3,13 @@ import { loadLand } from "../lib/dataClient";
 import { LAND_ON_SEA, defaultCamera, mercatorX, mercatorY } from "../lib/mapBase";
 
 // Stands in for the map while MapLibre downloads and starts (~1.5 MB of
-// script, its worker included): the sea, and the land as soon as land.json
+// script, its worker included): the sea, and the land as soon as land.tbin
 // has arrived (App.jsx starts it at first paint), drawn with a 2D canvas in
 // the map's own projection, view and colours (lib/mapBase.js), so the map can
 // take over without anything moving. App.jsx shows it until the map's code
 // has loaded; MapView keeps it over its canvas until that has drawn the land.
 
-// land.json once it has loaded, so a remounted stand-in (App's, then MapView's)
+// land.tbin once it has loaded, so a remounted stand-in (App's, then MapView's)
 // draws in its first frame instead of a frame later.
 let landCache = null;
 // The last canvas drawn: MapView's stand-in copies App's (same box) instead of

@@ -66,6 +66,19 @@
 /event/*
   Cache-Control: public, max-age=0, must-revalidate
 
+# /data/*.tbin: the map's geometry, land and boundaries (land.tbin, land-far.tbin,
+# land-cells/*.tbin, boundaries/<decade>.tbin, boundaries/shared/<hash>.tbin), in
+# the binary format of app/src/lib/geoCodec.js. Workers serves .tbin with no
+# Content-Type, and Cloudflare only compresses responses whose type is on its
+# list (application/octet-stream is not): without this the files ship raw (the
+# opening view's land and 2020 borders: 177 KB instead of 83 KB with brotli,
+# October 2026). The type is a label for the compressor; nothing reads it. It
+# replaces the asset's own type (checked with wrangler dev), and the splat
+# matches only .tbin files, so the JSON under /data/ keeps its type. Sets no
+# Cache-Control: the /data/ rules below decide caching, as for the JSON files.
+/data/*.tbin
+  Content-Type: application/x-protobuf
+
 # /data/*: the static dataset. Un-hashed names (land.json, land-far.json, land-cells/*.json, boundaries/*.json,
 # events/meta.json, selection-funnel.json, framing-review.json) change on every
 # data regeneration, so cache moderately and revalidate in the background. All

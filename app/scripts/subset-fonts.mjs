@@ -12,9 +12,10 @@
 // Characters kept, for every face whose fontsource unicode-range covers them:
 //   - all of Basic Latin (U+0020-007E), Latin-1 (U+00A0-00FF) and General
 //     Punctuation (U+2000-206F), whether used or not;
-//   - every character in a string of any JSON file under public/data/ (the files the
-//     browser loads, written by split-data.mjs, so run this after it), which covers
-//     titles, extracts, labels, border names, the framing review and the funnel;
+//   - every character in a string of any JSON or .tbin file under public/data/ (the
+//     files the browser loads, written by split-data.mjs, so run this after it; a
+//     .tbin is read decoded, src/lib/geoCodec.js), which covers titles, extracts,
+//     labels, border names, the framing review and the funnel;
 //   - every character in the app's source (src/**/*.{js,jsx,css}, index.html),
 //     with \u escapes and HTML character references decoded, for the UI strings.
 // Characters no fontsource subset covers (Arabic, Hebrew, ...) keep falling back to
@@ -38,6 +39,7 @@
 //   node scripts/subset-fonts.mjs
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { decodeGeo } from "../src/lib/geoCodec.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import subsetFont from "subset-font";
@@ -85,6 +87,13 @@ const listFiles = (dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? listFiles(path.join(dir, e.name)) : [path.join(dir, e.name)]
   );
+// The geometry files (.tbin: land and boundaries, with the border names), decoded.
+// A missing public/data/ is reported below.
+try {
+  for (const f of listFiles(path.join(APP, "public", "data")).filter((f) => f.endsWith(".tbin"))) walkJSON(decodeGeo(readFileSync(f)));
+} catch (err) {
+  if (err.code !== "ENOENT") throw err;
+}
 
 const dataDir = path.join(APP, "public", "data");
 let dataFiles = [];
