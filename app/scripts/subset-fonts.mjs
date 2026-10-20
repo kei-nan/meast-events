@@ -12,9 +12,10 @@
 // Characters kept, for every face whose fontsource unicode-range covers them:
 //   - all of Basic Latin (U+0020-007E), Latin-1 (U+00A0-00FF) and General
 //     Punctuation (U+2000-206F), whether used or not;
-//   - every character in a string of any JSON file under public/data/ (the files the
-//     browser loads, written by split-data.mjs, so run this after it), which covers
-//     titles, extracts, labels, border names, the framing review and the funnel;
+//   - every character in a string of any JSON or .tbin file under public/data/ (the
+//     files the browser loads, written by split-data.mjs, so run this after it; a
+//     .tbin is read decoded, src/lib/geoCodec.js), which covers titles, extracts,
+//     labels, border names, the framing review and the funnel;
 //   - every character in the app's source (src/**/*.{js,jsx,css}, index.html),
 //     with \u escapes and HTML character references decoded, for the UI strings.
 // Characters no fontsource subset covers (Arabic, Hebrew, ...) keep falling back to
@@ -34,6 +35,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import subsetFont from "subset-font";
+import { decodeGeo } from "../src/lib/geoCodec.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP = path.join(__dirname, "..");
@@ -80,15 +82,15 @@ const listFiles = (dir) =>
 const dataDir = path.join(APP, "public", "data");
 let dataFiles = [];
 try {
-  dataFiles = listFiles(dataDir).filter((f) => f.endsWith(".json"));
+  dataFiles = listFiles(dataDir).filter((f) => /\.(json|tbin)$/.test(f));
 } catch {
   // handled below
 }
 if (!dataFiles.length) {
-  console.error(`subset-fonts: no JSON under ${dataDir}; run scripts/split-data.mjs first`);
+  console.error(`subset-fonts: no data files under ${dataDir}; run scripts/split-data.mjs first`);
   process.exit(1);
 }
-for (const f of dataFiles) walkJSON(JSON.parse(readFileSync(f, "utf8")));
+for (const f of dataFiles) walkJSON(f.endsWith(".tbin") ? decodeGeo(readFileSync(f)) : JSON.parse(readFileSync(f, "utf8")));
 
 const decodeSource = (s) =>
   s

@@ -13,6 +13,7 @@
 
 import { eventCoords } from "./geo.js";
 import { fullBucket } from "./fullBucket.js";
+import { decodeGeo } from "./geoCodec.js";
 import { DATA_VERSION, FULL_BUCKETS } from "./dataVersion.js";
 
 // Pure year helpers live in eventYears.js (testable without the generated
@@ -25,7 +26,10 @@ const inFlight = new Map(); // url -> Promise<data>, so concurrent callers share
 // A caller-initiated abort rejects with err.aborted === true and NOT as an
 // outage; a timeout, network failure or 5xx is err.outage === true; a 4xx is
 // a bad request and says nothing about availability.
-function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
+// The answer is parsed as JSON, or with `decode(arrayBuffer)` when given (the
+// .tbin geometry files, lib/geoCodec.js); a file that does not parse or decode
+// fails like a truncated download.
+function fetchJSON(url, { timeoutMs, signal, cache, decode } = {}) {
   const controller = timeoutMs || signal ? new AbortController() : null;
   const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
   const onAbort = () => controller.abort();
@@ -52,7 +56,7 @@ function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
         err.outage = false;
         throw err;
       }
-      return res.json();
+      return decode ? res.arrayBuffer().then(decode) : res.json();
     })
     .catch((err) => {
       if (signal?.aborted) err.aborted = true;
@@ -67,9 +71,9 @@ function fetchJSON(url, { timeoutMs, signal, cache } = {}) {
 
 // `check(data)` throws on a file of the wrong shape; it runs before the answer
 // counts as a success, so a bad file is evicted like a failed fetch.
-function fetchJSONCached(url, { timeoutMs, cache, check } = {}) {
+function fetchJSONCached(url, { timeoutMs, cache, check, decode } = {}) {
   if (!inFlight.has(url)) {
-    const promise = fetchJSON(url, { timeoutMs, cache }).then((data) => {
+    const promise = fetchJSON(url, { timeoutMs, cache, decode }).then((data) => {
       check?.(data);
       return data;
     });
@@ -82,27 +86,42 @@ function fetchJSONCached(url, { timeoutMs, cache, check } = {}) {
 
 const dataUrl = (relPath) => `${import.meta.env.BASE_URL}data/${relPath}`;
 
+// A geometry file (data/<relPath>.tbin): binary, decoded to the same GeoJSON the
+// JSON file held (lib/geoCodec.js, written by scripts/split-data.mjs).
+const fetchGeoCached = (relPath, options) => fetchJSONCached(dataUrl(`${relPath}.tbin`), { ...options, decode: decodeGeo });
+
 // Pure physical geography (land/water silhouette) with no time dimension:
-// land.json for the opening view, land-far.json for the rest of the map
+// land.tbin for the opening view, land-far.tbin for the rest of the map
 // (NEAR_LAND_EXTENT in lib/mapExtent.js).
 export function loadLand() {
-  return fetchJSONCached(dataUrl("land.json"));
+  return fetchGeoCached("land");
 }
 
 // One cell's Natural Earth 1:10m land (scripts/build-land.js, lib/landStore.js).
 export function loadLandCell(cell) {
-  return fetchJSONCached(dataUrl(`land-cells/${cell}.json`));
+  return fetchGeoCached(`land-cells/${cell}`);
 }
 
 export function loadFarLand() {
-  return fetchJSONCached(dataUrl("land-far.json"));
+  return fetchGeoCached("land-far");
 }
 
-// A decade's FeatureCollection. Large geometries that span several decades are
-// stored once (boundaries/shared/<hash>.json, see split-data.mjs) and the chunk
-// names them in `geometry_ref`; they are put back here, so callers always get
-// plain features - except deferred ones (a `minzoom`, lib/deferredBoundaries.js),
-// which stay pending until the map asks for them with loadDeferredGeometry.
+// A geometry stored apart from the decade chunks: `ref` is "<file>#<index>",
+// feature <index> of boundaries/shared/<file>.tbin (split-data.mjs). Members of
+// one file share its single download.
+function loadSharedGeometry(ref) {
+  const [file, index = "0"] = ref.split("#");
+  return fetchGeoCached(`boundaries/shared/${file}`).then((fc) => {
+    const geometry = fc.features?.[Number(index)]?.geometry;
+    if (!geometry) throw new Error(`no shared geometry ${ref}`);
+    return geometry;
+  });
+}
+
+// A decade's FeatureCollection. A geometry stored apart (`geometry_ref`, see
+// split-data.mjs) is put back here, so callers get plain features - except
+// deferred ones (a `minzoom`, lib/deferredBoundaries.js), which stay pending until
+// the map asks for them with loadDeferredGeometry.
 // Concurrent/repeat callers share one load per decade.
 const boundaryDecades = new Map(); // decade -> Promise<FeatureCollection>
 export function loadBoundaryDecade(decade) {
@@ -110,12 +129,12 @@ export function loadBoundaryDecade(decade) {
     const check = (fc) => {
       if (!Array.isArray(fc?.features)) throw new Error("boundaries file has no features");
     };
-    const promise = fetchJSONCached(dataUrl(`boundaries/${decade}.json`), { check }).then(async (fc) => {
+    const promise = fetchGeoCached(`boundaries/${decade}`, { check }).then(async (fc) => {
       const features = await Promise.all(
         fc.features.map(async (f) => {
           if (!f.geometry_ref || f.minzoom != null) return f;
           const { geometry_ref: ref, ...rest } = f;
-          return { ...rest, geometry: await fetchJSONCached(dataUrl(`boundaries/shared/${ref}.json`)) };
+          return { ...rest, geometry: await loadSharedGeometry(ref) };
         })
       );
       return { ...fc, features };
@@ -127,7 +146,7 @@ export function loadBoundaryDecade(decade) {
 }
 
 export function loadDeferredGeometry(ref) {
-  return fetchJSONCached(dataUrl(`boundaries/shared/${ref}.json`));
+  return loadSharedGeometry(ref);
 }
 
 // Fire-and-forget: warms the cache for a decade without callers waiting on it

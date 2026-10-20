@@ -8,9 +8,9 @@
 // extent is complete; split-data fails the build if an event falls outside it.
 export const MAP_EXTENT = [-100, -40, 120, 75];
 
-// Land polygons that touch this box ship in data/land.json, which the first
+// Land polygons that touch this box ship in data/land.tbin, which the first
 // view waits for; the rest of MAP_EXTENT (the Americas, East Asia, Oceania, and
-// distant islands) ships in data/land-far.json, loaded once that view has drawn
+// distant islands) ships in data/land-far.tbin, loaded once that view has drawn
 // (MapView.jsx). Polygons are split whole, never cut. The box must hold every
 // opening view: measured on viewports from 320x568 to 3840x2160 and 3440x1440
 // (21:9), the default view spans lon -24.3..104.3, lat -30.4..68.8. A wider

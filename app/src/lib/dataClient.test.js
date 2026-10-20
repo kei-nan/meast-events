@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { register } from "node:module";
+import { topology } from "topojson-server";
 import { fullBucket } from "./fullBucket.js";
+import { encodeGeo } from "./geoCodec.js";
 import { TEST_DATA_VERSION as V1, TEST_FULL_BUCKETS as B1 } from "./testing/viteNodeHooks.mjs";
 
 // dataClient.js imports the generated dataVersion.js and reads Vite's
@@ -13,6 +15,9 @@ const freshClient = () => import(`./dataClient.js?copy=${++copies}`);
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+// A geometry file (.tbin, lib/geoCodec.js) holding `doc`.
+const tbin = (doc, status = 200) => new Response(encodeGeo(doc, { topology }), { status, headers: { "content-type": "application/x-protobuf" } });
+const fc = (...features) => ({ type: "FeatureCollection", features });
 const html = (status = 200) => new Response("<!doctype html><title>x</title>", { status, headers: { "content-type": "text/html; charset=utf-8" } });
 
 // globalThis.fetch answering from `routes` ({url: () => Response | throw}); an
@@ -36,8 +41,8 @@ const LITE = [{ id: "e1", date_start: "1948-05-14", coordinates: { lon: 35, lat:
 test("failure classes: 4xx and an HTML 200 are not outages, 5xx and network errors are", async () => {
   const { loadLand, loadFarLand, loadSelectionFunnel, loadFramingReviewSummary } = await freshClient();
   stubFetch({
-    "/data/land.json": () => json({}, 404),
-    "/data/land-far.json": () => json({}, 503),
+    "/data/land.tbin": () => json({}, 404),
+    "/data/land-far.tbin": () => json({}, 503),
     "/data/selection-funnel.json": () => html(200),
     "/data/framing-review.json": () => {
       throw new TypeError("fetch failed");
@@ -49,29 +54,37 @@ test("failure classes: 4xx and an HTML 200 are not outages, 5xx and network erro
   await assert.rejects(loadFramingReviewSummary(), (e) => e.outage === true && e instanceof TypeError);
 });
 
-test("a 200 that is not valid JSON counts as an outage", async () => {
-  const { loadLand } = await freshClient();
-  stubFetch({ "/data/land.json": () => new Response("{trunc", { headers: { "content-type": "application/json" } }) });
+test("a 200 that is not valid JSON, or a geometry file that does not decode, counts as an outage", async () => {
+  const { loadLand, loadFarLand, loadSelectionFunnel } = await freshClient();
+  const truncated = encodeGeo(fc(), { topology }).slice(0, 7);
+  stubFetch({
+    "/data/selection-funnel.json": () => new Response("{trunc", { headers: { "content-type": "application/json" } }),
+    "/data/land.tbin": () => new Response(truncated),
+    "/data/land-far.tbin": () => json(fc()), // JSON where a .tbin belongs
+  });
+  await assert.rejects(loadSelectionFunnel(), (e) => e.outage === true);
   await assert.rejects(loadLand(), (e) => e.outage === true);
+  await assert.rejects(loadFarLand(), (e) => e.outage === true && /not a .tbin file/.test(e.message));
 });
 
 test("concurrent callers share one request; a success stays cached, a failure is evicted", async () => {
   const { loadLand, loadLandCell } = await freshClient();
   let landOk = false;
   const calls = stubFetch({
-    "/data/land.json": () => (landOk ? json({ type: "FeatureCollection", features: [] }) : json({}, 500)),
-    "/data/land-cells/35_30.json": () => json({ cell: "35_30" }),
+    "/data/land.tbin": () => (landOk ? tbin(fc()) : json({}, 500)),
+    "/data/land-cells/35_30.tbin": () => tbin({ ...fc(), cell: "35_30" }),
   });
   const [a, b] = await Promise.all([loadLandCell("35_30"), loadLandCell("35_30")]);
   assert.equal(a, b);
+  assert.equal(a.cell, "35_30");
   await loadLandCell("35_30");
-  assert.equal(count(calls, "/data/land-cells/35_30.json"), 1);
+  assert.equal(count(calls, "/data/land-cells/35_30.tbin"), 1);
 
   await assert.rejects(Promise.all([loadLand(), loadLand()]));
-  assert.equal(count(calls, "/data/land.json"), 1);
+  assert.equal(count(calls, "/data/land.tbin"), 1);
   landOk = true;
-  assert.deepEqual(await loadLand(), { type: "FeatureCollection", features: [] });
-  assert.equal(count(calls, "/data/land.json"), 2);
+  assert.deepEqual(await loadLand(), fc());
+  assert.equal(count(calls, "/data/land.tbin"), 2);
 });
 
 test("loadAllLite reads the bundle's versioned folder once and normalizes", async () => {
@@ -192,53 +205,59 @@ test("prefetchFullLead warms the bucket loadFullLead then reuses; a failed prefe
 test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shares and evicts", async () => {
   const { loadBoundaryDecade, loadDeferredGeometry } = await freshClient();
   const geom = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] };
+  const geom2 = { type: "Polygon", coordinates: [[[5, 5], [6, 5], [6, 6], [5, 5]]] };
+  const feature = (geometry) => ({ type: "Feature", properties: {}, geometry });
   let decadeOk = false;
   const calls = stubFetch({
-    "/data/boundaries/1990.json": () =>
+    "/data/boundaries/1990.tbin": () =>
       decadeOk
-        ? json({
-            type: "FeatureCollection",
-            features: [
-              { properties: { name: "A" }, geometry_ref: "h1" },
-              { properties: { name: "B" }, geometry_ref: "h2", minzoom: 5 },
-              { properties: { name: "C" }, geometry: geom },
-            ],
-          })
+        ? tbin(
+            fc(
+              { properties: { name: "A" }, geometry: null, geometry_ref: "h1" },
+              { properties: { name: "B" }, geometry: null, geometry_ref: "h2#0", minzoom: 5 },
+              { properties: { name: "B2" }, geometry: null, geometry_ref: "h2#1", minzoom: 5 },
+              { properties: { name: "C" }, geometry: geom }
+            )
+          )
         : json({}, 500),
-    "/data/boundaries/shared/h1.json": () => json(geom),
-    "/data/boundaries/shared/h2.json": () => json(geom),
+    "/data/boundaries/shared/h1.tbin": () => tbin(fc(feature(geom))),
+    "/data/boundaries/shared/h2.tbin": () => tbin(fc(feature(geom), feature(geom2))),
   });
   await assert.rejects(loadBoundaryDecade(1990), (e) => e.outage === true);
   decadeOk = true;
-  const [fc, same] = await Promise.all([loadBoundaryDecade(1990), loadBoundaryDecade(1990)]);
-  assert.equal(fc, same);
-  assert.deepEqual(fc.features[0], { properties: { name: "A" }, geometry: geom });
-  assert.equal(fc.features[1].geometry_ref, "h2");
-  assert.equal(fc.features[1].geometry, undefined);
-  assert.equal(count(calls, "/data/boundaries/shared/h2.json"), 0);
-  assert.deepEqual(await loadDeferredGeometry("h2"), geom);
-  assert.equal(count(calls, "/data/boundaries/1990.json"), 2);
+  const [decade, same] = await Promise.all([loadBoundaryDecade(1990), loadBoundaryDecade(1990)]);
+  assert.equal(decade, same);
+  assert.deepEqual(decade.features[0], { properties: { name: "A" }, geometry: geom });
+  assert.equal(decade.features[1].geometry_ref, "h2#0");
+  assert.equal(decade.features[1].geometry, null);
+  assert.deepEqual(decade.features[3].geometry, geom);
+  assert.equal(count(calls, "/data/boundaries/shared/h2.tbin"), 0);
+  // The members of one shared file come from its one download.
+  assert.deepEqual(await Promise.all([loadDeferredGeometry("h2#0"), loadDeferredGeometry("h2#1")]), [geom, geom2]);
+  assert.equal(count(calls, "/data/boundaries/shared/h2.tbin"), 1);
+  await assert.rejects(loadDeferredGeometry("h2#2"), /no shared geometry h2#2/);
+  assert.equal(count(calls, "/data/boundaries/1990.tbin"), 2);
 });
 
 test("loadBoundaryDecade: a file without features is evicted and refetched", async () => {
   const { loadBoundaryDecade } = await freshClient();
   let good = false;
   const calls = stubFetch({
-    "/data/boundaries/2000.json": () => json(good ? { type: "FeatureCollection", features: [] } : { type: "FeatureCollection" }),
+    "/data/boundaries/2000.tbin": () => tbin(good ? fc() : { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] }),
   });
   await assert.rejects(loadBoundaryDecade(2000), /no features/);
   good = true;
   assert.deepEqual((await loadBoundaryDecade(2000)).features, []);
-  assert.equal(count(calls, "/data/boundaries/2000.json"), 2);
+  assert.equal(count(calls, "/data/boundaries/2000.tbin"), 2);
 });
 
 test("BASE_URL prefixes every data path", async () => {
   globalThis.__VITE_ENV__ = { BASE_URL: "/sub/" };
   try {
     const { loadLand } = await freshClient();
-    const calls = stubFetch({ "/sub/data/land.json": () => json({ ok: 1 }) });
-    assert.deepEqual(await loadLand(), { ok: 1 });
-    assert.deepEqual(calls.map((c) => c.url), ["/sub/data/land.json"]);
+    const calls = stubFetch({ "/sub/data/land.tbin": () => tbin({ ...fc(), ok: 1 }) });
+    assert.deepEqual(await loadLand(), { ...fc(), ok: 1 });
+    assert.deepEqual(calls.map((c) => c.url), ["/sub/data/land.tbin"]);
   } finally {
     delete globalThis.__VITE_ENV__;
   }

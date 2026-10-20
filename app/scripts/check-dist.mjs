@@ -8,6 +8,8 @@
 //     with the bucket count it names, and the built JavaScript carries both;
 //   - events/meta.json agrees with it, the lite list has no duplicate ids, and
 //     every event's full record is in the bucket its id hashes to;
+//   - every geometry file (.tbin) the app is pointed to exists and decodes: each
+//     decade's boundaries and the shared geometries they name, the land and its cells;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - every event has its page, and each is the app: the same /assets/ as index.html;
 //   - the search index (Pagefind) was built;
@@ -24,6 +26,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { fullBucket } from "../src/lib/fullBucket.js";
+import { decodeGeo } from "../src/lib/geoCodec.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(process.env.DIST_DIR ?? path.join(__dirname, "..", "dist"));
@@ -94,26 +97,39 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     }
   }
 
-  // Boundary chunks: every shared geometry a chunk points to exists.
+  // Geometry files (.tbin, src/lib/geoCodec.js): the decoded file, or null after
+  // reporting it missing or undecodable.
+  const readGeo = (rel) => {
+    if (!existsSync(distFile(rel))) return fail(`${rel} is missing`), null;
+    try {
+      return decodeGeo(readFileSync(distFile(rel)));
+    } catch (err) {
+      return fail(`${rel} does not decode: ${err.message}`), null;
+    }
+  };
+  // Boundary chunks, and every shared geometry a chunk points to ("<file>#<index>").
   const bmeta = readJSON("data/boundaries/meta.json");
   for (const d of bmeta.decades) {
-    for (const f of readJSON(`data/boundaries/${d}.json`).features) {
-      if (f.geometry_ref && !existsSync(distFile(`data/boundaries/shared/${f.geometry_ref}.json`))) {
-        fail(`data/boundaries/${d}.json points to missing shared geometry ${f.geometry_ref}`);
-      }
+    for (const f of readGeo(`data/boundaries/${d}.tbin`)?.features ?? []) {
+      if (!f.geometry_ref) continue;
+      const [file, index = "0"] = f.geometry_ref.split("#");
+      const rel = `data/boundaries/shared/${file}.tbin`;
+      if (!existsSync(distFile(rel))) fail(`data/boundaries/${d}.tbin points to missing shared geometry ${f.geometry_ref}`);
+      else if (!readGeo(rel)?.features?.[Number(index)]?.geometry) fail(`${rel} has no geometry ${index} (named by ${d}.tbin)`);
     }
   }
 
   // Land: the opening view's file and the rest (lib/mapExtent.js NEAR_LAND_EXTENT).
-  for (const name of ["land.json", "land-far.json"]) {
-    if (!existsSync(distFile(`data/${name}`))) fail(`data/${name} is missing`);
-    else if (!Array.isArray(readJSON(`data/${name}`).features)) fail(`data/${name} is not a FeatureCollection`);
+  const land = {};
+  for (const name of ["land", "land-far"]) {
+    land[name] = readGeo(`data/${name}.tbin`);
+    if (land[name] && !Array.isArray(land[name].features)) fail(`data/${name}.tbin is not a FeatureCollection`);
   }
-  // ...and the Middle East's 1:10m cells land.json lists (lib/landStore.js).
-  if (existsSync(distFile("data/land.json"))) {
-    const cells = readJSON("data/land.json").cells;
-    if (!Array.isArray(cells) || !cells.length) fail("data/land.json lists no land cells");
-    else for (const c of cells) if (!existsSync(distFile(`data/land-cells/${c}.json`))) fail(`data/land-cells/${c}.json is missing`);
+  // ...and the Middle East's 1:10m cells land.tbin lists (lib/landStore.js).
+  if (land.land) {
+    const cells = land.land.cells;
+    if (!Array.isArray(cells) || !cells.length) fail("data/land.tbin lists no land cells");
+    else for (const c of cells) readGeo(`data/land-cells/${c}.tbin`);
   }
 
   // 3. index.html's local references.

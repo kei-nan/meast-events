@@ -8,7 +8,9 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkDist } from "./check-dist.mjs";
+import { topology } from "topojson-server";
 import { fullBucket } from "../src/lib/fullBucket.js";
+import { encodeGeo } from "../src/lib/geoCodec.js";
 
 const SCRIPT = fileURLToPath(new URL("./check-dist.mjs", import.meta.url));
 const VERSION = "abcdef012345";
@@ -16,6 +18,10 @@ const DIR = `v.${VERSION}`;
 const BUCKETS = 2;
 const IDS = ["suez-crisis", "six-day-war", "oslo-i-accord"];
 const ENTRY = "/assets/index-AbCd_-12.js";
+// A geometry file (.tbin) holding `doc`.
+const tbin = (doc) => encodeGeo(doc, { topology });
+const fc = (features = [], extra = {}) => ({ type: "FeatureCollection", ...extra, features });
+const polygon = { type: "Polygon", coordinates: [[[35, 31], [36, 31], [36, 32], [35, 31]]] };
 
 const shell = (extra = "") => `<!doctype html><html><head><script type="module" src="${ENTRY}"></script>${extra}</head><body></body></html>`;
 const eventPage = (id) =>
@@ -35,7 +41,7 @@ function fixture() {
   const write = (rel, content) => {
     const file = path.join(dist, ...rel.split("/"));
     fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, typeof content === "string" ? content : JSON.stringify(content));
+    fs.writeFileSync(file, typeof content === "string" || content instanceof Uint8Array ? content : JSON.stringify(content));
   };
   fs.writeFileSync(versionFile, `export const DATA_VERSION = "${VERSION}";\nexport const FULL_BUCKETS = ${BUCKETS};\n`);
   write(`data/events/${DIR}/all.json`, IDS.map((id) => ({ id })));
@@ -45,11 +51,11 @@ function fixture() {
   write("data/events/meta.json", { version: VERSION, dir: DIR, fullBuckets: BUCKETS, totalEvents: IDS.length });
   write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";`);
   write("data/boundaries/meta.json", { decades: [1950] });
-  write("data/boundaries/1950.json", { features: [{ geometry_ref: "aaaaaaaaaaaa" }, { geometry: null }] });
-  write("data/boundaries/shared/aaaaaaaaaaaa.json", "{}");
-  write("data/land.json", { features: [], cells: ["n30e030"] });
-  write("data/land-far.json", { features: [] });
-  write("data/land-cells/n30e030.json", { features: [] });
+  write("data/boundaries/1950.tbin", tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#1" }, { type: "Feature", properties: {}, geometry: polygon }])));
+  write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([0, 1].map(() => ({ type: "Feature", properties: {}, geometry: polygon })))));
+  write("data/land.tbin", tbin(fc([], { cells: ["n30e030"] })));
+  write("data/land-far.tbin", tbin(fc()));
+  write("data/land-cells/n30e030.tbin", tbin(fc()));
   write("index.html", shell());
   for (const id of IDS) write(`event/${id}.html`, eventPage(id));
   write("pagefind/pagefind.js", "");
@@ -128,12 +134,16 @@ test("full records: a missing bucket, duplicate ids, a record outside its bucket
   await assertProblem((f) => f.write(`data/events/${DIR}/all.json`, { not: "an array" }), /all\.json is not an array/);
 });
 
-test("boundaries and land: a missing shared geometry, land file or land cell", async () => {
-  await assertProblem((f) => f.remove("data/boundaries/shared/aaaaaaaaaaaa.json"), /1950\.json points to missing shared geometry aaaaaaaaaaaa/);
-  await assertProblem((f) => f.remove("data/land-far.json"), /data\/land-far\.json is missing/);
-  await assertProblem((f) => f.write("data/land-far.json", { type: "Feature" }), /land-far\.json is not a FeatureCollection/);
-  await assertProblem((f) => f.remove("data/land-cells/n30e030.json"), /land-cells\/n30e030\.json is missing/);
-  await assertProblem((f) => f.write("data/land.json", { features: [], cells: [] }), /lists no land cells/);
+test("boundaries and land: a missing or undecodable geometry file, shared geometry, land file or land cell", async () => {
+  await assertProblem((f) => f.remove("data/boundaries/shared/aaaaaaaaaaaa.tbin"), /1950\.tbin points to missing shared geometry aaaaaaaaaaaa#1/);
+  await assertProblem((f) => f.write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([{ type: "Feature", properties: {}, geometry: polygon }]))), /aaaaaaaaaaaa\.tbin has no geometry 1/);
+  await assertProblem((f) => f.remove("data/boundaries/1950.tbin"), /data\/boundaries\/1950\.tbin is missing/);
+  await assertProblem((f) => f.write("data/boundaries/1950.tbin", fc()), /1950\.tbin does not decode: geoCodec: not a \.tbin file/);
+  await assertProblem((f) => f.remove("data/land-far.tbin"), /data\/land-far\.tbin is missing/);
+  await assertProblem((f) => f.write("data/land-far.tbin", tbin(polygon)), /land-far\.tbin is not a FeatureCollection/);
+  await assertProblem((f) => f.remove("data/land-cells/n30e030.tbin"), /land-cells\/n30e030\.tbin is missing/);
+  await assertProblem((f) => f.write("data/land-cells/n30e030.tbin", tbin(fc()).slice(0, 9)), /n30e030\.tbin does not decode/);
+  await assertProblem((f) => f.write("data/land.tbin", tbin(fc([], { cells: [] }))), /lists no land cells/);
 });
 
 test("index.html: no entry script, or a reference to a file not in dist/", async () => {
