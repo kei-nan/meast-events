@@ -112,9 +112,16 @@ for (const f of dataFiles) walkJSON(JSON.parse(readFileSync(f, "utf8")));
 const labelChars = new Set();
 for (let cp = 0x20; cp <= 0x7e; cp++) labelChars.add(cp);
 const boundariesDir = path.join(dataDir, "boundaries");
-for (const f of readdirSync(boundariesDir).filter((n) => /^\d{4}\.json$/.test(n))) {
-  for (const { properties } of JSON.parse(readFileSync(path.join(boundariesDir, f), "utf8")).features) {
-    for (const ch of properties.name ?? "") labelChars.add(ch.codePointAt(0));
+// The decade files (<decade>.tbin, read decoded). Finding none fails the run: the
+// border names would go unchecked, as happened when they moved from .json to .tbin.
+const decadeFiles = readdirSync(boundariesDir).filter((n) => /^\d{4}\.tbin$/.test(n));
+if (!decadeFiles.length) {
+  console.error(`subset-fonts: no <decade>.tbin under ${boundariesDir}; run scripts/split-data.mjs first`);
+  process.exit(1);
+}
+for (const f of decadeFiles) {
+  for (const { properties } of decodeGeo(readFileSync(path.join(boundariesDir, f))).features) {
+    for (const ch of properties?.name ?? "") labelChars.add(ch.codePointAt(0));
   }
 }
 
