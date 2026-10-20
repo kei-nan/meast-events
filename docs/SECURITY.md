@@ -92,9 +92,10 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   cookies or localStorage, to collect usage metrics" and does not
   fingerprint visitors ([product page](https://www.cloudflare.com/web-analytics/),
   read 2026-10-09; not tested here). The About dialog says so, with that link.
-- No other host: data, search index, fonts, glyphs and the base map style are
-  all same-origin. Cloudflare's bot-detection inline script
-  (`/cdn-cgi/challenge-platform`) stays blocked; its content changes per
+- No other host: data, search index, fonts and the base map style are
+  all same-origin; map labels are drawn in the browser from the page's own
+  Inter font (`app/src/lib/labelFont.js`). Cloudflare's bot-detection inline
+  script (`/cdn-cgi/challenge-platform`) stays blocked; its content changes per
   response, so only `'unsafe-inline'` would allow it.
 - The CSP is an allow-list: a new external host (e.g. a tile server) must be
   added to `connect-src`/`img-src`, otherwise the request is blocked and only
@@ -135,8 +136,6 @@ immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
   `public, max-age=0, must-revalidate`, set explicitly. An event's page is the
   app's `index.html` filled in, so like the home page it names the deploy's
   hashed `/assets/` files.
-- `/glyphs/*` (map label glyphs): 1 h, plus `Content-Type:
-  application/x-protobuf` so Cloudflare compresses the `.pbf` files.
 - Everything else, including the home page HTML, keeps Cloudflare's default
   (`max-age=0, must-revalidate`), so a deploy is picked up immediately.
 
