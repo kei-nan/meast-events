@@ -52,9 +52,26 @@ export function cellsInBounds(cells, size, [w, s, e, n]) {
 }
 
 // Whether to fetch every cell in the background (so a zoom-in finds its coast drawn), or
-// only the ones in view: not when the visitor has asked to save data, or is on 2G.
-// `connection` is navigator.connection (Network Information API; absent in some browsers).
+// only the ones in and around the view once zoomed in (MapView's onView): not when the
+// visitor has asked to save data, or the link looks slow. All cells are ~257 KB; on a
+// slow link that download runs for seconds after the map shows (measured 2026-10 on a
+// throttled phone, 1.6 Mbps/150 ms: until ~10 s, ~4.6 s past the map) and delays what a
+// click asks for next, an event's details or another decade's borders. The effective
+// type alone misses that link: Chromium calls it "4g" (3G starts at 270 ms or below
+// 0.7 Mbps). The round-trip time is the signal: 150 ms+ is a mobile network's, while
+// Chromium's starting estimate before it has measured anything is ~100 ms (a fresh
+// profile on a fast desktop link reported 100 ms, 1.45 Mbps). That estimate's downlink is why bandwidth only
+// counts below 1 Mbps: 1-2 Mbps is also what a fast link reports at first.
+// `connection` is navigator.connection (Network Information API, Chromium only): an
+// unknown field, or no API, keeps the fill on, as does a 0 (no estimate).
+export const SLOW_RTT_MS = 150;
+export const SLOW_DOWNLINK_MBPS = 1;
 export function wantsBackgroundDetail(connection) {
   if (!connection) return true;
-  return !connection.saveData && !/(^|-)2g$/.test(connection.effectiveType ?? "");
+  if (connection.saveData) return false;
+  if (/(^|-)[23]g$/.test(connection.effectiveType ?? "")) return false;
+  const { downlink, rtt } = connection;
+  if (rtt >= SLOW_RTT_MS) return false;
+  if (downlink > 0 && downlink < SLOW_DOWNLINK_MBPS) return false;
+  return true;
 }

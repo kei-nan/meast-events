@@ -58,11 +58,22 @@ test("cellsInBounds: overlap on the grid, edges that only touch excluded", () =>
   assert.deepEqual(cellsInBounds(cells, 5, [0, 0, 10, 10]), []);
 });
 
-test("wantsBackgroundDetail: off for save-data and 2G, on otherwise or when unknown", () => {
+test("wantsBackgroundDetail: off for save-data, 2G/3G or a slow link, on otherwise or when unknown", () => {
   assert.equal(wantsBackgroundDetail(undefined), true);
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g" }), true);
-  assert.equal(wantsBackgroundDetail({ effectiveType: "3g", saveData: false }), true);
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", saveData: false, downlink: 10, rtt: 50 }), true);
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g", saveData: true }), false);
+  assert.equal(wantsBackgroundDetail({ effectiveType: "3g" }), false);
   assert.equal(wantsBackgroundDetail({ effectiveType: "2g" }), false);
   assert.equal(wantsBackgroundDetail({ effectiveType: "slow-2g" }), false);
+  // What Chromium reported under the slow-4G throttle: still "4g".
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 1.35, rtt: 150 }), false);
+  // Chromium's starting estimate on a fast desktop link, before it has measured anything.
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 1.45, rtt: 100 }), true);
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 10, rtt: 125 }), true);
+  // Slow by latency alone, or by bandwidth alone.
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 10, rtt: 150 }), false);
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 0.95, rtt: 50 }), false);
+  // 0 = no estimate yet: unknown, so the fill stays on.
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 0, rtt: 0 }), true);
 });
