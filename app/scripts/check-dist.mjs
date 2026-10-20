@@ -24,9 +24,9 @@
 // Exits 1 with a list of problems, or prints a one-line summary.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { decodeGeo } from "../src/lib/geoCodec.js";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { fullBucket } from "../src/lib/fullBucket.js";
-import { decodeGeo } from "../src/lib/geoCodec.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(process.env.DIST_DIR ?? path.join(__dirname, "..", "dist"));

@@ -122,13 +122,12 @@ immutable`; "1 h" means `public, max-age=3600, stale-while-revalidate=86400`.
   appears under `assets/`, so nothing unhashed can get the
   immutable header.
 - `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
-  `boundaries/<decade>.tbin`, `boundaries/meta.json`, `land.tbin`,
-  `land-far.tbin`, `land-cells/*`, `selection-funnel.json`, `framing-review.json`;
-  every `.tbin` is also typed `application/x-protobuf`, so Cloudflare compresses it).
+  `boundaries/<decade>.json`, `boundaries/meta.json`, `land.json`,
+  `land-far.json`, `land-cells/*`, `selection-funnel.json`, `framing-review.json`).
   Immutable: `/data/events/v.<hash>/*` (the event list `all.json` and every
   `full/*.json` record, one folder per build named by a hash of all its files,
-  `app/scripts/split-data.mjs`) and `/data/boundaries/shared/*` (boundary
-  geometries shared by several decades, named by a hash of the file).
+  `app/scripts/split-data.mjs`) and `/data/boundaries/shared/*` (large
+  boundary geometries named by a hash of their content).
 - `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
   the engine and the `.pf_meta` keep their names; the content-hashed
   `/pagefind/index/*` chunks are immutable.
