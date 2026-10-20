@@ -64,7 +64,8 @@ from this GitHub repository. Setup (already done; for reference or a rebuild):
      `devDependencies`, locked in `app/package-lock.json`), installed by the build's
      `npm ci`, so a deploy never picks up whatever wrangler release is newest that day.
      Dependabot proposes upgrades like any other dependency.
-3. No build variables or secrets are needed.
+3. No build variables or secrets are needed. (Two optional hardening changes to the
+   build settings, made by hand: [Owner checklist](#owner-checklist-manual-dashboard-only).)
 
 Workers Builds' docs list a free-plan allowance of 3,000 build minutes/month, 1
 concurrent build and a 20-minute build timeout
@@ -129,7 +130,9 @@ Cloudflare does not deploy it.
 
 ## CI and the data pipeline
 
-`.github/workflows/ci.yml` runs on every push and pull request to `main` and deploys
+`.github/workflows/ci.yml` runs on every push and pull request to `main`, and on a manual
+or dispatched run (`workflow_dispatch`: the monthly refresh starts it on its pull request's
+branch, [below](#ci-on-the-refresh-pull-request)). It deploys
 nothing. Its jobs (the names GitHub shows as status checks):
 
 - **Build app/** - lints `app/` (oxlint), runs its unit tests (`npm test`), checks that
@@ -163,10 +166,12 @@ the Actions tab). It:
   cites were edited since the reviews (recorded in `data/framing-review.json`, with the
   diff at the top of the PR description; if the check cannot run, the PR says so).
 
-If `data/events.json` or `data/framing-review.json` changed, it validates the data, runs
-both unit-test suites and builds the site (`npm ci && npm run build` in `app/`, which
-includes the build-time checks above), since pull requests opened with the workflow token
-do not trigger CI, and then a pull request is opened. The workflow has two jobs: the
+If `data/events.json` or `data/framing-review.json` changed, it installs the repo-root
+dependencies (`npm ci`: the geometry library, without which `validate-events.js` skips its
+pin-in-country check and the root tests skip the geometry tests), validates the data, checks
+that the generated reports are current, runs both unit-test suites and builds the site
+(`npm ci && npm run build` in `app/`, which includes the build-time checks above), and then
+a pull request is opened and CI is started on it (below). The workflow has two jobs: the
 **Refresh summaries** job (`refresh`) does all of the above with a read-only token and
 hands the two data files and the reports on as artifacts; the pull request is opened by
 a separate job, **Open a pull request** (`open-pr`), which holds the write token and runs
@@ -180,6 +185,45 @@ It needs one repository setting, once:
 **Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"**.
 Without it the workflow still refreshes and checks the data, but fails at the step that
 opens the pull request.
+
+#### CI on the refresh pull request
+
+The pull request is opened with the workflow's own token (`GITHUB_TOKEN`). GitHub's
+[Triggering a workflow](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)
+page (read 2026-10-18) says events from that token do not start new workflow runs, except
+that `workflow_dispatch` and `repository_dispatch` "always create workflow runs", and that a
+pull request it opens gets its `pull_request` runs in an **approval-required** state, which a
+person with write access starts with **Approve workflows to run** in the merge box. So without
+help the required checks (`Build app/`, `Validate event data`) would sit waiting on the PR.
+
+So after opening the PR, the `open-pr` job runs `gh workflow run ci.yml --ref <branch>` (the
+job has `actions: write` for this only, the permission GitHub lists for the
+[workflow dispatch endpoint](https://docs.github.com/en/rest/authentication/permissions-required-for-github-apps)).
+For a `workflow_dispatch` run, `GITHUB_SHA` is the "last commit on the `GITHUB_REF` branch"
+([Events that trigger workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)),
+which is the PR's head commit, and its jobs have the same names as on a pull request. Check
+runs belong to a commit and the app that created them
+([checks guide](https://docs.github.com/en/rest/guides/using-the-rest-api-to-interact-with-checks)),
+and required status checks are matched by job name (and, if set, by source app:
+[About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)),
+so the dispatched run's checks should satisfy the ruleset. This was read from the docs, not
+yet seen on a real refresh PR: on the next one, check that the merge box lists the required
+checks as passed. Notes:
+
+- `workflow_dispatch` only works once `ci.yml` with that trigger is on `main` (it is, from
+  this change on). If the dispatch fails, the job logs a warning and the PR stays open; start
+  CI by hand: **Actions → CI → Run workflow** on the PR's branch, or approve the waiting
+  `pull_request` runs.
+- The approval-required `pull_request` runs may also appear on the PR. Approving them is
+  harmless (the same checks run twice); leaving them is fine too.
+- If the dispatched checks turn out not to count (say, a ruleset that pins a source app the
+  runs do not come from), the alternative is a token that is not `GITHUB_TOKEN`: a GitHub App
+  installation token (an App the owner creates with Contents and Pull requests write on this
+  repository, its ID and private key stored as Actions secrets, the token minted in `open-pr`
+  with `actions/create-github-app-token` pinned to a SHA) or a fine-grained personal access
+  token stored as a secret. PRs opened with either start CI normally. Both must be created by
+  the owner; nothing in the repo does it. The App is preferable (short-lived tokens, not tied
+  to a personal account).
 
 ## Frontend headers (`app/public/_headers`)
 
@@ -223,6 +267,49 @@ These are settings for the owner to make by hand; nothing in the repo changes th
    That skips the preview upload; the build command itself still runs. Dependabot pull
    requests still get CI.
 
+## Owner checklist (manual, dashboard-only)
+
+Nothing in the repo can make these changes; each is a setting in the Cloudflare or GitHub
+dashboard. None is needed for the site to work.
+
+1. **No preview builds for Dependabot branches.** See
+   [Recommended repository settings](#recommended-repository-settings-manual), item 2: either
+   exclude `dependabot/*` in Workers Builds' branch control, or set the preview command to the
+   `WORKERS_CI_BRANCH` check given there.
+2. **Do not run dependencies' install scripts in the Cloudflare build.** `app/package-lock.json`
+   marks three packages with `"hasInstallScript": true` (`esbuild`, `workerd` from wrangler, and
+   the macOS-only `fsevents`); the repo-root lockfile has none (checked 2026-10-18). Their
+   scripts run during the build's install with the build's API token in the environment.
+   - **Do not** just set `NPM_CONFIG_IGNORE_SCRIPTS=true` as a build variable. npm's
+     [`ignore-scripts`](https://docs.npmjs.com/cli/v11/using-npm/config#ignore-scripts) also
+     makes `npm run build` skip its `prebuild` and `postbuild` scripts, i.e. the data validation
+     and `check-dist.mjs` ([Build steps](#build-steps-and-build-time-checks)): checked locally on
+     2026-10-18, `NPM_CONFIG_IGNORE_SCRIPTS=true npm run build` ran only `vite build`. A broken
+     build would then deploy.
+   - Instead, limit it to the install: **Workers & Pages → `meast-events` → Settings → Build →
+     Variables**: add `SKIP_DEPENDENCY_INSTALL` = `1` (Workers Builds then skips its own install,
+     per its [build image](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/)
+     docs), and change the **Build command** to `npm ci --ignore-scripts && npm run build`.
+     Checked locally (Windows, 2026-10-18): after `npm ci --ignore-scripts`, `npm run build` ran
+     all its checks and passed, and `npx wrangler --version` worked. Watch the first Cloudflare
+     build after the change (Linux, where esbuild and workerd use their platform packages): if
+     it fails in esbuild or wrangler, revert both settings.
+3. **Narrow the build's API token.** Workers Builds creates a user API token by default with,
+   per its [configuration docs](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/),
+   account settings read, Workers Scripts edit, Workers KV Storage edit, Workers R2 Storage
+   edit, Workers Routes edit on all zones, and user details and memberships read. The site
+   uses no KV, no R2 and no routes (`app/wrangler.jsonc` declares none; the custom domain is
+   set in the dashboard). **My Profile → API Tokens** → the Workers Builds token → **Edit**:
+   remove Workers KV Storage and Workers R2 Storage, and restrict it to this account. Removing
+   Workers Routes is likely fine too but untested; if the next build's deploy fails, add it
+   back. Then confirm one push to `main` still deploys and one branch still gets a preview.
+4. **Finish [Retiring the old API](#retiring-the-old-api-manual-one-time):** delete the
+   `meast-api` Worker and the Redis Cloud database (and subscription), then delete the local
+   `server/.env` and `worker/.dev.vars` files (they hold the old Redis password).
+5. **Turn on GitHub private vulnerability reporting** (it was off on 2026-10-18), so the
+   "Report a vulnerability" route in [docs/SECURITY.md](docs/SECURITY.md#5-reporting-a-vulnerability)
+   works: **Settings → Advanced Security → Private vulnerability reporting → Enable**.
+
 ## Verifying a deploy
 
 1. Open the site: the map renders with country shapes and markers (not a blank
@@ -233,6 +320,8 @@ These are settings for the owner to make by hand; nothing in the repo changes th
    event count.
 4. The footer's "About the data · Sources & licences" links are visible, and "Sources
    & licences" opens the dialog at the credits for CShapes 2.0, UN OCHA and Wikipedia.
+   Its "third-party licences" link opens `/third-party-licenses.txt` (generated by the build,
+   `app/scripts/third-party-licenses.mjs`), which lists MapLibre GL JS among others.
 
 ## Free plan limits
 

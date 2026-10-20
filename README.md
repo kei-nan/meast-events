@@ -45,6 +45,7 @@ on merge to `main` (DEPLOYMENT.md).
 ## Licenses
 
 - **Source code:** GNU AGPL v3.0 - see [LICENSE](LICENSE).
-- **Data:** non-commercial only (CC BY-NC-SA 4.0 for the borders, derived from
-  CShapes 2.0; CC BY-SA 4.0 for Wikipedia text) - see [data/LICENSE](data/LICENSE)
-  and [NOTICE](NOTICE) for all credits.
+- **Data:** the borders are non-commercial only (CC BY-NC-SA 4.0, derived from
+  CShapes 2.0, plus UN OCHA's non-commercial terms for the West Bank areas); the
+  Wikipedia text stays CC BY-SA 4.0 - see [data/LICENSE](data/LICENSE)
+  and [NOTICE](NOTICE) for all credits, including the third-party software notices.

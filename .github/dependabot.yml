@@ -2,18 +2,25 @@ version: 2
 updates:
   # One entry per package.json / lockfile. Weekly, grouped so a week's bumps
   # arrive as one PR per directory instead of one per package.
+  # cooldown: a release is proposed only once it is 7 days old, so a hijacked
+  # package version that the registry pulls within days never reaches a PR
+  # (GitHub's Dependabot options reference, "cooldown"). It applies to version
+  # updates only: security updates still open at once.
   - package-ecosystem: npm
     directory: "/"
     schedule: { interval: weekly }
+    cooldown: { default-days: 7 }
     open-pull-requests-limit: 5
     groups:
       minor-and-patch: { update-types: [minor, patch] }
   - package-ecosystem: npm
     directory: "/app"
     schedule: { interval: weekly }
+    cooldown: { default-days: 7 }
     open-pull-requests-limit: 5
     groups:
       minor-and-patch: { update-types: [minor, patch] }
   - package-ecosystem: github-actions
     directory: "/"
     schedule: { interval: weekly }
+    cooldown: { default-days: 7 }

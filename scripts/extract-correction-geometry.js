@@ -51,7 +51,8 @@
 //        on the Iraq/Saudi Arabia Boundary" (30 Mar 1992) - turning points of the 1981 line,
 //        one of them labelled as the former Neutral Zone's western vertex.
 //        https://data.geodata.state.gov/guidance/DoS_Bulletin_04-Iraq-Saudi-Arabia-1992.pdf
-//      - GeoNames gazetteer country dumps (public domain, derived from NGA GNS), used only to
+//      - GeoNames gazetteer country dumps (CC BY 4.0, per the dump's readme.txt and
+//        geonames.org/about.html; credited in NOTICE and the About dialog), used only to
 //        look up the wells/capes the treaties name: https://download.geonames.org/export/dump/
 //        (SA.zip, KW.zip, IQ.zip)
 //    Every coordinate below is transcribed from one of those; none is estimated from a map

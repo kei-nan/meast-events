@@ -1,7 +1,18 @@
-middleeast.events - third-party data credits
+middleeast.events - third-party credits
 
 Source code: GNU Affero General Public License v3.0 (see LICENSE).
-Data (data/): see data/LICENSE. Non-commercial use only.
+Data (data/): see data/LICENSE. Each part keeps its source's licence:
+- Border data (boundaries.json, corrections-geometry.json): CC BY-NC-SA 4.0
+  (CShapes 2.0), with the UN OCHA areas under their own terms (below).
+  Non-commercial use only. The non-commercial limit applies to this part only.
+- Event text (titles, extracts) from Wikipedia: CC BY-SA 4.0, credited to
+  Wikipedia contributors. It has no non-commercial restriction.
+- Facts from Wikidata (dates, places, identifiers): CC0.
+Third-party software in the built site (MapLibre GL JS, BSD 3-Clause; React,
+Pagefind and uqr, MIT; the Fontsource font packages, OFL 1.1): their licence
+notices are generated at build time into third-party-licenses.txt, served at
+https://middleeast.events/third-party-licenses.txt
+(app/scripts/third-party-licenses.mjs).
 
 - CShapes 2.0 - historical country borders. Schvitz, G., et al. (2022).
   CC BY-NC-SA 4.0. https://icr.ethz.ch/data/cshapes/
@@ -19,7 +30,9 @@ Data (data/): see data/LICENSE. Non-commercial use only.
   2017 The Spectral Project Authors) - interface fonts, SIL Open Font License
   1.1, see app/public/fonts/. Installed from the Fontsource npm packages at
   build time; the font files are not in this repository.
-- GeoNames - CC BY 4.0. https://www.geonames.org/
+- GeoNames - CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+  https://www.geonames.org/ Gazetteer coordinates of the wells and capes
+  that treaties name, used in scripts/extract-correction-geometry.js.
 - Wikipedia / Wikidata - event titles, extracts and metadata. Text is
   CC BY-SA 4.0, credited to Wikipedia contributors; each event links to its
   source article. Wikidata is CC0.
