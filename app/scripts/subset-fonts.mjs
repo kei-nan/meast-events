@@ -32,10 +32,10 @@
 //   node scripts/subset-fonts.mjs
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { decodeGeo } from "../src/lib/geoCodec.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import subsetFont from "subset-font";
-import { decodeGeo } from "../src/lib/geoCodec.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP = path.join(__dirname, "..");
