@@ -9,10 +9,8 @@ import useAllEvents, { RETRY_MS } from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
 import useUrlState from "./hooks/useUrlState";
 import {
-  decadeFloor,
   eventOverlapsRange,
   eventYearRange,
-  loadBoundaryDecade,
   loadFullLead,
   loadLand,
   prefetchFullLead,
@@ -43,25 +41,30 @@ const MAP_PLACEHOLDER = <MapLoading />;
 // Opened from the footer or a link only, so its code loads on first use.
 const AboutData = lazy(() => importOr(() => import("./components/AboutData.jsx"), AboutDataFailed));
 
-// What the map needs first (land, the initial borders decade; the map chunk
-// itself is lazy-loaded) starts downloading right after the FIRST PAINT, all
-// in parallel. Not before it: on a slow connection these ~400 KB would share
-// bandwidth with index.js and delay the header, panel and timeline (Lighthouse
-// measured LCP 4.1 s -> 5.6 s with them preloaded from index.html). The data
-// loaders cache their requests, so MapView reuses these. `year` null: not known
-// yet (an event link without years shows the event's own year, which needs the
-// event list), so no borders decade is fetched ahead.
-function startMapDownloads(year) {
+// What the map needs before its chunk arrives (land.json, for the land
+// MapLoading draws; the map chunk itself is lazy-loaded) starts downloading
+// right after the FIRST PAINT. Not before it: on a slow connection these
+// downloads would share bandwidth with index.js and delay the header, panel and
+// timeline (Lighthouse measured LCP 4.1 s -> 5.6 s with land and the borders
+// decade preloaded from index.html). The data loaders cache their requests, so
+// MapView reuses this one.
+function startMapDownloads() {
+  // The borders decade is not fetched ahead either: MapView requests it at
+  // mount. Fetched here (~95 KB: the decade file and the shared geometries it
+  // needs) it competed with the MapView chunk, and the first-visit map tip in
+  // that chunk is the phone's LCP: measured (2026-10, slow 4G 1.6 Mbps/150 ms,
+  // 4x CPU, median of 7) LCP 4.33 -> 3.85 s without it, with the map showing
+  // its borders no later and desktop unchanged.
+  //
   // MapLibre's worker (self-contained since 6.13.0) is not preloaded: Chromium
   // ignores <link rel=preload as=worker>, and modulepreload would parse it on
   // the main thread. It downloads when the map starts it. A fetch() from here
   // would fill the HTTP cache for the Worker (Chromium reuses it), but measured
   // (2026-10) it took bandwidth from the panel's content on a slow phone
-  // connection (LCP 4.5 -> 5.2 s) to save ~0.25 s of map wait on desktop. The
-  // land MapLoading draws from land.json covers that wait instead.
-  const loads = [loadLand()];
-  if (year != null) loads.push(loadBoundaryDecade(decadeFloor(year)));
-  for (const load of loads) load.catch(() => {}); // MapView retries
+  // connection (LCP 4.5 -> 5.2 s) to save ~0.25 s of map wait on desktop, and
+  // re-measured alongside the map chunk it delayed that chunk (LCP +0.73 s).
+  // The land MapLoading draws from land.json covers that wait instead.
+  loadLand().catch(() => {}); // MapView retries
 }
 
 // Calls fn once the browser reports the First Contentful Paint. "The next frame"
@@ -147,8 +150,7 @@ export default function App() {
   useEffect(
     () =>
       afterFirstContentfulPaint(() => {
-        // The map shows the range's end year, or an opened event's own year.
-        startMapDownloads(initial.years?.[1] ?? (initial.eventId ? null : MAX_YEAR));
+        startMapDownloads();
         setMapStarted(true);
       }),
     [initial]
