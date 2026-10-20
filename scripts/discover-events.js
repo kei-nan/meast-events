@@ -62,6 +62,15 @@ import {
   EVENT_CLASSES,
   INCLUSION_MIN_SITELINKS,
 } from "./lib/event-classes.js";
+import {
+  predecessorStatesQuery,
+  predecessorStates,
+  predecessorItemsQuery,
+  presentDayCountryIndex,
+  predecessorCountryTags,
+} from "./lib/predecessor.js";
+import { fetchEntities } from "./lib/wd-entities.js";
+import { openCache } from "./lib/cache.js";
 
 // Countries, event classes and the sitelink threshold live in scripts/lib/event-classes.js
 // (shared with the enrichment step and docs/DATA_POLICY.md). Every class QID there was
@@ -73,6 +82,15 @@ import {
 //                               overwriting it. Without --classes all classes are queried and
 //                               the file is rewritten.
 //   --min-sitelinks=N           notable_enough threshold (default: the policy value, 10)
+//   --predecessors-only         run only the predecessor-state pass (below) and MERGE its NEW items into the existing
+//                               data/event-candidates.json; rows already there are kept exactly as they are
+//
+// PREDECESSOR STATES (docs/DATA_POLICY.md, inclusion rule 2): an item whose P17 is a historical state that Wikidata
+// links to a tracked country via P1366/P1365 (Ottoman Empire, Kingdom of Egypt, Pahlavi Iran, ...) counts only when
+// its own P625 lies inside a tracked country's present-day border shape (data/boundaries.json), or a P276 place's
+// present-day P17 is a tracked country; it is then tagged with that country. A few cheap queries (lib/predecessor.js):
+// the predecessor list, the items with such a P17 dated 1900+, and their event classes/dates/sitelinks; then the
+// items' and places' statements via wbgetentities (cached). Needs @turf/turf (root npm ci).
 //
 // A class query that fails (after the fallbacks below) makes the run write NOTHING and exit
 // non-zero, listing the failed classes: rewriting the file without them would silently drop
@@ -80,6 +98,7 @@ import {
 const argVal = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
 const MIN_SITELINKS = Number(argVal("min-sitelinks") ?? INCLUSION_MIN_SITELINKS);
 const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
+const PREDECESSORS_ONLY = process.argv.includes("--predecessors-only");
 const REQUEST_DELAY_MS = 1500; // WDQS etiquette: no rapid-fire/parallel querying.
 
 // classValues: query P31 instances of exactly these classes instead of classQid's tree
@@ -184,6 +203,110 @@ function titleFromEnwikiUrl(url) {
   return decodeURIComponent(slug).replace(/_/g, " ");
 }
 
+// Event classes, dates (the same rule as buildQuery), sitelinks and English article of the given items.
+function predecessorDetailQuery(itemQids) {
+  const maxYear = new Date().getFullYear() + 1;
+  return `
+SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?enwiki ?classes WHERE {
+  {
+    SELECT ?item (MIN(?date) AS ?eventDate) (MAX(?dateEnd) AS ?eventDateEnd) (SAMPLE(?sitelinks) AS ?nSitelinks)
+      (SAMPLE(?enArticle) AS ?enwiki) (GROUP_CONCAT(DISTINCT ?cls; separator="|") AS ?classes)
+    WHERE {
+      VALUES ?item { ${itemQids.map((q) => `wd:${q}`).join(" ")} }
+      VALUES ?cls { ${EVENT_CLASSES.map((c) => `wd:${c.qid}`).join(" ")} }
+      ?item wdt:P31/wdt:P279* ?cls .
+      OPTIONAL { ?item wdt:P585 ?pit }
+      OPTIONAL { ?item wdt:P580 ?start }
+      OPTIONAL { ?item wdt:P582 ?dateEnd }
+      BIND(COALESCE(?pit, ?start) AS ?date)
+      FILTER(BOUND(?date) && YEAR(?date) >= 1900 && YEAR(?date) <= ${maxYear})
+      ?item wikibase:sitelinks ?sitelinks .
+      OPTIONAL { ?enArticle schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> . }
+    }
+    GROUP BY ?item
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}`;
+}
+
+const PREDECESSOR_DETAIL_BATCH = 200;
+
+// The predecessor-state pass. Adds new rows to byQid (and the rule's tags to rows already there unless keepExisting).
+async function predecessorPass(byQid, { keepExisting = false } = {}) {
+  const turf = await import("@turf/turf").catch(() => null);
+  if (!turf) throw new Error("the predecessor-state pass needs @turf/turf: run npm ci at the repo root");
+  const boundaries = JSON.parse(await readFile(new URL("../data/boundaries.json", import.meta.url), "utf-8"));
+  const countriesAt = presentDayCountryIndex(boundaries, turf, new Date().getUTCFullYear());
+
+  const preds = predecessorStates(
+    (await runSparql(predecessorStatesQuery())).map((r) => ({
+      pred: qidFromUri(r.pred.value),
+      label: r.predLabel?.value,
+      country: QID_TO_COUNTRY[qidFromUri(r.country.value)],
+    }))
+  );
+  console.log(`  ${preds.size} predecessor states (P1366/P1365 to a tracked country)`);
+  await sleep(REQUEST_DELAY_MS);
+  const items = (await runSparql(predecessorItemsQuery([...preds.keys()]))).map((r) => qidFromUri(r.item.value)).sort(compareQids);
+  console.log(`  ${items.length} items with such a P17 and a P585/P580 from 1900`);
+
+  const detail = new Map();
+  for (let i = 0; i < items.length; i += PREDECESSOR_DETAIL_BATCH) {
+    await sleep(REQUEST_DELAY_MS);
+    for (const r of await runSparql(predecessorDetailQuery(items.slice(i, i + PREDECESSOR_DETAIL_BATCH)))) {
+      detail.set(qidFromUri(r.item.value), r);
+    }
+  }
+  console.log(`  ${detail.size} of them are instances of an event class and dated 1900+`);
+
+  const cache = openCache("entities");
+  const ents = await fetchEntities([...detail.keys()], { cache });
+  const placeQids = [...new Set([...ents.values()].filter(Boolean).flatMap((e) => e.p276))];
+  const places = await fetchEntities(placeQids, { cache, props: "claims|labels" });
+
+  let added = 0, tagged = 0, unlocated = 0;
+  for (const [qid, row] of [...detail].sort((a, b) => compareQids(a[0], b[0]))) {
+    const rule = predecessorCountryTags(ents.get(qid), places, preds, countriesAt);
+    if (!rule) continue; // P17 changed between the queries
+    if (!rule.countries.length) {
+      unlocated++;
+      continue; // the rule: neither its P625 nor a P276 place's present-day country is tracked
+    }
+    const matched = new Set((row.classes?.value ?? "").split("|").filter(Boolean).map(qidFromUri));
+    const classes = EVENT_CLASSES.filter((c) => matched.has(c.qid));
+    const predecessor_rule = { predecessors: rule.predecessors, via: rule.via };
+    const existing = byQid.get(qid);
+    if (existing) {
+      if (keepExisting) continue;
+      const before = existing.countries.length;
+      existing.countries = [...new Set([...existing.countries, ...rule.countries])];
+      if (existing.countries.length > before) {
+        existing.predecessor_rule = predecessor_rule;
+        tagged++;
+      }
+      continue;
+    }
+    byQid.set(qid, {
+      wikidata_qid: qid,
+      wikipedia_title: titleFromEnwikiUrl(row.enwiki?.value),
+      wikidata_label: row.itemLabel?.value ?? null,
+      wikidata_description: row.itemDescription?.value ?? null,
+      date_start: toDateString(row.eventDate?.value),
+      date_end: toDateString(row.eventDateEnd?.value),
+      countries: rule.countries,
+      category: classes[0].category,
+      wikidata_classes: classes.map((c) => c.label),
+      sitelinks: Number(row.nSitelinks?.value ?? 0),
+      has_en_wikipedia: Boolean(row.enwiki),
+      predecessor_rule,
+    });
+    added++;
+  }
+  console.log(
+    `  predecessor rule: ${added} new candidates, ${tagged} existing candidates got a tag, ${unlocated} items not located in a tracked country (not counted)`
+  );
+}
+
 async function loadExistingTitlesAndQids() {
   // Cross-check signal: does discovery re-find events already curated by hand? Uses
   // both seed-events.json (title match) and events.json (QID match, more reliable
@@ -212,8 +335,15 @@ async function loadExistingTitlesAndQids() {
 async function main() {
   const byQid = new Map();
   const outPath = new URL("../data/event-candidates.json", import.meta.url);
-  const classes = ONLY_CLASSES ? EVENT_CLASSES.filter((c) => ONLY_CLASSES.includes(c.qid)) : EVENT_CLASSES;
-  if (ONLY_CLASSES) {
+  const classes = PREDECESSORS_ONLY ? [] : ONLY_CLASSES ? EVENT_CLASSES.filter((c) => ONLY_CLASSES.includes(c.qid)) : EVENT_CLASSES;
+  const existingRows = new Set();
+  if (PREDECESSORS_ONLY) {
+    for (const c of JSON.parse(await readFile(outPath, "utf-8"))) {
+      byQid.set(c.wikidata_qid, c);
+      existingRows.add(c.wikidata_qid);
+    }
+    console.log(`Predecessor-state pass only; merging new items into ${byQid.size} existing candidates (kept as they are).`);
+  } else if (ONLY_CLASSES) {
     const unknown = ONLY_CLASSES.filter((q) => !EVENT_CLASSES.some((c) => c.qid === q));
     if (unknown.length) throw new Error(`--classes contains QIDs not in EVENT_CLASSES: ${unknown.join(", ")}`);
     // Bounded run: keep everything already discovered and merge the new rows into it.
@@ -279,17 +409,37 @@ async function main() {
     process.exit(1);
   }
 
+  // Bounded --classes runs leave the predecessor pass out (run it with --predecessors-only).
+  if (!ONLY_CLASSES) {
+    console.log(`Predecessor-state pass:`);
+    if (!PREDECESSORS_ONLY) await sleep(REQUEST_DELAY_MS);
+    await predecessorPass(byQid, { keepExisting: PREDECESSORS_ONLY });
+  }
+
   const { titles: existingTitles, qids: existingQids } = await loadExistingTitlesAndQids();
 
-  const all = [...byQid.values()].map((c) => ({
-    ...c,
-    notable_enough: c.sitelinks >= MIN_SITELINKS && c.has_en_wikipedia,
-    already_curated:
-      existingQids.has(c.wikidata_qid) ||
-      (c.wikipedia_title ? existingTitles.has(c.wikipedia_title.toLowerCase()) : false),
-  }));
+  const all = [...byQid.values()].map((c) =>
+    existingRows.has(c.wikidata_qid)
+      ? c // --predecessors-only: rows already in the file are not touched
+      : {
+          ...c,
+          notable_enough: c.sitelinks >= MIN_SITELINKS && c.has_en_wikipedia,
+          already_curated:
+            existingQids.has(c.wikidata_qid) ||
+            (c.wikipedia_title ? existingTitles.has(c.wikipedia_title.toLowerCase()) : false),
+        }
+  );
 
-  all.sort((a, b) => b.sitelinks - a.sitelinks || compareQids(a.wikidata_qid, b.wikidata_qid));
+  const bySitelinks = (a, b) => b.sitelinks - a.sitelinks || compareQids(a.wikidata_qid, b.wikidata_qid);
+  if (PREDECESSORS_ONLY) {
+    // Keep the file's existing order (its rows are untouched) and slot each new row in by the same sort.
+    const kept = all.filter((c) => existingRows.has(c.wikidata_qid));
+    for (const row of all.filter((c) => !existingRows.has(c.wikidata_qid)).sort(bySitelinks)) {
+      const at = kept.findIndex((c) => bySitelinks(row, c) < 0);
+      kept.splice(at < 0 ? kept.length : at, 0, row);
+    }
+    all.splice(0, all.length, ...kept);
+  } else all.sort(bySitelinks);
 
   await writeFile(outPath, JSON.stringify(all, null, 2));
 

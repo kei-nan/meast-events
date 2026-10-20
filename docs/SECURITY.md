@@ -13,6 +13,8 @@ the repo; git history keeps them. Shutting down what is still deployed is the
 owner's manual checklist in
 [DEPLOYMENT.md](../DEPLOYMENT.md#retiring-the-old-api-manual-one-time).)
 
+**Found a vulnerability?** See [Reporting a vulnerability](#5-reporting-a-vulnerability).
+
 Cloudflare claims below cite a docs URL. Where a page was read through a
 summarising fetch tool (not the raw page) or could not be confirmed, that is
 said explicitly. Docs change; re-check before relying on them.
@@ -168,7 +170,13 @@ splat.
 - `.github/dependabot.yml`: weekly npm updates for `/` and `/app`
   (minor+patch grouped) and GitHub Actions. Not validated by GitHub from here
   (I cannot run Actions/Dependabot): check the repo's Insights -> Dependency
-  graph -> Dependabot tab.
+  graph -> Dependabot tab. Every entry has `cooldown: { default-days: 7 }`:
+  Dependabot proposes a release only once it is 7 days old, so a hijacked
+  version that is caught and pulled within days never reaches a pull request.
+  Per GitHub's
+  [Dependabot options reference](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference)
+  (`cooldown`, read 2026-10-18), the cooldown applies to version updates
+  only, not to security updates, which still open at once.
 - CI `audit` job (`.github/workflows/ci.yml`), for the repo root and `app/`:
   `npm audit --omit=dev --audit-level=high` is **blocking** (runtime
   dependencies with a high/critical advisory are worth stopping for); the full
@@ -195,11 +203,13 @@ splat.
   - Job `refresh` (`contents: read`): runs the refresh scripts, `npm ci`, the
     tests, the build and `check-dist.mjs`, and uploads `data/events.json`,
     `data/framing-review.json` and the reports as workflow artifacts.
-  - Job `open-pr` (`contents: write`, `pull-requests: write`; only when
-    `refresh` succeeded and found changes): a fresh checkout of the same
-    commit (`persist-credentials: false`), the two data files copied in from
-    the artifact (nothing else from it reaches the commit), then commit, push
-    and `gh pr create`. It runs no npm and no repository script; git runs
+  - Job `open-pr` (`contents: write`, `pull-requests: write`, `actions:
+    write`; only when `refresh` succeeded and found changes): a fresh checkout
+    of the same commit (`persist-credentials: false`), the two data files
+    copied in from the artifact (nothing else from it reaches the commit),
+    then commit, push, `gh pr create` and `gh workflow run ci.yml` on the new
+    branch (`actions: write` is for that dispatch only; DEPLOYMENT.md,
+    "Monthly refresh"). It runs no npm and no repository script; git runs
     with `core.hooksPath=/dev/null`. The token is passed only to that last
     step, and only for the push through git's `GIT_CONFIG_*` environment
     (never written to `.git/config`).
@@ -207,3 +217,31 @@ splat.
     content of those two data files (or the PR description, from the
     reports). That reaches only the unmerged pull request, which the owner
     reviews; it cannot push elsewhere, change workflows, or merge.
+  - Wikipedia text in the PR description: the report lists changed titles
+    and lead sentences, which anyone can edit on Wikipedia. Each one is an
+    inline code span (`mdCode` in `scripts/lib/title-refresh.js`, with a fence
+    longer than any backtick run in the text and line breaks flattened), so
+    an edit containing `<!--`, markdown, links or `@mentions` shows as plain
+    text: it cannot hide the rest of the description from the reviewer or
+    notify anyone. Unit tests in `scripts/lib/title-refresh.test.js`.
+
+## 5. Reporting a vulnerability
+
+Please report security problems privately, not in a public issue: use
+GitHub's private vulnerability reporting, **Security -> Advisories -> Report
+a vulnerability** on the repository
+(<https://github.com/kei-nan/meast-events/security/advisories/new>). Only the
+maintainer sees the report. Useful to include: what is affected (the site,
+a workflow, a script), how to reproduce it, and what an attacker could do.
+There is no bug bounty; reports are answered as time allows, and fixed ones
+are credited in the advisory if you wish.
+
+The site has no accounts, no user data and no server code (above), so the
+interesting cases are things like script injection on the site, a way to get
+unreviewed content deployed, or a weakness in the CI workflows.
+
+Owner, once: private reporting must be switched on, or the button does not
+appear (it was off when checked on 2026-10-18). GitHub's
+[docs](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configuring-private-vulnerability-reporting-for-a-repository):
+repository **Settings -> Advanced Security** (sidebar section "Security and
+quality") -> **Private vulnerability reporting** -> **Enable**.

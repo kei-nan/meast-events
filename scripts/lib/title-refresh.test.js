@@ -1,6 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { detectTitleChange, checkFormerTitle, applyTitleChanges, titleReport, detectExtractHold, extractHoldReport } from "./title-refresh.js";
+import {
+  detectTitleChange,
+  checkFormerTitle,
+  applyTitleChanges,
+  titleReport,
+  detectExtractHold,
+  extractHoldReport,
+  leadChangeReport,
+  mdCode,
+} from "./title-refresh.js";
 
 const gaza = () => ({
   id: "2023-israel-hamas-war",
@@ -136,8 +145,8 @@ test("titleReport: lists every change and every held case", () => {
   const held = { file: "curated", ...detectTitleChange({ ...gaza(), id: "b" }, null) };
   const dry = titleReport([ch, held], { name: "curated" });
   assert.match(dry, /curated titles: 1 to update \(dry run\), 1 held/);
-  assert.match(dry, /`2023-israel-hamas-war`: "2023 Israel–Hamas war" -> "Gaza war"/);
-  assert.match(dry, /`b` \("2023 Israel–Hamas war"\): No article returned/);
+  assert.match(dry, /`2023-israel-hamas-war`: `2023 Israel–Hamas war` -> `Gaza war`/);
+  assert.match(dry, /`b` \(`2023 Israel–Hamas war`\): No article returned: `no Wikipedia page returned for "Gaza war"`/);
   assert.match(titleReport([ch], { applied: true }), /1 updated, 0 held/);
 });
 
@@ -175,5 +184,53 @@ test("extractHoldReport: lists every held extract, nothing when none", () => {
   assert.equal(extractHoldReport([]), "");
   const r = extractHoldReport([detectExtractHold(musa(), mountainLead())], { name: "proposed" });
   assert.match(r, /proposed extracts held: 1/);
-  assert.match(r, /`musa-dagh-resistance` \("Musa Dagh Resistance"\): Article belongs to a different Wikidata item\./);
+  assert.match(r, /`musa-dagh-resistance` \(`Musa Dagh Resistance`\): Article belongs to a different Wikidata item: `article "Musa Dagh"/);
+});
+
+// The refresh printout is the monthly PR description: Wikipedia text in it must not be able to hide the rest of the
+// description from the reviewer (an HTML comment), add links or markup, or ping anyone (@mentions).
+const HIDE = "Ordinary sentence. <!-- the reviewer would not see what follows";
+const PING = "Thanks @someuser and [click](https://example.com) **now**";
+
+test("mdCode: Wikipedia text becomes one inline code span", () => {
+  assert.equal(mdCode(HIDE), "`Ordinary sentence. <!-- the reviewer would not see what follows`");
+  assert.equal(mdCode(PING), "`Thanks @someuser and [click](https://example.com) **now**`");
+  // the fence is longer than any backtick run inside, and padded when the text starts or ends with one
+  assert.equal(mdCode("a `b` c"), "``a `b` c``");
+  assert.equal(mdCode("``x``"), "``` ``x`` ```");
+  assert.equal(mdCode(" spaced "), "`  spaced  `");
+  // a line break can never start a new markdown block (heading, list item, fence)
+  assert.equal(mdCode("one\n# Heading\r\n\n- item"), "`one # Heading - item`");
+  assert.equal(mdCode(""), "(empty)");
+  assert.equal(mdCode(null), "(empty)");
+});
+
+test("leadChangeReport: changed sentences are code spans, clipped, and capped at maxLines", () => {
+  const change = {
+    id: "some-event",
+    title: "Some <b>event</b>",
+    from: "2026-09-01",
+    d: { removed: [HIDE], added: [PING, "x".repeat(200), "third"], lenBefore: 10, lenAfter: 20 },
+  };
+  const r = leadChangeReport(change, { maxLines: 2 });
+  const lines = r.split("\n");
+  assert.equal(lines[0], "- `some-event` (`Some <b>event</b>`) stored 2026-09-01: 10 -> 20 chars, -1 +3 sentences");
+  assert.equal(lines[1], "    - `Ordinary sentence. <!-- the reviewer would not see what follows`");
+  assert.equal(lines[2], "    + `Thanks @someuser and [click](https://example.com) **now**`");
+  assert.equal(lines[3], "    + `" + "x".repeat(159) + "…`");
+  assert.equal(lines[4], "    + ... 1 more added");
+  assert.equal(lines.length, 5);
+  // no Wikipedia text outside a code span: strip the spans and nothing of the payloads is left
+  const outside = r.replace(/`[^`]*`/g, "");
+  assert.doesNotMatch(outside, /<!--|@someuser|\[click\]|<b>/);
+});
+
+test("titleReport and extractHoldReport: titles and details from Wikipedia stay inside code spans", () => {
+  const sneaky = lead({ title: "Gaza war <!-- hidden", redirected_from: "@someuser" });
+  const ch = { file: "curated", ...detectTitleChange(gaza(), sneaky) };
+  const held = { file: "curated", ...detectTitleChange({ ...gaza(), id: "b" }, lead({ ...sneaky, redirect_fragment: "x" })) };
+  const r = titleReport([ch, held]);
+  assert.match(r, /`2023 Israel–Hamas war` -> `Gaza war <!-- hidden`/);
+  const hr = extractHoldReport([detectExtractHold(musa(), mountainLead({ title: "@someuser <!--" }))]);
+  for (const text of [r, hr]) assert.doesNotMatch(text.replace(/`[^`]*`/g, ""), /<!--|@someuser/);
 });

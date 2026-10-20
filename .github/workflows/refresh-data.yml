@@ -23,8 +23,11 @@ name: Refresh Wikipedia summaries
 # files' content, which lands only in the reviewed PR (as before), or fail the run.
 #
 # Needs: Settings -> Actions -> General -> "Allow GitHub Actions to create and
-# approve pull requests". Pull requests opened with the workflow token do not
-# trigger the CI workflow, so the same checks run here before the PR is opened.
+# approve pull requests". A pull request opened with the workflow token does not
+# start CI on its own (its pull_request run waits for a person's approval), so
+# the data checks run here before the PR is opened, and "open-pr" then starts
+# CI on the PR's branch with a workflow_dispatch (ci.yml), whose check runs
+# land on the PR's head commit (DEPLOYMENT.md, "Monthly refresh").
 on:
   schedule:
     - cron: "0 6 1 * *" # 06:00 UTC on the 1st of each month
@@ -100,9 +103,25 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         run: node scripts/build-missing-coordinates-report.js
 
+      # The repo-root dependencies, as in ci.yml's "Validate event data" job: without
+      # the geometry library (turf) validate-events skips its pin-in-country check and
+      # the root tests skip the geometry tests, silently. Their install scripts run
+      # here, in the read-only job, never in "open-pr".
+      - name: Install repo-root dependencies (geometry library)
+        if: steps.diff.outputs.changed == 'true'
+        run: npm ci
+
       - name: Validate events
         if: steps.diff.outputs.changed == 'true'
         run: node scripts/validate-events.js
+
+      # ci.yml checks that the published reports match the data; the funnel counts
+      # curated events, so a refresh could change it. No network.
+      - name: Generated reports are current
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          node scripts/build-missing-coordinates-report.js --check
+          node scripts/build-selection-funnel.js --check
 
       - name: Unit tests
         if: steps.diff.outputs.changed == 'true'
@@ -160,6 +179,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      # Only to start ci.yml on the new branch (gh workflow run, below).
+      actions: write
     steps:
       # The same commit "refresh" started from, so the PR changes only what the
       # refresh changed. The token is not left in .git/config.
@@ -251,3 +272,10 @@ jobs:
           gh pr create --base main --head "$branch" \
             --title "Refresh Wikipedia summaries, titles and guideline versions (${day})" \
             --body-file "$RUNNER_TEMP/pr-body.md"
+          # The pull_request run of CI that the new PR would start waits for a person's
+          # approval when the PR comes from the workflow token; a workflow_dispatch from it
+          # always runs. It checks out the branch's last commit, the PR's head, so its jobs'
+          # check runs ("Build app/", "Validate event data", ...) are the PR's status checks.
+          # A failure here leaves the PR open without CI: say so, start it by hand.
+          gh workflow run ci.yml --ref "$branch" \
+            || echo "::warning::Could not start CI on $branch; start ci.yml on it from the Actions tab (Run workflow)."

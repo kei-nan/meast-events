@@ -92,6 +92,31 @@ export const CIVIC_EVENT_CLASSES = [
   { qid: "Q1072326", label: "summit", category: "diplomatic" },
 ];
 
+// "Not events" (docs/DATA_POLICY.md): an entry whose Wikidata item is a person, an organisation, a state or the history
+// of a country is not an event and is not included, whatever else it is typed as. Matched against the stored
+// `wikidata_classes` labels (Wikidata's English P31 labels); each QID's label was checked with wbgetentities on
+// 2026-10-15. The first eleven are the classes of the nine entries removed on 2026-10-09; "history of a country or
+// state" was added on 2026-10-15 (Jordanian independence, whose item is "history of Jordan").
+export const NOT_EVENT_CLASSES = [
+  { qid: "Q5", label: "human", kind: "person" },
+  { qid: "Q43229", label: "organization", kind: "organisation" },
+  { qid: "Q7210356", label: "political organization", kind: "organisation" },
+  { qid: "Q15627509", label: "military organization", kind: "organisation" },
+  { qid: "Q17127659", label: "terrorist organization", kind: "organisation" },
+  { qid: "Q17149090", label: "armed organization", kind: "organisation" },
+  { qid: "Q3024240", label: "historical country", kind: "state" },
+  { qid: "Q7275", label: "state", kind: "state" },
+  { qid: "Q3624078", label: "sovereign state", kind: "state" },
+  { qid: "Q21512251", label: "self-proclaimed state", kind: "state" },
+  { qid: "Q23037160", label: "quasi-state", kind: "state" },
+  { qid: "Q17544377", label: "history of a country or state", kind: "history of a country" },
+];
+const NOT_EVENT_BY_LABEL = new Map(NOT_EVENT_CLASSES.map((c) => [c.label, c]));
+
+// The not-event classes among an entry's Wikidata classes ([] for an event).
+export const notEventClasses = (wikidataClasses) =>
+  (wikidataClasses ?? []).map((l) => NOT_EVENT_BY_LABEL.get(l)).filter(Boolean);
+
 // Objective inclusion threshold: Wikidata sitelinks (number of Wikimedia-project pages).
 export const INCLUSION_MIN_SITELINKS = 10;
 

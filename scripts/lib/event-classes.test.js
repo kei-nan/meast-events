@@ -48,3 +48,20 @@ test("groupForEvent: without an overriding class the event keeps its group", () 
   assert.equal(groupForEvent([], "treaty"), "treaty");
   assert.equal(groupForEvent(undefined, "war"), "war");
 });
+
+test("not events: unique QIDs/labels, none of them an event class; matched by stored label", async () => {
+  const { NOT_EVENT_CLASSES, notEventClasses } = await import("./event-classes.js");
+  assert.equal(new Set(NOT_EVENT_CLASSES.map((c) => c.qid)).size, NOT_EVENT_CLASSES.length);
+  assert.equal(new Set(NOT_EVENT_CLASSES.map((c) => c.label)).size, NOT_EVENT_CLASSES.length);
+  const eventLabels = new Set(EVENT_CLASSES.map((c) => c.label));
+  assert.ok(NOT_EVENT_CLASSES.every((c) => !eventLabels.has(c.label)));
+  // The classes of the entries removed on 2026-10-09 and of Jordanian independence (history of Jordan, Q1639050).
+  for (const classes of [["human"], ["historical country", "kingdom"], ["state", "historical country"], ["organization", "military alliance"],
+    ["political organization", "political coalition"], ["caliphate", "armed organization", "self-proclaimed state"], ["history of a country or state"]]) {
+    assert.ok(notEventClasses(classes).length > 0, classes.join(", "));
+  }
+  // Events about them stay; a social movement is kept (Iranian Green Movement).
+  for (const classes of [["capital punishment"], ["social movement"], ["military operation"], ["League of Nations mandate", "British protectorate"], []]) {
+    assert.deepEqual(notEventClasses(classes), [], classes.join(", "));
+  }
+});

@@ -14,6 +14,11 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Started by refresh-data.yml on the branch of the pull request it opens: a PR
+  # opened with the workflow token gets no pull_request run without a person's
+  # approval, and a workflow_dispatch run's checks land on the branch's head
+  # commit. Also usable by hand from the Actions tab.
+  workflow_dispatch:
 
 # Least privilege: no job needs to write to the repo or PRs.
 permissions:

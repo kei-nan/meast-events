@@ -12,10 +12,17 @@ const BASE = `${import.meta.env.BASE_URL}pagefind/`;
 
 let enginePromise = null;
 let idsPromise = null;
+let engineFailures = 0;
+
+// A browser remembers a failed module import by URL and rejects a second
+// import of it at once, without a request (lib/importOr.js), so each retry
+// asks for a new URL. Pagefind finds its own files (worker, wasm, index) from
+// basePath, not from this URL, and the query is still same-origin for the CSP.
+const engineUrl = () => `${BASE}pagefind.js${engineFailures ? `?r=${engineFailures}` : ""}`;
 
 function load() {
   if (!enginePromise) {
-    enginePromise = import(/* @vite-ignore */ `${BASE}pagefind.js`).then(async (pf) => {
+    enginePromise = import(/* @vite-ignore */ engineUrl()).then(async (pf) => {
       await pf.options({ basePath: BASE });
       await pf.init();
       return pf;
@@ -23,6 +30,7 @@ function load() {
     // A failed load is retried on the next search.
     enginePromise.catch(() => {
       enginePromise = null;
+      engineFailures++;
     });
   }
   if (!idsPromise) {

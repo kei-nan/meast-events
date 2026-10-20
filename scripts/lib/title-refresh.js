@@ -9,6 +9,39 @@ import { titleFromWikipediaUrl } from "./lead.js";
 
 const TITLE_FLAG = "title_differs_from_article";
 
+// Wikipedia text (titles, lead sentences, redirect targets) as a markdown code span, for the refresh report that
+// becomes the monthly PR description. Inside a code span GitHub renders the text literally: an HTML comment ("<!--")
+// cannot hide the rest of the description from the reviewer, and markdown, links and @mentions do nothing. The fence
+// is one backtick longer than the longest run of backticks in the text, and padded with a space when the text starts
+// or ends with a backtick or a space (CommonMark strips one such space from each side). Line breaks become spaces,
+// so a line in the text can never start a new markdown block (a heading, a list item, a closing fence).
+export function mdCode(text) {
+  const s = String(text ?? "").replace(/\s*[\r\n]+\s*/g, " ");
+  if (!s) return "(empty)";
+  const longest = Math.max(0, ...(s.match(/`+/g) ?? []).map((r) => r.length));
+  const fence = "`".repeat(longest + 1);
+  const pad = /^[` ]|[` ]$/.test(s) ? " " : "";
+  return `${fence}${pad}${s}${pad}${fence}`;
+}
+
+const clip = (s, n = 160) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
+
+// Markdown lines for one changed lead in the refresh printout (scripts/refresh-extracts.js): `change` is
+// { id, title, from, d }, with d from diffLeads there. At most `maxLines` removed and added sentences are listed,
+// each clipped to 160 characters and rendered with mdCode.
+export function leadChangeReport(change, { maxLines = 6 } = {}) {
+  const { d } = change;
+  const L = [
+    `- ${mdCode(change.id)} (${mdCode(change.title)}) stored ${change.from ?? "?"}: ${d.lenBefore} -> ${d.lenAfter} chars, ` +
+      `-${d.removed.length} +${d.added.length} sentences`,
+  ];
+  for (const s of d.removed.slice(0, maxLines)) L.push(`    - ${mdCode(clip(s))}`);
+  if (d.removed.length > maxLines) L.push(`    - ... ${d.removed.length - maxLines} more removed`);
+  for (const s of d.added.slice(0, maxLines)) L.push(`    + ${mdCode(clip(s))}`);
+  if (d.added.length > maxLines) L.push(`    + ... ${d.added.length - maxLines} more added`);
+  return L.join("\n");
+}
+
 // kind:
 //   renamed_redirect  the stored URL redirects to an article with another title (the article was moved)
 //   title_stale       the stored URL is the current article, but the stored title is not its title
@@ -71,7 +104,7 @@ export function detectExtractHold(event, lead) {
   };
 }
 
-// Markdown lines for held extract updates (empty when there are none).
+// Markdown lines for held extract updates (empty when there are none). Wikipedia text goes through mdCode.
 export function extractHoldReport(held, { name = "curated" } = {}) {
   if (!held.length) return "";
   const L = [
@@ -81,7 +114,7 @@ export function extractHoldReport(held, { name = "curated" } = {}) {
       "another subject. These need a person's judgement.",
   ];
   for (const h of [...held].sort((a, b) => a.id.localeCompare(b.id))) {
-    L.push(`- \`${h.id}\` ("${h.title}"): ${HOLD_TEXT[h.hold]}. ${h.detail}`);
+    L.push(`- ${mdCode(h.id)} (${mdCode(h.title)}): ${HOLD_TEXT[h.hold]}: ${mdCode(h.detail)}`);
   }
   return L.join("\n");
 }
@@ -173,7 +206,8 @@ const HOLD_TEXT = {
 };
 
 // Markdown section for the refresh printout: every title/URL change (applied or, in a dry run, to be applied)
-// and every held case. `applied` says which of the two the changes are.
+// and every held case. `applied` says which of the two the changes are. Titles, URLs and the held cases' details
+// (which quote Wikipedia titles) go through mdCode.
 export function titleReport(changes, { name = "curated", applied = false } = {}) {
   const plain = changes.filter((c) => !c.hold);
   const held = changes.filter((c) => c.hold);
@@ -187,8 +221,9 @@ export function titleReport(changes, { name = "curated", applied = false } = {})
         : "Would be updated to the current English Wikipedia article title with --apply (ids unchanged):"
     );
     for (const c of [...plain].sort((a, b) => a.id.localeCompare(b.id))) {
-      const t = c.new_title === c.old_title ? `"${c.old_title}" (title unchanged)` : `"${c.old_title}" -> "${c.new_title}"`;
-      L.push(`- \`${c.id}\`: ${t}${c.url_update ? `; URL ${c.old_url} -> ${c.new_url}` : ""} (${KIND_TEXT[c.kind]})`);
+      const t = c.new_title === c.old_title ? `${mdCode(c.old_title)} (title unchanged)` : `${mdCode(c.old_title)} -> ${mdCode(c.new_title)}`;
+      const url = c.url_update ? `; URL ${mdCode(c.old_url)} -> ${mdCode(c.new_url)}` : "";
+      L.push(`- ${mdCode(c.id)}: ${t}${url} (${KIND_TEXT[c.kind]})`);
     }
   }
   if (held.length) {
@@ -199,7 +234,7 @@ export function titleReport(changes, { name = "curated", applied = false } = {})
         "at a broader article. These need a person's judgement."
     );
     for (const c of [...held].sort((a, b) => a.id.localeCompare(b.id))) {
-      L.push(`- \`${c.id}\` ("${c.old_title}"): ${HOLD_TEXT[c.hold]}. ${c.detail}`);
+      L.push(`- ${mdCode(c.id)} (${mdCode(c.old_title)}): ${HOLD_TEXT[c.hold]}: ${mdCode(c.detail)}`);
     }
   }
   return L.join("\n");

@@ -196,6 +196,9 @@ export default function MapView({
   const landRef = useRef({ near: null, far: null });
   const landAppliedRef = useRef(false); // the land source holds the light land
   const landStoreRef = useRef(null);
+  // Set by the map's load handler: starts the 1:10m coast for land.json that
+  // arrived late (after a failure, via Retry), whose cell list was empty then.
+  const landArrivedRef = useRef(null);
   landStoreRef.current ??= createLandStore();
   const landData = () => landStoreRef.current.data();
   // Only the settled year triggers a new fetch; boundariesForYear/labels below
@@ -243,6 +246,7 @@ export default function MapView({
       landRef.current.near = land;
       landFailedRef.current = false;
       setBorderError((e) => (e && e.decade === "land" ? null : e));
+      landArrivedRef.current?.();
       return land;
     } catch {
       landFailedRef.current = true;
@@ -262,7 +266,9 @@ export default function MapView({
       const land = await fetchLand();
       if (land) mapRef.current?.getSource("land")?.setData(landData());
     }
-    await fetchDecade(decade);
+    // An already cached decade returns at once without touching the notice,
+    // so the "retrying" set above is cleared here.
+    if (await fetchDecade(decade)) setBorderError((e) => (e && e.decade === decade ? null : e));
   }, [fetchDecade, fetchLand]);
 
   useEffect(() => {
@@ -548,10 +554,26 @@ export default function MapView({
           await loadCells(order.slice(i, i + 8));
         }
       };
+      // The cell list comes with land.json: until it is in (it may first fail
+      // and arrive through Retry) there is nothing to fill, so the background
+      // fill starts once both the map is idle and the list is known.
+      let detailStarted = false;
+      let fillStarted = false;
+      const startFill = () => {
+        if (fillStarted || !landRef.current.near || !wantsBackgroundDetail(navigator.connection)) return;
+        fillStarted = true;
+        backgroundFill();
+      };
       const startLandDetail = () => {
+        detailStarted = true;
         map.on("moveend", onView);
         onView();
-        if (wantsBackgroundDetail(navigator.connection)) backgroundFill();
+        startFill();
+      };
+      landArrivedRef.current = () => {
+        if (cancelled || !detailStarted) return;
+        onView();
+        startFill();
       };
     });
 
@@ -832,15 +854,13 @@ export default function MapView({
     source.setData(data);
   }, []);
 
-  // Selected marker (own source: stays visible even inside a cluster).
+  // Selected marker (own source: stays visible even inside a cluster). App's
+  // mapEvents always includes the selected event.
   useEffect(() => {
     if (!mapReady) return;
-    let ev = selectedEventId ? events.find((e) => e.id === selectedEventId) : null;
-    if (!ev && selectedEventId && focus && focus.id === selectedEventId && focus.lon != null) {
-      ev = { id: focus.id, coordinates: { lon: focus.lon, lat: focus.lat } };
-    }
+    const ev = selectedEventId ? events.find((e) => e.id === selectedEventId) : null;
     setPointSource("selected", ev);
-  }, [selectedEventId, events, focus, mapReady, setPointSource]);
+  }, [selectedEventId, events, mapReady, setPointSource]);
 
   useEffect(() => {
     if (!mapReady) return;
