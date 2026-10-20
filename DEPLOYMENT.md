@@ -120,13 +120,16 @@ Cloudflare does not deploy it.
 2. `vite build`.
 3. `postbuild`:
    - `scripts/build-event-pages.mjs` - the `/event/` pages (each event's is the app's `index.html` with the event's own head tags and text) and the sitemap.
+   - `scripts/expand-headers.mjs` - in `dist/_headers`, an immutable cache rule per
+     content-hashed file (each splat marked `#! immutable-per-file` in
+     `public/_headers`), so a 404 for a missing hashed file is never cached as immutable.
    - `scripts/check-dist.mjs` - fails if the versioned events folder named by
      `src/lib/dataVersion.js` is missing or inconsistent with `meta.json`, an event has
      no full record, a boundary chunk points to a missing shared geometry, a file
      `index.html` loads is missing, the search index is missing, **a file under
-     `dist/assets/` has no content hash** (outside the version-named MapLibre folder;
-     `_headers` caches all of `/assets/` as immutable), or `dist/` has more files than
-     the host allows per deploy.
+     `dist/assets/` has no content hash** (each gets an immutable rule in `_headers`),
+     `_headers` has an immutable splat rule, was not expanded or has more than 100
+     rules, or `dist/` has more files than the host allows per deploy.
 
 ## CI and the data pipeline
 
@@ -229,10 +232,12 @@ checks as passed. Notes:
 
 The static-assets Worker `meast-events` serves `dist/_headers` (copied from
 `app/public/_headers` by Vite): a CSP, `nosniff`, `X-Frame-Options`,
-`Referrer-Policy`, and cache rules: everything under `/assets/` is immutable for a
+`Referrer-Policy`, and cache rules: every file under `/assets/` is immutable for a
 year (every file there is content-hashed, MapLibre's worker included;
 `check-dist.mjs` fails the build otherwise), as are the content-hashed data folders and search
-index chunks; the other dataset files get 1 h + stale-while-revalidate, and HTML
+index chunks, each through its own rule (`scripts/expand-headers.mjs`), so the 404
+for a missing hashed file (a tab older or newer than a deploy) revalidates instead
+of being cached for a year; the other dataset files get 1 h + stale-while-revalidate, and HTML
 and the search entry files revalidate on every visit. If the site ever loads anything from another host, add it to the CSP
 in that file, or the browser will block it. Details and the verification
 notes: [docs/SECURITY.md](docs/SECURITY.md#2-static-site-headers-apppublic_headers).
