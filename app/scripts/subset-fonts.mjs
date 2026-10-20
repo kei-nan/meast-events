@@ -78,19 +78,26 @@ const listFiles = (dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? listFiles(path.join(dir, e.name)) : [path.join(dir, e.name)]
   );
+// The geometry files (.tbin: land and boundaries, with the border names), decoded.
+// A missing public/data/ is reported below.
+try {
+  for (const f of listFiles(path.join(APP, "public", "data")).filter((f) => f.endsWith(".tbin"))) walkJSON(decodeGeo(readFileSync(f)));
+} catch (err) {
+  if (err.code !== "ENOENT") throw err;
+}
 
 const dataDir = path.join(APP, "public", "data");
 let dataFiles = [];
 try {
-  dataFiles = listFiles(dataDir).filter((f) => /\.(json|tbin)$/.test(f));
+  dataFiles = listFiles(dataDir).filter((f) => f.endsWith(".json"));
 } catch {
   // handled below
 }
 if (!dataFiles.length) {
-  console.error(`subset-fonts: no data files under ${dataDir}; run scripts/split-data.mjs first`);
+  console.error(`subset-fonts: no JSON under ${dataDir}; run scripts/split-data.mjs first`);
   process.exit(1);
 }
-for (const f of dataFiles) walkJSON(f.endsWith(".tbin") ? decodeGeo(readFileSync(f)) : JSON.parse(readFileSync(f, "utf8")));
+for (const f of dataFiles) walkJSON(JSON.parse(readFileSync(f, "utf8")));
 
 const decodeSource = (s) =>
   s
