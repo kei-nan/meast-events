@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import { FontaineTransform } from 'fontaine'
 import { defineConfig } from 'vite'
 import thirdPartyLicenses from './scripts/third-party-licenses.mjs'
+import { LABEL_FONT_FAMILY } from './src/lib/labelFont.js'
 
 // The event list (data/events/v.<DATA_VERSION>/all.json, scripts/split-data.mjs)
 // is the largest file on the critical path and grows with the dataset. The app
@@ -67,6 +68,8 @@ export default defineConfig(({ command }) => ({
         'Inter Variable': ['Arial'],
         Spectral: ['Georgia'],
       },
+      // The map label font is drawn only on MapLibre's canvas, never as page text.
+      skipFontFaceGeneration: (name) => name === `${LABEL_FONT_FAMILY} fallback`,
     }),
     // dist/third-party-licenses.txt: the licence notices of the bundled packages (MapLibre's BSD-3-Clause
     // among them), linked from NOTICE and the "Sources & licences" dialog.

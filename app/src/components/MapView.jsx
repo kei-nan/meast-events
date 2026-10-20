@@ -14,6 +14,7 @@ import {
   pointFeature,
 } from "./mapLayers";
 import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";
+import { loadLabelFont } from "../lib/labelFont";
 import { readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
 import {
   BoundaryPopup,
@@ -95,12 +96,11 @@ prewarm();
 // Our own base style: a sea-colored background and nothing else. Land, borders
 // and events are all added from our own data on load, so the map depends on no
 // third-party tile server, and no modern political layer can leak onto a
-// historical map. Label glyphs (see LABEL_FONT in mapInstallLayers.js) are
-// served from public/glyphs/; MapLibre needs an absolute glyphs URL.
+// historical map. No `glyphs` URL: MapLibre draws the labels in the browser
+// from the page's own Inter (lib/labelFont.js).
 // SEA_COLOR: keep in sync with .map-placeholder in SidePanel.css.
 const BASE_STYLE = {
   version: 8,
-  glyphs: `${window.location.origin}${import.meta.env.BASE_URL}glyphs/{fontstack}/{range}.pbf`,
   sources: {},
   layers: [{ id: "background", type: "background", paint: { "background-color": SEA_COLOR } }],
 };
@@ -320,6 +320,9 @@ export default function MapView({
         Promise.race([landPromise, sleep(1200).then(() => null)]),
         // A year still unknown (yearPending) is fetched by the effect below once known.
         yearPendingRef.current ? null : Promise.race([fetchDecade(initialDecade), sleep(1200)]),
+        // Labels drawn before their font loads keep a fallback font (lib/labelFont.js).
+        // The files are the page's own Inter, so normally already in the cache.
+        Promise.race([loadLabelFont(), sleep(1200)]),
       ]);
       // Unmounted while the data was loading: the map is already removed.
       if (cancelled) return;

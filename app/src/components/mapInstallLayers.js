@@ -13,10 +13,11 @@ import {
 } from "./mapLayers";
 import { BORDER_STYLE, DASHED_EXPR } from "./mapBorders";
 import { LAND_ON_SEA } from "../lib/mapBase";
+import { LABEL_FONT_FAMILY } from "../lib/labelFont";
 
-// Label glyphs (Open Sans Semibold, Apache 2.0; see NOTICE) are served from
-// public/glyphs/ - only the ranges the labels use are shipped.
-const LABEL_FONT = ["Open Sans Semibold"];
+// Labels are drawn in the browser from the site's Inter at weight 600
+// (lib/labelFont.js); MapView loads the font before adding these layers.
+const LABEL_FONT = [LABEL_FONT_FAMILY];
 
 // A country label's anchors (boundaries-label below): centred, or 1.9 em below
 // or above when its state has at least `room` degrees of latitude both ways.
