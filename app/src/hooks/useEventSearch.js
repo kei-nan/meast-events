@@ -22,10 +22,6 @@ function effectiveQ(q) {
   return t.length >= MIN_QUERY_LENGTH ? t : "";
 }
 
-function paramsKey(q, area, categories, countries) {
-  return JSON.stringify([q, area, categories, countries]);
-}
-
 // Combined search: text + area + categories + countries, over the WHOLE
 // timeline (the year scope is applied by the caller, so toggling it needs no
 // refetch and both "N results" and "M in selected years" are exact).
@@ -48,6 +44,9 @@ function paramsKey(q, area, categories, countries) {
 //           'static' (q answered locally because the index could not be
 //           loaded: titles and summaries only)
 //
+// The index is queried by the text alone: it answers with every matching id,
+// and the filters/area are applied to those ids here, so changing a filter
+// re-filters the cached ids instead of searching again (no interim flash).
 // A newer q makes an older answer stale (ignored). If the index cannot be
 // loaded `onOutage()` is called and local matches become the answer; while
 // `degraded` it is not tried again for each keystroke, only when `probeTick`
@@ -73,8 +72,7 @@ export default function useEventSearch({
 
   const q = effectiveQ(query);
   const active = Boolean(q || area || cats.length || cs.length);
-  const currentKey = paramsKey(q, area, cats, cs);
-  const settledKey = paramsKey(effectiveQ(debouncedQuery), area, cats, cs);
+  const settledQ = effectiveQ(debouncedQuery);
 
   // Instant local answer for the current inputs (not debounced).
   const local = useMemo(
@@ -84,8 +82,8 @@ export default function useEventSearch({
     [ready, active, q, area, cats, cs, version]
   );
 
-  // Latest full-text answer: {key, status: 'ready'|'failed', ...}
-  const [full, setFull] = useState({ key: null });
+  // Latest full-text answer: {q, status: 'ready'|'failed', ids}
+  const [full, setFull] = useState({ q: null });
   const degradedRef = useRef(degraded);
   degradedRef.current = degraded;
   const handledProbeRef = useRef(probeTick);
@@ -93,30 +91,35 @@ export default function useEventSearch({
   useEffect(() => {
     const isProbe = probeTick !== handledProbeRef.current;
     handledProbeRef.current = probeTick;
-    const [sq, sArea, sCats, sCountries] = JSON.parse(settledKey);
-    if (!sq || !ready) return;
+    if (!settledQ || !ready) return;
     if (degradedRef.current && !isProbe) return;
     let stale = false;
 
-    searchEventIds(sq)
+    searchEventIds(settledQ)
       .then((ids) => {
         if (stale) return;
-        // Records come from the static store; filters and area apply locally.
-        const hits = textMatchesFromStore(ids, storeRef.current, { area: sArea, categories: sCats, countries: sCountries });
-        const results = rankEvents(hits, sq);
         onRecovered();
-        setFull({ key: settledKey, status: "ready", results, total: results.length, truncated: false });
+        setFull({ q: settledQ, status: "ready", ids });
       })
       .catch(() => {
         if (stale) return;
         onOutage();
-        setFull({ key: settledKey, status: "failed" });
+        setFull({ q: settledQ, status: "failed" });
       });
 
     return () => {
       stale = true;
     };
-  }, [settledKey, probeTick, ready, storeRef, onOutage, onRecovered]);
+  }, [settledQ, probeTick, ready, onOutage, onRecovered]);
+
+  // The full-text answer for the current text, under the current filters.
+  // Records come from the static store; filters and area apply locally.
+  const fullResults = useMemo(() => {
+    if (!ready || full.status !== "ready" || full.q !== q) return null;
+    return rankEvents(textMatchesFromStore(full.ids, storeRef.current, { area, categories: cats, countries: cs }), q);
+    // version signals that the (mutable) store has new entries.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, full, q, area, cats, cs, version]);
 
   if (!active) return IDLE;
   if (!ready) return { ...IDLE, status: "loading", textSearch: Boolean(q) };
@@ -132,10 +135,18 @@ export default function useEventSearch({
   });
 
   if (!q) return localState("local");
-  if (full.key === currentKey && full.status === "ready") {
-    return { ...IDLE, ...full, source: "fulltext", textSearch: true };
+  if (fullResults) {
+    return {
+      ...IDLE,
+      status: "ready",
+      results: fullResults,
+      total: fullResults.length,
+      truncated: false,
+      source: "fulltext",
+      textSearch: true,
+    };
   }
-  if (degraded || (full.key === currentKey && full.status === "failed")) {
+  if (degraded || (full.q === q && full.status === "failed")) {
     return localState("static");
   }
   // Full-text answer pending: show the instant local matches meanwhile.

@@ -159,9 +159,7 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     headingRef.current?.focus({ preventScroll: true });
   }, [event.id]);
 
-  const quality =
-    event.location_quality ??
-    (event.coordinate_source?.startsWith("country-fallback") ? "approximate" : "precise");
+  const quality = event.location_quality; // always set by lib/dataClient.js normalizeEvent
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
   // Shown only when they say more than the category does.
   const showClasses = classes.some((c) => c.toLowerCase() !== (event.category ?? "").toLowerCase());

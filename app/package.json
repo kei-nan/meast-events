@@ -14,7 +14,7 @@
     "build": "vite build",
     "postbuild": "node scripts/build-event-pages.mjs && node scripts/check-dist.mjs",
     "lint": "oxlint",
-    "test": "node --test \"src/lib/*.test.js\" \"src/components/*.test.js\" \"scripts/*.test.mjs\"",
+    "test": "node --test \"src/lib/*.test.js\" \"src/components/*.test.js\" \"src/hooks/*.test.js\" \"scripts/*.test.mjs\"",
     "preview": "vite preview"
   },
   "dependencies": {
