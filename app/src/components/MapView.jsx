@@ -22,6 +22,7 @@ import {
   MapTip,
   MapToolbar,
   YearToggle,
+  ZoomButtons,
 } from "./MapUi";
 import useMediaQuery from "../hooks/useMediaQuery";
 import MapLoading from "./MapLoading";
@@ -103,6 +104,8 @@ const HINT_AUTO_HIDE_MS = 8000;
 const HANDLE_HIT_PX = { mouse: 10, touch: 22, pen: 14 };
 // A drag shorter than this (px) is treated as a stray click, not a drawn area.
 const MIN_DRAW_PX = 6;
+// How long "Search area: the map view" stays under the toolbar after Use map view.
+const VIEW_AREA_NOTE_MS = 5000;
 
 function applyInteractivity(map, mode, hasArea) {
   const drawing = mode !== "off";
@@ -1042,13 +1045,47 @@ export default function MapView({
     };
   }, [mapReady]);
 
+  // "Use map view" (the Draw menu): the area is a rectangle of what the map
+  // shows, the way to set one without dragging (keyboard, a single tap). A
+  // short note under the toolbar confirms it, also to screen readers: the
+  // outline lies on the map's own edges.
+  // The note shows while that area is still the one set.
+  const [viewArea, setViewArea] = useState(null);
+  useEffect(() => {
+    if (!viewArea) return;
+    const timer = setTimeout(() => setViewArea(null), VIEW_AREA_NOTE_MS);
+    return () => clearTimeout(timer);
+  }, [viewArea]);
+  const viewAreaNote = viewArea != null && viewArea === area && areaMode === "off";
+  const areaFromView = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    const b = map.getBounds();
+    const next = makeRectArea([b.getWest(), b.getSouth()], [b.getEast(), b.getNorth()]);
+    onAreaChange?.(next);
+    onAreaModeChange?.("off");
+    setViewArea(next);
+  };
+
+  // Zoom buttons: one level, eased like the other camera moves (none with reduced motion).
+  const zoomBy = (dir) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const opts = { duration: reducedMotion() ? 0 : 300 };
+    if (dir > 0) map.zoomIn(opts);
+    else map.zoomOut(opts);
+    if (hintOpen) dismissHint();
+  };
+
   const toggle = (mode) => onAreaModeChange?.(areaMode === mode ? "off" : mode);
   const hint =
     areaMode === "rect"
-      ? "Drag on the map from one corner to the opposite corner. Esc cancels."
+      ? "Drag on the map from one corner to the opposite corner, or choose Use map view under Draw area. Esc cancels."
       : areaMode === "circle"
-        ? "Press at the centre and drag out to set the radius. Esc cancels."
-        : null;
+        ? "Press at the centre and drag out to set the radius, or choose Use map view under Draw area. Esc cancels."
+        : viewAreaNote
+          ? "Search area: the current map view."
+          : null;
 
   return (
     <div className="map-view" style={{ position: "relative" }}>
@@ -1060,6 +1097,7 @@ export default function MapView({
         compact={compact}
         onToggleMode={toggle}
         onClearArea={() => onAreaChange?.(null)}
+        onUseView={areaFromView}
         onReset={resetView}
         matchCount={matchBounds?.count ?? null}
         matchTotal={matchIds?.size ?? null}
@@ -1085,6 +1123,7 @@ export default function MapView({
             onClick={onToggleEventYear}
           />
         )}
+        <ZoomButtons onZoomIn={() => zoomBy(1)} onZoomOut={() => zoomBy(-1)} />
         <MapNotices
           loading={eventsLoading || !mapReady || !decadeCached}
           borderError={relevantError}

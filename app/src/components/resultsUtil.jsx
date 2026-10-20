@@ -1,29 +1,33 @@
+import { Fragment } from "react";
 import { eventOverlapsRange } from "../lib/eventYears.js";
+import { queryMarks } from "../lib/queryMarks.js";
 
-function escapeRe(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// Right-to-left runs isolated (<bdi>), as in EventDetail, so the punctuation
+// around a name in Arabic, Hebrew or Persian script stays in place.
+function bidiNodes(pieces, keyBase) {
+  return pieces.map((p, k) =>
+    p.rtl ? (
+      <bdi key={`${keyBase}-${k}`} dir="rtl" lang={p.lang ?? undefined}>
+        {p.text}
+      </bdi>
+    ) : (
+      p.text
+    )
+  );
 }
 
-/** Split text into nodes with query-word prefixes wrapped in <mark>. */
+/** Text as nodes: query-word prefixes wrapped in <mark>, right-to-left runs in <bdi> (lib/queryMarks.js). */
 export function highlight(text, query) {
-  const tokens = (query ?? "")
-    .split(/\s+/)
-    .map((t) => t.trim())
-    .filter(Boolean);
-  if (!text || tokens.length === 0) return text;
-  const re = new RegExp(`(?<![\\p{L}\\p{N}])(${tokens.map(escapeRe).join("|")})`, "giu");
-  const out = [];
-  let last = 0;
-  let found = false;
-  for (const m of text.matchAll(re)) {
-    found = true;
-    if (m.index > last) out.push(text.slice(last, m.index));
-    out.push(<mark key={m.index}>{m[0]}</mark>);
-    last = m.index + m[0].length;
-  }
-  if (!found) return text;
-  if (last < text.length) out.push(text.slice(last));
-  return out;
+  if (!text) return text;
+  const segs = queryMarks(text, query);
+  if (segs.length === 1 && !segs[0].mark && segs[0].pieces.length === 1 && !segs[0].pieces[0].rtl) return text;
+  let at = 0;
+  return segs.map((s) => {
+    const key = at;
+    at += s.text.length;
+    const nodes = bidiNodes(s.pieces, key);
+    return s.mark ? <mark key={key}>{nodes}</mark> : <Fragment key={key}>{nodes}</Fragment>;
+  });
 }
 
 // The years as the dates give them, for labels (lib/eventYears.js).

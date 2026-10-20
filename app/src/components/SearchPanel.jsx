@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
@@ -11,6 +11,7 @@ import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
+import { RETRY_MS } from "../hooks/useAllEvents";
 import "../SidePanel.css";
 
 // The screen reader status waits this long for typing or slider steps to settle,
@@ -54,6 +55,8 @@ const SORT_KEYS = [
  *                                          selected years (all is used for the "show all N" button)
  * @param {"fulltext"|"local"|"static"} props.source   "static" (full-text index unavailable) shows a
  *                                          notice under the search box
+ * @param {boolean} [props.eventsError]     the event list could not be loaded (it is retried): the list
+ *                                          says so instead of "no events match"
  * @param {object|null} props.selectedEvent full event object for the detail view, or null
  * @param {number|null} props.viewCount     events in current map view (null = unknown)
  * @param {[number,number]} props.range     selected timeline years [start,end] (for "outside selected years")
@@ -83,6 +86,7 @@ export default function SearchPanel({
   total,
   source,
   eventsLoading = false,
+  eventsError = false,
   interim = false,
   counts,
   selectedEvent,
@@ -109,6 +113,8 @@ export default function SearchPanel({
   const inputRef = useRef(null);
   const toggleRef = useRef(null);
   const listWrapRef = useRef(null);
+  const scrollRef = useRef(null);
+  const listScrollRef = useRef(0); // the list's scroll position, restored by Back
   const lastSelectedRef = useRef(null);
   const hadSelectionRef = useRef(false);
   const [sheet, setSheet] = useState(query || selectedEvent ? "full" : "peek");
@@ -132,6 +138,19 @@ export default function SearchPanel({
   // The text being searched for (highlighted in the rows), "" while it is no search.
   const textQuery = query.trim().length >= MIN_QUERY_LENGTH ? query.trim() : "";
   const { key: sortKey, dir: sortDir } = parseSort(sort);
+
+  // The panel scrolls as one (.sp-scroll): an opened event starts at its top,
+  // not at the list's (or the previous event's) scroll position, and Back
+  // returns to where the list was. Before the focus below, which then finds
+  // its row in view.
+  const scrolledForRef = useRef(selectedId);
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    const prev = scrolledForRef.current;
+    scrolledForRef.current = selectedId;
+    if (!el || prev === selectedId) return;
+    el.scrollTop = selectedId ? 0 : listScrollRef.current;
+  }, [selectedId]);
 
   // Back restores focus to
   // the originating row (or the search box if that row is gone).
@@ -248,6 +267,7 @@ export default function SearchPanel({
   function describeStatus(years) {
     const sel = years ?? "selected years";
     if (eventsLoading) return { text: "Loading events…", extra: "" };
+    if (eventsError) return { text: "Events could not be loaded - retrying", extra: "" };
     if (loading && interim && results.length > 0)
       return { text: `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`, extra: "" };
     if (loading && results.length === 0) return { text: "Searching…", extra: "" };
@@ -313,7 +333,14 @@ export default function SearchPanel({
         {sheet === "full" ? "Show map" : selectedEvent ? "Show event" : "Show results"}
       </button>
 
-      <div className="sp-scroll">
+      <div
+        className="sp-scroll"
+        ref={scrollRef}
+        onScroll={(e) => {
+          // Only the list's own scrolling; opening an event changes the content under it.
+          if (!selectedId) listScrollRef.current = e.currentTarget.scrollTop;
+        }}
+      >
         {selectedEvent && (
           <div
             onKeyDown={(e) => {
@@ -369,11 +396,14 @@ export default function SearchPanel({
             </p>
           </div>
 
-          {offline && (
-            <p className="sp-banner" role="status">
-              Full-text search didn&apos;t load. Matching titles and summaries only; retrying.
-            </p>
-          )}
+          {/* Always in the page, so screen readers announce the banner when it appears. */}
+          <div role="status">
+            {offline && (
+              <p className="sp-banner">
+                Full-text search didn&apos;t load. Matching titles and summaries only; retrying.
+              </p>
+            )}
+          </div>
 
           <div className="sp-toolbar">
             <button
@@ -405,7 +435,7 @@ export default function SearchPanel({
                 </button>
               )}
               {/* Order of the browse list (no search or filters): search results keep their relevance order. */}
-              {!searching && !eventsLoading && onSortChange && (
+              {!searching && !eventsLoading && !eventsError && onSortChange && (
                 <div className="sp-sort" role="group" aria-label="Sort events">
                   <span className="sp-sort-label" aria-hidden="true">
                     Sort
@@ -502,6 +532,15 @@ export default function SearchPanel({
                   </li>
                 ))}
               </ul>
+            ) : eventsError && total === 0 && results.length === 0 ? (
+              // An outage, not an empty result: the list could not be loaded at all.
+              <div className="sp-empty">
+                <p>The events could not be loaded.</p>
+                <p className="sp-muted">
+                  This is a problem with the connection or the site, not with your search. Trying again every{" "}
+                  {RETRY_MS / 1000} seconds; the list appears as soon as it loads.
+                </p>
+              </div>
             ) : total === 0 && !loading && results.length === 0 ? (
               <div className="sp-empty">
                 <p>

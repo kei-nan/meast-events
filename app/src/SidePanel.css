@@ -558,9 +558,9 @@ button.sp-chip[aria-pressed="true"] {
   outline-offset: 2px;
 }
 
-/* Touch-sized like the other panel controls (kept out of the shared mobile
+/* Touch-sized like the other panel controls (kept out of the shared touch
    block further down). */
-@media (max-width: 768px) {
+@media (max-width: 768px), (pointer: coarse) {
   .sp-scope-link,
   .sp-sort-btn {
     min-height: 44px;
@@ -1150,6 +1150,11 @@ button.sp-chip[aria-pressed="true"] {
     white-space: nowrap;
   }
 
+}
+
+/* Touch screens (and phones): 44px targets, also on a tablet or a touch
+   laptop wider than the phone layout. */
+@media (max-width: 768px), (pointer: coarse) {
   .sp-seg-btn,
   .sp-chip,
   .sp-btn,
@@ -1210,4 +1215,28 @@ button.sp-chip[aria-pressed="true"] {
   font-size: 0.78rem;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Windows high contrast (forced colours) ---------- */
+
+/* The forced palette drops the tint and accent that mark a pressed toggle or
+   the open row, so they take the system's selection colours instead. */
+@media (forced-colors: active) {
+  .sp-seg-btn[aria-pressed="true"],
+  button.sp-chip[aria-pressed="true"],
+  .sp-sort-btn[aria-pressed="true"] {
+    forced-color-adjust: none; /* else the text keeps the forced ButtonText, unreadable on Highlight */
+    color: HighlightText;
+    background: Highlight;
+    border-color: Highlight;
+  }
+
+  /* Its transparent left edge would be forced to the text colour on every row. */
+  .sp-row {
+    border-left-color: Canvas;
+  }
+
+  .sp-row--selected {
+    border-left-color: Highlight;
+  }
 }

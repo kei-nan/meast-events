@@ -18,11 +18,17 @@
   height: 15px;
 }
 
+/* Touch screens (and phones): a 44px target. */
+@media (max-width: 768px), (pointer: coarse) {
+  .share > button {
+    min-width: 44px;
+  }
+}
+
 /* Phones: the icon alone, as in phone apps; "Share" stays the button's
    accessible name. */
 @media (max-width: 768px) {
   .share > button {
-    min-width: 44px;
     padding-inline: 10px;
   }
 

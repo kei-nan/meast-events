@@ -506,30 +506,22 @@ export default function App() {
         </a>
         <header className="app-header">
           <h1>{SITE_TITLE}</h1>
-          {/* Status notices share the title's line; the in-view count is in the panel. */}
-          <div className="app-search">
+          {/* Status notices share the title's line (their own line on phones); the
+              in-view count is in the panel. One live region, always in the page, so
+              screen readers announce each notice as it appears. */}
+          <div className="app-search" role="status">
             {eventsLoading && (
-              <span className="app-loading" role="status">
+              <span className="app-loading">
                 <span className="app-loading-spinner" aria-hidden="true" />
                 Loading events…
               </span>
             )}
-            {eventsError && !eventsLoading && (
-              <span className="app-notice" role="status">
-                Events could not be loaded - retrying
-              </span>
-            )}
+            {eventsError && !eventsLoading && <span className="app-notice">Events could not be loaded - retrying</span>}
             {/* Once its matches are listed the panel says this under the search box. */}
             {degraded && search.textSearch && search.source !== "static" && (
-              <span className="app-notice" role="status">
-                Full-text search is unavailable - matching titles and summaries only
-              </span>
+              <span className="app-notice">Full-text search is unavailable - matching titles and summaries only</span>
             )}
-            {notFound && (
-              <span className="app-notice" role="status">
-                That event could not be found.
-              </span>
-            )}
+            {notFound && <span className="app-notice">That event could not be found.</span>}
           </div>
           {/* The URL holds the view (years, filters, area), so this shares it as seen. While
               an event is open its own Share (EventDetail) takes over, so there is only ever one. */}
@@ -574,6 +566,7 @@ export default function App() {
             total={panelTotal}
             source={search.source ?? "fulltext"}
             eventsLoading={eventsLoading}
+            eventsError={eventsError}
             selectedEvent={selectedEvent}
             viewCount={viewportEventCount}
             range={panelRange}

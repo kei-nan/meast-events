@@ -1,4 +1,4 @@
-import { Fragment, Suspense, lazy, useEffect, useRef, useState } from "react";
+import { Fragment, Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FramingPointer } from "./FramingPointer.jsx";
 import { FramingReviewFailed } from "./LoadFailed.jsx";
 import ShareButton from "./ShareButton.jsx";
@@ -159,6 +159,32 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     headingRef.current?.focus({ preventScroll: true });
   }, [event.id]);
 
+  // The sticky action row covers the top of the panel's scroller, so focus
+  // moving up the article (Shift+Tab) would land under it: the scroller keeps
+  // that much clear (scroll-padding-top), measured, since the row wraps to two
+  // lines on a narrow phone. The row sticks at its `top` from the scroller's
+  // content edge (inside its padding), plus a little air.
+  const actionsRef = useRef(null);
+  useLayoutEffect(() => {
+    const row = actionsRef.current;
+    const scroller = row?.closest(".sp-scroll");
+    if (!row || !scroller) return;
+    const update = () => {
+      const top = parseFloat(getComputedStyle(row).top) || 0;
+      const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+      scroller.style.scrollPaddingTop = `${Math.max(0, Math.ceil(pad + top + row.offsetHeight + 8))}px`;
+    };
+    update();
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
+    ro?.observe(row);
+    window.addEventListener("resize", update); // the offset differs on phones (SidePanel.css)
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", update);
+      scroller.style.scrollPaddingTop = "";
+    };
+  }, []);
+
   const quality = event.location_quality; // always set by lib/dataClient.js normalizeEvent
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
   // Shown only when they say more than the category does.
@@ -251,7 +277,7 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
 
   return (
     <article className="event-detail" aria-labelledby="event-detail-title">
-      <div className="event-detail-actions">
+      <div className="event-detail-actions" ref={actionsRef}>
         <button type="button" className="sp-btn" onClick={onBack}>
           <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
         </button>
@@ -326,16 +352,16 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
           )}
         </div>
       )}
-      {event.leadStatus === "loading" && (
-        <p className="event-detail-note" role="status">
-          Loading the full text…
-        </p>
-      )}
-      {event.leadStatus === "error" && (
-        <p className="event-detail-note" role="status">
-          The full text could not be loaded; only the opening is shown. Read the whole article on Wikipedia.
-        </p>
-      )}
+      {/* One live region for the full text's state, in the page while the
+          event is open, so a failure that comes later is announced. */}
+      <div role="status">
+        {event.leadStatus === "loading" && <p className="event-detail-note">Loading the full text…</p>}
+        {event.leadStatus === "error" && (
+          <p className="event-detail-note">
+            The full text could not be loaded; only the opening is shown. Read the whole article on Wikipedia.
+          </p>
+        )}
+      </div>
       {retrieved && (
         <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
       )}
