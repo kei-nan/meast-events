@@ -86,6 +86,29 @@ test("a failed id map or engine load is retried on the next search", async () =>
   }
 });
 
+test("a failed engine download is retried under a new URL", async () => {
+  // A browser rejects a second import of a URL whose download failed, without
+  // a request; the stub does the same (one module per URL). A BASE_URL of its
+  // own keeps this test's failed URL apart from the other tests'.
+  globalThis.__VITE_ENV__ = { BASE_URL: "/retry/" };
+  let downloadFails = true;
+  globalThis.__fakePagefindDownloadFails = () => downloadFails;
+  try {
+    const { searchEventIds } = await fresh();
+    const pf = fakePagefind({ results: [{ id: "p1" }] });
+    stubIds({ p1: "e1" });
+    await assert.rejects(searchEventIds("q"), /dynamically imported module/);
+    downloadFails = false;
+    assert.deepEqual(await searchEventIds("q"), ["e1"]);
+    assert.deepEqual(pf.calls.options, [{ basePath: "/retry/pagefind/" }]);
+    // The plain URL stays failed: importing it again would not recover.
+    await assert.rejects(import("/retry/pagefind/pagefind.js"), /dynamically imported module/);
+  } finally {
+    delete globalThis.__VITE_ENV__;
+    delete globalThis.__fakePagefindDownloadFails;
+  }
+});
+
 test("preloadTextSearch swallows a failure", async () => {
   const { preloadTextSearch } = await fresh();
   fakePagefind({ initFails: 1 });

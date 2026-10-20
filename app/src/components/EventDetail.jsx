@@ -185,9 +185,7 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
     };
   }, []);
 
-  const quality =
-    event.location_quality ??
-    (event.coordinate_source?.startsWith("country-fallback") ? "approximate" : "precise");
+  const quality = event.location_quality; // always set by lib/dataClient.js normalizeEvent
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
   // Shown only when they say more than the category does.
   const showClasses = classes.some((c) => c.toLowerCase() !== (event.category ?? "").toLowerCase());
@@ -380,8 +378,9 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
       />
       {quality === "approximate" && (
         <p className="event-detail-note">
-          Approximate location: this event isn&apos;t tied to a single known site, so its
-          marker is placed at a national capital. It is left out of drawn-area searches.
+          Approximate location: no coordinates were found for this event, so its marker is
+          placed at a national capital. The marker shows the country, not where the event
+          happened. It is left out of drawn-area searches.
           <ShadingNote event={event} />
         </p>
       )}

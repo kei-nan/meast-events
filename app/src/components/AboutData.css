@@ -76,6 +76,10 @@
   font-size: 0.95rem;
   text-transform: capitalize;
 }
+/* Headings written as sentences ("our grouping" is lower case wherever the site uses it). */
+.about-inner h4.about-sentence-case {
+  text-transform: none;
+}
 .about-inner ul {
   padding-left: 1.2em;
 }
@@ -104,7 +108,9 @@
 }
 .about-bars li {
   display: grid;
-  grid-template-columns: minmax(120px, 1.2fr) 2fr auto;
+  /* A fixed count column (up to "99,999"): each row is its own grid, so with
+     auto the tracks would end at different places. */
+  grid-template-columns: minmax(120px, 1.2fr) 2fr 6ch;
   align-items: center;
   gap: 8px;
   margin: 4px 0;
@@ -160,12 +166,16 @@
   padding: 3px 8px;
   text-align: left;
 }
+/* Country names stay whole (the dialog's overflow-wrap: anywhere would split "Lebanon"). */
+.about-coverage-table th[scope="row"] {
+  white-space: nowrap;
+}
 @media (max-width: 600px) {
   .about-inner {
     padding: 12px 14px 20px;
   }
   .about-bars li {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 6ch;
   }
   .about-bar-track {
     grid-column: 1 / -1;

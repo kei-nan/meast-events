@@ -221,7 +221,7 @@ ${items}
 
 function locationNote(quality) {
   if (quality === "approximate") {
-    return `<p class="note">Approximate location: this event isn’t tied to a single known site, so its marker on the map is placed at a national capital.</p>`;
+    return `<p class="note">Approximate location: no coordinates were found for this event, so its marker on the map is placed at a national capital. The marker shows the country, not where the event happened.</p>`;
   }
   if (quality === "none") {
     return `<p class="note">No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no marker on the map.</p>`;

@@ -7,6 +7,7 @@ import { applyDataFix, reconcileStartDate, keptEndPrecision, lastDayOfPeriod } f
 import { detectExtractHold } from "./title-refresh.js";
 
 export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
+export const PREDECESSOR_FLAG = "country_via_predecessor_state";
 
 export const CLASS_GROUP = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
@@ -189,7 +190,8 @@ export function finalizeEvent(ev, ctx) {
 
   // 3. date source reconciliation (candidates only), then the verified-fix ledger
   ev.review_reasons = [...(ev.review_reasons ?? [])];
-  let dateFlags = (ev.date_flags ?? []).filter((f) => !f.startsWith("date_source_adjusted"));
+  // Without reconciliation (an event already merged) a date_source_adjusted note the caller carried over is kept.
+  let dateFlags = (ev.date_flags ?? []).filter((f) => !(ctx.reconcileDates && f.startsWith("date_source_adjusted")));
   if (ctx.reconcileDates) {
     const r = reconcileStartDate(ev.date_start, entity);
     if (r) {
@@ -210,6 +212,7 @@ export function finalizeEvent(ev, ctx) {
   ev.review_reasons = dropPrefix(ev.review_reasons, [
     "date_order_invalid", "date_year_mismatch", "date_end_year_mismatch",
     "title_differs_from_article", "country_not_supported_by_wikidata", "country_via_place_only",
+    PREDECESSOR_FLAG,
   ]);
   dateFlags = dateFlags.filter((f) => !/^(date_order_invalid|date_end_precision_coarse|wikipedia_dates_note|date_start_year_not_in_lead)/.test(f));
   const years = yearsIn(ev.extract);
@@ -228,9 +231,19 @@ export function finalizeEvent(ev, ctx) {
       `title_differs_from_article: record title "${ev.title}" differs from the Wikipedia article title "${urlTitle}" and does not appear in its lead`
     );
   }
+  // Tags from the predecessor-state rule (inclusion rule 2; lib/predecessor.js): Wikidata's own P625 or P276 place
+  // supports them, so they are not "unsupported"; the flag names the evidence.
+  const predRule = ev.predecessor_rule ?? null;
+  if (predRule?.via?.length) {
+    const names = (predRule.predecessors ?? []).map((q) => `${ctx.labels[q] ?? q} (${q})`).join(", ");
+    const via = predRule.via.map((v) => `${v.property} ${v.value} -> ${v.countries.join(", ")}`).join("; ");
+    ev.review_reasons.push(
+      `${PREDECESSOR_FLAG}: Wikidata P17 is ${names}, a predecessor state of a tracked country (P1366/P1365); tagged from the item's own location: ${via}`
+    );
+  }
   if (entity) {
     const wc = wikidataCountries(entity, ctx.places);
-    const wdAll = new Set([...wc.direct, ...wc.viaPlace]);
+    const wdAll = new Set([...wc.direct, ...wc.viaPlace, ...(predRule?.via ?? []).flatMap((v) => v.countries)]);
     // only tracked-set tags can be compared with P17/P276/P131 (other names, e.g. from a fix, are Wikidata's own)
     const evc = (ev.countries ?? []).filter((c) => c in COUNTRIES);
     const p17Sov = (entity.p17 ?? []).filter((q) => ctx.sovereign.has(q));

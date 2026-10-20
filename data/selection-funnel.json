@@ -1,74 +1,74 @@
 {
-  "data_as_of": "2026-10-10",
+  "data_as_of": "2026-10-14",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
     {
       "stage": "raw_candidates",
       "label": "Raw Wikidata candidates (23 event classes, 15 tracked countries, dated 1900+)",
-      "count": 5063
+      "count": 5073
     },
     {
       "stage": "english_article",
       "label": "Has an English Wikipedia article",
-      "count": 3194,
-      "removed": 1869,
+      "count": 3201,
+      "removed": 1872,
       "removed_by_reason": {
-        "no_english_article": 1869
+        "no_english_article": 1872
       }
     },
     {
       "stage": "sitelinks",
       "label": "At least 10 sitelinks (all Wikimedia projects)",
-      "count": 801,
-      "removed": 2393,
+      "count": 802,
+      "removed": 2399,
       "removed_by_reason": {
-        "fewer_than_min_sitelinks": 2393
+        "fewer_than_min_sitelinks": 2399
       }
     },
     {
       "stage": "enrichment",
       "label": "Resolved against Wikipedia + Wikidata and proposed (already-curated items are not re-proposed)",
-      "count": 801,
+      "count": 802,
       "removed": 0,
       "removed_by_reason": {},
       "note": "Since data shape v2.1 no candidate is removed here for lacking coordinates or for a Wikidata date-order error; they are kept and flagged.",
       "of_which": {
         "already_curated_seed_events_found_by_discovery": 519,
-        "enriched_and_proposed": 282
+        "enriched_and_proposed": 283
       }
     }
   ],
   "proposed_breakdown": {
-    "proposed_total": 254,
-    "location_quality_none_no_map_marker": 186,
-    "date_order_invalid_flagged_and_kept": 2,
+    "proposed_total": 255,
+    "location_quality_none_no_map_marker": 187,
+    "date_order_invalid_flagged_and_kept": 1,
     "excluded_as_redirect_duplicates_by_review": 0,
     "already_merged_into_curated": 254,
-    "pending_merge_new_events": 0,
-    "pending_merge_new_events_without_location": 0,
+    "pending_merge_new_events": 1,
+    "pending_merge_new_events_without_location": 1,
     "hard_excluded_no_wikipedia_summary_or_extract": 28
   },
   "shown_now": {
-    "curated_total": 816,
-    "seed_events_hand_picked": 103,
+    "curated_total": 815,
+    "seed_events_hand_picked": 102,
     "seed_events_also_found_by_discovery": 60,
-    "seed_events_not_reachable_by_discovery": 43,
+    "seed_events_not_reachable_by_discovery": 42,
     "discovered_events_merged": 713,
     "location_quality": {
-      "approximate": 74,
+      "approximate": 73,
       "precise": 364,
       "none": 378
     },
-    "seed_file_entries": 103
+    "seed_file_entries": 102
   },
   "sitelink_measurement": {
     "rule_uses": "sitelinks across ALL Wikimedia projects (Wikidata wikibase:sitelinks: Wikipedias + Wikisource, Wikiquote, Commons, ...)",
     "threshold": 10,
-    "candidates_measured": 5062,
-    "candidates_with_english_article": 3194,
-    "pass_by_all_projects": 801,
-    "pass_by_wikipedia_editions_only": 760,
+    "candidates_measured": 5072,
+    "candidates_with_english_article": 3201,
+    "pass_by_all_projects": 802,
+    "pass_by_wikipedia_editions_only": 761,
     "pass_by_all_projects_but_not_wikipedia_only": 41,
     "pass_by_wikipedia_only_but_not_all_projects": 0,
     "median_all_projects_of_passing": 16,
@@ -83,7 +83,7 @@
         "fewer_than_min_sitelinks": 493,
         "passed_filters": 231,
         "proposed_location_none": 53,
-        "date_order_flagged": 2,
+        "date_order_flagged": 1,
         "in_curated": 211
       },
       "Lebanon": {
@@ -96,27 +96,27 @@
         "in_curated": 65
       },
       "Jordan": {
-        "raw": 127,
+        "raw": 128,
         "no_english_article": 24,
-        "fewer_than_min_sitelinks": 62,
+        "fewer_than_min_sitelinks": 63,
         "passed_filters": 41,
         "proposed_location_none": 10,
         "date_order_flagged": 1,
         "in_curated": 41
       },
       "Turkey": {
-        "raw": 1594,
-        "no_english_article": 1119,
-        "fewer_than_min_sitelinks": 314,
-        "passed_filters": 161,
-        "proposed_location_none": 41,
+        "raw": 1600,
+        "no_english_article": 1121,
+        "fewer_than_min_sitelinks": 317,
+        "passed_filters": 162,
+        "proposed_location_none": 42,
         "date_order_flagged": 0,
         "in_curated": 138
       },
       "Iran": {
-        "raw": 388,
-        "no_english_article": 74,
-        "fewer_than_min_sitelinks": 208,
+        "raw": 391,
+        "no_english_article": 75,
+        "fewer_than_min_sitelinks": 210,
         "passed_filters": 106,
         "proposed_location_none": 36,
         "date_order_flagged": 0,
@@ -132,9 +132,9 @@
         "in_curated": 121
       },
       "Iraq": {
-        "raw": 641,
+        "raw": 642,
         "no_english_article": 61,
-        "fewer_than_min_sitelinks": 445,
+        "fewer_than_min_sitelinks": 446,
         "passed_filters": 135,
         "proposed_location_none": 27,
         "date_order_flagged": 1,
@@ -224,8 +224,8 @@
         "in_curated": 43
       },
       "armed conflict": {
-        "raw": 1436,
-        "no_english_article": 186,
+        "raw": 1438,
+        "no_english_article": 188,
         "fewer_than_min_sitelinks": 888,
         "passed_filters": 362,
         "proposed_location_none": 61,
@@ -278,11 +278,11 @@
         "in_curated": 38
       },
       "military operation": {
-        "raw": 297,
-        "no_english_article": 63,
-        "fewer_than_min_sitelinks": 142,
-        "passed_filters": 92,
-        "proposed_location_none": 5,
+        "raw": 307,
+        "no_english_article": 66,
+        "fewer_than_min_sitelinks": 148,
+        "passed_filters": 93,
+        "proposed_location_none": 6,
         "date_order_flagged": 0,
         "in_curated": 82
       },
@@ -382,7 +382,7 @@
         "fewer_than_min_sitelinks": 157,
         "passed_filters": 37,
         "proposed_location_none": 1,
-        "date_order_flagged": 1,
+        "date_order_flagged": 0,
         "in_curated": 37
       },
       "airstrike": {
@@ -422,8 +422,8 @@
         "in_curated": 3
       },
       "battle": {
-        "raw": 620,
-        "no_english_article": 81,
+        "raw": 622,
+        "no_english_article": 83,
         "fewer_than_min_sitelinks": 394,
         "passed_filters": 145,
         "proposed_location_none": 0,
@@ -559,11 +559,11 @@
     },
     "by_group": {
       "war": {
-        "raw": 1497,
-        "no_english_article": 213,
-        "fewer_than_min_sitelinks": 898,
-        "passed_filters": 386,
-        "proposed_location_none": 66,
+        "raw": 1507,
+        "no_english_article": 216,
+        "fewer_than_min_sitelinks": 904,
+        "passed_filters": 387,
+        "proposed_location_none": 67,
         "date_order_flagged": 1,
         "in_curated": 358
       },
@@ -627,7 +627,7 @@
         "fewer_than_min_sitelinks": 485,
         "passed_filters": 95,
         "proposed_location_none": 1,
-        "date_order_flagged": 1,
+        "date_order_flagged": 0,
         "in_curated": 95
       },
       "migration": {
@@ -651,18 +651,18 @@
     },
     "by_decade": {
       "1930s": {
-        "raw": 184,
+        "raw": 185,
         "no_english_article": 136,
-        "fewer_than_min_sitelinks": 38,
+        "fewer_than_min_sitelinks": 39,
         "passed_filters": 10,
         "proposed_location_none": 1,
         "date_order_flagged": 0,
         "in_curated": 10
       },
       "1910s": {
-        "raw": 204,
-        "no_english_article": 17,
-        "fewer_than_min_sitelinks": 113,
+        "raw": 208,
+        "no_english_article": 18,
+        "fewer_than_min_sitelinks": 116,
         "passed_filters": 74,
         "proposed_location_none": 10,
         "date_order_flagged": 0,
@@ -678,8 +678,8 @@
         "in_curated": 162
       },
       "1940s": {
-        "raw": 238,
-        "no_english_article": 85,
+        "raw": 239,
+        "no_english_article": 86,
         "fewer_than_min_sitelinks": 85,
         "passed_filters": 68,
         "proposed_location_none": 11,
@@ -710,13 +710,13 @@
         "fewer_than_min_sitelinks": 427,
         "passed_filters": 88,
         "proposed_location_none": 27,
-        "date_order_flagged": 1,
+        "date_order_flagged": 0,
         "in_curated": 83
       },
       "1960s": {
-        "raw": 274,
+        "raw": 275,
         "no_english_article": 161,
-        "fewer_than_min_sitelinks": 90,
+        "fewer_than_min_sitelinks": 91,
         "passed_filters": 23,
         "proposed_location_none": 8,
         "date_order_flagged": 0,
@@ -750,18 +750,18 @@
         "in_curated": 17
       },
       "1920s": {
-        "raw": 106,
+        "raw": 107,
         "no_english_article": 15,
         "fewer_than_min_sitelinks": 64,
-        "passed_filters": 27,
-        "proposed_location_none": 1,
+        "passed_filters": 28,
+        "proposed_location_none": 2,
         "date_order_flagged": 0,
         "in_curated": 27
       },
       "1900s": {
-        "raw": 29,
-        "no_english_article": 4,
-        "fewer_than_min_sitelinks": 18,
+        "raw": 31,
+        "no_english_article": 5,
+        "fewer_than_min_sitelinks": 19,
         "passed_filters": 7,
         "proposed_location_none": 0,
         "date_order_flagged": 0,
@@ -790,5 +790,85 @@
     "Qatar",
     "UAE",
     "Oman"
-  ]
+  ],
+  "coverage": {
+    "scope": "Events shown on the site (data/events.json). An event tagged with several countries counts once in each.",
+    "shown_total": 815,
+    "by_country": {
+      "Israel/Palestine": 223,
+      "Turkey": 143,
+      "Iraq": 138,
+      "Syria": 123,
+      "Iran": 105,
+      "Egypt": 81,
+      "Lebanon": 65,
+      "Saudi Arabia": 47,
+      "Jordan": 39,
+      "Yemen": 38,
+      "UAE": 24,
+      "Kuwait": 23,
+      "Qatar": 22,
+      "Bahrain": 21,
+      "Oman": 18,
+      "regional": 10
+    },
+    "events_tagged_with_8_or_more_countries": 17,
+    "by_country_without_events_tagged_with_8_or_more_countries": {
+      "Israel/Palestine": 211,
+      "Turkey": 133,
+      "Iraq": 121,
+      "Syria": 111,
+      "Iran": 90,
+      "Egypt": 69,
+      "Lebanon": 53,
+      "Saudi Arabia": 30,
+      "Jordan": 27,
+      "Yemen": 26,
+      "regional": 10,
+      "UAE": 7,
+      "Kuwait": 6,
+      "Qatar": 5,
+      "Bahrain": 4,
+      "Oman": 1
+    },
+    "by_decade": {
+      "1900s": 8,
+      "1910s": 78,
+      "1920s": 34,
+      "1930s": 14,
+      "1940s": 60,
+      "1950s": 18,
+      "1960s": 25,
+      "1970s": 47,
+      "1980s": 54,
+      "1990s": 34,
+      "2000s": 85,
+      "2010s": 193,
+      "2020s": 165
+    },
+    "by_category": {
+      "war": 360,
+      "political": 158,
+      "terrorism": 95,
+      "atrocity": 74,
+      "uprising": 39,
+      "treaty": 34,
+      "protest": 28,
+      "diplomatic": 20,
+      "migration": 6,
+      "economic": 1
+    },
+    "economic_events": {
+      "total": 1,
+      "from_hand_picked_list": 1,
+      "titles": [
+        "1973 oil crisis"
+      ]
+    },
+    "notes": [
+      "\"regional\" is a hand-assigned tag of a few hand-picked events that concern the whole region; it is not a country.",
+      "by_country_without_events_tagged_with_8_or_more_countries: the same count leaving out the 17 events tagged with 8 or more countries (world wars, region-wide conflicts), which otherwise count in each of their 8 to 15 countries.",
+      "by_decade: the decade of the event's start date. by_category: our coarse grouping (docs/DATA_POLICY.md, Category); hand-picked events count in the group assigned to them."
+    ]
+  }
 }

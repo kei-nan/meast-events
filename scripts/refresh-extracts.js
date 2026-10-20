@@ -31,6 +31,7 @@ import {
   titleReport,
   detectExtractHold,
   extractHoldReport,
+  leadChangeReport,
 } from "./lib/title-refresh.js";
 import { syncMirrorTexts } from "./lib/mirrors.js";
 
@@ -52,7 +53,6 @@ const sentences = (t) =>
     .flatMap((p) => p.split(/(?<=[.!?\]"'”])\s+(?=[A-Z0-9"'“(])/))
     .map((s) => s.trim())
     .filter(Boolean);
-const clip = (s, n = 160) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
 
 export function diffLeads(oldText, newText) {
   const a = sentences(oldText ?? "");
@@ -119,6 +119,9 @@ async function refresh(events, label, file) {
   return out;
 }
 
+// The printout is also the PR description (refresh-data.yml), so every Wikipedia title and sentence in it is a
+// code span (lib/title-refresh.js mdCode, leadChangeReport): an edit to an article cannot hide part of the
+// description or ping anyone.
 const lines = [];
 const say = (s = "") => {
   console.log(s);
@@ -139,13 +142,7 @@ for (const [name, r] of results) say("\n" + titleReport(r.titles, { name, applie
 for (const [name, r] of results) {
   say(`\n## ${name}: ${r.changed.length} changed, ${r.unchanged} identical, ${r.held.length} held, ${r.missing.length} missing`);
   if (r.held.length) say("\n" + extractHoldReport(r.held, { name }));
-  for (const c of r.changed) {
-    say(`\n- ${c.id} ("${c.title}") stored ${c.from ?? "?"}: ${c.d.lenBefore} -> ${c.d.lenAfter} chars, -${c.d.removed.length} +${c.d.added.length} sentences`);
-    for (const s of c.d.removed.slice(0, MAX_LINES)) say(`    - ${clip(s)}`);
-    if (c.d.removed.length > MAX_LINES) say(`    - ... ${c.d.removed.length - MAX_LINES} more removed`);
-    for (const s of c.d.added.slice(0, MAX_LINES)) say(`    + ${clip(s)}`);
-    if (c.d.added.length > MAX_LINES) say(`    + ... ${c.d.added.length - MAX_LINES} more added`);
-  }
+  for (const c of r.changed) say("\n" + leadChangeReport(c, { maxLines: MAX_LINES }));
   if (r.missing.length) say(`\nNo lead returned for: ${r.missing.join(", ")}`);
 }
 if (mirrored.length) {

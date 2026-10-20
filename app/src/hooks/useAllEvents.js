@@ -4,8 +4,8 @@ import { loadAllLite, normalizeEvents } from "../lib/dataClient";
 // How often an unreachable source is retried (here and App's full-text index).
 export const RETRY_MS = 20000;
 
-// Owns the event store: a ref-held Map of every event (lite records; a record
-// gains its full lead when one arrives), filled ONCE from the static
+// Owns the event store: a ref-held Map of every event (lite records; full leads
+// are kept by App, not here), filled ONCE from the static
 // events/all.<hash>.json - no API call. Everything else (range, viewport,
 // filters, drawn areas) is derived from this store locally.
 //
@@ -25,8 +25,7 @@ export default function useAllEvents() {
   const addEvents = useCallback((events) => {
     let changed = false;
     for (const event of normalizeEvents(events)) {
-      const existing = storeRef.current.get(event.id);
-      if (!existing || (existing.extract === undefined && event.extract !== undefined)) {
+      if (!storeRef.current.has(event.id)) {
         storeRef.current.set(event.id, event);
         changed = true;
       }

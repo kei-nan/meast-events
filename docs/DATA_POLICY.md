@@ -133,6 +133,23 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
    Sahara, Sahel, North Africa, Gulf of Aden, Bab-el-Mandeb - lend no country. Historical predecessors such as the Ottoman Empire or Mandatory Palestine
    are not sovereign states today and count on neither side. The rule only removes country tags derived from such places (the hand-picked
    events keep their hand-typed tags), and an event left with no tracked country is excluded (`data/proposed-exclusions.json`: 23 events on 2026-09-29, 5 more from the classes added on 2026-10-06).
+
+   **Predecessor states** (owner's rule, 2026-10-15). If an item's country (`P17`) is a historical state that Wikidata links to a tracked country
+   via *replaced by* / *replaces* (`P1366` / `P1365`, one step: "X replaced by Turkey" or "Turkey replaces X"), it counts only when the item's own
+   coordinates (`P625`) fall in a tracked country, or its place's (`P276`) present-day country is a tracked country; it is then tagged with that
+   country. "Fall in" means inside the country's present-day border shape in `data/boundaries.json` (the map's own country-to-shape table,
+   no tolerance). A place's present-day country is a tracked country in its `P17` that is not itself such a predecessor (so a place whose only
+   `P17` is the Ottoman Empire, or Mandatory Palestine, lends none). Present-day sovereign states are never predecessors. The rule is strict:
+   a historical `P17` alone never places an event. On 2026-10-15 Wikidata linked 42 such states (among them the Ottoman Empire, the Kingdom of
+   Egypt, Pahlavi Iran, the Trucial States, the Yemen Arab Republic, South Yemen, the United Arab Republic and some Ottoman vilayets); 256 items
+   had one of them as `P17` and a date from 1900, and 130 of those were dated instances of an event class. 73 of the 130 were already found
+   through rule 2's other paths, 47 are not located in a tracked country by this rule and are not counted, and 10 were new: one of them
+   has 10+ sitelinks and an English article, the Koçgiri rebellion (`P17` Ottoman Empire, `P276` Sivas Province, Turkey), now in
+   `data/events.proposed.json` (not merged; `scripts/enrich-candidates.js --keep-existing` added it without re-deriving the other proposed records).
+   Its place would also qualify it through the ordinary `P276` path, but the 2026-10-06 discovery run did not return it (the item was last
+   edited on 2026-08-07, so the cause is on the query side; it was not traced further). Code: `scripts/lib/predecessor.js`, run by
+   `scripts/discover-events.js` (`--predecessors-only` adds only that pass's new items to `data/event-candidates.json`); such events carry
+   the review note `country_via_predecessor_state`, which names the state and the evidence.
 3. **Time.** It has a date (`P585` point in time, else `P580` start time) from 1900 to the present.
 4. **Significance.** Its Wikidata item has **at least 10 sitelinks** (`INCLUSION_MIN_SITELINKS`) and has an **English Wikipedia article**, or an English
    Wikipedia title that redirects into one (see "Events without an article of their own" below).
@@ -183,16 +200,40 @@ The rule stays as coded (all projects); the documentation now says so.
 - **Wikidata modelling is uneven.** Only events that some editor has typed with a class, dated and located in a tracked country are found at all. Multi-country events
   carry only the countries Wikidata lists.
 - **English Wikipedia is required** for an extract, which biases toward what English Wikipedia covers.
-- **The hand-picked seed list** (103 events, 43 of them not reachable by the rule; 112 before 2026-10-09, see "Not events" below) is our own selection.
+- **The hand-picked seed list** (102 events, 42 of them not reachable by the rule; 112 before 2026-10-09 and 103 before 2026-10-15, see "Not events" below) is our own selection.
   It is still the only source of economic events; the rule now also finds diplomatic ones (summits, ceasefires, peace conferences).
 - **Location is not required, but it changes visibility.** Events without coordinates are listed but have no marker; abstract and large-area events (wars, referendums,
   treaties) lack coordinates far more often than point-like ones.
 
 The funnel from 5,063 raw candidates to what is shown, with breakdowns by country, class, group and decade, is machine readable in `data/selection-funnel.json`
 (recomputed from the data files by `scripts/build-selection-funnel.js`, not copied from documents) so the app's About page can render it.
+Its `coverage` block (added 2026-10-15) counts what is shown (`data/events.json`): per country as tagged and again without the events tagged
+with 8 or more countries (17 on 2026-10-15: the world wars and other region-wide conflicts, which otherwise count in each of their countries),
+per decade of the start date, and per category; the About page shows it under "Coverage". It also records that the economic category holds one
+event, the 1973 oil crisis, which comes from the hand-picked list. CI keeps the file current (`--check`).
 
 These biases are visible in the data; the project does not attempt to correct them, because a correction would be an editorial judgement of the very kind this policy avoids.
 Bias in the wording of individual summaries is handled the same way: it is not corrected, but it is disclosed next to the text by the framing review (see `docs/framing-review.md`).
+
+### Known gaps: major events the rule does not reach
+
+Some well-known events fail the rule because of how Wikidata models them, not because of their significance. They are listed here, with the
+reason read from their Wikidata items (wbgetentities, 2026-10-15), and they are **not** added by hand: no seeds are added for them. The
+Armenian genocide and the Young Turk Revolution are the two of them that are shown, only because they are on the hand-picked list from before the rule.
+
+| Event (QID) | Sitelinks | Why the rule misses it |
+|---|---|---|
+| Armenian genocide (Q80034) | 125 | `P17` Ottoman Empire; `P276` Ottoman Empire, Western Armenia (no `P17`) and the Six vilayets (`P17` Ottoman Empire); no `P625`. No present-day place, so the predecessor rule does not place it. Shown because it is a hand-picked event. |
+| Sayfo (Q852236) | 53 | `P17` Ottoman Empire; `P276` West Asia, which has no `P17`; no `P625`. |
+| Young Turk Revolution (Q4298662) | 46 | `P17` and `P276` Ottoman Empire; no `P625`. Shown because it is a hand-picked event. |
+| Population exchange between Greece and Turkey (Q131017) | 42 | No `P17`, `P276`, `P131` or `P625` at all. |
+| Greek genocide (Q911233) | 36 | `P17` and `P276` Ottoman Empire; no `P625`. |
+| Taif Agreement (Q321936) | 24 | No `P17`, `P276`, `P131` or `P625` at all (a "peace treaty", dated 1989 at year precision). |
+| 1913 Ottoman coup d'état (Q4559693) | 17 | `P17` Ottoman Empire; no `P276` or `P625`. |
+| Treaty of London (1946) (Q541293) | 10 | Meets the class (treaty), date (1946, year precision), English-article and sitelink (exactly 10) conditions, but `P17` is the United Kingdom and `P276` is London: no tracked country. Checked 2026-10-15, when "Jordanian independence" was removed. |
+
+Each of these would be found by the rule once Wikidata records a place (`P276`) whose present-day country is tracked; for those whose `P17`
+is the Ottoman Empire, coordinates (`P625`) inside a tracked country would also do. That is an upstream edit, which this project does not make.
 
 ### Not events: people, organisations and states
 
@@ -202,6 +243,16 @@ contained them. On 2026-10-09 this removed nine hand-picked entries: Saddam Huss
 Organization, Islamic State and the Central Treaty Organization (listed as "Baghdad Pact"; organisation classes); the Kingdom of Iraq, the United Arab
 Republic and Syrian independence (state classes). Events about them stay (for example the Execution of Saddam Hussein, the 14 July Revolution).
 The Iranian Green Movement (`social movement`, in practice the 2009 protests) is kept.
+
+On 2026-10-15 the rule was extended to the **history of a country** (Wikidata class `history of a country or state`, Q17544377) and is now
+applied by code instead of by hand: `NOT_EVENT_CLASSES` in `scripts/lib/event-classes.js` lists the classes (human; organization, political,
+military, terrorist and armed organization; historical country, state, sovereign state, self-proclaimed state, quasi-state; history of a country
+or state), matched against the stored `wikidata_classes`. `scripts/merge-proposed.js` removes a curated entry that has one of them (listed in its
+dry run; `--no-add` applies the rules without adding proposed events), `scripts/enrich-candidates.js` never proposes one (`exclusion_reason:
+not_an_event`), and `validate-events.js` warns about any it finds. The run of 2026-10-15 (`merge-proposed.js --apply --no-add`) removed one
+hand-picked entry, "Jordanian independence", whose Wikidata item (Q1639050) and Wikipedia link are the *history of Jordan*; its seed line and
+framing review were removed with it. No other curated or proposed event has one of these classes. The Emirate of Transjordan (classes `League
+of Nations mandate`, `British protectorate`) does not match the list and is kept.
 
 ## Default order
 
@@ -315,6 +366,32 @@ but are not shown; an event with any date flag still shows only the years in its
   against Wikidata and fixed (F11).
 - `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (74 events on 2026-10-10, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
+
+  **A fallback pin marks the country, not the event's place.** It is the same point for every event of that country, taken from
+  `COUNTRY_CAPITALS` in `scripts/lib/geo.js` (also the reference point of the `coordinate_far_from_countries` flag), whatever the event's date:
+  a Turkey event from before 1923 sits at Ankara, which became the capital only in 1923, and a Saudi event before 1932 at Riyadh. The event
+  panel and the static event page say so ("The marker shows the country, not where the event happened").
+
+  | Country tag | Point (lat, lon) | Where it is |
+  |---|---|---|
+  | Turkey | 39.9334, 32.8597 | Ankara |
+  | Iran | 35.6892, 51.389 | Tehran |
+  | Iraq | 33.3152, 44.3661 | Baghdad |
+  | Syria | 33.5138, 36.2765 | Damascus |
+  | Lebanon | 33.8938, 35.5018 | Beirut |
+  | Jordan | 31.9454, 35.9284 | Amman |
+  | Israel/Palestine | 31.7683, 35.2137 | Jerusalem: the city's conventional coordinate, which lies in West Jerusalem |
+  | Egypt | 30.0444, 31.2357 | Cairo |
+  | Saudi Arabia | 24.7136, 46.6753 | Riyadh |
+  | Yemen | 15.3694, 44.191 | Sanaa |
+  | Kuwait | 29.3759, 47.9774 | Kuwait City |
+  | Bahrain | 26.2285, 50.586 | Manama |
+  | Qatar | 25.2854, 51.531 | Doha |
+  | UAE | 24.4539, 54.3773 | Abu Dhabi |
+  | Oman | 23.5859, 58.4059 | Muscat |
+
+  The Israel/Palestine point is one point for the combined tag. It is not a statement about the city's status; it is the coordinate commonly
+  given for Jerusalem, and it falls in West Jerusalem. The coordinates are unchanged (owner's decision, 2026-10-15); only this description is new.
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
   Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 378 of the 816 curated events and 186 of the 254 proposed events
   (counted from `data/events.json` and `data/events.proposed.json`).
@@ -371,7 +448,9 @@ north-west corner are Kuwait from 1961 and blank before, like the rest of Kuwait
 
 ```
 node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-candidates.json (bounded runs merge)
-node scripts/enrich-candidates.js [--reuse] [--limit=N] # -> data/enriched-candidates.json, data/events.proposed.json,
+node scripts/discover-events.js --predecessors-only     # only the predecessor-state pass; adds its new items (rule 2)
+node scripts/enrich-candidates.js [--reuse] [--limit=N] [--keep-existing]
+                                                        # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
@@ -382,7 +461,9 @@ node scripts/verify-sample.js                           # -> data/import-verific
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
 npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings (runs in CI; needs root npm ci)
-node scripts/merge-proposed.js [--apply]                # dry-run by default; --apply writes data/events.json
+node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --apply writes data/events.json. Every run also
+                                                        #    applies the "Not events" rule and carries re-derived date-order
+                                                        #    flags to curated records (--no-add: only that, nothing added)
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.

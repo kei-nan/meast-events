@@ -1,11 +1,13 @@
 // Test-only stand-in for the few React hooks a map hook uses (useRef, useMemo,
-// useEffect), so a hook can be driven under `node --test` with no DOM and no
+// useEffect, useState), so a hook can be driven under `node --test` with no DOM and no
 // renderer. Aliased in for "react" by viteNodeHooks.mjs (`data.aliases`).
 //
 // Semantics kept from React: hook slots by call order; useMemo/useEffect re-run
 // when a dependency changes (Object.is) or when no dependency array is given;
 // effects run after the render, in declaration order, each previous cleanup
-// first. Not modelled: state, context, batching, StrictMode double runs.
+// first. useState keeps its value per slot, but setting it does not re-render:
+// the test calls rerender() to see it. Not modelled: context, batching,
+// StrictMode double runs.
 
 let current = null;
 
@@ -21,6 +23,17 @@ function slot(init) {
 
 export function useRef(initial) {
   return slot(() => ({ current: initial }));
+}
+
+export function useState(initial) {
+  const s = slot(() => {
+    const st = { value: typeof initial === "function" ? initial() : initial };
+    st.set = (v) => {
+      st.value = typeof v === "function" ? v(st.value) : v;
+    };
+    return st;
+  });
+  return [s.value, s.set];
 }
 
 export function useMemo(fn, deps) {
@@ -63,4 +76,4 @@ export function renderHook(hook, props) {
   return { rerender: render };
 }
 
-export default { useRef, useMemo, useEffect };
+export default { useRef, useMemo, useEffect, useState };
