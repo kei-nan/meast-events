@@ -43,6 +43,7 @@ jobs:
         working-directory: app
         run: npm ci
 
+      # oxlint (app/.oxlintrc.json: react, jsx-a11y and import plugins); warnings fail.
       - name: Lint
         working-directory: app
         run: npm run lint
@@ -69,6 +70,19 @@ jobs:
       - name: Build (validates data before, checks dist/ after)
         working-directory: app
         run: npm run build
+
+      # Runs the built site under its production headers (wrangler dev applies
+      # dist/_headers, CSP included) in the runner's preinstalled Chrome, and
+      # checks the map draws, full-text search answers (Pagefind and its
+      # WebAssembly), an event and the About dialog open, /event/<id> loads, and
+      # nothing logs an error or a CSP violation. Local only (no account, no
+      # deploy), and CI only: Workers Builds does not run it, so it gates merges
+      # (as a required check), not deploys.
+      - name: Smoke test of the built site (scripts/smoke.mjs)
+        working-directory: app
+        env:
+          SMOKE_BROWSER: chrome
+        run: npm run smoke
 
   data:
     name: Validate event data
@@ -111,7 +125,7 @@ jobs:
 
       # oxlint over scripts/ (.oxlintrc.json at the repo root). import/named is an
       # error: a named import that the target module does not export fails here
-      # instead of at run time in the monthly refresh. Warnings do not fail.
+      # instead of at run time in the monthly refresh. Warnings fail too.
       - name: Lint (scripts/)
         run: npm run lint
       # data/boundaries.json: required properties, per-name year gaps, overlaps between shapes

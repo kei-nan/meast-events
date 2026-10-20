@@ -10,8 +10,9 @@ border-corrections pipeline). See DEPLOYMENT.md.
 
 ## Quick start
 
-Needs Node.js 22 (`.nvmrc`; anything matching `^20.19.0 || >=22.12.0` in
-`engines` should work, but CI and the tests use 22+).
+Needs Node.js 22 (`.nvmrc`; `engines` asks for 22.12.0 or later). Node 20 is
+not enough: `npm test` passes `node --test` glob patterns, which Node supports
+from version 21.
 
 ```sh
 npm ci                 # repo root: the data-pipeline scripts' dependencies
@@ -28,8 +29,9 @@ pipeline), which the site build never installs.
 |---|---|
 | Run the site locally | `cd app && npm run dev` (first regenerates `app/public/data/`, the search index and `app/src/lib/dataVersion.js` from `data/`) |
 | Unit tests | `npm test` (scripts/lib) and `npm test --prefix app` (app/src/lib, app/src/components and app/scripts) |
-| Lint | `npm run lint --prefix app` |
+| Lint | `npm run lint` (scripts/) and `npm run lint --prefix app`; warnings fail both |
 | Production build | `cd app && npm run build` (its postbuild step writes the event pages and runs `scripts/check-dist.mjs`) |
+| Smoke test of the build | `cd app && npm run smoke` (after a build: serves `dist/` with `wrangler dev`, which applies `_headers`, and checks the map, search, event panel, About dialog and an `/event/<id>` page in an installed Chrome or Edge; `SMOKE_BROWSER=msedge` or `chrome`) |
 | Validate the event data | `node scripts/validate-events.js` |
 | Validate the border data | `npm run validate-boundaries` (checks `data/boundaries.json`) |
 | Border check | `node scripts/verify-borders.js --check` (CI); `npm run verify-borders` also rewrites `docs/border-verification.md` |

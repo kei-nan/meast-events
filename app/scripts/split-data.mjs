@@ -77,7 +77,7 @@ const SHARED_GEOMETRY_MIN_BYTES = 32 * 1024;
 // source geometry for the same ground (CShapes' West Bank record, as drawn for
 // 1967-1999), never a simplified copy of the areas. The Borders list and the
 // popup still describe the members, whose properties ship in the chunk.
-const DEFERRED_GROUPS = [
+export const DEFERRED_GROUPS = [
   {
     members: [
       "West Bank Area A (Palestinian Authority)",
@@ -104,7 +104,7 @@ const MAX_DECADE = decadeFloor(MAX_YEAR);
 // [MIN_YEAR, MAX_YEAR] can't be reached via the timeline, so they don't need
 // their own chunk - a feature that starts in 1886 just also lives in the 1900
 // chunk, since that's the earliest chunk anyone will ever fetch).
-function decadesFor(startYear, endYear) {
+export function decadesFor(startYear, endYear) {
   const s = Math.max(MIN_DECADE, decadeFloor(Math.min(startYear, endYear)));
   const e = Math.min(MAX_DECADE, decadeFloor(Math.min(Math.max(startYear, endYear), MAX_YEAR)));
   const decades = [];
@@ -115,7 +115,7 @@ function decadesFor(startYear, endYear) {
   return decades;
 }
 
-function hasRealCoordinates(event) {
+export function hasRealCoordinates(event) {
   const c = event.coordinates;
   return (
     !!c &&
@@ -125,12 +125,12 @@ function hasRealCoordinates(event) {
 }
 
 // First 160 characters (code points, never splitting a surrogate pair).
-function makeSnippet(extract) {
+export function makeSnippet(extract) {
   if (!extract) return "";
   return extract.length <= SNIPPET_LENGTH ? extract : Array.from(extract).slice(0, SNIPPET_LENGTH).join("");
 }
 
-function locationQuality(event) {
+export function locationQuality(event) {
   if (!hasRealCoordinates(event)) return "none";
   if (event.location_quality === "precise" || event.location_quality === "approximate") return event.location_quality;
   return String(event.coordinate_source || "").startsWith("country-fallback") ? "approximate" : "precise";
@@ -143,7 +143,7 @@ const strings = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === "string"
 // Fields only the detail view shows (Wikipedia link, Wikidata classes and QID,
 // date flags, coordinate source) are in the full record instead (detailFields),
 // which the app merges over this one when an event is opened.
-function publicEvent(e) {
+export function publicEvent(e) {
   const quality = locationQuality(e);
   return {
     id: e.id,
@@ -161,7 +161,7 @@ function publicEvent(e) {
 }
 
 // wikidata_classes are Wikidata's own labels, shown as-is.
-function detailFields(e) {
+export function detailFields(e) {
   return {
     wikipedia_url: e.wikipedia_url,
     wikidata_qid: e.wikidata_qid,
@@ -189,7 +189,7 @@ async function writeJSON(filePath, data) {
 // zoom threshold and bbox, and one placeholder feature per group. A name that no
 // longer matches fails the build, so a renamed area can't silently ship eagerly
 // or lose its placeholder.
-function deferredBoundaryGroups(features) {
+export function deferredBoundaryGroups(features, groups = DEFERRED_GROUPS) {
   const byName = (name) => {
     const hits = features.filter((f) => f.properties.name === name);
     if (hits.length !== 1) throw new Error(`DEFERRED_GROUPS: expected one boundary named "${name}", found ${hits.length}`);
@@ -197,7 +197,7 @@ function deferredBoundaryGroups(features) {
   };
   const members = new Map(); // feature -> {minzoom, bbox}
   const placeholders = [];
-  for (const group of DEFERRED_GROUPS) {
+  for (const group of groups) {
     const feats = group.members.map(byName);
     const { start_year, end_year } = feats[0].properties;
     if (feats.some((f) => f.properties.start_year !== start_year || f.properties.end_year !== end_year)) {
@@ -310,13 +310,13 @@ async function loadFramingReview() {
 
 // The guideline section as it read in the revision the reviews applied (the same link as
 // permalink() in scripts/lib/guidelines.js, which records `reviewed_revision`).
-function guidelineVersionUrl(url, revid) {
+export function guidelineVersionUrl(url, revid) {
   const u = new URL(url);
   const title = decodeURIComponent(u.pathname.replace(/^\/wiki\//, ""));
   return `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(title)}&oldid=${revid}${u.hash}`;
 }
 
-function framingFor(review, e) {
+export function framingFor(review, e) {
   const r = review?.events?.[e.id];
   if (!r) return null;
   const text = e.extract ?? "";
@@ -497,7 +497,7 @@ async function splitEvents() {
 }
 
 // Polygon bbox, [minLon, minLat, maxLon, maxLat].
-function geometryBbox(geometry) {
+export function geometryBbox(geometry) {
   const b = [Infinity, Infinity, -Infinity, -Infinity];
   const walk = (c) => {
     if (typeof c[0] === "number") {
@@ -565,7 +565,11 @@ async function main() {
   console.log(`\nWrote chunked data to ${path.relative(process.cwd(), OUT_DIR)}`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// The pure helpers above are exported for scripts/split-data.test.mjs; the split
+// itself runs only when this file is the command (node scripts/split-data.mjs).
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
