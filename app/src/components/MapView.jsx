@@ -105,6 +105,13 @@ const BASE_STYLE = {
   layers: [{ id: "background", type: "background", paint: { "background-color": SEA_COLOR } }],
 };
 
+// The longest the loading cover stays up once the map has its layers (the load
+// handler), for a slow worker or event list, or a map that never settles: it
+// normally goes ~0.2 s after that on desktop and ~0.6 s on a slow phone link
+// (measured 2026-10, 1.6 Mbps/150 ms, 4x CPU: MapLibre's worker script is the
+// last thing in), so 2 s leaves room for a slower link without a long wait.
+const REVEAL_CAP_MS = 2000;
+
 // The first-visit hint hides itself after this long (or on the first map interaction).
 const HINT_AUTO_HIDE_MS = 8000;
 
@@ -179,7 +186,10 @@ export default function MapView({
   const draggingRef = useRef(false);
   const suppressClickRef = useRef(false);
   const [mapReady, setMapReady] = useState(false);
-  const [landDrawn, setLandDrawn] = useState(false); // the canvas shows the land: MapLoading can go
+  const [landDrawn, setLandDrawn] = useState(false); // the canvas shows the opening view: MapLoading can go
+  // The events source holds the loaded event list (or its load has failed): the
+  // reveal waits for it (the load handler).
+  const eventsInRef = useRef(false);
 
   // Boundary decade chunks are fetched (static files) on demand and cached forever here -
   // scrubbing the timeline back over an already-visited decade never re-fetches
@@ -297,8 +307,18 @@ export default function MapView({
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only
     // Set on unmount; the async load handler checks it after each await.
     let cancelled = false;
+    let revealCap; // the loading cover's time limit (the load handler)
 
     map.on("load", async () => {
+      // No "idle" until our layers are in: MapLibre places labels without a fade
+      // until its first "idle" (then fades them in over 300 ms, and redoes the
+      // placement at most once per fade). Without this the bare map went idle
+      // while the data below loaded, and the country names faded in ~0.2-0.5 s
+      // after the borders (measured 2026-10, desktop filmstrip). "load" fires
+      // just before that check in the same frame, so set here it is in time.
+      // Costs a repaint per frame of an empty map until installLayers (at most
+      // the 1.2 s races below); fades on later pans and zooms are unchanged.
+      map.repaint = true;
       // Land silhouette and the boundary decade covering the initial year are
       // both needed for a correct first paint, so fetch them in parallel and
       // wait on both before building the map's own sources/layers - this
@@ -326,6 +346,7 @@ export default function MapView({
       ]);
       // Unmounted while the data was loading: the map is already removed.
       if (cancelled) return;
+      map.repaint = false;
       if (landResult) landAppliedRef.current = true;
       const initialFeatures = boundaryCacheRef.current.get(initialDecade) ?? [];
       const boundaries = boundariesForYear(yearRef.current, drawableBoundaries(initialFeatures));
@@ -474,25 +495,33 @@ export default function MapView({
 
       setMapReady(true);
 
-      // The stand-in (MapLoading) stays over the canvas until a frame with the
-      // land and borders in it has been drawn: their tiles are cut in the
-      // worker after installLayers, and until then the canvas is bare sea.
-      // "idle" is the fallback (everything settled, whatever loaded) - but never
-      // before the land is in: its request may outlast installLayers' 1.2 s wait,
-      // and "idle" would then uncover bare sea. A failed land load reveals the map
-      // with its notice.
+      // The stand-in (MapLoading) stays over the canvas until the map has drawn
+      // the whole opening view - land, borders, their names and the events - and
+      // then goes in one step. "idle" is that frame: every tile cut and drawn,
+      // every label placed (no fade yet, see map.repaint above). Revealing on the
+      // first frame with land and borders instead showed the map in stages
+      // (measured 2026-10, desktop filmstrip: bare land at 0.77 s, borders and
+      // events 0.9 s, names fading in until 1.35 s).
+      // Never before the land is in: its request may outlast installLayers' 1.2 s
+      // wait, and the map would uncover bare sea. A failed land load reveals the
+      // map with its notice, as does a failed event list (eventsLoading ends).
+      // REVEAL_CAP_MS after this point the map is shown with whatever it has
+      // drawn, so a slow worker or event list never keeps the stand-in up.
+      let capped = false;
       const reveal = () => {
-        map.off("render", revealWhenDrawn);
         map.off("idle", revealOnIdle);
+        clearTimeout(revealCap);
         setLandDrawn(true);
       };
       const landIn = () => landAppliedRef.current || landFailedRef.current;
-      const revealWhenDrawn = () => {
-        if (landIn() && map.isSourceLoaded("land") && map.isSourceLoaded("boundaries")) reveal();
+      const revealOnIdle = () => {
+        if (landIn() && (eventsInRef.current || capped)) reveal();
       };
-      map.on("render", revealWhenDrawn);
-      const revealOnIdle = () => (landIn() ? reveal() : map.once("idle", revealOnIdle));
-      map.once("idle", revealOnIdle);
+      revealCap = setTimeout(() => {
+        capped = true;
+        if (landIn()) reveal();
+      }, REVEAL_CAP_MS);
+      map.on("idle", revealOnIdle);
       map.triggerRepaint();
 
       // Land beyond the opening view loads once that view has drawn, so it never
@@ -594,6 +623,7 @@ export default function MapView({
 
     return () => {
       cancelled = true;
+      clearTimeout(revealCap);
       map.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -618,6 +648,14 @@ export default function MapView({
       source.updateData({ remove: diff.remove, add: diff.add.map((id) => eventFeature(byId.get(id), matchIds)) });
     }
   }, [events, matchIds, mapReady]);
+
+  // After the effect above, so the events are in the source: the next "idle"
+  // has drawn them, and may reveal the map (the load handler).
+  useEffect(() => {
+    if (!mapReady || eventsLoading || eventsInRef.current) return;
+    eventsInRef.current = true;
+    mapRef.current.triggerRepaint(); // an already idle map fires "idle" after this frame
+  }, [eventsLoading, mapReady]);
 
   // Fetch trigger: only fires when the *settled* year lands in a decade that
   // isn't cached yet. Also opportunistically warms the neighboring decades, so

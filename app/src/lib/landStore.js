@@ -75,3 +75,22 @@ export function wantsBackgroundDetail(connection) {
   if (downlink > 0 && downlink < SLOW_DOWNLINK_MBPS) return false;
   return true;
 }
+
+// Whether the link is known to be fast enough for the map's downloads to start at
+// once, alongside the page's own, instead of after its first paint (App.jsx). The
+// wait is for slow links, where they would share bandwidth with the panel and
+// delay it; on a fast one it only holds the map back (~0.2 s on desktop). So, the
+// opposite default to wantsBackgroundDetail's: anything not known to be fast waits
+// - no API (Safari, Firefox), save-data, or no estimate (0). Nor does Chromium's
+// estimate before it has measured much: a fresh profile on a fast desktop link
+// reported 1.45-1.75 Mbps with 100 or 50 ms (2026-10), hence the bandwidth floor;
+// and below 100 ms, as a mobile network's round trip (150 ms+) never is. Chromium
+// reports at most 10 Mbps, in 25 ms and 25 kbps steps.
+export const FAST_RTT_MS = 100;
+export const FAST_DOWNLINK_MBPS = 5;
+export function isFastConnection(connection) {
+  if (!connection || connection.saveData) return false;
+  if (connection.effectiveType && connection.effectiveType !== "4g") return false;
+  const { downlink, rtt } = connection;
+  return rtt > 0 && rtt < FAST_RTT_MS && downlink >= FAST_DOWNLINK_MBPS;
+}
