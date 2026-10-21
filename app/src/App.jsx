@@ -16,6 +16,7 @@ import {
   prefetchFullLead,
 } from "./lib/dataClient";
 import { rawEventYears } from "./lib/eventYears";
+import { isFastConnection } from "./lib/landStore";
 import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
@@ -146,16 +147,22 @@ export default function App() {
   }, []);
 
   // The map mounts (and its downloads start) after the first paint; see
-  // startMapDownloads.
+  // startMapDownloads. On a link known to be fast (lib/landStore.js
+  // isFastConnection) it starts at once instead of waiting for the First
+  // Contentful Paint (~0.2 s on desktop): measured (2026-10, local HTTP/2
+  // server, cold cache) the map completes ~0.09 s sooner on desktop (median of
+  // 5), and on a phone on a fast link (10 Mbps/50 ms, 3x CPU, median of 7) LCP
+  // 1.10 -> 1.00 s, with the first paint unchanged in both.
   const [mapStarted, setMapStarted] = useState(false);
-  useEffect(
-    () =>
-      afterFirstContentfulPaint(() => {
-        startMapDownloads();
-        setMapStarted(true);
-      }),
-    [initial]
-  );
+  useEffect(() => {
+    const start = () => {
+      startMapDownloads();
+      setMapStarted(true);
+    };
+    if (!isFastConnection(navigator.connection)) return afterFirstContentfulPaint(start);
+    start();
+    return undefined;
+  }, [initial]);
   // An event link: the event's detail record downloads alongside the event
   // list instead of after it.
   useEffect(() => {

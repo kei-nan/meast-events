@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { cellsInBounds, createLandStore, wantsBackgroundDetail } from "./landStore.js";
+import { cellsInBounds, createLandStore, isFastConnection, wantsBackgroundDetail } from "./landStore.js";
 
 const piece = (cell, tag) => ({ type: "Feature", properties: cell ? { cell, tag } : { tag }, geometry: null });
 const fc = (...features) => ({ type: "FeatureCollection", features });
@@ -76,4 +76,24 @@ test("wantsBackgroundDetail: off for save-data, 2G/3G or a slow link, on otherwi
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 0.95, rtt: 50 }), false);
   // 0 = no estimate yet: unknown, so the fill stays on.
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 0, rtt: 0 }), true);
+});
+
+test("isFastConnection: only a measured fast link; unknown, save-data or Chromium's starting estimate wait", () => {
+  // A warmed-up Chromium on a fast desktop link.
+  assert.equal(isFastConnection({ effectiveType: "4g", saveData: false, downlink: 10, rtt: 50 }), true);
+  assert.equal(isFastConnection({ effectiveType: "4g", downlink: 5, rtt: 75 }), true);
+  // No API (Safari, Firefox) or no estimate yet (0): not known to be fast.
+  assert.equal(isFastConnection(undefined), false);
+  assert.equal(isFastConnection(null), false);
+  assert.equal(isFastConnection({ effectiveType: "4g" }), false);
+  assert.equal(isFastConnection({ effectiveType: "4g", downlink: 0, rtt: 0 }), false);
+  // Chromium's starting estimate on a fast desktop link, before it has measured anything.
+  assert.equal(isFastConnection({ effectiveType: "4g", downlink: 1.45, rtt: 100 }), false);
+  assert.equal(isFastConnection({ effectiveType: "4g", downlink: 10, rtt: 100 }), false);
+  // What Chromium reported under the slow-4G throttle.
+  assert.equal(isFastConnection({ effectiveType: "4g", downlink: 1.35, rtt: 150 }), false);
+  // Low latency but little bandwidth, save-data, or a slower type.
+  assert.equal(isFastConnection({ effectiveType: "4g", downlink: 4.9, rtt: 50 }), false);
+  assert.equal(isFastConnection({ effectiveType: "4g", saveData: true, downlink: 10, rtt: 50 }), false);
+  assert.equal(isFastConnection({ effectiveType: "3g", downlink: 10, rtt: 50 }), false);
 });
