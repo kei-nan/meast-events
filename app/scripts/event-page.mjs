@@ -183,7 +183,7 @@ ${fairness}
 ${wording}
 </section>
 ${notes.join("\n")}
-<p class="framing-review-meta">Reviewed by Claude, an AI model made by Anthropic, and not checked line by line by a person. It does not judge whether the events happened, and the Wikipedia text above is shown unchanged. ${link(METHOD_URL, "How we review", { external: true })} · ${link(contestUrl(event, review), "Disagree with this review?", { external: true })}</p>
+<p class="framing-review-meta">Reviewed by AI · ${link(METHOD_URL, "How we review", { external: true })} · ${link(contestUrl(event, review), "Disagree with this review?", { external: true })}</p>
 </aside>`;
 }
 

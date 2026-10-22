@@ -143,9 +143,11 @@ export default function FramingReview({ event, tab, onTab }) {
           <strong>Disclosure:</strong> {review.disclosure}
         </p>
       )}
+      {/* Short on purpose: "AI" stays on every review; who made it (Claude, by Anthropic),
+          that no person checked it line by line, and what it does not judge are on
+          the "How we review" page. */}
       <p className="framing-review-meta">
-        Reviewed by Claude, an AI model made by Anthropic, and not checked line by line by a person. It does not judge
-        whether the events happened, and the Wikipedia text above is shown unchanged.{" "}
+        Reviewed by AI ·{" "}
         <a href={METHOD_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
           How we review
         </a>{" "}
