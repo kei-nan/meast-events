@@ -1041,6 +1041,48 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-tertiary);
 }
 
+/* "Reviewed by AI" opens a note, so it is a button (docs/design-contract.md
+   "Controls"), drawn as text with a dotted underline: it explains, it does not
+   take you anywhere. On touch screens its tap area grows without moving the line. */
+.fr-ai-btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.fr-ai-btn:hover {
+  color: var(--text-primary);
+}
+
+@media (pointer: coarse) {
+  .fr-ai-btn::after {
+    content: "";
+    position: absolute;
+    inset: -12px -4px;
+  }
+}
+
+.fr-ai-note {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-field);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
 .framing-review a {
   font-size: inherit;
 }

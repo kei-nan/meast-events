@@ -130,6 +130,8 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 .framing-obs li { margin-bottom: 0.4rem; }
 .framing-review-flag { color: var(--fr-wording); }
 .framing-review-meta { font-size: 0.8rem; }
+.ai-btn { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline dotted; cursor: pointer; }
+.ai-note { max-width: 22rem; padding: 0.8rem 1rem; background: var(--bg); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; line-height: 1.5; }
 
 .event-index { padding-left: 1.6rem; }
 .event-index li { margin-bottom: 0.3rem; }

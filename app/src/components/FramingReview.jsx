@@ -4,7 +4,7 @@
 // guidelines). A tab is coloured when its review found something and grey when it found
 // nothing. Always boxed off from the Wikipedia text it describes.
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { REVIEW_TABS, TAB_NAMES, tabStatus } from "../lib/reviewTabs.js";
 import { safeUrl } from "../lib/safeUrl.js";
 
@@ -73,6 +73,46 @@ function WordingPanel({ r }) {
 export default function FramingReview({ event, tab, onTab }) {
   const review = event.framing_review;
   const tabRefs = useRef({});
+  const aboutRef = useRef(null);
+  const aboutBtnRef = useRef(null);
+
+  // "Reviewed by AI" opens a short note in the browser's popover (tap, click or
+  // Enter; Esc or a click elsewhere closes it). It floats above the panel, under its
+  // button or above it when there is no room below, and closes when the panel
+  // scrolls or the window resizes rather than drifting away from the button.
+  useEffect(() => {
+    const p = aboutRef.current;
+    if (!p) return;
+    const place = (e) => {
+      if (e.newState !== "open") return;
+      const b = aboutBtnRef.current.getBoundingClientRect();
+      const w = Math.min(300, window.innerWidth - 16);
+      p.style.width = `${w}px`;
+      p.style.left = `${Math.max(8, Math.min(b.left, window.innerWidth - w - 8))}px`;
+      const h = p.offsetHeight;
+      p.style.top = `${b.bottom + 6 + h <= window.innerHeight - 8 ? b.bottom + 6 : Math.max(8, b.top - 6 - h)}px`;
+    };
+    const close = () => p.matches(":popover-open") && p.hidePopover();
+    // One Escape does one thing (lib/escapeKey.js): with the note open it closes only
+    // the note, and is marked handled before the panel's Escape (Back) sees it.
+    const onEscape = (e) => {
+      if (e.key !== "Escape" || !p.matches(":popover-open")) return;
+      e.preventDefault();
+      p.hidePopover();
+    };
+    const scroller = p.closest(".sp-scroll");
+    p.addEventListener("toggle", place);
+    scroller?.addEventListener("scroll", close, { passive: true });
+    window.addEventListener("resize", close);
+    document.addEventListener("keydown", onEscape, true);
+    return () => {
+      p.removeEventListener("toggle", place);
+      scroller?.removeEventListener("scroll", close);
+      window.removeEventListener("resize", close);
+      document.removeEventListener("keydown", onEscape, true);
+    };
+  }, [review]);
+
   if (!review) return null;
 
   function onKeyDown(e) {
@@ -143,11 +183,18 @@ export default function FramingReview({ event, tab, onTab }) {
           <strong>Disclosure:</strong> {review.disclosure}
         </p>
       )}
-      {/* Short on purpose: "AI" stays on every review; who made it (Claude, by Anthropic),
-          that no person checked it line by line, and what it does not judge are on
-          the "How we review" page. */}
+      {/* Short on purpose: "AI" stays on every review, and what that means is one tap away. */}
       <p className="framing-review-meta">
-        Reviewed by AI ·{" "}
+        <button
+          ref={aboutBtnRef}
+          type="button"
+          className="fr-ai-btn"
+          popoverTarget="fr-ai-note"
+          aria-label="Reviewed by AI: what this means"
+        >
+          Reviewed by AI
+        </button>{" "}
+        ·{" "}
         <a href={METHOD_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
           How we review
         </a>{" "}
@@ -156,6 +203,11 @@ export default function FramingReview({ event, tab, onTab }) {
           Disagree with this review?
         </a>
       </p>
+      <div id="fr-ai-note" ref={aboutRef} popover="auto" className="fr-ai-note">
+        This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It
+        looks at how the summary is written, not whether the events happened, and the Wikipedia text is shown
+        unchanged.
+      </div>
     </section>
   );
 }
