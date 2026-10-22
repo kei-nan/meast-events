@@ -64,6 +64,14 @@
   font-family: var(--font-sans);
 }
 
+/* Wider on big screens, so the text and the sections below it are shorter.
+   Phones and touch screens set their own size further down. */
+@media (min-width: 1400px) {
+  .side-panel {
+    width: 440px;
+  }
+}
+
 .sp-scroll {
   flex: 1;
   min-height: 0;
@@ -739,18 +747,10 @@ button.sp-chip[aria-pressed="true"] {
   text-decoration: none;
 }
 
-.event-detail-category {
-  display: inline-block;
-  text-transform: uppercase;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
+
 
 .event-detail h2 {
-  margin: 0 0 8px;
+  margin: 6px 0 6px;
   font-family: var(--font-serif);
   font-weight: 600;
   font-size: 1.3rem;
@@ -761,7 +761,18 @@ button.sp-chip[aria-pressed="true"] {
 .event-detail-meta {
   color: var(--text-secondary);
   font-size: 0.85rem;
+  margin: 0 0 2px;
+}
+
+.event-detail-head {
   margin: 0 0 14px;
+}
+
+.event-detail-facts {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .event-detail-extract {
@@ -804,9 +815,10 @@ button.sp-chip[aria-pressed="true"] {
 
 .event-detail-classes,
 .event-detail-asof {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
   color: var(--text-secondary);
-  margin: 0 0 12px;
+  margin: 0 0 4px;
 }
 
 .event-detail-asof {
@@ -882,7 +894,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .framing-review {
-  margin: 16px 0;
+  margin: 22px 0 0;
   padding: 12px 14px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -1037,7 +1049,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail-attribution {
-  margin-top: 18px;
+  margin: 0;
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--text-secondary);
@@ -1176,29 +1188,33 @@ button.sp-chip[aria-pressed="true"] {
 
 /* ---------- Event detail: Wikidata "part of" and its reverse ---------- */
 
-.event-detail-partof {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin: -8px 0 14px;
-  overflow-wrap: anywhere;
-}
+
 
 .event-detail .event-detail-wd {
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
-.event-detail-includes,
-.event-detail-related {
-  margin: 16px 0 4px;
+/* The parts below the text (Includes, Related events, About this entry) share one
+   look with the framing review's heading: a thin rule, even spacing, and a small
+   all-caps heading. The review keeps its box: it is our reading, not Wikipedia's. */
+.event-detail-section {
+  margin: 22px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-soft);
 }
 
-.event-detail-includes h3,
-.event-detail-related h3 {
-  margin: 0 0 6px;
-  font-size: 0.82rem;
+.event-detail-section > h3 {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--text-secondary);
+}
+
+.event-detail-about .event-detail-note {
+  margin: 0 0 8px;
 }
 
 .event-detail-includes ul {

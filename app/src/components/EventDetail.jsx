@@ -28,11 +28,11 @@ const INCLUDES_SHOWN = 8;
 
 // Wikidata's "part of" (P361), as Wikidata gives it (lib/partOf.js): its labels,
 // unchanged. A parent that is one of our events links to it; any other parent
-// is plain text with a small link to its Wikidata item.
+// is plain text with a small link to its Wikidata item. Inline, in the line under the date.
 function PartOf({ parents, onSelectEvent }) {
   if (!parents?.length) return null;
   return (
-    <p className="event-detail-partof">
+    <span className="event-detail-partof">
       Part of:{" "}
       {parents.map((p, i) => {
         const wd = !p.id && wikidataUrl(p.qid);
@@ -60,7 +60,7 @@ function PartOf({ parents, onSelectEvent }) {
           </span>
         );
       })}
-    </p>
+    </span>
   );
 }
 
@@ -72,7 +72,7 @@ function Includes({ event, onSelectEvent, showAll, onShowAll }) {
   const shown = clamps && !showAll ? list.slice(0, INCLUDES_SHOWN) : list;
   const listId = "event-detail-includes";
   return (
-    <section className="event-detail-includes" aria-labelledby={`${listId}-title`}>
+    <section className="event-detail-section event-detail-includes" aria-labelledby={`${listId}-title`}>
       <h3 id={`${listId}-title`}>
         Includes {list.length === 1 ? "1 event" : `${list.length} events`} in this dataset
       </h3>
@@ -281,19 +281,24 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
           </a>
         )}
       </div>
-      {event.category && (
-        <span className="event-detail-category">Category (our grouping): {categoryLabel(event.category)}</span>
-      )}
-      <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
-        {event.title}
-      </h2>
-      <p className="event-detail-meta">
-        {dateText} · {(event.countries ?? []).join(", ")}
-      </p>
-      <PartOf parents={event.part_of} onSelectEvent={onSelectEvent} />
-      {showClasses && (
-        <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>
-      )}
+      <header className="event-detail-head">
+        <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
+          {event.title}
+        </h2>
+        {/* Two short lines under the title, so the text starts sooner: when and where,
+            then our category and Wikidata's "part of". Where an entry's data comes
+            from is in "About this entry" at the end. */}
+        <p className="event-detail-meta">
+          {dateText} · {(event.countries ?? []).join(", ")}
+        </p>
+        {(event.category || event.part_of?.length > 0) && (
+          <p className="event-detail-facts">
+            {event.category && <span>Category (our grouping): {categoryLabel(event.category)}</span>}
+            {event.category && event.part_of?.length > 0 && " · "}
+            <PartOf parents={event.part_of} onSelectEvent={onSelectEvent} />
+          </p>
+        )}
+      </header>
       {dateNote && (
         <p className="event-detail-note" role="note">
           {dateNote}
@@ -348,9 +353,6 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
           </p>
         )}
       </div>
-      {retrieved && (
-        <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>
-      )}
       {event.framing_review && (
         <Suspense fallback={null}>
           <FramingReview event={event} tab={reviewTab} onTab={openTab} />
@@ -369,44 +371,49 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
         onTab={setRelatedTab}
         onSelectEvent={onSelectEvent}
       />
-      {quality === "approximate" && (
-        <p className="event-detail-note">
-          Approximate location: no coordinates were found for this event, so its marker is
-          placed at a national capital. The marker shows the country, not where the event
-          happened. It is left out of drawn-area searches.
-          <ShadingNote event={event} />
-        </p>
-      )}
-      {quality === "none" && (
-        <p className="event-detail-note">
-          No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
-          marker on the map and is left out of drawn-area searches.
-          <ShadingNote event={event} />
-        </p>
-      )}
-      <p className="event-detail-attribution">
-        Text from Wikipedia, licensed{" "}
-        <a
-          href="https://creativecommons.org/licenses/by-sa/4.0/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          CC BY-SA 4.0
-        </a>
-        {wikiUrl ? (
-          <>
-            {" "}
-            by{" "}
-            <a href={historyUrl(wikiUrl)} target="_blank" rel="noreferrer">
-              Wikipedia contributors
-            </a>
-          </>
-        ) : (
-          " by Wikipedia contributors"
+      <section className="event-detail-section event-detail-about" aria-labelledby="event-detail-about-title">
+        <h3 id="event-detail-about-title">About this entry</h3>
+        {quality === "approximate" && (
+          <p className="event-detail-note">
+            Approximate location: no coordinates were found for this event, so its marker is
+            placed at a national capital. The marker shows the country, not where the event
+            happened. It is left out of drawn-area searches.
+            <ShadingNote event={event} />
+          </p>
         )}
-        .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
-        {event.part_of?.length > 0 && <> &ldquo;Part of&rdquo; is Wikidata&apos;s statement, in its labels (CC0).</>}
-      </p>
+        {quality === "none" && (
+          <p className="event-detail-note">
+            No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
+            marker on the map and is left out of drawn-area searches.
+            <ShadingNote event={event} />
+          </p>
+        )}
+        {showClasses && <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>}
+        {retrieved && <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>}
+        <p className="event-detail-attribution">
+          Text from Wikipedia, licensed{" "}
+          <a
+            href="https://creativecommons.org/licenses/by-sa/4.0/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            CC BY-SA 4.0
+          </a>
+          {wikiUrl ? (
+            <>
+              {" "}
+              by{" "}
+              <a href={historyUrl(wikiUrl)} target="_blank" rel="noreferrer">
+                Wikipedia contributors
+              </a>
+            </>
+          ) : (
+            " by Wikipedia contributors"
+          )}
+          .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
+          {event.part_of?.length > 0 && <> &ldquo;Part of&rdquo; is Wikidata&apos;s statement, in its labels (CC0).</>}
+        </p>
+      </section>
     </article>
   );
 }

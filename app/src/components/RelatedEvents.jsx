@@ -207,7 +207,7 @@ export default function RelatedEvents({ related, date, tab, onTab, onSelectEvent
   );
 
   return (
-    <section className="event-detail-related" aria-labelledby="event-detail-related-title">
+    <section className="event-detail-section event-detail-related" aria-labelledby="event-detail-related-title">
       <h3 id="event-detail-related-title">Related events in this dataset</h3>
       {single ? (
         <>
