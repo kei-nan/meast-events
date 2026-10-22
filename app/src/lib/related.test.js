@@ -43,7 +43,7 @@ test("a curated parent or child is not repeated, nor is the event itself", () =>
   assert.ok(!ids(r.get("x")?.same_time).includes("war"), "the curated parent is already under Part of");
 });
 
-test("nearby: only precise locations within NEARBY_KM, closest first, with rounded km", () => {
+test("nearby: only precise locations within NEARBY_KM, closest first, with km to 0.1 and the bearing", () => {
   const at = (lon, lat, o = {}) => ({ coordinates: { lon, lat }, date_start: "1950-01-01", ...o });
   const r = resolveRelated([
     ev("home", at(35, 32, { date_start: "2010-01-01" })),
@@ -53,7 +53,8 @@ test("nearby: only precise locations within NEARBY_KM, closest first, with round
     ev("capital", at(35, 32.01, { location_quality: "approximate" })),
   ]);
   assert.deepEqual(ids(r.get("home").nearby), ["n5", "n20"]);
-  assert.deepEqual(r.get("home").nearby.map((x) => x.km), [5, 20]);
+  assert.deepEqual(r.get("home").nearby.map((x) => x.km), [4.7, 20]);
+  assert.deepEqual(r.get("home").nearby.map((x) => x.bearing), [90, 0], "n5 is due east, n20 due north");
   assert.equal(r.get("capital")?.nearby, undefined, "an approximate event gets no nearby list");
 });
 

@@ -19,6 +19,7 @@ import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
 import { NEARBY_KM, RELATED_SHOWN } from "../src/lib/related.js";
+import { compassPoint, formatKm } from "../src/lib/relatedViz.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
 import { eventPath, isValidEventId } from "../src/lib/urlState.js";
 
@@ -237,7 +238,8 @@ function renderRelated(related) {
     const items = list
       .map((r) => {
         const when = key === "same_time" ? formatEventDate(r.date_start, null, { precision: "day" }) : r.date_start ? String(r.date_start).slice(0, 4) : "";
-        const km = Number.isFinite(r.km) ? `${when ? " · " : ""}${r.km < 1 ? "under 1" : r.km} km away` : "";
+        const dir = Number.isFinite(r.bearing) ? ` ${compassPoint(r.bearing)}` : "";
+        const km = Number.isFinite(r.km) ? `${when ? " · " : ""}${formatKm(r.km)}${dir}` : "";
         const meta = when || km ? ` <span class="year">${escapeHtml(when + km)}</span>` : "";
         return `<li>${link(eventPath(r.id), escapeHtml(r.title ?? r.id))}${meta}</li>`;
       })

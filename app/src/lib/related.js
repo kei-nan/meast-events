@@ -7,7 +7,7 @@
 // Used at build time by scripts/split-data.mjs (the result rides in the full-lead
 // buckets, like part_of / includes) and so by the event pages.
 
-import { haversineKm } from "./geo.js";
+import { bearingDeg, haversineKm } from "./geo.js";
 
 const QID = /^Q[1-9]\d*$/;
 
@@ -23,7 +23,7 @@ export const SAME_TIME_DAYS = 183;
 const DATE = /^(-?\d{4})(?:-(\d{2})(?:-(\d{2}))?)?/;
 
 // Days since 1970 for a "YYYY", "YYYY-MM" or "YYYY-MM-DD" start, or null.
-function dayNumber(date) {
+export function dayNumber(date) {
   const m = DATE.exec(typeof date === "string" ? date : "");
   if (!m) return null;
   const t = Date.UTC(Number(m[1]), m[2] ? Number(m[2]) - 1 : 0, m[3] ? Number(m[3]) : 1);
@@ -54,7 +54,8 @@ const item = (e) => ({ id: e.id, title: e.title, date_start: e.date_start ?? nul
  * coordinates, wikidata_qid?, part_of?}]. `partOf`: resolvePartOf(events) (lib/partOf.js),
  * whose curated parents and children are already shown, so they are left out here.
  * Returns Map<event id, {shared_parent?, nearby?, same_time?}>, each a list of at most
- * RELATED_SHOWN {id, title, date_start} (nearby also has `km`, rounded), closest first:
+ * RELATED_SHOWN {id, title, date_start}, closest first (nearby also has `km`, to 0.1 km,
+ * and `bearing`, whole degrees clockwise from north, from this event to that one):
  *   shared_parent  share a Wikidata "part of" QID with the event; closest in time
  *                  (undated events last);
  *   nearby         both precise, within NEARBY_KM;
@@ -108,10 +109,12 @@ export function resolveRelated(events, partOf = new Map()) {
         // One degree of latitude is ~111 km: skip the far ones before the haversine.
         if (o.id === e.id || Math.abs(o.coordinates.lat - lat) * 111 > NEARBY_KM + 1) continue;
         const km = haversineKm(lon, lat, o.coordinates.lon, o.coordinates.lat);
-        if (km <= NEARBY_KM) near.push({ e: o, d: km });
+        if (km <= NEARBY_KM) near.push({ e: o, d: km, b: bearingDeg(lon, lat, o.coordinates.lon, o.coordinates.lat) });
       }
       const chosen = pick(near);
-      if (chosen.length) groups.nearby = chosen.map(({ e: o, d }) => ({ ...item(o), km: Math.round(d) }));
+      if (chosen.length) {
+        groups.nearby = chosen.map(({ e: o, d, b }) => ({ ...item(o), km: Math.round(d * 10) / 10, bearing: Math.round(b) % 360 }));
+      }
     }
 
     if (exactDay(e) && own != null) {

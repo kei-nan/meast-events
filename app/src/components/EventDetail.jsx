@@ -5,7 +5,6 @@ import ShareButton from "./ShareButton.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
 import { safeUrl } from "../lib/safeUrl.js";
-import { eventPath } from "../lib/urlState.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
@@ -16,7 +15,8 @@ import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
 import { importOr } from "../lib/importOr.js";
-import { NEARBY_KM, RELATED_SHOWN } from "../lib/related.js";
+import EventLink from "./EventLink.jsx";
+import RelatedEvents from "./RelatedEvents.jsx";
 
 // The review below the text loads with the first opened event, not with the page.
 // If its code cannot be downloaded (retried once, then the page reloads once), a
@@ -25,23 +25,6 @@ const FramingReview = lazy(() => importOr(() => import("./FramingReview.jsx"), F
 
 // Children shown before "Show all N".
 const INCLUDES_SHOWN = 8;
-
-// A link to another event in the app: a real link (new tab, copy link work), but a
-// plain click or Enter opens it in place through the app's own selection.
-function EventLink({ id, onSelectEvent, children }) {
-  return (
-    <a
-      href={eventPath(id)}
-      onClick={(e) => {
-        if (!onSelectEvent || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        e.preventDefault();
-        onSelectEvent(id);
-      }}
-    >
-      {children}
-    </a>
-  );
-}
 
 // Wikidata's "part of" (P361), as Wikidata gives it (lib/partOf.js): its labels,
 // unchanged. A parent that is one of our events links to it; any other parent
@@ -112,49 +95,6 @@ function Includes({ event, onSelectEvent, showAll, onShowAll }) {
   );
 }
 
-// Other events in this dataset by a shared Wikidata parent, place or date
-// (lib/related.js), closest first. "Same time" lists only day-exact dates, so
-// they are shown in full; the others show their year.
-const RELATED_GROUPS = [
-  { key: "shared_parent", title: "Also part of the same wider events" },
-  { key: "nearby", title: `Nearby (within ${NEARBY_KM} km)` },
-  { key: "same_time", title: "Around the same time (within six months)" },
-];
-
-function Related({ related, onSelectEvent }) {
-  const groups = RELATED_GROUPS.filter((g) => related?.[g.key]?.length);
-  if (!groups.length) return null;
-  return (
-    <section className="event-detail-related" aria-labelledby="event-detail-related-title">
-      <h3 id="event-detail-related-title">Related events in this dataset</h3>
-      {groups.map((g) => (
-        <Fragment key={g.key}>
-          <h4>{g.title}</h4>
-          <ul>
-            {related[g.key].map((r) => (
-              <li key={r.id}>
-                <EventLink id={r.id} onSelectEvent={onSelectEvent}>
-                  {r.title}
-                </EventLink>{" "}
-                <span className="event-detail-includes-year event-detail-related-when">
-                  {g.key === "same_time"
-                    ? formatEventDate(r.date_start, null, { precision: "day" })
-                    : r.date_start && String(r.date_start).slice(0, 4)}
-                  {r.km != null && <> · {r.km < 1 ? "under 1" : r.km} km away</>}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </Fragment>
-      ))}
-      <p className="event-detail-related-note">
-        Chosen only by Wikidata&apos;s &ldquo;part of&rdquo;, distance and date, closest first; up to{" "}
-        {RELATED_SHOWN} each. Places count only when both locations are precise.
-      </p>
-    </section>
-  );
-}
-
 // What the map shades for an event without a precise location (see
 // countryHighlight.js): its listed countries, with the borders of its year.
 function ShadingNote({ event }) {
@@ -196,6 +136,8 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
   const [expandedId, setExpandedId] = useState(null);
   // The event whose "Includes" list is shown in full.
   const [allIncludesId, setAllIncludesId] = useState(null);
+  // The related-events tab, kept while moving between events (a missing group falls back).
+  const [relatedTab, setRelatedTab] = useState(null);
   // Set when "Read the review" opened the text, to scroll to the review once it has grown.
   const reviewAfterExpand = useRef(false);
 
@@ -420,7 +362,13 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
         showAll={allIncludesId === event.id}
         onShowAll={() => setAllIncludesId(allIncludesId === event.id ? null : event.id)}
       />
-      <Related related={event.related} onSelectEvent={onSelectEvent} />
+      <RelatedEvents
+        related={event.related}
+        date={event.date_start}
+        tab={relatedTab}
+        onTab={setRelatedTab}
+        onSelectEvent={onSelectEvent}
+      />
       {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: no coordinates were found for this event, so its marker is

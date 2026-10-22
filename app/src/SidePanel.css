@@ -1201,8 +1201,7 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
-.event-detail-includes ul,
-.event-detail-related ul {
+.event-detail-includes ul {
   margin: 0 0 8px;
   padding-left: 18px;
   font-size: 0.85rem;
@@ -1210,8 +1209,7 @@ button.sp-chip[aria-pressed="true"] {
   overflow-wrap: anywhere;
 }
 
-.event-detail-includes li,
-.event-detail-related li {
+.event-detail-includes li {
   margin: 0 0 3px;
 }
 
@@ -1221,14 +1219,176 @@ button.sp-chip[aria-pressed="true"] {
   font-variant-numeric: tabular-nums;
 }
 
-.event-detail-related h4 {
+.event-detail-related h4,
+.rel-panel-title {
   margin: 10px 0 4px;
   font-size: 0.8rem;
   font-weight: 600;
 }
 
-/* A date or "12 km away" is not split across lines. */
-.event-detail-related-when {
+/* Tabs are toggles (docs/design-contract.md "Controls"): the open one has an
+   --accent border and tint. */
+.rel-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.rel-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.rel-tab:hover {
+  border-color: var(--accent);
+}
+
+.rel-tab[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--text-primary);
+}
+
+.rel-tab:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.rel-tab-name {
+  font-weight: 600;
+}
+
+.rel-tab-count {
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+@media (pointer: coarse) {
+  .rel-tab {
+    min-height: 44px;
+  }
+}
+
+/* The diagrams: gold dots are data (as on the timeline), cream marks this event. */
+.rel-compass,
+.rel-strip {
+  display: block;
+  width: 100%;
+  margin: 4px auto 6px;
+  font-family: var(--font-sans);
+}
+
+.rel-compass {
+  max-width: 230px;
+}
+
+.rel-strip {
+  max-width: 380px;
+}
+
+.rel-ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-dasharray: 3 3;
+}
+
+.rel-axis,
+.rel-tick {
+  stroke: var(--border-field);
+}
+
+.rel-ring-label {
+  fill: var(--text-tertiary);
+  font-size: 10px;
+}
+
+.rel-north {
+  fill: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rel-here {
+  fill: var(--text-primary);
+  stroke: var(--bg-1);
+  stroke-width: 2;
+}
+
+.rel-here-line {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.rel-here-label {
+  fill: var(--text-secondary);
+  font-size: 10px;
+}
+
+.rel-dot {
+  cursor: pointer;
+}
+
+.rel-dot circle {
+  fill: var(--accent);
+  stroke: var(--bg-1);
+  stroke-width: 1.5;
+}
+
+.rel-dot text {
+  fill: var(--bg-0);
+  font-size: 10px;
+  font-weight: 700;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.rel-dot--hot circle {
+  fill: var(--accent-strong);
+  stroke: var(--text-primary);
+  stroke-width: 2;
+}
+
+.rel-caption {
+  margin: -2px 0 8px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Numbered like the dots. */
+.rel-list {
+  margin: 0 0 8px;
+  padding-left: 22px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.rel-list li {
+  margin: 0 0 3px;
+}
+
+.rel-list li::marker {
+  color: var(--accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rel-row--hot a {
+  color: var(--accent-strong);
+}
+
+/* A date or "12 km NE" is not split across lines. */
+.rel-when {
   white-space: nowrap;
 }
 
