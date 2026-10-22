@@ -90,6 +90,7 @@ export default function SearchPanel({
   interim = false,
   counts,
   selectedEvent,
+  mapBorderYear, // the year whose borders the map draws (App: the event's or the range end)
   viewCount,
   range,
   playState = "stopped",
@@ -349,7 +350,13 @@ export default function SearchPanel({
               onBack();
             }}
           >
-            <EventDetail event={selectedEvent} onBack={onBack} onShowOnMap={showOnMap} onSelectEvent={onSelect} />
+            <EventDetail
+              event={selectedEvent}
+              borderYear={mapBorderYear}
+              onBack={onBack}
+              onShowOnMap={showOnMap}
+              onSelectEvent={onSelect}
+            />
           </div>
         )}
 

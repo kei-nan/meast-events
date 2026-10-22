@@ -274,12 +274,21 @@ export default function App() {
 
   // While an event is open the map shows the borders of the event's own year
   // (eventBorderYear: its start year), not the timeline's end year, unless the
-  // user chose "Use timeline year" for this event. The range is left alone.
+  // user chose the range end under "Borders as of" for this event, or pressed
+  // Play (so playback visibly moves the map). The range is left alone.
   const [timelineBordersFor, setTimelineBordersFor] = useState(null); // event id
   const eventYear = selectedEventRaw ? eventBorderYear(selectedEventRaw, MIN_YEAR, MAX_YEAR) : null;
+  const eventYearLabel = selectedEventRaw && eventYearRange(selectedEventRaw)[1] > eventYear ? "event start" : "event";
   const borderYear = eventYear != null && timelineBordersFor !== selectedEventId ? eventYear : null;
-  const toggleEventYear = useCallback(
-    () => setTimelineBordersFor((id) => (id === selectedEventId ? null : selectedEventId)),
+  const chooseBorderYear = useCallback(
+    (which) => setTimelineBordersFor(which === "range" ? selectedEventId : null),
+    [selectedEventId]
+  );
+  const handlePlayState = useCallback(
+    (next) => {
+      if (next === "playing" && selectedEventId) setTimelineBordersFor(selectedEventId);
+      setPlayState(next);
+    },
     [selectedEventId]
   );
   // Countries shaded on the map: the hovered list row's, else the open event's,
@@ -549,7 +558,8 @@ export default function App() {
                 year={endYear}
                 borderYear={borderYear}
                 eventYear={eventYear}
-                onToggleEventYear={toggleEventYear}
+                eventYearLabel={eventYearLabel}
+                onChooseBorderYear={chooseBorderYear}
                 highlightEvent={highlightEvent}
                 selectedEventId={selectedEventId}
                 hoverId={hoverId}
@@ -578,6 +588,7 @@ export default function App() {
             eventsLoading={eventsLoading}
             eventsError={eventsError}
             selectedEvent={selectedEvent}
+            mapBorderYear={borderYear ?? endYear}
             viewCount={viewportEventCount}
             range={panelRange}
             playState={playState}
@@ -603,7 +614,7 @@ export default function App() {
           eventCountsByYear={eventCountsByYear}
           borderYear={borderYear}
           playState={playState}
-          onPlayStateChange={setPlayState}
+          onPlayStateChange={handlePlayState}
           eventYear={eventYear}
         />
         {about && (

@@ -96,9 +96,11 @@ function Includes({ event, onSelectEvent, showAll, onShowAll }) {
 }
 
 // What the map shades for an event without a precise location (see
-// countryHighlight.js): its listed countries, with the borders of its year.
-function ShadingNote({ event }) {
-  const year = eventBorderYear(event, MIN_YEAR, MAX_YEAR);
+// countryHighlight.js): its listed countries, with the borders of the year the
+// map draws (`year`: the event's, or the range end when that is chosen under
+// "Borders as of"), so the note never names a year the map is not showing.
+function ShadingNote({ event, year: shownYear }) {
+  const year = shownYear ?? eventBorderYear(event, MIN_YEAR, MAX_YEAR);
   const { shaded, unshaded } = countryShading(event.countries, year);
   if (!shaded.length) {
     return <> None of its listed countries has a border shape for {year} in our data, so nothing is shaded.</>;
@@ -127,8 +129,9 @@ function historyUrl(wikipediaUrl) {
  * `onShowOnMap` (optional) collapses the mobile sheet so the map is visible;
  * its button is shown on narrow screens only (SidePanel.css).
  * `onSelectEvent(id)` opens another event (the "Part of", "Includes" and related links).
+ * `borderYear` is the year whose borders the map draws (for the shading note).
  */
-export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent }) {
+export default function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent }) {
   const headingRef = useRef(null);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
@@ -375,14 +378,14 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
             Approximate location: no coordinates were found for this event, so its marker is
             placed at a national capital. The marker shows the country, not where the event
             happened. It is left out of drawn-area searches.
-            <ShadingNote event={event} />
+            <ShadingNote event={event} year={borderYear} />
           </p>
         )}
         {quality === "none" && (
           <p className="event-detail-note">
             No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
             marker on the map and is left out of drawn-area searches.
-            <ShadingNote event={event} />
+            <ShadingNote event={event} year={borderYear} />
           </p>
         )}
         {showClasses && <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>}

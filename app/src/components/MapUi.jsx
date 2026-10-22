@@ -141,22 +141,45 @@ function ShowMatchesButton({ count, total, compact, onClick }) {
   );
 }
 
-// "Use 2026" / "Use 1901" next to the Borders chip. Phones get the short
-// form so the two sit in one row; the accessible name still says which year.
-export function YearToggle({ useTimeline, timelineYear, eventYear, compact, onClick }) {
-  const full = useTimeline ? `Use timeline year (${timelineYear})` : `Use event year (${eventYear})`;
-  const short = `Use ${useTimeline ? timelineYear : eventYear}`;
-  const kind = useTimeline ? "the timeline year" : "the event year";
+// "Borders as of" the two years they can be while an event is open, the drawn one
+// pressed (a toggle: docs/design-contract.md "Controls"): the open event's year
+// (`eventLabel` "event", or "event start" for a multi-year event) or the end of
+// the selected years. Both years are always printed, so the map never leaves
+// in doubt which year its borders are from. Phones keep only the two years in
+// sight beside the Borders chip; the accessible names keep the words.
+export function BorderYearChoice({ eventYear, eventLabel, rangeYear, eventShown, compact, onChoose }) {
+  const options = [
+    { key: "event", year: eventYear, label: eventLabel, pressed: eventShown },
+    { key: "range", year: rangeYear, label: "range end", pressed: !eventShown },
+  ];
+  const describe = (o) =>
+    o.key === "event"
+      ? `${o.year}, the open event's ${eventLabel === "event start" ? "start year" : "year"}`
+      : `${o.year}, the end of the selected years`;
   return (
-    <button
-      type="button"
-      className="mu-btn mu-btn-small mu-year-toggle"
-      onClick={onClick}
-      aria-label={compact ? `${short}, ${kind}, for the borders` : `${full} for the borders`}
-      title={compact ? full : undefined}
-    >
-      {compact ? short : full}
-    </button>
+    <div className="mu-year-choice" role="group" aria-label="Borders as of">
+      {!compact && (
+        <span className="mu-year-choice-cap" aria-hidden="true">
+          Borders as of
+        </span>
+      )}
+      <div className="mu-year-seg">
+        {options.map((o) => (
+          <button
+            key={o.key}
+            type="button"
+            className="mu-btn mu-btn-small mu-year-seg-btn"
+            aria-pressed={o.pressed}
+            aria-label={describe(o)}
+            title={compact ? `${o.year} · ${o.label}` : undefined}
+            onClick={() => !o.pressed && onChoose(o.key)}
+          >
+            {o.year}
+            {!compact && <span className="mu-year-seg-sub"> · {o.label}</span>}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -292,13 +315,17 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
 
 // Keyboard-reachable alternative to clicking polygons: every border drawn for
 // the shown year, each expandable to the same details. Its button doubles as
-// the "borders as of YEAR" indicator, with a sub-line for the opened event's
-// year or while the decade for a newly picked year is still loading.
-export function BordersList({ year, shownYear, updating, eventYearShown, items, compact }) {
+// the "borders as of YEAR" indicator, with a sub-line while the decade for a
+// newly picked year is still loading (which year it is, event or range end, is
+// said by BorderYearChoice beside it).
+// `yearBeside`: the "Borders as of" choice beside it already prints the drawn
+// year (pressed), so on a phone the chip says just "Borders" and the two fit in
+// one row; its accessible name and the opened list still give the year.
+export function BordersList({ year, shownYear, updating, eventYearShown, items, compact, yearBeside = false }) {
   const [open, setOpen] = useState(false);
   const flagged = items.filter((b) => isDashedStatus(b.status)).length;
   if (shownYear == null) return null;
-  const sub = updating ? `updating to ${year}` : eventYearShown ? "event year" : null;
+  const sub = updating ? `updating to ${year}` : null;
   const n = items.length;
   const countText = `${n} ${n === 1 ? "border" : "borders"} drawn for ${shownYear}`;
   return (
@@ -316,7 +343,7 @@ export function BordersList({ year, shownYear, updating, eventYearShown, items, 
         onClick={() => setOpen((v) => !v)}
       >
         <span className="mu-borders-main">
-          Borders {shownYear}
+          Borders{compact && yearBeside && !updating ? "" : ` ${shownYear}`}
           {n > 0 && !compact ? <span className="mu-badge-sub"> · {n} drawn</span> : null}
         </span>
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
