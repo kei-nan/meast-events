@@ -281,20 +281,20 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
           </a>
         )}
       </div>
+      {/* Our category above the title, the title, then when and where and Wikidata's
+          "part of". Where an entry's data comes from is in "About this entry" at the end. */}
       <header className="event-detail-head">
+        {event.category && (
+          <p className="event-detail-category">Category (our grouping): {categoryLabel(event.category)}</p>
+        )}
         <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
           {event.title}
         </h2>
-        {/* Two short lines under the title, so the text starts sooner: when and where,
-            then our category and Wikidata's "part of". Where an entry's data comes
-            from is in "About this entry" at the end. */}
         <p className="event-detail-meta">
           {dateText} · {(event.countries ?? []).join(", ")}
         </p>
-        {(event.category || event.part_of?.length > 0) && (
+        {event.part_of?.length > 0 && (
           <p className="event-detail-facts">
-            {event.category && <span>Category (our grouping): {categoryLabel(event.category)}</span>}
-            {event.category && event.part_of?.length > 0 && " · "}
             <PartOf parents={event.part_of} onSelectEvent={onSelectEvent} />
           </p>
         )}

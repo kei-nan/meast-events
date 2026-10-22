@@ -750,10 +750,10 @@ button.sp-chip[aria-pressed="true"] {
 
 
 .event-detail h2 {
-  margin: 6px 0 6px;
+  margin: 2px 0 6px;
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 1.3rem;
+  font-size: 1.45rem;
   line-height: 1.3;
   color: var(--text-primary);
 }
@@ -766,6 +766,16 @@ button.sp-chip[aria-pressed="true"] {
 
 .event-detail-head {
   margin: 0 0 14px;
+}
+
+/* Gold, so the top of the panel has one accent; the wording is the bias review's. */
+.event-detail-category {
+  margin: 6px 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
 }
 
 .event-detail-facts {
@@ -894,7 +904,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .framing-review {
-  margin: 22px 0 0;
+  margin: 18px 0 0;
   padding: 12px 14px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -1195,13 +1205,24 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
-/* The parts below the text (Includes, Related events, About this entry) share one
-   look with the framing review's heading: a thin rule, even spacing, and a small
-   all-caps heading. The review keeps its box: it is our reading, not Wikipedia's. */
+/* The parts below the text are boxes like the framing review (same surface,
+   border and all-caps heading), so each reads as its own part; "About this entry"
+   is the footer, under a plain rule. */
 .event-detail-section {
-  margin: 22px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-soft);
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.event-detail-about {
+  margin-top: 24px;
+  padding: 14px 0 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
 }
 
 .event-detail-section > h3 {
@@ -1312,7 +1333,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .rel-face {
-  fill: var(--bg-2);
+  fill: var(--bg-1);
   stroke: var(--border);
 }
 
