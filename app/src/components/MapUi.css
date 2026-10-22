@@ -133,6 +133,50 @@
   color: #5c4d38;
 }
 
+/* "Borders as of" [1917 · event] [2026 · range end]: one cream box like the other
+   map controls, the caption over two joined buttons; the drawn year is pressed
+   (the map's pressed style, .mu-btn[aria-pressed]). */
+.mu-year-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 5px 6px 6px;
+  border: 2px solid #5c4d38;
+  border-radius: 6px;
+  background: #f4f1ea;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.mu-year-choice-cap {
+  font: 600 11px/1.2 system-ui, sans-serif;
+  color: #3a3020;
+}
+.mu-year-seg {
+  display: flex;
+}
+.mu-year-seg-btn {
+  box-shadow: none;
+  white-space: nowrap;
+}
+.mu-year-seg-btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.mu-year-seg-btn:last-child {
+  margin-left: -2px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.mu-year-seg-btn[aria-pressed="true"] {
+  cursor: default;
+}
+.mu-year-seg-sub {
+  font-weight: 400;
+}
+.mu-year-seg-btn[aria-pressed="false"] .mu-year-seg-sub {
+  color: #5c4d38;
+}
+
 .mu-legend-panel,
 .mu-borders-panel,
 .mu-popup,
@@ -525,7 +569,7 @@
   .mu-legend-panel {
     max-height: 34dvh;
   }
-  /* With an event open the Borders chip and "Use 2026" sit side by side in
+  /* With an event open the Borders chip and the [1917][2026] choice sit side by side in
      one row (stacked they covered the map where the event was zoomed to);
      only a very narrow phone (320px) wraps the button under the chip. The
      right edge of the 3-button toolbar is at ~185px. */
@@ -562,13 +606,23 @@
     padding: 5px 8px;
   }
   .mu-borders-main,
-  .mu-borders-sub,
-  .mu-year-toggle {
+  .mu-borders-sub {
     white-space: nowrap;
   }
-  .mu-year-toggle {
-    padding-left: 9px;
-    padding-right: 9px;
+  /* Phones: just the two joined years beside the Borders chip, no box or
+     caption (the chip says "Borders 1917" right next to them). */
+  .mu-year-choice {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  /* 8px sides: chip and pair fit one row down to a 360px phone. */
+  .mu-year-seg-btn {
+    min-height: 36px;
+    padding-left: 8px;
+    padding-right: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   }
   .mu-borders-panel {
     max-height: 34dvh;

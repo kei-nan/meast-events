@@ -22,7 +22,7 @@ import {
   MapNotices,
   MapTip,
   MapToolbar,
-  YearToggle,
+  BorderYearChoice,
   ZoomButtons,
 } from "./MapUi";
 import useMediaQuery from "../hooks/useMediaQuery";
@@ -156,8 +156,9 @@ export default function MapView({
   events,
   year: timelineYear,
   borderYear = null, // an opened event's year: shown instead of the timeline year (App.jsx)
-  eventYear = null, // the opened event's year, for the "Use event year" button
-  onToggleEventYear,
+  eventYear = null, // the opened event's year, for the "Borders as of" choice
+  eventYearLabel = "event", // "event start" for a multi-year event
+  onChooseBorderYear, // ("event" | "range")
   highlightEvent = null, // event whose listed countries are shaded (countryHighlight.js)
   matchIds = null,
   selectedEventId,
@@ -1163,14 +1164,16 @@ export default function MapView({
           eventYearShown={borderYear != null}
           items={yearBorders}
           compact={compact}
+          yearBeside={eventYear != null && eventYear !== timelineYear}
         />
         {eventYear != null && eventYear !== timelineYear && (
-          <YearToggle
-            useTimeline={borderYear != null}
-            timelineYear={timelineYear}
+          <BorderYearChoice
             eventYear={eventYear}
+            eventLabel={eventYearLabel}
+            rangeYear={timelineYear}
+            eventShown={borderYear != null}
             compact={compact}
-            onClick={onToggleEventYear}
+            onChoose={onChooseBorderYear}
           />
         )}
         <ZoomButtons onZoomIn={() => zoomBy(1)} onZoomOut={() => zoomBy(-1)} />
