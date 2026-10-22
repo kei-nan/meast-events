@@ -34,13 +34,24 @@ function Dot({ x, y, n, item, hot, onHot, onSelectEvent, label }) {
   );
 }
 
+// Drawn as a compass face, not a target: one softly filled disc (its size is in
+// the caption), the four directions outside its edge, no cross lines or inner
+// rings, and a diamond for this event.
+const FACE = [
+  ["N", 0],
+  ["E", 90],
+  ["S", 180],
+  ["W", 270],
+];
+
 function Compass({ items, hotId, onHot, onSelectEvent }) {
-  const R = 84;
-  const size = 2 * R + 2 * DOT_R + 28;
-  const c = size / 2;
-  const { rings } = compassScale(Math.max(0, ...items.map((i) => i.km)));
+  const R = 84; // the farthest dot centre
+  const disc = R + DOT_R + 4;
+  const c = disc + 18;
+  const size = 2 * c;
+  const { outer } = compassScale(Math.max(0, ...items.map((i) => i.km)));
   const pts = compassLayout(items, { radius: R, gap: 2 * DOT_R + 2, inner: DOT_R + 8 });
-  const outer = rings.at(-1);
+  const at = (deg, r) => [c + r * Math.sin((deg * Math.PI) / 180), c - r * Math.cos((deg * Math.PI) / 180)];
   return (
     <svg
       className="rel-compass"
@@ -48,16 +59,21 @@ function Compass({ items, hotId, onHot, onSelectEvent }) {
       role="img"
       aria-label={`Compass: the direction and distance of each nearby event from this one, north up, out to ${outer} km. The same events are listed below.`}
     >
-      {/* Ring sizes are in the caption below, where no dot can cover them. */}
-      {rings.map((km) => (
-        <circle key={km} className="rel-ring" cx={c} cy={c} r={(km / outer) * R} />
-      ))}
-      <line className="rel-axis" x1={c} y1={c - R} x2={c} y2={c + R} />
-      <line className="rel-axis" x1={c - R} y1={c} x2={c + R} y2={c} />
-      <text className="rel-north" x={c} y={12} textAnchor="middle">
-        N
-      </text>
-      <circle className="rel-here" cx={c} cy={c} r={5} />
+      <circle className="rel-face" cx={c} cy={c} r={disc} />
+      {FACE.map(([label, deg]) => {
+        const [x1, y1] = at(deg, disc - 5);
+        const [x2, y2] = at(deg, disc);
+        const [tx, ty] = at(deg, disc + 10);
+        return (
+          <g key={label}>
+            <line className="rel-tick" x1={x1} y1={y1} x2={x2} y2={y2} />
+            <text className={label === "N" ? "rel-north" : "rel-ring-label"} x={tx} y={ty} dy="0.35em" textAnchor="middle">
+              {label}
+            </text>
+          </g>
+        );
+      })}
+      <rect className="rel-here" x={c - 4.5} y={c - 4.5} width={9} height={9} transform={`rotate(45 ${c} ${c})`} />
       {items.map((it, i) => (
         <Dot
           key={it.id}
@@ -163,7 +179,7 @@ export default function RelatedEvents({ related, date, tab, onTab, onSelectEvent
         <>
           <Compass items={list} hotId={hotId} onHot={setHotId} onSelectEvent={onSelectEvent} />
           <p className="rel-caption">
-            North up · rings at {compassScale(Math.max(...list.map((i) => i.km))).rings.join(" and ")} km
+            North up · edge of the circle: {compassScale(Math.max(...list.map((i) => i.km))).outer} km
           </p>
         </>
       )}

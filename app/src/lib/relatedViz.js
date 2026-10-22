@@ -16,14 +16,14 @@ export function formatKm(km) {
   return km < 1 ? "under 1 km" : `${Math.round(km)} km`;
 }
 
-// Outer ring sizes: the smallest that holds the farthest event, so close events
-// are not squeezed into the centre of a fixed 50 km dial.
+// The compass edge: the smallest step that holds the farthest event, so close
+// events are not squeezed into the centre of a fixed 50 km dial.
 const RING_STEPS = [1, 2, 5, 10, 20, 50];
 
-/** {outer, rings}: the outer ring in km and the rings drawn (half and full). */
+/** {outer}: the distance in km the edge of the compass stands for. */
 export function compassScale(maxKm) {
   const outer = RING_STEPS.find((s) => s >= maxKm) ?? Math.ceil(maxKm);
-  return { outer, rings: [outer / 2, outer] };
+  return { outer };
 }
 
 /**

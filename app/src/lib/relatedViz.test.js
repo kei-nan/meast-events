@@ -18,10 +18,10 @@ test("bearingDeg: north, east, and Gaza to Jerusalem (about 67°, north-east) an
   assert.equal(Math.round(bearingDeg(35.21, 31.77, 34.45, 31.5)), 248); // the reverse, plus 180 and a little: the sphere
 });
 
-test("the outer ring is the smallest step that holds the farthest event", () => {
-  assert.deepEqual(compassScale(0), { outer: 1, rings: [0.5, 1] });
-  assert.deepEqual(compassScale(3), { outer: 5, rings: [2.5, 5] });
-  assert.deepEqual(compassScale(35), { outer: 50, rings: [25, 50] });
+test("the compass edge is the smallest step that holds the farthest event", () => {
+  assert.deepEqual(compassScale(0), { outer: 1 });
+  assert.deepEqual(compassScale(3), { outer: 5 });
+  assert.deepEqual(compassScale(35), { outer: 50 });
 });
 
 test("compass dots sit at their true direction and scaled distance, north up", () => {

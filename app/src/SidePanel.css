@@ -1295,10 +1295,9 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 380px;
 }
 
-.rel-ring {
-  fill: none;
+.rel-face {
+  fill: var(--bg-2);
   stroke: var(--border);
-  stroke-dasharray: 3 3;
 }
 
 .rel-axis,
