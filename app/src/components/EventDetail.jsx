@@ -16,6 +16,7 @@ import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
 import { importOr } from "../lib/importOr.js";
+import { NEARBY_KM, RELATED_SHOWN } from "../lib/related.js";
 
 // The review below the text loads with the first opened event, not with the page.
 // If its code cannot be downloaded (retried once, then the page reloads once), a
@@ -111,6 +112,49 @@ function Includes({ event, onSelectEvent, showAll, onShowAll }) {
   );
 }
 
+// Other events in this dataset by a shared Wikidata parent, place or date
+// (lib/related.js), closest first. "Same time" lists only day-exact dates, so
+// they are shown in full; the others show their year.
+const RELATED_GROUPS = [
+  { key: "shared_parent", title: "Also part of the same wider events" },
+  { key: "nearby", title: `Nearby (within ${NEARBY_KM} km)` },
+  { key: "same_time", title: "Around the same time (within six months)" },
+];
+
+function Related({ related, onSelectEvent }) {
+  const groups = RELATED_GROUPS.filter((g) => related?.[g.key]?.length);
+  if (!groups.length) return null;
+  return (
+    <section className="event-detail-related" aria-labelledby="event-detail-related-title">
+      <h3 id="event-detail-related-title">Related events in this dataset</h3>
+      {groups.map((g) => (
+        <Fragment key={g.key}>
+          <h4>{g.title}</h4>
+          <ul>
+            {related[g.key].map((r) => (
+              <li key={r.id}>
+                <EventLink id={r.id} onSelectEvent={onSelectEvent}>
+                  {r.title}
+                </EventLink>{" "}
+                <span className="event-detail-includes-year event-detail-related-when">
+                  {g.key === "same_time"
+                    ? formatEventDate(r.date_start, null, { precision: "day" })
+                    : r.date_start && String(r.date_start).slice(0, 4)}
+                  {r.km != null && <> · {r.km < 1 ? "under 1" : r.km} km away</>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Fragment>
+      ))}
+      <p className="event-detail-related-note">
+        Chosen only by Wikidata&apos;s &ldquo;part of&rdquo;, distance and date, closest first; up to{" "}
+        {RELATED_SHOWN} each. Places count only when both locations are precise.
+      </p>
+    </section>
+  );
+}
+
 // What the map shades for an event without a precise location (see
 // countryHighlight.js): its listed countries, with the borders of its year.
 function ShadingNote({ event }) {
@@ -142,7 +186,7 @@ function historyUrl(wikipediaUrl) {
  * `onBack` returns to the results list (the panel restores focus to the row).
  * `onShowOnMap` (optional) collapses the mobile sheet so the map is visible;
  * its button is shown on narrow screens only (SidePanel.css).
- * `onSelectEvent(id)` opens another event (the "Part of" and "Includes" links).
+ * `onSelectEvent(id)` opens another event (the "Part of", "Includes" and related links).
  */
 export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent }) {
   const headingRef = useRef(null);
@@ -376,6 +420,7 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
         showAll={allIncludesId === event.id}
         onShowAll={() => setAllIncludesId(allIncludesId === event.id ? null : event.id)}
       />
+      <Related related={event.related} onSelectEvent={onSelectEvent} />
       {quality === "approximate" && (
         <p className="event-detail-note">
           Approximate location: no coordinates were found for this event, so its marker is

@@ -59,6 +59,7 @@ import { countPositions, decodeGeo, encodeGeo, forEachCoordinate, geoMismatch, M
 import { MAP_EXTENT, NEAR_LAND_EXTENT } from "../src/lib/mapExtent.js";
 import { otherArticleTitle } from "../src/lib/otherArticle.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
+import { resolveRelated } from "../src/lib/related.js";
 import { DECADE_SIZE, decadeFloor } from "../src/lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 
@@ -413,6 +414,12 @@ async function splitEvents() {
   const review = await loadFramingReview();
   // Wikidata "part of" (P361) and its reverse, only for the detail view (see lib/partOf.js).
   const relations = resolvePartOf(allEvents);
+  // Related events (lib/related.js), on the public location (an approximate or
+  // missing one never counts as nearby) and the raw date precision and flags.
+  const related = resolveRelated(
+    allEvents.map((e, i) => ({ ...events[i], wikidata_qid: e.wikidata_qid, part_of: e.part_of, date_precision: e.date_precision, date_flags: e.date_flags })),
+    relations
+  );
 
   // Detail records, bucketed by id hash (see header comment).
   const bucketCount = fullBucketCount(allEvents.length);
@@ -440,6 +447,7 @@ async function splitEvents() {
     const rel = relations.get(e.id);
     if (rel?.part_of.length) record.part_of = rel.part_of;
     if (rel?.includes.length) record.includes = rel.includes;
+    if (related.has(e.id)) record.related = related.get(e.id);
     fullBuckets[fullBucket(e.id, bucketCount)][e.id] = record;
   }
   {
@@ -452,6 +460,10 @@ async function splitEvents() {
       if (r.includes.length) parents++;
     }
     console.log(`part of: ${withParent} events name a parent, ${curatedParent} of them a curated event; ${parents} curated parents`);
+    const count = (k) => [...related.values()].filter((g) => g[k]).length;
+    console.log(
+      `related: ${related.size} events list some (${count("shared_parent")} a shared parent, ${count("nearby")} nearby, ${count("same_time")} same time)`
+    );
   }
   if (review) {
     await writeJSON(path.join(OUT_DIR, "framing-review.json"), {

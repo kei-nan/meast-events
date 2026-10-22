@@ -1188,18 +1188,21 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
-.event-detail-includes {
+.event-detail-includes,
+.event-detail-related {
   margin: 16px 0 4px;
 }
 
-.event-detail-includes h3 {
+.event-detail-includes h3,
+.event-detail-related h3 {
   margin: 0 0 6px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
-.event-detail-includes ul {
+.event-detail-includes ul,
+.event-detail-related ul {
   margin: 0 0 8px;
   padding-left: 18px;
   font-size: 0.85rem;
@@ -1207,7 +1210,8 @@ button.sp-chip[aria-pressed="true"] {
   overflow-wrap: anywhere;
 }
 
-.event-detail-includes li {
+.event-detail-includes li,
+.event-detail-related li {
   margin: 0 0 3px;
 }
 
@@ -1215,6 +1219,23 @@ button.sp-chip[aria-pressed="true"] {
   font-size: 0.78rem;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.event-detail-related h4 {
+  margin: 10px 0 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* A date or "12 km away" is not split across lines. */
+.event-detail-related-when {
+  white-space: nowrap;
+}
+
+.event-detail-related-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }
 
 /* ---------- Windows high contrast (forced colours) ---------- */
