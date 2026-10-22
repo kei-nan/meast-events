@@ -1303,6 +1303,19 @@ button.sp-chip[aria-pressed="true"] {
   font-weight: 600;
 }
 
+/* A group with no events stays as a tab (its panel says why), drawn quieter. */
+.rel-tab--empty:not([aria-selected="true"]) {
+  color: var(--text-tertiary);
+  border-style: dashed;
+}
+
+.rel-empty {
+  margin: 4px 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .rel-tab-count {
   margin-left: 6px;
   font-variant-numeric: tabular-nums;

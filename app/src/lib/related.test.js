@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { NEARBY_KM, RELATED_SHOWN, SAME_TIME_DAYS, resolveRelated } from "./related.js";
+import { NEARBY_KM, RELATED_SHOWN, SAME_TIME_DAYS, emptyReason, resolveRelated } from "./related.js";
 import { resolvePartOf } from "./partOf.js";
 
 // A precise, day-exact event unless told otherwise.
@@ -89,4 +89,17 @@ test("each related event is listed once, in the first group it fits; groups are 
 test("an event with nothing related is absent", () => {
   const r = resolveRelated([ev("a", far(0)), ev("b", { ...far(1), date_start: "1950-01-01" })]);
   assert.equal(r.size, 0);
+});
+
+test("emptyReason says which rule left a group empty", () => {
+  const base = ev("a");
+  assert.match(emptyReason("shared_parent", base), /does not list this event as part of/);
+  assert.match(emptyReason("shared_parent", { ...base, part_of: [{ qid: "Q1" }] }), /No other event .* shares/);
+  assert.match(emptyReason("nearby", { ...base, location_quality: "none", coordinates: null }), /no map location/);
+  assert.match(emptyReason("nearby", { ...base, location_quality: "approximate" }), /approximate place/);
+  assert.match(emptyReason("nearby", base), new RegExp(`within ${NEARBY_KM} km`));
+  assert.match(emptyReason("same_time", { ...base, date_flags: ["x"] }), /could not be checked/);
+  assert.match(emptyReason("same_time", { ...base, date_precision: "year" }), /known only to the year/);
+  assert.match(emptyReason("same_time", { ...base, date_precision: undefined }), /exact day .* not recorded/);
+  assert.match(emptyReason("same_time", base), /within six months/);
 });

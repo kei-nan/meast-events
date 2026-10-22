@@ -364,13 +364,10 @@ export default function EventDetail({ event, onBack, onShowOnMap, onSelectEvent 
         showAll={allIncludesId === event.id}
         onShowAll={() => setAllIncludesId(allIncludesId === event.id ? null : event.id)}
       />
-      <RelatedEvents
-        related={event.related}
-        date={event.date_start}
-        tab={relatedTab}
-        onTab={setRelatedTab}
-        onSelectEvent={onSelectEvent}
-      />
+      {/* Only with the full record: until it arrives, an empty tab's reason could be wrong. */}
+      {!event.leadStatus && (
+        <RelatedEvents event={event} tab={relatedTab} onTab={setRelatedTab} onSelectEvent={onSelectEvent} />
+      )}
       <section className="event-detail-section event-detail-about" aria-labelledby="event-detail-about-title">
         <h3 id="event-detail-about-title">About this entry</h3>
         {quality === "approximate" && (
