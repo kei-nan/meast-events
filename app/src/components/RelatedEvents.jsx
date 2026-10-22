@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import EventLink from "./EventLink.jsx";
 import { formatEventDate } from "../lib/eventDate.js";
-import { NEARBY_KM, RELATED_SHOWN } from "../lib/related.js";
+import { NEARBY_KM, RELATED_SHOWN, emptyReason } from "../lib/related.js";
 import { compassLayout, compassPoint, compassScale, formatKm, stripLayout } from "../lib/relatedViz.js";
 
 // Other events in this dataset by a shared Wikidata parent, place or date
-// (lib/related.js), one tab per group that has any, in this fixed order. Nearby
+// (lib/related.js): always the three tabs, in this fixed order. An empty one says
+// which rule left it empty (emptyReason), so a missing group never looks like a bug. Nearby
 // and same-time events also get a small diagram (lib/relatedViz.js) whose
 // numbered dots match the numbered list; the list is the accessible version, so
 // the diagrams are images to assistive technology and their dots are not tab stops.
@@ -146,18 +147,19 @@ function when(key, r) {
 }
 
 /**
- * `related` is the event's related groups (lib/related.js); `date` its date_start
- * (the middle of the time strip). `tab` is the chosen tab key, kept by the caller
- * across events; a group this event lacks falls back to its first group.
+ * `event` is the open event with its full record (related, date_start, part_of,
+ * location_quality, date_precision, date_flags). `tab` is the chosen tab key, kept
+ * by the caller across events; with none chosen, the first group with events opens.
  */
-export default function RelatedEvents({ related, date, tab, onTab, onSelectEvent }) {
+export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
   const [hotId, setHotId] = useState(null);
   const tabRefs = useRef({});
-  const tabs = RELATED_TABS.filter((t) => related?.[t.key]?.length);
-  if (!tabs.length) return null;
-  const current = tabs.find((t) => t.key === tab) ?? tabs[0];
-  const list = related[current.key];
-  const single = tabs.length === 1;
+  const related = event.related ?? {};
+  const tabs = RELATED_TABS;
+  const count = (t) => related[t.key]?.length ?? 0;
+  const current = tabs.find((t) => t.key === tab) ?? tabs.find((t) => count(t) > 0) ?? tabs[0];
+  const list = related[current.key] ?? [];
+  const date = event.date_start;
 
   // Arrow keys step from the tab that has focus.
   function onKeyDown(e, from) {
@@ -173,7 +175,9 @@ export default function RelatedEvents({ related, date, tab, onTab, onSelectEvent
     tabRefs.current[next.key]?.focus();
   }
 
-  const panel = (
+  const panel = !list.length ? (
+    <p className="rel-empty">{emptyReason(current.key, event)}</p>
+  ) : (
     <>
       {current.key === "nearby" && (
         <>
@@ -207,41 +211,32 @@ export default function RelatedEvents({ related, date, tab, onTab, onSelectEvent
   );
 
   return (
-    <section className="event-detail-related" aria-labelledby="event-detail-related-title">
+    <section className="event-detail-section event-detail-related" aria-labelledby="event-detail-related-title">
       <h3 id="event-detail-related-title">Related events in this dataset</h3>
-      {single ? (
-        <>
-          <h4>{current.title}</h4>
-          {panel}
-        </>
-      ) : (
-        <>
-          <div className="rel-tabs" role="tablist" aria-labelledby="event-detail-related-title">
-            {tabs.map((t) => (
-              <button
-                key={t.key}
-                ref={(el) => (tabRefs.current[t.key] = el)}
-                type="button"
-                role="tab"
-                id={`rel-tab-${t.key}`}
-                aria-selected={t === current}
-                aria-controls="rel-panel"
-                tabIndex={t === current ? 0 : -1}
-                className="rel-tab"
-                onClick={() => onTab(t.key)}
-                onKeyDown={(e) => onKeyDown(e, t)}
-              >
-                <span className="rel-tab-name">{t.name}</span>
-                <span className="rel-tab-count">{related[t.key].length}</span>
-              </button>
-            ))}
-          </div>
-          <div id="rel-panel" role="tabpanel" aria-labelledby={`rel-tab-${current.key}`}>
-            <p className="rel-panel-title">{current.title}</p>
-            {panel}
-          </div>
-        </>
-      )}
+      <div className="rel-tabs" role="tablist" aria-labelledby="event-detail-related-title">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            ref={(el) => (tabRefs.current[t.key] = el)}
+            type="button"
+            role="tab"
+            id={`rel-tab-${t.key}`}
+            aria-selected={t === current}
+            aria-controls="rel-panel"
+            tabIndex={t === current ? 0 : -1}
+            className={`rel-tab${count(t) ? "" : " rel-tab--empty"}`}
+            onClick={() => onTab(t.key)}
+            onKeyDown={(e) => onKeyDown(e, t)}
+          >
+            <span className="rel-tab-name">{t.name}</span>
+            <span className="rel-tab-count">{count(t)}</span>
+          </button>
+        ))}
+      </div>
+      <div id="rel-panel" role="tabpanel" aria-labelledby={`rel-tab-${current.key}`}>
+        <p className="rel-panel-title">{current.title}</p>
+        {panel}
+      </div>
       <p className="event-detail-related-note">
         Chosen only by Wikidata&apos;s &ldquo;part of&rdquo;, distance and date, closest first; up to {RELATED_SHOWN} each.
         Places count only when both locations are precise.

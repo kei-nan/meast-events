@@ -63,6 +63,33 @@ const item = (e) => ({ id: e.id, title: e.title, date_start: e.date_start ?? nul
  * An event is listed at most once per event, in the first group it fits, and never
  * for itself. Events with no related event are absent; empty groups are left out.
  */
+const PRECISION_WORDS = { month: "month", year: "year", decade: "decade", century: "century" };
+
+/**
+ * Why `event` has no events in group `key` ("shared_parent", "nearby",
+ * "same_time"), in plain words, from the same rules resolveRelated applies.
+ * `event` needs location_quality, part_of, date_precision and date_flags.
+ */
+export function emptyReason(key, event) {
+  if (key === "shared_parent") {
+    return event.part_of?.length
+      ? "No other event in this dataset shares a Wikidata “part of” with this one."
+      : "Wikidata does not list this event as part of a wider one.";
+  }
+  if (key === "nearby") {
+    if (event.location_quality === "none") return "This event has no map location (Wikipedia and Wikidata give no coordinates), so nothing can be measured from it.";
+    if (!precise(event)) {
+      return "This event’s marker is only an approximate place (a national capital), so distances from it would be misleading.";
+    }
+    return `No other event with a precise location is within ${NEARBY_KM} km.`;
+  }
+  if (event.date_flags?.length) return "This event’s date could not be checked against its Wikipedia text, so it is not compared day by day.";
+  const word = PRECISION_WORDS[event.date_precision];
+  if (word) return `This event’s date is known only to the ${word}, so it is not compared day by day.`;
+  if (!exactDay(event)) return "The exact day of this event is not recorded, so it is not compared day by day.";
+  return "No other event with an exact date is within six months.";
+}
+
 export function resolveRelated(events, partOf = new Map()) {
   const list = events.filter((e) => e && typeof e.id === "string");
   const day = new Map(list.map((e) => [e.id, dayNumber(e.date_start)]));

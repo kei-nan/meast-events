@@ -64,6 +64,14 @@
   font-family: var(--font-sans);
 }
 
+/* Wider on big screens, so the text and the sections below it are shorter.
+   Phones and touch screens set their own size further down. */
+@media (min-width: 1400px) {
+  .side-panel {
+    width: 440px;
+  }
+}
+
 .sp-scroll {
   flex: 1;
   min-height: 0;
@@ -739,21 +747,13 @@ button.sp-chip[aria-pressed="true"] {
   text-decoration: none;
 }
 
-.event-detail-category {
-  display: inline-block;
-  text-transform: uppercase;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
+
 
 .event-detail h2 {
-  margin: 0 0 8px;
+  margin: 2px 0 6px;
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 1.3rem;
+  font-size: 1.45rem;
   line-height: 1.3;
   color: var(--text-primary);
 }
@@ -761,7 +761,28 @@ button.sp-chip[aria-pressed="true"] {
 .event-detail-meta {
   color: var(--text-secondary);
   font-size: 0.85rem;
+  margin: 0 0 2px;
+}
+
+.event-detail-head {
   margin: 0 0 14px;
+}
+
+/* Gold, so the top of the panel has one accent; the wording is the bias review's. */
+.event-detail-category {
+  margin: 6px 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.event-detail-facts {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .event-detail-extract {
@@ -804,9 +825,10 @@ button.sp-chip[aria-pressed="true"] {
 
 .event-detail-classes,
 .event-detail-asof {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
   color: var(--text-secondary);
-  margin: 0 0 12px;
+  margin: 0 0 4px;
 }
 
 .event-detail-asof {
@@ -882,7 +904,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .framing-review {
-  margin: 16px 0;
+  margin: 18px 0 0;
   padding: 12px 14px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -1019,6 +1041,48 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-tertiary);
 }
 
+/* "Reviewed by AI" opens a note, so it is a button (docs/design-contract.md
+   "Controls"), drawn as text with a dotted underline: it explains, it does not
+   take you anywhere. On touch screens its tap area grows without moving the line. */
+.fr-ai-btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.fr-ai-btn:hover {
+  color: var(--text-primary);
+}
+
+@media (pointer: coarse) {
+  .fr-ai-btn::after {
+    content: "";
+    position: absolute;
+    inset: -12px -4px;
+  }
+}
+
+.fr-ai-note {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-field);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
 .framing-review a {
   font-size: inherit;
 }
@@ -1037,7 +1101,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail-attribution {
-  margin-top: 18px;
+  margin: 0;
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--text-secondary);
@@ -1176,29 +1240,44 @@ button.sp-chip[aria-pressed="true"] {
 
 /* ---------- Event detail: Wikidata "part of" and its reverse ---------- */
 
-.event-detail-partof {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin: -8px 0 14px;
-  overflow-wrap: anywhere;
-}
+
 
 .event-detail .event-detail-wd {
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
-.event-detail-includes,
-.event-detail-related {
-  margin: 16px 0 4px;
+/* The parts below the text are boxes like the framing review (same surface,
+   border and all-caps heading), so each reads as its own part; "About this entry"
+   is the footer, under a plain rule. */
+.event-detail-section {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
 }
 
-.event-detail-includes h3,
-.event-detail-related h3 {
-  margin: 0 0 6px;
-  font-size: 0.82rem;
+.event-detail-about {
+  margin-top: 24px;
+  padding: 14px 0 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.event-detail-section > h3 {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--text-secondary);
+}
+
+.event-detail-about .event-detail-note {
+  margin: 0 0 8px;
 }
 
 .event-detail-includes ul {
@@ -1266,6 +1345,19 @@ button.sp-chip[aria-pressed="true"] {
   font-weight: 600;
 }
 
+/* A group with no events stays as a tab (its panel says why), drawn quieter. */
+.rel-tab--empty:not([aria-selected="true"]) {
+  color: var(--text-tertiary);
+  border-style: dashed;
+}
+
+.rel-empty {
+  margin: 4px 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .rel-tab-count {
   margin-left: 6px;
   font-variant-numeric: tabular-nums;
@@ -1296,7 +1388,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .rel-face {
-  fill: var(--bg-2);
+  fill: var(--bg-1);
   stroke: var(--border);
 }
 
