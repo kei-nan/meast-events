@@ -176,6 +176,28 @@ test("Includes lists the children as links to their pages, with an escaped title
   assert.match(one, /Includes 1 event in this dataset/);
 });
 
+test("Related lists each group as links, with the full date for same-time events and the distance for nearby ones", () => {
+  const html = page({
+    id: "e",
+    title: "E",
+    related: {
+      shared_parent: [{ id: "s", title: "Sibling <S>", date_start: "1917-10-31" }],
+      nearby: [
+        { id: "n", title: "Near", date_start: "2023-10-07", km: 12.4, bearing: 50 },
+        { id: "z", title: "Same spot", date_start: null, km: 0 },
+      ],
+      same_time: [{ id: "t", title: "Then", date_start: "1917-11-02" }, { id: "../evil", title: "Skipped" }],
+    },
+  });
+  assert.match(html, /<h2 id="related-title">Related events in this dataset<\/h2>/);
+  assert.match(html, /<h3>Also part of the same wider events<\/h3>\n<ul>\n<li><a href="\/event\/s">Sibling &lt;S&gt;<\/a> <span class="year">1917<\/span><\/li>/);
+  assert.match(html, /<a href="\/event\/n">Near<\/a> <span class="year">2023 · 12 km NE<\/span>/);
+  assert.match(html, /<a href="\/event\/z">Same spot<\/a> <span class="year">under 1 km<\/span>/);
+  assert.match(html, /<a href="\/event\/t">Then<\/a> <span class="year">2 November 1917<\/span>/);
+  assert.ok(!html.includes("Skipped"));
+  assert.ok(!page({ id: "p", title: "P", related: { nearby: [] } }).includes('id="related-title"'));
+});
+
 test("only an end before the start gets a date note, in plain language", () => {
   const html = page({
     id: "passover-massacre",

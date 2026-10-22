@@ -150,4 +150,7 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 .includes { margin: 1.5rem 0; }
 .includes h2 { font-size: 1rem; }
 .includes ul { margin: 0; padding-left: 1.2rem; overflow-wrap: anywhere; }
+.related .year { white-space: nowrap; }
 .includes .year { color: var(--text-tertiary); font-size: 0.85rem; }
+.related h3 { font-size: 0.9rem; margin: 1rem 0 0.3rem; }
+.related-note { color: var(--text-tertiary); font-size: 0.85rem; }

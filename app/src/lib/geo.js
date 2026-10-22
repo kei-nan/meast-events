@@ -28,6 +28,16 @@ export function destination([lon, lat], bearingDeg, km) {
   return [toDeg(l2), toDeg(p2)];
 }
 
+// The initial bearing from the first point to the second (degrees clockwise
+// from north, 0 to <360), on the sphere; the inverse of destination().
+export function bearingDeg(lon1, lat1, lon2, lat2) {
+  const p1 = toRad(lat1);
+  const p2 = toRad(lat2);
+  const dl = toRad(lon2 - lon1);
+  const b = Math.atan2(Math.sin(dl) * Math.cos(p2), Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl));
+  return (toDeg(b) + 360) % 360;
+}
+
 // Valid {lon, lat} of an event, or null. Events without coordinates are never
 // shown anywhere, so every consumer goes through this.
 export function eventCoords(e) {

@@ -18,6 +18,8 @@ import { rawEventYears } from "../src/lib/eventYears.js";
 import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
+import { NEARBY_KM, RELATED_SHOWN } from "../src/lib/related.js";
+import { compassPoint, formatKm } from "../src/lib/relatedViz.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
 import { eventPath, isValidEventId } from "../src/lib/urlState.js";
 
@@ -219,6 +221,41 @@ ${items}
 </section>`;
 }
 
+// Other events by a shared Wikidata parent, place or date (src/lib/related.js),
+// closest first; the "same time" ones are day-exact, so they show the full date.
+const RELATED_GROUPS = [
+  ["shared_parent", "Also part of the same wider events"],
+  ["nearby", `Nearby (within ${NEARBY_KM} km)`],
+  ["same_time", "Around the same time (within six months)"],
+];
+
+function renderRelated(related) {
+  const groups = RELATED_GROUPS.map(([key, heading]) => [key, heading, (related?.[key] ?? []).filter((r) => r && isValidEventId(r.id))]).filter(
+    ([, , list]) => list.length
+  );
+  if (!groups.length) return "";
+  const sections = groups.map(([key, heading, list]) => {
+    const items = list
+      .map((r) => {
+        const when = key === "same_time" ? formatEventDate(r.date_start, null, { precision: "day" }) : r.date_start ? String(r.date_start).slice(0, 4) : "";
+        const dir = Number.isFinite(r.bearing) ? ` ${compassPoint(r.bearing)}` : "";
+        const km = Number.isFinite(r.km) ? `${when ? " · " : ""}${formatKm(r.km)}${dir}` : "";
+        const meta = when || km ? ` <span class="year">${escapeHtml(when + km)}</span>` : "";
+        return `<li>${link(eventPath(r.id), escapeHtml(r.title ?? r.id))}${meta}</li>`;
+      })
+      .join("\n");
+    return `<h3>${escapeHtml(heading)}</h3>
+<ul>
+${items}
+</ul>`;
+  });
+  return `<section class="includes related" aria-labelledby="related-title">
+<h2 id="related-title">Related events in this dataset</h2>
+${sections.join("\n")}
+<p class="related-note">Chosen only by Wikidata’s “part of”, distance and date, closest first; up to ${RELATED_SHOWN} each. Places count only when both locations are precise.</p>
+</section>`;
+}
+
 function locationNote(quality) {
   if (quality === "approximate") {
     return `<p class="note">Approximate location: no coordinates were found for this event, so its marker on the map is placed at a national capital. The marker shows the country, not where the event happened.</p>`;
@@ -394,7 +431,7 @@ export function jsonLdScript(data) {
  * One event's page: the app shell `template` (dist/index.html) filled with the
  * event (fillAppShell). `event` is the lite record (split-data.mjs publicEvent)
  * merged with its full-lead record (extract, extract_retrieved_at, date_precision,
- * framing_review, part_of, includes). Every field may be missing except id and title.
+ * framing_review, part_of, includes, related). Every field may be missing except id and title.
  */
 export function renderEventPage(event, template) {
   if (!isValidEventId(event?.id)) throw new Error(`invalid event id: ${JSON.stringify(event?.id)}`);
@@ -427,6 +464,7 @@ export function renderEventPage(event, template) {
     retrieved && `<p class="asof">Text retrieved ${escapeHtml(retrieved)} from Wikipedia.</p>`,
     renderReview(event, review),
     renderIncludes(event.includes),
+    renderRelated(event.related),
     locationNote(event.location_quality),
     `<p class="attribution">Text from Wikipedia, licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
       wiki ? link(historyUrl(wiki), "Wikipedia contributors", { external: true }) : "Wikipedia contributors"
