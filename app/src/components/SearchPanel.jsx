@@ -29,6 +29,12 @@ const SORT_KEYS = [
   { key: "date", label: "Date", dirs: { asc: "oldest first", desc: "newest first" }, title: "By start date" },
 ];
 
+// The results view switch (ResultsList layout).
+const VIEWS = [
+  { key: "list", label: "List", title: "Results as a list" },
+  { key: "timeline", label: "Timeline", title: "Results oldest first, with each event's years as a bar" },
+];
+
 /**
  * Right-hand side panel (bottom sheet on mobile): search, area, filters, status,
  * results and the selected-event detail. Fully controlled; owns only UI state
@@ -73,6 +79,9 @@ const SORT_KEYS = [
  * @param {()=>void}               props.onBack   clear selection, return to results
  * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
  * @param {(s:string)=>void}       [props.onSortChange]
+ * @param {"list"|"timeline"}      [props.view]   how results are shown: the list, or oldest first with
+ *                                          a bar per event on a year axis (ResultsList layout)
+ * @param {(v:"list"|"timeline")=>void} [props.onViewChange]
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -105,6 +114,8 @@ export default function SearchPanel({
   onBack,
   sort = "coverage",
   onSortChange,
+  view = "list",
+  onViewChange,
   ref,
 }) {
   const inputId = useId();
@@ -315,7 +326,7 @@ export default function SearchPanel({
   const settledLiveText = useDebouncedValue(liveText, ANNOUNCE_DELAY_MS);
   const announced = paused ? liveText : settledLiveText;
 
-  const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}`;
+  const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
 
   return (
     <aside className="side-panel" data-sheet={sheet} aria-label="Search and event details">
@@ -441,8 +452,27 @@ export default function SearchPanel({
                   {scopeAction.label}
                 </button>
               )}
-              {/* Order of the browse list (no search or filters): search results keep their relevance order. */}
-              {!searching && !eventsLoading && !eventsError && onSortChange && (
+              {/* List or Timeline, for the browse list and search results alike. First,
+                  so it stays in place when Sort hides. */}
+              {!eventsLoading && !eventsError && onViewChange && (
+                <div className="sp-sort sp-view" role="group" aria-label="Show results as">
+                  {VIEWS.map(({ key, label, title }) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className="sp-sort-btn"
+                      aria-pressed={view === key}
+                      title={title}
+                      onClick={() => onViewChange(key)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Order of the browse list (no search or filters): search results keep their
+                  relevance order, and the Timeline is always oldest first. */}
+              {!searching && view !== "timeline" && !eventsLoading && !eventsError && onSortChange && (
                 <div className="sp-sort" role="group" aria-label="Sort events">
                   <span className="sp-sort-label" aria-hidden="true">
                     Sort
@@ -577,6 +607,8 @@ export default function SearchPanel({
                 onFocusInput={focusInput}
                 busy={loading}
                 browse={!searching}
+                layout={view}
+                fitAxis={status !== "idle" && filters.scope !== "range"}
               />
             )}
           </div>

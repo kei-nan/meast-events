@@ -140,6 +140,7 @@ export default function App() {
   const [areaMode, setAreaMode] = useState("off");
   const [about, setAbout] = useState(initial.about);
   const [sort, setSort] = useState(initial.sort); // browse list order, lib/browseOrder.js SORTS ("coverage" = default)
+  const [view, setView] = useState(initial.view); // results panel: "list" | "timeline" (lib/timelineView.js)
   const [aboutSection, setAboutSection] = useState(null); // "credits": the dialog opens at its credits
   const openAbout = useCallback((section) => {
     setAboutSection(section);
@@ -410,9 +411,10 @@ export default function App() {
     setAboutSection(null);
     setAbout(parsed.about);
     setSort(parsed.sort);
+    setView(parsed.view);
   }, []);
 
-  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort };
+  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort, view };
   const replaceNextUrl = useUrlState(urlState, handleNavigate);
 
   // Share links come from the state as it is now, not the address bar: URL
@@ -610,6 +612,8 @@ export default function App() {
             onBack={handleBack}
             sort={sort}
             onSortChange={setSort}
+            view={view}
+            onViewChange={setView}
             counts={counts}
             interim={search.interim}
           />
