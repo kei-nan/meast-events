@@ -54,10 +54,12 @@
 
 /* --panel-w: the reader's width (components/PanelResizer.jsx), kept between
    320px and 60% of the window (lib/panelWidth.js has the same limits), so a
-   remembered width never squeezes the map in a smaller window. */
+   remembered width never squeezes the map in a smaller window; and at most
+   56rem, the event view's 53rem (.event-detail) plus padding and a scrollbar,
+   since past that widening only adds empty space. */
 .side-panel {
   position: relative;
-  width: clamp(320px, var(--panel-w, 380px), 60vw);
+  width: clamp(320px, var(--panel-w, 380px), min(60vw, 56rem));
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -72,7 +74,7 @@
    Phones and touch screens set their own size further down. */
 @media (min-width: 1400px) {
   .side-panel {
-    width: clamp(320px, var(--panel-w, 440px), 60vw);
+    width: clamp(320px, var(--panel-w, 440px), min(60vw, 56rem));
   }
 }
 
@@ -1083,8 +1085,9 @@ button.sp-chip[aria-pressed="true"] {
 /* The text and the boxes under it fill the panel, so a reader who widens it
    (PanelResizer) reads more per line and scrolls less. One cap for all of them,
    so they end at the same edge: 53rem, about 115 characters of the summary per
-   line, reached only on very large screens (the panel is at most 60% of the
-   window: 828px of content in a 1440px window). */
+   line. The panel is at most 56rem (.side-panel), so it never grows past this
+   into empty space; in a 1440px window its 60% limit comes first (828px of
+   content). */
 .event-detail {
   max-width: 53rem;
   --fr-wording: #e0914f;

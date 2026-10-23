@@ -2,6 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import useMediaQuery from "../hooks/useMediaQuery";
 import { PANEL_MIN, clampPanelWidth, maxPanelWidth, widthForKey } from "../lib/panelWidth.js";
 
+// The widest the panel may be now: the window's width and the root font size
+// (the limit is in rem, like the content it fits).
+function currentMax() {
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  return maxPanelWidth(window.innerWidth, Number.isFinite(rem) && rem > 0 ? rem : 16);
+}
+
 /**
  * The side panel's left edge as a handle (the WAI-ARIA window splitter): drag it
  * to change the panel's width, or focus it and use the arrow keys (Left wider,
@@ -23,13 +30,13 @@ export default function PanelResizer({ panelRef, panelId, onDrag, onCommit, onRe
   // the widest it may be, for the separator's value and the keys.
   const [size, setSize] = useState({ shown: null, max: null });
   const [dragging, setDragging] = useState(false);
-  const dragRef = useRef(null); // {right: the panel's right edge, last: the last width sent}
+  const dragRef = useRef(null); // {right: the panel's right edge, max: the widest it may be, last: the last width sent}
 
   useEffect(() => {
     const el = panelRef.current;
     if (phone || !el) return undefined;
     const update = () =>
-      setSize({ shown: Math.round(el.getBoundingClientRect().width), max: maxPanelWidth(window.innerWidth) });
+      setSize({ shown: Math.round(el.getBoundingClientRect().width), max: currentMax() });
     update();
     const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
     ro?.observe(el);
@@ -52,7 +59,7 @@ export default function PanelResizer({ panelRef, panelId, onDrag, onCommit, onRe
   function onPointerDown(e) {
     if (e.button !== 0 || !panelRef.current) return;
     e.preventDefault();
-    dragRef.current = { right: panelRef.current.getBoundingClientRect().right, last: null };
+    dragRef.current = { right: panelRef.current.getBoundingClientRect().right, max: currentMax(), last: null };
     e.currentTarget.setPointerCapture?.(e.pointerId);
     setDragging(true);
   }
@@ -60,7 +67,7 @@ export default function PanelResizer({ panelRef, panelId, onDrag, onCommit, onRe
   function onPointerMove(e) {
     const d = dragRef.current;
     if (!d) return;
-    const w = clampPanelWidth(d.right - e.clientX, window.innerWidth);
+    const w = clampPanelWidth(d.right - e.clientX, d.max);
     if (w === d.last) return;
     d.last = w;
     onDrag(w);
@@ -77,7 +84,7 @@ export default function PanelResizer({ panelRef, panelId, onDrag, onCommit, onRe
   function onKeyDown(e) {
     const current = size.shown ?? panelRef.current?.getBoundingClientRect().width;
     if (!current) return;
-    const next = widthForKey(e.key, e.shiftKey, Math.round(current), window.innerWidth);
+    const next = widthForKey(e.key, e.shiftKey, Math.round(current), currentMax());
     if (next === null) return;
     e.preventDefault();
     if (next === "reset") onReset();
