@@ -475,22 +475,29 @@ export default function App() {
     setSelectedEventId(null);
   }, []);
 
-  // Map click: select only. List click: select AND fly the map there.
-  const handleSelectFromMap = useCallback((id) => {
-    setNotFound(false);
-    setHoverId(null);
-    setSelectedEventId(id);
-  }, []);
+  // Map click: select only. List click: select AND fly the map there. An event
+  // opened while Play runs gets the range end's borders, as pressing Play with it
+  // open does (handlePlayState), so playback keeps visibly moving the map.
+  const handleSelectFromMap = useCallback(
+    (id) => {
+      setNotFound(false);
+      setHoverId(null);
+      setSelectedEventId(id);
+      if (playState === "playing") setTimelineBordersFor(id);
+    },
+    [playState]
+  );
   const handleSelectFromList = useCallback(
     (id) => {
       setNotFound(false);
       setHoverId(null);
       setSelectedEventId(id);
+      if (playState === "playing") setTimelineBordersFor(id);
       const ev = storeRef.current.get(id);
       const f = ev && focusFor(ev, focusNonceRef);
       if (f) setFocus(f);
     },
-    [storeRef]
+    [storeRef, playState]
   );
 
   // The tab title names the open event (and is restored when it closes), as the
@@ -613,6 +620,7 @@ export default function App() {
           onChangeRange={handleChangeRange}
           eventCountsByYear={eventCountsByYear}
           borderYear={borderYear}
+          borderYearLabel={eventYearLabel}
           playState={playState}
           onPlayStateChange={handlePlayState}
           eventYear={eventYear}
