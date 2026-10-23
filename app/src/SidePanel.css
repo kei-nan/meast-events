@@ -52,8 +52,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* --panel-w: the reader's width (components/PanelResizer.jsx), kept between
+   320px and 60% of the window (lib/panelWidth.js has the same limits), so a
+   remembered width never squeezes the map in a smaller window. */
 .side-panel {
-  width: 380px;
+  position: relative;
+  width: clamp(320px, var(--panel-w, 380px), 60vw);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -68,8 +72,93 @@
    Phones and touch screens set their own size further down. */
 @media (min-width: 1400px) {
   .side-panel {
-    width: 440px;
+    width: clamp(320px, var(--panel-w, 440px), 60vw);
   }
+}
+
+/* The panel's left edge as a resize handle: a 10px strip over the border,
+   with a short grip in the middle so it can be found; the border lights up
+   on hover, focus and while dragging. */
+.sp-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -6px;
+  z-index: 6;
+  width: 11px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.sp-resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 1px;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.sp-resizer:hover::before,
+.sp-resizer:focus-visible::before,
+.sp-resizer--dragging::before {
+  left: 4px;
+  width: 3px;
+  background: var(--accent);
+}
+
+.sp-resizer:focus-visible {
+  outline: none;
+}
+
+.sp-resizer-grip {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 5px;
+  height: 36px;
+  margin-top: -18px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-field);
+  border-radius: 3px;
+}
+
+.sp-resizer:hover .sp-resizer-grip,
+.sp-resizer:focus-visible .sp-resizer-grip,
+.sp-resizer--dragging .sp-resizer-grip {
+  border-color: var(--accent-strong);
+  background: var(--accent);
+}
+
+/* A finger needs a wider strip (the grip stays on the border). */
+@media (pointer: coarse) {
+  .sp-resizer {
+    left: -12px;
+    width: 23px;
+  }
+
+  .sp-resizer::before {
+    left: 11px;
+  }
+
+  .sp-resizer:hover::before,
+  .sp-resizer:focus-visible::before,
+  .sp-resizer--dragging::before {
+    left: 10px;
+  }
+
+  .sp-resizer-grip {
+    left: 9px;
+  }
+}
+
+/* While dragging: the resize cursor over the map and panel too, no text selection. */
+.is-resizing-panel,
+.is-resizing-panel * {
+  cursor: col-resize !important;
+  user-select: none !important;
 }
 
 .sp-scroll {
@@ -1648,6 +1737,11 @@ button.sp-chip[aria-pressed="true"] {
 /* The forced palette drops the tint and accent that mark a pressed toggle or
    the open row, so they take the system's selection colours instead. */
 @media (forced-colors: active) {
+  /* The accent line that marks the focused resize handle is not drawn here. */
+  .sp-resizer:focus-visible {
+    outline: 2px solid Highlight;
+  }
+
   .sp-seg-btn[aria-pressed="true"],
   button.sp-chip[aria-pressed="true"],
   .sp-sort-btn[aria-pressed="true"] {

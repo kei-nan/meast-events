@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useImperativeHandle, useLayoutEffect, us
 import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
+import PanelResizer from "./PanelResizer.jsx";
 import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
 import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
@@ -11,6 +12,7 @@ import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
+import usePanelWidth from "../hooks/usePanelWidth";
 import { RETRY_MS } from "../hooks/useAllEvents";
 import "../SidePanel.css";
 
@@ -119,6 +121,10 @@ export default function SearchPanel({
   ref,
 }) {
   const inputId = useId();
+  const panelId = useId();
+  const panelRef = useRef(null);
+  // The reader's width for the panel (PanelResizer); null = the CSS default.
+  const panelWidth = usePanelWidth();
   const hintId = useId();
   const filtersId = useId();
   const filtersBtnRef = useRef(null);
@@ -329,7 +335,21 @@ export default function SearchPanel({
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
 
   return (
-    <aside className="side-panel" data-sheet={sheet} aria-label="Search and event details">
+    <aside
+      ref={panelRef}
+      id={panelId}
+      className="side-panel"
+      data-sheet={sheet}
+      aria-label="Search and event details"
+      style={panelWidth.width ? { "--panel-w": `${panelWidth.width}px` } : undefined}
+    >
+      <PanelResizer
+        panelRef={panelRef}
+        panelId={panelId}
+        onDrag={panelWidth.setWidth}
+        onCommit={panelWidth.commit}
+        onReset={panelWidth.reset}
+      />
       <p className="sp-sr-status" role="status">
         {announced}
       </p>
