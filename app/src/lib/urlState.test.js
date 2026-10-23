@@ -30,7 +30,16 @@ test("defaults serialize to empty and parse back to defaults", () => {
     eventId: null,
     about: false,
     sort: "coverage",
+    view: "list",
   });
+});
+
+test("view=timeline round trips; the list (default) and junk stay out of the URL", () => {
+  assert.equal(parseUrlState("?view=timeline").view, "timeline");
+  assert.equal(parseUrlState("?view=grid").view, "list");
+  assert.equal(serializeUrlState({ ...base, view: "timeline" }), "?view=timeline");
+  assert.equal(serializeUrlState({ ...base, view: "list" }), "");
+  assert.equal(serializeUrlState({ ...base, view: "grid" }), "");
 });
 
 test("sort round trips; the default (coverage) and junk stay out of the URL", () => {

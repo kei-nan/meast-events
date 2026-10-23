@@ -607,7 +607,8 @@ button.sp-chip[aria-pressed="true"] {
   border-top: 1px solid var(--border-soft);
 }
 
-/* "Ongoing, started before <year>" between the two browse-list groups. */
+/* "Ongoing, started before <year>" between the two browse-list groups; in the
+   Timeline view also the decades (--decade: "1970s", not "1970S"). */
 .sp-list li.sp-list-heading {
   padding: 14px 8px 6px 11px; /* aligned with .sp-row text */
   font-size: 0.72rem;
@@ -616,6 +617,10 @@ button.sp-chip[aria-pressed="true"] {
   text-transform: uppercase;
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
+}
+
+.sp-list li.sp-list-heading--decade {
+  text-transform: none;
 }
 
 .sp-list-heading h2 {
@@ -712,6 +717,154 @@ button.sp-chip[aria-pressed="true"] {
 
 .sp-more:hover {
   border-color: var(--accent);
+}
+
+/* ---------- Timeline view (ResultsList layout="timeline") ---------- */
+
+/* List | Timeline, before Sort on the same line. */
+.sp-view {
+  margin-right: 12px;
+}
+
+/* A row: the start year in a margin column, then title, bar, year/place line
+   and tags. The axis above uses the same columns, so its years line up with
+   the bars. */
+.sp-trow,
+.sp-taxis {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+.sp-trow-year {
+  padding-top: 2px;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.sp-trow-body {
+  min-width: 0;
+}
+
+/* The years of the whole axis, faint; the event's years in gold, the colour
+   the timeline's density bars use for data. */
+.sp-track {
+  position: relative;
+  display: block;
+  height: 6px;
+  margin: 7px 0 5px;
+  background: var(--border-soft);
+  border-radius: 3px;
+}
+
+.sp-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 4px;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* One year on a long axis: a short mark, centred in its year. */
+.sp-bar--point {
+  min-width: 6px;
+}
+
+/* Cut at an end of the axis: fades out there (the event goes on). */
+.sp-bar--before {
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(to right, transparent, var(--accent) 14px);
+}
+
+.sp-bar--after {
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(to left, transparent, var(--accent) 14px);
+}
+
+.sp-bar--before.sp-bar--after {
+  border-radius: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--accent) 14px,
+    var(--accent) calc(100% - 14px),
+    transparent
+  );
+}
+
+.sp-row:hover .sp-bar:not(.sp-bar--before):not(.sp-bar--after),
+.sp-row--selected .sp-bar:not(.sp-bar--before):not(.sp-bar--after) {
+  background: var(--accent-strong);
+}
+
+/* The selected years, when the axis is wider than them (a search over the
+   whole timeline). */
+.sp-track-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--accent-tint);
+  box-shadow: inset 0 0 0 1px rgba(201, 154, 69, 0.35);
+  border-radius: 3px;
+}
+
+/* The year scale stays in view while the panel scrolls. Padding as .sp-row
+   (8px, plus its 3px left border), so the columns match. The negative offset
+   is .sp-scroll's top padding (as .event-detail-actions), so no row shows
+   above it. */
+.sp-taxis {
+  position: sticky;
+  top: -16px;
+  z-index: 1;
+  padding: 6px 8px 6px 11px;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-taxis-scale {
+  grid-column: 2;
+  position: relative;
+  height: 1.1rem;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+.sp-taxis-scale .sp-track-band {
+  bottom: -6px;
+  border-radius: 3px 3px 0 0;
+  box-shadow: none;
+}
+
+.sp-taxis-end,
+.sp-taxis-tick {
+  position: absolute;
+  top: 0;
+  line-height: 1.1rem;
+}
+
+.sp-taxis-end--start {
+  left: 0;
+}
+
+.sp-taxis-end--end {
+  right: 0;
+}
+
+.sp-taxis-tick {
+  transform: translateX(-50%);
+}
+
+.sp-taxis-tick::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  height: 4px;
+  border-left: 1px solid var(--border-field);
 }
 
 /* ---------- Event detail ---------- */
@@ -1180,7 +1333,8 @@ button.sp-chip[aria-pressed="true"] {
     padding: 0 14px 16px;
   }
 
-  .event-detail-actions {
+  .event-detail-actions,
+  .sp-taxis {
     top: 0;
   }
 

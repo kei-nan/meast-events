@@ -11,7 +11,8 @@
 //   scope=all|range, area=r:minLon,minLat,maxLon,maxLat | c:lon,lat,radiusKm,
 //   about=1 (the "About the data" dialog is open),
 //   sort=coverage-asc|date|date-desc (browse list order, lib/browseOrder.js; the
-//   default, most covered first, is omitted)
+//   default, most covered first, is omitted),
+//   view=timeline (the results panel's Timeline view; the default list is omitted)
 //
 // Older links put the event in the query, /?e=<id>: still read (the path wins
 // if both are given), and rewritten to /event/<id> by the next URL write.
@@ -104,7 +105,7 @@ export function areaToParam(area) {
   return null;
 }
 
-// -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort}
+// -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort, view}
 export function parseUrlState(search, pathname = "/") {
   const p = new URLSearchParams(search);
   let q = p.get("q") ?? "";
@@ -129,12 +130,13 @@ export function parseUrlState(search, pathname = "/") {
     eventId: eventIdFromPath(pathname) ?? (isValidEventId(e) ? e : null),
     about: p.get("about") === "1",
     sort: SORTS.includes(p.get("sort")) ? p.get("sort") : "coverage",
+    view: p.get("view") === "timeline" ? "timeline" : "list",
   };
 }
 
 const enc = (v) => encodeURIComponent(v).replace(/%2C/g, ",").replace(/%3A/g, ":");
 
-// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort}
+// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view}
 // -> the query string: "" or "?a=b&..." (defaults omitted so the bare URL stays
 // clean). The event is not in it: it is the path (stateUrl).
 export function serializeUrlState(state) {
@@ -157,6 +159,7 @@ export function serializeUrlState(state) {
   if (area) parts.push(`area=${enc(area)}`);
   if (state.about) parts.push("about=1");
   if (SORTS.includes(state.sort) && state.sort !== "coverage") parts.push(`sort=${state.sort}`);
+  if (state.view === "timeline") parts.push("view=timeline");
   return parts.length ? `?${parts.join("&")}` : "";
 }
 
