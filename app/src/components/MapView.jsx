@@ -59,7 +59,7 @@ import { reducedMotion } from "../lib/reducedMotion";
 import { haversineKm } from "../lib/geo";
 import { isUnhandledEscape } from "../lib/escapeKey";
 import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
-import { sheetCoversMap, stripOffset, toolbarInset } from "../lib/mapInsets";
+import { sheetStrip, stripOffset, toolbarInset } from "../lib/mapInsets";
 
 // Distance between two [lon, lat] points (the drawing code works in pairs).
 const distanceKm = (a, b) => haversineKm(a[0], a[1], b[0], b[1]);
@@ -942,7 +942,7 @@ export default function MapView({
     // goes in the middle of that strip, below the toolbar (lib/mapInsets.js),
     // not under the sheet.
     const box = map.getContainer();
-    const offset = stripOffset(box.clientHeight, sheetCoversMap(), toolbarInset(box));
+    const offset = stripOffset(box.clientHeight, sheetStrip(box), toolbarInset(box));
     const opts = { center: [focus.lon, focus.lat], zoom, offset };
     // easeTo with no duration, not jumpTo, which has no `offset`.
     if (reducedMotion()) map.easeTo({ ...opts, duration: 0 });
