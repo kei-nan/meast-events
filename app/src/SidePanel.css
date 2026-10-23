@@ -1036,7 +1036,6 @@ button.sp-chip[aria-pressed="true"] {
 
 .event-detail-extract p {
   margin: 0 0 0.85em;
-  max-width: 68ch;
 }
 
 .event-detail-more {
@@ -1081,7 +1080,13 @@ button.sp-chip[aria-pressed="true"] {
   border-style: dashed;
 }
 
+/* The text and the boxes under it fill the panel, so a reader who widens it
+   (PanelResizer) reads more per line and scrolls less. One cap for all of them,
+   so they end at the same edge: 53rem, about 115 characters of the summary per
+   line, reached only on very large screens (the panel is at most 60% of the
+   window: 828px of content in a 1440px window). */
 .event-detail {
+  max-width: 53rem;
   --fr-wording: #e0914f;
   --fr-fairness: #c3a1f0;
   --fr-mark: var(--fr-wording);
@@ -1095,7 +1100,6 @@ button.sp-chip[aria-pressed="true"] {
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-primary);
-  max-width: 68ch;
 }
 
 .framing-pointer-link {
@@ -1174,7 +1178,6 @@ button.sp-chip[aria-pressed="true"] {
 
 .framing-review p {
   margin: 0 0 8px;
-  max-width: 68ch;
 }
 
 .fr-tabs {
@@ -1256,7 +1259,6 @@ button.sp-chip[aria-pressed="true"] {
 .framing-obs {
   margin: 0 0 10px;
   padding-left: 18px;
-  max-width: 68ch;
 }
 
 .framing-obs li {
