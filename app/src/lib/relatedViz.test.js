@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { compassLayout, compassPoint, compassScale, formatKm, stripLayout } from "./relatedViz.js";
+import { MONTH_LABEL_PX, compassLayout, compassPoint, compassScale, formatKm, stripLayout } from "./relatedViz.js";
 import { bearingDeg } from "./geo.js";
 
 test("compass points and km wording", () => {
@@ -84,4 +84,24 @@ test("time strip: the open event is the middle, six months each side, close dots
   assert.deepEqual(labels, ["Jul 1917", "Oct", "Jan 1918", "Apr"]);
   assert.ok(s.ticks.every((t, i) => i === 0 || t.x > s.ticks[i - 1].x));
   assert.equal(stripLayout([], null, { width: 100, gap: 10 }), null);
+});
+
+test("time strip: wide enough, every month is labelled, and close dots fit side by side", () => {
+  const items = [{ date_start: "1917-11-01" }, { date_start: "1917-11-15" }];
+  const narrow = stripLayout(items, "1917-10-31", { width: 300, gap: 20 });
+  const wide = stripLayout(items, "1917-10-31", { width: 12 * MONTH_LABEL_PX, gap: 20 });
+  assert.equal(narrow.lanes, 2, "two weeks apart overlap at 300px");
+  assert.equal(wide.lanes, 1, "and fits side by side at 576px");
+  const labels = wide.ticks.filter((t) => t.label).map((t) => t.label);
+  assert.deepEqual(labels.slice(0, 8), ["Jun 1917", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan 1918"]);
+  const width = 12 * MONTH_LABEL_PX;
+  for (const t of wide.ticks) assert.equal(t.label !== null, t.x >= 12 && t.x <= width - 12, `tick at ${t.x}`);
+});
+
+test("time strip: no label so close to an end that it would be cut off; the year moves to the next", () => {
+  // Centre 2024-02-29: the strip starts on 2023-08-30, so September 1st is 2 days (3px) in.
+  const s = stripLayout([], "2024-02-29", { width: 818, gap: 20 });
+  assert.equal(s.ticks[0].label, null);
+  assert.ok(s.ticks[0].x < 12);
+  assert.equal(s.ticks[1].label, "Oct 2023");
 });

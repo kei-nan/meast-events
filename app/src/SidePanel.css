@@ -1631,8 +1631,29 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 230px;
 }
 
-.rel-strip {
-  max-width: 380px;
+/* Drawn at its box's width in pixels (RelatedEvents TimeStrip), so it fills a
+   widened panel without growing its dots and labels. */
+.rel-strip-box {
+  width: 100%;
+}
+
+/* Nearby in a wide panel: the compass beside its list instead of above it, so
+   widening the panel does not just add space around a 230px circle. */
+.event-detail-related {
+  container: related / inline-size;
+}
+
+@container related (min-width: 560px) {
+  .rel-body--side {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: center;
+  }
+
+  .rel-body--side .rel-list {
+    margin: 0;
+  }
 }
 
 .rel-face {

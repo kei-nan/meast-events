@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EventLink from "./EventLink.jsx";
 import { formatEventDate } from "../lib/eventDate.js";
 import { NEARBY_KM, RELATED_SHOWN, emptyReason } from "../lib/related.js";
@@ -92,50 +92,67 @@ function Compass({ items, hotId, onHot, onSelectEvent }) {
   );
 }
 
+// The strip's width before its box has been measured (and without ResizeObserver).
+const STRIP_DEFAULT_W = 300;
+
+// Drawn at its box's width in pixels (viewBox = drawn size), so in a wider panel
+// (PanelResizer) the months spread out while dots and labels keep their size:
+// close dates stop stacking, and every month gets a label once there is room.
 function TimeStrip({ items, center, hotId, onHot, onSelectEvent }) {
-  const W = 300;
+  const boxRef = useRef(null);
+  const [boxW, setBoxW] = useState(null);
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(() => setBoxW(Math.floor(el.clientWidth)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const pad = DOT_R + 4;
+  const W = boxW ? Math.max(STRIP_DEFAULT_W, boxW - 2 * pad) : STRIP_DEFAULT_W;
   const lane = 2 * DOT_R + 4;
   const layout = stripLayout(items, center, { width: W, gap: 2 * DOT_R + 2 });
   if (!layout) return null;
   const axisY = 8 + layout.lanes * lane;
   const h = axisY + 34;
   return (
-    <svg
-      className="rel-strip"
-      viewBox={`${-pad} 0 ${W + 2 * pad} ${h}`}
-      role="img"
-      aria-label="Timeline: when each event listed below happened, six months before and after this one, which is in the middle."
-    >
-      <line className="rel-axis" x1={0} y1={axisY} x2={W} y2={axisY} />
-      {layout.ticks.map((t) => (
-        <g key={t.x}>
-          <line className="rel-tick" x1={t.x} y1={axisY} x2={t.x} y2={axisY + (t.label ? 6 : 3)} />
-          {t.label && (
-            <text className="rel-ring-label" x={t.x} y={axisY + 17} textAnchor="middle">
-              {t.label}
-            </text>
-          )}
-        </g>
-      ))}
-      <line className="rel-here-line" x1={W / 2} y1={4} x2={W / 2} y2={axisY + 4} />
-      <text className="rel-here-label" x={W / 2} y={axisY + 30} textAnchor="middle">
-        this event
-      </text>
-      {items.map((it, i) => (
-        <Dot
-          key={it.id}
-          x={layout.dots[i].x}
-          y={axisY - DOT_R - 2 - layout.dots[i].lane * lane}
-          n={i + 1}
-          item={it}
-          hot={hotId === it.id}
-          onHot={onHot}
-          onSelectEvent={onSelectEvent}
-          label={formatEventDate(it.date_start, null, { precision: "day" })}
-        />
-      ))}
-    </svg>
+    <div ref={boxRef} className="rel-strip-box">
+      <svg
+        className="rel-strip"
+        viewBox={`${-pad} 0 ${W + 2 * pad} ${h}`}
+        role="img"
+        aria-label="Timeline: when each event listed below happened, six months before and after this one, which is in the middle."
+      >
+        <line className="rel-axis" x1={0} y1={axisY} x2={W} y2={axisY} />
+        {layout.ticks.map((t) => (
+          <g key={t.x}>
+            <line className="rel-tick" x1={t.x} y1={axisY} x2={t.x} y2={axisY + (t.label ? 6 : 3)} />
+            {t.label && (
+              <text className="rel-ring-label" x={t.x} y={axisY + 17} textAnchor="middle">
+                {t.label}
+              </text>
+            )}
+          </g>
+        ))}
+        <line className="rel-here-line" x1={W / 2} y1={4} x2={W / 2} y2={axisY + 4} />
+        <text className="rel-here-label" x={W / 2} y={axisY + 30} textAnchor="middle">
+          this event
+        </text>
+        {items.map((it, i) => (
+          <Dot
+            key={it.id}
+            x={layout.dots[i].x}
+            y={axisY - DOT_R - 2 - layout.dots[i].lane * lane}
+            n={i + 1}
+            item={it}
+            hot={hotId === it.id}
+            onHot={onHot}
+            onSelectEvent={onSelectEvent}
+            label={formatEventDate(it.date_start, null, { precision: "day" })}
+          />
+        ))}
+      </svg>
+    </div>
   );
 }
 
@@ -175,17 +192,18 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
     tabRefs.current[next.key]?.focus();
   }
 
+  // Nearby: in a wide panel the compass sits beside its list (SidePanel.css, @container related).
   const panel = !list.length ? (
     <p className="rel-empty">{emptyReason(current.key, event)}</p>
   ) : (
-    <>
+    <div className={`rel-body${current.key === "nearby" ? " rel-body--side" : ""}`}>
       {current.key === "nearby" && (
-        <>
+        <div className="rel-figure">
           <Compass items={list} hotId={hotId} onHot={setHotId} onSelectEvent={onSelectEvent} />
           <p className="rel-caption">
             North up · edge of the circle: {compassScale(Math.max(...list.map((i) => i.km))).outer} km
           </p>
-        </>
+        </div>
       )}
       {current.key === "same_time" && (
         <TimeStrip items={list} center={date} hotId={hotId} onHot={setHotId} onSelectEvent={onSelectEvent} />
@@ -207,7 +225,7 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
           </li>
         ))}
       </ol>
-    </>
+    </div>
   );
 
   return (
