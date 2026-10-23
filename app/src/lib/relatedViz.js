@@ -75,6 +75,14 @@ export function compassLayout(items, { radius, gap, inner = 0 }) {
   return pts.map(({ x, y }) => ({ x: Math.round(x * 10) / 10 + 0, y: Math.round(y * 10) / 10 + 0 }));
 }
 
+// Three letters each ("en-GB" short names give "Sept").
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** The room a month needs on the time strip for every month to be labelled ("Jan 2024" at 10px). */
+export const MONTH_LABEL_PX = 48;
+/** A label is centred on its tick: one this close to an end of the strip would be cut off, so it is left out. */
+const LABEL_EDGE_PX = 12;
+
 /**
  * The time strip for `items` ([{date_start}]) around `center` (the open event's
  * date_start), SAME_TIME_DAYS either side across `width`:
@@ -82,10 +90,13 @@ export function compassLayout(items, { radius, gap, inner = 0 }) {
  *          would overlap one already placed (closer than `gap`) goes a lane up;
  *   lanes: how many lanes are used;
  *   ticks: [{x, label}] at each month start in range; label set on Jan/Apr/Jul/Oct
- *          (with the year on January and on the first label), else null.
+ *          (on every month when the strip gives each month MONTH_LABEL_PX), with
+ *          the year on January and on the first label; else null. No label within
+ *          LABEL_EDGE_PX of either end, where it would be cut off.
  * Null if `center` is not a date.
  */
 export function stripLayout(items, center, { width, gap }) {
+  const step = width / 12 >= MONTH_LABEL_PX ? 1 : 3; // months between labels
   const c = dayNumber(center);
   if (c == null) return null;
   const x = (day) => ((day - c + SAME_TIME_DAYS) / (2 * SAME_TIME_DAYS)) * width;
@@ -107,9 +118,11 @@ export function stripLayout(items, center, { width, gap }) {
     if (m > 11) [y, m] = [y + 1, 0];
     const day = Math.round(Date.UTC(y, m, 1) / 86400000);
     if (day > c + SAME_TIME_DAYS) break;
-    const name = new Date(Date.UTC(y, m, 1)).toLocaleString("en-GB", { month: "short", timeZone: "UTC" });
+    const name = MONTHS[m];
     const yearToo = m === 0 || !ticks.some((t) => t.label);
-    ticks.push({ x: Math.round(x(day) * 10) / 10, label: m % 3 === 0 ? (yearToo ? `${name} ${y}` : name) : null });
+    const tx = Math.round(x(day) * 10) / 10;
+    const labelled = m % step === 0 && tx >= LABEL_EDGE_PX && tx <= width - LABEL_EDGE_PX;
+    ticks.push({ x: tx, label: labelled ? (yearToo ? `${name} ${y}` : name) : null });
     m++;
   }
   return { dots, lanes: Math.max(1, ...dots.map((d) => d.lane + 1)), ticks };

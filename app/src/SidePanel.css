@@ -52,8 +52,14 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* --panel-w: the reader's width (components/PanelResizer.jsx), kept between
+   320px and 60% of the window (lib/panelWidth.js has the same limits), so a
+   remembered width never squeezes the map in a smaller window; and at most
+   56rem, the event view's 53rem (.event-detail) plus padding and a scrollbar,
+   since past that widening only adds empty space. */
 .side-panel {
-  width: 380px;
+  position: relative;
+  width: clamp(320px, var(--panel-w, 380px), min(60vw, 56rem));
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -68,8 +74,93 @@
    Phones and touch screens set their own size further down. */
 @media (min-width: 1400px) {
   .side-panel {
-    width: 440px;
+    width: clamp(320px, var(--panel-w, 440px), min(60vw, 56rem));
   }
+}
+
+/* The panel's left edge as a resize handle: a 10px strip over the border,
+   with a short grip in the middle so it can be found; the border lights up
+   on hover, focus and while dragging. */
+.sp-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -6px;
+  z-index: 6;
+  width: 11px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.sp-resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 1px;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.sp-resizer:hover::before,
+.sp-resizer:focus-visible::before,
+.sp-resizer--dragging::before {
+  left: 4px;
+  width: 3px;
+  background: var(--accent);
+}
+
+.sp-resizer:focus-visible {
+  outline: none;
+}
+
+.sp-resizer-grip {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 5px;
+  height: 36px;
+  margin-top: -18px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-field);
+  border-radius: 3px;
+}
+
+.sp-resizer:hover .sp-resizer-grip,
+.sp-resizer:focus-visible .sp-resizer-grip,
+.sp-resizer--dragging .sp-resizer-grip {
+  border-color: var(--accent-strong);
+  background: var(--accent);
+}
+
+/* A finger needs a wider strip (the grip stays on the border). */
+@media (pointer: coarse) {
+  .sp-resizer {
+    left: -12px;
+    width: 23px;
+  }
+
+  .sp-resizer::before {
+    left: 11px;
+  }
+
+  .sp-resizer:hover::before,
+  .sp-resizer:focus-visible::before,
+  .sp-resizer--dragging::before {
+    left: 10px;
+  }
+
+  .sp-resizer-grip {
+    left: 9px;
+  }
+}
+
+/* While dragging: the resize cursor over the map and panel too, no text selection. */
+.is-resizing-panel,
+.is-resizing-panel * {
+  cursor: col-resize !important;
+  user-select: none !important;
 }
 
 .sp-scroll {
@@ -947,7 +1038,6 @@ button.sp-chip[aria-pressed="true"] {
 
 .event-detail-extract p {
   margin: 0 0 0.85em;
-  max-width: 68ch;
 }
 
 .event-detail-more {
@@ -992,7 +1082,14 @@ button.sp-chip[aria-pressed="true"] {
   border-style: dashed;
 }
 
+/* The text and the boxes under it fill the panel, so a reader who widens it
+   (PanelResizer) reads more per line and scrolls less. One cap for all of them,
+   so they end at the same edge: 53rem, about 115 characters of the summary per
+   line. The panel is at most 56rem (.side-panel), so it never grows past this
+   into empty space; in a 1440px window its 60% limit comes first (828px of
+   content). */
 .event-detail {
+  max-width: 53rem;
   --fr-wording: #e0914f;
   --fr-fairness: #c3a1f0;
   --fr-mark: var(--fr-wording);
@@ -1006,7 +1103,6 @@ button.sp-chip[aria-pressed="true"] {
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-primary);
-  max-width: 68ch;
 }
 
 .framing-pointer-link {
@@ -1085,7 +1181,6 @@ button.sp-chip[aria-pressed="true"] {
 
 .framing-review p {
   margin: 0 0 8px;
-  max-width: 68ch;
 }
 
 .fr-tabs {
@@ -1167,7 +1262,6 @@ button.sp-chip[aria-pressed="true"] {
 .framing-obs {
   margin: 0 0 10px;
   padding-left: 18px;
-  max-width: 68ch;
 }
 
 .framing-obs li {
@@ -1537,8 +1631,29 @@ button.sp-chip[aria-pressed="true"] {
   max-width: 230px;
 }
 
-.rel-strip {
-  max-width: 380px;
+/* Drawn at its box's width in pixels (RelatedEvents TimeStrip), so it fills a
+   widened panel without growing its dots and labels. */
+.rel-strip-box {
+  width: 100%;
+}
+
+/* Nearby in a wide panel: the compass beside its list instead of above it, so
+   widening the panel does not just add space around a 230px circle. */
+.event-detail-related {
+  container: related / inline-size;
+}
+
+@container related (min-width: 560px) {
+  .rel-body--side {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: center;
+  }
+
+  .rel-body--side .rel-list {
+    margin: 0;
+  }
 }
 
 .rel-face {
@@ -1648,6 +1763,11 @@ button.sp-chip[aria-pressed="true"] {
 /* The forced palette drops the tint and accent that mark a pressed toggle or
    the open row, so they take the system's selection colours instead. */
 @media (forced-colors: active) {
+  /* The accent line that marks the focused resize handle is not drawn here. */
+  .sp-resizer:focus-visible {
+    outline: 2px solid Highlight;
+  }
+
   .sp-seg-btn[aria-pressed="true"],
   button.sp-chip[aria-pressed="true"],
   .sp-sort-btn[aria-pressed="true"] {
