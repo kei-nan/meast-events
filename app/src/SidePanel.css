@@ -1400,6 +1400,18 @@ button.sp-chip[aria-pressed="true"] {
     height: calc(100% - 120px);
   }
 
+  /* Half of the map area (lib/sheetSnap.js HALF_SHARE). While its bar is
+     dragged (data-sheet="drag") the height is set inline and follows the
+     finger; between resting heights it slides. */
+  .side-panel[data-sheet="half"] {
+    height: 50%;
+  }
+
+  .side-panel[data-sheet="half"],
+  .side-panel[data-sheet="full"] {
+    transition: height 0.2s ease-out;
+  }
+
   .sp-sheet-toggle {
     display: flex;
     align-items: center;
@@ -1414,6 +1426,8 @@ button.sp-chip[aria-pressed="true"] {
     font-family: var(--font-sans);
     font-size: 0.72rem;
     cursor: pointer;
+    /* Dragging the bar resizes the sheet; the page must not scroll or zoom instead. */
+    touch-action: none;
   }
 
   .sp-sheet-grip {
@@ -1756,6 +1770,14 @@ button.sp-chip[aria-pressed="true"] {
   margin: 0;
   font-size: 0.75rem;
   color: var(--text-secondary);
+}
+
+/* The phone sheet jumps between its heights instead of sliding. */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .side-panel[data-sheet="half"],
+  .side-panel[data-sheet="full"] {
+    transition: none;
+  }
 }
 
 /* ---------- Windows high contrast (forced colours) ---------- */

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { countryHighlightFeatures, featuresBbox } from "../lib/eventCountries";
 import { reducedMotion } from "../lib/reducedMotion";
-import { sheetCoversMap, stripOffset, toolbarInset } from "../lib/mapInsets";
+import { sheetStrip, stripOffset, toolbarInset } from "../lib/mapInsets";
 
 // Map layer that shades the listed countries of an event without a precise
 // location (lib/eventCountries.js decides which border shapes those are). The
@@ -75,7 +75,7 @@ export default function useCountryHighlight({ mapRef, mapReady, event, year, fea
     // On phones the event's sheet leaves only a strip of the map in sight
     // (lib/mapInsets.js); the camera's target goes in the middle of that strip.
     const box = map.getContainer();
-    const offset = stripOffset(box.clientHeight, sheetCoversMap(), toolbarInset(box));
+    const offset = stripOffset(box.clientHeight, sheetStrip(box), toolbarInset(box));
     // easeTo with no duration, not jumpTo, which has no `offset`.
     const move = (opts) => (duration === 0 ? map.easeTo({ ...opts, offset, duration }) : map.flyTo({ ...opts, offset }));
     if (bbox) {

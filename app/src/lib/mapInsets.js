@@ -1,19 +1,36 @@
 // Where an opened event lands on the map. On phones the open event fills the
-// bottom sheet, which covers all of the map but a strip along its top
-// (SidePanel.css: .side-panel[data-sheet="full"] is calc(100% - 120px) of the
-// map area), and the map toolbar sits over the top of that strip. Camera moves
-// for an opened event aim at the part of the strip left in sight.
+// bottom sheet, which covers the map from the bottom (half of it, or all but a
+// strip along its top: lib/sheetSnap.js; the reader can drag it between), and
+// the map toolbar sits over the top of what is left. Camera moves for an opened
+// event aim at the part of the map left in sight above the sheet.
 
-export const SHEET_STRIP_PX = 120; // keep in sync with SidePanel.css
 // Below this much clear strip under the toolbar, the toolbar is ignored.
 const MIN_CLEAR_PX = 40;
 
-/** True when the phone sheet is open over the map (reads the page). */
-export function sheetCoversMap() {
-  if (typeof document === "undefined") return false;
-  return Boolean(
-    window.matchMedia?.("(max-width: 768px)").matches && document.querySelector('.side-panel[data-sheet="full"]')
-  );
+const isPhone = () => typeof window !== "undefined" && !!window.matchMedia?.("(max-width: 768px)").matches;
+
+/**
+ * How much of `container` (the map) the phone sheet covers from the bottom, in
+ * px: 0 on wider screens or without a sheet. Any sheet position, peek included.
+ * Reads the page.
+ */
+export function sheetCover(container) {
+  if (typeof document === "undefined" || !container || !isPhone()) return 0;
+  const sheet = document.querySelector(".side-panel");
+  if (!sheet) return 0;
+  const box = container.getBoundingClientRect();
+  return Math.max(0, Math.round(box.bottom - Math.max(box.top, sheet.getBoundingClientRect().top)));
+}
+
+/**
+ * The map strip in sight above the open phone sheet (px from the map's top),
+ * or null when the sheet is not open over the map (wider screens, or the sheet
+ * at its peek bar). Reads the page.
+ */
+export function sheetStrip(container) {
+  if (typeof document === "undefined" || !container) return null;
+  if (!isPhone() || document.querySelector('.side-panel[data-sheet="peek"]')) return null;
+  return Math.max(0, container.clientHeight - sheetCover(container));
 }
 
 /** How far the map toolbar reaches down into `container` (px; 0 without one). Reads the page. */
@@ -24,17 +41,18 @@ export function toolbarInset(container) {
 }
 
 // The clear band of the strip: [top, bottom] in map pixels.
-function clearBand(top) {
-  return SHEET_STRIP_PX - top >= MIN_CLEAR_PX ? [top, SHEET_STRIP_PX] : [0, SHEET_STRIP_PX];
+function clearBand(strip, top) {
+  return strip - top >= MIN_CLEAR_PX ? [top, strip] : [0, strip];
 }
 
 /**
  * flyTo/easeTo `offset` that puts the target in the middle of the strip in
- * sight (below a toolbar reaching `top` px down) of a map `height` px tall;
- * [0, 0] when the sheet is not over the map. Pure.
+ * sight (`strip` px from the top, below a toolbar reaching `top` px down) of a
+ * map `height` px tall; [0, 0] when the sheet is not over the map (`strip`
+ * null) or leaves all of it. Pure.
  */
-export function stripOffset(height, covered, top = 0) {
-  if (!covered || height <= SHEET_STRIP_PX) return [0, 0];
-  const [a, b] = clearBand(top);
+export function stripOffset(height, strip, top = 0) {
+  if (strip == null || strip >= height || strip <= 0) return [0, 0];
+  const [a, b] = clearBand(strip, top);
   return [0, Math.round((a + b) / 2 - height / 2)];
 }

@@ -13,6 +13,7 @@ import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
+import useSheetDrag from "../hooks/useSheetDrag";
 import { RETRY_MS } from "../hooks/useAllEvents";
 import "../SidePanel.css";
 
@@ -135,16 +136,19 @@ export default function SearchPanel({
   const listScrollRef = useRef(0); // the list's scroll position, restored by Back
   const lastSelectedRef = useRef(null);
   const hadSelectionRef = useRef(false);
-  const [sheet, setSheet] = useState(query || selectedEvent ? "full" : "peek");
+  // Phone sheet: "peek" | "half" | "full", dragged by its bar (hooks/useSheetDrag.js).
+  const { sheet, setSheet, dragHeight, barProps } = useSheetDrag(query || selectedEvent ? "full" : "peek", panelRef);
+  const sheetOpen = sheet !== "peek";
   // Filters sit behind a disclosure so results start near the top of the panel.
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Selecting an event (from a row or the map) opens the sheet on mobile.
+  // Selecting an event (from a row or the map) opens the sheet on mobile; a
+  // sheet the reader left at half stays at half.
   const selectedId = selectedEvent?.id ?? null;
   const [prevSelectedId, setPrevSelectedId] = useState(selectedId);
   if (selectedId !== prevSelectedId) {
     setPrevSelectedId(selectedId);
-    if (selectedId) setSheet("full");
+    if (selectedId && sheet === "peek") setSheet("full");
   }
 
   const loading = status === "loading";
@@ -192,12 +196,12 @@ export default function SearchPanel({
     ref,
     () => ({
       skipTo() {
-        flushSync(() => setSheet("full"));
+        if (!sheetOpen) flushSync(() => setSheet("full"));
         const target = selectedId ? document.getElementById("event-detail-title") : inputRef.current;
         target?.focus();
       },
     }),
-    [selectedId]
+    [selectedId, sheetOpen, setSheet]
   );
 
   // Mobile: collapse the sheet to its peek bar so the map (already centred on
@@ -260,7 +264,7 @@ export default function SearchPanel({
       if (query) {
         e.preventDefault();
         onQueryChange("");
-      } else if (sheet === "full") {
+      } else if (sheetOpen) {
         e.preventDefault();
         setSheet("peek");
       }
@@ -339,9 +343,12 @@ export default function SearchPanel({
       ref={panelRef}
       id={panelId}
       className="side-panel"
-      data-sheet={sheet}
+      data-sheet={dragHeight === null ? sheet : "drag"}
       aria-label="Search and event details"
-      style={panelWidth.width ? { "--panel-w": `${panelWidth.width}px` } : undefined}
+      style={{
+        ...(panelWidth.width ? { "--panel-w": `${panelWidth.width}px` } : null),
+        ...(dragHeight === null ? null : { height: `${dragHeight}px` }),
+      }}
     >
       <PanelResizer
         panelRef={panelRef}
@@ -357,12 +364,14 @@ export default function SearchPanel({
         ref={toggleRef}
         type="button"
         className="sp-sheet-toggle"
-        aria-expanded={sheet === "full"}
+        aria-expanded={sheetOpen}
         aria-controls="sp-body"
-        onClick={() => setSheet(sheet === "full" ? "peek" : "full")}
+        aria-keyshortcuts="ArrowUp ArrowDown"
+        title="Tap to open or close; drag, or use the arrow keys, for half or full height"
+        {...barProps}
       >
         <span className="sp-sheet-grip" aria-hidden="true" />
-        {sheet === "full" ? "Show map" : selectedEvent ? "Show event" : "Show results"}
+        {sheetOpen ? "Show map" : selectedEvent ? "Show event" : "Show results"}
       </button>
 
       <div

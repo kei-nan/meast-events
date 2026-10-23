@@ -3,6 +3,7 @@ import { CATEGORY_COLORS } from "./mapLayers";
 import { humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import { categoryLabel } from "../lib/categoryLabels";
 import { isUnhandledEscape } from "../lib/escapeKey";
+import { sheetCover } from "../lib/mapInsets";
 import "./MapUi.css";
 
 // ---- the map toolbar ----
@@ -286,8 +287,10 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
   }, [onClose]);
   const cardW = Math.min(320, Math.max(0, width - 16));
   const left = Math.max(8, Math.min(popup.point[0] + 12, width - cardW - 8));
-  // On phones the results sheet overlaps the bottom of the map; keep clear of it.
-  const reserve = window.matchMedia?.("(max-width: 768px)").matches ? 120 : 8;
+  // On phones the results sheet overlaps the bottom of the map, as far as the
+  // reader has pulled it up (lib/mapInsets.js); keep clear of it.
+  const phone = window.matchMedia?.("(max-width: 768px)").matches;
+  const reserve = phone ? Math.max(120, sheetCover(document.querySelector(".map-view")) + 8) : 8;
   const bottomLimit = Math.max(200, height - reserve);
   const top = Math.max(8, Math.min(popup.point[1] + 12, bottomLimit - 180));
   return (
