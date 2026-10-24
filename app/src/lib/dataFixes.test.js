@@ -32,7 +32,7 @@ test("githubAnchor: GitHub's heading ids", () => {
 test("dataFixAnchors: one anchor per Fn heading of the real fix log; other headings ignored", () => {
   const md = readFileSync(new URL("../../../docs/data-fixes.md", import.meta.url), "utf8");
   const anchors = dataFixAnchors(md);
-  assert.deepEqual([...anchors.keys()], ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"]);
+  assert.deepEqual([...anchors.keys()], ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14"]);
   assert.equal(anchors.get("F11"), "f11---pins-that-were-another-items-location-owners-rule-an-event-is-pinned-only-at-its-own-location");
   assert.equal(dataFixAnchors("## Not verified\n### F3 - sub\n").size, 0);
 });

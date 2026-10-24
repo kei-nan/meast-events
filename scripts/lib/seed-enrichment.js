@@ -1,9 +1,10 @@
 // What the enrichment pipeline would record for a hand-picked seed event (data/seed-events.json, curated
 // before date_precision, part_of and resolved_qid existed), derived the way enrich-candidates.js derives it
-// for a discovered event. Pure: the network part is scripts/enrich-seed.js. The result is a PROPOSAL for the
-// owner's review (data/seed-enrichment.proposed.json); nothing here changes an event, and titles, extracts,
-// dates, countries and coordinates are never proposed.
-import { keptDatePrecision } from "./fixes.js";
+// for a discovered event. Pure: the network part is scripts/enrich-seed.js. The result is a PROPOSAL
+// (data/seed-enrichment.proposed.json); titles, extracts, dates, countries and coordinates are never proposed.
+// applySeedProposal writes a proposal into an event only when the event's date agrees with Wikidata, and
+// applySeedFix applies the verified F13/F14 ledger entries (lib/fixes.js) that settle a seed date first.
+import { FIXES_BY_QID, SEED_FIX_REFS, applyDataFix, keptDatePrecision } from "./fixes.js";
 import { monthPrecisionDayFlag } from "./flags.js";
 import { precisionCode } from "./wiki.js";
 
@@ -74,6 +75,48 @@ export function proposeSeedFields(event, { entity, partOfQids = [], labels = {},
   // Never repeat a note the record already carries.
   const existing = new Set(Array.isArray(event.review_reasons) ? event.review_reasons : []);
   return { set, add_review_reasons: reasons.filter((r) => !existing.has(r)), notes };
+}
+
+/**
+ * Applies the F13/F14 ledger entry for a seed event (and no other entry: the older fixes belong to the pipeline).
+ * F13 sets date_start to the Wikidata value the article confirms; F14 sets date_precision "day" for a stored date
+ * the article states. Returns the changed field names (lib/fixes.js applyDataFix, which also adds its
+ * "data_fix Fn:" review note and sets needs_review), [] when the event has no such entry.
+ */
+export function applySeedFix(event) {
+  const fix = FIXES_BY_QID.get(event?.wikidata_qid);
+  if (!fix || !SEED_FIX_REFS.includes(fix.ref)) return [];
+  return applyDataFix(event);
+}
+
+/**
+ * Writes a proposal (proposeSeedFields) into the event, but only when its date agrees: the event's date_start is
+ * one of the item's P585/P580 values (proposed date_precision not null) or the event already records a precision
+ * (an F14 entry). Otherwise, or when the Wikidata item could not be fetched, nothing changes. Only fields the event
+ * lacks are set; the proposal's review notes are appended once and needs_review follows the pipeline's rule
+ * (any review note or date flag). Returns the changed field names.
+ */
+export function applySeedProposal(event, proposal) {
+  const precision = "date_precision" in proposal.set ? proposal.set.date_precision : event.date_precision;
+  if (precision == null) return [];
+  const changed = [];
+  for (const [k, v] of Object.entries(proposal.set)) {
+    if (k in event) continue;
+    event[k] = v;
+    changed.push(k);
+  }
+  const existing = Array.isArray(event.review_reasons) ? event.review_reasons : [];
+  const add = proposal.add_review_reasons.filter((r) => !existing.includes(r));
+  if (add.length) {
+    event.review_reasons = [...existing, ...add];
+    changed.push("review_reasons");
+    const needs = event.review_reasons.length > 0 || (event.date_flags?.length ?? 0) > 0;
+    if (event.needs_review !== needs) {
+      event.needs_review = needs;
+      changed.push("needs_review");
+    }
+  }
+  return changed;
 }
 
 // Counts for the summary: how many proposals set each field, and to what.
