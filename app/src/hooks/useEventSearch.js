@@ -86,19 +86,26 @@ export default function useEventSearch({
   const [full, setFull] = useState({ q: null });
   const degradedRef = useRef(degraded);
   degradedRef.current = degraded;
+  const fullRef = useRef(full);
+  fullRef.current = full;
   const handledProbeRef = useRef(probeTick);
 
+  // Re-run when `degraded` clears too: a probe that loaded the index but went
+  // stale (the text changed meanwhile, which is not searched while degraded)
+  // still ends the outage, and the current text is then searched at once.
   useEffect(() => {
     const isProbe = probeTick !== handledProbeRef.current;
     handledProbeRef.current = probeTick;
     if (!settledQ || !ready) return;
     if (degradedRef.current && !isProbe) return;
+    // Already answered (the recovery that answered it cleared `degraded`).
+    if (!isProbe && fullRef.current.q === settledQ && fullRef.current.status === "ready") return;
     let stale = false;
 
     searchEventIds(settledQ)
       .then((ids) => {
-        if (stale) return;
         onRecovered();
+        if (stale) return;
         setFull({ q: settledQ, status: "ready", ids });
       })
       .catch(() => {
@@ -110,7 +117,7 @@ export default function useEventSearch({
     return () => {
       stale = true;
     };
-  }, [settledQ, probeTick, ready, onOutage, onRecovered]);
+  }, [settledQ, probeTick, ready, degraded, onOutage, onRecovered]);
 
   // The full-text answer for the current text, under the current filters.
   // Records come from the static store; filters and area apply locally.
