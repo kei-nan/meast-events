@@ -162,6 +162,78 @@ DATA_FIXES.push({
     "resolves to); the operation's own item has no P625. No location of its own, so none is shown",
 });
 
+// A link to one revision of an English Wikipedia page (the evidence for F13/F14).
+export const revisionUrl = (title, revid) =>
+  `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(title.replace(/ /g, "_"))}&oldid=${revid}`;
+
+// F13 and F14: hand-picked seed events whose stored date_start is none of the item's Wikidata P585/P580 values
+// (scripts/enrich-seed.js), checked by hand against the lead and infobox of the English article at the revision
+// named (live 2026-10-24). Applied to data/events.json by `node scripts/enrich-seed.js --apply` only.
+// F13: the article gives one of the item's own Wikidata day values as the start, so date_start = that value
+// (Wikipedia and Wikidata agree against the seed date). date_end is not changed.
+for (const [qid, date, label, wikidata, title, revid, says] of [
+  ["Q2992403", "1920-03-08", "Franco-Syrian War", "P580 1920-03-08", "Franco-Syrian War", 1379975922,
+    'infobox "8 March – 25 July 1920"'],
+  ["Q154288", "1970-09-06", "Black September", "P580 1970-09-06", "Black September", 1377443084,
+    'infobox "6 September 1970 – 23 July 1971" (the lead dates the main phase of the fighting 16–27 September 1970)'],
+  ["Q45266620", "2017-12-06", "United States recognition of Jerusalem as capital of Israel", "P585 2017-12-06",
+    "United States recognition of Jerusalem as capital of Israel", 1379528222,
+    'lead "On December 6, 2017, the United States officially recognized Jerusalem"; infobox date_signed 2017-12-06'],
+  ["Q131404510", "2024-12-08", "Fall of the Assad regime", "P585 2024-12-08", "Fall of the Assad regime", 1380552397,
+    'lead "On 8 December 2024, the Assad regime in Syria collapsed"; infobox date 8 December 2024'],
+  ["Q122974556", "2023-10-08", "Hezbollah–Israel conflict (2023–present)", "P580 2023-10-08",
+    "Hezbollah–Israel conflict (2023–present)", 1368616555,
+    'lead "began on 8 October 2023"; infobox (Template:Hezbollah–Israel conflict (2023–present) infobox, revision 1381585493) "8 October 2023 – present"'],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F13",
+    set: { date_start: date },
+    note:
+      `${label}: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata ${wikidata} (day precision); ` +
+      `English Wikipedia ${revisionUrl(title, revid)}: ${says} (checked 2026-10-24). date_start = Wikidata ${wikidata.split(" ")[0]}; date_end unchanged`,
+  });
+}
+
+// F14: the article states the stored date_start itself to the day, but Wikidata has no value equal to it (no date at
+// all, a coarser one, or another day). The date is unchanged; date_precision = "day", with the article as its source.
+for (const [qid, label, wikidata, title, revid, says] of [
+  ["Q239060", "Arab Revolt", "P580 1916-06 (month)", "Arab Revolt", 1380894633,
+    'infobox "10 June 1916 – 25 October 1918"; lead "officially initiated at Mecca on 10 June 1916"'],
+  ["Q2821698", "Abolition of the Caliphate", "P585 1924 (year)", "Abolition of the Caliphate", 1380313801,
+    'lead "abolished on 3 March 1924"; infobox date 3 March 1924'],
+  ["Q99495661", "Abraham Accords", "P585 2020 (year)", "Abraham Accords", 1380714856,
+    'lead "signed in Washington, D.C. on September 15, 2020"; infobox date_signed "September 15, 2020"'],
+  ["Q4298662", "Young Turk Revolution", "P585 1908-07-24, the end of the infobox range", "Young Turk Revolution", 1380448478,
+    'infobox "3–24 July 1908"'],
+  ["Q164983", "Gallipoli campaign", "P580 1915-04-25, the landings", "Gallipoli campaign", 1379733603,
+    'lead "from 19 February 1915 to 9 January 1916"; infobox "19 February 1915 – 9 January 1916"'],
+  ["Q2281806", "1929 Palestine riots", "P585 1929-08-29, the end of the infobox range", "1929 Palestine riots", 1378961464,
+    'infobox "23–29 August 1929"'],
+  ["Q593774", "1953 Iranian coup d'état", "P580 1953-08-18", "1953 Iranian coup d'état", 1380975077,
+    'infobox "15–19 August 1953"'],
+  ["Q19682450", "Saudi-led intervention in the Yemeni civil war", "P580 2015-03-25", "Saudi-led intervention in the Yemeni civil war", 1380996194,
+    'lead "On 26 March 2015, Saudi Arabia ... staged a military intervention"; infobox (Template:Saudi-led intervention in the Yemeni civil war infobox, revision 1379014728) "26 March 2015 – ongoing"'],
+  ["Q52836581", "United States withdrawal from the Iran nuclear deal", "P585 2018-05-18", "United States withdrawal from the Iran nuclear deal", 1359899431,
+    'lead "On 8 May 2018, the United States ... announced its withdrawal"'],
+  ["Q1121819", "Emirate of Transjordan", "no P585/P580", "Emirate of Transjordan", 1377341920,
+    'lead "established on 11 April 1921"; infobox date_start "11 April", year_start 1921'],
+  ["Q846795", "United Nations Partition Plan for Palestine", "no P585/P580", "United Nations Partition Plan for Palestine", 1381412191,
+    'lead "adopted by the UN General Assembly on 29 November 1947"; infobox date "29 November", year 1947'],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F14",
+    set: { date_precision: "day" },
+    note:
+      `${label}: the seed date_start is no Wikidata value (Wikidata: ${wikidata}). English Wikipedia ${revisionUrl(title, revid)}: ` +
+      `${says} (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article`,
+  });
+}
+
+// The only ledger entries scripts/enrich-seed.js --apply applies (to hand-picked seed events).
+export const SEED_FIX_REFS = ["F13", "F14"];
+
 export const FIXES_BY_QID =new Map(DATA_FIXES.map((f) => [f.qid, f]));
 
 // Coordinates that look swapped to the validator (outside the region, inside it with

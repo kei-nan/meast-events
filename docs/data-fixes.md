@@ -297,3 +297,79 @@ put them outside the tracked set; the validator now rejects any event without a 
   extract match (`scripts/lib/order-flags.js`). Two curated records changed, only in `date_flags` / `wikipedia_lead_dates`:
   `passover-massacre` (`date_order_invalid` + note + lead dates -> `date_end_precision_coarse`, so the site no longer shows a reversed-date
   note) and `arab-cold-war` (its `date_order_invalid` text now names the end's year precision; still shown).
+
+## Seed enrichment of 2026-10-24: the 35 seed dates that are no Wikidata value
+
+- `node scripts/enrich-seed.js --apply` (live Wikidata and Wikipedia, 2026-10-24) wrote the proposed `date_precision`, `part_of`, `resolved_qid`
+  and `wikidata_description` (and the `part_of` review notes) into the hand-picked seed events whose stored `date_start` is one of the item's
+  Wikidata P585/P580 values: 67 of 102. In the other 35 the stored date is none of them (seed dates were typed by hand from
+  `data/seed-events.json`). Each was checked by hand against the lead and infobox of its English article at the revision linked below.
+- Rule: a date is applied only where the article states the start to the day, unambiguously, and that day is either one of the item's
+  Wikidata values (F13: the date changes to it) or the stored date itself (F14: the date stays, its day precision is recorded with the article
+  as source). Nothing is rounded: a month or year in the article is not turned into a day. A day the article names that is neither the stored
+  date nor a Wikidata value is not applied. `date_end` is never changed here.
+- 16 settled (5 F13, 11 F14) get the whole proposal plus their ledger note; 19 are left exactly as they were (listed at the end) and stay in
+  `data/seed-enrichment.proposed.json`.
+
+## F13 - five seed start dates replaced by the Wikidata value the article confirms
+
+| Event (QID) | Stored start | Wikidata P585 / P580 / P582 | English Wikipedia (revision) | Fix |
+|---|---|---|---|---|
+| Franco-Syrian War (Q2992403) | 1920-04-08 | - / 1920-03-08 / 1920-07-25 | infobox "8 March – 25 July 1920" ([1379975922](https://en.wikipedia.org/w/index.php?title=Franco-Syrian_War&oldid=1379975922)) | 1920-03-08 |
+| Black September (Q154288) | 1970-09-16 | - / 1970-09-06 / 1971-07-17 | infobox "6 September 1970 – 23 July 1971"; the lead dates the main phase of the fighting 16–27 September 1970 ([1377443084](https://en.wikipedia.org/w/index.php?title=Black_September&oldid=1377443084)) | 1970-09-06 |
+| United States recognition of Jerusalem as capital of Israel (Q45266620) | 2018-05-14 | 2017-12-06 / - / - | lead "On December 6, 2017, the United States officially recognized Jerusalem"; infobox date_signed 2017-12-06 ([1379528222](https://en.wikipedia.org/w/index.php?title=United_States_recognition_of_Jerusalem_as_capital_of_Israel&oldid=1379528222)) | 2017-12-06 |
+| Fall of the Assad regime (Q131404510) | 2024-11-27 | 2024-12-08 / - / - | lead "On 8 December 2024, the Assad regime in Syria collapsed"; infobox 8 December 2024 ([1380552397](https://en.wikipedia.org/w/index.php?title=Fall_of_the_Assad_regime&oldid=1380552397)) | 2024-12-08 |
+| Hezbollah–Israel conflict (2023–present) (Q122974556) | 2024-09-23 | 2020 (decade) / 2023-10-08 / - | lead "began on 8 October 2023" ([1368616555](https://en.wikipedia.org/w/index.php?title=Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)&oldid=1368616555)); infobox template "8 October 2023 – present" ([1381585493](https://en.wikipedia.org/w/index.php?title=Template:Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)_infobox&oldid=1381585493)) | 2023-10-08 |
+
+- Wikipedia and Wikidata agree on the start against the seed record. -> `date_start` = the Wikidata value (ledger entry F13); `date_precision`
+  is that statement's precision (day).
+- Not changed: every `date_end`. Black September's (1971-07-17) is Wikidata's P582 and the lead's "until 17 July 1971" (infobox 23 July);
+  the Fall of the Assad regime's is 2024-12-08, now the same day as its start; the Hezbollah–Israel conflict keeps 2024-11-27 although the
+  article says "present".
+
+## F14 - eleven seed dates the article states to the day: day precision recorded, date unchanged
+
+| Event (QID) | Stored start | Wikidata P585 / P580 | English Wikipedia (revision) |
+|---|---|---|---|
+| Arab Revolt (Q239060) | 1916-06-10 | 1918-10 (month) / 1916-06 (month) | infobox "10 June 1916 – 25 October 1918"; lead "officially initiated at Mecca on 10 June 1916" ([1380894633](https://en.wikipedia.org/w/index.php?title=Arab_Revolt&oldid=1380894633)) |
+| Abolition of the Caliphate (Q2821698) | 1924-03-03 | 1924 (year) / - | lead "abolished on 3 March 1924"; infobox 3 March 1924 ([1380313801](https://en.wikipedia.org/w/index.php?title=Abolition_of_the_Caliphate&oldid=1380313801)) |
+| Abraham Accords (Q99495661) | 2020-09-15 | 2020 (year) / - | lead "signed in Washington, D.C. on September 15, 2020"; infobox date_signed "September 15, 2020" ([1380714856](https://en.wikipedia.org/w/index.php?title=Abraham_Accords&oldid=1380714856)) |
+| Young Turk Revolution (Q4298662) | 1908-07-03 | 1908-07-24 / - | infobox "3–24 July 1908" ([1380448478](https://en.wikipedia.org/w/index.php?title=Young_Turk_Revolution&oldid=1380448478)) |
+| Gallipoli campaign (Q164983) | 1915-02-19 | - / 1915-04-25 | lead "from 19 February 1915 to 9 January 1916"; infobox the same ([1379733603](https://en.wikipedia.org/w/index.php?title=Gallipoli_campaign&oldid=1379733603)) |
+| 1929 Palestine riots (Q2281806) | 1929-08-23 | 1929-08-29 / - | infobox "23–29 August 1929" ([1378961464](https://en.wikipedia.org/w/index.php?title=1929_Palestine_riots&oldid=1378961464)) |
+| 1953 Iranian coup d'état (Q593774) | 1953-08-15 | - / 1953-08-18 | infobox "15–19 August 1953" ([1380975077](https://en.wikipedia.org/w/index.php?title=1953_Iranian_coup_d'%C3%A9tat&oldid=1380975077)) |
+| Saudi-led intervention in the Yemeni civil war (Q19682450) | 2015-03-26 | - / 2015-03-25 | lead "On 26 March 2015, Saudi Arabia ... staged a military intervention" ([1380996194](https://en.wikipedia.org/w/index.php?title=Saudi-led_intervention_in_the_Yemeni_civil_war&oldid=1380996194)); infobox template "26 March 2015 – ongoing" ([1379014728](https://en.wikipedia.org/w/index.php?title=Template:Saudi-led_intervention_in_the_Yemeni_civil_war_infobox&oldid=1379014728)) |
+| United States withdrawal from the Iran nuclear deal (Q52836581) | 2018-05-08 | 2018-05-18 / - | lead "On 8 May 2018, the United States ... announced its withdrawal" ([1359899431](https://en.wikipedia.org/w/index.php?title=United_States_withdrawal_from_the_Iran_nuclear_deal&oldid=1359899431)) |
+| Emirate of Transjordan (Q1121819) | 1921-04-11 | - / - | lead "established on 11 April 1921"; infobox date_start "11 April", year_start 1921 ([1377341920](https://en.wikipedia.org/w/index.php?title=Emirate_of_Transjordan&oldid=1377341920)) |
+| United Nations Partition Plan for Palestine (Q846795) | 1947-11-29 | - / - | lead "adopted by the UN General Assembly on 29 November 1947"; infobox date "29 November", year 1947 ([1381412191](https://en.wikipedia.org/w/index.php?title=United_Nations_Partition_Plan_for_Palestine&oldid=1381412191)) |
+
+- `date_start` unchanged; `date_precision: "day"` (ledger entry F14), its source the article at the revision named, not Wikidata. Three have
+  a coarser Wikidata value that contains the day (Arab Revolt, Abolition, Abraham Accords), two have no Wikidata date (Transjordan, Partition
+  Plan), and six have a different Wikidata day: for Young Turk Revolution and the 1929 riots Wikidata's P585 is the end of the infobox range;
+  for Gallipoli it is the landings of 25 April 1915; for the coup, the intervention and the withdrawal the article disagrees with Wikidata itself
+  (an upstream matter, not drafted here). In the intervention's infobox template the age counter starts from 25 March (`day1=25`) while its
+  displayed date says 26 March.
+
+### Left as they were (19): the article does not settle the start to the day
+
+| Event (QID) | Stored start / end | Wikidata P585 / P580 / P582 | English Wikipedia (revision) | Why not applied |
+|---|---|---|---|---|
+| McMahon–Hussein correspondence (Q59524) | 1915-07-14 / 1916-03-10 | none | lead "from July 1915 to March 1916", no infobox ([1363295392](https://en.wikipedia.org/w/index.php?title=McMahon%E2%80%93Hussein_correspondence&oldid=1363295392)) | months only |
+| Capture of Baghdad (1917) (Q2665637) | 1917-03-11 / - | 1917 (year) / 1917-03-08 / 1917-03-11 | lead "(11 March 1917)"; infobox "8–11 March 1917" ([1374873756](https://en.wikipedia.org/w/index.php?title=Capture_of_Baghdad_(1917)&oldid=1374873756)) | the article gives two starts: 11 March (lead, = P582) and 8 March (infobox, = P580) |
+| Iraqi Revolt (Q616851) | 1920-05-30 / 1920-10-17 | 1920 (year) / 1920-05 (month) / 1920-10 (month) | infobox "May–October 1920"; lead "summer of 1920" ([1381194751](https://en.wikipedia.org/w/index.php?title=Iraqi_Revolt&oldid=1381194751)) | months only |
+| Great Syrian Revolt (Q1968718) | 1925-07-18 / 1927-04-01 | - / 1925-07-19 / 1927-06 (month) | infobox "1925–1927"; lead "1925 to 1927" ([1379976254](https://en.wikipedia.org/w/index.php?title=Great_Syrian_Revolt&oldid=1379976254)) | years only |
+| Unification of Saudi Arabia (Q251600) | 1932-09-23 / - | 1902 (year) / 1902 (year) / 1932 (year) | infobox "First phase: 13 January 1902 – 23 September 1932" ([1381088878](https://en.wikipedia.org/w/index.php?title=Unification_of_Saudi_Arabia&oldid=1381088878)) | the stored point is the article's end; its start (1902) would need a new `date_end` as well |
+| Anglo-Iraqi Treaty of 1930 (Q541372) | 1932-10-03 / - | 1930-06-30 / - / - | lead names no date, no infobox ([1369404529](https://en.wikipedia.org/w/index.php?title=Anglo-Iraqi_Treaty_of_1930&oldid=1369404529)) | not stated |
+| Peel Commission (Q655894) | 1936-11-01 / 1937-07-07 | - / 1936-08 (month) / - | lead "appointed in 1936", report "On 7 July 1937"; infobox "July 1937" ([1375537897](https://en.wikipedia.org/w/index.php?title=Peel_Commission&oldid=1375537897)) | start day not stated |
+| White Paper of 1939 (Q1501775) | 1939-05-17 / - | 1939 (year) / - / - | lead "formal approval in the House of Commons on 23 May 1939"; infobox created "May 1939", ratified 23 May 1939 ([1357789658](https://en.wikipedia.org/w/index.php?title=White_Paper_of_1939&oldid=1357789658)) | the article's day (23 May) is neither the stored date nor a Wikidata value |
+| National Pact (Q748819) | 1943-11-22 / - | none | lead "Enacted in the summer of 1943" ([1363774120](https://en.wikipedia.org/w/index.php?title=National_Pact&oldid=1363774120)) | season only |
+| Nakba (Q3266633) | 1948-05-15 / 1949-01-01 | 1948 (year) / - / - | infobox "31 December 1947 – present" ([1381546706](https://en.wikipedia.org/w/index.php?title=Nakba&oldid=1381546706)) | the article's day is neither the stored date nor a Wikidata value (and is outside Wikidata's year) |
+| 1949 Armistice Agreements (Q999143) | 1949-02-24 / 1949-07-20 | 1949 (year) / - / - | lead names no date (only its references), no infobox ([1373406233](https://en.wikipedia.org/w/index.php?title=1949_Armistice_Agreements&oldid=1373406233)) | not stated |
+| Jewish exodus from the Muslim world (Q276172) | 1948-01-01 / 1972-01-01 | 2000 (century) / 1930 (decade) / 1970 (decade) | lead "from 1948 to the early 1970s" ([1380077539](https://en.wikipedia.org/w/index.php?title=Jewish_exodus_from_the_Muslim_world&oldid=1380077539)) | years only |
+| Khartoum Resolution (Q1740597) | 1967-08-29 / 1967-09-01 | none | lead "of 1 September 1967 ... issued at the conclusion of the 1967 Arab League summit" ([1379408937](https://en.wikipedia.org/w/index.php?title=Khartoum_Resolution&oldid=1379408937)) | the article's day is the stored end, not the start |
+| 1973 oil crisis (Q316817) | 1973-10-17 / 1974-03-18 | 1973 (year) / 1973-10-16 / 1974-03-17 | lead "In October 1973 ... In March 1974", no infobox ([1378160425](https://en.wikipedia.org/w/index.php?title=1973_oil_crisis&oldid=1378160425)) | months only |
+| Iranian Revolution (Q126065) | 1978-01-07 / 1979-02-11 | 1970 (decade) / 1978-01 (month) / 1979-02 (month) | infobox "7 January 1978 – 11 February 1979", but the lead says the demonstrations began in October 1977 ([1379794348](https://en.wikipedia.org/w/index.php?title=Iranian_Revolution&oldid=1379794348)) | lead and infobox give different starts |
+| Anfal campaign (Q529723) | 1986-02-23 / 1989-09-06 | 1988-09 (month) / 1986 (year) / 1989 (year) | infobox "February–September 1988"; lead "from February to September 1988" ([1377434227](https://en.wikipedia.org/w/index.php?title=Anfal_campaign&oldid=1377434227)) | months only, and another year |
+| Israeli disengagement from the Gaza Strip (Q196122) | 2005-08-15 / 2005-09-12 | 2005-08 (month) / - / - | lead "A deadline was issued for August 15, 2005, after which the IDF began evicting", no infobox ([1380235471](https://en.wikipedia.org/w/index.php?title=Israeli_disengagement_from_the_Gaza_Strip&oldid=1380235471)) | a deadline, not stated as the start |
+| Iranian Green Movement (Q2626387) | 2009-06-13 / 2010-02-11 | none | lead "arose after the 12 June 2009 Iranian presidential election and lasted until early 2010" ([1375717703](https://en.wikipedia.org/w/index.php?title=Iranian_Green_Movement&oldid=1375717703)) | start day not stated |
+| Egyptian Crisis (2011–2014) (Q577539) | 2012-06-30 / 2014-06-08 | - / 2011-01-25 / 2014-05 (month) | lead "began with the 2011 Egyptian revolution and ended with the presidency of Abdel Fattah el-Sisi in 2014" ([1374697190](https://en.wikipedia.org/w/index.php?title=Egyptian_Crisis_(2011%E2%80%932014)&oldid=1374697190)) | year only (2011, against the stored 2012) |

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isSeedEvent, proposeSeedFields, summarize } from "./seed-enrichment.js";
+import { applySeedFix, applySeedProposal, isSeedEvent, proposeSeedFields, summarize } from "./seed-enrichment.js";
 
 // A seed record as in data/events.json (no sitelinks, date_precision, part_of or resolved_qid).
 const seed = (over = {}) => ({
@@ -81,4 +81,52 @@ test("summarize: counts per field", () => {
   assert.equal(s.wikidata_description, 1);
   assert.deepEqual(s.review_reasons_added, { part_of: 1, qid_mismatch: 1 });
   assert.equal(s.with_notes, 1);
+});
+
+const partOfNote = 'part_of: Wikidata (P361) lists this event as part of "Cold War" (Q8683); it may overlap with that larger event';
+
+test("applySeedProposal: a date that agrees gets the missing fields, the notes once, and needs_review", () => {
+  const ev = seed({ needs_review: false });
+  const p = proposeSeedFields(ev, { entity: entity(), partOfQids: ["Q8683"], labels: { Q8683: "Cold War" }, lead: lead() });
+  assert.deepEqual(applySeedProposal(ev, p), ["date_precision", "part_of", "resolved_qid", "wikidata_description", "review_reasons", "needs_review"]);
+  assert.equal(ev.date_precision, "day");
+  assert.deepEqual(ev.review_reasons, [partOfNote]);
+  assert.equal(ev.needs_review, true);
+  // nothing else changed
+  assert.equal(ev.date_start, "1956-10-29");
+  assert.equal(ev.title, "Suez Crisis");
+  assert.deepEqual(applySeedProposal(ev, p), [], "a second run changes nothing");
+});
+
+test("applySeedProposal: a date that is no Wikidata value, or an item that could not be fetched, changes nothing", () => {
+  const ev = seed();
+  const before = JSON.stringify(ev);
+  const other = proposeSeedFields(ev, { entity: entity({ p580: [{ time: "1956-10-30", precision: 11 }] }), partOfQids: ["Q8683"], lead: lead() });
+  assert.deepEqual(applySeedProposal(ev, other), []);
+  assert.deepEqual(applySeedProposal(ev, proposeSeedFields(ev, { entity: null, lead: lead() })), []);
+  assert.equal(JSON.stringify(ev), before);
+});
+
+test("applySeedProposal: a recorded precision (F14) counts as agreeing", () => {
+  const ev = seed({ date_precision: "day" });
+  const p = proposeSeedFields(ev, { entity: entity({ p580: [] }), partOfQids: [], lead: lead() });
+  assert.deepEqual(applySeedProposal(ev, p), ["part_of", "resolved_qid", "wikidata_description"]);
+});
+
+test("applySeedFix: only the F13/F14 ledger entries, with their data_fix note", () => {
+  // F13 (Franco-Syrian War): date_start = Wikidata P580, confirmed by the article.
+  const war = seed({ id: "franco-syrian-war", wikidata_qid: "Q2992403", date_start: "1920-04-08", date_end: "1920-07-25" });
+  assert.deepEqual(applySeedFix(war), ["date_start"]);
+  assert.equal(war.date_start, "1920-03-08");
+  assert.equal(war.date_end, "1920-07-25");
+  assert.ok(war.review_reasons.some((r) => r.startsWith("data_fix F13:") && r.includes("oldid=1379975922")));
+  // F14 (Arab Revolt): the stored date stays; its day precision comes from the article.
+  const revolt = seed({ id: "arab-revolt", wikidata_qid: "Q239060", date_start: "1916-06-10" });
+  assert.deepEqual(applySeedFix(revolt), ["date_precision"]);
+  assert.equal(revolt.date_start, "1916-06-10");
+  assert.equal(revolt.date_precision, "day");
+  // An older entry (F7, October 7 attacks) is the pipeline's, not this script's.
+  const oct7 = seed({ wikidata_qid: "Q122976243", date_start: "2023-10-01" });
+  assert.deepEqual(applySeedFix(oct7), []);
+  assert.equal(oct7.date_start, "2023-10-01");
 });

@@ -480,9 +480,12 @@ node scripts/discover-events.js --predecessors-only     # only the predecessor-s
 node scripts/enrich-candidates.js [--reuse] [--limit=N] [--keep-existing]
                                                         # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
-node scripts/enrich-seed.js                             # -> data/seed-enrichment.proposed.json: date_precision, part_of,
+node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichment.proposed.json: date_precision, part_of,
                                                         #    resolved_qid, wikidata_description for the hand-picked seed
-                                                        #    events that lack them (a proposal; nothing applies it)
+                                                        #    events that lack them; --apply writes them into data/events.json
+                                                        #    only where the stored date is a Wikidata P585/P580 value or a
+                                                        #    verified F13/F14 entry (docs/data-fixes.md) settles it
+                                                        #    (run 2026-10-24: 83 of 102 applied, 19 left as they are)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
@@ -527,7 +530,7 @@ seed events are exempt) a discovery count below the rule's 10, a `sitelinks_curr
 P580 "+2000" at century precision, i.e. the 20th century, stored as 2000-01-01); an event tagged with 8 or more countries; and two events sharing a
 `wikipedia_url` or an identical extract, naming the other event (since 2026-10-24 also when all but one of them are events without an article of their own,
 whose `resolved_qid` differs, see above; the warning then says which one is the article's own event). Since 2026-10-24 also: a hand-picked seed event without
-`date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value), a year in the title outside `date_start`..`date_end`
+`date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value; 19 left after its 2026-10-24 `--apply`), a year in the title outside `date_start`..`date_end`
 (`title_years_outside_dates`), and a precise pin rounded to at most one decimal place (`coordinate_low_precision`); both are also pipeline flags, see
 "Review flags". Warnings are for a person to look at; nothing is changed automatically.
 
