@@ -1,19 +1,27 @@
 import { useEffect, useMemo, useRef } from "react";
 import { countryHighlightFeatures, featuresBbox } from "../lib/eventCountries";
 import { reducedMotion } from "../lib/reducedMotion";
-import { sheetStrip, stripOffset, toolbarInset } from "../lib/mapInsets";
+import { growPadding, keepPinInside, mapClearView } from "../lib/mapInsets";
 
 // Map layer that shades the listed countries of an event without a precise
 // location (lib/eventCountries.js decides which border shapes those are). The
 // shapes are the borders already loaded for the displayed year, passed through
 // untouched. Also fits the map to them when such an event is opened (a focus
 // with `fitCountries`), falling back to the event's pin, if any, when none of
-// its countries has a shape in that year.
+// its countries has a shape in that year. Either way the pin ends up in the
+// part of the map no control or panel covers.
 
 const SOURCE = "country-highlight";
 // Above the borders, below the search area, markers and country labels.
 const BEFORE_LAYER = "area-fill";
 const FIT_MAX_ZOOM = 6;
+// Air around the fitted countries, px.
+const FIT_PADDING = 40;
+// The clear part must leave at least this much, past FIT_PADDING, to fit into.
+const MIN_FIT_PX = 80;
+// How many zoom levels further out than a whole-map fit a fit into the clear
+// part may be before the whole map's zoom is used instead.
+const FIT_ZOOM_SLACK = 1;
 
 function addLayers(map) {
   map.addSource(SOURCE, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
@@ -71,27 +79,42 @@ export default function useCountryHighlight({ mapRef, mapReady, event, year, fea
     pendingRef.current = null;
     const map = mapRef.current;
     const bbox = featuresBbox(countryHighlightFeatures({ countries: p.countries }, year, features));
-    const duration = reducedMotion() ? 0 : undefined;
-    // On phones the event's sheet leaves only a strip of the map in sight
-    // (lib/mapInsets.js); the camera's target goes in the middle of that strip.
-    const box = map.getContainer();
-    const offset = stripOffset(box.clientHeight, sheetStrip(box), toolbarInset(box));
+    // Fit the countries into the part of the map that the controls (and, on
+    // phones, the sheet) leave in sight (lib/mapInsets.js), and always keep the
+    // event's pin there.
+    const { width, height, padding, offset } = mapClearView(map);
+    const pin = p.lon != null && p.lat != null ? [p.lon, p.lat] : null;
     // easeTo with no duration, not jumpTo, which has no `offset`.
-    const move = (opts) => (duration === 0 ? map.easeTo({ ...opts, offset, duration }) : map.flyTo({ ...opts, offset }));
+    const move = (opts) => (reducedMotion() ? map.easeTo({ ...opts, duration: 0 }) : map.flyTo(opts));
+    const toPin = (cam) => ({ ...cam, center: pin ? keepPinInside(pin, cam, width, height, padding) : cam.center });
     if (bbox) {
       const bounds = [
         [bbox[0], bbox[1]],
         [bbox[2], bbox[3]],
       ];
-      // The zoom that fits the countries in the whole map, centred on them.
-      // Under the sheet they are not fitted into the strip itself: a strip
-      // ~60 px tall fits a few countries only at a zoom out past the map's
-      // extent. Their middle shows in the strip, the rest above the sheet's edge.
-      const cam = offset[1] ? map.cameraForBounds(bounds, { padding: 40, maxZoom: FIT_MAX_ZOOM }) : null;
-      if (cam) move({ center: cam.center, zoom: cam.zoom });
-      else map.fitBounds(bounds, { padding: 40, maxZoom: FIT_MAX_ZOOM, ...(duration === 0 ? { duration } : {}) });
-    } else if (p.lon != null && p.lat != null) {
-      move({ center: [p.lon, p.lat], zoom: Math.max(map.getZoom(), 5) });
+      const asArray = (cam) => cam && { center: [cam.center.lng, cam.center.lat], zoom: cam.zoom };
+      // The zoom that fits the countries in the whole map.
+      const whole = asArray(map.cameraForBounds(bounds, { padding: FIT_PADDING, maxZoom: FIT_MAX_ZOOM }));
+      // Fitted into the clear part instead, unless that part is too small for
+      // it (a phone's strip above the sheet, ~60-120 px tall, fits a few
+      // countries only at a zoom out past the map's extent): then their middle
+      // goes in the middle of the clear part at the whole map's zoom, the rest
+      // reaching under the sheet.
+      const clearW = width - padding.left - padding.right - 2 * FIT_PADDING;
+      const clearH = height - padding.top - padding.bottom - 2 * FIT_PADDING;
+      const fit =
+        clearW >= MIN_FIT_PX && clearH >= MIN_FIT_PX
+          ? asArray(map.cameraForBounds(bounds, { padding: growPadding(padding, FIT_PADDING), maxZoom: FIT_MAX_ZOOM }))
+          : null;
+      if (fit && (!whole || fit.zoom >= whole.zoom - FIT_ZOOM_SLACK)) {
+        move(toPin({ ...fit, offset: [0, 0] }));
+        return;
+      }
+      if (whole) {
+        move(toPin({ ...whole, offset }));
+        return;
+      }
     }
+    if (pin) move({ center: pin, zoom: Math.max(map.getZoom(), 5), offset });
   }, [mapRef, mapReady, focus, year, features]);
 }

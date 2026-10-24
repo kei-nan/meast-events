@@ -10,6 +10,7 @@ const fakeReactUrl = new URL("../lib/testing/fakeReact.mjs", import.meta.url).hr
 register("../lib/testing/viteNodeHooks.mjs", import.meta.url, { data: { aliases: { react: fakeReactUrl } } });
 const { renderHook } = await import(fakeReactUrl);
 const { default: useCountryHighlight } = await import("./countryHighlight.js");
+const { PIN_MARGIN_PX, screenPoint } = await import("../lib/mapInsets.js");
 
 const sq = (x) => ({ type: "Polygon", coordinates: [[[x, 30], [x + 4, 30], [x + 4, 34], [x, 34], [x, 30]]] });
 const shape = (name, x, start = 1900, end = 9999) => ({
@@ -18,8 +19,8 @@ const shape = (name, x, start = 1900, end = 9999) => ({
   geometry: sq(x),
 });
 
-function fakeMap({ hasAreaLayer = true } = {}) {
-  const log = { layers: [], setData: [], fitBounds: [], flyTo: [], easeTo: [] };
+function fakeMap({ hasAreaLayer = true, canvasHeight } = {}) {
+  const log = { layers: [], setData: [], fitBounds: [], flyTo: [], easeTo: [], cameraForBounds: [], calls: [] };
   let source = null;
   const map = {
     log,
@@ -29,11 +30,19 @@ function fakeMap({ hasAreaLayer = true } = {}) {
       source = { setData: (d) => log.setData.push(d) };
     },
     addLayer: (layer, before) => log.layers.push([layer.id, before]),
-    getContainer: () => ({ clientHeight: 600, closest: () => null }),
+    getContainer: () => ({ clientWidth: 800, clientHeight: 600, closest: () => null }),
     getZoom: () => 3,
-    cameraForBounds: () => null,
+    // The bounds' middle at zoom 4.
+    cameraForBounds: (b, o) => {
+      log.cameraForBounds.push([b, o]);
+      return { center: { lng: (b[0][0] + b[1][0]) / 2, lat: (b[0][1] + b[1][1]) / 2 }, zoom: 4 };
+    },
     fitBounds: (b, o) => log.fitBounds.push([b, o]),
-    flyTo: (o) => log.flyTo.push(o),
+    flyTo: (o) => {
+      log.calls.push("flyTo");
+      log.flyTo.push(o);
+    },
+    ...(canvasHeight ? { getCanvas: () => ({ clientWidth: 800, clientHeight: canvasHeight }), resize: () => log.calls.push("resize") } : {}),
     easeTo: (o) => log.easeTo.push(o),
   };
   return map;
@@ -84,17 +93,45 @@ test("a fitCountries focus waits for the borders, then fits them once", () => {
   const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, nonce: 1 };
   const props = { mapRef, mapReady: true, event: EVENT, year: 2003, features: null, focus };
   const h = renderHook(useCountryHighlight, props);
-  assert.equal(map.log.fitBounds.length, 0);
+  assert.equal(map.log.flyTo.length, 0);
   h.rerender({ ...props, features: FEATURES });
-  assert.equal(map.log.fitBounds.length, 1);
-  const [bounds, opts] = map.log.fitBounds[0];
+  assert.equal(map.log.flyTo.length, 1);
+  const [bounds, opts] = map.log.cameraForBounds.at(-1);
   assert.deepEqual(bounds, [
     [40, 30],
     [51, 34],
   ]);
   assert.equal(opts.maxZoom, 6);
+  // Nothing over the map here (no page): fitted into all of it.
+  assert.deepEqual(opts.padding, { top: 40, right: 40, bottom: 40, left: 40 });
+  assert.deepEqual(map.log.flyTo[0], { center: [45.5, 32], zoom: 4, offset: [0, 0] });
   h.rerender({ ...props, features: FEATURES, year: 2004 });
-  assert.equal(map.log.fitBounds.length, 1);
+  assert.equal(map.log.flyTo.length, 1);
+});
+
+test("a pin outside the fitted countries is kept in sight", () => {
+  const map = fakeMap();
+  // Far to the west of Iraq and Kuwait: at zoom 4 (~23 px a degree) 20
+  // degrees off the middle would be off the 800 px map.
+  const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, lon: 25, lat: 32, nonce: 5 };
+  renderHook(useCountryHighlight, { mapRef: { current: map }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  const [move] = map.log.flyTo;
+  assert.equal(move.zoom, 4);
+  const [x, y] = screenPoint([25, 32], move, 800, 600);
+  assert.ok(x >= PIN_MARGIN_PX && x <= 800 - PIN_MARGIN_PX, `x ${x}`);
+  assert.ok(y >= PIN_MARGIN_PX && y <= 600 - PIN_MARGIN_PX, `y ${y}`);
+});
+
+test("a map behind its container's size is resized before the camera is aimed", () => {
+  // The phone timeline grows as the sheet drops to its peek bar ("Show on map"):
+  // the container is already 600 px tall, MapLibre still has 646.
+  const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, lon: 44.4, lat: 33.3, nonce: 6 };
+  const stale = fakeMap({ canvasHeight: 646 });
+  renderHook(useCountryHighlight, { mapRef: { current: stale }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  assert.deepEqual(stale.log.calls, ["resize", "flyTo"]);
+  const inStep = fakeMap({ canvasHeight: 600 });
+  renderHook(useCountryHighlight, { mapRef: { current: inStep }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus: { ...focus, nonce: 7 } });
+  assert.deepEqual(inStep.log.calls, ["flyTo"]);
 });
 
 test("no shape in that year: flies to the event's pin, or does nothing without one", () => {
