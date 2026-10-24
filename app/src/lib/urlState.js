@@ -201,6 +201,15 @@ export function urlWriteMode(prevUrl, nextUrl, { replace = false, backUrl = null
   return "push";
 }
 
+// An area that survives its own link: what parseArea reads back from
+// areaToParam. The URL keeps 4 decimals, so a rectangle thinner than that (a
+// sideways-only drag) or a circle of a few metres would be dropped on share or
+// reload; the map does not commit such a shape (MapView).
+export function areaRoundTrips(area) {
+  const param = areaToParam(area);
+  return param != null && parseArea(param) != null;
+}
+
 // Before a push (an event opened/closed, About toggled): the URL the CURRENT
 // entry should have first. A non-event change made just before (typing, a
 // filter, the years) is still waiting for its debounced replace, which the push

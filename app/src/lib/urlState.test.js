@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  areaRoundTrips,
   areaToParam,
   canonicalPath,
   entryBeforePush,
@@ -184,6 +185,16 @@ test("urlWriteMode: closing in the app goes back to the entry it was opened from
   // Debounced changes and replaces are not affected.
   assert.equal(urlWriteMode("/event/a", "/event/a?q=x", { backUrl: "/event/a" }), "debounce");
   assert.equal(urlWriteMode("/event/bogus", "/", { replace: true, backUrl: "/" }), "replace");
+});
+
+test("areaRoundTrips: a shape its link would drop does not round trip", () => {
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [30, 31, 40, 32] }), true);
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [30, 31.5, 40, 31.5] }), false); // zero height
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [30, 31.50001, 40, 31.50002] }), false); // under 4 decimals
+  assert.equal(areaRoundTrips({ type: "circle", center: [35, 31], radiusKm: 5 }), true);
+  assert.equal(areaRoundTrips({ type: "circle", center: [35, 31], radiusKm: 0.00004 }), false);
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [170, 31, 190, 32] }), false); // off the map
+  assert.equal(areaRoundTrips(null), false);
 });
 
 test("entryBeforePush: carries a pending non-event change onto the current entry", () => {

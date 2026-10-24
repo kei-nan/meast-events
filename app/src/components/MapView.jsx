@@ -34,6 +34,7 @@ import { LIST_MAX, allSameCoordinates, clusterClickAction, eventsBounds, stackIt
 import useCountryHighlight from "./countryHighlight";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels";
+import { areaRoundTrips } from "../lib/urlState";
 import {
   decadeFloor,
   loadBoundaryDecade,
@@ -1032,6 +1033,10 @@ export default function MapView({
       setTimeout(() => (suppressClickRef.current = false), 60);
       const p = propsRef.current;
       const isDraw = d.kind === "rect" || d.kind === "circle";
+      // A shape its own link would drop (a sideways-only rectangle, a circle of a
+      // few metres: lib/urlState.js areaRoundTrips) is not committed; a draw
+      // stays armed for another try, an edit snaps back.
+      if (commit && d.moved && d.current && !areaRoundTrips(d.current)) commit = false;
       if (commit && d.moved && d.current) {
         p.onAreaChange?.(d.current);
         if (isDraw) p.onAreaModeChange?.("off");
