@@ -516,6 +516,14 @@ export default function App() {
     },
     [storeRef, playState]
   );
+  // The phone's "Show on map": the camera aimed the event at the strip above the
+  // open sheet, so as the sheet drops to its peek bar it is aimed again, at the
+  // map now in sight (lib/mapInsets.js).
+  const handleRefocus = useCallback(() => {
+    const ev = selectedEventId && storeRef.current.get(selectedEventId);
+    const f = ev && focusFor(ev, focusNonceRef);
+    if (f) setFocus(f);
+  }, [storeRef, selectedEventId]);
 
   // The tab title names the open event (and is restored when it closes), as the
   // event's page has it (scripts/event-page.mjs eventPageTitle).
@@ -625,6 +633,7 @@ export default function App() {
             onSelect={handleSelectFromList}
             onHover={setHoverId}
             onBack={handleBack}
+            onRefocus={handleRefocus}
             sort={sort}
             onSortChange={setSort}
             view={view}

@@ -23,15 +23,15 @@ import "../SidePanel.css";
 // so it speaks the result once instead of after every key.
 const ANNOUNCE_DELAY_MS = 700;
 
-// The browse-list sort switch: each key's label and how its directions read aloud.
-const SORT_KEYS = [
-  {
-    key: "coverage",
-    label: "Coverage",
-    dirs: { desc: "most covered first", asc: "least covered first" },
-    title: "By the number of Wikimedia pages about the event (Wikipedia language versions and other projects, as counted by Wikidata)",
-  },
-  { key: "date", label: "Date", dirs: { asc: "oldest first", desc: "newest first" }, title: "By start date" },
+// The browse-list sort menu: one entry per lib/browseOrder.js SORTS value, each
+// naming its direction, so reversing is a choice in sight, not a second press.
+const COVERAGE_TITLE =
+  "By the number of Wikimedia pages about the event (Wikipedia language versions and other projects, as counted by Wikidata)";
+const SORT_OPTIONS = [
+  { value: "coverage", label: "Most covered", title: COVERAGE_TITLE },
+  { value: "coverage-asc", label: "Least covered", title: COVERAGE_TITLE },
+  { value: "date", label: "Oldest first", title: "By start date" },
+  { value: "date-desc", label: "Newest first", title: "By start date" },
 ];
 
 // The results view switch (ResultsList layout).
@@ -82,6 +82,7 @@ const VIEWS = [
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
+ * @param {()=>void}               [props.onRefocus] aim the map at the open event again (phone "Show on map")
  * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
  * @param {(s:string)=>void}       [props.onSortChange]
  * @param {"list"|"timeline"}      [props.view]   how results are shown: the list, or oldest first with
@@ -117,6 +118,7 @@ export default function SearchPanel({
   onSelect,
   onHover,
   onBack,
+  onRefocus,
   sort = "coverage",
   onSortChange,
   view = "list",
@@ -166,6 +168,7 @@ export default function SearchPanel({
   // The text being searched for (highlighted in the rows), "" while it is no search.
   const textQuery = query.trim().length >= MIN_QUERY_LENGTH ? query.trim() : "";
   const { key: sortKey, dir: sortDir } = parseSort(sort);
+  const sortNow = sortValue(sortKey, sortDir); // normalised: an unknown value is the default sort
 
   // The panel scrolls as one (.sp-scroll): an opened event starts at its top,
   // not at the list's (or the previous event's) scroll position, and Back
@@ -210,10 +213,14 @@ export default function SearchPanel({
     [selectedId, sheetOpen, setSheet]
   );
 
-  // Mobile: collapse the sheet to its peek bar so the map (already centred on
-  // the event) shows; focus moves to the toggle, which reopens the event.
+  // Mobile: collapse the sheet to its peek bar so the map shows, and aim the
+  // map at the event again: it was aimed at the strip above the open sheet,
+  // which is now near the top, under the toolbar. Both updates land in one
+  // render, so the camera move reads the sheet at its peek bar. Focus moves to
+  // the toggle, which reopens the event.
   function showOnMap() {
     setSheet("peek");
+    onRefocus?.();
     toggleRef.current?.focus();
   }
 
@@ -477,108 +484,47 @@ export default function SearchPanel({
             )}
           </div>
 
-          <div className="sp-toolbar">
-            <button
-              ref={filtersBtnRef}
-              type="button"
-              className="sp-filters-toggle"
-              aria-expanded={filtersOpen}
-              aria-controls={filtersId}
-              onClick={() => setFiltersOpen(!filtersOpen)}
-            >
-              <span className="sp-caret" aria-hidden="true" />
-              Filters{activeCount > 0 ? ` (${activeCount})` : ""}
-            </button>
-            <div className="sp-statusline">
-              <p className="sp-status">
-                {statusText}
-                {statusExtra && <span className="sp-sr">{statusExtra}</span>}
-              </p>
-              {/* One button in a fixed place whose text flips between the two
-                  scopes, so keyboard focus stays on it after pressing it. */}
-              {scopeAction && (
-                <button
-                  type="button"
-                  className="sp-scope-link"
-                  aria-label={scopeAction.aria ?? undefined}
-                  onClick={() => onFiltersChange({ ...filters, scope: scopeAction.scope })}
-                >
-                  {scopeAction.label}
-                </button>
-              )}
-              {/* List or Timeline, for the browse list and search results alike. First,
-                  so it stays in place when Sort hides. */}
-              {!eventsLoading && !eventsError && onViewChange && (
-                <div className="sp-sort sp-view" role="group" aria-label="Show results as">
-                  {VIEWS.map(({ key, label, title }) => (
-                    <button
-                      key={key}
-                      type="button"
-                      className="sp-sort-btn"
-                      aria-pressed={view === key}
-                      title={title}
-                      onClick={() => onViewChange(key)}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {/* Order of the browse list (no search or filters): search results keep their
-                  relevance order, and the Timeline is always oldest first. */}
-              {!searching && view !== "timeline" && !eventsLoading && !eventsError && onSortChange && (
-                <div className="sp-sort" role="group" aria-label="Sort events">
-                  <span className="sp-sort-label" aria-hidden="true">
-                    Sort
-                  </span>
-                  {SORT_KEYS.map(({ key, label, dirs, title }) => {
-                    const active = sortKey === key;
-                    // The active sort shows its direction; pressing it again reverses it.
-                    const dir = active ? sortDir : null;
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        className="sp-sort-btn"
-                        aria-pressed={active}
-                        aria-label={active ? `${label}, ${dirs[dir]}` : label}
-                        title={active ? `${title}. Press again to reverse.` : title}
-                        onClick={() => onSortChange(active ? sortValue(key, dir === "asc" ? "desc" : "asc") : key)}
-                      >
-                        {label}
-                        {dir && (
-                          <span className="sp-sort-dir" aria-hidden="true">
-                            {dir === "asc" ? "↑" : "↓"}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-              {/* Last on the line and always the same width ("Download"; the count is
-                  in its name), shown with List | Timeline, so nothing moves when the
-                  results change: disabled while there is nothing settled to save. */}
-              {showDownload && (
-                <button
-                  ref={downloadBtnRef}
-                  type="button"
-                  className="sp-download-toggle"
-                  aria-expanded={downloadOpen}
-                  aria-controls={downloadId}
-                  aria-label={canDownload ? downloadLabel : "Download (no results to save)"}
-                  title={canDownload ? `${downloadLabel} as CSV or JSON` : undefined}
-                  disabled={!canDownload}
-                  onClick={() => setDownloadOpen(!downloadOpen)}
-                >
-                  <span className="sp-caret" aria-hidden="true" />
-                  Download
-                </button>
-              )}
-            </div>
+          {/* Line 1: what is listed (and the scope button), and Download, which
+              saves exactly that. */}
+          <div className="sp-statusline">
+            <p className="sp-status">
+              {statusText}
+              {statusExtra && <span className="sp-sr">{statusExtra}</span>}
+            </p>
+            {/* One button in a fixed place whose text flips between the two
+                scopes, so keyboard focus stays on it after pressing it. */}
+            {scopeAction && (
+              <button
+                type="button"
+                className="sp-scope-link"
+                aria-label={scopeAction.aria ?? undefined}
+                onClick={() => onFiltersChange({ ...filters, scope: scopeAction.scope })}
+              >
+                {scopeAction.label}
+              </button>
+            )}
+            {/* At the line's end and always the same width ("Download"; the count is
+                in its name), so nothing moves when the results change: disabled
+                while there is nothing settled to save. */}
+            {showDownload && (
+              <button
+                ref={downloadBtnRef}
+                type="button"
+                className="sp-download-toggle"
+                aria-expanded={downloadOpen}
+                aria-controls={downloadId}
+                aria-label={canDownload ? downloadLabel : "Download (no results to save)"}
+                title={canDownload ? `${downloadLabel} as CSV or JSON` : undefined}
+                disabled={!canDownload}
+                onClick={() => setDownloadOpen(!downloadOpen)}
+              >
+                <span className="sp-caret" aria-hidden="true" />
+                Download
+              </button>
+            )}
           </div>
 
-          {/* The download choices, under the toolbar like the Filters disclosure. */}
+          {/* The download choices, right under their button. */}
           {showDownload && (
             <div
               id={downloadId}
@@ -610,6 +556,57 @@ export default function SearchPanel({
               </p>
             </div>
           )}
+
+          {/* Line 2: how the results are shown. */}
+          <div className="sp-toolbar">
+            <button
+              ref={filtersBtnRef}
+              type="button"
+              className="sp-filters-toggle"
+              aria-expanded={filtersOpen}
+              aria-controls={filtersId}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              <span className="sp-caret" aria-hidden="true" />
+              Filters{activeCount > 0 ? ` (${activeCount})` : ""}
+            </button>
+            {/* List or Timeline, for the browse list and search results alike. Before
+                Sort, so it stays in place when Sort hides. */}
+            {!eventsLoading && !eventsError && onViewChange && (
+              <div className="sp-sort sp-view" role="group" aria-label="Show results as">
+                {VIEWS.map(({ key, label, title }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className="sp-sort-btn"
+                    aria-pressed={view === key}
+                    title={title}
+                    onClick={() => onViewChange(key)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {/* Order of the browse list (no search or filters): search results keep their
+                relevance order, and the Timeline is always oldest first. */}
+            {!searching && view !== "timeline" && !eventsLoading && !eventsError && onSortChange && (
+              <label className="sp-select sp-sortselect">
+                <span className="sp-sr">Sort events</span>
+                <select
+                  value={sortNow}
+                  title={SORT_OPTIONS.find((o) => o.value === sortNow)?.title}
+                  onChange={(e) => onSortChange(e.target.value)}
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
 
           {!filtersOpen && (activeCount > 0 || areaMode !== "off") && (
             <div className="sp-active" aria-label="Active filters" role="group">
