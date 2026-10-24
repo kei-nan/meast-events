@@ -1,10 +1,24 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { clampSheet, sheetDetents, snapSheet, stepSheet } from "../lib/sheetSnap.js";
 
 // Below this much movement a press on the bar is a tap (it toggles), not a drag.
 const DRAG_START_PX = 6;
-// The peek bar's height before it has been measured.
-const PEEK_FALLBACK_PX = 120;
+// A finger held still this long before it lets go has stopped: no flick.
+export const FLICK_IDLE_MS = 100;
+// Space under the search box at peek (SidePanel.css, .side-panel[data-sheet="peek"] .sp-scroll).
+const PEEK_PAD_PX = 10; // keep in sync with SidePanel.css
+
+/**
+ * The sheet's height at peek: its top border, the bar and, without an event
+ * open, the search input (its label hides at peek), plus the space under it.
+ * Measured from those parts, so it is right before the sheet has ever been at
+ * peek (a link that opens an event at full height).
+ */
+function peekHeight(el) {
+  const bar = el.querySelector(".sp-sheet-toggle")?.offsetHeight ?? 0;
+  const input = el.querySelector(".sp-inputwrap")?.offsetHeight ?? 0; // 0 while hidden
+  return el.clientTop + bar + input + PEEK_PAD_PX;
+}
 
 /**
  * The phone results sheet's position: "peek" (the bar and search box), "half"
@@ -23,18 +37,11 @@ export default function useSheetDrag(initial, sheetRef) {
   const [sheet, setSheet] = useState(initial);
   const [dragHeight, setDragHeight] = useState(null);
   const dragRef = useRef(null); // {y, h, last, lastT, v, moved}
-  const peekRef = useRef(PEEK_FALLBACK_PX);
   const swallowClickRef = useRef(false);
 
-  // The peek height is whatever the bar and search box take; measured whenever it shows.
-  useLayoutEffect(() => {
-    const el = sheetRef.current;
-    if (sheet === "peek" && dragHeight === null && el?.offsetHeight) peekRef.current = el.offsetHeight;
-  });
-
   const detents = () => {
-    const area = sheetRef.current?.parentElement?.clientHeight ?? 0;
-    return sheetDetents(area, peekRef.current);
+    const el = sheetRef.current;
+    return sheetDetents(el?.parentElement?.clientHeight ?? 0, el ? peekHeight(el) : 0);
   };
 
   function onPointerDown(e) {
@@ -66,12 +73,15 @@ export default function useSheetDrag(initial, sheetRef) {
     setDragHeight(h);
   }
 
-  function endDrag() {
+  function endDrag(e) {
     const d = dragRef.current;
     dragRef.current = null;
     if (!d?.moved) return;
     swallowClickRef.current = true; // the click that follows a drag is not a tap
-    setSheet(snapSheet(d.last, d.v, d.ds));
+    // The velocity is that of the last moves: after a pause it is stale, and
+    // a fast drag that stopped before letting go rests at the nearest height.
+    const v = e.timeStamp - d.lastT > FLICK_IDLE_MS ? 0 : d.v;
+    setSheet(snapSheet(d.last, v, d.ds));
     setDragHeight(null);
   }
 

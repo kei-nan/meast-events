@@ -1446,6 +1446,7 @@ button.sp-chip[aria-pressed="true"] {
     top: 0;
   }
 
+  /* The 10px is part of the peek height (hooks/useSheetDrag.js PEEK_PAD_PX). */
   .side-panel[data-sheet="peek"] .sp-scroll {
     overflow: visible;
     padding-bottom: 10px;
