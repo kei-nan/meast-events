@@ -53,14 +53,23 @@ revision was saved (UTC, as the API gives it, e.g. `2026-10-15T19:38:37Z`). Both
 (`prop=extracts|pageprops|info|revisions&rvprop=ids|timestamp`: MediaWiki's `lastrevid` and its latest revision's timestamp, used only when the two
 name the same revision). They let a citation link that exact version, `https://en.wikipedia.org/w/index.php?title=<title>&oldid=<revid>`, under
 that version's date, as APA, MLA and Chicago ask when citing Wikipedia (the citation rules and their sources are in `app/src/lib/citation.js`).
-The two are present together or not at all (`validate-events.js` checks it). They are set in two ways only, and are otherwise **absent**, never guessed:
+The two are present together or not at all (`validate-events.js` checks it). They are set in three ways only, and are otherwise **absent**, never guessed:
 
 - `scripts/refresh-extracts.js --apply` writes them together with every lead it writes (the revision that lead was read from); an event that
   shows another event's article (see "Events without an article of their own") takes that event's revision and date with its text.
 - `node scripts/backfill-revids.js --apply` (run on 2026-10-24, re-runnable) fetched every event's current lead, revision and revision date and
   stored them **only where the current lead equals the stored `extract` exactly**. Where the text had changed on Wikipedia since it was retrieved,
-  they stay absent: we cannot say which revision the stored text came from. It changes nothing else in any event. The revision can be newer
+  this mode leaves them absent (see the next point). It changes nothing else in any event. The revision can be newer
   than `extract_retrieved_at` (an edit outside the lead); its lead is still exactly the stored text.
+- `node scripts/backfill-revids.js --historical --apply` (run on 2026-10-24, re-runnable) does the same for events whose lead has changed since
+  retrieval, with an older revision: it walks the article's revisions back from the current one (`prop=revisions`, 50 per request, section 0
+  only), parses the revisions nearest `extract_retrieved_at` first (`action=parse&oldid=<revid>&section=0`), turns that HTML into plain text the
+  way TextExtracts does (`scripts/lib/rev-lead.js`: lead only; the same elements removed; tags dropped; entities decoded) and applies the same
+  whitespace normalisation, and stores a revision **only when that lead equals the stored `extract` exactly**: the revision current on the
+  retrieval day if it matches, else the matching revision nearest that day. TextExtracts serves only current revisions, so the conversion is
+  checked rather than assumed: for each article it must reproduce the current TextExtracts lead exactly from the current revision, or the event
+  is left without a revision. Old revisions are parsed with today's templates; a lead whose templates have changed their output since simply
+  does not match and stays without a revision.
 
 Without them, a citation gives the article's URL and the retrieval date (`extract_retrieved_at`), and the site says the text may have changed since.
 

@@ -507,6 +507,8 @@
     "coordinate_source": "wikidata",
     "needs_manual_coordinates": false,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1369160266,
+    "wikipedia_revid_timestamp": "2026-08-13T06:59:19Z",
     "wikidata_classes": [
       "armistice"
     ],
@@ -694,6 +696,8 @@
     "coordinate_source": "country-fallback:Turkey",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-10-01",
+    "wikipedia_revid": 1377647906,
+    "wikipedia_revid_timestamp": "2026-09-30T09:44:09Z",
     "wikidata_classes": [
       "war of national liberation",
       "war of independence",
@@ -939,6 +943,8 @@
     "coordinate_source": "country-fallback:Saudi Arabia",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-10-01",
+    "wikipedia_revid": 1377335671,
+    "wikipedia_revid_timestamp": "2026-09-29T00:09:16Z",
     "wikidata_classes": [
       "conflict"
     ],
@@ -1161,6 +1167,8 @@
     "coordinate_source": "country-fallback:Syria",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1378462737,
+    "wikipedia_revid_timestamp": "2026-10-04T16:48:17Z",
     "wikidata_classes": [
       "military operation"
     ],
@@ -1232,6 +1240,8 @@
     "coordinate_source": "country-fallback:Israel/Palestine",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1374818440,
+    "wikipedia_revid_timestamp": "2026-09-14T06:53:32Z",
     "wikidata_classes": [
       "United Nations General Assembly resolution"
     ],
@@ -1498,6 +1508,8 @@
     "coordinate_source": "country-fallback:Egypt",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1374209538,
+    "wikipedia_revid_timestamp": "2026-09-10T14:46:10Z",
     "wikidata_classes": [
       "revolution"
     ],
@@ -1543,6 +1555,8 @@
     "coordinate_source": "country-fallback:Iran",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1378458295,
+    "wikipedia_revid_timestamp": "2026-10-04T16:24:41Z",
     "wikidata_classes": [
       "coup d'état"
     ],
@@ -1607,6 +1621,8 @@
     "coordinate_source": "country-fallback:Egypt",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1374851403,
+    "wikipedia_revid_timestamp": "2026-09-14T12:31:20Z",
     "wikidata_classes": [
       "military expedition",
       "offensive"
@@ -1800,6 +1816,8 @@
     "coordinate_source": "country-fallback:Israel/Palestine",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1375500255,
+    "wikipedia_revid_timestamp": "2026-09-18T04:09:39Z",
     "wikidata_classes": [
       "war"
     ],
@@ -2397,6 +2415,8 @@
     "coordinate_source": "wikipedia",
     "needs_manual_coordinates": false,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1371504293,
+    "wikipedia_revid_timestamp": "2026-08-26T21:17:30Z",
     "wikidata_classes": [
       "hostage taking",
       "international crisis"
@@ -2591,6 +2611,8 @@
     "coordinate_source": "wikipedia",
     "needs_manual_coordinates": false,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376811260,
+    "wikipedia_revid_timestamp": "2026-09-26T10:17:17Z",
     "wikidata_classes": [
       "suicide attack",
       "suicide car bombing",
@@ -3586,6 +3608,8 @@
     "coordinate_source": "country-fallback:Yemen",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376086193,
+    "wikipedia_revid_timestamp": "2026-09-22T00:11:58Z",
     "wikidata_classes": [
       "rebellion",
       "protest"
@@ -3658,6 +3682,8 @@
     "coordinate_source": "country-fallback:Yemen",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376796546,
+    "wikipedia_revid_timestamp": "2026-09-26T07:21:35Z",
     "wikidata_classes": [
       "civil war",
       "war"
@@ -4066,6 +4092,8 @@
     "coordinate_source": "country-fallback:Israel/Palestine",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376864831,
+    "wikipedia_revid_timestamp": "2026-09-26T17:49:41Z",
     "wikidata_classes": [
       "contract"
     ],
@@ -4292,6 +4320,8 @@
     "coordinate_source": "country-fallback:Israel/Palestine",
     "needs_manual_coordinates": true,
     "extract_retrieved_at": "2026-10-01",
+    "wikipedia_revid": 1377864011,
+    "wikipedia_revid_timestamp": "2026-10-01T16:20:05Z",
     "wikidata_classes": [
       "war"
     ],
@@ -4606,6 +4636,8 @@
     "needs_review": true,
     "wikidata_description": "1912 naval battle of the Italo-Turkish War",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1370446451,
+    "wikipedia_revid_timestamp": "2026-08-21T04:12:31Z",
     "sitelinks_current": 10
   },
   {
@@ -8212,6 +8244,8 @@
     "needs_review": true,
     "wikidata_description": "1973 battle between Israel in the PLO in Lebanon",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376633653,
+    "wikipedia_revid_timestamp": "2026-09-25T09:28:41Z",
     "sitelinks_current": 16,
     "wikidata_aliases": [
       "Operation Spring of Youth",
@@ -8607,6 +8641,8 @@
     "needs_review": true,
     "wikidata_description": "massacre",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1356232011,
+    "wikipedia_revid_timestamp": "2026-05-26T14:03:42Z",
     "sitelinks_current": 21
   },
   {
@@ -11647,6 +11683,8 @@
     "needs_review": true,
     "wikidata_description": "2011 siege",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1373437725,
+    "wikipedia_revid_timestamp": "2026-09-06T00:22:13Z",
     "sitelinks_current": 10
   },
   {
@@ -12344,6 +12382,8 @@
     "needs_review": false,
     "wikidata_description": "Massacre by the Islamic State of Iraq and the Levant during the occupation of Tikrit",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1374125875,
+    "wikipedia_revid_timestamp": "2026-09-10T00:42:35Z",
     "sitelinks_current": 18
   },
   {
@@ -13912,6 +13952,8 @@
     "needs_review": false,
     "wikidata_description": "terrorist mass shooting that occurred at a nightclub in the Beşiktaş district of Istanbul, Turkey, on 1 January 2017",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1375713766,
+    "wikipedia_revid_timestamp": "2026-09-19T15:23:51Z",
     "sitelinks_current": 53
   },
   {
@@ -14869,6 +14911,8 @@
     "needs_review": true,
     "wikidata_description": "terrorist attack and massacre in southern Israel on October 7, 2023 carried out by the Islamic Fundamentalist Terrorist Group Hamas",
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379171419,
+    "wikipedia_revid_timestamp": "2026-10-08T09:55:17Z",
     "sitelinks_current": 59,
     "wikidata_aliases": [
       "October 7 Hamas-led attack on Israel",
@@ -15772,6 +15816,8 @@
     "needs_review": true,
     "wikidata_description": "death of a five-year old Palestinian girl by Israeli Army gunfire during the Israel-Gaza war",
     "extract_retrieved_at": "2026-10-01",
+    "wikipedia_revid": 1377272835,
+    "wikipedia_revid_timestamp": "2026-09-28T17:02:36Z",
     "sitelinks_current": 30
   },
   {
@@ -15887,6 +15933,8 @@
     "needs_review": true,
     "wikidata_description": "2024 Israeli attack in Syria",
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376132923,
+    "wikipedia_revid_timestamp": "2026-09-22T06:46:56Z",
     "sitelinks_current": 26
   },
   {
@@ -16972,6 +17020,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379529706,
+    "wikipedia_revid_timestamp": "2026-10-10T14:37:01Z",
     "date_flags": [
       "date_source_adjusted: Wikidata P585 1918-11-11 equals the item's end time (P582); used P580 start time 1914-07-28"
     ],
@@ -17881,6 +17931,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1370602081,
+    "wikipedia_revid_timestamp": "2026-08-22T01:56:58Z",
     "wikidata_description": "1921 battle",
     "sitelinks_current": 17
   },
@@ -17990,6 +18042,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1370439473,
+    "wikipedia_revid_timestamp": "2026-08-21T03:27:36Z",
     "wikidata_description": "1922 battle during the Greco-Turkish War",
     "sitelinks_current": 16
   },
@@ -18351,6 +18405,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1378826390,
+    "wikipedia_revid_timestamp": "2026-10-06T09:47:02Z",
     "wikidata_description": "Kurdish and Zaza uprising against the Turkish government in Dersim, eastern Turkey",
     "sitelinks_current": 30,
     "wikidata_aliases": [
@@ -18443,6 +18499,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379498269,
+    "wikipedia_revid_timestamp": "2026-10-10T10:04:34Z",
     "wikidata_description": "1939–1945 global conflict",
     "sitelinks_current": 291,
     "wikidata_aliases": [
@@ -19178,6 +19236,8 @@
     "review_reasons": [],
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1364402941,
+    "wikipedia_revid_timestamp": "2026-07-16T08:37:50Z",
     "wikidata_description": "1963–1979 reforms by the Shah of Iran",
     "sitelinks_current": 39
   },
@@ -19399,6 +19459,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1378902696,
+    "wikipedia_revid_timestamp": "2026-10-06T20:48:54Z",
     "wikidata_description": "1968–1982 conflict initiated by Palestinian militants against Israel and Christian Lebanese factions in Lebanon",
     "sitelinks_current": 10,
     "wikidata_aliases": [
@@ -20661,6 +20723,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1375930078,
+    "wikipedia_revid_timestamp": "2026-09-20T23:31:51Z",
     "wikidata_description": "1988 United States naval offensive against Iran during the Iran-Iraq War",
     "sitelinks_current": 19
   },
@@ -20904,6 +20968,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1374935025,
+    "wikipedia_revid_timestamp": "2026-09-14T22:57:31Z",
     "wikidata_description": "1991 Western protection to Iraqi Kurds",
     "sitelinks_current": 11
   },
@@ -20984,6 +21050,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1370630524,
+    "wikipedia_revid_timestamp": "2026-08-22T04:55:36Z",
     "wikidata_description": "fought between Israel and Hezbollah from July 25 to July 31, 1993",
     "sitelinks_current": 14
   },
@@ -21292,6 +21360,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-03",
+    "wikipedia_revid": 1378226477,
+    "wikipedia_revid_timestamp": "2026-10-03T15:50:12Z",
     "wikidata_description": "2003–2011 war after an American-led invasion",
     "sitelinks_current": 110,
     "wikidata_aliases": [
@@ -21677,6 +21747,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376407991,
+    "wikipedia_revid_timestamp": "2026-09-24T00:38:19Z",
     "wikidata_description": "2009–2014 separatist protests and attacks on government forces",
     "sitelinks_current": 14
   },
@@ -22293,6 +22365,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1371329469,
+    "wikipedia_revid_timestamp": "2026-08-25T22:57:27Z",
     "wikidata_description": "Armed conflict in the Middle East",
     "sitelinks_current": 32,
     "wikidata_aliases": [
@@ -22412,6 +22486,8 @@
     "review_reasons": [],
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1364479325,
+    "wikipedia_revid_timestamp": "2026-07-16T20:23:39Z",
     "wikidata_description": "genocide committed by ISIS against Yazidis in Iraq and Syria",
     "sitelinks_current": 25
   },
@@ -23195,6 +23271,8 @@
     "review_reasons": [],
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1376376526,
+    "wikipedia_revid_timestamp": "2026-09-23T20:25:44Z",
     "wikidata_description": "2020 Peace agreement between the US and the Taliban",
     "sitelinks_current": 29,
     "wikidata_aliases": [
@@ -23712,6 +23790,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379550219,
+    "wikipedia_revid_timestamp": "2026-10-10T17:20:02Z",
     "wikidata_description": "destruction of the Palestinian people in the Gaza Strip carried out by Israel during the Gaza war since 2023",
     "sitelinks_current": 91,
     "wikidata_aliases": [
@@ -23886,6 +23966,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379033655,
+    "wikipedia_revid_timestamp": "2026-10-07T14:20:19Z",
     "wikidata_description": "Sexual assaults committed by Hamas terrorists against Israelis",
     "sitelinks_current": 12,
     "wikidata_aliases": [
@@ -24143,6 +24225,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1370659575,
+    "wikipedia_revid_timestamp": "2026-08-22T10:19:24Z",
     "wikidata_description": "2024 Israeli sucessful rescue operation to save four hostages alive from Hamas captivity during the ongoing war in Gaza. Military activity that is also widely accused for being a raid and mass killings of Palestinians",
     "sitelinks_current": 16,
     "wikidata_aliases": [
@@ -24796,6 +24880,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
+    "wikipedia_revid": 1371920290,
+    "wikipedia_revid_timestamp": "2026-08-29T09:53:11Z",
     "wikidata_description": "fighting since July 2025",
     "sitelinks_current": 14
   },
@@ -25049,6 +25135,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379608103,
+    "wikipedia_revid_timestamp": "2026-10-10T23:31:52Z",
     "wikidata_description": "ongoing armed conflict in West Asia",
     "sitelinks_current": 102,
     "wikidata_aliases": [
@@ -25140,6 +25228,8 @@
     "review_reasons": [],
     "needs_review": false,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379472083,
+    "wikipedia_revid_timestamp": "2026-10-10T05:05:28Z",
     "wikidata_description": "defence agreement between Saudi Arabia, Turkey, and Pakistan",
     "sitelinks_current": 36,
     "wikidata_aliases": [
@@ -25600,6 +25690,8 @@
     "possible_duplicates": [],
     "review_reasons": [],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378560942,
+    "wikipedia_revid_timestamp": "2026-10-05T00:53:26Z",
     "needs_review": false,
     "wikidata_description": "Arab attacks on Hebrew settlements in the Galilee - Tel Hai events and neighborhoods of Jews in Jerusalem that occurred in 1920",
     "sitelinks_current": 23,
@@ -25841,6 +25933,8 @@
       "country_via_place_only: Wikidata P17 of the item is Eritrea, Djibouti, Somalia, Ethiopia; the tracked country tag comes only from the P276/P131 place"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378869230,
+    "wikipedia_revid_timestamp": "2026-10-06T16:45:44Z",
     "needs_review": true,
     "wikidata_description": "major theatre of operations during the Second World War",
     "sitelinks_current": 35
@@ -26111,6 +26205,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Mediterranean and Middle East Theater of World War II\" (Q696817); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378128246,
+    "wikipedia_revid_timestamp": "2026-10-03T02:38:28Z",
     "needs_review": true,
     "wikidata_description": "1941 invasion during World War II",
     "sitelinks_current": 44,
@@ -27304,6 +27400,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Syrian intervention in the Lebanese Civil War\" (Q85804678); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1374921843,
+    "wikipedia_revid_timestamp": "2026-09-14T21:20:33Z",
     "needs_review": true,
     "wikidata_description": "Syrian occupied Lebanon (1976-2005)",
     "sitelinks_current": 11
@@ -27860,6 +27958,8 @@
     "possible_duplicates": [],
     "review_reasons": [],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378614291,
+    "wikipedia_revid_timestamp": "2026-10-05T06:22:21Z",
     "needs_review": false,
     "wikidata_description": "Elections for the eleventh Knesset",
     "sitelinks_current": 11,
@@ -27987,6 +28087,8 @@
     "possible_duplicates": [],
     "review_reasons": [],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378191260,
+    "wikipedia_revid_timestamp": "2026-10-03T11:29:31Z",
     "needs_review": false,
     "wikidata_description": "1988 airliner shootdown",
     "sitelinks_current": 43,
@@ -28335,6 +28437,8 @@
     "possible_duplicates": [],
     "review_reasons": [],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378442427,
+    "wikipedia_revid_timestamp": "2026-10-04T14:23:04Z",
     "needs_review": false,
     "wikidata_description": "elections for the 15th Knesset",
     "sitelinks_current": 13,
@@ -30135,6 +30239,8 @@
     "possible_duplicates": [],
     "review_reasons": [],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1375538179,
+    "wikipedia_revid_timestamp": "2026-09-18T11:57:18Z",
     "needs_review": false,
     "wikidata_description": "February 2012 association football riot in Port Said, Egypt",
     "sitelinks_current": 34
@@ -30651,6 +30757,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Iraqi Civil War of 2014–2017\" (Q17984356); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378166946,
+    "wikipedia_revid_timestamp": "2026-10-03T06:47:12Z",
     "date_flags": [
       "date_source_adjusted: Wikidata P585 2014-06-25 equals the item's end time (P582); used P580 start time 2014-06-05"
     ],
@@ -33923,6 +34031,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Yemeni Civil War\" (Q19686631); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379578748,
+    "wikipedia_revid_timestamp": "2026-10-10T20:47:07Z",
     "needs_review": true,
     "wikidata_description": "2022 drone attack in Abu Dhabi, United Arab Emirates",
     "sitelinks_current": 13
@@ -34461,6 +34571,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"list of modern conflicts in the Middle East\" (Q4116408); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378348893,
+    "wikipedia_revid_timestamp": "2026-10-04T02:37:21Z",
     "needs_review": true,
     "wikidata_description": "series of conflicts in the Middle East beginning on 7 October 2023",
     "sitelinks_current": 23,
@@ -35439,6 +35551,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern crisis (2023–present)\" (Q124373310); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1375316976,
+    "wikipedia_revid_timestamp": "2026-09-17T02:27:23Z",
     "needs_review": true,
     "wikidata_description": "military invasion by Israel into Syria following the fall of the Assad regime",
     "sitelinks_current": 28,
@@ -35481,6 +35595,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Southeast Europe protests\" (Q135427266); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379491766,
+    "wikipedia_revid_timestamp": "2026-10-10T08:44:11Z",
     "needs_review": true,
     "wikidata_description": "protests against arrests of political figures",
     "sitelinks_current": 26
@@ -35815,6 +35931,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"Arab tribal insurgency in Eastern Syria\" (Q134412766); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379496270,
+    "wikipedia_revid_timestamp": "2026-10-10T09:42:13Z",
     "needs_review": true,
     "wikidata_description": "Syrian military operation against DAANES",
     "sitelinks_current": 13
@@ -35878,6 +35996,8 @@
       "possible_duplicate: possible duplicate of \"2026 Iran war\" (2026-iran-war) - similar title, date within 1 year and nearby / same country"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1376734717,
+    "wikipedia_revid_timestamp": "2026-09-25T23:29:01Z",
     "needs_review": true,
     "wikidata_description": "period of heightened tensions between Iran and the United States",
     "sitelinks_current": 12,
@@ -35924,6 +36044,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"2026 Iran War\" (Q138503695); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-06",
+    "wikipedia_revid": 1378568993,
+    "wikipedia_revid_timestamp": "2026-10-05T01:29:04Z",
     "needs_review": true,
     "wikidata_description": null,
     "sitelinks_current": 10
@@ -35973,6 +36095,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"2026 Iran War\" (Q138503695); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379493021,
+    "wikipedia_revid_timestamp": "2026-10-10T09:01:59Z",
     "needs_review": true,
     "wikidata_description": "Ongoing conflict in the Middle East",
     "sitelinks_current": 30
@@ -36018,6 +36142,8 @@
       "part_of: Wikidata (P361) lists this event as part of \"2026 Iran War\" (Q138503695); it may overlap with that larger event"
     ],
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1378931469,
+    "wikipedia_revid_timestamp": "2026-10-07T00:05:38Z",
     "needs_review": true,
     "wikidata_description": "2026 torpedo attack",
     "sitelinks_current": 15,
@@ -36403,6 +36529,8 @@
       "text_from_redirect_target: no English Wikipedia article of its own; its title leads to the article of Q122962941, whose text is shown (as for 2023-israel-hamas-war; docs/data-fixes.md F12)"
     ],
     "extract_retrieved_at": "2026-10-01",
+    "wikipedia_revid": 1377864011,
+    "wikipedia_revid_timestamp": "2026-10-01T16:20:05Z",
     "date_flags": [
       "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2023-10-00"
     ],
@@ -36470,6 +36598,8 @@
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
+    "wikipedia_revid": 1379171419,
+    "wikipedia_revid_timestamp": "2026-10-08T09:55:17Z",
     "wikidata_description": "7 October 2023 attack by Hamas in Israel",
     "sitelinks_current": 11
   },
