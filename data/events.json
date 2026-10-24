@@ -55,7 +55,12 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 62
+    "sitelinks_current": 62,
+    "wikidata_aliases": [
+      "Tripolitanian War",
+      "Libyan War",
+      "Turco-Italian War"
+    ]
   },
   {
     "id": "balkan-wars",
@@ -144,7 +149,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 125
+    "sitelinks_current": 125,
+    "wikidata_aliases": [
+      "Armenian Massacre",
+      "Armenian Holocaust",
+      "Armenian Massacres",
+      "Great Crime"
+    ]
   },
   {
     "id": "gallipoli-campaign",
@@ -174,7 +185,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 75
+    "sitelinks_current": 75,
+    "wikidata_aliases": [
+      "Battle of Gallipoli",
+      "Battle of Çanakkale",
+      "The Gallipoli Campaign",
+      "Dardanelles campaign"
+    ]
   },
   {
     "id": "mcmahon-hussein-correspondence",
@@ -235,7 +252,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 67
+    "sitelinks_current": 67,
+    "wikidata_aliases": [
+      "Asia Minor Agreement",
+      "Sykes-Picot",
+      "Sykes-Picot Agreement",
+      "Sykes-Picot Treaty"
+    ]
   },
   {
     "id": "arab-revolt",
@@ -300,7 +323,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 86
+    "sitelinks_current": 86,
+    "wikidata_aliases": [
+      "Balfour Declaration of 1917"
+    ]
   },
   {
     "id": "fall-of-baghdad-1917",
@@ -387,7 +413,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 50
+    "sitelinks_current": 50,
+    "wikidata_aliases": [
+      "Armistice of Moudros"
+    ]
   },
   {
     "id": "san-remo-conference",
@@ -445,7 +474,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Iraqi revolt against the British"
+    ]
   },
   {
     "id": "treaty-of-s-vres",
@@ -475,7 +507,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 68
+    "sitelinks_current": 68,
+    "wikidata_aliases": [
+      "Treaty of Sevres"
+    ]
   },
   {
     "id": "franco-syrian-war",
@@ -535,7 +570,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 68
+    "sitelinks_current": 68,
+    "wikidata_aliases": [
+      "Turkish War of Liberation"
+    ]
   },
   {
     "id": "emirate-of-transjordan",
@@ -565,7 +603,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 45
+    "sitelinks_current": 45,
+    "wikidata_aliases": [
+      "Trans-Jordan",
+      "Emirate of Trans-Jordan",
+      "Transjordan",
+      "Amirate of Trans-Jordan"
+    ]
   },
   {
     "id": "treaty-of-lausanne",
@@ -594,7 +638,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 74
+    "sitelinks_current": 74,
+    "wikidata_aliases": [
+      "Treaty of Peace with Turkey Signed at Lausanne"
+    ]
   },
   {
     "id": "abolition-of-the-ottoman-caliphate",
@@ -652,7 +699,14 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "Great Druze Revolt",
+      "Great Syrian Revolution",
+      "Great Revolt of 1925–1927",
+      "Syrian Revolution of 1925–1927",
+      "1925–1927 Syrian Revolution"
+    ]
   },
   {
     "id": "1929-palestine-riots",
@@ -772,7 +826,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "1936–39 Arab revolt in Palestine"
+    ]
   },
   {
     "id": "peel-commission",
@@ -801,7 +858,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "Palestine Royal Commission"
+    ]
   },
   {
     "id": "white-paper-of-1939",
@@ -830,7 +890,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "McDonald White Paper"
+    ]
   },
   {
     "id": "anglo-iraqi-war",
@@ -859,7 +922,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "wikidata_aliases": [
+      "May War"
+    ]
   },
   {
     "id": "syria-lebanon-campaign",
@@ -947,7 +1013,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 50
+    "sitelinks_current": 50,
+    "wikidata_aliases": [
+      "United Nations General Assembly Resolution 181",
+      "Future government of Palestine"
+    ]
   },
   {
     "id": "1948-palestine-war",
@@ -982,7 +1052,11 @@
     ],
     "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 65
+    "sitelinks_current": 65,
+    "wikidata_aliases": [
+      "Israeli War of Independence",
+      "1947–1949 Palestine war"
+    ]
   },
   {
     "id": "israeli-declaration-of-independence",
@@ -1014,7 +1088,16 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 54
+    "sitelinks_current": 54,
+    "wikidata_aliases": [
+      "Israel Declaration of Independence",
+      "Israeli Declaration of Independence",
+      "Declaration of Independence of Israel",
+      "Declaration of Israeli Independence",
+      "Independence of Israel",
+      "Declaration of State of Israel",
+      "Declaration of Independence of the State of Israel"
+    ]
   },
   {
     "id": "nakba",
@@ -1046,7 +1129,24 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 57
+    "sitelinks_current": 57,
+    "wikidata_aliases": [
+      "Nakbah",
+      "Palestinian Nakba",
+      "Palestine Nakba",
+      "Palestinian Catastrophe",
+      "Al-Nakbah",
+      "The Nakba Day",
+      "The Nakbah",
+      "Nakbah Day",
+      "Al-Nakba",
+      "Al Nakba",
+      "Al-Nacbah",
+      "AlNacbah",
+      "Al Naqba",
+      "An-Nakba",
+      "An Nakba"
+    ]
   },
   {
     "id": "1949-armistice-agreements",
@@ -1115,7 +1215,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 34
+    "sitelinks_current": 34,
+    "wikidata_aliases": [
+      "Jewish Nakba",
+      "Jewish exodus from Arab and Muslim countries"
+    ]
   },
   {
     "id": "egyptian-revolution-of-1952",
@@ -1144,7 +1248,12 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 49
+    "sitelinks_current": 49,
+    "wikidata_aliases": [
+      "July 23 revolution",
+      "1952 Egyptian coup d'état",
+      "Egyptian revolution of 1952"
+    ]
   },
   {
     "id": "1953-iranian-coup-d-tat",
@@ -1173,7 +1282,15 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 51
+    "sitelinks_current": 51,
+    "wikidata_aliases": [
+      "Iranian coup d'etat",
+      "28 Mordad coup",
+      "1953 Iranian coup",
+      "Operation Boot",
+      "Operation Ajax",
+      "TP-AJAX Project"
+    ]
   },
   {
     "id": "suez-crisis",
@@ -1203,7 +1320,15 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 87
+    "sitelinks_current": 87,
+    "wikidata_aliases": [
+      "Second Arab-Israeli War",
+      "Tripartite Aggression",
+      "1956 Sinai War",
+      "Sinai War 1956",
+      "Suez Canal crisis",
+      "Suez War"
+    ]
   },
   {
     "id": "14-july-revolution",
@@ -1232,7 +1357,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "14 July Revolution"
+    ]
   },
   {
     "id": "north-yemen-civil-war",
@@ -1264,7 +1392,12 @@
     ],
     "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "1962 Yemeni revolution",
+      "26 September Revolution",
+      "Egyptian war in Yemen"
+    ]
   },
   {
     "id": "1966-syrian-coup-d-tat",
@@ -1325,7 +1458,18 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 109
+    "sitelinks_current": 109,
+    "wikidata_aliases": [
+      "The June War",
+      "1967 Arab-Israeli War",
+      "1967 Six Day War",
+      "Six Day War in Israel",
+      "Six Day War 1967",
+      "Six Days War",
+      "Third Arab-Israeli War",
+      "June War",
+      "6 Day War"
+    ]
   },
   {
     "id": "khartoum-resolution",
@@ -1387,7 +1531,13 @@
     ],
     "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 47
+    "sitelinks_current": 47,
+    "wikidata_aliases": [
+      "1967-1970 War of Attrition",
+      "1967-1970 Egypt-Israeli Conflict",
+      "War of Attrition 1967-1970",
+      "opotřebovací válka (1967-1970)"
+    ]
   },
   {
     "id": "battle-of-karameh",
@@ -1419,7 +1569,13 @@
     ],
     "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "Karameh battle",
+      "Operation Inferno",
+      "Operation Tofet",
+      "Karameh raid"
+    ]
   },
   {
     "id": "1968-iraqi-coup-d-tat",
@@ -1478,7 +1634,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 45
+    "sitelinks_current": 45,
+    "wikidata_aliases": [
+      "Jordanian Civil War"
+    ]
   },
   {
     "id": "yom-kippur-war",
@@ -1509,7 +1668,18 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 95
+    "sitelinks_current": 95,
+    "wikidata_aliases": [
+      "1973 Arab-Israeli War",
+      "Ramadan War",
+      "4th Arab-Israeli War",
+      "Fourth Arab-Israeli War",
+      "1973 October War",
+      "October War of 1973",
+      "October War 1973",
+      "October War",
+      "Tishreen Liberation war"
+    ]
   },
   {
     "id": "1973-oil-crisis",
@@ -1570,7 +1740,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 64
+    "sitelinks_current": 64,
+    "wikidata_aliases": [
+      "Lebanon Civil War",
+      "Lebanon's Civil War",
+      "Civil War of Lebanon",
+      "الحرب الأهلية اللبنانية"
+    ]
   },
   {
     "id": "camp-david-accords",
@@ -1629,7 +1805,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 102
+    "sitelinks_current": 102,
+    "wikidata_aliases": [
+      "Revolution of 1979",
+      "Islamic Revolution of Iran",
+      "Islamic Revolution",
+      "1979 Iranian Revolution"
+    ]
   },
   {
     "id": "egypt-israel-peace-treaty",
@@ -1660,7 +1842,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 34
+    "sitelinks_current": 34,
+    "wikidata_aliases": [
+      "Egypt-Israel Peace Treaty"
+    ]
   },
   {
     "id": "grand-mosque-seizure",
@@ -1751,7 +1936,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 96
+    "sitelinks_current": 96,
+    "wikidata_aliases": [
+      "Gulf War",
+      "Iraq-Iran War"
+    ]
   },
   {
     "id": "1982-lebanon-war",
@@ -1784,7 +1973,12 @@
     ],
     "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 55
+    "sitelinks_current": 55,
+    "wikidata_aliases": [
+      "Lebanon War of 1982",
+      "First Lebanon War",
+      "Operation Peace in Galilee"
+    ]
   },
   {
     "id": "sabra-and-shatila-massacre",
@@ -1813,7 +2007,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 44
+    "sitelinks_current": 44,
+    "wikidata_aliases": [
+      "Sabra et Chatila"
+    ]
   },
   {
     "id": "1983-beirut-barracks-bombings",
@@ -1875,7 +2072,12 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 53
+    "sitelinks_current": 53,
+    "wikidata_aliases": [
+      "First Palestinian Intifada",
+      "Stone Intifada",
+      "1st Intifada"
+    ]
   },
   {
     "id": "al-anfal-campaign",
@@ -1909,7 +2111,12 @@
     ],
     "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "wikidata_aliases": [
+      "Kurdish genocide",
+      "Al-Anfal campaign",
+      "Anfal genocide"
+    ]
   },
   {
     "id": "gulf-war",
@@ -1940,7 +2147,16 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 114
+    "sitelinks_current": 114,
+    "wikidata_aliases": [
+      "Kuwait War",
+      "Iraq War",
+      "First Gulf War",
+      "Gulf War I",
+      "First Iraq War",
+      "Persian Gulf War",
+      "Video Game War"
+    ]
   },
   {
     "id": "madrid-conference-of-1991",
@@ -2063,7 +2279,17 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "Yitzhak Rabin assassination",
+      "Yitzhak Rabin's assassination",
+      "murder of Yitzhak Rabin",
+      "Yitzhak Rabin's murder",
+      "Yitzhak Rabin murder",
+      "killing of Yitzhak Rabin",
+      "Yitzhak Rabin's killing",
+      "Yitzhak Rabin killing"
+    ]
   },
   {
     "id": "second-intifada",
@@ -2093,7 +2319,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 49
+    "sitelinks_current": 49,
+    "wikidata_aliases": [
+      "Al-Aqsa Intifada"
+    ]
   },
   {
     "id": "israeli-withdrawal-from-lebanon",
@@ -2127,7 +2356,12 @@
     ],
     "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "1985-2000 South Lebanon conflict",
+      "South Lebanon Conflict 1985-2000",
+      "Security Zone Conflict in Lebanon"
+    ]
   },
   {
     "id": "invasion-of-iraq",
@@ -2156,7 +2390,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 49
+    "sitelinks_current": 49,
+    "wikidata_aliases": [
+      "invasion of Iraq"
+    ]
   },
   {
     "id": "capture-of-saddam-hussein",
@@ -2185,7 +2422,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "capture of Saddam Hussein"
+    ]
   },
   {
     "id": "cedar-revolution",
@@ -2214,7 +2454,15 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Independence Uprising",
+      "Intifadat al-Istiqlal",
+      "Cedar Spring",
+      "Independence 05",
+      "Istiqlal Lubnan",
+      "Rabi' el Arz"
+    ]
   },
   {
     "id": "israeli-disengagement-from-gaza",
@@ -2306,7 +2554,15 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 74
+    "sitelinks_current": 74,
+    "wikidata_aliases": [
+      "2006 Israel–Hezbollah War",
+      "July War",
+      "Second Lebanon War",
+      "Operation Just Reward",
+      "Just Reward",
+      "Lebanon War"
+    ]
   },
   {
     "id": "battle-of-gaza-2007",
@@ -2365,7 +2621,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 62
+    "sitelinks_current": 62,
+    "wikidata_aliases": [
+      "Operation Cast Lead"
+    ]
   },
   {
     "id": "iranian-green-movement",
@@ -2394,7 +2653,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Green Wave of Iran"
+    ]
   },
   {
     "id": "arab-spring",
@@ -2424,7 +2686,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "none",
-    "sitelinks_current": 112
+    "sitelinks_current": 112,
+    "wikidata_aliases": [
+      "The Arabian Revolutions",
+      "Arab Spring revolt"
+    ]
   },
   {
     "id": "egyptian-revolution-of-2011",
@@ -2453,7 +2719,14 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 73
+    "sitelinks_current": 73,
+    "wikidata_aliases": [
+      "2011–2012 Egyptian revolution",
+      "Revolution of 25 January",
+      "Thawret 25 yanāyir",
+      "Egyptian Revolution of 2011",
+      "Egyptian Revolution of Dignity"
+    ]
   },
   {
     "id": "syrian-civil-war",
@@ -2485,7 +2758,16 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 117
+    "sitelinks_current": 117,
+    "wikidata_aliases": [
+      "Syrian Uprising",
+      "Syrian Demonstrations",
+      "Syrian Protests",
+      "Syrian Rebellion",
+      "Syrian Revolt",
+      "Syrian Revolution",
+      "Syrian Unrest"
+    ]
   },
   {
     "id": "yemeni-revolution",
@@ -2606,7 +2888,10 @@
     ],
     "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 30
+    "sitelinks_current": 30,
+    "wikidata_aliases": [
+      "Saudi Arabian-led intervention in Yemen"
+    ]
   },
   {
     "id": "joint-comprehensive-plan-of-action",
@@ -2636,7 +2921,12 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 39
+    "sitelinks_current": 39,
+    "wikidata_aliases": [
+      "Iran nuclear deal",
+      "JCPOA",
+      "Iran Deal"
+    ]
   },
   {
     "id": "battle-of-aleppo-2012-2016",
@@ -2694,7 +2984,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "Operation \"We Are Coming, Nineveh\""
+    ]
   },
   {
     "id": "qatar-diplomatic-crisis",
@@ -2725,7 +3018,16 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 46
+    "sitelinks_current": 46,
+    "wikidata_aliases": [
+      "2017 Qatari crisis",
+      "Qatarstrophe",
+      "Qatar crisis",
+      "2017 Middle East crisis",
+      "2017 Mideast crisis",
+      "2017 Qatari diplomatic crisis",
+      "Qatari diplomatic crisis"
+    ]
   },
   {
     "id": "united-states-recognition-of-jerusalem-as-the-capital-of-israel",
@@ -2754,7 +3056,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "United States recognition of Jerusalem"
+    ]
   },
   {
     "id": "united-states-withdrawal-from-the-joint-comprehensive-plan-of-action",
@@ -2783,7 +3088,10 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "United States withdrawal from the Joint Comprehensive Plan of Action"
+    ]
   },
   {
     "id": "killing-of-jamal-khashoggi",
@@ -2816,7 +3124,20 @@
     ],
     "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "murder of Jamal Khashoggi",
+      "kidnapping of Jamal Khashoggi",
+      "disappearance of Jamal Khashoggi",
+      "death of Jamal Khashoggi",
+      "killing of Jamal Khashoggi",
+      "Jamal Khashoggi assassination",
+      "Jamal Khashoggi's assassination",
+      "Jamal Khashoggi's murder",
+      "Jamal Khashoggi murder",
+      "Jamal Khashoggi's killing",
+      "Jamal Khashoggi killing"
+    ]
   },
   {
     "id": "abraham-accords",
@@ -2878,7 +3199,15 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 84
+    "sitelinks_current": 84,
+    "wikidata_aliases": [
+      "4 August 2020 Beirut explosion",
+      "4 Aug 2020 Beirut explosion",
+      "Beirut explosion",
+      "2020 Beirut explosion",
+      "2020 Lebanon explosion",
+      "Beirut blast"
+    ]
   },
   {
     "id": "assassination-of-qasem-soleimani",
@@ -2913,7 +3242,10 @@
     ],
     "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "wikidata_aliases": [
+      "death of Qasem Soleimani"
+    ]
   },
   {
     "id": "2021-israel-palestine-crisis",
@@ -2944,7 +3276,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 48
+    "sitelinks_current": 48,
+    "wikidata_aliases": [
+      "2021 Jerusalem conflict",
+      "Operation Guardian of the Walls"
+    ]
   },
   {
     "id": "mahsa-amini-protests",
@@ -3004,7 +3340,25 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 120
+    "sitelinks_current": 120,
+    "wikidata_aliases": [
+      "Operation Swords of Iron",
+      "Swords of Iron",
+      "2023 Gaza–Israel conflict",
+      "2023 Hamas–Israel war",
+      "2023 Gaza war",
+      "Sukkot War",
+      "Operation Iron Swords",
+      "War of Iron Swords",
+      "Israel-Hamas war",
+      "Hamas–Israel war",
+      "Hamas-Israel war",
+      "Iron Swords",
+      "2023 Israel-Hamas war",
+      "2023 Israel–Hamas war",
+      "Gaza War",
+      "2023–2025 Hamas–Israel war"
+    ]
   },
   {
     "id": "fall-of-the-assad-regime",
@@ -3033,7 +3387,12 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "Fall of the Bashar al-Assad",
+      "Fall of the Assad government",
+      "Fall of the Assad administration"
+    ]
   },
   {
     "id": "2024-israel-hezbollah-conflict",
@@ -3064,7 +3423,14 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 31
+    "sitelinks_current": 31,
+    "wikidata_aliases": [
+      "Israel-Lebanon border clashes",
+      "Israel-Hezbollah conflict",
+      "Hezbollah–Israel conflict",
+      "Hezbollah-Israel conflict",
+      "Third Lebanon War"
+    ]
   },
   {
     "id": "twelve-day-war",
@@ -3094,7 +3460,12 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 77
+    "sitelinks_current": 77,
+    "wikidata_aliases": [
+      "12 Day War",
+      "Iran–Israel War",
+      "Israel–Iran War"
+    ]
   },
   {
     "id": "battle-of-holy-apostles-monastery",
@@ -3291,7 +3662,10 @@
     "needs_review": true,
     "wikidata_description": "1912 battle of the First Balkan War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Battle of Sakiz-Keuy"
+    ]
   },
   {
     "id": "siege-of-adrianople-1912-1913",
@@ -3543,7 +3917,10 @@
     "needs_review": true,
     "wikidata_description": "1914 a WWI battle in Iraq (British vs Ottoman)",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Battle of Basra (1914)"
+    ]
   },
   {
     "id": "battle-of-qurna",
@@ -3886,7 +4263,10 @@
     "needs_review": true,
     "wikidata_description": "Armenian resistance during the Armenian genocide",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Musa Dagh resistance"
+    ]
   },
   {
     "id": "battle-of-bitlis",
@@ -3971,7 +4351,10 @@
     "needs_review": true,
     "wikidata_description": "Armenian resistance in Urfa against the Ottoman Empire",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Urfa Rebellion"
+    ]
   },
   {
     "id": "battle-of-ctesiphon-1915",
@@ -4055,7 +4438,10 @@
     "needs_review": true,
     "wikidata_description": "1915 siege in the First World War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "First battle of Kut"
+    ]
   },
   {
     "id": "erzurum-offensive",
@@ -4434,7 +4820,10 @@
     "needs_review": true,
     "wikidata_description": "1917 third and final battle of the recapture of the Sinai Peninsula by British forces during the Sinai and Palestine Campaign of WWI",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Action of Rafah"
+    ]
   },
   {
     "id": "first-battle-of-gaza",
@@ -4645,7 +5034,11 @@
     "needs_review": true,
     "wikidata_description": "1918 battle of the First World War which was fought in Ottoman Palestine",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Rout of Nablus",
+      "Breakthrough at Nablus"
+    ]
   },
   {
     "id": "battle-of-imbros",
@@ -5585,7 +5978,11 @@
     "needs_review": true,
     "wikidata_description": "1946 event in Jerusalem",
     "extract_retrieved_at": "2026-10-03",
-    "sitelinks_current": 31
+    "sitelinks_current": 31,
+    "wikidata_aliases": [
+      "Operation Chick",
+      "bombing of King David Hotel"
+    ]
   },
   {
     "id": "haifa-oil-refinery-massacre",
@@ -5790,7 +6187,10 @@
     "needs_review": true,
     "wikidata_description": "1948 battle of the Arab-Israeli War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Operation Bi'ur Hametz"
+    ]
   },
   {
     "id": "kfar-etzion-massacre",
@@ -5909,7 +6309,10 @@
     "needs_review": true,
     "wikidata_description": "Israeli military operation during the 1948 Arab–Israeli War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Operation Philistia"
+    ]
   },
   {
     "id": "palestinian-expulsion-from-lydda-and-ramle",
@@ -6496,7 +6899,10 @@
     "needs_review": false,
     "wikidata_description": "international treaty for the conservation and sustainable utilization of wetlands",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 78
+    "sitelinks_current": 78,
+    "wikidata_aliases": [
+      "Convention on Wetlands of International Importance, especially as Waterfowl Habitat"
+    ]
   },
   {
     "id": "sabena-flight-571",
@@ -6617,7 +7023,11 @@
     "needs_review": true,
     "wikidata_description": "1973 battle between Israel in the PLO in Lebanon",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Operation Spring of Youth",
+      "Israeli raid on Lebanon 1973"
+    ]
   },
   {
     "id": "battle-of-the-chinese-farm",
@@ -7085,7 +7495,10 @@
     "needs_review": true,
     "wikidata_description": "Massacre",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "Cinema Rex Fire"
+    ]
   },
   {
     "id": "operation-eagle-claw",
@@ -7127,7 +7540,11 @@
     "needs_review": true,
     "wikidata_description": "1980 Delta Force failed operation for rescuing American hostages",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "wikidata_aliases": [
+      "Operation Evening Light",
+      "Operation Tabas"
+    ]
   },
   {
     "id": "battle-of-khorramshahr-1980",
@@ -7169,7 +7586,10 @@
     "needs_review": true,
     "wikidata_description": "1980 battle in the Iran-Iraq War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "First Battle of Khorramshahr"
+    ]
   },
   {
     "id": "siege-of-abadan",
@@ -7297,7 +7717,12 @@
     "needs_review": true,
     "wikidata_description": "successful operation by Iranian air force against Iraq's air base",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Operation H3",
+      "Attack on H-3",
+      "Operation H-3"
+    ]
   },
   {
     "id": "assassination-of-anwar-sadat",
@@ -7334,7 +7759,18 @@
     "needs_review": false,
     "wikidata_description": "Egyptian assassination",
     "extract_retrieved_at": "2026-10-10",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Anwar Sadat's death",
+      "Anwar Sadat assassination",
+      "Anwar Sadat's assassination",
+      "murder of Anwar Sadat",
+      "Anwar Sadat's murder",
+      "Anwar Sadat murder",
+      "killing of Anwar Sadat",
+      "Anwar Sadat's killing",
+      "Anwar Sadat killing"
+    ]
   },
   {
     "id": "1982-hama-massacre",
@@ -7377,7 +7813,11 @@
     "needs_review": true,
     "wikidata_description": "suppression of the Islamic Revolution and killing of thousands of civilians in Hama, Syria, 1982",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "1982 Hama massacre",
+      "Hama revolution"
+    ]
   },
   {
     "id": "battle-of-khorramshahr-1982",
@@ -7575,7 +8015,10 @@
     "needs_review": true,
     "wikidata_description": "1983 suicide bombing in Beirut, Lebanon",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "United States embassy bombing"
+    ]
   },
   {
     "id": "gulf-air-flight-771",
@@ -7797,7 +8240,11 @@
     "needs_review": true,
     "wikidata_description": "massacre against the Kurdish people that took place in Halabja, Iraq on March 16, 1988",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "Bloody Friday",
+      "Halabja chemical attack"
+    ]
   },
   {
     "id": "palestinian-declaration-of-independence",
@@ -7876,7 +8323,10 @@
     "needs_review": true,
     "wikidata_description": "also called the Battle of Daman, fought on August 2–3, 1990, during the Iraqi invasion of Kuwait",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Batalla del Palacio de Dasman"
+    ]
   },
   {
     "id": "battle-of-khafji",
@@ -8442,7 +8892,13 @@
     "needs_review": true,
     "wikidata_description": "2003 major battle of the Iraq War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Battle of Baghdad (2003)",
+      "Fall of Baghdad",
+      "Battle of Bagdad",
+      "Fall of Bagdad"
+    ]
   },
   {
     "id": "operation-viking-hammer",
@@ -9040,7 +9496,10 @@
     "needs_review": true,
     "wikidata_description": "Late 2004 battle of the Iraq War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "Phantom Fury"
+    ]
   },
   {
     "id": "assassination-of-rafic-hariri",
@@ -9078,7 +9537,17 @@
     "needs_review": false,
     "wikidata_description": "2005 murder in Beirut, Lebanon",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Rafic Hariri assassination",
+      "Rafic Hariri's assassination",
+      "murder of Rafic Hariri",
+      "Rafic Hariri's murder",
+      "Rafic Hariri murder",
+      "killing of Rafic Hariri",
+      "Rafic Hariri's killing",
+      "Rafic Hariri killing"
+    ]
   },
   {
     "id": "2005-sharm-el-sheikh-bombings",
@@ -9122,7 +9591,10 @@
     "needs_review": true,
     "wikidata_description": "Terrorist attacks in Sharm El Sheikh, Egypt on 23 July 2005",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "Many dead in Egyptian resort blasts"
+    ]
   },
   {
     "id": "2005-amman-bombings",
@@ -9201,7 +9673,10 @@
     "needs_review": true,
     "wikidata_description": "incident in which 24 unarmed Iraqi men, women and children were killed by a group of US Marines",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Haditha incident"
+    ]
   },
   {
     "id": "mahmudiyah-rape-and-murders",
@@ -9318,7 +9793,17 @@
     "needs_review": false,
     "wikidata_description": "2007 assassination of Turkish-Armenian journalist",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Hrant Dink assassination",
+      "Hrant Dink's assassination",
+      "murder of Hrant Dink",
+      "Hrant Dink's murder",
+      "Hrant Dink murder",
+      "killing of Hrant Dink",
+      "Hrant Dink's killing",
+      "Hrant Dink killing"
+    ]
   },
   {
     "id": "qahtaniyah-bombings",
@@ -9396,7 +9881,10 @@
     "needs_review": true,
     "wikidata_description": "2007 mass shooting in Iraq",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Blackwater Baghdad shootings"
+    ]
   },
   {
     "id": "battle-of-basra-2008",
@@ -9649,7 +10137,12 @@
     "needs_review": true,
     "wikidata_description": "Protests in Bahrain that started on February 14, 2011",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "Bahraini protest",
+      "Bahraini revolution",
+      "February 14th revolution"
+    ]
   },
   {
     "id": "siege-of-daraa",
@@ -9770,7 +10263,10 @@
     "needs_review": false,
     "wikidata_description": "Council of Europe convention against gender violence signed in Istanbul, Turkey",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 54
+    "sitelinks_current": 54,
+    "wikidata_aliases": [
+      "Istanbul Convention"
+    ]
   },
   {
     "id": "siege-of-talkalakh-may-2011",
@@ -10107,7 +10603,12 @@
     "needs_review": true,
     "wikidata_description": "November 2012 eight-day Israel Defense Forces operation in the Hamas-governed Gaza Strip",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 43
+    "sitelinks_current": 43,
+    "wikidata_aliases": [
+      "Operation Pillar of Cloud",
+      "2012 Israel–Gaza conflict",
+      "Operation Pillar of Defense"
+    ]
   },
   {
     "id": "battle-of-ras-al-ayn-2012-13",
@@ -10269,7 +10770,11 @@
     "needs_review": true,
     "wikidata_description": "Military coup overthrowing Mohamed Morsi",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 38
+    "sitelinks_current": 38,
+    "wikidata_aliases": [
+      "Map of the Future (Egypt)",
+      "Roadmap (Egypt)"
+    ]
   },
   {
     "id": "rabaa-massacre",
@@ -10305,7 +10810,10 @@
     "needs_review": false,
     "wikidata_description": "forceful dispersal of pro-Morsi sit-in in Cairo, Egypt",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "Rabba massacre"
+    ]
   },
   {
     "id": "ghouta-chemical-attack",
@@ -10685,7 +11193,14 @@
     "needs_review": true,
     "wikidata_description": "2014 battle in the Syrian Civil War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 31
+    "sitelinks_current": 31,
+    "wikidata_aliases": [
+      "Siege of Kobani",
+      "Siege of Kobane",
+      "Battle of Kobanê",
+      "Battle of Kobani",
+      "Battle of Kobane"
+    ]
   },
   {
     "id": "2014-jerusalem-synagogue-attack",
@@ -10819,7 +11334,12 @@
     "needs_review": true,
     "wikidata_description": "2004–2014 Houthi rebellion, escalating into the Yemen Civil War",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Houthi rebellion",
+      "Sa'dah War",
+      "Sa'dah conflict"
+    ]
   },
   {
     "id": "march-2015-sanaa-mosque-bombings",
@@ -10934,7 +11454,10 @@
     "needs_review": false,
     "wikidata_description": "bombing which took place on 26 June 2015 at a Shia mosque in Kuwait",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Atentado de Kuwait de 2015"
+    ]
   },
   {
     "id": "suruc-bombing",
@@ -11016,7 +11539,10 @@
     "needs_review": false,
     "wikidata_description": "bombing of Ankara Central railway station on October 10 2015",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "Ankara bombings"
+    ]
   },
   {
     "id": "metrojet-flight-9268",
@@ -11052,7 +11578,17 @@
     "needs_review": false,
     "wikidata_description": "2015 airliner bombing",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 57
+    "sitelinks_current": 57,
+    "wikidata_aliases": [
+      "KGL9268",
+      "Flight 9268",
+      "Sinai plane crash of 2015",
+      "Kolavia Flight 9268",
+      "7K9268",
+      "Kogalymavia Flight 9268",
+      "Kolavia Flight 7K9268",
+      "KGL-9268"
+    ]
   },
   {
     "id": "2015-beirut-bombings",
@@ -11252,7 +11788,10 @@
     "needs_review": true,
     "wikidata_description": "2016 military operation started by the Syrian Arab Army",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "Battle of Palmyra"
+    ]
   },
   {
     "id": "march-2016-ankara-bombing",
@@ -11533,7 +12072,10 @@
     "needs_review": false,
     "wikidata_description": "terrorist attack in Turkey",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 50
+    "sitelinks_current": 50,
+    "wikidata_aliases": [
+      "June 28 Istanbul Attack"
+    ]
   },
   {
     "id": "2016-karrada-bombing",
@@ -11576,7 +12118,11 @@
     "needs_review": true,
     "wikidata_description": "Himansuborah",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "3 July 2016 Baghdad bombing",
+      "2 July 2016 Baghdad bombings"
+    ]
   },
   {
     "id": "august-2016-gaziantep-bombing",
@@ -11663,7 +12209,11 @@
     "needs_review": true,
     "wikidata_description": "2016 military operation",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Euphrates Shield",
+      "Battle of Jarabulus"
+    ]
   },
   {
     "id": "battle-of-al-bab",
@@ -11798,7 +12348,10 @@
     "needs_review": true,
     "wikidata_description": "Suicide bombing",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "First insurgency"
+    ]
   },
   {
     "id": "botroseya-church-bombing",
@@ -11841,7 +12394,10 @@
     "needs_review": true,
     "wikidata_description": "suicide bombing on 11 December 2016",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Cairo Church bombing"
+    ]
   },
   {
     "id": "assassination-of-andrei-karlov",
@@ -11876,7 +12432,17 @@
     "needs_review": false,
     "wikidata_description": "2016 murder of the Russian ambassador to Turkey",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 41
+    "sitelinks_current": 41,
+    "wikidata_aliases": [
+      "Andrei Karlov assassination",
+      "Andrei Karlov's assassination",
+      "murder of Andrei Karlov",
+      "Andrei Karlov's murder",
+      "Andrei Karlov murder",
+      "killing of Andrei Karlov",
+      "Andrei Karlov's killing",
+      "Andrei Karlov killing"
+    ]
   },
   {
     "id": "istanbul-nightclub-shooting",
@@ -11957,7 +12523,10 @@
     "needs_review": true,
     "wikidata_description": "terrorist vehicle-ramming attack",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "2017 Jerusalem attack"
+    ]
   },
   {
     "id": "palm-sunday-church-bombings",
@@ -12001,7 +12570,10 @@
     "needs_review": true,
     "wikidata_description": "Bomb Coptic Churchs in the Nile Delta City of Tanta and Alexandria",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "2017 Tanta bombing"
+    ]
   },
   {
     "id": "2017-aleppo-suicide-car-bombing",
@@ -12174,7 +12746,11 @@
     "needs_review": true,
     "wikidata_description": "2017 battle in War in Iraq (2013–2017)",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Batalla de Kirkuk",
+      "Invasión de Kirkuk"
+    ]
   },
   {
     "id": "battle-of-raqqa-2017",
@@ -12253,7 +12829,11 @@
     "needs_review": false,
     "wikidata_description": "terrorist bombing in a Sinai mosque, Egypt",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "2017 Arish attack",
+      "November 2017 Sinai attack"
+    ]
   },
   {
     "id": "ahvaz-military-parade-attack",
@@ -12374,7 +12954,10 @@
     "needs_review": true,
     "wikidata_description": "Turkish offensive against the SDF in Afrin",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "Operation Olive Branch"
+    ]
   },
   {
     "id": "israel-united-arab-emirates-normalization-agreement",
@@ -12419,7 +13002,15 @@
     "needs_review": true,
     "wikidata_description": "2020 agreement between Israel and the UAE",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Israel–United Arab Emirates accords",
+      "Israel-UAE peace treaty",
+      "Israel-UAE peace agreement",
+      "Israel-UAE accords",
+      "Abraham Accord",
+      "Israel–United Arab Emirates peace treaty"
+    ]
   },
   {
     "id": "bahrain-israel-normalization-agreement",
@@ -12552,7 +13143,10 @@
     "needs_review": true,
     "wikidata_description": "2022 incident during the Israeli-Palestinian conflict",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "2022 Al-Aqsa Mosque attack"
+    ]
   },
   {
     "id": "2022-shah-cheragh-attack",
@@ -12594,7 +13188,11 @@
     "needs_review": true,
     "wikidata_description": "2022 mass shooting in Iran",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Shah Cheragh massacre",
+      "2022 Shiraz massacre"
+    ]
   },
   {
     "id": "2022-istanbul-bombing",
@@ -12637,7 +13235,10 @@
     "needs_review": true,
     "wikidata_description": "explosion in Istanbul, Turkey, on 13 November 2022",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "2022 Taksim bombing"
+    ]
   },
   {
     "id": "2023-neve-yaakov-shooting",
@@ -12682,7 +13283,15 @@
     "needs_review": true,
     "wikidata_description": "27 January 2023 mass murder of Israelis by a Palestinian",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "2023 Jerusalem shooting",
+      "2023 Neve Yaakov synagogue shooting",
+      "Neve Yaakov synagogue shooting",
+      "Jerusalem synagogue shooting",
+      "Jerusalem shooting",
+      "2023 East Jerusalem synagogue shooting"
+    ]
   },
   {
     "id": "july-2023-jenin-incursion",
@@ -12729,7 +13338,14 @@
     "needs_review": true,
     "wikidata_description": "2023 Israeli military operation in the West Bank",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Home and Garden",
+      "2023 Jenin incursion",
+      "Jenin incursion",
+      "Bayit VeGan",
+      "Operation Home and Garden"
+    ]
   },
   {
     "id": "october-7-attacks",
@@ -12782,7 +13398,23 @@
     "needs_review": true,
     "wikidata_description": "terrorist attack and massacre in southern Israel on October 7, 2023 carried out by the Islamic Fundamentalist Terrorist Group Hamas",
     "extract_retrieved_at": "2026-10-10",
-    "sitelinks_current": 59
+    "sitelinks_current": 59,
+    "wikidata_aliases": [
+      "October 7 Hamas-led attack on Israel",
+      "Simchat Torah Massacre",
+      "Black Sabbath",
+      "Deluge",
+      "Al-Aqsa Flood",
+      "October 7 Massacre",
+      "7 October 2023 Massacre in Israel",
+      "surprise attack on Israel",
+      "October 7 attack",
+      "7 October attack",
+      "10/7",
+      "7/10",
+      "Tévakh Shiv'a Be'oktober",
+      "'amalyat Tufan AlAqsa"
+    ]
   },
   {
     "id": "zikim-attack",
@@ -12870,7 +13502,17 @@
     "needs_review": true,
     "wikidata_description": "massacre of Israeli civilians at a dance party near Re'im, Israel on 7 October 2023",
     "extract_retrieved_at": "2026-10-10",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "Re'im music festival attack",
+      "Supernova Music Festival attack",
+      "Hamas’ attack on Israel’s Supernova Music Festival",
+      "Supernova Sukkot festival massacre",
+      "October 7th",
+      "October 7th attack",
+      "October 7th massacre",
+      "October 7"
+    ]
   },
   {
     "id": "kfar-aza-massacre",
@@ -12963,7 +13605,10 @@
     "needs_review": true,
     "wikidata_description": "7 October 2023 mass murder in Israel",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Beeri massacre"
+    ]
   },
   {
     "id": "netiv-haasara-massacre",
@@ -13053,7 +13698,10 @@
     "needs_review": true,
     "wikidata_description": "Hamas-led massacre in Israeli kibbutz on 7 October 2023",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Nir Oz massacre"
+    ]
   },
   {
     "id": "nahal-oz-attack",
@@ -13103,7 +13751,11 @@
     "needs_review": true,
     "wikidata_description": "2023 mass murder in Israel",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Nahal Oz massacre",
+      "Nahal Oz Battle"
+    ]
   },
   {
     "id": "alumim-massacre",
@@ -13147,7 +13799,11 @@
     "needs_review": true,
     "wikidata_description": "7 October 2023 attack in Israel",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Alumim battle",
+      "battle of Alumim"
+    ]
   },
   {
     "id": "nirim-attack",
@@ -13433,7 +14089,13 @@
     "needs_review": true,
     "wikidata_description": "2024 HTS-led military operation of the Syrian civil war",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "Fall of Aleppo",
+      "The capture of Aleppo",
+      "Capture of Aleppo",
+      "Liberation of Aleppo"
+    ]
   },
   {
     "id": "assassination-of-saleh-al-arouri",
@@ -13660,7 +14322,12 @@
     "needs_review": true,
     "wikidata_description": "Israeli massacre of Palestinians at northern Gaza Strip (29 Feb. 2024)",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "Al-Rashid humanitarian aid incident",
+      "Al-Rashid humanitarian aid convoy incident",
+      "Al-Rashid massacre"
+    ]
   },
   {
     "id": "israeli-airstrike-on-the-iranian-consulate-in-damascus",
@@ -13811,7 +14478,11 @@
     "needs_review": true,
     "wikidata_description": "Israeli airstrike on the Rafah refugee camp on 26 May 2024 and subsequent fire that caused numerous casualties",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Tel al-Sultan massacre",
+      "Israeli strike on displacement camp in Rafah on 26 May 2024"
+    ]
   },
   {
     "id": "july-2024-houthi-israel-attacks",
@@ -13863,7 +14534,10 @@
     "needs_review": true,
     "wikidata_description": "Israeli bombing in Al Hudaydah, Yemen, on 20 July 2024",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Operation Long Arm"
+    ]
   },
   {
     "id": "majdal-shams-attack",
@@ -13913,7 +14587,13 @@
     "needs_review": true,
     "wikidata_description": "rocket strike on a soccer pitch full of young people in Majdal Shams, Golan Heights",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Attack on Majdal Shams",
+      "Majdal Shams terror attack",
+      "Hezbollah attack on Majdal Shams",
+      "Majdal Shams massacre"
+    ]
   },
   {
     "id": "assassination-of-ismail-haniyeh",
@@ -13961,7 +14641,11 @@
     "needs_review": true,
     "wikidata_description": "2024 Assassination of Hamas leader",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 38
+    "sitelinks_current": 38,
+    "wikidata_aliases": [
+      "killing of Ismail Haniyeh",
+      "Ismail Haniyeh's death"
+    ]
   },
   {
     "id": "2024-hezbollah-headquarters-strike",
@@ -14015,7 +14699,12 @@
     "needs_review": true,
     "wikidata_description": "Israeli airstrike in Beirut, Lebanon on 27 Sept. 2024",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Operation New Order",
+      "Assassination of Hassan Nasrallah",
+      "Death of Hassan Nasrallah"
+    ]
   },
   {
     "id": "killing-of-yahya-sinwar",
@@ -14058,7 +14747,11 @@
     "needs_review": true,
     "wikidata_description": "2024 event in the Israel–Hamas war",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Yahya Sinwar's death",
+      "death of Yahya Sinwar"
+    ]
   },
   {
     "id": "turkish-aerospace-industries-headquarters-attack",
@@ -14144,7 +14837,11 @@
     "needs_review": true,
     "wikidata_description": "2024 conquest during the Syrian civil war",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Siege of Damascus",
+      "Capture of Damascus"
+    ]
   },
   {
     "id": "rafah-paramedic-massacre",
@@ -14242,7 +14939,10 @@
     "needs_review": true,
     "wikidata_description": "2025 terrorist attack in Damascus, Syria",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Mar Elias Church bombing"
+    ]
   },
   {
     "id": "israeli-attack-on-doha",
@@ -14289,7 +14989,10 @@
     "needs_review": true,
     "wikidata_description": "September 2025 Israeli airstrike targeting top Hamas leaders in Doha, Qatar",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "Operation Summit of Fire"
+    ]
   },
   {
     "id": "assassination-of-ali-khamenei",
@@ -14333,7 +15036,12 @@
     "needs_review": true,
     "wikidata_description": "2026 assassination in Tehran, Iran",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "wikidata_aliases": [
+      "Ali Khamenei's death",
+      "killing of Ali Khamenei",
+      "elimination of Ali Khamenei"
+    ]
   },
   {
     "id": "2026-minab-school-attack",
@@ -14382,7 +15090,11 @@
     "needs_review": true,
     "wikidata_description": "2026 Iran war missile strike",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "wikidata_aliases": [
+      "Minab school massacre",
+      "Minab massacre"
+    ]
   },
   {
     "id": "assassination-of-ali-larijani",
@@ -14418,7 +15130,10 @@
     "needs_review": false,
     "wikidata_description": "2026 assassination",
     "extract_retrieved_at": "2026-09-26",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Ali Larijani‘s death"
+    ]
   },
   {
     "id": "battle-of-riyadh",
@@ -14489,7 +15204,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "conflict between Saudi loyalist forces of the newborn Emirate of Riyadh and the Emirate of Ha'il (Jabal Shammar), supported by the Rashidis",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "First Saudi–Rashidi War",
+      "Battles over Qasim"
+    ]
   },
   {
     "id": "constitutionalization-attempts-in-iran",
@@ -14706,7 +15425,24 @@
       "date_source_adjusted: Wikidata P585 1918-11-11 equals the item's end time (P582); used P580 start time 1914-07-28"
     ],
     "wikidata_description": "1914–1918 global conflict",
-    "sitelinks_current": 265
+    "sitelinks_current": 265,
+    "wikidata_aliases": [
+      "World War One",
+      "WW1",
+      "World War 1",
+      "World War",
+      "the First World War",
+      "1st World War",
+      "the 1st World War",
+      "WW I",
+      "The Great War",
+      "WW 1",
+      "World War, 1914-1918",
+      "Great War",
+      "WWI",
+      "The War to End All Wars",
+      "First World War"
+    ]
   },
   {
     "id": "german-ottoman-alliance",
@@ -14812,7 +15548,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "group of Hunchakian activists who were hanged by the Muslim Ottoman rulers in the Armenian genocide",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "The 20s"
+    ]
   },
   {
     "id": "jungle-movement-of-gilan",
@@ -14878,7 +15617,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "of 1915 made the Emirate of Nejd & Hassa a British protectorate to define its boundaries",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Darin Pact"
+    ]
   },
   {
     "id": "battle-of-mecca-1916",
@@ -15094,7 +15836,12 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "meeting held between March and April 1918 in Trebizond between the Ottoman Empire and Transcaucasia",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Trebizond Peace Conference",
+      "Conference of Trebizond",
+      "Conference of Trabzon"
+    ]
   },
   {
     "id": "franco-turkish-war",
@@ -15133,7 +15880,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "war lasting from 1918 to 1921 during the Turkish War of Independence",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Cilicia Campaign",
+      "Southern Front of the Turkish War of Independence",
+      "Southern Front"
+    ]
   },
   {
     "id": "1919-egyptian-revolution",
@@ -15216,7 +15968,15 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "war lasting from 1919 to 1922 during the Turkish War of Independence",
-    "sitelinks_current": 55
+    "sitelinks_current": 55,
+    "wikidata_aliases": [
+      "Western Front of the Turkish War of Independence",
+      "Western Front (Turkish War of Independence)",
+      "Asia Minor Campaign",
+      "Asia Minor Catastrophe",
+      "Asia Minor Disaster",
+      "Greco-Turkish War of 1919–1922"
+    ]
   },
   {
     "id": "operation-nemesis",
@@ -15332,7 +16092,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1920 battle",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Tel Hai clashes"
+    ]
   },
   {
     "id": "1920-capture-of-damascus",
@@ -15403,7 +16166,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Coup d'état in Persia, 1921",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "1921 Persian coup d'état"
+    ]
   },
   {
     "id": "kurdish-turkish-conflict",
@@ -15668,7 +16434,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Turkish capture of the city of Smyrna during the Greco-Turkish War in 1922",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Liberation of İzmir",
+      "Recovery of İzmir",
+      "Loss of Smyrna"
+    ]
   },
   {
     "id": "uqair-protocol-of-1922",
@@ -15700,7 +16471,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "agreement at Uqair on 2 December 1922 which defined the boundaries between Iraq and the Sultanate of Nejd (modern Saudi Arabia) and between Kuwait and Nejd",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Uqair Protocol"
+    ]
   },
   {
     "id": "sheikh-said-rebellion",
@@ -15771,7 +16545,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "UK recognized the independence of Ibn Saud and sovereignty of the Kingdom of Hejaz & Nejd",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Treaty between His Majesty and His Majesty the King of the Hejaz and of Nejd and Its Dependencies"
+    ]
   },
   {
     "id": "ararat-rebellion",
@@ -15962,7 +16739,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "Kurdish and Zaza uprising against the Turkish government in Dersim, eastern Turkey",
-    "sitelinks_current": 30
+    "sitelinks_current": 30,
+    "wikidata_aliases": [
+      "Dersim rebellion"
+    ]
   },
   {
     "id": "treaty-of-saadabad",
@@ -15994,7 +16774,11 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1937 treaty between Turkey, Iran, Iraq, and Afghanistan",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Saadabad Pact",
+      "Saʿdābād Pact"
+    ]
   },
   {
     "id": "world-war-ii",
@@ -16045,7 +16829,18 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "1939–1945 global conflict",
-    "sitelinks_current": 291
+    "sitelinks_current": 291,
+    "wikidata_aliases": [
+      "WW 2",
+      "WW II",
+      "World War Two",
+      "2nd World War",
+      "World War 2",
+      "the Second World War",
+      "Second World War",
+      "II World War",
+      "World War 2, 1939–1945"
+    ]
   },
   {
     "id": "battle-for-jerusalem",
@@ -16131,7 +16926,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "ethnic cleansing, expulsion, and flight of Palestinians during the 1948 Palestine war",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "The Arabs of the Land of Israel in the War of Independence",
+      "1948 Palestinian expulsion and flight"
+    ]
   },
   {
     "id": "operation-dani",
@@ -16170,7 +16969,14 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Palmach military operation to conquer Lod, Ramle, Latrun and Ramallah in the 1948 Arab-Israeli War",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Operation Danni",
+      "Operation Dani",
+      "Mivtsa Dani",
+      "Mivtza Dani",
+      "Operation L.R.L.R."
+    ]
   },
   {
     "id": "operation-nachshon",
@@ -16254,7 +17060,13 @@
       "date_source_adjusted: Wikidata P585 1940-00-00 is only decade-or-coarser precision; used P580 start time 1948-05-15"
     ],
     "wikidata_description": "second and final stage of the 1947–1949 Palestine war",
-    "sitelinks_current": 50
+    "sitelinks_current": 50,
+    "wikidata_aliases": [
+      "First Arab-Israeli War",
+      "1948 War of Independence",
+      "Nakba",
+      "1948 Arab–Zionist War"
+    ]
   },
   {
     "id": "operation-yoav",
@@ -16498,7 +17310,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1949-1950 Rescue of Jews from Yemen",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Operation On Wings of Eagles"
+    ]
   },
   {
     "id": "reparations-agreement-between-israel-and-the-federal-republic-of-germany",
@@ -16678,7 +17493,13 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "27 May 1960 government coup in Turkey",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "27 Mayıs Darbesi",
+      "Turkish coup of 1960",
+      "Turkish coup of 27 May",
+      "27 May coup in Turkey"
+    ]
   },
   {
     "id": "white-revolution",
@@ -16792,7 +17613,11 @@
       "date_start_year_not_in_lead: start year 1963 (1963-06-09) is not within 1 year of any year in the Wikipedia lead [1965, 1970, 1973]"
     ],
     "wikidata_description": "Revolution against the Al Bu Said dynasty in Oman",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Dhofar War",
+      "9 June Revolution"
+    ]
   },
   {
     "id": "ankara-agreement",
@@ -16825,7 +17650,11 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1963 treaty between Turkey and the EEC",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Agreement Creating An Association Between The Republic of Turkey and the European Economic Community",
+      "Agreement establishing an association between the European Economic Community and Turkey"
+    ]
   },
   {
     "id": "aden-emergency",
@@ -16868,7 +17697,10 @@
       "date_source_adjusted: Wikidata P585 1967-11-30 equals the item's end time (P582); used P580 start time 1963-10-14"
     ],
     "wikidata_description": "Armed rebellion against British colonial rule in Yemen",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "Radfan Uprising"
+    ]
   },
   {
     "id": "palestinian-insurgency-in-south-lebanon",
@@ -16913,7 +17745,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "1968–1982 conflict initiated by Palestinian militants against Israel and Christian Lebanese factions in Lebanon",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Israel-PLO war in Lebanon"
+    ]
   },
   {
     "id": "aeroflot-flight-244",
@@ -16987,7 +17822,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "coup and political movement led by Hafez al-Assad in 1970",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "الثورة التصحيحية"
+    ]
   },
   {
     "id": "1971-turkish-military-memorandum",
@@ -17026,7 +17864,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "12 March 1971 government coup in Turkey",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "12 Mart Muhtırası",
+      "1971 Turkish coup d'état"
+    ]
   },
   {
     "id": "seizure-of-abu-musa-and-the-greater-and-lesser-tunbs",
@@ -17170,7 +18012,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "armed siege of a refugee camp in Beirut 1976",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "siege of Tel al-Zaatar",
+      "Massacre of Tel al-Zaatar"
+    ]
   },
   {
     "id": "black-friday-1978",
@@ -17443,7 +18289,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "12 September 1980 government coup in Turkey",
-    "sitelinks_current": 31
+    "sitelinks_current": 31,
+    "wikidata_aliases": [
+      "12 Eylül Darbesi"
+    ]
   },
   {
     "id": "operation-kaman-99",
@@ -17533,7 +18382,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1980 military operation",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Operation Pearl"
+    ]
   },
   {
     "id": "1981-iranian-prime-minister-s-office-bombing",
@@ -17685,7 +18537,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1982 military operation",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Operation Fath ol-Mobin"
+    ]
   },
   {
     "id": "operation-beit-ol-moqaddas",
@@ -17724,7 +18579,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1982 military operation",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Operation Jerusalem"
+    ]
   },
   {
     "id": "operation-mole-cricket-19",
@@ -17763,7 +18621,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1982 Israeli Air Force SEAD campaign",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Mole Cricket 19"
+    ]
   },
   {
     "id": "may-17-agreement",
@@ -17804,7 +18665,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": null,
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Peace Treaty between Lebanon and Israel"
+    ]
   },
   {
     "id": "iran-israel-proxy-conflict",
@@ -17859,7 +18723,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "ongoing indirect conflict between Iran and Israel",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Iran–Israel proxy war",
+      "Iran-Israel proxy conflict"
+    ]
   },
   {
     "id": "south-yemeni-crisis",
@@ -18027,7 +18895,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1988 Iraqi military operation",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Second Battle of al-Faw",
+      "Operation Ramadan Mubarak"
+    ]
   },
   {
     "id": "operation-praying-mantis",
@@ -18118,7 +18990,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "1988 Iranian military operation in the Iran–Iraq War",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Operation Forough Javidan",
+      "Operation Eternal Light",
+      "Operation Ambush"
+    ]
   },
   {
     "id": "1989-iranian-constitutional-referendum",
@@ -18468,7 +19345,11 @@
       "date_source_adjusted: Wikidata P585 1994-07-07 equals the item's end time (P582); used P580 start time 1994-05-04"
     ],
     "wikidata_description": "civil war in Yemen",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Yemeni Civil War",
+      "1994 civil war in Yemen"
+    ]
   },
   {
     "id": "1996-cruise-missile-strikes-on-iraq",
@@ -18586,7 +19467,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "bombardment of Iraq by the USA and the UK in December 1998",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "Operation Desert Fox"
+    ]
   },
   {
     "id": "operation-defensive-shield",
@@ -18674,7 +19558,23 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-03",
     "wikidata_description": "2003–2011 war after an American-led invasion",
-    "sitelinks_current": 110
+    "sitelinks_current": 110,
+    "wikidata_aliases": [
+      "Operation Iraqi Freedom",
+      "Iraqi Freedom",
+      "Invasion of Iraq",
+      "Iraq Invasion",
+      "Occupation of Iraq",
+      "War in Iraq",
+      "Second Gulf War",
+      "Gulf War II",
+      "Gulf War 2/battle of Ramadi/battle of Faluya",
+      "OIF",
+      "Iraq War, 2003-2011",
+      "Second Persian Gulf War",
+      "2nd Persian Gulf War",
+      "2nd Gulf War"
+    ]
   },
   {
     "id": "iraqi-conflict",
@@ -19079,7 +19979,10 @@
       "1991-01-15"
     ],
     "wikidata_description": "1990 major conflict between the Ba'athist Iraq and the state of Kuwait",
-    "sitelinks_current": 45
+    "sitelinks_current": 45,
+    "wikidata_aliases": [
+      "Project 17"
+    ]
   },
   {
     "id": "zurich-protocols",
@@ -19144,7 +20047,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "referendum to change the Turkish constitution in 2010\"",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "2010 referendum (Republic of Turkey)"
+    ]
   },
   {
     "id": "iraqi-insurgency-2011-2013",
@@ -19281,7 +20187,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "early stage of protests in 2011",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "civil uprising phase of the Syrian Revolution"
+    ]
   },
   {
     "id": "arab-winter",
@@ -19367,7 +20276,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2012 Israel Defense Forces military operation in the Gaza Strip",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Operation Returning Echo"
+    ]
   },
   {
     "id": "2012-syrian-constitutional-referendum",
@@ -19440,7 +20352,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "military and political conflict in northern Syria",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "Rojava conflict",
+      "Syrian Kurdistan Revolution",
+      "Syrian Kurdistan conflict"
+    ]
   },
   {
     "id": "2012-egyptian-constitutional-referendum",
@@ -19551,7 +20468,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "war fought between the Israel Defense Forces and the Hamas-governed Gaza Strip during 2014",
-    "sitelinks_current": 61
+    "sitelinks_current": 61,
+    "wikidata_aliases": [
+      "Protective Edge",
+      "Operation Protective Edge"
+    ]
   },
   {
     "id": "war-in-iraq-2013-2017",
@@ -19596,7 +20517,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Armed conflict in the Middle East",
-    "sitelinks_current": 32
+    "sitelinks_current": 32,
+    "wikidata_aliases": [
+      "Iraqi Civil War"
+    ]
   },
   {
     "id": "2014-egyptian-constitutional-referendum",
@@ -19830,7 +20754,10 @@
       "date_source_adjusted: Wikidata P585 2015-02-06 equals the item's end time (P582); used P580 start time 2014-09-21"
     ],
     "wikidata_description": "2014–2015 revolution after the capture of the capital, Sanaa",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "September 21 Revolution"
+    ]
   },
   {
     "id": "operation-inherent-resolve",
@@ -19873,7 +20800,10 @@
       "date_start_year_not_in_lead: start year 2014 (2014-09-22) is not within 1 year of any year in the Wikipedia lead [2018, 2017, 2019]"
     ],
     "wikidata_description": "2014–present military intervention against the Islamic State of Iraq and the Levant",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "OIR"
+    ]
   },
   {
     "id": "2015-2016-latakia-offensive",
@@ -19998,7 +20928,13 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "offensive which started on 22 May 2016",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Fallujah offensive",
+      "22 May 2016",
+      "Third Battle of Fallujah",
+      "Operation Breaking Terrorism"
+    ]
   },
   {
     "id": "2016-turkish-coup-d-etat-attempt",
@@ -20039,7 +20975,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "July 2016 attempted military junta coup in Turkey",
-    "sitelinks_current": 77
+    "sitelinks_current": 77,
+    "wikidata_aliases": [
+      "2016 Turkish attempted coup d'état",
+      "2016 Turkish attempted coup",
+      "2016 military uprising in Turkey"
+    ]
   },
   {
     "id": "aleppo-offensive-november-december-2016",
@@ -20079,7 +21020,13 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "December 2016 battle in Aleppo",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Operation Dawn of Victory",
+      "Aleppo offensive (November 2016)",
+      "Liberation of Aleppo",
+      "Aleppo final battle"
+    ]
   },
   {
     "id": "2017-turkish-constitutional-referendum",
@@ -20236,7 +21183,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2019 Turkish military offensive in northern Syria",
-    "sitelinks_current": 41
+    "sitelinks_current": 41,
+    "wikidata_aliases": [
+      "Operation Peace Spring",
+      "Peace Spring",
+      "2019 Rojava offensive"
+    ]
   },
   {
     "id": "2019-egyptian-constitutional-referendum",
@@ -20353,7 +21305,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2019 military operation of the Syrian civil war",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Idlib offensive"
+    ]
   },
   {
     "id": "operation-spring-shield",
@@ -20426,7 +21381,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2020 Peace agreement between the US and the Taliban",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "wikidata_aliases": [
+      "Agreement for Bringing Peace to Afghanistan"
+    ]
   },
   {
     "id": "operation-claw-eagle-2",
@@ -20458,7 +21416,11 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2021 Turkish military operation",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Gara Massacre",
+      "Gara Massacer"
+    ]
   },
   {
     "id": "iran-china-25-year-cooperation-program",
@@ -20490,7 +21452,10 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "comprehensive strategic partnership between China and Iran",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Comprehensive Strategic Partnership between I.R. Iran, P.R. China"
+    ]
   },
   {
     "id": "black-sea-grain-initiative",
@@ -20529,7 +21494,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2022 Russia–Ukraine agreement on grain export",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "Black Sea Grain deal",
+      "Grain deal",
+      "nitiative on the Safe Transportation of Grain and Foodstuffs from Ukrainian ports"
+    ]
   },
   {
     "id": "2022-gaza-israel-clashes",
@@ -20569,7 +21539,14 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2022 Israeli airstrikes on Gaza",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "The Righteous Dawn operation",
+      "Righteous Dawn operation",
+      "Breaking Dawn",
+      "Israel bombing of the Gaza Strip in 2022",
+      "Operation Breaking Dawn"
+    ]
   },
   {
     "id": "israeli-blockade-of-the-gaza-strip-2023-present",
@@ -20618,7 +21595,15 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Israeli siege of the Palestinian enclave since October 2023",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "blockade of the Gaza Strip",
+      "Gaza blockade",
+      "siege of Gaza",
+      "Gaza siege",
+      "siege of the Gaza Strip",
+      "2023 Blockade of the Gaza Strip"
+    ]
   },
   {
     "id": "war-crimes-in-the-gaza-war",
@@ -20696,7 +21681,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2023 military operation",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Operation Shield and Arrow",
+      "Shield and Arrow"
+    ]
   },
   {
     "id": "gaza-war-hostage-crisis",
@@ -20738,7 +21727,13 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "hostages taken into Gaza",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "2023 kidnapping to the Gaza Strip",
+      "kidnappings during the 2023 Israel–Hamas war",
+      "2023 Israel–Hamas war hostage crisis",
+      "Gaza war hostage crisis"
+    ]
   },
   {
     "id": "gaza-strip-famine",
@@ -20788,7 +21783,10 @@
       "date_start_year_not_in_lead: start year 2023 (2023-10-01) is not within 1 year of any year in the Wikipedia lead [2025, 2026]"
     ],
     "wikidata_description": "ongoing man-made famine in the Gaza Strip",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Gaza famine"
+    ]
   },
   {
     "id": "gaza-strip-evacuations",
@@ -20834,7 +21832,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "displacement of people by the regime in part of Palestine due to the war in Gaza",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "evacuations in Gaza",
+      "Gaza evacuations",
+      "\"ethnic cleansing of Gaza Strip\""
+    ]
   },
   {
     "id": "gaza-genocide",
@@ -20875,7 +21878,14 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "destruction of the Palestinian people in the Gaza Strip carried out by Israel during the Gaza war since 2023",
-    "sitelinks_current": 91
+    "sitelinks_current": 91,
+    "wikidata_aliases": [
+      "genocide in Gaza",
+      "genocide in the Gaza Strip",
+      "Gazan genocide",
+      "Gaza Strip genocide",
+      "Palestinian genocide"
+    ]
   },
   {
     "id": "battle-of-sderot",
@@ -20953,7 +21963,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "battle at Re'im Army Base, headquarters of the Gaza Division of the IDF, on 7 October 2023",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Re'im clashes"
+    ]
   },
   {
     "id": "kidnapping-and-killing-of-the-bibas-family",
@@ -21033,7 +22046,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "Sexual assaults committed by Hamas terrorists against Israelis",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Sexual violence during October 7"
+    ]
   },
   {
     "id": "red-sea-crisis",
@@ -21099,7 +22115,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "main part of the Houthi involvement in the Israel–Hamas war",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "United States–Iran proxy war"
+    ]
   },
   {
     "id": "2023-gaza-war-ceasefire",
@@ -21227,7 +22246,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "European Union military operation to protect Red Sea shipping",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "European Union Naval Force – Aspides",
+      "EUNAVFOR Aspides"
+    ]
   },
   {
     "id": "nuseirat-rescue-and-massacre",
@@ -21272,7 +22295,16 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2024 Israeli sucessful rescue operation to save four hostages alive from Hamas captivity during the ongoing war in Gaza. Military activity that is also widely accused for being a raid and mass killings of Palestinians",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Operation Seeds of Summer",
+      "2024 Nuseirat raid",
+      "2024 Nuseirat rescue operation",
+      "Nuseirat rescue operation",
+      "Nuseirat raid",
+      "Nuseirat massacre",
+      "Nuseirat rescue and massacre"
+    ]
   },
   {
     "id": "2024-lebanon-electronic-device-attacks",
@@ -21321,7 +22353,13 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-01",
     "wikidata_description": "explosive device attacks in Lebanon and Syria",
-    "sitelinks_current": 46
+    "sitelinks_current": 46,
+    "wikidata_aliases": [
+      "2024 Hezbollah pager explosions",
+      "2024 Lebanon pager and walkie-talkie explosions",
+      "exploding pagers",
+      "pager explosions"
+    ]
   },
   {
     "id": "20-september-2024-beirut-attack",
@@ -21469,7 +22507,14 @@
       "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2024-10-01"
     ],
     "wikidata_description": "military conflict between Lebanese organisation Hezbollah and the IDF",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "2024 Israeli ground operation in Lebanon",
+      "Israeli invasion of Lebanon",
+      "Third Lebanon War",
+      "2024 Israel–Hezbollah War",
+      "2024 Israeli invasion of Lebanon"
+    ]
   },
   {
     "id": "2024-israel-lebanon-ceasefire-agreement",
@@ -21509,7 +22554,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "sixty-day agreement halting the Israel–Hezbollah conflict started in 2024",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "2024 Israel–Hezbollah ceasefire agreement"
+    ]
   },
   {
     "id": "january-2025-gaza-war-ceasefire",
@@ -21548,7 +22596,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Israel–Hamas hostage-prisoner exchange and armistice",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Three-Phase Proposal for a Durable Peace in the Middle East",
+      "January 2025 Israel–Hamas war ceasefire",
+      "January 2025 Gaza war ceasefire"
+    ]
   },
   {
     "id": "2025-massacres-of-syrian-alawites",
@@ -21588,7 +22641,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Massacres against Alawites in Syria",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "genocide of Sirian Alawites"
+    ]
   },
   {
     "id": "march-may-2025-united-states-attacks-in-yemen",
@@ -21738,7 +22794,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "large-scale offensive in the air, land and sea in the Gaza Strip as part of Israel's war with Hamas, which began on 17 May 2025, and was announced on 4 May 2025",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Gideon's Chariots"
+    ]
   },
   {
     "id": "2025-gaza-strip-aid-distribution-killings",
@@ -21815,7 +22874,13 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Israeli surprise attack on Iran beginning on 13 June 2025",
-    "sitelinks_current": 48
+    "sitelinks_current": 48,
+    "wikidata_aliases": [
+      "Am keLavi",
+      "2025 Israeli strikes on Iran",
+      "Rising Lion",
+      "June 2025 Israeli strikes on Iran"
+    ]
   },
   {
     "id": "southern-syria-clashes-july-september-2025",
@@ -21909,7 +22974,10 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "Israeli airstrikes targeting top Houthi leaders in Sanaa",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Operation Lucky Drop"
+    ]
   },
   {
     "id": "gaza-peace-summit",
@@ -21949,7 +23017,12 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "diplomatic meeting in Sharm El Sheikh, Egypt",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Sharm El Sheikh summit",
+      "Sharm el-Sheikh summit",
+      "Sharm El Sheikh Summit for Peace: Agreement to End the War in Gaza"
+    ]
   },
   {
     "id": "2025-2026-iranian-protests",
@@ -21994,7 +23067,12 @@
       "date_source_adjusted: Wikidata P585 2020-00-00 is only decade-or-coarser precision; used P580 start time 2025-12-28"
     ],
     "wikidata_description": "2025–2026 protests against the Islamic Republic",
-    "sitelinks_current": 65
+    "sitelinks_current": 65,
+    "wikidata_aliases": [
+      "2025 Tehran Bazaar Protests",
+      "December 2025 Iranian protests",
+      "2025 Iranian protests"
+    ]
   },
   {
     "id": "2025-2026-iran-massacres",
@@ -22039,7 +23117,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "massacres of Iranian people by the Islamic Republic of Iran in 2026",
-    "sitelinks_current": 32
+    "sitelinks_current": 32,
+    "wikidata_aliases": [
+      "deaths in the 2025–2026 Iranian protests",
+      "massacres during the 2025–2026 Iranian protests"
+    ]
   },
   {
     "id": "2026-iran-war",
@@ -22087,7 +23169,21 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "ongoing armed conflict in West Asia",
-    "sitelinks_current": 102
+    "sitelinks_current": 102,
+    "wikidata_aliases": [
+      "True Promise IV",
+      "True Promise 4",
+      "Roaring Lion",
+      "Operation Shield of Judah",
+      "Operation Epic Fury",
+      "Operation Roaring Lion",
+      "2026 war on Iran",
+      "US-Israel war on Iran",
+      "US-Israeli Iran War",
+      "2026 Ramadan war",
+      "Third Gulf War",
+      "West Asia War"
+    ]
   },
   {
     "id": "fall-of-aden-2026",
@@ -22162,7 +23258,11 @@
     "needs_review": false,
     "extract_retrieved_at": "2026-10-10",
     "wikidata_description": "defence agreement between Saudi Arabia, Turkey, and Pakistan",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "Makkah Joint Defence Agreement",
+      "Makkah Joint Defense Agreement"
+    ]
   },
   {
     "id": "shiraz-pogrom",
@@ -22285,7 +23385,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "1914 armed conflicts between the Russian and Ottoman Empires during WWI",
-    "sitelinks_current": 42
+    "sitelinks_current": 42,
+    "wikidata_aliases": [
+      "Caucasus offensive, 1918"
+    ]
   },
   {
     "id": "middle-eastern-theatre-of-world-war-i",
@@ -22341,7 +23444,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "scene of action between 29 October 1914 and 30 October 1918",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "World War I in the Middle East"
+    ]
   },
   {
     "id": "mesopotamian-campaign",
@@ -22425,7 +23531,10 @@
     ],
     "needs_review": true,
     "wikidata_description": "1915 military operation of WWI",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Actions on the Suez Canal"
+    ]
   },
   {
     "id": "sinai-and-palestine-campaign",
@@ -22466,7 +23575,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "campaign of the Middle Eastern theatre of World War I",
-    "sitelinks_current": 34
+    "sitelinks_current": 34,
+    "wikidata_aliases": [
+      "Sinai and Palestine Campaign"
+    ]
   },
   {
     "id": "stalemate-in-southern-palestine",
@@ -22589,7 +23701,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Arab attacks on Hebrew settlements in the Galilee - Tel Hai events and neighborhoods of Jews in Jerusalem that occurred in 1920",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "1920 Jerusalem riots"
+    ]
   },
   {
     "id": "jaffa-riots-may-1921",
@@ -22633,7 +23748,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "1921 riots in Jaffa, Mandate Palestine",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "ليس 1921 بل 1229"
+    ]
   },
   {
     "id": "chanak-crisis",
@@ -22672,7 +23790,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "war scare in September 1922 between the United Kingdom and Turkey",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Chanak affair",
+      "Chanak incident"
+    ]
   },
   {
     "id": "1929-hebron-massacre",
@@ -22855,7 +23977,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "one of two major stages of the North African Campaign during WWII",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Desert War"
+    ]
   },
   {
     "id": "italian-invasion-of-egypt",
@@ -22900,7 +24025,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Italian offensive during the Western Desert Campaign (1940–1943) of the Second World War",
-    "sitelinks_current": 32
+    "sitelinks_current": 32,
+    "wikidata_aliases": [
+      "Operazione E"
+    ]
   },
   {
     "id": "bombing-of-bahrain-in-world-war-ii",
@@ -23012,7 +24140,18 @@
     ],
     "needs_review": true,
     "wikidata_description": "anti-Jewish massacres (pogroms) that took place in Baghdad (Iraq) in 1941",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "The Farhud",
+      "AFarhud",
+      "Al-Farhoud",
+      "The Farhoud",
+      "Al-Farhud",
+      "Farhoud",
+      "AlFarhud",
+      "A-Farhud",
+      "A-Farhoud"
+    ]
   },
   {
     "id": "anglo-soviet-invasion-of-iran",
@@ -23057,7 +24196,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "1941 invasion during World War II",
-    "sitelinks_current": 44
+    "sitelinks_current": 44,
+    "wikidata_aliases": [
+      "Anglo-Soviet Invasion of Persia",
+      "Operation Countenance"
+    ]
   },
   {
     "id": "tehran-conference",
@@ -23093,7 +24236,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "strategy meeting of the leaders of the USSR, the USA, and the UK in Tehran in 1943 during World War 2",
-    "sitelinks_current": 71
+    "sitelinks_current": 71,
+    "wikidata_aliases": [
+      "codenamed '''Eureka\""
+    ]
   },
   {
     "id": "levant-crisis",
@@ -23174,7 +24320,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "conflict in northwestern Iran",
-    "sitelinks_current": 36
+    "sitelinks_current": 36,
+    "wikidata_aliases": [
+      "Iran crisis of 1946"
+    ]
   },
   {
     "id": "1946-turkish-general-election",
@@ -23207,7 +24356,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "general election held in the Republic of Turkey in 1946",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Turkish general election, 1946"
+    ]
   },
   {
     "id": "1947-anti-jewish-riots-in-aleppo",
@@ -23375,7 +24527,13 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "geopolitical conflict in the Middle East and North Africa between Israel and its Arab neighbours",
-    "sitelinks_current": 120
+    "sitelinks_current": 120,
+    "wikidata_aliases": [
+      "Arab–Israeli wars",
+      "Arab-Israeli conflict",
+      "Arab–Israeli war",
+      "Arab–Israeli conflicts"
+    ]
   },
   {
     "id": "gaza-israel-conflict",
@@ -23416,7 +24574,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "armed conflict between armed forces of Israel and armed forces of Gaza",
-    "sitelinks_current": 34
+    "sitelinks_current": 34,
+    "wikidata_aliases": [
+      "Gaza conflict",
+      "Hamas conflict"
+    ]
   },
   {
     "id": "safsaf-massacre",
@@ -23498,7 +24660,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "elections for the first Israeli Knesset",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Israeli legislative election 1949"
+    ]
   },
   {
     "id": "1951-israeli-legislative-election",
@@ -23531,7 +24696,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the second Knesset",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Israeli legislative election 1951"
+    ]
   },
   {
     "id": "cairo-fire",
@@ -23567,7 +24735,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "riots in Cairo, Egypt in 1952",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Black Saturday"
+    ]
   },
   {
     "id": "ma-ale-akrabim-massacre",
@@ -23642,7 +24813,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the third Knesset",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli legislative election 1955"
+    ]
   },
   {
     "id": "istanbul-pogrom",
@@ -23680,7 +24854,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "series of state-sponsored anti-Greek mob attacks",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "wikidata_aliases": [
+      "Istanbul riots"
+    ]
   },
   {
     "id": "1959-israeli-legislative-election",
@@ -23713,7 +24890,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the fourth Knesset",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli legislative election 1959"
+    ]
   },
   {
     "id": "1961-israeli-legislative-election",
@@ -23746,7 +24926,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the fifth Knesset",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Israeli legislative election 1961"
+    ]
   },
   {
     "id": "1964-hama-riot",
@@ -23819,7 +25002,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the sixth Knesset",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Israeli legislative election 1965"
+    ]
   },
   {
     "id": "operation-focus",
@@ -23906,7 +25092,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "military occupation by Israel since 1967",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Israeli presence in the Judea and samarie"
+    ]
   },
   {
     "id": "political-violence-in-turkey-1976-1980",
@@ -24067,7 +25256,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the seventh Knesset",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli legislative election 1969"
+    ]
   },
   {
     "id": "1973-israeli-legislative-election",
@@ -24100,7 +25292,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the eighth Knesset",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli legislative election 1973"
+    ]
   },
   {
     "id": "syrian-occupation-of-lebanon",
@@ -24173,7 +25368,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the ninth Knesset",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Israeli legislative election 1977"
+    ]
   },
   {
     "id": "1978-south-lebanon-conflict",
@@ -24220,7 +25418,13 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "1978 war between Israel and Lebanon and the PLO",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "Operation Litani",
+      "Invasion of Lebanon 1978",
+      "South Lebanon Conflict 1978",
+      "1978 South Lebanon conflict"
+    ]
   },
   {
     "id": "kurdistan-workers-party-insurgency",
@@ -24264,7 +25468,15 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "armed conflict between the Republic of Turkey and various Kurdish insurgent groups",
-    "sitelinks_current": 31
+    "sitelinks_current": 31,
+    "wikidata_aliases": [
+      "Kurdish Conflict",
+      "Kurdish insurgency",
+      "Kurdish rebellion",
+      "Kurdish uprising",
+      "Kurdistan Workers' Party insurgency",
+      "Kurdish–Turkish conflict (PKK)"
+    ]
   },
   {
     "id": "arab-cold-war",
@@ -24362,7 +25574,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": null,
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "International Women's Day Protests in Tehran, 1979"
+    ]
   },
   {
     "id": "1980-iranian-presidential-election",
@@ -24439,7 +25654,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Israeli air strike carried out on 7 June 1981, which destroyed an Iraqi nuclear reactor Osirak",
-    "sitelinks_current": 39
+    "sitelinks_current": 39,
+    "wikidata_aliases": [
+      "Operation Babylon"
+    ]
   },
   {
     "id": "1981-israeli-legislative-election",
@@ -24472,7 +25690,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the tenth Knesset",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Israeli legislative election 1981"
+    ]
   },
   {
     "id": "july-1981-iranian-presidential-election",
@@ -24513,7 +25734,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2nd Iranian presidential election",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Iranian presidential election, July 1981"
+    ]
   },
   {
     "id": "october-1981-iranian-presidential-election",
@@ -24554,7 +25778,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "3rd Iranian presidential election",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Iranian presidential election, October 1981"
+    ]
   },
   {
     "id": "tanker-war",
@@ -24606,7 +25833,10 @@
     ],
     "needs_review": true,
     "wikidata_description": "protracted series of armed skirmishes against merchant vessels during the Iran–Iraq War",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Tanker War"
+    ]
   },
   {
     "id": "1984-israeli-legislative-election",
@@ -24639,7 +25869,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the eleventh Knesset",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Israeli legislative election 1984"
+    ]
   },
   {
     "id": "israeli-occupation-of-southern-lebanon-1982-2000",
@@ -24684,7 +25917,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "1985 military occupation",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "South Lebanon Security Belt"
+    ]
   },
   {
     "id": "1985-iranian-presidential-election",
@@ -24717,7 +25953,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "4th Iranian presidential election",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Iranian presidential election, 1985"
+    ]
   },
   {
     "id": "iran-air-flight-655",
@@ -24753,7 +25992,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "1988 airliner shootdown",
-    "sitelinks_current": 43
+    "sitelinks_current": 43,
+    "wikidata_aliases": [
+      "IR655"
+    ]
   },
   {
     "id": "1988-israeli-legislative-election",
@@ -24786,7 +26028,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the 12th Knesset",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli legislative election 1988"
+    ]
   },
   {
     "id": "1991-iraqi-missile-attacks-against-israel",
@@ -24833,7 +26078,10 @@
     "extract_retrieved_at": "2026-10-10",
     "needs_review": true,
     "wikidata_description": "1991 unsuccessful Iraqi campaign against Israel during the Gulf War",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israel in the Gulf War"
+    ]
   },
   {
     "id": "1992-israeli-legislative-election",
@@ -24866,7 +26114,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the 13th Knesset",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli legislative election 1992"
+    ]
   },
   {
     "id": "cave-of-the-patriarchs-massacre",
@@ -24918,7 +26169,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "mass shooting committed by American-Israeli Baruch Goldstein",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "Ibrahimi Mosque massacre",
+      "Hebron massacre"
+    ]
   },
   {
     "id": "1996-palestinian-general-election",
@@ -24959,7 +26214,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "general election held in the Palestinian National Authority",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Palestinian general election, 1996"
+    ]
   },
   {
     "id": "1996-israeli-general-election",
@@ -25000,7 +26258,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "elections for the Israeli Knesset",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Israeli general election, 1996"
+    ]
   },
   {
     "id": "1999-istanbul-summit",
@@ -25065,7 +26326,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "elections for the 15th Knesset",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Israeli general election, 1999"
+    ]
   },
   {
     "id": "1999-iranian-student-protests",
@@ -25142,7 +26406,12 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "guerra entre fuerzas israelíes, libanesas, sirias y otras en el Líbano desde 1948",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Lebanese–Lebanese conflict",
+      "Israeli-Lebanese conflict",
+      "Israel-Lebanon conflict"
+    ]
   },
   {
     "id": "2001-israeli-prime-ministerial-election",
@@ -25174,7 +26443,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "elections for the Israeli prime minister",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Israeli prime ministerial election, 2001"
+    ]
   },
   {
     "id": "dolphinarium-discotheque-bombing",
@@ -25249,7 +26521,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "8th Iranian presidential election",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Iranian presidential election, 2001"
+    ]
   },
   {
     "id": "sbarro-restaurant-suicide-bombing",
@@ -25291,7 +26566,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2001 terror attack in Jerusalem, Israel",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Masacre de Sbarro"
+    ]
   },
   {
     "id": "passover-massacre",
@@ -25369,7 +26647,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": null,
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Iraqi presidential referendum, 2002"
+    ]
   },
   {
     "id": "2002-turkish-general-election",
@@ -25435,7 +26716,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "elections for the 16th Knesset",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Israeli legislative election, 2003"
+    ]
   },
   {
     "id": "anbar-campaign-2003-2011",
@@ -25475,7 +26759,12 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Campaign of the Iraq War, 2003–2011",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Al Anbar campaign",
+      "Al Anbar Governorate in the Iraq War",
+      "Iraq War in Anbar Province"
+    ]
   },
   {
     "id": "maxim-restaurant-suicide-bombing",
@@ -25622,7 +26911,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "NATO diplomatic conference in Turkey",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "2004 Turkey summit",
+      "2004 NATO summit"
+    ]
   },
   {
     "id": "2005-palestinian-presidential-election",
@@ -25655,7 +26948,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "general election held in the Palestinian National Authority",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Palestinian presidential election, 2005"
+    ]
   },
   {
     "id": "january-2005-iraqi-parliamentary-election",
@@ -25696,7 +26992,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Iraqi parliamentary election, January 2005"
+    ]
   },
   {
     "id": "2005-iranian-presidential-election",
@@ -25729,7 +27028,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "9th Iranian presidential election",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "Iranian presidential election, 2005"
+    ]
   },
   {
     "id": "2005-egyptian-presidential-election",
@@ -25762,7 +27064,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "first allegedly contested presidential election in Egypt's history",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Egyptian presidential election, 2005"
+    ]
   },
   {
     "id": "december-2005-iraqi-parliamentary-election",
@@ -25803,7 +27108,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Iraqi parliamentary election, December 2005"
+    ]
   },
   {
     "id": "2006-gaza-israel-conflict",
@@ -25843,7 +27151,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Israeli military offensive in the Gaza strip",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Operation Summer Rains"
+    ]
   },
   {
     "id": "2006-palestinian-legislative-election",
@@ -25884,7 +27195,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "Palestinian legislative election, 2006"
+    ]
   },
   {
     "id": "2006-israeli-legislative-election",
@@ -25925,7 +27239,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Elections for the 17th Knesset",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Israeli legislative election 2006"
+    ]
   },
   {
     "id": "2006-qana-airstrike",
@@ -25995,7 +27312,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Syrian presidential election, 2007"
+    ]
   },
   {
     "id": "july-12-2007-baghdad-airstrike",
@@ -26032,7 +27352,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "series of air-to-ground attacks by a team of two Apache helicopters in Al-Amin al-Thaniyah",
-    "sitelinks_current": 20
+    "sitelinks_current": 20,
+    "wikidata_aliases": [
+      "Collateral Murder"
+    ]
   },
   {
     "id": "2007-turkish-general-election",
@@ -26073,7 +27396,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Turkish general election, 2007"
+    ]
   },
   {
     "id": "2007-turkish-presidential-election",
@@ -26114,7 +27440,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Turkish presidential election",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Turkish presidential election, 2007"
+    ]
   },
   {
     "id": "george-w-bush-shoe-throwing-incident",
@@ -26148,7 +27477,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "2008 incident in Baghdad, Iraq",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Bush shoe",
+      "Iraqi Shoe Toss"
+    ]
   },
   {
     "id": "2009-israeli-legislative-election",
@@ -26181,7 +27514,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Elections for the 18th Knesset",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "Israeli legislative election 2009"
+    ]
   },
   {
     "id": "2009-lebanese-general-election",
@@ -26214,7 +27550,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": null,
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Lebanese general election, 2009"
+    ]
   },
   {
     "id": "2009-iranian-presidential-election",
@@ -26255,7 +27594,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "10th Iranian presidential election",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "wikidata_aliases": [
+      "Iranian presidential election, 2009"
+    ]
   },
   {
     "id": "2009-iranian-presidential-election-protests",
@@ -26329,7 +27671,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "Iraqi parliamentary election, 2010"
+    ]
   },
   {
     "id": "2010-gaza-flotilla-raid",
@@ -26509,7 +27854,10 @@
     ],
     "needs_review": true,
     "wikidata_description": "series of demonstrations in Iran",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "2011–12 Iranian protests"
+    ]
   },
   {
     "id": "2011-turkish-general-election",
@@ -26542,7 +27890,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "general election held on 12 June 2011",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Turkish general election of 2011",
+      "Turkish general election, 2011"
+    ]
   },
   {
     "id": "syrian-civil-war-spillover-in-lebanon",
@@ -26611,7 +27963,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Egyptian parliamentary election, 2011–2012"
+    ]
   },
   {
     "id": "2011-british-embassy-in-iran-attack",
@@ -26718,7 +28073,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "parliamentary election in Syria",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Syrian parliamentary election, 2012"
+    ]
   },
   {
     "id": "2012-egyptian-presidential-election",
@@ -26826,7 +28184,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election for the nineteenth Knesset",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "Israeli legislative election, 2013"
+    ]
   },
   {
     "id": "turkey-islamic-state-conflict",
@@ -26977,7 +28338,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "11th Iranian presidential election",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Iranian presidential election, 2013"
+    ]
   },
   {
     "id": "2014-turkish-local-elections",
@@ -27044,7 +28408,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Iraqi parliamentary election, 2014",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Iraqi parliamentary election, 2014"
+    ]
   },
   {
     "id": "2014-egyptian-presidential-election",
@@ -27077,7 +28444,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "presidential election in Egypt held between 26 and 28 May 2014",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Egyptian presidential election, 2014"
+    ]
   },
   {
     "id": "2014-syrian-presidential-election",
@@ -27110,7 +28480,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Syrian presidential election, 2014"
+    ]
   },
   {
     "id": "islamic-state-invasion-of-iraq",
@@ -27162,7 +28535,10 @@
     ],
     "needs_review": true,
     "wikidata_description": "ISIL military offensive in northern Iraq against Iraqi government (2014)",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "2014 Northern Iraq offensive"
+    ]
   },
   {
     "id": "2014-israeli-presidential-election",
@@ -27195,7 +28571,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": null,
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Israeli presidential election, 2014"
+    ]
   },
   {
     "id": "war-against-the-islamic-state",
@@ -27243,7 +28622,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "military actions against the Islamic State",
-    "sitelinks_current": 38
+    "sitelinks_current": 38,
+    "wikidata_aliases": [
+      "Fight against IS"
+    ]
   },
   {
     "id": "2014-turkish-presidential-election",
@@ -27276,7 +28658,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Turkish presidential election in 2014",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Turkish presidential election, 2014"
+    ]
   },
   {
     "id": "united-states-intervention-in-syria",
@@ -27323,7 +28708,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Military campaign against Islamist extremist militant groups in Syria led by the United States of America",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "American intervention in the Syrian civil war and conflict"
+    ]
   },
   {
     "id": "second-battle-of-tikrit",
@@ -27398,7 +28786,12 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election for the twentieth Knesset",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Israeli legislative election of 2015",
+      "2015 Israeli election",
+      "Israeli legislative election, 2015"
+    ]
   },
   {
     "id": "houthi-saudi-conflict",
@@ -27443,7 +28836,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "clashes and airstrikes in Jazan, Najran and Asir in southern Saudi Arabia",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "conflict in Najran"
+    ]
   },
   {
     "id": "june-2015-turkish-general-election",
@@ -27484,7 +28880,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "general election held on 7 June 2015",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "wikidata_aliases": [
+      "Turkish general election of 2015",
+      "Turkish general election, Jun 2015"
+    ]
   },
   {
     "id": "2015-2016-lebanese-protests",
@@ -27604,7 +29004,10 @@
     ],
     "needs_review": true,
     "wikidata_description": "election",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Egyptian parliamentary election, 2015"
+    ]
   },
   {
     "id": "2015-al-hawl-offensive",
@@ -27691,7 +29094,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "Turkish general election, November 2015"
+    ]
   },
   {
     "id": "2015-g20-antalya-summit",
@@ -27804,7 +29210,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": null,
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Saudi Arabian municipal elections, 2015"
+    ]
   },
   {
     "id": "2016-iranian-legislative-election",
@@ -27837,7 +29246,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Parliamentary elections in Iran",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Iranian legislative election, 2016"
+    ]
   },
   {
     "id": "2016-syrian-parliamentary-election",
@@ -27870,7 +29282,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "parliamentary election in Syria",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Syrian parliamentary election, 2016"
+    ]
   },
   {
     "id": "2016-saudi-arabia-bombings",
@@ -27909,7 +29324,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "series of suicide bombings in Saudi Arabia on 4 July 2016",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "Prophet's Mosque bombing",
+      "2016 Medina suicide bombing"
+    ]
   },
   {
     "id": "turkish-occupation-of-northern-syria",
@@ -27942,7 +29361,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "an autonomous region in northern Syria (under the control of the Syrian opposition)",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Northern Syria Security Belt",
+      "Safe Zone in Syria"
+    ]
   },
   {
     "id": "manbij-offensive-2016",
@@ -27985,7 +29408,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2016 military operation by the Syrian Democratic Forces (SDF) in Aleppo Governorate, Syria",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "Battle of Manbij"
+    ]
   },
   {
     "id": "2016-jordanian-general-election",
@@ -28018,7 +29444,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "elections",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Jordanian general election, 2016"
+    ]
   },
   {
     "id": "raqqa-campaign-2016-2017",
@@ -28071,7 +29500,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2016-2017 offensive to liberate Raqqa from ISIL",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "Operation Wrath of Euphrates"
+    ]
   },
   {
     "id": "2017-dutch-turkish-diplomatic-incident",
@@ -28185,7 +29617,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "2017 chemical attack in Syria",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "Gas attack reportedly kills dozens in Syria",
+      "2017 Khan Shaykhun chemical attack"
+    ]
   },
   {
     "id": "2017-shayrat-missile-strike",
@@ -28344,7 +29780,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Iranian protesters in hijab status",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "Girls of Enghelab protests"
+    ]
   },
   {
     "id": "2017-2018-iranian-protests",
@@ -28378,7 +29817,16 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "series of demonstrations in Iran beginning on 28 December 2017",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "wikidata_aliases": [
+      "2017 anti-government protests in Iran",
+      "Iran's anti-government protests, 2017",
+      "2017 Iran protests",
+      "2017 Iranian protests",
+      "2018 Iranian protests",
+      "December 2017 unrests in Iran",
+      "anti-government protests in Iran (2017)"
+    ]
   },
   {
     "id": "february-2018-israel-syria-incident",
@@ -28427,7 +29875,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2018 air attack",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "Israeli F-16 shot down by Syrian anti-aircraft forces, tensions growing between the two countries"
+    ]
   },
   {
     "id": "2018-egyptian-presidential-election",
@@ -28460,7 +29911,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "International Egyptian Presidential Elections",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "wikidata_aliases": [
+      "Egyptian presidential election, 2018"
+    ]
   },
   {
     "id": "2018-2019-gaza-border-protests",
@@ -28503,7 +29957,15 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "escalation on the Israel–Gaza border starting in 2018",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "2018 Land Day demonstration",
+      "2018 Land Day incidents",
+      "Great March of Return",
+      "2018–19 Gaza border protests",
+      "Gaza protests",
+      "Gaza border protests"
+    ]
   },
   {
     "id": "douma-chemical-attack",
@@ -28646,7 +30108,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2018 military offensive",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Operation Damascus Steel"
+    ]
   },
   {
     "id": "united-arab-emirates-occupation-of-socotra",
@@ -28719,7 +30184,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Parliamentary election held in Lebanon",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Lebanese general election, 2018"
+    ]
   },
   {
     "id": "operation-house-of-cards",
@@ -28792,7 +30260,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "election",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Iraqi parliamentary election, 2018"
+    ]
   },
   {
     "id": "2018-turkish-presidential-election",
@@ -28845,7 +30316,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "21st Turkish presidential election",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "Turkish presidential election, 2018"
+    ]
   },
   {
     "id": "2018-turkish-general-election",
@@ -28892,7 +30366,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2018 Presidential and parliamentary elections in Turkey",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "Turkish general election, 2018"
+    ]
   },
   {
     "id": "2018-turkish-parliamentary-election",
@@ -28945,7 +30422,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "parliamentary election",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "Turkish parliamentary election, 2018"
+    ]
   },
   {
     "id": "2015-2018-iraqi-protests",
@@ -29029,7 +30509,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2018 Israeli air strikes on western Syria during the Syrian Civil War",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "2018 Russian Ilyushin Il-20 shootdown",
+      "2018 Russian Air Force Ilyushin Il-18 shootdown"
+    ]
   },
   {
     "id": "december-2019-united-states-airstrikes-in-iraq-and-syria",
@@ -29092,7 +30576,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2019 war event against Iraqi group Kata'ib Hezbollah",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "United States bombing of Kata'ib Hizbollah"
+    ]
   },
   {
     "id": "2019-turkish-local-elections",
@@ -29167,7 +30654,15 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election for the twenty-first Knesset",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Israeli legislative election, April 2019",
+      "April 2019 Israeli elections",
+      "Knesset election, April 2019",
+      "Israel elections, April 2019",
+      "2019 Israeli elections",
+      "Knesset election, 2019"
+    ]
   },
   {
     "id": "june-2019-istanbul-mayoral-election",
@@ -29298,7 +30793,14 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election for the 22nd Knesset",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "2019 Israeli legislative election",
+      "2019 Israeli elections",
+      "Israel elections, September 2019",
+      "Israeli elections, September 2019",
+      "September Knesset election, 2019"
+    ]
   },
   {
     "id": "2019-2021-iraqi-protests",
@@ -29342,7 +30844,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "ongoing series of protests",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Tishreen Revolution"
+    ]
   },
   {
     "id": "17-october-revolution",
@@ -29414,7 +30919,12 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Iranian series of protests",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "wikidata_aliases": [
+      "Bloody November",
+      "Aban 98",
+      "Aban 1398"
+    ]
   },
   {
     "id": "ukraine-international-airlines-flight-752",
@@ -29459,7 +30969,15 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "flight shot down by Iranian armed forces",
-    "sitelinks_current": 47
+    "sitelinks_current": 47,
+    "wikidata_aliases": [
+      "Crash of Ukraine International Airlines Flight 752 on January 8, 2020",
+      "Ukraine International Airlines flight 752",
+      "Crash of flight PS752 on January 8, 2020",
+      "PS752",
+      "AUI752",
+      "UKRAINE INTERNATIONAL 752"
+    ]
   },
   {
     "id": "operation-martyr-soleimani",
@@ -29508,7 +31026,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Iranian military offensive on January 8, 2020",
-    "sitelinks_current": 31
+    "sitelinks_current": 31,
+    "wikidata_aliases": [
+      "Operation Martyr Soleimani",
+      "2020 Al Asad Airbase strike"
+    ]
   },
   {
     "id": "2020-israeli-legislative-election",
@@ -29556,7 +31078,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election for the 23rd Knesset",
-    "sitelinks_current": 24
+    "sitelinks_current": 24,
+    "wikidata_aliases": [
+      "Israel elections 2020"
+    ]
   },
   {
     "id": "2020-syrian-parliamentary-election",
@@ -29661,7 +31186,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "15th summit of Group of Twenty",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "2020 G20 summit"
+    ]
   },
   {
     "id": "january-2021-baghdad-bombings",
@@ -29791,7 +31319,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "protocol incident between the European Union and Turkey",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "Sofa-Gate"
+    ]
   },
   {
     "id": "2021-syrian-presidential-election",
@@ -29857,7 +31388,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "13th Iranian presidential election",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "wikidata_aliases": [
+      "Iranian presidential election, 2021"
+    ]
   },
   {
     "id": "2021-2022-iranian-protests",
@@ -29889,7 +31423,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "series of protests in 2021–2022",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "wikidata_aliases": [
+      "2021 summer Iranian protests"
+    ]
   },
   {
     "id": "2021-qatari-general-election",
@@ -29922,7 +31459,13 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "first elections in Qatar, held October 2021",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "Qatari legislative election, 2021",
+      "2021 Qatar general election",
+      "Qatari general election, 2021",
+      "2021 Qatari general election"
+    ]
   },
   {
     "id": "2021-iraqi-parliamentary-election",
@@ -29990,7 +31533,13 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "2021 armed clashes in Beirut, Lebanon",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "2021 Beirut shootings",
+      "2021 Beirut massacre",
+      "Tayouneh Incident",
+      "Mini May 7 Clashes"
+    ]
   },
   {
     "id": "2021-2022-iraqi-political-crisis",
@@ -30195,7 +31744,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "election for the 25th Knesset held on 1 November 2022",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "wikidata_aliases": [
+      "Israeli legislative election, 2022"
+    ]
   },
   {
     "id": "2023-iran-drone-attacks",
@@ -30230,7 +31782,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "January 2023 drone strikes against a munitions factory in Isfahan",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "wikidata_aliases": [
+      "2023 Iran explosions",
+      "Iran drone attacks"
+    ]
   },
   {
     "id": "2023-israel-palestine-tensions",
@@ -30414,7 +31970,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": null,
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "wikidata_aliases": [
+      "2023 Turkish parliamentary election"
+    ]
   },
   {
     "id": "2023-turkish-general-election",
@@ -30619,7 +32178,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "series of conflicts in the Middle East beginning on 7 October 2023",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "wikidata_aliases": [
+      "Middle Eastern crisis"
+    ]
   },
   {
     "id": "al-shati-refugee-camp-airstrikes",
@@ -30730,7 +32292,13 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "17 October 2023 explosion in Gaza",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "wikidata_aliases": [
+      "2023 Gaza hospital explosion",
+      "Gaza hospital explosion",
+      "attack on Baptist hospital in Gaza",
+      "al-Ahli Arab Hospital bombing"
+    ]
   },
   {
     "id": "attacks-on-us-bases-during-the-middle-eastern-crisis-2023-present",
@@ -31089,7 +32657,15 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Iranian retaliatory strikes against Israel on 13 April 2024",
-    "sitelinks_current": 50
+    "sitelinks_current": 50,
+    "wikidata_aliases": [
+      "Operation True Promise",
+      "2024 Iranian strikes on Israel",
+      "2024 Iranian drone strike on Israel",
+      "Iranian strike on Israel",
+      "Iranian strikes on Israel",
+      "April 2024 Iranian strikes on Israel"
+    ]
   },
   {
     "id": "april-2024-israeli-strikes-on-iran",
@@ -31136,7 +32712,14 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Israeli attacks against Iran",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "2024 Israeli missile attacks in Iran",
+      "2024 Israeli attacks in Iran",
+      "2024 Israeli drone attacks against Iran",
+      "2024 Israeli strikes on Iran",
+      "Israeli strikes on Iran"
+    ]
   },
   {
     "id": "2024-iranian-presidential-election",
@@ -31258,7 +32841,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "episode of the 2024 Iran–Israel conflict",
-    "sitelinks_current": 35
+    "sitelinks_current": 35,
+    "wikidata_aliases": [
+      "Operation True Promise 2",
+      "Iranian strikes on Israel"
+    ]
   },
   {
     "id": "october-2024-israeli-strikes-on-iran",
@@ -31307,7 +32894,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "26 October 2024 Israeli retaliation on Iran",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "Operation Days of Repentance"
+    ]
   },
   {
     "id": "2024-syrian-opposition-offensives",
@@ -31347,7 +32937,14 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "2024 HTS-led military operation of the Syrian civil war",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "wikidata_aliases": [
+      "Operation Deterrence of Aggression",
+      "Deterrence of Aggression",
+      "2024 Northwestern Syria offensive",
+      "Northwestern Syria offensive",
+      "Syrian opposition offensives"
+    ]
   },
   {
     "id": "southern-syria-offensive-2024",
@@ -31471,7 +33068,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "HTS-led military operation during the Syrian civil war",
-    "sitelinks_current": 16
+    "sitelinks_current": 16,
+    "wikidata_aliases": [
+      "Homs offensive"
+    ]
   },
   {
     "id": "israeli-invasion-of-syria-2024-present",
@@ -31518,7 +33118,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "military invasion by Israel into Syria following the fall of the Assad regime",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "wikidata_aliases": [
+      "Operation Bashan Arrow"
+    ]
   },
   {
     "id": "2025-2026-turkish-protests",
@@ -31598,7 +33201,15 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Bombing of Iranian nuclear facilities by the United States (2025)",
-    "sitelinks_current": 45
+    "sitelinks_current": 45,
+    "wikidata_aliases": [
+      "US attacks on Iran in 2025",
+      "American strikes on Iranian nuclear sites",
+      "Midnight Hammer",
+      "United States attacks on Iranian nuclear facilities",
+      "Operation Midnight Hammer",
+      "American strikes on Iran"
+    ]
   },
   {
     "id": "2025-iranian-strikes-on-al-udeid-air-base",
@@ -31703,7 +33314,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "Israeli airstrike",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Nasser Hospital attack"
+    ]
   },
   {
     "id": "2025-syrian-parliamentary-election",
@@ -31777,7 +33391,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "Parliamentary Elections of the Council of Representatives of Iraq",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "next Iraqi parliamentary election"
+    ]
   },
   {
     "id": "2025-2026-southern-yemen-campaign",
@@ -31817,7 +33434,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "military campaign in Yemen",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "Operation Promising Future"
+    ]
   },
   {
     "id": "2026-northeastern-syria-offensive",
@@ -31925,7 +33545,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "period of heightened tensions between Iran and the United States",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "wikidata_aliases": [
+      "prelude to the 2026 Iran conflict"
+    ]
   },
   {
     "id": "united-arab-emirates-in-the-2026-iran-war",
@@ -32062,7 +33685,10 @@
     "extract_retrieved_at": "2026-10-10",
     "needs_review": true,
     "wikidata_description": "2026 torpedo attack",
-    "sitelinks_current": 15
+    "sitelinks_current": 15,
+    "wikidata_aliases": [
+      "IRIS Dena's sinking"
+    ]
   },
   {
     "id": "2026-iranian-supreme-leader-election",
@@ -32133,7 +33759,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "2026 mass shooting in Turkey",
-    "sitelinks_current": 34
+    "sitelinks_current": 34,
+    "wikidata_aliases": [
+      "2026 Kahramanmaraş school shooting",
+      "shooting in Ayser Çalık school"
+    ]
   },
   {
     "id": "2026-ankara-nato-summit",
@@ -32166,7 +33796,13 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "NATO diplomatic conference in Turkey",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "wikidata_aliases": [
+      "2026 Turkey summit",
+      "2026 NATO summit",
+      "2026 Ankara NATO summit",
+      "Ankara summit 2026"
+    ]
   },
   {
     "id": "2026-yemen-offensives",
@@ -32240,7 +33876,10 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": false,
     "wikidata_description": "next Israeli election",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "Israeli legislative election, 2026"
+    ]
   },
   {
     "id": "attack-on-the-united-states-embassy-in-baghdad",
@@ -32295,7 +33934,11 @@
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
     "wikidata_description": "storming of the United States embassy in Baghdad, beginning starting on 31 December 2019",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "wikidata_aliases": [
+      "US Baghdad embassy attacked by protesters",
+      "2019 attack on the United States embassy in Iraq"
+    ]
   },
   {
     "id": "operation-guardian-of-the-walls",
@@ -32353,7 +33996,11 @@
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikidata_description": "2021 Israel Defense Forces operation in the Gaza Strip",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "wikidata_aliases": [
+      "Operation Wall Guardian",
+      "Guardian of the Walls"
+    ]
   },
   {
     "id": "israeli-invasion-of-the-gaza-strip",
@@ -32412,7 +34059,15 @@
     ],
     "needs_review": true,
     "wikidata_description": "Israeli military operation against Hamas since 2023",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "wikidata_aliases": [
+      "Operation Swords of Iron",
+      "Operation Iron Swords",
+      "Swords of Iron",
+      "Iron Swords",
+      "Gaza Strip invasion",
+      "2023 Israeli invasion of the Gaza Strip"
+    ]
   },
   {
     "id": "ein-hashlosha-massacre",
@@ -32520,6 +34175,11 @@
     "extract_retrieved_at": "2026-09-26",
     "needs_review": true,
     "wikidata_description": "Iranian retaliatory strikes against Israel in June 2025",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "wikidata_aliases": [
+      "2025 Iranian strikes on Israel",
+      "True Promise III",
+      "June 2025 Iranian strikes on Israel"
+    ]
   }
 ]
