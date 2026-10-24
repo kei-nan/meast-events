@@ -211,7 +211,7 @@ function Timeline({
   const showEventMarker = eventYear != null && eventYear >= MIN_YEAR && eventYear <= MAX_YEAR;
   // While an event is open the map may show that event's year (App borderYear;
   // the map's "Borders as of" choice switches to the range end), in the map's
-  // words. Kept short so it still fits beside the presets on a 1280px screen.
+  // words.
   const bordersText =
     borderYear != null ? `Borders as of ${borderYear} (${borderYearLabel})` : `Borders as of ${endYear} (range end)`;
 
@@ -287,12 +287,11 @@ function Timeline({
             </span>
           </button>
         </div>
-        {/* Shown only where it fits whole (Timeline.css), never cut short. */}
-        <div className="timeline-help-wrap">
-          <p className="timeline-help" id="timeline-help">
-            {bordersText}.
-          </p>
-        </div>
+        {/* For screen readers (both handles point at it) and, below, the handles'
+            tooltips: on screen the map's Borders controls already show the year. */}
+        <p className="timeline-sr" id="timeline-help">
+          {bordersText}.
+        </p>
         {editing ? (
           <YearEditor
             startYear={startYear}

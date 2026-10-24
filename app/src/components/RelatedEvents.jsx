@@ -5,7 +5,8 @@ import { NEARBY_KM, RELATED_SHOWN, emptyReason, relatedTabFor } from "../lib/rel
 import { compassLayout, compassPoint, compassScale, formatKm, stripLayout } from "../lib/relatedViz.js";
 
 // Other events in this dataset by a shared Wikidata parent, place or date
-// (lib/related.js): always the three tabs, in this fixed order. An empty one says
+// (lib/related.js): the three tabs, in this fixed order (or, when all three are
+// empty, no tabs, just each one's reason). An empty one says
 // which rule left it empty (emptyReason), so a missing group never looks like a bug. Nearby
 // and same-time events also get a small diagram (lib/relatedViz.js) whose
 // numbered dots match the numbered list; the list is the accessible version, so
@@ -188,6 +189,29 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
   };
   const list = related[current.key] ?? [];
   const date = event.date_start;
+  const note = (
+    <p className="event-detail-related-note">
+      Chosen only by Wikidata&apos;s &ldquo;part of&rdquo;, distance and date, closest first; up to {RELATED_SHOWN} each.
+      Places count only when both locations are precise.
+    </p>
+  );
+
+  // Nothing in any group: no tabs to click through, just each group's reason.
+  if (tabs.every((t) => !counts[t.key])) {
+    return (
+      <section className="event-detail-section event-detail-related" aria-labelledby="event-detail-related-title">
+        <h3 id="event-detail-related-title">Related events in this dataset</h3>
+        <ul className="rel-none">
+          {tabs.map((t) => (
+            <li key={t.key}>
+              <strong>{t.name}:</strong> {emptyReason(t.key, event)}
+            </li>
+          ))}
+        </ul>
+        {note}
+      </section>
+    );
+  }
 
   // Arrow keys step from the tab that has focus.
   function onKeyDown(e, from) {
@@ -266,10 +290,7 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
         <p className="rel-panel-title">{current.title}</p>
         {panel}
       </div>
-      <p className="event-detail-related-note">
-        Chosen only by Wikidata&apos;s &ldquo;part of&rdquo;, distance and date, closest first; up to {RELATED_SHOWN} each.
-        Places count only when both locations are precise.
-      </p>
+      {note}
     </section>
   );
 }

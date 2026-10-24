@@ -106,7 +106,7 @@ const at = (g) => ({ left: `${g.left}%`, width: `${g.width}%` });
 // One row of the Timeline view: the start year in the margin, then the title,
 // a bar for the years on the shared axis, the year/place line and the tags.
 // Named like a list row (title and year/place line); the bar is decoration,
-// its years are in the line under it.
+// its years are in the margin and the line under it.
 const TimelineRow = memo(function TimelineRow({
   ev,
   idx,
@@ -126,7 +126,15 @@ const TimelineRow = memo(function TimelineRow({
   const approximate = ev.location_quality === "approximate";
   const reversed = bar?.reversed ?? false;
   const hasTags = outside || nomap || approximate || reversed;
-  const [start] = eventYears(ev);
+  const [start, end] = eventYears(ev);
+  const marginYear = Number.isFinite(start) && start > 0 ? start : null;
+  // A single year is already in the margin, so the line under the bar shows
+  // only a span of years; screen readers (the margin is hidden from them)
+  // still hear the year as part of the row's name.
+  const yearInMargin = marginYear != null && end === start;
+  const place = [ev.countries?.length ? timelineCountries(ev.countries) : "", ev.category ? categoryLabel(ev.category) : ""]
+    .filter(Boolean)
+    .join(" · ");
   return (
     <li>
       <button
@@ -143,7 +151,7 @@ const TimelineRow = memo(function TimelineRow({
         onMouseLeave={() => onHover?.(null)}
       >
         <span className="sp-trow-year" aria-hidden="true">
-          {Number.isFinite(start) && start > 0 ? start : ""}
+          {marginYear ?? ""}
         </span>
         <span className="sp-trow-body">
           <span className="sp-row-title" id={`${id}-title`}>
@@ -164,9 +172,20 @@ const TimelineRow = memo(function TimelineRow({
             )}
           </span>
           <span className="sp-row-meta" id={`${id}-meta`}>
-            {yearLabel(ev)}
-            {ev.countries?.length ? ` · ${timelineCountries(ev.countries)}` : ""}
-            {ev.category ? ` · ${categoryLabel(ev.category)}` : ""}
+            {yearInMargin ? (
+              <>
+                <span className="sp-sr">
+                  {yearLabel(ev)}
+                  {place ? ", " : ""}
+                </span>
+                {place}
+              </>
+            ) : (
+              <>
+                {yearLabel(ev)}
+                {place ? ` · ${place}` : ""}
+              </>
+            )}
           </span>
           {hasTags && (
             <span className="sp-tags" id={`${id}-tags`}>

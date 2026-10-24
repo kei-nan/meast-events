@@ -276,12 +276,14 @@
 
 /* ---------- Filters disclosure ---------- */
 
-/* One row under the search box: Filters button + status / result count. */
+/* The second line under the search box: Filters, List | Timeline and Sort.
+   Wraps rather than squeezes when the panel is narrow. */
 .sp-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px 10px;
+  margin-top: 8px;
 }
 
 .sp-filters-toggle {
@@ -557,15 +559,19 @@ button.sp-chip[aria-pressed="true"] {
 
 /* ---------- Status + results ---------- */
 
-/* Result count plus the scope button ("show the 3 in selected years" /
-   "show all 23"); wraps under the count when the panel is narrow. */
+/* The first line under the search box: the result count, the scope button
+   ("show the 3 in selected years" / "show all 23") and, at its end, Download;
+   wraps under the count when the panel is narrow. */
 .sp-statusline {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 8px;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 10px;
+}
+
+.sp-statusline .sp-download-toggle {
+  margin-left: auto;
 }
 
 .sp-status {
@@ -574,19 +580,17 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
-/* Browse order switch under the count: a joined pair styled like the
-   timeline's Grow | Move (Timeline.css .timeline-mode-btn), the active one
-   outlined in the accent with a light tint, not filled. */
+/* List | Timeline: a joined pair styled like the timeline's Grow | Move
+   (Timeline.css .timeline-mode-btn), the active one outlined in the accent
+   with a light tint, not filled. */
 .sp-sort {
   display: inline-flex;
   align-items: center;
-  margin-top: 4px;
 }
 
-.sp-sort-label {
-  margin-right: 8px;
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
+/* The browse order menu, at the end of the line. */
+.sp-sortselect {
+  margin-left: auto;
 }
 
 .sp-sort-btn {
@@ -625,20 +629,13 @@ button.sp-chip[aria-pressed="true"] {
   outline-offset: 2px;
 }
 
-/* Direction of the active sort. */
-.sp-sort-dir {
-  margin-left: 4px;
-  color: var(--accent-strong);
-}
-
 /* The scope button changes the results, so it is a compact bordered button
-   (the same size as a sort segment), not link-styled text: in this panel
+   (the same size as a List | Timeline segment), not link-styled text: in this panel
    links take you somewhere, buttons change something. */
 .sp-scope-link {
   font-family: var(--font-sans);
   font-size: 0.75rem;
   min-height: 28px;
-  margin-top: 4px;
   padding: 0 10px;
   background: var(--bg-2);
   border: 1px solid var(--border);
@@ -666,14 +663,13 @@ button.sp-chip[aria-pressed="true"] {
   }
 }
 
-/* "Download" (the results as CSV or JSON): sized like a sort segment, with
-   the Filters button's caret, as it opens choices under the toolbar. */
+/* "Download" (the results as CSV or JSON): sized like a List | Timeline
+   segment, with the Filters button's caret, as it opens choices under it. */
 .sp-download-toggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 28px;
-  margin-top: 4px;
   padding: 0 10px;
   font-family: var(--font-sans);
   font-size: 0.75rem;
@@ -892,11 +888,6 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 /* ---------- Timeline view (ResultsList layout="timeline") ---------- */
-
-/* List | Timeline, before Sort on the same line. */
-.sp-view {
-  margin-right: 12px;
-}
 
 /* A row: the start year in a margin column, then title, bar, year/place line
    and tags. The axis above uses the same columns, so its years line up with
@@ -1730,6 +1721,25 @@ button.sp-chip[aria-pressed="true"] {
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--text-secondary);
+}
+
+/* No related events at all: each group's reason, in place of the tabs. */
+.rel-none {
+  margin: 6px 0 10px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.rel-none li + li {
+  margin-top: 4px;
+}
+
+.rel-none strong {
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .rel-tab-count {

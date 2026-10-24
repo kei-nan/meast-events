@@ -322,8 +322,8 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
 // newly picked year is still loading (which year it is, event or range end, is
 // said by BorderYearChoice beside it).
 // `yearBeside`: the "Borders as of" choice beside it already prints the drawn
-// year (pressed), so on a phone the chip says just "Borders" and the two fit in
-// one row; its accessible name and the opened list still give the year.
+// year (pressed), so the chip says just "Borders" (a phone fits the two in one
+// row); its accessible name and the opened list still give the year.
 export function BordersList({ year, shownYear, updating, eventYearShown, items, compact, yearBeside = false }) {
   const [open, setOpen] = useState(false);
   const flagged = items.filter((b) => isDashedStatus(b.status)).length;
@@ -346,7 +346,7 @@ export function BordersList({ year, shownYear, updating, eventYearShown, items, 
         onClick={() => setOpen((v) => !v)}
       >
         <span className="mu-borders-main">
-          Borders{compact && yearBeside && !updating ? "" : ` ${shownYear}`}
+          Borders{yearBeside && !updating ? "" : ` ${shownYear}`}
           {n > 0 && !compact ? <span className="mu-badge-sub"> · {n} drawn</span> : null}
         </span>
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
