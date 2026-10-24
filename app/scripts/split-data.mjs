@@ -471,6 +471,9 @@ async function splitEvents() {
     const record = {
       extract: e.extract ?? "",
       extract_retrieved_at: e.extract_retrieved_at ?? null,
+      // The Wikipedia revision whose lead is exactly `extract`, where known (docs/DATA_POLICY.md,
+      // "Revision"): citations link it (src/lib/citation.js).
+      ...(e.wikipedia_revid ? { wikipedia_revid: e.wikipedia_revid } : {}),
       ...detailFields(e, fixAnchors),
       // Wikidata's precision of date_start ("day", "month", "year", "decade").
       date_precision: e.date_precision ?? null,

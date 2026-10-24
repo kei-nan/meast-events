@@ -157,3 +157,36 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 .related h3 { font-size: 0.9rem; margin: 1rem 0 0.3rem; }
 .neighbours ul { list-style: none; padding-left: 0; }
 .related-note { color: var(--text-tertiary); font-size: 0.85rem; }
+
+/* "Cite this" (event-page.mjs renderCitation). */
+.cite { margin: 1.5rem 0; font-family: system-ui, -apple-system, sans-serif; }
+.cite h2 { font-size: 1rem; }
+.cite h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); margin: 0.9rem 0 0.2rem; }
+.cite-text { margin: 0; overflow-wrap: anywhere; font-family: Georgia, "Times New Roman", serif; }
+.cite .note { overflow-wrap: anywhere; }
+.cite-live { padding: 6px 10px; border-left: 3px solid var(--accent); color: var(--text-primary); }
+
+/* Printing: text only. Title, dates, text, citations, attribution and licence; no header links, actions,
+   framing review or lists of other events. Black on white. */
+@media print {
+  :root {
+    --bg: #fff;
+    --bg-2: #fff;
+    --border: #999;
+    --text-primary: #000;
+    --text-secondary: #333;
+    --text-tertiary: #444;
+    --link: #000;
+    --accent: #666;
+    color-scheme: light;
+  }
+  body { font-size: 11pt; line-height: 1.45; }
+  /* The app's own stylesheet is on this page too (it is the app shell): black on white over both. */
+  html { background: #fff !important; }
+  body, body * { color: #000 !important; background: transparent !important; }
+  .site-header, .site-footer, .actions, .framing-pointer, .framing-review, .includes, .ai-note { display: none !important; }
+  main { max-width: none; padding: 0; }
+  .framing-mark { background: none; text-decoration: none; padding: 0; }
+  .cite, .cite h3 + .cite-text { break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+}
