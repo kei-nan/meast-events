@@ -1,0 +1,128 @@
+/* ---------- "Cite this" (Citation.jsx): the dialog from the Share menu, and the print-only block ---------- */
+
+.cite-dialog {
+  width: min(640px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-1);
+  color: var(--text-primary);
+  font: 15px/1.55 var(--font-sans);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.cite-dialog::backdrop {
+  background: rgba(12, 10, 7, 0.7);
+}
+
+.cite-inner {
+  padding: 16px 20px 20px;
+  overflow-y: auto;
+  max-height: calc(100dvh - 28px);
+  box-sizing: border-box;
+}
+
+/* Close stays in reach while the citations scroll (on a phone they run past the screen). */
+.cite-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: -16px;
+  z-index: 1;
+  margin-top: -8px;
+  padding: 8px 0;
+  background: var(--bg-1);
+}
+
+.cite-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.cite-intro {
+  margin: 8px 0 4px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.cite-dialog .sp-btn:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.cite-version {
+  margin: 10px 0 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* No revision recorded: said plainly, in the body colour, with a mark at the side. */
+.cite-version--live {
+  padding: 6px 10px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-tint);
+  color: var(--text-primary);
+}
+
+.cite-style {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  column-gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.cite-style-name {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.cite-text {
+  margin: 0;
+  /* Long URLs break anywhere rather than widen the dialog. */
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.cite-copy {
+  min-width: 72px;
+}
+
+.cite-note {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* Phones: the copy button under its citation, full width, 44px tall (.sp-btn). */
+@media (max-width: 480px) {
+  .cite-inner {
+    padding: 12px 16px 16px;
+  }
+
+  .cite-head {
+    top: -12px;
+  }
+
+  .cite-style {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+}
+
+/* Printed only (print.css shows it). */
+.cite-print {
+  display: none;
+}

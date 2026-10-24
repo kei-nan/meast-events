@@ -2,6 +2,7 @@ import { Fragment, Suspense, lazy, useEffect, useLayoutEffect, useRef, useState 
 import { FramingPointer } from "./FramingPointer.jsx";
 import { FramingReviewFailed } from "./LoadFailed.jsx";
 import ShareButton from "./ShareButton.jsx";
+import { CitationPrint } from "./Citation.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
 import { roundedLocationNote } from "../lib/coordPrecision.js";
@@ -277,7 +278,8 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
             Show on map
           </button>
         )}
-        <ShareButton title={event.title} />
+        {/* "Cite" once the full record (retrieval date, revision) is in. */}
+        <ShareButton title={event.title} cite={event.leadStatus ? null : event} />
         {wikiUrl && (
           <a className="sp-btn event-detail-wiki" href={wikiUrl} target="_blank" rel="noreferrer">
             {/* "Read on" is for screen readers only, to keep the action row short. */}
@@ -373,6 +375,7 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
       {!event.leadStatus && (
         <RelatedEvents event={event} tab={relatedTab} onTab={setRelatedTab} onSelectEvent={onSelectEvent} />
       )}
+      <CitationPrint event={event} />
       <section className="event-detail-section event-detail-about" aria-labelledby="event-detail-about-title">
         <h3 id="event-detail-about-title">About this entry</h3>
         {quality === "approximate" && event.approximate_reason === "rounded" && (

@@ -133,6 +133,35 @@ test("an event page escapes data, keeps the title exactly and links to itself an
   assert.ok(!html.includes("<quickly>"));
 });
 
+test("Cite this: the Wikipedia article in APA, MLA and Chicago, the revision's permalink when known", () => {
+  const base = {
+    id: "six-day-war",
+    title: "Six-Day War",
+    wikipedia_url: "https://en.wikipedia.org/wiki/Six-Day_War",
+    extract: "It was fought.",
+    extract_retrieved_at: "2026-09-26",
+  };
+  const html = page({ ...base, wikipedia_revid: 123, wikipedia_revid_timestamp: "2026-10-15T19:38:37Z" });
+  assert.match(html, /<h2 id="cite-title">Cite this<\/h2>/);
+  assert.match(
+    html,
+    /<p class="cite-text">Six-Day War\. \(2026, October 15\)\. In <i>Wikipedia<\/i>\. https:\/\/en\.wikipedia\.org\/w\/index\.php\?title=Six-Day_War&amp;oldid=123<\/p>/
+  );
+  assert.match(html, /“Six-Day War\.” <i>Wikipedia: The Free Encyclopedia<\/i>, Wikimedia Foundation, 15 Oct\. 2026, en\.wikipedia\.org\/w\/index\.php\?title=Six-Day_War&amp;oldid=123\.<\/p>/);
+  assert.match(html, /Wikipedia, “Six-Day War,” last modified October 15, 2026, 19:38 \(UTC\), https:\/\/en\.wikipedia\.org\/w\/index\.php\?title=Six-Day_War&amp;oldid=123\./);
+  assert.match(html, /The link is the Wikipedia revision of October 15, 2026 \(revision 123\), whose lead is exactly the text shown here\./);
+  assert.doesNotMatch(html, /Retrieved September|Accessed 26|accessed September/);
+  assert.match(html, /This event on Middle East, 1900–present: https:\/\/middleeast\.events\/event\/six-day-war/);
+  assert.match(html, /CShapes 2\.0 - historical country borders\. Schvitz, G\., et al\. \(2022\)/);
+  assert.doesNotMatch(html, /cite-live/);
+
+  const live = page(base);
+  assert.match(live, /<p class="note cite-live">No revision is recorded for this text, so the link is the live article: Wikipedia’s text may have changed since it was retrieved on September 26, 2026\.<\/p>/);
+  assert.match(live, /Retrieved September 26, 2026, from https:\/\/en\.wikipedia\.org\/wiki\/Six-Day_War<\/p>/);
+  // no article: no section
+  assert.doesNotMatch(page({ id: "bare", title: "Bare" }), /cite-title/);
+});
+
 test("an event with no dates, countries, extract, link or review still renders", () => {
   const html = page({ id: "bare", title: "Bare", location_quality: "none" });
   assert.match(html, /<h1>Bare<\/h1>/);

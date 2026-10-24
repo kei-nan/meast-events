@@ -19,8 +19,9 @@
     {
       // Native <dialog>: the click handler closes it on a backdrop click (a mouse
       // convenience; Esc and the Close button are the keyboard path), the
-      // keydown/wheel/pointer handlers only stop the credits auto-scroll.
-      "files": ["src/components/LoadFailed.jsx", "src/components/AboutData.jsx"],
+      // keydown/wheel/pointer handlers only stop the credits auto-scroll. In
+      // Citation.jsx the keydown handler keeps Esc to the dialog (not the event's Back).
+      "files": ["src/components/LoadFailed.jsx", "src/components/AboutData.jsx", "src/components/Citation.jsx"],
       "rules": {
         "jsx-a11y/click-events-have-key-events": "off",
         "jsx-a11y/no-noninteractive-element-interactions": "off"

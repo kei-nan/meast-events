@@ -1,5 +1,6 @@
 import { useContext, useEffect, useId, useRef, useState } from "react";
 import { ShareLinkContext } from "../lib/shareLinkContext.js";
+import { CiteDialog } from "./Citation.jsx";
 import "./ShareButton.css";
 
 // The QR library is only downloaded when someone opens a QR code.
@@ -88,11 +89,13 @@ const slug = (s) =>
  * @param {object} props
  * @param {string} props.title  shared as the title, and names the PNG
  * @param {"start"|"end"} [props.align]  which edge of the button the panel lines up with
+ * @param {object|null} [props.cite]  an event's full record: adds "Cite" (Citation.jsx CiteDialog)
  */
-export default function ShareButton({ title, align = "start", className = "sp-btn" }) {
+export default function ShareButton({ title, align = "start", className = "sp-btn", cite = null }) {
   const [open, setOpen] = useState(false);
   const [qr, setQr] = useState(null); // {url, data} | "loading" | "error" | null
   const [copied, setCopied] = useState(false);
+  const [citing, setCiting] = useState(false);
   const rootRef = useRef(null);
   const buttonRef = useRef(null);
   const panelRef = useRef(null);
@@ -159,6 +162,11 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
     }
   }
 
+  function openCite() {
+    close(false);
+    setCiting(true);
+  }
+
   async function showQr() {
     const url = link();
     const request = ++qrRequestRef.current;
@@ -200,6 +208,11 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
               QR code
             </button>
           )}
+          {cite && (
+            <button type="button" className="sp-btn" aria-haspopup="dialog" onClick={openCite}>
+              Cite
+            </button>
+          )}
           {qr === "loading" && <p className="share-note">Making the QR code…</p>}
           {qr === "error" && <p className="share-note">The QR code could not be made. Please try again.</p>}
           {qr?.data && (
@@ -226,6 +239,15 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
             {copied ? "Link copied" : ""}
           </span>
         </div>
+      )}
+      {citing && cite && (
+        <CiteDialog
+          event={cite}
+          onClose={() => {
+            setCiting(false);
+            buttonRef.current?.focus();
+          }}
+        />
       )}
     </div>
   );

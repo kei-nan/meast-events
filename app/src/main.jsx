@@ -8,6 +8,8 @@ import '@subset-fonts/fonts.css'
 import './index.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+// Text-only printing of an open event (no map); after the app's own styles.
+import './print.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

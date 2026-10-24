@@ -12,6 +12,7 @@
 // (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
 import { categoryLabel } from "../src/lib/categoryLabels.js";
+import { citationNotes, citeEvent } from "../src/lib/citation.js";
 import { roundedLocationNote } from "../src/lib/coordPrecision.js";
 import { dataFixUrl } from "../src/lib/dataFixes.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
@@ -285,6 +286,28 @@ ${items.join("\n")}
 </nav>`;
 }
 
+// "Cite this": the event's citations as the app's Cite dialog gives them (src/lib/citation.js), without the
+// copy buttons (no JavaScript here); the italics as <i>.
+function renderCitation(event) {
+  const cite = citeEvent(event);
+  if (!cite) return "";
+  const [versionNote, chicagoNote] = citationNotes(cite);
+  const styles = cite.styles
+    .map((s) => {
+      const text = s.parts.map((p) => (p.italic ? `<i>${escapeHtml(p.text)}</i>` : escapeHtml(p.text))).join("");
+      return `<h3>${escapeHtml(s.label)}</h3>\n<p class="cite-text">${text}</p>`;
+    })
+    .join("\n");
+  return `<section class="cite" aria-labelledby="cite-title">
+<h2 id="cite-title">Cite this</h2>
+<p class="note${cite.revid ? "" : " cite-live"}">${escapeHtml(versionNote)}</p>
+${styles}
+<p class="note">${escapeHtml(chicagoNote)}</p>
+<p class="note">This event on ${escapeHtml(cite.siteName)}: ${escapeHtml(cite.eventPage)}</p>
+<p class="note">If you use the map’s borders: ${escapeHtml(cite.borders)}</p>
+</section>`;
+}
+
 function locationNote(quality, event) {
   if (quality === "approximate" && event?.approximate_reason === "rounded") {
     return `<p class="note">${escapeHtml(roundedLocationNote(event))}</p>`;
@@ -523,6 +546,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
     renderPointer(review),
     `<div class="extract">${paragraphs.length ? paragraphs.map((p) => renderParagraph(p, review?.highlights)).join("\n") : "<p>No summary available.</p>"}</div>`,
     retrieved && `<p class="asof">Text retrieved ${escapeHtml(retrieved)} from Wikipedia.</p>`,
+    renderCitation(event),
     renderReview(event, review),
     renderIncludes(event.includes),
     renderRelated(event.related),

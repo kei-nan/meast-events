@@ -1,0 +1,122 @@
+/* ---------- Printing an open event: text only ----------
+   The event's category, title, dates and places, its text (the whole lead, also the paragraphs behind "Show full
+   text"), the citations (Citation.jsx CitationPrint), and "About this entry" with the attribution and licence.
+   No map (and no snapshot of it), timeline, header, controls, framing review or related events. Black on white
+   whatever the screen theme. Only while an event is open: printing the map view is left to the browser. */
+@media print {
+  html:has(.event-detail),
+  html:has(.event-detail) body,
+  html:has(.event-detail) #root {
+    height: auto;
+    background: #fff;
+  }
+
+  .app:has(.event-detail) {
+    display: block;
+    height: auto;
+    background: #fff;
+    color: #000;
+    --bg-0: #fff;
+    --bg-1: #fff;
+    --bg-2: #fff;
+    --border: #999;
+    --border-soft: #ccc;
+    --text-primary: #000;
+    --text-secondary: #333;
+    --text-tertiary: #444;
+    --link: #000;
+    --accent: #666;
+    --accent-tint: transparent;
+  }
+
+  /* Everything but the panel, and in the panel everything but the event. */
+  .app:has(.event-detail) > :not(.app-body),
+  .app:has(.event-detail) .app-body > :not(.side-panel),
+  .app:has(.event-detail) .side-panel > :not(.sp-scroll),
+  .app:has(.event-detail) .sp-scroll > :not(:has(.event-detail)) {
+    display: none !important;
+  }
+
+  .app:has(.event-detail) .app-body,
+  .app:has(.event-detail) .side-panel,
+  .app:has(.event-detail) .sp-scroll {
+    display: block;
+    position: static;
+    inset: auto;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    transform: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    background: #fff;
+  }
+
+  .event-detail-actions,
+  .event-detail-more,
+  .framing-pointer,
+  .framing-review,
+  .event-detail-includes,
+  .event-detail-related,
+  .event-detail [role="status"] {
+    display: none !important;
+  }
+
+  /* The whole lead, not only the first paragraphs (over SidePanel.css's [hidden] rule). */
+  .event-detail #event-detail-more[hidden] {
+    display: block !important;
+  }
+
+  /* Highlights are the framing review's, which is not printed: plain text. */
+  .event-detail mark.framing-mark {
+    background: none;
+    color: inherit;
+    border: 0;
+    padding: 0;
+    text-decoration: none;
+  }
+
+  .event-detail {
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  .event-detail h2 {
+    font-size: 18pt;
+  }
+
+  .event-detail p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .event-detail a {
+    color: #000;
+  }
+
+  .event-detail .cite-print {
+    display: block;
+    margin-top: 1.2em;
+    break-inside: avoid-page;
+  }
+
+  .cite-print h3 {
+    margin: 0 0 0.3em;
+    font-size: 12pt;
+  }
+
+  .cite-print .cite-style {
+    display: block;
+    padding: 0.3em 0;
+    border: 0;
+    break-inside: avoid;
+  }
+
+  .cite-print .cite-style-name {
+    margin: 0;
+    font-size: 9pt;
+  }
+}
