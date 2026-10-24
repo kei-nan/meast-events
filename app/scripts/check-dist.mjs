@@ -21,17 +21,74 @@
 //     immutable (it would apply to the 404 for a missing file too), the entry
 //     script has its own immutable rule, and there are no more rules than the
 //     host reads;
+//   - every inline <script> in the HTML (index.html's "js" class script) has its
+//     sha256 hash in the CSP's script-src, or the browser would block it;
+//   - the icons index.html links are valid: favicon.ico an ICO, apple-touch-icon.png
+//     a 180x180 PNG (scripts/make-icons.mjs);
+//   - each event page preloads its own full-record bucket, and that file exists;
+//   - dist/_redirects, when there is one, redirects only ids that are no longer
+//     events to ids that are (scripts/redirects.mjs);
+//   - the Pagefind engine files are cached only for the Pagefind release
+//     PAGEFIND_ENGINE_VERSION names (see public/_headers);
 //   - dist/ has fewer files than the host allows per deploy (MAX_DIST_FILES,
 //     default 20,000: Cloudflare Workers static assets on the free plan,
 //     https://developers.cloudflare.com/workers/platform/limits/). Every event
 //     adds a page, so this is the limit the dataset reaches first.
 // Exits 1 with a list of problems, or prints a one-line summary.
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { decodeGeo } from "../src/lib/geoCodec.js";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { fullBucket } from "../src/lib/fullBucket.js";
 import { IMMUTABLE, MARKER, MAX_RULES, hasMarker, parseRules } from "./expand-headers.mjs";
+import { NO_JS_STYLESHEET, preloadTag } from "./event-page.mjs";
+import { checkRedirectsText } from "./redirects.mjs";
+
+// The Pagefind release whose engine files (pagefind.js, its worker, the wasm)
+// public/_headers lets browsers cache for an hour plus a day of
+// stale-while-revalidate. Their names never change, so after an upgrade a
+// browser could pair an old engine with the new index: update this only after
+// the steps in DEPLOYMENT.md ("Upgrading Pagefind").
+export const PAGEFIND_ENGINE_VERSION = "1.5.2";
+const ENGINE_PATHS = ["/pagefind/pagefind.js", "/pagefind/pagefind-worker.js", "/pagefind/wasm.*"];
+
+// Inline scripts (no src, and not a data block such as JSON-LD) in an HTML page.
+export function inlineScripts(html) {
+  const out = [];
+  for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const attrs = m[1];
+    if (/\bsrc\s*=/i.test(attrs)) continue;
+    const type = /\btype\s*=\s*["']?([^"'\s>]+)/i.exec(attrs)?.[1]?.toLowerCase();
+    if (type && !["module", "text/javascript", "application/javascript"].includes(type)) continue;
+    out.push(m[2]);
+  }
+  return out;
+}
+export const scriptHash = (text) => `'sha256-${createHash("sha256").update(text, "utf8").digest("base64")}'`;
+
+// Width and height of a PNG (its IHDR chunk), or null.
+function pngSize(buf) {
+  const sig = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (buf.length < 24 || !buf.subarray(0, 8).equals(sig) || buf.toString("latin1", 12, 16) !== "IHDR") return null;
+  return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+}
+
+// Problems with an ICO file: its header and that each image lies inside the file.
+function icoProblems(buf) {
+  if (buf.length < 6 || buf.readUInt16LE(0) !== 0 || buf.readUInt16LE(2) !== 1) return ["is not an ICO file"];
+  const count = buf.readUInt16LE(4);
+  if (!count) return ["holds no image"];
+  const problems = [];
+  for (let i = 0; i < count; i++) {
+    const at = 6 + 16 * i;
+    if (at + 16 > buf.length) return ["is truncated"];
+    const size = buf.readUInt32LE(at + 8);
+    const offset = buf.readUInt32LE(at + 12);
+    if (!size || offset + size > buf.length) problems.push(`image ${i} lies outside the file`);
+  }
+  return problems;
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(process.env.DIST_DIR ?? path.join(__dirname, "..", "dist"));
@@ -152,6 +209,7 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   // index.html's region markers.
   const assetRefs = (page) => [...new Set(page.match(/\/assets\/[^"'\s)]+/g) ?? [])].sort().join(" ");
   const shellAssets = assetRefs(html);
+  const htmlPages = [["index.html", html]];
   let eventPages = 0;
   for (const e of Array.isArray(all) ? all : []) {
     const rel = `event/${e.id}.html`;
@@ -162,7 +220,14 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     const page = readFileSync(distFile(rel), "utf8");
     const where = `${rel} (an event page is index.html filled in, scripts/event-page.mjs)`;
     if (assetRefs(page) !== shellAssets) fail(`${where} does not load the same /assets/ files as index.html`);
-    if (!page.includes(`href="/event/event.css" media="(scripting: none)"`)) fail(`${where} lacks its no-JavaScript stylesheet`);
+    if (!page.includes(NO_JS_STYLESHEET)) fail(`${where} lacks its no-JavaScript stylesheet`);
+    // Its full record's bucket, preloaded as the app fetches it (lib/dataClient.js).
+    const bucket = `/data/events/${meta.dir}/full/${fullBucket(e.id, meta.fullBuckets)}.json`;
+    if (!page.includes(preloadTag(bucket))) fail(`${where} does not preload its full-record bucket ${bucket}`);
+    for (const m of page.matchAll(/<link rel="preload" href="([^"]+)"/g)) {
+      if (!existsSync(distFile(decodeURIComponent(m[1]).replace(/^\//, "")))) fail(`${where} preloads ${m[1]}, which is not in dist/`);
+    }
+    htmlPages.push([rel, page]);
     if (!page.includes(`<link rel="canonical" href="https://middleeast.events/event/${encodeURIComponent(e.id)}">`)) {
       fail(`${where} does not name itself as canonical`);
     }
@@ -216,6 +281,58 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     }
   }
 
+  // 6c. Inline scripts against the CSP: each must have its hash in script-src of
+  // the rule for every path (/*), or the browser blocks it.
+  const rules = existsSync(distFile("_headers")) ? parseRules(readFileSync(distFile("_headers"), "utf8")) : [];
+  const csp = rules.find((r) => r.pattern === "/*")?.headers.find((h) => /^content-security-policy:/i.test(h)) ?? "";
+  const scriptSrc = /(?:^|;)\s*script-src\s+([^;]*)/i.exec(csp.replace(/^content-security-policy:\s*/i, ""))?.[1].split(/\s+/) ?? [];
+  if (existsSync(distFile("_headers")) && !csp) fail("_headers: the /* rule has no Content-Security-Policy");
+  for (const rel of ["404.html", "event/index.html"]) if (existsSync(distFile(rel))) htmlPages.push([rel, readFileSync(distFile(rel), "utf8")]);
+  const unlisted = new Map();
+  for (const [rel, page] of htmlPages) {
+    for (const script of inlineScripts(page)) {
+      const hash = scriptHash(script);
+      if (!scriptSrc.includes(hash) && !unlisted.has(hash)) unlisted.set(hash, rel);
+    }
+  }
+  for (const [hash, rel] of unlisted) fail(`${rel} has an inline script whose hash ${hash} is not in the CSP's script-src (public/_headers)`);
+
+  // 6d. Icons (scripts/make-icons.mjs), linked by index.html and every page.
+  if (!existsSync(distFile("favicon.ico"))) fail("favicon.ico is missing (scripts/make-icons.mjs)");
+  else for (const p of icoProblems(readFileSync(distFile("favicon.ico")))) fail(`favicon.ico ${p}`);
+  if (!existsSync(distFile("apple-touch-icon.png"))) fail("apple-touch-icon.png is missing (scripts/make-icons.mjs)");
+  else {
+    const size = pngSize(readFileSync(distFile("apple-touch-icon.png")));
+    if (!size) fail("apple-touch-icon.png is not a PNG");
+    else if (size.width !== 180 || size.height !== 180) fail(`apple-touch-icon.png is ${size.width}x${size.height}, not 180x180`);
+  }
+  for (const icon of ["/favicon.ico", "/favicon.svg", "/apple-touch-icon.png"]) {
+    if (!html.includes(`href="${icon}"`)) fail(`index.html does not link ${icon}`);
+  }
+
+  // 6e. Redirects for renamed ids (scripts/redirects.mjs).
+  let redirectCount = 0;
+  if (existsSync(distFile("_redirects"))) {
+    const text = readFileSync(distFile("_redirects"), "utf8");
+    redirectCount = text.split(/\r?\n/).filter((l) => l.trim() && !l.startsWith("#")).length;
+    for (const p of checkRedirectsText(text, new Set(Array.isArray(all) ? all.map((e) => e.id) : []))) fail(p);
+  }
+
+  // 6f. The Pagefind engine is cached under fixed names (public/_headers): only
+  // for the release that was checked for it.
+  const engineCached = rules.some(
+    (r) => ENGINE_PATHS.includes(r.pattern) && r.headers.some((h) => /^cache-control:.*\bmax-age=[1-9]/i.test(h))
+  );
+  if (engineCached && existsSync(distFile("pagefind/pagefind-entry.json"))) {
+    const { version } = readJSON("pagefind/pagefind-entry.json");
+    if (version !== PAGEFIND_ENGINE_VERSION) {
+      fail(
+        `Pagefind ${version} built the search index, but public/_headers caches the engine files for ${PAGEFIND_ENGINE_VERSION}: ` +
+          `follow "Upgrading Pagefind" in DEPLOYMENT.md, then set PAGEFIND_ENGINE_VERSION in scripts/check-dist.mjs`
+      );
+    }
+  }
+
   // 7. File count against the host's per-deploy limit. _headers and _redirects are
   // configuration, not assets, but counting them keeps the margin honest.
   const countFiles = (d) => readdirSync(d, { withFileTypes: true }).reduce((n, e) => n + (e.isDirectory() ? countFiles(path.join(d, e.name)) : 1), 0);
@@ -225,7 +342,8 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
 
   const summary =
     `${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
-    `${refs.length} index.html references, ${eventPages} event pages, search index present, 404.html, assets/ hashed, ${headerRules} header rules, ${fileCount} files (limit ${maxFiles})`;
+    `${refs.length} index.html references, ${eventPages} event pages, search index present, 404.html, assets/ hashed, ${headerRules} header rules, ` +
+    `inline scripts in the CSP, icons, ${redirectCount} redirects, ${fileCount} files (limit ${maxFiles})`;
   return { problems, warnings, summary };
 }
 

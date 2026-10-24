@@ -4,9 +4,14 @@
 // guidelines). A tab is coloured when its review found something and grey when it found
 // nothing. Always boxed off from the Wikipedia text it describes.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { REVIEW_TABS, TAB_NAMES, tabStatus } from "../lib/reviewTabs.js";
 import { safeUrl } from "../lib/safeUrl.js";
+
+// The Popover API (Safari 17+, Chrome 114+, Firefox 125+). Where it is missing, the
+// popover attribute does nothing (the note would show all the time) and
+// matches(":popover-open") throws, so the note is a plain toggle instead.
+const HAS_POPOVER = typeof HTMLElement !== "undefined" && typeof HTMLElement.prototype.showPopover === "function";
 
 const REPO = "https://github.com/kei-nan/meast-events";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
@@ -80,9 +85,31 @@ export default function FramingReview({ event, tab, onTab }) {
   // Enter; Esc or a click elsewhere closes it). It floats above the panel, under its
   // button or above it when there is no room below, and closes when the panel
   // scrolls or the window resizes rather than drifting away from the button.
+  // Without the Popover API the button shows and hides the note in the page flow,
+  // below the links (.fr-ai-note--inline); Escape closes it there too.
+  const [noteOpen, setNoteOpen] = useState(false);
+
   useEffect(() => {
     const p = aboutRef.current;
     if (!p) return;
+    if (!HAS_POPOVER) {
+      if (!noteOpen) return;
+      const onEscapeInline = (e) => {
+        if (e.key !== "Escape") return;
+        e.preventDefault();
+        setNoteOpen(false);
+      };
+      document.addEventListener("keydown", onEscapeInline, true);
+      return () => document.removeEventListener("keydown", onEscapeInline, true);
+    }
+    // Never throws, even on an engine with showPopover but not the pseudo-class.
+    const isOpen = () => {
+      try {
+        return p.matches(":popover-open");
+      } catch {
+        return false;
+      }
+    };
     const place = (e) => {
       if (e.newState !== "open") return;
       const b = aboutBtnRef.current.getBoundingClientRect();
@@ -92,11 +119,11 @@ export default function FramingReview({ event, tab, onTab }) {
       const h = p.offsetHeight;
       p.style.top = `${b.bottom + 6 + h <= window.innerHeight - 8 ? b.bottom + 6 : Math.max(8, b.top - 6 - h)}px`;
     };
-    const close = () => p.matches(":popover-open") && p.hidePopover();
+    const close = () => isOpen() && p.hidePopover();
     // One Escape does one thing (lib/escapeKey.js): with the note open it closes only
     // the note, and is marked handled before the panel's Escape (Back) sees it.
     const onEscape = (e) => {
-      if (e.key !== "Escape" || !p.matches(":popover-open")) return;
+      if (e.key !== "Escape" || !isOpen()) return;
       e.preventDefault();
       p.hidePopover();
     };
@@ -111,7 +138,7 @@ export default function FramingReview({ event, tab, onTab }) {
       window.removeEventListener("resize", close);
       document.removeEventListener("keydown", onEscape, true);
     };
-  }, [review]);
+  }, [review, noteOpen]);
 
   if (!review) return null;
 
@@ -189,7 +216,9 @@ export default function FramingReview({ event, tab, onTab }) {
           ref={aboutBtnRef}
           type="button"
           className="fr-ai-btn"
-          popoverTarget="fr-ai-note"
+          {...(HAS_POPOVER
+            ? { popoverTarget: "fr-ai-note" }
+            : { "aria-expanded": noteOpen, "aria-controls": "fr-ai-note", onClick: () => setNoteOpen((o) => !o) })}
           aria-label="Reviewed by AI: what this means"
         >
           Reviewed by AI
@@ -203,7 +232,12 @@ export default function FramingReview({ event, tab, onTab }) {
           Disagree with this review?
         </a>
       </p>
-      <div id="fr-ai-note" ref={aboutRef} popover="auto" className="fr-ai-note">
+      <div
+        id="fr-ai-note"
+        ref={aboutRef}
+        {...(HAS_POPOVER ? { popover: "auto" } : { hidden: !noteOpen })}
+        className={HAS_POPOVER ? "fr-ai-note" : "fr-ai-note fr-ai-note--inline"}
+      >
         This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It
         looks at how the summary is written, not whether the events happened, and the Wikipedia text is shown
         unchanged.

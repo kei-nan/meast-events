@@ -267,6 +267,24 @@ function renderDataFixes(fixes) {
   return `<p class="note">Corrected by this project (${links} in our log of data fixes).</p>`;
 }
 
+// The events just before and after this one in the dataset's order (oldest
+// first, as the /event/ index lists them), so every page links on to others,
+// including the ones with nothing related.
+function renderNeighbours(neighbours) {
+  const side = (e, rel, label) => {
+    if (!e || !isValidEventId(e.id)) return "";
+    const year = e.date_start ? ` <span class="year">${escapeHtml(String(e.date_start).slice(0, 4))}</span>` : "";
+    return `<li>${label}: <a href="${escapeHtml(eventPath(e.id))}" rel="${rel}">${escapeHtml(e.title ?? e.id)}</a>${year}</li>`;
+  };
+  const items = [side(neighbours?.prev, "prev", "Earlier"), side(neighbours?.next, "next", "Later")].filter(Boolean);
+  if (!items.length) return "";
+  return `<nav class="includes neighbours" aria-label="Earlier and later events">
+<ul>
+${items.join("\n")}
+</ul>
+</nav>`;
+}
+
 function locationNote(quality, event) {
   if (quality === "approximate" && event?.approximate_reason === "rounded") {
     return `<p class="note">${escapeHtml(roundedLocationNote(event))}</p>`;
@@ -301,12 +319,19 @@ ${description ? `<meta property="og:description" content="${d}">\n` : ""}${c ? `
 ${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta name="twitter:image" content="${OG_IMAGE}">${jsonLd ? `\n${jsonLd}` : ""}`;
 }
 
+// The site's icons (public/, made by scripts/make-icons.mjs), as index.html links
+// them: the SVG for browsers that take it, favicon.ico for the rest (and for the
+// /favicon.ico they ask for on their own), and the home-screen icon for iOS.
+export const ICON_LINKS = `<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
+
 // A whole <head> for the pages that are not the app (the /event/ index, 404.html).
 function head(meta) {
   return `<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+${ICON_LINKS}
 <link rel="stylesheet" href="/event/event.css">
 <meta name="theme-color" content="#1d1a15">
 ${pageMeta(meta)}
@@ -335,15 +360,24 @@ function replaceRegion(html, [open, close], content) {
 /**
  * index.html (`template`, as Vite built it) with the page's own <head> tags
  * (`meta`, as pageMeta takes them) and `content` inside #root. The event page's
- * stylesheet applies only without JavaScript (media "scripting: none"), so it
- * never touches the app; with JavaScript the app's CSS keeps `content` hidden
- * until React replaces it (src/index.css .static-page).
+ * stylesheet is inside <noscript> (NO_JS_STYLESHEET), so it loads only without
+ * JavaScript and never touches the app (a "scripting: none" media query does
+ * the same only from Safari 17 on). With JavaScript the app's CSS keeps
+ * `content` hidden until React replaces it (src/index.css, html.js .static-page,
+ * the class index.html's first script sets). `preload` (a same-origin path) is
+ * the event's full-record bucket, fetched as the app's fetch() will ask for it
+ * (crossorigin anonymous: same credentials mode), so it downloads while the
+ * JavaScript does instead of after it.
  */
-export function fillAppShell(template, meta, content) {
+export const NO_JS_STYLESHEET = `<noscript><link rel="stylesheet" href="/event/event.css"></noscript>`;
+
+export const preloadTag = (href) => `<link rel="preload" href="${escapeHtml(href)}" as="fetch" crossorigin="anonymous">`;
+
+export function fillAppShell(template, meta, content, { preload = null } = {}) {
   const withMeta = replaceRegion(
     template,
     SHELL_MARKERS.meta,
-    `${pageMeta(meta)}\n<link rel="stylesheet" href="/event/event.css" media="(scripting: none)">`
+    `${pageMeta(meta)}\n${preload ? `${preloadTag(preload)}\n` : ""}${NO_JS_STYLESHEET}`
   );
   return replaceRegion(withMeta, SHELL_MARKERS.body, `<div id="root"><div class="static-page">\n${content}\n</div></div>`);
 }
@@ -362,10 +396,19 @@ export function eventDateText(event) {
  * the years as the dates give them (rawEventYears). No dates: "Title – site".
  */
 export function eventPageTitle(event) {
+  return `${eventShareTitle(event)} – ${SITE_NAME}`;
+}
+
+/**
+ * The link-preview title (og:title, twitter:title): "Title (1912–1913)", the tab
+ * title without the site name, which og:site_name already gives. No dates: the
+ * title alone.
+ */
+export function eventShareTitle(event) {
   const title = String(event.title ?? event.id);
   const [s, e] = rawEventYears(event);
   const years = event.date_start && Number.isFinite(s) ? (e !== s ? `${s}–${e}` : `${s}`) : "";
-  return `${title}${years ? ` (${years})` : ""} – ${SITE_NAME}`;
+  return `${title}${years ? ` (${years})` : ""}`;
 }
 
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -382,12 +425,14 @@ function isoDate(date, precision) {
 
 /**
  * schema.org structured data for an event page: the WebPage, based on the
- * Wikipedia article under its licence, about an Event with the dates at the
- * precision recorded. The Event is the page's subject ("about"), not the page
- * itself, so search engines are not invited to list a historical event as one
- * to attend. A location is given only for a precise pin: a capital-city
- * fallback is not where the event happened. Name and description are
- * Wikipedia's, unchanged (the description is the meta description).
+ * Wikipedia article under its licence, about a Thing identified by its
+ * Wikipedia article and Wikidata item (sameAs). Not a schema.org Event: Google
+ * reads Event as something to attend and requires a location, which most of
+ * these topics (wars, treaties, crises) do not have. The page's own
+ * temporalCoverage (an ISO 8601 date or "start/end" interval) carries the dates
+ * at the precision recorded, and spatialCoverage a precise pin only: a
+ * capital-city fallback is not where the event happened. Name and description
+ * are Wikipedia's, unchanged (the description is the meta description).
  */
 export function eventJsonLd(event) {
   const title = String(event.title ?? event.id);
@@ -406,6 +451,7 @@ export function eventJsonLd(event) {
   const precise = event.location_quality === "precise" && Number.isFinite(c?.lat) && Number.isFinite(c?.lon);
   const description = metaDescription(event.extract);
   const sameAs = [wiki, wd].filter(Boolean);
+  const temporalCoverage = startDate ? (endDate && endDate !== startDate ? `${startDate}/${endDate}` : startDate) : null;
   return {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -417,14 +463,13 @@ export function eventJsonLd(event) {
     isPartOf: { "@type": "WebSite", name: SITE_NAME, url: `${SITE}/` },
     ...(wiki && { isBasedOn: wiki }),
     license: CC_BY_SA,
+    ...(temporalCoverage && { temporalCoverage }),
+    ...(precise && {
+      spatialCoverage: { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: c.lat, longitude: c.lon } },
+    }),
     about: {
-      "@type": "Event",
+      "@type": "Thing",
       name: title,
-      ...(startDate && { startDate }),
-      ...(endDate && endDate !== startDate && { endDate }),
-      ...(precise && {
-        location: { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: c.lat, longitude: c.lon } },
-      }),
       ...(sameAs.length && { sameAs }),
     },
   };
@@ -446,8 +491,10 @@ export function jsonLdScript(data) {
  * event (fillAppShell). `event` is the lite record (split-data.mjs publicEvent)
  * merged with its full-lead record (extract, extract_retrieved_at, date_precision,
  * framing_review, part_of, includes, related). Every field may be missing except id and title.
+ * `neighbours` ({prev, next}, lite records) are the events before and after it in
+ * the dataset's order; `preload` is its full-record bucket's path (fillAppShell).
  */
-export function renderEventPage(event, template) {
+export function renderEventPage(event, template, { neighbours = null, preload = null } = {}) {
   if (!isValidEventId(event?.id)) throw new Error(`invalid event id: ${JSON.stringify(event?.id)}`);
   const title = String(event.title ?? event.id);
   const canonical = SITE + eventPath(event.id);
@@ -479,6 +526,7 @@ export function renderEventPage(event, template) {
     renderReview(event, review),
     renderIncludes(event.includes),
     renderRelated(event.related),
+    renderNeighbours(neighbours),
     locationNote(event.location_quality, event),
     renderDataFixes(event.data_fixes),
     `<p class="attribution">Text from Wikipedia, licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
@@ -490,14 +538,15 @@ export function renderEventPage(event, template) {
 
   return fillAppShell(
     template,
-    { title, pageTitle: eventPageTitle(event), description, canonical, type: "article", jsonLd: jsonLdScript(eventJsonLd(event)) },
+    { title: eventShareTitle(event), pageTitle: eventPageTitle(event), description, canonical, type: "article", jsonLd: jsonLdScript(eventJsonLd(event)) },
     `${siteHeader}
 <main>
 <article>
 ${body.join("\n")}
 </article>
 </main>
-${siteFooter}`
+${siteFooter}`,
+    { preload }
   );
 }
 
@@ -552,12 +601,30 @@ ${siteFooter}
 `;
 }
 
-/** sitemap.xml: the home page, the event index and every event page. */
+// The day an event's text was retrieved from Wikipedia (extract_retrieved_at, an
+// ISO timestamp), as a sitemap date, or null.
+const retrievedDay = (e) => {
+  const m = /^(\d{4}-\d{2}-\d{2})(?:T|$)/.exec(String(e?.extract_retrieved_at ?? ""));
+  return m ? m[1] : null;
+};
+
+/**
+ * sitemap.xml: the home page, the event index and every event page. An event's
+ * <lastmod> is the day its text was retrieved from Wikipedia (the page changes
+ * when that text does); the home page's and the index's is the latest of those.
+ * A page with no retrieval date gets none.
+ */
 export function renderSitemap(events) {
-  const urls = [`${SITE}/`, `${SITE}/event/`, ...events.map((e) => SITE + eventPath(e.id))];
+  const days = events.map(retrievedDay);
+  const latest = days.filter(Boolean).sort().at(-1) ?? null;
+  const urls = [
+    [`${SITE}/`, latest],
+    [`${SITE}/event/`, latest],
+    ...events.map((e, i) => [SITE + eventPath(e.id), days[i]]),
+  ];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${escapeHtml(u)}</loc></url>`).join("\n")}
+${urls.map(([u, day]) => `  <url><loc>${escapeHtml(u)}</loc>${day ? `<lastmod>${day}</lastmod>` : ""}</url>`).join("\n")}
 </urlset>
 `;
 }

@@ -58,6 +58,7 @@ import {
 import { keptDatePrecision } from "./lib/fixes.js";
 import { renderMissingReport } from "./lib/missing-report.js";
 import { refreshOrderFlags } from "./lib/order-flags.js";
+import { slugify } from "./lib/slug.js";
 import { validateEvents, borrowedSource, BORROWED_SOURCE } from "./lib/validate.js";
 
 const PRECISION_CODE = Object.fromEntries(Array.from({ length: 15 }, (_, c) => [precisionName(c), c]));
@@ -84,15 +85,6 @@ const path = (name) => new URL(`../data/${name}`, import.meta.url);
 const outName = (base, ext) => `${base}${SUFFIX}.${ext}`;
 
 const CLASS_GROUP = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
-
-function slugify(title) {
-  return title
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 async function resolveCandidate(candidate, index, total) {
   const label = `[${index + 1}/${total}] ${candidate.wikipedia_title}`;
@@ -299,7 +291,11 @@ async function main() {
   const takenIds = new Map(curated.map((e) => [e.id, e.wikidata_qid]));
   const curatedByQid = new Map(curated.map((e) => [e.wikidata_qid, e]));
   for (const r of results) {
-    if (takenIds.has(r.id) && takenIds.get(r.id) !== r.wikidata_qid) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
+    // An item already in the curated file keeps the id it has there, whatever its title slugifies to now
+    // (lib/slug.js may spell a title differently than when that id was made, e.g. "dawson-s-field-hijackings").
+    const existing = curatedByQid.get(r.wikidata_qid);
+    if (existing) r.id = existing.id;
+    else if (takenIds.has(r.id) && takenIds.get(r.id) !== r.wikidata_qid) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
     takenIds.set(r.id, r.wikidata_qid);
   }
 

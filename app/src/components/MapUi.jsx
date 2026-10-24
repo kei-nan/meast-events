@@ -437,7 +437,9 @@ export function MapNotices({ loading, borderError, onRetry }) {
       <div role="alert" className="mu-alert">
         {borderError && (
           <div className="mu-notice is-error">
-            <span>{borderError === "final" ? "Borders failed to load." : "Borders failed to load - retrying"}</span>
+            {/* The land and the borders come from the same /data/ files, so a failure
+                leaves plain sea: name the whole map, not only its borders. */}
+            <span>{borderError === "final" ? "Map data failed to load." : "Map data failed to load - retrying"}</span>
             <button type="button" className="mu-btn mu-btn-small" onClick={onRetry}>
               Retry
             </button>

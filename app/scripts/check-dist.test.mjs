@@ -7,7 +7,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkDist } from "./check-dist.mjs";
+import { PAGEFIND_ENGINE_VERSION, checkDist, scriptHash } from "./check-dist.mjs";
+import { NO_JS_STYLESHEET, preloadTag } from "./event-page.mjs";
 import { topology } from "topojson-server";
 import { fullBucket } from "../src/lib/fullBucket.js";
 import { encodeGeo } from "../src/lib/geoCodec.js";
@@ -24,8 +25,13 @@ const fc = (features = [], extra = {}) => ({ type: "FeatureCollection", ...extra
 const polygon = { type: "Polygon", coordinates: [[[35, 31], [36, 31], [36, 32], [35, 31]]] };
 
 // dist/_headers as expand-headers.mjs leaves it: the splat revalidates, each file is immutable.
-const HEADERS = (entryRule = ENTRY) =>
+const INLINE = 'document.documentElement.classList.add("js")';
+const CSP = (extra = "") => `Content-Security-Policy: default-src 'self'; script-src 'self' ${scriptHash(INLINE)}${extra}`;
+const HEADERS = (entryRule = ENTRY, csp = CSP()) =>
   [
+    "/*",
+    `  ${csp}`,
+    "",
     "/assets/*",
     "  Cache-Control: public, max-age=0, must-revalidate",
     "",
@@ -38,12 +44,36 @@ const HEADERS = (entryRule = ENTRY) =>
     "",
   ].join("\n");
 
-const shell = (extra = "") => `<!doctype html><html><head><script type="module" src="${ENTRY}"></script>${extra}</head><body></body></html>`;
+const ICONS = `<link rel="icon" href="/favicon.ico"><link rel="icon" href="/favicon.svg"><link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
+const shell = (extra = "") =>
+  `<!doctype html><html><head><script>${INLINE}</script>${ICONS}<script type="module" src="${ENTRY}"></script>${extra}</head><body></body></html>`;
+const bucketOf = (id) => `/data/events/${DIR}/full/${fullBucket(id, BUCKETS)}.json`;
 const eventPage = (id) =>
   shell(
-    `<link rel="stylesheet" href="/event/event.css" media="(scripting: none)">` +
+    NO_JS_STYLESHEET +
+      preloadTag(bucketOf(id)) +
       `<link rel="canonical" href="https://middleeast.events/event/${encodeURIComponent(id)}">`
   );
+
+// A PNG's signature and IHDR chunk header for a width x height image (all check-dist reads).
+const png = (w, h) => {
+  const b = Buffer.alloc(33);
+  Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(b, 0);
+  b.writeUInt32BE(13, 8);
+  b.write("IHDR", 12, "latin1");
+  b.writeUInt32BE(w, 16);
+  b.writeUInt32BE(h, 20);
+  return b;
+};
+// An ICO holding one image (`image`).
+const ico = (image = png(32, 32)) => {
+  const head = Buffer.alloc(22);
+  head.writeUInt16LE(1, 2);
+  head.writeUInt16LE(1, 4);
+  head.writeUInt32LE(image.length, 6 + 8);
+  head.writeUInt32LE(22, 6 + 12);
+  return Buffer.concat([head, image]);
+};
 
 // A minimal build that passes every check. Returns the paths and a writer for
 // the tests to break it with.
@@ -74,6 +104,10 @@ function fixture() {
   write("index.html", shell());
   for (const id of IDS) write(`event/${id}.html`, eventPage(id));
   write("pagefind/pagefind.js", "");
+  write("pagefind/pagefind-entry.json", { version: PAGEFIND_ENGINE_VERSION });
+  write("favicon.svg", "<svg/>");
+  write("favicon.ico", new Uint8Array(ico()));
+  write("apple-touch-icon.png", new Uint8Array(png(180, 180)));
   write("404.html", "");
   write("_headers", HEADERS());
   const remove = (rel) => fs.rmSync(path.join(dist, ...rel.split("/")), { recursive: true, force: true });
@@ -164,16 +198,52 @@ test("boundaries and land: a missing or undecodable geometry file, shared geomet
 
 test("index.html: no entry script, or a reference to a file not in dist/", async () => {
   await assertProblem((f) => f.write("index.html", "<html></html>"), /references no \/assets\/index-\*\.js entry script/);
-  await assertProblem((f) => f.write("index.html", shell(`<link rel="icon" href="/favicon.svg">`)), /references \/favicon\.svg, which is not in dist\//);
+  await assertProblem((f) => f.write("index.html", shell(`<link rel="icon" href="/missing.svg">`)), /references \/missing\.svg, which is not in dist\//);
 });
 
 test("event pages: missing, other assets, no no-JS stylesheet, no canonical, a leftover region marker", async () => {
   const id = IDS[1];
   await assertProblem((f) => f.remove(`event/${id}.html`), new RegExp(`event/${id}\\.html is missing`));
   await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id).replace(ENTRY, "/assets/index-ZZZZZZZZ.js")), /does not load the same \/assets\/ files as index\.html/);
-  await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id).replace(`media="(scripting: none)"`, "")), /lacks its no-JavaScript stylesheet/);
+  await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id).replace(NO_JS_STYLESHEET, `<link rel="stylesheet" href="/event/event.css">`)), /lacks its no-JavaScript stylesheet/);
+  await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id).replace(preloadTag(bucketOf(id)), "")), /does not preload its full-record bucket/);
+  await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id) + preloadTag("/data/nope.json")), /preloads \/data\/nope\.json, which is not in dist\//);
   await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id).replace("https://middleeast.events/event/", "https://example.org/")), /does not name itself as canonical/);
   await assertProblem((f) => f.write(`event/${id}.html`, eventPage(id) + "<!-- page-body -->"), /still has an index\.html region marker/);
+});
+
+test("an inline script whose hash the CSP does not list, or no CSP at all", async () => {
+  await assertProblem((f) => f.write("index.html", shell("<script>alert(1)</script>")), /index\.html has an inline script whose hash 'sha256-.*' is not in the CSP's script-src/);
+  await assertProblem((f) => f.write("404.html", "<script>x()</script>"), /404\.html has an inline script/);
+  await assertProblem((f) => f.write("_headers", HEADERS(ENTRY, "Content-Security-Policy: script-src 'self'")), /index\.html has an inline script whose hash/);
+  await assertProblem((f) => f.write("_headers", HEADERS(ENTRY, "X-Other: 1")), /the \/\* rule has no Content-Security-Policy/);
+  // Data blocks (JSON-LD) and external scripts are not inline scripts.
+  assert.deepEqual(await problemsAfter((f) => f.write("404.html", '<script type="application/ld+json">{}</script><script src="/a.js"></script>')), []);
+});
+
+test("icons: missing, not an ICO, a touch icon of the wrong size, or not linked", async () => {
+  await assertProblem((f) => f.remove("favicon.ico"), /favicon\.ico is missing/);
+  await assertProblem((f) => f.write("favicon.ico", "<svg/>"), /favicon\.ico is not an ICO file/);
+  await assertProblem((f) => f.write("favicon.ico", new Uint8Array(ico().subarray(0, 30))), /favicon\.ico image 0 lies outside the file/);
+  await assertProblem((f) => f.write("apple-touch-icon.png", new Uint8Array(png(192, 192))), /apple-touch-icon\.png is 192x192, not 180x180/);
+  await assertProblem((f) => f.write("apple-touch-icon.png", "GIF89a"), /apple-touch-icon\.png is not a PNG/);
+  await assertProblem((f) => f.remove("apple-touch-icon.png"), /apple-touch-icon\.png is missing/);
+  await assertProblem((f) => f.write("index.html", shell().replace('<link rel="apple-touch-icon" href="/apple-touch-icon.png">', "")), /does not link \/apple-touch-icon\.png/);
+});
+
+test("_redirects: a redirect from a live event or to a missing one", async () => {
+  assert.deepEqual(await problemsAfter((f) => f.write("_redirects", `/event/old-name /event/${IDS[0]} 301\n`)), []);
+  await assertProblem((f) => f.write("_redirects", `/event/${IDS[1]} /event/${IDS[0]} 301\n`), /_redirects: redirect from six-day-war: it is still an event/);
+  await assertProblem((f) => f.write("_redirects", "/event/old-name /event/gone 301\n"), /_redirects: redirect old-name -> gone: gone is not an event/);
+});
+
+test("Pagefind: a new release while its engine files are cached is a problem until reviewed", async () => {
+  const engine = "/pagefind/pagefind.js\n  ! Cache-Control\n  Cache-Control: public, max-age=3600, stale-while-revalidate=86400\n";
+  const upgraded = (f) => f.write("pagefind/pagefind-entry.json", { version: "9.9.9" });
+  await assertProblem((f) => (f.write("_headers", HEADERS() + engine), upgraded(f)), /Pagefind 9\.9\.9 built the search index, but public\/_headers caches the engine files for/);
+  // Not cached (no-cache): any release is fine.
+  assert.deepEqual(await problemsAfter((f) => (f.write("_headers", HEADERS() + engine.replace(/max-age=3600, stale-while-revalidate=86400/, "no-cache")), upgraded(f))), []);
+  assert.deepEqual(await problemsAfter((f) => f.write("_headers", HEADERS() + engine)), []);
 });
 
 test("search index and 404 page missing", async () => {
@@ -195,7 +265,7 @@ test("_headers: missing, not expanded, an immutable splat, no rule for the entry
   );
   await assertProblem((f) => f.write("_headers", HEADERS("/assets/other-ZZZZZZZZ.js")), /no immutable rule for the entry script \/assets\/index-/);
   const many = Array.from({ length: 100 }, (_, i) => `/p${i}\n  X: 1\n`).join("");
-  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 103 rules; the host reads only the first 100/);
+  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 104 rules; the host reads only the first 100/);
 });
 
 test("file count: a problem at the host's limit, a warning from 75% of it", async () => {

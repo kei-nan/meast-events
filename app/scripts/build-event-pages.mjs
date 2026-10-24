@@ -8,6 +8,9 @@
 //   dist/sitemap.xml      home + /event/ + every event page
 //   dist/404.html         served with status 404 for any other path
 //                         (wrangler.jsonc not_found_handling "404-page")
+//   dist/_redirects       /event/<old id> -> /event/<new id>, only when the
+//                         optional data/event-redirects.json lists renamed
+//                         ids (scripts/redirects.mjs)
 //
 // An event's page is the app: dist/index.html, as Vite just built it (the same
 // hashed script and styles), with the event's own <head> tags and the event as
@@ -26,14 +29,19 @@
 // second time.
 //
 // Run via `npm run build` or `node scripts/build-event-pages.mjs` after `vite build`.
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fullBucket } from "../src/lib/fullBucket.js";
 import { renderEventPage, renderIndexPage, renderNotFoundPage, renderSitemap } from "./event-page.mjs";
+import { redirectProblems, redirectsFile } from "./redirects.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DIST = process.env.EVENT_PAGES_DIST ? path.resolve(process.env.EVENT_PAGES_DIST) : path.join(__dirname, "..", "dist");
+// ATLAS_DATA_DIR overrides the repo-root data/ (as in split-data.mjs).
+const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR ? path.resolve(process.env.ATLAS_DATA_DIR) : path.join(__dirname, "..", "..", "data");
+const REDIRECTS = path.join(ROOT_DATA_DIR, "event-redirects.json");
 const DATA = path.join(DIST, "data", "events");
 const OUT = path.join(DIST, "event");
 
@@ -61,11 +69,27 @@ async function main() {
     events.push({ ...e, ...f });
   }
 
+  // Each page links to the events just before and after it by start date (no
+  // date last; ties keep the data's order).
+  const byDate = events
+    .map((e, i) => [e, i])
+    .sort(([a, i], [b, j]) => {
+      const x = a.date_start ? String(a.date_start) : "￿";
+      const y = b.date_start ? String(b.date_start) : "￿";
+      return x < y ? -1 : x > y ? 1 : i - j;
+    })
+    .map(([e]) => e);
+  const pick = (e) => e && { id: e.id, title: e.title, date_start: e.date_start };
+  const neighbours = new Map(byDate.map((e, i) => [e.id, { prev: pick(byDate[i - 1]), next: pick(byDate[i + 1]) }]));
+
   // Keep the stylesheet Vite copied from public/event/; replace only the pages.
   await mkdir(OUT, { recursive: true });
   let bytes = 0;
   for (const e of events) {
-    const html = renderEventPage(e, template);
+    // The bucket the app fetches for this event (lib/dataClient.js bucketUrl),
+    // preloaded by the page.
+    const preload = `/data/events/${meta.dir}/full/${fullBucket(e.id, meta.fullBuckets)}.json`;
+    const html = renderEventPage(e, template, { neighbours: neighbours.get(e.id), preload });
     bytes += Buffer.byteLength(html);
     await writeFile(path.join(OUT, `${e.id}.html`), html);
   }
@@ -74,9 +98,21 @@ async function main() {
   await writeFile(path.join(DIST, "sitemap.xml"), renderSitemap(events));
   await writeFile(path.join(DIST, "404.html"), renderNotFoundPage());
   if (events.length !== meta.totalEvents) throw new Error(`event pages: ${events.length} pages for ${meta.totalEvents} events`);
+
+  // Renamed ids (scripts/redirects.mjs): data/event-redirects.json, if there is one.
+  let redirects = 0;
+  await rm(path.join(DIST, "_redirects"), { force: true });
+  if (existsSync(REDIRECTS)) {
+    const map = await readJSON(REDIRECTS);
+    const problems = redirectProblems(map, seen);
+    if (problems.length) throw new Error(`data/event-redirects.json:\n  ${problems.join("\n  ")}`);
+    redirects = Object.keys(map).length;
+    if (redirects) await writeFile(path.join(DIST, "_redirects"), redirectsFile(map));
+  }
   console.log(
     `event pages: ${events.length} pages + index -> ${path.relative(process.cwd(), OUT)} ` +
-      `(${((bytes + Buffer.byteLength(index)) / 1024).toFixed(0)}KB), sitemap.xml with ${events.length + 2} URLs, 404.html`
+      `(${((bytes + Buffer.byteLength(index)) / 1024).toFixed(0)}KB), sitemap.xml with ${events.length + 2} URLs, 404.html` +
+      (redirects ? `, _redirects with ${redirects} renamed ids` : "")
   );
 }
 
