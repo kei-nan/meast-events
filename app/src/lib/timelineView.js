@@ -1,4 +1,5 @@
-// The results panel's Timeline view: events oldest first, grouped by decade,
+// The results panel's Timeline view: events oldest first (in the browse list,
+// those starting in the selected years before those ongoing), grouped by decade,
 // each with a bar for the years its dates name on a shared axis. Pure.
 //
 // Bars show the dates as the data gives them (docs/DATA_POLICY.md): a record
@@ -9,6 +10,7 @@
 // An event without an end date is a point at its start year: a missing end is
 // not read as "still going on".
 
+import { startedBefore } from "./browseOrder.js";
 import { rawEventYears } from "./eventYears.js";
 
 /** The event's start date as a sortable string ("" when it has none). */
@@ -26,6 +28,21 @@ export function chronological(events) {
       return a.i - b.i;
     })
     .map((x) => x.e);
+}
+
+/**
+ * The Timeline view's order. With `rangeStart` (the browse list): the events
+ * that START in the selected years first, then those ongoing from before them,
+ * each part oldest first - the List view's split (lib/browseOrder.js). Without
+ * it: all oldest first. Undated events stay in the first part, as in the List.
+ */
+export function timelineOrder(events, rangeStart = null) {
+  const sorted = chronological(events);
+  if (!Number.isFinite(rangeStart)) return sorted;
+  const starting = [];
+  const ongoing = [];
+  for (const e of sorted) (startedBefore(e, rangeStart) ? ongoing : starting).push(e);
+  return starting.concat(ongoing);
 }
 
 /** The first year of the decade the event starts in, or null when it has no start year. */

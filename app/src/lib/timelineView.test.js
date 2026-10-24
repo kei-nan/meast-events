@@ -8,6 +8,7 @@ import {
   rangeBand,
   startDecade,
   timelineAxis,
+  timelineOrder,
 } from "./timelineView.js";
 
 const ev = (id, date_start, date_end) => ({ id, title: id, date_start, date_end });
@@ -30,6 +31,48 @@ test("chronological does not change its input", () => {
   const events = [ev("b", "2000-01-01"), ev("a", "1990-01-01")];
   chronological(events);
   assert.deepEqual(events.map((e) => e.id), ["b", "a"]);
+});
+
+test("timelineOrder: events starting in the range first, then the ongoing ones, each oldest first", () => {
+  // The 1967 preset: the Six-Day War leads, not the conflicts that began earlier.
+  const events = [
+    ev("attrition", "1967-07-01", "1970-08-07"),
+    ev("kurdish", "1918-01-01", "2003-01-01"),
+    ev("six-day", "1967-06-05", "1967-06-10"),
+    ev("yemen", "1962-09-26", "1970-04-14"),
+    ev("aden", "1963-12-10", "1967-11-30"),
+    ev("dhofar", "1963-01-01", "1976-01-01"),
+  ];
+  assert.deepEqual(
+    timelineOrder(events, 1967).map((e) => e.id),
+    ["six-day", "attrition", "kurdish", "yemen", "dhofar", "aden"]
+  );
+});
+
+test("timelineOrder without a range start is chronological", () => {
+  const events = [ev("b", "1973-10-06"), ev("a", "1948-05-15"), ev("none", null)];
+  assert.deepEqual(timelineOrder(events).map((e) => e.id), ["a", "b", "none"]);
+  assert.deepEqual(timelineOrder(events, null).map((e) => e.id), ["a", "b", "none"]);
+});
+
+test("timelineOrder: a reversed record goes by its start; undated stay in the first part; input unchanged", () => {
+  const events = [
+    ev("old", "1960-01-01", "1980-01-01"),
+    ev("reversed", "1969-05-01", "1968-01-01"), // starts in the range, ends before it
+    ev("reversed-old", "1966-05-01", "1964-01-01"), // starts before the range
+    ev("none", null),
+    ev("new", "1968-02-01"),
+  ];
+  assert.deepEqual(
+    timelineOrder(events, 1967).map((e) => e.id),
+    ["new", "reversed", "none", "old", "reversed-old"]
+  );
+  assert.deepEqual(events.map((e) => e.id), ["old", "reversed", "reversed-old", "none", "new"]);
+});
+
+test("timelineOrder: a range start before every event leaves one oldest-first part", () => {
+  const events = [ev("b", "1990-01-01"), ev("a", "1980-01-01")];
+  assert.deepEqual(timelineOrder(events, 1900).map((e) => e.id), ["a", "b"]);
 });
 
 test("decades and their labels", () => {

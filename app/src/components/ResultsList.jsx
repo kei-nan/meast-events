@@ -6,11 +6,11 @@ import { countryLabel } from "../lib/eventCountries.js";
 import {
   axisTicks,
   barGeometry,
-  chronological,
   decadeLabel,
   rangeBand,
   startDecade,
   timelineAxis,
+  timelineOrder,
 } from "../lib/timelineView.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 
@@ -198,7 +198,8 @@ function TimelineAxis({ axis, band }) {
  * subheading and carry an "ongoing since" tag. Arrow keys move between rows (roving tabindex);
  * ArrowUp on the first row and Escape return to `onFocusInput`.
  * With `layout="timeline"` the same results are shown oldest first under
- * decade headings, each with a bar on a shared year axis (lib/timelineView.js):
+ * decade headings (with `browse`, the ongoing ones after the rest, under their
+ * subheading), each with a bar on a shared year axis (lib/timelineView.js):
  * the selected years, or with `fitAxis` (a search over the whole timeline) the
  * results' own span, with the selected years shaded.
  * Remount (change `key`) to reset pagination when the result set changes.
@@ -220,7 +221,11 @@ function ResultsList({
   const [shown, setShown] = useState(PAGE);
   const [active, setActive] = useState(0);
   const timeline = layout === "timeline";
-  const ordered = useMemo(() => (timeline ? chronological(results) : results), [timeline, results]);
+  const rangeStart = browse && range ? range[0] : null;
+  const ordered = useMemo(
+    () => (timeline ? timelineOrder(results, rangeStart) : results),
+    [timeline, results, rangeStart]
+  );
   const axis = useMemo(
     () => (timeline ? timelineAxis(results, range, { fit: fitAxis, minYear: MIN_YEAR, maxYear: MAX_YEAR }) : null),
     [timeline, results, range, fitAxis]
@@ -264,7 +269,7 @@ function ResultsList({
       <ul className="sp-list" onKeyDown={onKeyDown} aria-busy={busy || undefined}>
         {timeline && visible.map((ev, idx) => {
           // Headings by decade; in the browse list the events that began
-          // before the selected years come first, under one heading.
+          // before the selected years come last (timelineOrder), under one heading.
           const group = (e) => (browse && range && startedBefore(e, range[0]) ? "ongoing" : startDecade(e));
           const g = group(ev);
           const first = idx === 0 || group(visible[idx - 1]) !== g;
