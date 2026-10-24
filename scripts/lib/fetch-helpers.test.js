@@ -1,9 +1,10 @@
-// lead.js fetchLeads (API continuation) and wiki.js fetchLabels (failed chunks) against a mocked
+// lead.js fetchLeads (API continuation), wiki.js fetchLabels (failed chunks) and wd-entities.js aliases against a mocked
 // global fetch - no network.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fetchLeads } from "./lead.js";
 import { fetchLabels } from "./wiki.js";
+import { fetchEntities, setWikidataAliases } from "./wd-entities.js";
 
 async function withFetch(handler, fn) {
   const real = globalThis.fetch;
@@ -93,4 +94,35 @@ test("fetchLabels: labels per chunk of 50; a failed chunk throws instead of bein
     (url, n) => (n === 1 ? json({ entities: entities(url) }) : json({}, 404)),
     async () => assert.rejects(fetchLabels(qids), /labels HTTP 404/)
   );
+});
+
+test("fetchEntities: English aliases as values in Wikidata's order, [] when none, undefined when not requested", async () => {
+  const entities = {
+    Q1: { id: "Q1", sitelinks: {}, aliases: { en: [{ language: "en", value: "July War" }, { language: "en", value: "Second Lebanon War" }] } },
+    Q2: { id: "Q2", sitelinks: {}, aliases: {} },
+  };
+  await withFetch(
+    () => json({ entities }),
+    async (calls) => {
+      const out = await fetchEntities(["Q1", "Q2"], { props: "sitelinks|aliases", delayMs: 0 });
+      assert.match(calls[0], /props=sitelinks%7Caliases|props=sitelinks\|aliases/);
+      assert.deepEqual(out.get("Q1").aliases, ["July War", "Second Lebanon War"]);
+      assert.deepEqual(out.get("Q2").aliases, []);
+    }
+  );
+  await withFetch(
+    () => json({ entities: { Q1: { id: "Q1", sitelinks: {} } } }),
+    async () => assert.equal((await fetchEntities(["Q1"], { props: "sitelinks", delayMs: 0 })).get("Q1").aliases, undefined)
+  );
+});
+
+test("setWikidataAliases: sets, replaces or removes the field; undefined (not fetched) leaves it", () => {
+  const ev = { id: "a" };
+  assert.equal(setWikidataAliases(ev, ["July War"]), true);
+  assert.deepEqual(ev.wikidata_aliases, ["July War"]);
+  assert.equal(setWikidataAliases(ev, ["July War"]), false);
+  assert.equal(setWikidataAliases(ev, undefined), false);
+  assert.deepEqual(ev.wikidata_aliases, ["July War"]);
+  assert.equal(setWikidataAliases(ev, []), true);
+  assert.equal("wikidata_aliases" in ev, false);
 });

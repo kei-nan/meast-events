@@ -1,6 +1,7 @@
 // Batched Wikidata entity fetch (read-only). Keeps a trimmed record per item:
 // class statements (P31), location statements (P17/P276/P131), dates (P585/P580/P582),
-// coordinates (P625), sitelinks (all projects / Wikipedia editions only).
+// coordinates (P625), sitelinks (all projects / Wikipedia editions only), English aliases
+// (only when "aliases" is among the requested props).
 import { politeFetch, sleep } from "./http.js";
 
 const API = "https://www.wikidata.org/w/api.php";
@@ -22,6 +23,9 @@ function trim(ent) {
     qid: ent.id,
     label: ent.labels?.en?.value ?? null,
     description: ent.descriptions?.en?.value ?? null,
+    // English aliases ("also known as"), values only, in Wikidata's order; [] when the item has none,
+    // undefined when aliases were not requested.
+    aliases: ent.aliases ? (ent.aliases.en ?? []).map((a) => a.value) : undefined,
     lastrevid: ent.lastrevid ?? null,
     p31: ids(c.P31), // Wikidata statement order, deprecated statements excluded
     p17: ids(c.P17),
@@ -100,4 +104,15 @@ export async function fetchLabelsCached(qids, { cache = null, delayMs = 300 } = 
     if (i + 50 < todo.length) await sleep(delayMs);
   }
   return out;
+}
+
+// Stores an item's English aliases on an event as `wikidata_aliases` (Wikidata's values as-is, in its order),
+// or removes the field when the item has none. `aliases` undefined (not fetched) leaves the event unchanged.
+// Returns true when the event changed.
+export function setWikidataAliases(ev, aliases) {
+  if (aliases === undefined) return false;
+  const before = JSON.stringify(ev.wikidata_aliases ?? null);
+  if (aliases.length) ev.wikidata_aliases = [...aliases];
+  else delete ev.wikidata_aliases;
+  return JSON.stringify(ev.wikidata_aliases ?? null) !== before;
 }

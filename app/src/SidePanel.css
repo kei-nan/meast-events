@@ -758,6 +758,15 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
+/* The Wikidata alias a search matched (ResultsList), when the title did not. */
+.sp-row-alias {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
 .sp-row-snippet {
   display: -webkit-box;
   -webkit-line-clamp: 2;

@@ -20,7 +20,7 @@ import { fetchEntity, fetchLabels } from "./lib/wiki.js";
 import { SEED_FIELDS, isSeedEvent, proposeSeedFields, summarize } from "./lib/seed-enrichment.js";
 
 const REQUEST_DELAY_MS = 300;
-const FULL = "claims|labels|descriptions|sitelinks/urls"; // as lib/context.js, so the cache entries are shared
+const FULL = "claims|labels|descriptions|aliases|sitelinks/urls"; // as lib/context.js, so the cache entries are shared
 const curatedUrl = new URL("../data/events.json", import.meta.url);
 const outUrl = new URL("../data/seed-enrichment.proposed.json", import.meta.url);
 const log = (m) => process.stdout.write(`\r${m}      `);

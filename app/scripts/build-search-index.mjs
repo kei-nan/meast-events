@@ -1,5 +1,5 @@
-// Builds the full-text search index (Pagefind) over every event's title and
-// full lead, into public/pagefind/. The app searches it in the browser
+// Builds the full-text search index (Pagefind) over every event's title,
+// Wikidata aliases and full lead, into public/pagefind/. The app searches it in the browser
 // (src/lib/textSearch.js): no server, no database. Like public/data/, it is
 // generated on every dev start and build (including Cloudflare's) and not
 // committed.
@@ -34,11 +34,15 @@ async function main() {
   const { index, errors } = await pagefind.createIndex({ forceLanguage: "en" });
   if (!index) throw new Error(`pagefind: ${errors.join("; ")}`);
   for (const e of events) {
-    // The title is part of the content so it is searchable like the lead
-    // (as the old search API did: title|extract). Ranking is done by the app.
+    // The title and Wikidata's English aliases (wikidata_aliases, so "July War"
+    // finds the 2006 Lebanon War) are part of the content, searchable like the
+    // lead. Ranking is done by the app (src/lib/ranking.js), which puts title
+    // and then alias matches first, so the index needs no weights (a custom
+    // record has none; only HTML input does).
+    const aliases = Array.isArray(e.wikidata_aliases) ? e.wikidata_aliases : [];
     const res = await index.addCustomRecord({
       url: eventPath(e.id), // unused by the app, which needs only meta.id (ids.json below)
-      content: `${e.title}\n\n${e.extract ?? ""}`,
+      content: [e.title, aliases.join("\n"), e.extract ?? ""].filter(Boolean).join("\n\n"),
       language: "en",
       meta: { title: e.title, id: e.id },
     });

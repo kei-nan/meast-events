@@ -76,6 +76,12 @@ test("publicEvent: lite record nulls coordinates without a location and prefers 
   assert.equal(publicEvent({ id: "b", sitelinks_current: "12" }).sitelinks, null);
 });
 
+test("publicEvent: Wikidata aliases as-is under `aliases`, absent when the event has none", () => {
+  assert.deepEqual(publicEvent({ id: "a", wikidata_aliases: ["July War", "Second Lebanon War"] }).aliases, ["July War", "Second Lebanon War"]);
+  assert.equal("aliases" in publicEvent({ id: "b" }), false);
+  assert.equal("aliases" in publicEvent({ id: "c", wikidata_aliases: [] }), false);
+});
+
 test("publicEvent: a precise pin rounded to one decimal place is published as approximate, coordinates unchanged", () => {
   // As in the data: al-anfal-campaign, Wikidata P625 33, 43.
   const anfal = { id: "al-anfal-campaign", location_quality: "precise", coordinate_source: "wikidata", coordinates: { lat: 33, lon: 43 } };

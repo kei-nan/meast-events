@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { matchesFilters, matchesTokens, normalizeText, rankEvents, tokenize } from "./ranking.js";
+import { matchedAlias, matchesFilters, matchesTokens, normalizeText, rankEvents, tokenize } from "./ranking.js";
 import { makeCircleArea, makeRectArea } from "./geo.js";
 
 const ev = (id, title, extra = {}) => ({
@@ -67,6 +67,34 @@ test("rank: exact > prefix > contains > rest (server order), stable", () => {
   ];
   assert.deepEqual(rankEvents(list, "war").map((e) => e.id), ["exact", "prefix", "contains", "rest1", "rest2"]);
   assert.deepEqual(rankEvents(list, "WAR").map((e) => e.id), ["exact", "prefix", "contains", "rest1", "rest2"]);
+});
+
+test("aliases: matched as words like the title, ranked after the same kind of title match", () => {
+  const war2006 = ev("w2006", "2006 Lebanon War", { aliases: ["July War", "Second Lebanon War", "Lebanon War"] });
+  const war1982 = ev("w1982", "1982 Lebanon War", { extract: "the second Israeli invasion of Lebanon; the war" });
+  const july = ev("july", "14 July Revolution", { extract: "a war" });
+  assert.ok(matchesTokens(war2006, tokenize("july war")));
+  assert.ok(matchesTokens(war2006, tokenize("second leb")));
+  assert.deepEqual(rankEvents([july, war1982, war2006], "July War").map((e) => e.id), ["w2006", "july", "w1982"]);
+  assert.deepEqual(rankEvents([war1982, war2006], "Second Lebanon War").map((e) => e.id), ["w2006", "w1982"]);
+  // A title match of a kind beats an alias match of the same kind: both contain "lebanon war" in the title,
+  // and the alias "Lebanon War" (exact) lifts 2006 above 1982 (title contains only).
+  assert.deepEqual(rankEvents([war1982, war2006], "Lebanon War").map((e) => e.id), ["w2006", "w1982"]);
+  const exact = ev("exact", "Lebanon War");
+  assert.deepEqual(rankEvents([war2006, exact], "Lebanon War").map((e) => e.id), ["exact", "w2006"]);
+  // Prefix of an alias, for search-as-you-type.
+  const ykw = ev("ykw", "Yom Kippur War", { aliases: ["October War", "Tishreen Liberation war"] });
+  assert.deepEqual(rankEvents([july, ykw], "Tishreen").map((e) => e.id), ["ykw", "july"]);
+});
+
+test("matchedAlias: the best-matching alias when the title does not match, else null", () => {
+  const ykw = ev("ykw", "Yom Kippur War", { aliases: ["1973 October War", "October War", "Tishreen Liberation war"] });
+  assert.equal(matchedAlias(ykw, "october war"), "October War");
+  assert.equal(matchedAlias(ykw, "Tishreen"), "Tishreen Liberation war");
+  assert.equal(matchedAlias(ykw, "yom kippur"), null);
+  assert.equal(matchedAlias(ykw, "war"), null);
+  assert.equal(matchedAlias(ykw, "egypt"), null);
+  assert.equal(matchedAlias(ev("x", "X"), "october war"), null);
 });
 
 test("rank: no query sorts by date, stable on ties", () => {

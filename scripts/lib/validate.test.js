@@ -407,3 +407,11 @@ test("validateEvents: an entry typed as a person, organisation, state or country
   assert.match(warnings[0], /not an event by its Wikidata classes \(history of a country or state\)/);
   assert.deepEqual(validateEvents([event({ wikidata_classes: ["military operation", "revolt"] })]).warnings, []);
 });
+
+test("validateEvents: wikidata_aliases is absent or a non-empty array of non-empty strings", () => {
+  assert.deepEqual(validateEvents([event({ wikidata_aliases: ["July War", "2006 Lebanon war"] })]).errors, []);
+  assert.deepEqual(validateEvents([event()]).errors, []);
+  for (const bad of [[], ["July War", ""], "July War", [1]]) {
+    assert.match(validateEvents([event({ wikidata_aliases: bad })]).errors.join("\n"), /wikidata_aliases must be/);
+  }
+});

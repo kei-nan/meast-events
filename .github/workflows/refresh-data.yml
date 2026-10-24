@@ -71,11 +71,12 @@ jobs:
         run: node scripts/refresh-extracts.js --apply --report="$RUNNER_TEMP/refresh-report.md"
 
       # The counts behind the default "most covered" list order (docs/DATA_POLICY.md,
-      # "Default order"); the changed counts are appended to the report.
-      - name: Re-fetch the Wikidata sitelink counts
+      # "Default order") and the English aliases the search also matches; the
+      # changes are appended to the report.
+      - name: Re-fetch the Wikidata sitelink counts and aliases
         run: |
           set -o pipefail
-          { echo; echo "## Sitelink counts"; echo; echo '```'; node scripts/refresh-sitelinks.js --apply; echo '```'; } | tee -a "$RUNNER_TEMP/refresh-report.md"
+          { echo; echo "## Sitelink counts and aliases"; echo; echo '```'; node scripts/refresh-sitelinks.js --apply; echo '```'; } | tee -a "$RUNNER_TEMP/refresh-report.md"
 
       # Whether the guideline sections the wording check cites changed since the
       # reviews applied them (docs/framing-review.md, "Guideline versions"). A

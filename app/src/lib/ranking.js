@@ -3,8 +3,10 @@
 // Local (title + summary) matching, used for instant results and when the
 // full-text index cannot be loaded: the query is split
 // into tokens (case- and diacritic-insensitive); every token must occur as a
-// whole word in title+extract, except the LAST token which is prefix-matched
-// when it has >= 2 characters.
+// whole word in title+aliases+extract, except the LAST token which is
+// prefix-matched when it has >= 2 characters. `aliases` are the item's English
+// Wikidata aliases (scripts/split-data.mjs), so "July War" finds the 2006
+// Lebanon War; the title shown is still Wikipedia's.
 
 import { eventCoords, inArea } from "./geo.js";
 
@@ -39,8 +41,10 @@ function tokenMatches(token, isLast, words) {
 // The text is stored with its words, so an event that later gains its extract
 // is tokenised again.
 const wordCache = new WeakMap(); // event -> { text, words }
+const aliasesOf = (event) => (Array.isArray(event.aliases) ? event.aliases : []);
+
 function eventWords(event) {
-  const text = `${event.title ?? ""} ${event.extract ?? event.snippet ?? ""}`;
+  const text = `${event.title ?? ""} ${aliasesOf(event).join(" ")} ${event.extract ?? event.snippet ?? ""}`;
   const hit = wordCache.get(event);
   if (hit && hit.text === text) return hit.words;
   const words = tokenize(text);
@@ -70,14 +74,44 @@ export function matchesFilters(event, { q = "", area = null, categories = [], co
   return true;
 }
 
-function tier(event, qNorm, tokens) {
-  const title = normalizeText(event.title).trim();
+// How a name (the title or one alias) matches the query: 0 exact, 1 prefix,
+// 2 contains (the text, or every token as a word), 3 not.
+function nameTier(name, qNorm, tokens) {
+  const norm = normalizeText(name).trim();
   const phrase = tokens.join(" ");
-  const titleTokens = tokenize(event.title).join(" ");
-  if (title === qNorm || titleTokens === phrase) return 0;
-  if (title.startsWith(qNorm) || titleTokens.startsWith(phrase)) return 1;
-  if (title.includes(qNorm) || matchesTokens({ title: event.title, extract: "" }, tokens)) return 2;
+  const nameTokens = tokenize(name).join(" ");
+  if (norm === qNorm || nameTokens === phrase) return 0;
+  if (norm.startsWith(qNorm) || nameTokens.startsWith(phrase)) return 1;
+  if (norm.includes(qNorm) || matchesTokens({ title: name, extract: "" }, tokens)) return 2;
   return 3;
+}
+
+function bestAlias(event, qNorm, tokens) {
+  let best = null;
+  for (const alias of aliasesOf(event)) {
+    const t = nameTier(alias, qNorm, tokens);
+    if (t < 3 && (!best || t < best.tier)) best = { alias, tier: t };
+  }
+  return best;
+}
+
+// Title exact > alias exact > title prefix > alias prefix > title contains >
+// alias contains > the rest. An alias never outranks the same kind of title
+// match.
+function tier(event, qNorm, tokens) {
+  const t = nameTier(event.title, qNorm, tokens);
+  const a = bestAlias(event, qNorm, tokens)?.tier ?? 3;
+  return Math.min(t * 2, a * 2 + 1);
+}
+
+// The alias the query matched, for a result whose title it does not match
+// (shown as "matched: …"); null otherwise.
+export function matchedAlias(event, q) {
+  const tokens = tokenize(q);
+  if (!tokens.length || !aliasesOf(event).length) return null;
+  const qNorm = normalizeText(q).trim();
+  if (nameTier(event.title, qNorm, tokens) < 3) return null;
+  return bestAlias(event, qNorm, tokens)?.alias ?? null;
 }
 
 function isChronological(events) {
@@ -88,7 +122,8 @@ function isChronological(events) {
 }
 
 // With a query: exact title > title prefix > title contains > everything else
-// (in the server's order). Without: chronological by start date. Stable.
+// (in the full-text index's order), each title tier followed by the same tier
+// of alias matches (see tier). Without: chronological by start date. Stable.
 export function rankEvents(events, q = "") {
   const tokens = tokenize(q);
   // Chronological input (the app keeps its store in this order, so every

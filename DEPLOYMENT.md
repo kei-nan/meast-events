@@ -202,7 +202,8 @@ the Actions tab). It:
   are applied, and so are plain title renames; held cases (a redirect to a section of
   another article, another Wikidata item, a stored title Wikipedia does not redirect to)
   are not changed but listed in the PR description for review;
-- refreshes the Wikidata sitelink counts behind the default "most covered" order;
+- refreshes the Wikidata sitelink counts behind the default "most covered" order, and
+  the items' English Wikidata aliases (`wikidata_aliases`), which the search also matches;
 - checks whether the Wikipedia guideline sections the framing review's wording check
   cites were edited since the reviews (recorded in `data/framing-review.json`, with the
   diff at the top of the PR description; if the check cannot run, the PR says so).
