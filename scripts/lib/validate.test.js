@@ -73,6 +73,13 @@ test("isRealDate: years 1900 to next year only", () => {
   assert.match(validateEvents([event({ date_start: "1067-06-05", date_end: null })]).errors[0], /date_start invalid/);
 });
 
+test("validateEvents: wikipedia_revid, when present, is a positive integer", () => {
+  assert.deepEqual(validateEvents([event({ wikipedia_revid: 1234567 })]).errors, []);
+  for (const bad of [0, -1, 1.5, "123", null]) {
+    assert.match(validateEvents([event({ wikipedia_revid: bad })]).errors[0], /wikipedia_revid must be a positive integer/);
+  }
+});
+
 test("validateEvents: category and category_group come from the pipeline's fixed set", () => {
   // The app labels exactly the groups the pipeline can assign.
   assert.deepEqual([...CATEGORIES].sort(), Object.keys(CATEGORY_LABELS).sort());

@@ -26,6 +26,7 @@ rather than a second layer of ours. Concretely:
 |---|---|---|
 | `title`, `wikipedia_url` | English Wikipedia article title / URL | Wikipedia |
 | `extract`, `extract_retrieved_at` | The **full lead section** (everything before the first heading) of the English article as plain text, and the date it was fetched | Wikipedia |
+| `wikipedia_revid` | Only where known: the id of the English Wikipedia revision whose lead is exactly `extract` (see "Revision") | Wikipedia |
 | `wikidata_classes` | ALL class labels of the Wikidata item, see below | Wikidata |
 | `date_start`, `date_end` | Wikidata dates (P585 point in time, else P580 start; P582 end) | Wikidata |
 | `countries` | Wikidata's country (P17, or P17 of the P276/P131 place), mapped to the 15 tracked names | Wikidata |
@@ -44,6 +45,21 @@ text. Only whitespace is normalised (no-break spaces to plain spaces, runs of sp
 `snippet` (lite data/UI) is the first 160 characters of it. Length before and after the change for the 394 curated events: median 435 -> 1,207
 characters, mean 476 -> 1,494, max 1,487 -> 5,481; 327 got longer, 66 were already the whole lead, 1 got shorter (Wikipedia rewrote the lead of the
 Battle of Elli in between). The earlier text was mostly the first paragraph only. `extract_retrieved_at` says when the text was fetched, so it can be shown as "as of".
+
+### Revision (`wikipedia_revid`)
+
+The id of the article revision (MediaWiki `lastrevid`, from the same `prop=extracts|pageprops|info` request as the lead) whose lead is
+exactly the stored `extract`. It lets a citation link that exact version, `https://en.wikipedia.org/w/index.php?title=<title>&oldid=<revid>`,
+as APA Style asks when citing Wikipedia (the citation rules and their sources are in `app/src/lib/citation.js`). It is set in two ways
+only, and is otherwise **absent**, never guessed:
+
+- `scripts/refresh-extracts.js --apply` writes it together with every lead it writes (the revision that lead was read from); an event that
+  shows another event's article (see "Events without an article of their own") takes that event's revision with its text.
+- `node scripts/backfill-revids.js --apply` (run once on 2026-10-24, re-runnable) fetched every event's current lead and revision and stored the
+  revision **only where the current lead equals the stored `extract` exactly**. Where the text had changed on Wikipedia since it was retrieved,
+  the field stays absent: we cannot say which revision the stored text came from. It changes nothing else in any event.
+
+Without it, a citation gives the article's URL and the retrieval date (`extract_retrieved_at`), and the site says the text may have changed since.
 
 ### Wikidata classes (`wikidata_classes`)
 
@@ -526,7 +542,7 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 (`.github/workflows/refresh-data.yml`) runs on the 1st of each month, and on demand from the Actions tab ("Run workflow"):
 
 1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
-   `extract_retrieved_at` set to that day; unchanged events are not touched, so the diff contains only real changes. The same run updates titles of
+   `extract_retrieved_at` set to that day and `wikipedia_revid` to the revision the new lead came from; unchanged events are not touched, so the diff contains only real changes. The same run updates titles of
    renamed articles (see "Titles" below). It then runs `node scripts/refresh-sitelinks.js --apply`, which updates each event's
    `sitelinks_current` (the count behind the default list order, see "Default order"). Last, `node scripts/refresh-guidelines.js --apply` compares
    the Wikipedia guideline sections the framing review cites with the versions the reviews applied, and records a section that changed

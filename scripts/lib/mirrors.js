@@ -5,6 +5,8 @@
 // (lib/title-refresh.js detectExtractHold); for a mirror it copies the source's stored text instead.
 // Pure.
 
+import { setRevid } from "./revid.js";
+
 const hasOwnArticle = (e) => !e.resolved_qid || e.resolved_qid === e.wikidata_qid;
 
 /** [{ mirror, source }] for every mirror whose article is another event's own article. */
@@ -20,13 +22,15 @@ export function mirrorPairs(events) {
   return pairs;
 }
 
-/** Copies each source's text into its mirror where they differ. Returns the mirrors' ids that changed. */
+/** Copies each source's text (and its date and revision) into its mirror where they differ. Returns the mirrors' ids that changed. */
 export function syncMirrorTexts(events) {
   const changed = [];
   for (const { mirror, source } of mirrorPairs(events)) {
     if (mirror.extract === source.extract) continue;
     mirror.extract = source.extract;
     mirror.extract_retrieved_at = source.extract_retrieved_at;
+    // same article, same text: the source's revision is the mirror's too (lib/revid.js)
+    setRevid(mirror, source.wikipedia_revid);
     changed.push(mirror.id);
   }
   return changed;

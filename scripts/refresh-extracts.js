@@ -10,7 +10,8 @@
 //
 // Rules: the lead text is Wikipedia's, only whitespace-normalised (lib/lead.js). `extract_retrieved_at` is set
 // to today only for leads whose text changed, so an unchanged event is not touched and a refresh diff shows only
-// real changes (each check is recorded by the refresh workflow's run history). With --apply the curated file is
+// real changes (each check is recorded by the refresh workflow's run history). With each lead it writes it also
+// writes `wikipedia_revid`, the revision that lead came from (lib/revid.js). With --apply the curated file is
 // written. Apart from titles (below), nothing else in an event is touched. A lead is never copied when the fetched
 // article belongs to a different Wikidata item than the event's wikidata_qid (the stored URL leads to another
 // subject's article); such updates are held and listed under "held" (lib/title-refresh.js detectExtractHold).
@@ -34,6 +35,7 @@ import {
   leadChangeReport,
 } from "./lib/title-refresh.js";
 import { syncMirrorTexts } from "./lib/mirrors.js";
+import { setRevid } from "./lib/revid.js";
 
 const APPLY = process.argv.includes("--apply");
 const PROPOSED = process.argv.includes("--proposed");
@@ -97,6 +99,8 @@ async function refresh(events, label, file) {
     if (APPLY) {
       e.extract = lead.extract;
       e.extract_retrieved_at = today;
+      // the revision this lead came from (lib/revid.js); absent if the API gave none
+      setRevid(e, lead.lastrevid);
     }
   }
   // A "title out of date" proposal stands only if Wikipedia redirects the stored title to the same article
