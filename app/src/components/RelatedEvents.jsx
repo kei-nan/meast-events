@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import EventLink from "./EventLink.jsx";
 import { formatEventDate } from "../lib/eventDate.js";
-import { NEARBY_KM, RELATED_SHOWN, emptyReason } from "../lib/related.js";
+import { NEARBY_KM, RELATED_SHOWN, emptyReason, relatedTabFor } from "../lib/related.js";
 import { compassLayout, compassPoint, compassScale, formatKm, stripLayout } from "../lib/relatedViz.js";
 
 // Other events in this dataset by a shared Wikidata parent, place or date
@@ -15,6 +15,8 @@ const RELATED_TABS = [
   { key: "nearby", name: "Nearby", title: `Within ${NEARBY_KM} km` },
   { key: "same_time", name: "Same time", title: "Within six months" },
 ];
+
+const TAB_KEYS = RELATED_TABS.map((t) => t.key);
 
 const DOT_R = 9;
 
@@ -166,15 +168,24 @@ function when(key, r) {
 /**
  * `event` is the open event with its full record (related, date_start, part_of,
  * location_quality, date_precision, date_flags). `tab` is the chosen tab key, kept
- * by the caller across events; with none chosen, the first group with events opens.
+ * by the caller across events; with none chosen, or one empty for this event, the
+ * first group with events opens (lib/related.js relatedTabFor).
  */
 export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
   const [hotId, setHotId] = useState(null);
+  // The event the tab was last chosen on: there an empty tab stays open.
+  const [chosenOn, setChosenOn] = useState(null);
   const tabRefs = useRef({});
   const related = event.related ?? {};
   const tabs = RELATED_TABS;
   const count = (t) => related[t.key]?.length ?? 0;
-  const current = tabs.find((t) => t.key === tab) ?? tabs.find((t) => count(t) > 0) ?? tabs[0];
+  const counts = Object.fromEntries(tabs.map((t) => [t.key, count(t)]));
+  const currentKey = relatedTabFor(TAB_KEYS, counts, tab, chosenOn === event.id);
+  const current = tabs.find((t) => t.key === currentKey);
+  const choose = (key) => {
+    setChosenOn(event.id);
+    onTab(key);
+  };
   const list = related[current.key] ?? [];
   const date = event.date_start;
 
@@ -188,7 +199,7 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
     else if (e.key === "End") next = tabs.at(-1);
     if (!next) return;
     e.preventDefault();
-    onTab(next.key);
+    choose(next.key);
     tabRefs.current[next.key]?.focus();
   }
 
@@ -243,7 +254,7 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
             aria-controls="rel-panel"
             tabIndex={t === current ? 0 : -1}
             className={`rel-tab${count(t) ? "" : " rel-tab--empty"}`}
-            onClick={() => onTab(t.key)}
+            onClick={() => choose(t.key)}
             onKeyDown={(e) => onKeyDown(e, t)}
           >
             <span className="rel-tab-name">{t.name}</span>
