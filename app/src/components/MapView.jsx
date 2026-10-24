@@ -60,7 +60,7 @@ import { reducedMotion } from "../lib/reducedMotion";
 import { haversineKm } from "../lib/geo";
 import { isUnhandledEscape } from "../lib/escapeKey";
 import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
-import { sheetStrip, stripOffset, toolbarInset } from "../lib/mapInsets";
+import { mapClearView } from "../lib/mapInsets";
 
 // Distance between two [lon, lat] points (the drawing code works in pairs).
 const distanceKm = (a, b) => haversineKm(a[0], a[1], b[0], b[1]);
@@ -939,11 +939,9 @@ export default function MapView({
     const w = map.getContainer().clientWidth;
     const target = 5 - (w < 700 ? 0.5 : 0) - (w < 360 ? 0.5 : 0) - (ev?.location_quality === "approximate" ? 0.5 : 0);
     const zoom = Math.min(Math.max(map.getZoom(), target), target + 2);
-    // On phones the event's sheet covers the map but its top strip: the place
-    // goes in the middle of that strip, below the toolbar (lib/mapInsets.js),
-    // not under the sheet.
-    const box = map.getContainer();
-    const offset = stripOffset(box.clientHeight, sheetStrip(box), toolbarInset(box));
+    // The place goes in the middle of the part of the map that the controls
+    // and, on phones, the sheet leave in sight (lib/mapInsets.js), not under them.
+    const { offset } = mapClearView(map.getContainer());
     const opts = { center: [focus.lon, focus.lat], zoom, offset };
     // easeTo with no duration, not jumpTo, which has no `offset`.
     if (reducedMotion()) map.easeTo({ ...opts, duration: 0 });
