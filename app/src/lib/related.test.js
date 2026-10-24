@@ -96,7 +96,11 @@ test("emptyReason says which rule left a group empty", () => {
   assert.match(emptyReason("shared_parent", base), /does not list this event as part of/);
   assert.match(emptyReason("shared_parent", { ...base, part_of: [{ qid: "Q1" }] }), /No other event .* shares/);
   assert.match(emptyReason("nearby", { ...base, location_quality: "none", coordinates: null }), /no map location/);
-  assert.match(emptyReason("nearby", { ...base, location_quality: "approximate" }), /approximate place/);
+  assert.match(emptyReason("nearby", { ...base, location_quality: "approximate" }), /approximate place \(a national capital\)/);
+  assert.match(
+    emptyReason("nearby", { ...base, location_quality: "approximate", approximate_reason: "rounded" }),
+    /approximate place \(coordinates rounded to the area\)/
+  );
   assert.match(emptyReason("nearby", base), new RegExp(`within ${NEARBY_KM} km`));
   assert.match(emptyReason("same_time", { ...base, date_flags: ["x"] }), /could not be checked/);
   assert.match(emptyReason("same_time", { ...base, date_precision: "year" }), /known only to the year/);

@@ -93,6 +93,14 @@ test("bar: a reversed record is drawn at its start year only", () => {
   assert.equal(g.width, 5);
 });
 
+test("bar: a reversed record with only its end year on the axis is a point there", () => {
+  // Kuwait is listed for 1985-1994 by its end year 1990 (lib/eventYears.js), so its bar sits at 1990.
+  const g = barGeometry(ev("kuwait", "2009-08-02", "1990-08-04"), [1985, 1994]);
+  assert.deepEqual(g, { left: 50, width: 10, before: false, after: false, reversed: true, point: true });
+  // Neither year on the axis (a range between them): no bar.
+  assert.equal(barGeometry(ev("kuwait", "2009-08-02", "1990-08-04"), [1995, 2004]), null);
+});
+
 test("bar: none off the axis or without a start year", () => {
   assert.equal(barGeometry(ev("x", "1950-01-01", "1951-01-01"), [1960, 1970]), null);
   assert.equal(barGeometry(ev("x", null), [1960, 1970]), null);

@@ -12,8 +12,11 @@
 // (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
 import { categoryLabel } from "../src/lib/categoryLabels.js";
+import { roundedLocationNote } from "../src/lib/coordPrecision.js";
+import { dataFixUrl } from "../src/lib/dataFixes.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
 import { formatEventDate } from "../src/lib/eventDate.js";
+import { countryLabel } from "../src/lib/eventCountries.js";
 import { rawEventYears } from "../src/lib/eventYears.js";
 import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
@@ -257,7 +260,17 @@ ${sections.join("\n")}
 </section>`;
 }
 
-function locationNote(quality) {
+// The documented corrections applied to the event (src/lib/dataFixes.js), as the event panel says it.
+function renderDataFixes(fixes) {
+  if (!Array.isArray(fixes) || !fixes.length) return "";
+  const links = fixes.map((f) => link(dataFixUrl(f), escapeHtml(f.ref), { external: true })).join(", ");
+  return `<p class="note">Corrected by this project (${links} in our log of data fixes).</p>`;
+}
+
+function locationNote(quality, event) {
+  if (quality === "approximate" && event?.approximate_reason === "rounded") {
+    return `<p class="note">${escapeHtml(roundedLocationNote(event))}</p>`;
+  }
   if (quality === "approximate") {
     return `<p class="note">Approximate location: no coordinates were found for this event, so its marker on the map is placed at a national capital. The marker shows the country, not where the event happened.</p>`;
   }
@@ -450,7 +463,7 @@ export function renderEventPage(event, template) {
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
   const paragraphs = extract.split(/\n+/).filter((p) => p.trim());
 
-  const meta = [dateText, countries.join(", ")].filter(Boolean).map(escapeHtml).join(" · ");
+  const meta = [dateText, countries.map(countryLabel).join(", ")].filter(Boolean).map(escapeHtml).join(" · ");
   const body = [
     event.category && `<p class="category">Category (our grouping): ${escapeHtml(categoryLabel(event.category))}</p>`,
     `<h1>${escapeHtml(title)}</h1>`,
@@ -466,7 +479,8 @@ export function renderEventPage(event, template) {
     renderReview(event, review),
     renderIncludes(event.includes),
     renderRelated(event.related),
-    locationNote(event.location_quality),
+    locationNote(event.location_quality, event),
+    renderDataFixes(event.data_fixes),
     `<p class="attribution">Text from Wikipedia, licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
       wiki ? link(historyUrl(wiki), "Wikipedia contributors", { external: true }) : "Wikipedia contributors"
     }${wiki ? `, from the article ${link(wiki, escapeHtml(title), { external: true })}` : ""}.${showClasses ? " Classes are Wikidata’s labels (CC0)." : ""}${

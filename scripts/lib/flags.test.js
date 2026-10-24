@@ -1,6 +1,46 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { firstSentence, exactDaysIn, monthPrecisionDayFlag, MONTH_DAY_FLAG, pruneDuplicateHints } from "./flags.js";
+import {
+  firstSentence,
+  exactDaysIn,
+  monthPrecisionDayFlag,
+  MONTH_DAY_FLAG,
+  pruneDuplicateHints,
+  titleYears,
+  titleYearsFlag,
+  TITLE_YEARS_FLAG,
+  lowPrecisionCoordinateFlag,
+  LOW_PRECISION_FLAG,
+} from "./flags.js";
+
+test("titleYears: single years, ranges, two-digit ends and 'present'", () => {
+  assert.deepEqual(titleYears("2009 Iranian presidential election protests"), [2009]);
+  assert.deepEqual(titleYears("Egyptian Crisis (2011–2014)"), [2011, 2014]);
+  assert.deepEqual(titleYears("Battle of Ras al-Ayn (2012–13)"), [2012, 2013]);
+  assert.deepEqual(titleYears("Hezbollah–Israel conflict (2023–present)"), [2023]);
+  assert.deepEqual(titleYears("2015-2018 Iraqi protests"), [2015, 2018]);
+  // Not years: other numbers, and years before 1900.
+  assert.deepEqual(titleYears("Resolution 242"), []);
+  assert.deepEqual(titleYears("Iran Air Flight 655"), []);
+  assert.deepEqual(titleYears("Treaty of 1839 and Flight 12345"), []);
+});
+
+test("titleYearsFlag: a title year outside the stored dates, flag only", () => {
+  const f = titleYearsFlag({ title: "War in Iraq (2013–2017)", date_start: "2014-01-01", date_end: "2017-12-09" });
+  assert.equal(f, `${TITLE_YEARS_FLAG}: the title names 2013, outside the stored dates (2014-01-01 to 2017-12-09); dates and title are kept as the sources give them`);
+  assert.match(titleYearsFlag({ title: "Anglo-Iraqi Treaty of 1930", date_start: "1932-10-03", date_end: null }), /names 1930, .*no end date/);
+  assert.equal(titleYearsFlag({ title: "Raqqa campaign (2016–2017)", date_start: "2016-11-06", date_end: null }), null);
+  assert.equal(titleYearsFlag({ title: "Six-Day War", date_start: "1967-06-05", date_end: "1967-06-10" }), null);
+  assert.equal(titleYearsFlag({ title: "1990 thing", date_start: null }), null);
+});
+
+test("lowPrecisionCoordinateFlag: precise pins with at most one decimal place", () => {
+  const anfal = { location_quality: "precise", coordinates: { lat: 33, lon: 43 }, coordinate_source: "wikidata" };
+  assert.ok(lowPrecisionCoordinateFlag(anfal).startsWith(`${LOW_PRECISION_FLAG}: the wikidata coordinates (33, 43)`));
+  assert.equal(lowPrecisionCoordinateFlag({ ...anfal, coordinates: { lat: 33.3, lon: 43.25 } }), null);
+  assert.equal(lowPrecisionCoordinateFlag({ ...anfal, location_quality: "approximate" }), null);
+  assert.equal(lowPrecisionCoordinateFlag({ location_quality: "none", coordinates: null }), null);
+});
 
 const OCT7 =
   "On October 7, 2023, a series of coordinated armed incursions from the blockaded Gaza Strip into the Gaza envelope of " +

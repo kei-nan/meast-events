@@ -1067,6 +1067,7 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail-classes,
+.event-detail-fixes,
 .event-detail-asof {
   font-size: 0.75rem;
   line-height: 1.5;

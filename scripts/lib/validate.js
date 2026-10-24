@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { COUNTRIES, EVENT_CLASSES, INCLUSION_MIN_SITELINKS, notEventClasses } from "./event-classes.js";
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode } from "./wiki.js";
+import { lowPrecisionCoordinateFlag, titleYearsFlag } from "./flags.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
 // Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
@@ -308,9 +309,21 @@ export function validateEvents(
       else if (e.date_precision !== null && precisionCode(e.date_precision) === null) {
         warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
       }
+    } else if (!("date_precision" in e)) {
+      // Seed events were added before date_precision existed; without it their date shows as the year only
+      // (app/src/lib/eventDate.js). scripts/enrich-seed.js proposes the Wikidata value for the owner's review.
+      warn(i, e, "date_precision missing (hand-picked seed event; its date shows as the year only until the Wikidata precision is recorded)");
     } else if (e.date_precision != null && precisionCode(e.date_precision) === null) {
       warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
     }
+    // Years only: the title is Wikipedia's, the dates Wikidata's; neither is changed (lib/flags.js titleYearsFlag).
+    if (typeof e.title === "string" && isRealDate(e.date_start)) {
+      const ty = titleYearsFlag(e);
+      if (ty) warn(i, e, ty);
+    }
+    // A precise pin rounded to whole degrees or tenths (app/src/lib/coordPrecision.js): the site shows it as approximate.
+    const lowPin = lowPrecisionCoordinateFlag(e);
+    if (lowPin) warn(i, e, `${lowPin}; shown on the site as an approximate location`);
     // A decade/century date stored as its first day, with no end: shown as a single year that Wikidata never gave
     // (e.g. "+2000-00-00" at century precision is the 20th century, 1901-2000, stored as 2000-01-01).
     const pc = precisionCode(e.date_precision);
@@ -349,8 +362,11 @@ export function validateEvents(
   // Two events with the same wikipedia_url or the same extract. Expected only for events without an English
   // article of their own (docs/DATA_POLICY.md, "Events without an article of their own"): their resolved_qid
   // differs from their wikidata_qid, and they already carry that warning above. A group is explained when
-  // at most one member is the article's own item; anything else is listed.
+  // at most one member is the article's own item; it is still listed, naming the other event(s), once per
+  // event (one warning for the shared wikipedia_url, saying whether the extract is identical too). Anything
+  // else is listed as unexplained.
   const ownItem = (e) => !(typeof e.resolved_qid === "string" && e.resolved_qid !== e.wikidata_qid);
+  const sameText = (members) => new Set(members.map((e) => (typeof e.extract === "string" ? e.extract.trim() : ""))).size === 1;
   for (const [field, label] of [["wikipedia_url", "wikipedia_url"], ["extract", "extract"]]) {
     const groups = new Map();
     events.forEach((e, i) => {
@@ -363,8 +379,19 @@ export function validateEvents(
       if (idx.length < 2) continue;
       const members = idx.map((i) => events[i]);
       const sameUrl = new Set(members.map((e) => e.wikipedia_url)).size === 1;
-      if (sameUrl && members.filter(ownItem).length <= 1) continue;
       const others = (i) => idx.filter((j) => j !== i).map((j) => events[j].id).join(", ");
+      if (sameUrl && members.filter(ownItem).length <= 1) {
+        // Explained: listed once per event, under the wikipedia_url group (the same extract adds no second warning).
+        if (field !== "wikipedia_url") continue;
+        const text = sameText(members) ? " and the same extract" : "";
+        for (const i of idx) {
+          const why = ownItem(events[i])
+            ? "this is the article's own event"
+            : `this event has no English article of its own (the article belongs to ${events[i].resolved_qid})`;
+          warn(i, events[i], `same wikipedia_url${text} as ${others(i)}: ${why}; both show this article's text`);
+        }
+        continue;
+      }
       for (const i of idx) warn(i, events[i], `same ${label} as ${others(i)}${sameUrl ? "" : " (different wikipedia_url)"}, and not explained as an event without an article of its own`);
     }
   }

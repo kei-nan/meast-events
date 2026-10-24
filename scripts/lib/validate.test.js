@@ -25,8 +25,9 @@ const event = (over = {}) => ({
   wikidata_classes: ["war"],
   extract_retrieved_at: "2026-09-26T00:00:00Z",
   location_quality: "precise",
-  coordinates: { lat: 31, lon: 34 },
+  coordinates: { lat: 31.25, lon: 34.25 },
   coordinate_source: "wikipedia",
+  date_precision: "day",
   wikipedia_url: "https://en.wikipedia.org/wiki/Six-Day_War",
   ...over,
 });
@@ -125,7 +126,9 @@ test("validateEvents: dangling possible_duplicates, short extract and QID/articl
     event({ id: "d", wikidata_qid: "Q4", resolved_qid: "Q4", wikipedia_url: "https://en.wikipedia.org/wiki/D", extract: "D ".repeat(100) }),
   ]);
   assert.deepEqual(r.errors, []);
-  assert.equal(r.warnings.length, 3, r.warnings.join("\n"));
+  // 3, plus c sharing six-day-war's article (listed on both, naming the other).
+  assert.equal(r.warnings.length, 5, r.warnings.join("\n"));
+  assert.ok(r.warnings.some((w) => /c: same wikipedia_url and the same extract as six-day-war/.test(w)));
   assert.ok(r.warnings.some((w) => /possible_duplicates names "gone"/.test(w)));
   assert.ok(r.warnings.some((w) => /b: extract is only 10 characters/.test(w)));
   assert.ok(r.warnings.some((w) => /c: .*belongs to Q9/.test(w)));
@@ -201,28 +204,31 @@ test("validateEvents: a precise pin outside every tagged country's shape is one 
       box("Turkey", 1924, 9999, [26, 36, 44.8, 42]),
     ],
   };
+  // The test points are whole degrees; their coordinate_low_precision warning is tested on its own below.
+  const pinOnly = (r) => ({ ...r, warnings: r.warnings.filter((w) => !/coordinate_low_precision/.test(w)) });
+  const validate = (events, o) => pinOnly(validateEvents(events, o));
   const opts = { boundaries, turf };
   const at = (lat, lon, over = {}) => event({ date_start: "1990-01-01", date_end: null, coordinates: { lat, lon }, ...over });
   // Inside, and just outside the edge (within the 5 km tolerance): fine.
-  assert.deepEqual(validateEvents([at(30, 30)], opts).warnings, []);
-  assert.deepEqual(validateEvents([at(25, 35.04)], opts).warnings, []); // ~4 km east of the edge
+  assert.deepEqual(validate([at(30, 30)], opts).warnings, []);
+  assert.deepEqual(validate([at(25, 35.04)], opts).warnings, []); // ~4 km east of the edge
   // Outside Egypt by tens of km: warned, with the distance.
-  const off = validateEvents([at(32, 30)], opts).warnings;
+  const off = validate([at(32, 30)], opts).warnings;
   assert.equal(off.length, 1);
   assert.match(off[0], /precise pin \(32, 30\) is [4-6]\d km outside the 1990 border shapes of every tagged country \(Egypt; tolerance 5 km/);
   // Inside ANY tagged country is enough.
-  assert.deepEqual(validateEvents([at(39, 35, { countries: ["Egypt", "Turkey"] })], opts).warnings, []);
+  assert.deepEqual(validate([at(39, 35, { countries: ["Egypt", "Turkey"] })], opts).warnings, []);
   // The year matters: Turkey's shape starts in 1924, so a 1915 Turkey pin cannot be checked.
-  assert.deepEqual(validateEvents([at(39, 30, { countries: ["Turkey"], date_start: "1915-01-01" })], opts).warnings, []);
+  assert.deepEqual(validate([at(39, 30, { countries: ["Turkey"], date_start: "1915-01-01" })], opts).warnings, []);
   // A tagged country without a shape that year, or "regional": not checkable, no warning.
-  assert.deepEqual(validateEvents([at(39, 30, { countries: ["Egypt", "Kuwait"] })], opts).warnings, []);
-  assert.deepEqual(validateEvents([at(39, 30, { countries: ["regional"] })], opts).warnings, []);
+  assert.deepEqual(validate([at(39, 30, { countries: ["Egypt", "Kuwait"] })], opts).warnings, []);
+  assert.deepEqual(validate([at(39, 30, { countries: ["regional"] })], opts).warnings, []);
   // Approximate pins and points outside the Middle East box (already warned) are not checked again.
   const capital = at(32, 30, { location_quality: "approximate", coordinate_source: "country-fallback:Egypt" });
-  assert.deepEqual(validateEvents([capital], opts).warnings, []);
-  assert.equal(validateEvents([at(38.9, -77.03)], opts).warnings.length, 1);
+  assert.deepEqual(validate([capital], opts).warnings, []);
+  assert.equal(validate([at(38.9, -77.03)], opts).warnings.length, 1);
   // Without boundaries/turf the check is off.
-  assert.deepEqual(validateEvents([at(32, 30)]).warnings, []);
+  assert.deepEqual(validate([at(32, 30)]).warnings, []);
 });
 
 test("findClashes: id and QID clashes with the base set, each reason listed", () => {
@@ -257,7 +263,7 @@ test("validateEvents: inclusion-rule warnings for discovered events; hand-picked
     found({ id: "fr", wikidata_qid: "Q3", wikipedia_url: "https://fr.wikipedia.org/wiki/Guerre_des_Six_Jours", extract: "G ".repeat(90) }),
     found({ id: "noprec", wikidata_qid: "Q4", date_precision: undefined, wikipedia_url: "https://en.wikipedia.org/wiki/N", extract: "N ".repeat(90) }),
     found({ id: "badprec", wikidata_qid: "Q5", date_precision: "fortnight", wikipedia_url: "https://en.wikipedia.org/wiki/P", extract: "P ".repeat(90) }),
-    // seed event: no sitelinks key, low current count, no precision - none of the above applies
+    // seed event: no sitelinks key, low current count - none of the above applies
     event({ id: "seed", wikidata_qid: "Q6", sitelinks_current: 8, wikipedia_url: "https://en.wikipedia.org/wiki/S", extract: "S ".repeat(90) }),
   ].map((e) => {
     if (e.id === "noprec") delete e.date_precision;
@@ -274,6 +280,52 @@ test("validateEvents: inclusion-rule warnings for discovered events; hand-picked
   assert.equal(r.warnings.length, 5, r.warnings.join("\n"));
   // null precision (a ledger date that is no Wikidata value) is allowed
   assert.deepEqual(validateEvents([found({ date_precision: null })]).warnings, []);
+});
+
+test("validateEvents: a seed event without date_precision is a warning (its date shows as the year only)", () => {
+  const seed = event();
+  delete seed.date_precision;
+  const r = validateEvents([seed]);
+  assert.deepEqual(r.errors, []);
+  assert.equal(r.warnings.length, 1, r.warnings.join("\n"));
+  assert.match(r.warnings[0], /six-day-war: date_precision missing \(hand-picked seed event; its date shows as the year only/);
+  // null is a recorded value (no Wikidata precision for the kept date), not a missing one.
+  assert.deepEqual(validateEvents([event({ date_precision: null })]).warnings, []);
+});
+
+test("validateEvents: years in the title outside the dates are a warning; the dates are not judged otherwise", () => {
+  const w = (over) => validateEvents([event({ wikipedia_url: "https://en.wikipedia.org/wiki/T", ...over })]).warnings;
+  // As in the data: 2009-iranian-presidential-election-protests (Wikidata 2010-02-11 to 2010-12-07).
+  const protests = w({ title: "2009 Iranian presidential election protests", date_start: "2010-02-11", date_end: "2010-12-07" });
+  assert.equal(protests.length, 1);
+  assert.match(protests[0], /title_years_outside_dates: the title names 2009, outside the stored dates \(2010-02-11 to 2010-12-07\)/);
+  // A range: israeli-occupation-of-southern-lebanon-1982-2000 (1985-02-16 to 2000-05-25).
+  assert.match(w({ title: "Israeli occupation of Southern Lebanon (1982–2000)", date_start: "1985-02-16", date_end: "2000-05-25" }).join(), /names 1982,/);
+  // "present": 2024-israel-hezbollah-conflict (2024-09-23 to 2024-11-27).
+  assert.match(w({ title: "Hezbollah–Israel conflict (2023–present)", date_start: "2024-09-23", date_end: "2024-11-27" }).join(), /names 2023,/);
+  // No end date: only years before the start are outside (2015-2018-iraqi-protests, start 2018-09-07).
+  assert.match(w({ title: "2015–2018 Iraqi protests", date_start: "2018-09-07", date_end: null }).join(), /names 2015, outside the stored dates \(2018-09-07, no end date\)/);
+  assert.deepEqual(w({ title: "2018–2019 Gaza border protests", date_start: "2018-03-30", date_end: null }), []);
+  // Inside the dates, a two-digit range end, reversed dates (lower to higher year): nothing.
+  assert.deepEqual(w({ title: "Six-Day War of 1967", date_start: "1967-06-05", date_end: "1967-06-10" }), []);
+  assert.deepEqual(w({ title: "Battle of Ras al-Ayn (2012–13)", date_start: "2012-11-08", date_end: "2013-07-17" }), []);
+  assert.match(w({ title: "Battle of Ras al-Ayn (2012–14)", date_start: "2012-11-08", date_end: "2013-07-17" }).join(), /names 2014,/);
+  const kuwait = { title: "Iraqi invasion of Kuwait 1990", date_start: "2009-08-02", date_end: "1990-08-04", date_flags: ["date_order_invalid: x"] };
+  assert.doesNotMatch(w(kuwait).join(), /title_years/);
+});
+
+test("validateEvents: a precise pin with at most one decimal place is a warning (the site shows it as approximate)", () => {
+  // As in the data: al-anfal-campaign 33, 43 (Wikidata), siege-of-basra 30.5, 47.8 (Wikipedia).
+  const anfal = validateEvents([event({ coordinates: { lat: 33, lon: 43 }, coordinate_source: "wikidata" })]).warnings;
+  assert.equal(anfal.length, 1, anfal.join("\n"));
+  assert.match(anfal[0], /coordinate_low_precision: the wikidata coordinates \(33, 43\) have at most one decimal place.*approximate location/);
+  assert.equal(validateEvents([event({ coordinates: { lat: 30.5, lon: 47.8 } })]).warnings.length, 1);
+  // Two decimals in either coordinate: not flagged (october-7-attacks 31.36, 34.51; adana-massacre 37, 35.32133).
+  assert.deepEqual(validateEvents([event({ coordinates: { lat: 31.36, lon: 34.51 } })]).warnings, []);
+  assert.deepEqual(validateEvents([event({ coordinates: { lat: 37, lon: 35.32133 } })]).warnings, []);
+  // A capital fallback is already approximate: not flagged.
+  const capital = event({ coordinates: { lat: 33, lon: 44 }, location_quality: "approximate", coordinate_source: "country-fallback:Iraq" });
+  assert.deepEqual(validateEvents([capital]).warnings, []);
 });
 
 test("validateEvents: a decade/century start without an end, and >= 8 countries, are warnings", () => {
@@ -299,13 +351,45 @@ test("validateEvents: a coarse end that reaches the start is a warning only with
   assert.equal(validateEvents([real]).errors.length, 1);
 });
 
-test("validateEvents: shared wikipedia_url or extract is a warning unless explained by a redirect", () => {
+test("validateEvents: the curated records whose end is before their start are each caught", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const curated = JSON.parse(await readFile(new URL("../../data/events.json", import.meta.url), "utf-8"));
+  const expected = {
+    "iraqi-invasion-of-kuwait": /date_end \(1990-08-04\) precedes date_start \(2009-08-02\) - flagged in date_flags/,
+    "arab-cold-war": /date_end \(1970-01-01\) precedes date_start \(1979-02-11\) - flagged in date_flags/,
+    "passover-massacre": /date_end \(2002-01-01\) is a coarse Wikidata end \(year precision\) that reaches date_start \(2002-03-27\)/,
+  };
+  for (const [id, re] of Object.entries(expected)) {
+    const e = curated.find((x) => x.id === id);
+    assert.ok(e, `${id} is in data/events.json`);
+    const r = validateEvents([e], { lenient: true });
+    assert.deepEqual(r.errors, [], id);
+    assert.ok(r.warnings.some((w) => re.test(w)), `${id}: ${r.warnings.join("\n")}`);
+  }
+  // Every reversed record in the file is caught one way or the other (warned when flagged, an error otherwise).
+  const all = validateEvents(curated, { lenient: true });
+  for (const e of curated.filter((x) => x.date_end && x.date_end < x.date_start)) {
+    assert.ok([...all.warnings, ...all.errors].some((w) => w.includes(` ${e.id}: date_end (${e.date_end})`)), e.id);
+  }
+});
+
+test("validateEvents: shared wikipedia_url or extract is a warning naming the other event, explained or not", () => {
   const a = found({ id: "a", wikidata_qid: "Q1" });
-  // b's title redirects into a's article (resolved_qid = a's item): the documented case, no new warning.
+  // b's title redirects into a's article (resolved_qid = a's item): the documented case (as
+  // ein-hashlosha-massacre / october-7-attacks). Each is listed once, naming the other.
   const b = found({ id: "b", wikidata_qid: "Q2", resolved_qid: "Q1", coordinate_source: "wikidata" });
   const explained = validateEvents([a, b]).warnings;
-  assert.equal(explained.length, 1, explained.join("\n"));
-  assert.match(explained[0], /b: wikipedia_url .* belongs to Q1/);
+  assert.equal(explained.length, 3, explained.join("\n"));
+  assert.ok(explained.some((w) => /b: wikipedia_url .* belongs to Q1/.test(w)));
+  assert.ok(explained.some((w) => /a: same wikipedia_url and the same extract as b: this is the article's own event/.test(w)));
+  assert.ok(explained.some((w) => /b: same wikipedia_url and the same extract as a: this event has no English article of its own \(the article belongs to Q1\)/.test(w)));
+  assert.ok(!explained.some((w) => /not explained/.test(w)));
+  // Neither is the article's own item (june-2025-israeli-strikes-on-iran / june-2025-iranian-strikes-on-israel).
+  const n1 = found({ id: "n1", wikidata_qid: "Q5", resolved_qid: "Q9", coordinate_source: "wikidata" });
+  const n2 = found({ id: "n2", wikidata_qid: "Q6", resolved_qid: "Q9", coordinate_source: "wikidata", extract: a.extract + " More." });
+  const both = validateEvents([n1, n2]).warnings.filter((w) => /same wikipedia_url/.test(w));
+  assert.equal(both.length, 2, both.join("\n"));
+  assert.match(both[0], /n1: same wikipedia_url as n2: this event has no English article of its own/);
   // Two events that are each the article's own item: listed.
   const c = found({ id: "c", wikidata_qid: "Q3" });
   const r = validateEvents([a, c]).warnings;

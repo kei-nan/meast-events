@@ -4,11 +4,13 @@ import { FramingReviewFailed } from "./LoadFailed.jsx";
 import ShareButton from "./ShareButton.jsx";
 import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
+import { roundedLocationNote } from "../lib/coordPrecision.js";
+import { dataFixUrl } from "../lib/dataFixes.js";
 import { safeUrl } from "../lib/safeUrl.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
-import { countryShading, eventBorderYear } from "../lib/eventCountries.js";
+import { countryLabel, countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
@@ -109,7 +111,7 @@ function ShadingNote({ event, year: shownYear }) {
     <>
       {" "}The shaded area on the map is the event&apos;s listed countries ({shaded.join(", ")}) as of {year}, not a
       precise location.
-      {unshaded.length > 0 && <> Not shaded: {unshaded.join(", ")} (no matching border shape for {year}).</>}
+      {unshaded.length > 0 && <> Not shaded: {unshaded.map(countryLabel).join(", ")} (no matching border shape for {year}).</>}
     </>
   );
 }
@@ -294,7 +296,7 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
           {event.title}
         </h2>
         <p className="event-detail-meta">
-          {dateText} · {(event.countries ?? []).join(", ")}
+          {dateText} · {(event.countries ?? []).map(countryLabel).join(", ")}
         </p>
         {event.part_of?.length > 0 && (
           <p className="event-detail-facts">
@@ -373,7 +375,13 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
       )}
       <section className="event-detail-section event-detail-about" aria-labelledby="event-detail-about-title">
         <h3 id="event-detail-about-title">About this entry</h3>
-        {quality === "approximate" && (
+        {quality === "approximate" && event.approximate_reason === "rounded" && (
+          <p className="event-detail-note">
+            {roundedLocationNote(event)} It is left out of drawn-area searches.
+            <ShadingNote event={event} year={borderYear} />
+          </p>
+        )}
+        {quality === "approximate" && event.approximate_reason !== "rounded" && (
           <p className="event-detail-note">
             Approximate location: no coordinates were found for this event, so its marker is
             placed at a national capital. The marker shows the country, not where the event
@@ -386,6 +394,21 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
             No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no
             marker on the map and is left out of drawn-area searches.
             <ShadingNote event={event} year={borderYear} />
+          </p>
+        )}
+        {event.data_fixes?.length > 0 && (
+          <p className="event-detail-fixes">
+            Corrected by this project (
+            {event.data_fixes.map((f, i) => (
+              <Fragment key={f.ref}>
+                {i > 0 && ", "}
+                <a href={dataFixUrl(f)} target="_blank" rel="noreferrer">
+                  {f.ref}
+                  <span className="sp-sr-status"> (opens in a new tab)</span>
+                </a>
+              </Fragment>
+            ))}{" "}
+            in our log of data fixes).
           </p>
         )}
         {showClasses && <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>}
