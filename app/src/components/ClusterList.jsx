@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
 import { isUnhandledEscape } from "../lib/escapeKey";
+import { sheetCover } from "../lib/mapInsets";
 
 // Events that share one spot on the map (capital-pinned "approximate" events,
 // or a cluster no zoom level can split): listed in a card at the click point.
@@ -24,7 +25,10 @@ export default function ClusterList({ list, onSelect, onClose, width, height }) 
 
   const cardW = Math.min(320, Math.max(0, width - 16));
   const left = Math.max(8, Math.min(list.point[0] + 12, width - cardW - 8));
-  const reserve = window.matchMedia?.("(max-width: 768px)").matches ? 120 : 8;
+  // On phones keep clear of the results sheet, as far as the reader has pulled
+  // it up (half covers half the map), as BoundaryPopup does.
+  const phone = window.matchMedia?.("(max-width: 768px)").matches;
+  const reserve = phone ? Math.max(120, sheetCover(document.querySelector(".map-view")) + 8) : 8;
   const bottomLimit = Math.max(200, height - reserve);
   const top = Math.max(8, Math.min(list.point[1] + 12, bottomLimit - 220));
   const { items, total, oneSpot } = list;
