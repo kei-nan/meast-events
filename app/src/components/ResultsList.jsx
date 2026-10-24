@@ -2,6 +2,7 @@ import { Fragment, memo, useId, useMemo, useState } from "react";
 import { eventYears, highlight, inRange } from "./resultsUtil.jsx";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { startedBefore } from "../lib/browseOrder.js";
+import { countryLabel } from "../lib/eventCountries.js";
 import {
   axisTicks,
   barGeometry,
@@ -60,7 +61,7 @@ const ResultRow = memo(function ResultRow({
         </span>
         <span className="sp-row-meta" id={`${id}-meta`}>
           {yearLabel(ev)}
-          {ev.countries?.length ? ` · ${ev.countries.join(", ")}` : ""}
+          {ev.countries?.length ? ` · ${ev.countries.map(countryLabel).join(", ")}` : ""}
           {ev.category ? ` · ${categoryLabel(ev.category)}` : ""}
         </span>
         {ev.snippet && (
@@ -87,7 +88,7 @@ const MAX_TIMELINE_COUNTRIES = 3;
 
 function timelineCountries(countries) {
   if (!countries?.length) return "";
-  return countries.length > MAX_TIMELINE_COUNTRIES ? `${countries.length} countries` : countries.join(", ");
+  return countries.length > MAX_TIMELINE_COUNTRIES ? `${countries.length} countries` : countries.map(countryLabel).join(", ");
 }
 
 const at = (g) => ({ left: `${g.left}%`, width: `${g.width}%` });

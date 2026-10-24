@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import {
   COUNTRY_SHAPES,
   countryHighlightFeatures,
+  countryLabel,
   countryShading,
   eventBorderYear,
   featuresBbox,
@@ -13,6 +14,13 @@ import {
   shapeNamesFor,
 } from "./eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "./years.js";
+
+test("countryLabel: the 'regional' tag reads 'Region-wide'; country names as they are", () => {
+  assert.equal(countryLabel("regional"), "Region-wide");
+  assert.equal(countryLabel("Israel/Palestine"), "Israel/Palestine");
+  assert.equal(countryLabel("Iraq"), "Iraq");
+  assert.equal(countryLabel("toString"), "toString"); // no inherited keys
+});
 
 const DATA_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "data");
 const boundaries = JSON.parse(readFileSync(path.join(DATA_DIR, "boundaries.json"), "utf8")).features;

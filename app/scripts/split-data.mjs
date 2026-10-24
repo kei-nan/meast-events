@@ -62,6 +62,8 @@ import { resolvePartOf } from "../src/lib/partOf.js";
 import { resolveRelated } from "../src/lib/related.js";
 import { DECADE_SIZE, decadeFloor } from "../src/lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
+import { isLowPrecisionPin } from "../src/lib/coordPrecision.js";
+import { dataFixAnchors, dataFixRefs } from "../src/lib/dataFixes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.join(__dirname, "..", "src", "data"); // land.json
@@ -70,6 +72,8 @@ const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR
   ? path.resolve(process.env.ATLAS_DATA_DIR)
   : path.join(__dirname, "..", "..", "data");
 const EVENTS_FILE = path.join(ROOT_DATA_DIR, "events.json"); // repo-root source of truth
+// The log of documented corrections, for the anchors of its "## Fn" entries (src/lib/dataFixes.js).
+const DATA_FIXES_FILE = path.join(__dirname, "..", "..", "docs", "data-fixes.md");
 const BOUNDARIES_FILE = path.join(ROOT_DATA_DIR, "boundaries.json");
 const OUT_DIR = process.env.SPLIT_OUT_DIR
   ? path.resolve(process.env.SPLIT_OUT_DIR)
@@ -152,8 +156,15 @@ const strings = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === "string"
 // Fields only the detail view shows (Wikipedia link, Wikidata classes and QID,
 // date flags, coordinate source) are in the full record instead (detailFields),
 // which the app merges over this one when an event is opened.
+//
+// A precise pin rounded to at most one decimal place (src/lib/coordPrecision.js,
+// e.g. Al-Anfal campaign 33, 43) marks an area, not a site: it is published as
+// "approximate" with approximate_reason "rounded", so the site gives it the
+// approximate treatment (hollow ring, tag, no drawn-area match, country shading)
+// with its own note. The coordinates are the source's, unchanged.
 export function publicEvent(e) {
   const quality = locationQuality(e);
+  const rounded = isLowPrecisionPin({ ...e, location_quality: quality });
   return {
     id: e.id,
     title: e.title,
@@ -163,15 +174,20 @@ export function publicEvent(e) {
     category: e.category_group || e.category,
     snippet: makeSnippet(e.extract),
     coordinates: quality === "none" ? null : e.coordinates,
-    location_quality: quality,
+    location_quality: rounded ? "approximate" : quality,
+    ...(rounded ? { approximate_reason: "rounded" } : {}),
     // Wikidata sitelink count (all projects), for the default "most covered" order.
     sitelinks: Number.isFinite(e.sitelinks_current) ? e.sitelinks_current : null,
   };
 }
 
-// wikidata_classes are Wikidata's own labels, shown as-is.
-export function detailFields(e) {
+// wikidata_classes are Wikidata's own labels, shown as-is. `fixAnchors`: Map
+// ref -> heading anchor in docs/data-fixes.md (src/lib/dataFixes.js dataFixAnchors).
+export function detailFields(e, fixAnchors = new Map()) {
+  const fixes = dataFixRefs(e.review_reasons).map((ref) => ({ ref, anchor: fixAnchors.get(ref) ?? null }));
   return {
+    // The documented corrections applied to this event (only on those 18 or so events).
+    ...(fixes.length ? { data_fixes: fixes } : {}),
     wikipedia_url: e.wikipedia_url,
     wikidata_qid: e.wikidata_qid,
     wikidata_classes: strings(e.wikidata_classes),
@@ -353,6 +369,18 @@ async function loadFramingReview() {
   return doc;
 }
 
+// Anchors of the "## Fn" entries of docs/data-fixes.md. Missing file: a warning, and the
+// event panel links to the log itself (src/lib/dataFixes.js dataFixUrl).
+async function loadDataFixAnchors() {
+  try {
+    return dataFixAnchors(await readFile(DATA_FIXES_FILE, "utf8"));
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+    console.warn(`warning: ${DATA_FIXES_FILE} missing; data-fix notes link to the log without an anchor`);
+    return new Map();
+  }
+}
+
 // The guideline section as it read in the revision the reviews applied (the same link as
 // permalink() in scripts/lib/guidelines.js, which records `reviewed_revision`).
 export function guidelineVersionUrl(url, revid) {
@@ -412,6 +440,7 @@ async function splitEvents() {
     throw new Error(`events outside MAP_EXTENT (src/lib/mapExtent.js): ${outside.map((e) => e.id).join(", ")}`);
   }
   const review = await loadFramingReview();
+  const fixAnchors = await loadDataFixAnchors();
   // Wikidata "part of" (P361) and its reverse, only for the detail view (see lib/partOf.js).
   const relations = resolvePartOf(allEvents);
   // Related events (lib/related.js), on the public location (an approximate or
@@ -438,7 +467,7 @@ async function splitEvents() {
     const record = {
       extract: e.extract ?? "",
       extract_retrieved_at: e.extract_retrieved_at ?? null,
-      ...detailFields(e),
+      ...detailFields(e, fixAnchors),
       // Wikidata's precision of date_start ("day", "month", "year", "decade").
       date_precision: e.date_precision ?? null,
       framing_review: framing,
@@ -541,6 +570,9 @@ async function splitEvents() {
     maxFullBytes: fullMax,
   });
 
+  const rounded = events.filter((e) => e.approximate_reason === "rounded").length;
+  const fixed = allEvents.filter((e) => dataFixRefs(e.review_reasons).length).length;
+  console.log(`locations: ${rounded} rounded precise pins shown as approximate; data fixes: ${fixed} events note a documented correction`);
   console.log(
     `events/${dir}/all.json: ${events.length} lite records (${noLocation} without coordinates, kept), ` +
       `${(allBytes / 1024).toFixed(0)}KB, ${(allGzip / 1024).toFixed(0)}KB gzipped (${Math.round(allGzip / Math.max(1, events.length))} B/event; ` +

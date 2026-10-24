@@ -21,6 +21,20 @@ export function decimalPlaces(n) {
 // At most this many decimal places in BOTH latitude and longitude.
 export const LOW_PRECISION_MAX_DECIMALS = 1;
 
+const SOURCE_NAMES = { wikipedia: "Wikipedia", wikidata: "Wikidata" };
+
+/**
+ * The plain-language note for a marker published as approximate because its
+ * coordinates are rounded (scripts/split-data.mjs approximate_reason "rounded"),
+ * shown by the event panel and the event's static page.
+ */
+export function roundedLocationNote(e) {
+  const source = SOURCE_NAMES[e?.coordinate_source] ?? "The source";
+  const c = e?.coordinates;
+  const at = c && Number.isFinite(c.lat) && Number.isFinite(c.lon) ? ` (${c.lat}, ${c.lon})` : "";
+  return `Approximate location: ${source} gives this event’s coordinates only to the nearest degree or tenth of a degree${at}, so its marker shows the general area, not where the event happened.`;
+}
+
 /**
  * True for a precise pin whose latitude and longitude both have at most one decimal
  * place. Approximate (capital) and coordinate-less events are never "low precision":

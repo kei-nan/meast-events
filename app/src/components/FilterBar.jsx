@@ -1,6 +1,7 @@
 // From mapLayers, not MapView: MapView (and MapLibre) is lazy-loaded (App.jsx).
 import { CATEGORY_COLORS as COLORS } from "./mapLayers";
 import { categoryLabel } from "../lib/categoryLabels";
+import { countryLabel } from "../lib/eventCountries.js";
 
 const DEFAULT_CATEGORIES = Object.keys(COLORS);
 
@@ -64,7 +65,7 @@ export default function FilterBar({
               <option value="">All countries</option>
               {countryOptions.map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {countryLabel(c)}
                 </option>
               ))}
             </select>

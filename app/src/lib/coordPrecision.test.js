@@ -1,6 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { decimalPlaces, isLowPrecisionPin } from "./coordPrecision.js";
+import { decimalPlaces, isLowPrecisionPin, roundedLocationNote } from "./coordPrecision.js";
+
+test("roundedLocationNote: names the source and the coordinates as given", () => {
+  assert.equal(
+    roundedLocationNote({ coordinate_source: "wikidata", coordinates: { lat: 33, lon: 43 } }),
+    "Approximate location: Wikidata gives this event’s coordinates only to the nearest degree or tenth of a degree (33, 43), so its marker shows the general area, not where the event happened."
+  );
+  assert.match(roundedLocationNote({ coordinate_source: "wikipedia", coordinates: { lat: 30.5, lon: 47.8 } }), /^Approximate location: Wikipedia gives .* \(30\.5, 47\.8\),/);
+  // Before the full record arrives (no coordinate_source yet).
+  assert.match(roundedLocationNote({ coordinates: { lat: 30, lon: 24 } }), /^Approximate location: The source gives/);
+});
 
 test("decimalPlaces: as JavaScript writes the number", () => {
   assert.equal(decimalPlaces(33), 0);

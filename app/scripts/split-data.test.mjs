@@ -12,6 +12,7 @@ import {
   DEFERRED_GROUPS,
   decadesFor,
   deferredBoundaryGroups,
+  detailFields,
   encodeGeoChecked,
   framingFor,
   geometryBbox,
@@ -73,6 +74,30 @@ test("publicEvent: lite record nulls coordinates without a location and prefers 
   assert.equal(e.sitelinks, 12);
   assert.equal("wikipedia_url" in e, false); // detail-only fields stay out of the lite list
   assert.equal(publicEvent({ id: "b", sitelinks_current: "12" }).sitelinks, null);
+});
+
+test("publicEvent: a precise pin rounded to one decimal place is published as approximate, coordinates unchanged", () => {
+  // As in the data: al-anfal-campaign, Wikidata P625 33, 43.
+  const anfal = { id: "al-anfal-campaign", location_quality: "precise", coordinate_source: "wikidata", coordinates: { lat: 33, lon: 43 } };
+  const e = publicEvent(anfal);
+  assert.equal(e.location_quality, "approximate");
+  assert.equal(e.approximate_reason, "rounded");
+  assert.deepEqual(e.coordinates, { lat: 33, lon: 43 });
+  // Finer coordinates, a capital fallback, no location: no reason added.
+  const fine = publicEvent({ ...anfal, coordinates: { lat: 31.36, lon: 34.51 } });
+  assert.equal(fine.location_quality, "precise");
+  assert.equal("approximate_reason" in fine, false);
+  const capital = publicEvent({ ...anfal, location_quality: "approximate", coordinate_source: "country-fallback:Iraq", coordinates: { lat: 33.3152, lon: 44.3661 } });
+  assert.equal("approximate_reason" in capital, false);
+  assert.equal("approximate_reason" in publicEvent({ id: "n", location_quality: "none", coordinates: null }), false);
+});
+
+test("detailFields: the documented data fixes of an event, with their anchors", () => {
+  const anchors = new Map([["F7", "f7---october-7-attacks"]]);
+  const oct7 = { review_reasons: ["part_of: x", "data_fix F7: October 7 attacks: ... (fields: date_start; see docs/data-fixes.md)"] };
+  assert.deepEqual(detailFields(oct7, anchors).data_fixes, [{ ref: "F7", anchor: "f7---october-7-attacks" }]);
+  assert.deepEqual(detailFields({ review_reasons: ["data_fix F99: x"] }, anchors).data_fixes, [{ ref: "F99", anchor: null }]);
+  assert.equal("data_fixes" in detailFields({ review_reasons: ["part_of: x"] }, anchors), false);
 });
 
 const square = (x, y, d = 0.1) => ({ type: "Polygon", coordinates: [[[x, y], [x + d, y], [x + d, y + d], [x, y + d], [x, y]]] });

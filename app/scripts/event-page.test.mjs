@@ -214,6 +214,27 @@ test("only an end before the start gets a date note, in plain language", () => {
   assert.doesNotMatch(other, /date_start_year_not_in_lead|Date unverified|role="note"/);
 });
 
+test("a documented data fix is noted with a link to its entry; a rounded pin gets its own location note", () => {
+  const oct7 = page({ id: "october-7-attacks", title: "October 7 attacks", data_fixes: [{ ref: "F7", anchor: "f7---october-7-attacks" }] });
+  assert.ok(
+    oct7.includes(
+      'Corrected by this project (<a href="https://github.com/kei-nan/meast-events/blob/main/docs/data-fixes.md#f7---october-7-attacks" rel="noreferrer">F7</a> in our log of data fixes).'
+    )
+  );
+  assert.doesNotMatch(page({ id: "x", title: "X" }), /Corrected by this project/);
+  const anfal = page({
+    id: "al-anfal-campaign",
+    title: "Al-Anfal campaign",
+    location_quality: "approximate",
+    approximate_reason: "rounded",
+    coordinate_source: "wikidata",
+    coordinates: { lat: 33, lon: 43 },
+  });
+  assert.ok(anfal.includes("Approximate location: Wikidata gives this event’s coordinates only to the nearest degree or tenth of a degree (33, 43)"));
+  assert.doesNotMatch(anfal, /national capital/);
+  assert.match(page({ id: "c", title: "C", location_quality: "approximate", coordinates: { lat: 33.3152, lon: 44.3661 } }), /national capital/);
+});
+
 test("an invalid id is refused", () => {
   assert.throws(() => page({ id: "../x", title: "X" }));
 });

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient";
+import { countryLabel } from "../lib/eventCountries.js";
 import "./AboutData.css";
 
 const REPO = "https://github.com/kei-nan/meast-events";
@@ -181,7 +182,7 @@ function Coverage({ state }) {
           <tbody>
             {Object.entries(c.by_country).map(([k, v]) => (
               <tr key={k}>
-                <th scope="row">{k === "regional" ? "Regional" : k}</th>
+                <th scope="row">{countryLabel(k)}</th>
                 <td>{fmt(v)}</td>
                 <td>{fmt(without[k] ?? 0)}</td>
               </tr>
@@ -351,7 +352,13 @@ export default function AboutData({ section = null, onClose }) {
         <h3>What is on the map</h3>
         <p>
           This site shows Wikipedia and Wikidata content as it is. Titles, dates, countries and article text are
-          copied, not rewritten; automated checks may only add a visible note, never change or remove content.
+          copied, not rewritten. The exceptions are a small number of documented corrections, where a value was
+          checked against both sources and changed by hand; each of those events says so and links to its entry in
+          our{" "}
+          <a href={`${REPO}/blob/main/docs/data-fixes.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            log of data fixes
+          </a>
+          . Automated checks may only add a visible note, never change or remove content.
         </p>
         <p>An event is included when all of the following hold:</p>
         <ul>
@@ -363,7 +370,8 @@ export default function AboutData({ section = null, onClose }) {
         <p>
           Events without coordinates are still listed and searchable, tagged “No map location”; they get no map
           marker and are left out of drawn-area searches. Events pinned at a country capital because no specific site is
-          known are marked “Approximate location”. A hand-picked seed list of events is also included; that part is
+          known, and events whose coordinates the sources give only to the nearest degree or tenth of a degree, are
+          marked “Approximate location”. A hand-picked seed list of events is also included; that part is
           our own choice.
         </p>
 

@@ -114,6 +114,13 @@ export const COUNTRY_SHAPES = {
   regional: [],
 };
 
+// How a `countries` tag reads on the site. Display only: the data keeps the tag
+// ("regional" for an event about the region as a whole, not one country).
+const COUNTRY_LABELS = { regional: "Region-wide" };
+export function countryLabel(country) {
+  return Object.hasOwn(COUNTRY_LABELS, country) ? COUNTRY_LABELS[country] : country;
+}
+
 // Shading is only for events without a precise marker.
 export function needsCountryShading(event) {
   const q = event?.location_quality;
