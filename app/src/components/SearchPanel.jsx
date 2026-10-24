@@ -11,7 +11,7 @@ import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
-import { chronological } from "../lib/timelineView.js";
+import { timelineOrder } from "../lib/timelineView.js";
 import { downloadText, exportFilename, exportQuery, exportRows, toCSV, toJSON } from "../lib/exportResults.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
@@ -345,15 +345,15 @@ export default function SearchPanel({
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
 
   // The download is the list as the panel shows it: the same results, in the
-  // order ResultsList lists them (the Timeline view: oldest first), every row,
-  // not only the ones "Show more" has revealed. Built from the lite records in
-  // memory (lib/exportResults.js says what that leaves out).
+  // order ResultsList lists them (the Timeline view: timelineOrder, as there),
+  // every row, not only the ones "Show more" has revealed. Built from the lite
+  // records in memory (lib/exportResults.js says what that leaves out).
   const showDownload = !eventsLoading && !eventsError;
   const canDownload = showDownload && !loading && results.length > 0;
   const downloadLabel = `Download ${results.length === 1 ? "this result" : `these ${results.length} results`}`;
   function download(kind) {
     if (!canDownload) return;
-    const ordered = view === "timeline" ? chronological(results) : results;
+    const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0]) : results;
     const rows = exportRows(ordered, { range, browse: !searching });
     const name = exportFilename(range, rows.length, kind);
     if (kind === "csv") downloadText(toCSV(rows), name, "text/csv;charset=utf-8");
