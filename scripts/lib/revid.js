@@ -4,8 +4,10 @@
 // at all, and only where that is known:
 // - refresh-extracts.js --apply writes them with every lead it writes (the revision the lead came from);
 // - backfill-revids.js sets them on an event without them when the article's current lead equals the stored extract
-//   exactly; otherwise they stay absent, since we cannot tell which revision the stored text came from.
-// Both come from the same API request as the lead (lib/lead.js: lastrevid, lastrev_timestamp). Pure.
+//   exactly; otherwise they stay absent, since we cannot tell which revision the stored text came from;
+// - backfill-revids.js --historical sets them to an OLDER revision whose lead (lib/rev-lead.js) equals the stored
+//   extract exactly, for events whose article's lead has changed since retrieval.
+// The first two take them from the same API request as the lead (lib/lead.js: lastrevid, lastrev_timestamp). Pure.
 
 /** A valid revision id: a positive safe integer. */
 export const isRevid = (v) => Number.isSafeInteger(v) && v > 0;
