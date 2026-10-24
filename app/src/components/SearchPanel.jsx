@@ -11,6 +11,8 @@ import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
+import { timelineOrder } from "../lib/timelineView.js";
+import { downloadText, exportFilename, exportQuery, exportRows, toCSV, toJSON } from "../lib/exportResults.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
 import useSheetDrag from "../hooks/useSheetDrag";
@@ -141,6 +143,10 @@ export default function SearchPanel({
   const sheetOpen = sheet !== "peek";
   // Filters sit behind a disclosure so results start near the top of the panel.
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // "Download": a disclosure under the toolbar offering CSV and JSON of the list.
+  const [downloadOpen, setDownloadOpen] = useState(false);
+  const downloadId = useId();
+  const downloadBtnRef = useRef(null);
 
   // Selecting an event (from a row or the map) opens the sheet on mobile; a
   // sheet the reader left at half stays at half.
@@ -338,6 +344,25 @@ export default function SearchPanel({
 
   const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
 
+  // The download is the list as the panel shows it: the same results, in the
+  // order ResultsList lists them (the Timeline view: timelineOrder, as there),
+  // every row, not only the ones "Show more" has revealed. Built from the lite
+  // records in memory (lib/exportResults.js says what that leaves out).
+  const showDownload = !eventsLoading && !eventsError;
+  const canDownload = showDownload && !loading && results.length > 0;
+  const downloadLabel = `Download ${results.length === 1 ? "this result" : `these ${results.length} results`}`;
+  function download(kind) {
+    if (!canDownload) return;
+    const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0]) : results;
+    const rows = exportRows(ordered, { range, browse: !searching });
+    const name = exportFilename(range, rows.length, kind);
+    if (kind === "csv") downloadText(toCSV(rows), name, "text/csv;charset=utf-8");
+    else {
+      const q = exportQuery({ query: textQuery, filters, area, range, sort, view });
+      downloadText(toJSON(rows, { query: q }), name, "application/json;charset=utf-8");
+    }
+  }
+
   return (
     <aside
       ref={panelRef}
@@ -531,8 +556,60 @@ export default function SearchPanel({
                   })}
                 </div>
               )}
+              {/* Last on the line and always the same width ("Download"; the count is
+                  in its name), shown with List | Timeline, so nothing moves when the
+                  results change: disabled while there is nothing settled to save. */}
+              {showDownload && (
+                <button
+                  ref={downloadBtnRef}
+                  type="button"
+                  className="sp-download-toggle"
+                  aria-expanded={downloadOpen}
+                  aria-controls={downloadId}
+                  aria-label={canDownload ? downloadLabel : "Download (no results to save)"}
+                  title={canDownload ? `${downloadLabel} as CSV or JSON` : undefined}
+                  disabled={!canDownload}
+                  onClick={() => setDownloadOpen(!downloadOpen)}
+                >
+                  <span className="sp-caret" aria-hidden="true" />
+                  Download
+                </button>
+              )}
             </div>
           </div>
+
+          {/* The download choices, under the toolbar like the Filters disclosure. */}
+          {showDownload && (
+            <div
+              id={downloadId}
+              className="sp-download"
+              role="group"
+              aria-label={downloadLabel}
+              hidden={!downloadOpen || !canDownload}
+              onKeyDown={(e) => {
+                if (e.key !== "Escape") return;
+                e.preventDefault();
+                setDownloadOpen(false);
+                downloadBtnRef.current?.focus();
+              }}
+            >
+              <p className="sp-download-what">
+                {downloadLabel}, in the order listed:
+              </p>
+              <div className="sp-download-btns">
+                <button type="button" className="sp-btn" onClick={() => download("csv")}>
+                  CSV <span className="sp-download-hint">(spreadsheet)</span>
+                </button>
+                <button type="button" className="sp-btn" onClick={() => download("json")}>
+                  JSON
+                </button>
+              </div>
+              <p className="sp-download-note">
+                Titles are Wikipedia text (CC BY-SA 4.0, credited in the file). No summaries or borders
+                are included; each row links its event page.
+              </p>
+            </div>
+          )}
 
           {!filtersOpen && (activeCount > 0 || areaMode !== "off") && (
             <div className="sp-active" aria-label="Active filters" role="group">

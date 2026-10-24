@@ -666,6 +666,78 @@ button.sp-chip[aria-pressed="true"] {
   }
 }
 
+/* "Download" (the results as CSV or JSON): sized like a sort segment, with
+   the Filters button's caret, as it opens choices under the toolbar. */
+.sp-download-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  margin-top: 4px;
+  padding: 0 10px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sp-download-toggle:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+
+.sp-download-toggle:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.sp-download-toggle[aria-expanded="true"] .sp-caret {
+  transform: rotate(180deg);
+}
+
+.sp-download-toggle:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .sp-download-toggle {
+    min-height: 44px;
+  }
+}
+
+.sp-download {
+  margin-top: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.8rem;
+}
+
+.sp-download-what,
+.sp-download-note {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.sp-download-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.sp-download-hint {
+  color: var(--text-tertiary);
+}
+
+.sp-download-note {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
 .sp-results,
 .sp-empty {
   margin-top: 8px;
