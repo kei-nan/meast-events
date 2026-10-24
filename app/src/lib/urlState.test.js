@@ -168,6 +168,24 @@ test("urlWriteMode: pushes event changes, debounces the rest, replaces on reques
   assert.equal(urlWriteMode("/?q=x", "/?q=y", { replace: true }), "debounce");
 });
 
+test("urlWriteMode: closing in the app goes back to the entry it was opened from", () => {
+  // Opened from "/", closed again: back, whatever else changed meanwhile.
+  assert.equal(urlWriteMode("/event/a", "/", { backUrl: "/" }), "back");
+  assert.equal(urlWriteMode("/event/a?y=1950-1960", "/?y=1950-1960", { backUrl: "/" }), "back");
+  // About closed over an open event.
+  assert.equal(urlWriteMode("/event/a?about=1", "/event/a", { backUrl: "/event/a" }), "back");
+  assert.equal(urlWriteMode("/?about=1", "/", { backUrl: "/?q=x" }), "back");
+  // Another event, or a close the entry was not pushed from: a push.
+  assert.equal(urlWriteMode("/event/a", "/event/b", { backUrl: "/" }), "push");
+  assert.equal(urlWriteMode("/event/b", "/", { backUrl: "/event/a" }), "push");
+  // No entry pushed from (a deep link, an older ?e= link, a reload): a push.
+  assert.equal(urlWriteMode("/event/a", "/", { backUrl: null }), "push");
+  assert.equal(urlWriteMode("/event/a", "/"), "push");
+  // Debounced changes and replaces are not affected.
+  assert.equal(urlWriteMode("/event/a", "/event/a?q=x", { backUrl: "/event/a" }), "debounce");
+  assert.equal(urlWriteMode("/event/bogus", "/", { replace: true, backUrl: "/" }), "replace");
+});
+
 test("entryBeforePush: carries a pending non-event change onto the current entry", () => {
   const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, about: false };
   // Typed "suez", then opened an event within the debounce: the current entry
