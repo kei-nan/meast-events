@@ -7,9 +7,16 @@ const REPLACE_DEBOUNCE_MS = 400;
 // is the path, /event/<id>; lib/urlState.js).
 const currentUrl = () => (typeof window === "undefined" ? "/" : `${window.location.pathname}${window.location.search}`);
 
+// This page load, in the history.state of each entry it pushes ({doc, back}):
+// `back` (the entry pushed from) is only gone back to within the same load. An
+// entry from before a reload belongs to another document: going back to it
+// would load the page again.
+const DOC = Math.random().toString(36).slice(2);
+
 // Mirrors app state into the URL with the History API.
 //  - Selecting/deselecting an event PUSHES a history entry (Back walks
-//    through selections) and writes immediately.
+//    through selections) and writes immediately; closing it again in the app
+//    goes BACK to the entry it was opened from, so Back does not re-open it.
 //  - Every other change (text, filters, years, scope, area) REPLACES the
 //    current entry, debounced so typing doesn't spam history.
 //  - popstate re-reads the URL (strictly validated) and hands the parsed
@@ -25,6 +32,7 @@ export default function useUrlState(state, onNavigate) {
   const url = stateUrl(state);
   const lastRef = useRef(currentUrl());
   const replaceNextRef = useRef(false);
+  const goingBackRef = useRef(false); // a history.back() of ours, awaiting its popstate
   const navigateRef = useRef(onNavigate);
   useEffect(() => {
     navigateRef.current = onNavigate;
@@ -37,12 +45,25 @@ export default function useUrlState(state, onNavigate) {
   });
 
   useEffect(() => {
-    const mode = urlWriteMode(lastRef.current, url, { replace: replaceNextRef.current });
+    const entry = window.history.state;
+    const backUrl = entry?.doc === DOC ? entry.back : null;
+    const mode = urlWriteMode(lastRef.current, url, { replace: replaceNextRef.current, backUrl });
     if (!mode) return;
+    // A replace keeps the entry's own history.state (its `back`).
     const write = (method, next = url) => {
-      window.history[method](null, "", `${next}${window.location.hash}`);
+      const data = method === "pushState" ? { doc: DOC, back: lastRef.current } : window.history.state;
+      window.history[method](data, "", `${next}${window.location.hash}`);
       lastRef.current = next;
     };
+    if (mode === "back") {
+      // The popstate it fires is ours: that entry then gets the view as it is
+      // now (years or filters changed while the event was open are kept).
+      replaceNextRef.current = false;
+      goingBackRef.current = true;
+      lastRef.current = url;
+      window.history.back();
+      return;
+    }
     if (mode !== "debounce") {
       replaceNextRef.current = false;
       if (mode === "push") {
@@ -60,8 +81,15 @@ export default function useUrlState(state, onNavigate) {
 
   useEffect(() => {
     const onPop = () => {
-      lastRef.current = currentUrl();
       replaceNextRef.current = false;
+      if (goingBackRef.current) {
+        goingBackRef.current = false;
+        const next = stateUrl(stateRef.current);
+        window.history.replaceState(window.history.state, "", `${next}${window.location.hash}`);
+        lastRef.current = next;
+        return;
+      }
+      lastRef.current = currentUrl();
       navigateRef.current(parseUrl(lastRef.current));
     };
     window.addEventListener("popstate", onPop);

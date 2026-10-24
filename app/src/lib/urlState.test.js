@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  areaRoundTrips,
   areaToParam,
   canonicalPath,
   entryBeforePush,
@@ -166,6 +167,34 @@ test("urlWriteMode: pushes event changes, debounces the rest, replaces on reques
   assert.equal(urlWriteMode("/event/bogus?q=x", "/?q=x", { replace: true }), "replace");
   // The flag only matters for event changes.
   assert.equal(urlWriteMode("/?q=x", "/?q=y", { replace: true }), "debounce");
+});
+
+test("urlWriteMode: closing in the app goes back to the entry it was opened from", () => {
+  // Opened from "/", closed again: back, whatever else changed meanwhile.
+  assert.equal(urlWriteMode("/event/a", "/", { backUrl: "/" }), "back");
+  assert.equal(urlWriteMode("/event/a?y=1950-1960", "/?y=1950-1960", { backUrl: "/" }), "back");
+  // About closed over an open event.
+  assert.equal(urlWriteMode("/event/a?about=1", "/event/a", { backUrl: "/event/a" }), "back");
+  assert.equal(urlWriteMode("/?about=1", "/", { backUrl: "/?q=x" }), "back");
+  // Another event, or a close the entry was not pushed from: a push.
+  assert.equal(urlWriteMode("/event/a", "/event/b", { backUrl: "/" }), "push");
+  assert.equal(urlWriteMode("/event/b", "/", { backUrl: "/event/a" }), "push");
+  // No entry pushed from (a deep link, an older ?e= link, a reload): a push.
+  assert.equal(urlWriteMode("/event/a", "/", { backUrl: null }), "push");
+  assert.equal(urlWriteMode("/event/a", "/"), "push");
+  // Debounced changes and replaces are not affected.
+  assert.equal(urlWriteMode("/event/a", "/event/a?q=x", { backUrl: "/event/a" }), "debounce");
+  assert.equal(urlWriteMode("/event/bogus", "/", { replace: true, backUrl: "/" }), "replace");
+});
+
+test("areaRoundTrips: a shape its link would drop does not round trip", () => {
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [30, 31, 40, 32] }), true);
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [30, 31.5, 40, 31.5] }), false); // zero height
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [30, 31.50001, 40, 31.50002] }), false); // under 4 decimals
+  assert.equal(areaRoundTrips({ type: "circle", center: [35, 31], radiusKm: 5 }), true);
+  assert.equal(areaRoundTrips({ type: "circle", center: [35, 31], radiusKm: 0.00004 }), false);
+  assert.equal(areaRoundTrips({ type: "rect", bbox: [170, 31, 190, 32] }), false); // off the map
+  assert.equal(areaRoundTrips(null), false);
 });
 
 test("entryBeforePush: carries a pending non-event change onto the current entry", () => {

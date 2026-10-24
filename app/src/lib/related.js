@@ -90,6 +90,20 @@ export function emptyReason(key, event) {
   return "No other event with an exact date is within six months.";
 }
 
+/**
+ * The related-events tab to show: `chosen` (a tab key, kept across events) while
+ * it has events, or when it was chosen for this very event (`chosenHere`: an
+ * empty tab clicked on purpose shows its emptyReason); otherwise the first tab
+ * with events, so a group missing from the next event falls back. `chosen` is
+ * not changed, so it applies again to an event that has that group. `counts`
+ * maps each key in `keys` to its number of events.
+ */
+export function relatedTabFor(keys, counts, chosen, chosenHere = false) {
+  const has = (k) => (counts[k] ?? 0) > 0;
+  if (keys.includes(chosen) && (chosenHere || has(chosen))) return chosen;
+  return keys.find(has) ?? (keys.includes(chosen) ? chosen : keys[0]);
+}
+
 export function resolveRelated(events, partOf = new Map()) {
   const list = events.filter((e) => e && typeof e.id === "string");
   const day = new Map(list.map((e) => [e.id, dayNumber(e.date_start)]));

@@ -140,3 +140,38 @@ test("filters alone are answered locally, without the index", () => {
   assert.deepEqual(ids(s), ["e2"]);
   assert.deepEqual(index.calls, []);
 });
+
+test("while degraded, a probe that went stale still ends the outage, and the current text is searched", async () => {
+  const index = stubIndex();
+  let recovered = 0;
+  const p = props({ query: "old", degraded: true, probeTick: 0, onRecovered: () => recovered++ });
+  const h = renderHook(useEventSearch, p);
+  assert.deepEqual(index.calls, []); // degraded: no search until a probe
+  h.rerender({ ...p, probeTick: 1 });
+  assert.deepEqual(index.calls, ["old"]);
+  // The text changes before the probe answers (and settles: 300 ms), which is
+  // not searched while degraded.
+  h.rerender({ ...p, query: "new", probeTick: 1 });
+  await new Promise((r) => setTimeout(r, 320));
+  h.rerender({ ...p, query: "new", probeTick: 1 });
+  assert.deepEqual(index.calls, ["old"]);
+  await index.settle(); // the stale probe loads
+  assert.equal(recovered, 1);
+  // App clears degraded: the current text is searched at once, and answered.
+  h.rerender({ ...p, query: "new", probeTick: 1, degraded: false });
+  assert.deepEqual(index.calls, ["old", "new"]);
+  await index.settle();
+  const s = h.rerender({ ...p, query: "new", probeTick: 1, degraded: false });
+  assert.equal(s.status, "ready");
+  assert.equal(s.source, "fulltext");
+});
+
+test("a recovery that answered the text does not search it again", async () => {
+  const index = stubIndex();
+  const p = props({ degraded: true, probeTick: 0 });
+  const h = renderHook(useEventSearch, p);
+  h.rerender({ ...p, probeTick: 1 });
+  await index.settle();
+  h.rerender({ ...p, probeTick: 1, degraded: false });
+  assert.deepEqual(index.calls, ["event"]);
+});

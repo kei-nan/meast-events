@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { NEARBY_KM, RELATED_SHOWN, SAME_TIME_DAYS, emptyReason, resolveRelated } from "./related.js";
+import { NEARBY_KM, RELATED_SHOWN, SAME_TIME_DAYS, emptyReason, relatedTabFor, resolveRelated } from "./related.js";
 import { resolvePartOf } from "./partOf.js";
 
 // A precise, day-exact event unless told otherwise.
@@ -102,4 +102,20 @@ test("emptyReason says which rule left a group empty", () => {
   assert.match(emptyReason("same_time", { ...base, date_precision: "year" }), /known only to the year/);
   assert.match(emptyReason("same_time", { ...base, date_precision: undefined }), /exact day .* not recorded/);
   assert.match(emptyReason("same_time", base), /within six months/);
+});
+
+test("relatedTabFor: the chosen tab while it has events, else the first that has", () => {
+  const keys = ["shared_parent", "nearby", "same_time"];
+  const counts = { shared_parent: 0, nearby: 2, same_time: 1 };
+  assert.equal(relatedTabFor(keys, counts, null), "nearby");
+  assert.equal(relatedTabFor(keys, counts, "same_time"), "same_time");
+  // Chosen on another event, empty for this one: falls back.
+  assert.equal(relatedTabFor(keys, counts, "shared_parent"), "nearby");
+  // Chosen on this event: an empty tab stays open (it says why it is empty).
+  assert.equal(relatedTabFor(keys, counts, "shared_parent", true), "shared_parent");
+  // All empty: the chosen one, else the first.
+  const none = { shared_parent: 0, nearby: 0, same_time: 0 };
+  assert.equal(relatedTabFor(keys, none, "same_time"), "same_time");
+  assert.equal(relatedTabFor(keys, none, null), "shared_parent");
+  assert.equal(relatedTabFor(keys, counts, "bogus"), "nearby");
 });

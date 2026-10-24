@@ -182,12 +182,32 @@ export function parseUrl(url) {
 // Back does not return to the dead URL); "debounce" = any other change,
 // replaced after a pause. An older /?e=<id> link rewritten to /event/<id> is
 // "debounce": the same event, so the entry is replaced, not pushed.
-export function urlWriteMode(prevUrl, nextUrl, { replace = false } = {}) {
+// "back" = a push that would return to the entry the current one was pushed
+// from (`backUrl`, that entry's URL as it was left; null when the current entry
+// was not pushed by this page load: a deep link, the first entry, a reload).
+// Closing an event or About is then an undo: useUrlState goes back to that
+// entry (and gives it the current view) instead of pushing a copy of it, so the
+// browser's Back does not re-open what was just closed.
+export function urlWriteMode(prevUrl, nextUrl, { replace = false, backUrl = null } = {}) {
   if (nextUrl === prevUrl) return null;
   const prev = parseUrl(prevUrl);
   const next = parseUrl(nextUrl);
   if (prev.eventId === next.eventId && prev.about === next.about) return "debounce";
-  return replace ? "replace" : "push";
+  if (replace) return "replace";
+  if (typeof backUrl === "string") {
+    const back = parseUrl(backUrl);
+    if (back.eventId === next.eventId && back.about === next.about) return "back";
+  }
+  return "push";
+}
+
+// An area that survives its own link: what parseArea reads back from
+// areaToParam. The URL keeps 4 decimals, so a rectangle thinner than that (a
+// sideways-only drag) or a circle of a few metres would be dropped on share or
+// reload; the map does not commit such a shape (MapView).
+export function areaRoundTrips(area) {
+  const param = areaToParam(area);
+  return param != null && parseArea(param) != null;
 }
 
 // Before a push (an event opened/closed, About toggled): the URL the CURRENT

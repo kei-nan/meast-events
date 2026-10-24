@@ -612,7 +612,9 @@ export default function SearchPanel({
                 <p>
                   {textQuery
                     ? `No events in this atlas match “${textQuery}”.`
-                    : "No events in this atlas match these filters."}
+                    : searching
+                      ? "No events in this atlas match these filters."
+                      : "No events in the selected years."}
                 </p>
                 <p className="sp-muted">
                   The atlas covers only a partial selection of events, so a missing result says
