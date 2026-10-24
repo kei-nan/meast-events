@@ -1331,6 +1331,14 @@ button.sp-chip[aria-pressed="true"] {
   line-height: 1.5;
 }
 
+/* No Popover API (Safari before 17, FramingReview.jsx HAS_POPOVER): the note opens
+   in the page flow under its button instead of floating. */
+.fr-ai-note--inline {
+  position: static;
+  margin-top: 8px;
+  box-shadow: none;
+}
+
 .framing-review a {
   font-size: inherit;
 }

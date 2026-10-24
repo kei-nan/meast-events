@@ -86,6 +86,12 @@ export default defineConfig(({ command }) => ({
     exclude: ['maplibre-gl'],
   },
   build: {
+    // The oldest browsers the JavaScript and CSS are compiled for: Vite 8's own
+    // default ("baseline-widely-available"), written out so a Vite major upgrade
+    // cannot raise it silently. Safari/iOS 16.4 is the floor; what 16.4 lacks at
+    // runtime is feature-detected (the Popover API, Safari 17: FramingReview.jsx;
+    // "@media (scripting)", Safari 17: the html.js class in index.html).
+    target: ['chrome111', 'edge111', 'firefox114', 'safari16.4', 'ios16.4'],
     // Never inline a font as a data: URL. Subsetting (scripts/subset-fonts.mjs) makes
     // some faces smaller than Vite's 4 KB default limit, and an inlined face is
     // downloaded with the main stylesheet on every first visit even when no character
