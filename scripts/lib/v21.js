@@ -5,6 +5,7 @@ import { yearsIn, yearOf, precisionName } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
 import { applyDataFix, reconcileStartDate, keptEndPrecision, lastDayOfPeriod } from "./fixes.js";
 import { detectExtractHold } from "./title-refresh.js";
+import { setWikidataAliases } from "./wd-entities.js";
 
 export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
 export const PREDECESSOR_FLAG = "country_via_predecessor_state";
@@ -187,6 +188,8 @@ export function finalizeEvent(ev, ctx) {
   ev.category = group;
   ev.category_group = group;
   delete ev.category_label;
+  // Wikidata's English aliases, as-is (none: no field); the app's search also matches them.
+  setWikidataAliases(ev, entity?.aliases);
 
   // 3. date source reconciliation (candidates only), then the verified-fix ledger
   ev.review_reasons = [...(ev.review_reasons ?? [])];

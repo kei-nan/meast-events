@@ -6,7 +6,7 @@ import { fetchEntities, fetchLabelsCached } from "./wd-entities.js";
 import { QID_TO_COUNTRY } from "./event-classes.js";
 
 const SOVEREIGN_STATE = "Q3624078";
-const FULL = "claims|labels|descriptions|sitelinks/urls";
+const FULL = "claims|labels|descriptions|aliases|sitelinks/urls";
 const LIGHT = "claims|labels";
 
 // events: any objects with wikipedia_url/title/wikidata_qid. candidates: rows of event-candidates.json

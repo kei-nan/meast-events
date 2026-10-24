@@ -235,6 +235,13 @@ export function validateEvents(
       // "Not events" (docs/DATA_POLICY.md): merge-proposed.js removes such an entry; listed here until it does.
       warn(i, e, `not an event by its Wikidata classes (${notEventClasses(e.wikidata_classes).map((c) => c.label).join(", ")}): merge-proposed.js removes it`);
     }
+    // Wikidata's English aliases (scripts/refresh-sitelinks.js): absent when the item has none, never empty.
+    if (
+      e.wikidata_aliases !== undefined &&
+      (!Array.isArray(e.wikidata_aliases) || !e.wikidata_aliases.length || e.wikidata_aliases.some((a) => typeof a !== "string" || !a.trim()))
+    ) {
+      err(i, e, "wikidata_aliases must be a non-empty array of non-empty strings (absent when Wikidata has none)");
+    }
     if (typeof e.extract_retrieved_at !== "string" || !/^\d{4}-\d{2}-\d{2}/.test(e.extract_retrieved_at)) {
       err(i, e, "extract_retrieved_at must be an ISO date");
     }

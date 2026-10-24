@@ -3,6 +3,7 @@ import { eventYears, highlight, inRange } from "./resultsUtil.jsx";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { startedBefore } from "../lib/browseOrder.js";
 import { countryLabel } from "../lib/eventCountries.js";
+import { matchedAlias } from "../lib/ranking.js";
 import {
   axisTicks,
   barGeometry,
@@ -40,7 +41,11 @@ const ResultRow = memo(function ResultRow({
   const nomap = ev.location_quality === "none";
   const approximate = ev.location_quality === "approximate";
   const hasTags = outside || ongoing || nomap || approximate;
-  const describedBy = [ev.snippet && `${id}-snippet`, hasTags && `${id}-tags`].filter(Boolean).join(" ");
+  // The Wikidata alias the query matched, when the title does not match it.
+  const alias = query ? matchedAlias(ev, query) : null;
+  const describedBy = [alias && `${id}-alias`, ev.snippet && `${id}-snippet`, hasTags && `${id}-tags`]
+    .filter(Boolean)
+    .join(" ");
   return (
     <li>
       <button
@@ -64,6 +69,11 @@ const ResultRow = memo(function ResultRow({
           {ev.countries?.length ? ` · ${ev.countries.map(countryLabel).join(", ")}` : ""}
           {ev.category ? ` · ${categoryLabel(ev.category)}` : ""}
         </span>
+        {alias && (
+          <span className="sp-row-alias" id={`${id}-alias`}>
+            matched: {alias}
+          </span>
+        )}
         {ev.snippet && (
           <span className="sp-row-snippet" id={`${id}-snippet`}>
             {highlight(ev.snippet, query)}

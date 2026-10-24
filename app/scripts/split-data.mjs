@@ -15,7 +15,7 @@
 //   events/v.<version>/all.json         the whole LITE set (every event,
 //       coordinate-less included): only the fields the lists, filters and map
 //       need. The app loads it once and does range/viewport/filter/area/
-//       title-snippet matching locally. This is the file that grows with the
+//       title/snippet/alias matching locally. This is the file that grows with the
 //       dataset and is on the critical path, so it carries nothing the list does
 //       not show (see publicEvent) and its compressed size has a budget
 //       (MAX_LITE_GZIP_BYTES, the build fails above it).
@@ -178,6 +178,10 @@ export function publicEvent(e) {
     ...(rounded ? { approximate_reason: "rounded" } : {}),
     // Wikidata sitelink count (all projects), for the default "most covered" order.
     sitelinks: Number.isFinite(e.sitelinks_current) ? e.sitelinks_current : null,
+    // Wikidata's English aliases (data wikidata_aliases, as-is), only on events that have them: the
+    // local search matches and ranks them, a result row names the one a query matched, and the
+    // event panel lists them.
+    ...(strings(e.wikidata_aliases).length ? { aliases: strings(e.wikidata_aliases) } : {}),
   };
 }
 
