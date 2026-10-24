@@ -210,12 +210,14 @@ the Actions tab). It:
 
 If `data/events.json` or `data/framing-review.json` changed, it installs the repo-root
 dependencies (`npm ci`: the geometry library, without which `validate-events.js` skips its
-pin-in-country check and the root tests skip the geometry tests), validates the data, checks
-that the generated reports are current, runs both unit-test suites and builds the site
+pin-in-country check and the root tests skip the geometry tests), validates the data,
+regenerates the two generated reports (`data/missing-coordinates-report.md`, and
+`data/selection-funnel.json` with `--offline`, which keeps its committed sitelink measurement)
+and checks that they are current, runs both unit-test suites and builds the site
 (`npm ci && npm run build` in `app/`, which includes the build-time checks above), and then
 a pull request is opened and CI is started on it (below). The workflow has two jobs: the
 **Refresh summaries** job (`refresh`) does all of the above with a read-only token and
-hands the two data files and the reports on as artifacts; the pull request is opened by
+hands the two data files and the generated and refresh reports on as artifacts; the pull request is opened by
 a separate job, **Open a pull request** (`open-pr`), which holds the write token and runs
 no npm code and no repository scripts, so nothing the refresh installs or builds holds a
 token that can push. The PR description holds the start of the refresh report; the full

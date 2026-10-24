@@ -15,11 +15,14 @@ name: Refresh Wikipedia summaries
 # Two jobs, so code from npm never runs where a write token exists:
 # - "refresh" runs the repo's scripts, `npm ci` (whose install scripts run
 #   arbitrary package code), the tests and the build with a READ-ONLY token.
-#   It hands the two data files and the reports to the next job as artifacts.
+#   It hands the two data files, the two generated reports built from them and
+#   the refresh reports to the next job as artifacts.
 # - "open-pr" holds the write token. It checks the repo out afresh, copies in
-#   just data/events.json and data/framing-review.json, commits, pushes a branch
-#   and opens the PR. It runs no npm and no repo code, and git with hooks off.
-# What a compromised dependency in "refresh" could still do is change those two
+#   just data/events.json, data/framing-review.json and the two generated reports
+#   (data/missing-coordinates-report.md, data/selection-funnel.json), commits,
+#   pushes a branch and opens the PR. It runs no npm and no repo code, and git
+#   with hooks off.
+# What a compromised dependency in "refresh" could still do is change those four
 # files' content, which lands only in the reviewed PR (as before), or fail the run.
 #
 # Needs: Settings -> Actions -> General -> "Allow GitHub Actions to create and
@@ -97,12 +100,15 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # The report lists titles and sitelink counts from data/events.json, which
-      # the steps above may have changed; CI checks that it matches the data
-      # (ci.yml, "Generated reports are current"). No network.
-      - name: Regenerate the missing-coordinates report
+      # The reports list titles, sitelink counts and lead dates from data/events.json,
+      # which the steps above may have changed; CI checks that they match the data
+      # (ci.yml, "Generated reports are current"). No network: the funnel keeps its
+      # committed sitelink_measurement (--offline).
+      - name: Regenerate the missing-coordinates report and the selection funnel
         if: steps.diff.outputs.changed == 'true'
-        run: node scripts/build-missing-coordinates-report.js
+        run: |
+          node scripts/build-missing-coordinates-report.js
+          node scripts/build-selection-funnel.js --offline
 
       # The repo-root dependencies, as in ci.yml's "Validate event data" job: without
       # the geometry library (turf) validate-events skips its pin-in-country check and
@@ -156,9 +162,9 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      # The changed data for the "open-pr" job: whole files (all three, changed or
+      # The changed data for the "open-pr" job: whole files (all four, changed or
       # not), stored at the artifact's top level as events.json,
-      # framing-review.json and missing-coordinates-report.md.
+      # framing-review.json, missing-coordinates-report.md and selection-funnel.json.
       - name: Upload the refreshed data
         if: steps.diff.outputs.changed == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -168,6 +174,7 @@ jobs:
             data/events.json
             data/framing-review.json
             data/missing-coordinates-report.md
+            data/selection-funnel.json
           if-no-files-found: error
           retention-days: 7
 
@@ -203,11 +210,11 @@ jobs:
           name: refresh-report
           path: ${{ runner.temp }}/reports
 
-      # Only these three paths are taken from the artifact; nothing else from the
+      # Only these four paths are taken from the artifact; nothing else from the
       # "refresh" job reaches the commit.
       - name: Apply the refreshed data
         run: |
-          for f in events.json framing-review.json missing-coordinates-report.md; do
+          for f in events.json framing-review.json missing-coordinates-report.md selection-funnel.json; do
             src="$RUNNER_TEMP/refresh-data/$f"
             if [ ! -f "$src" ] || [ -L "$src" ]; then echo "::error::$f missing from the refresh-data artifact"; exit 1; fi
             cp -- "$src" "data/$f"
@@ -235,7 +242,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -c core.hooksPath=/dev/null switch -c "$branch"
-          git -c core.hooksPath=/dev/null add data/events.json data/framing-review.json data/missing-coordinates-report.md
+          git -c core.hooksPath=/dev/null add data/events.json data/framing-review.json data/missing-coordinates-report.md data/selection-funnel.json
           git -c core.hooksPath=/dev/null commit -m "Refresh Wikipedia summaries, titles and guideline versions (${day})"
           # Checkout ran with persist-credentials: false. Authenticate this one
           # push the way actions/checkout does (an http.extraheader), passed
