@@ -460,6 +460,9 @@ node scripts/discover-events.js --predecessors-only     # only the predecessor-s
 node scripts/enrich-candidates.js [--reuse] [--limit=N] [--keep-existing]
                                                         # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
+node scripts/enrich-seed.js                             # -> data/seed-enrichment.proposed.json: date_precision, part_of,
+                                                        #    resolved_qid, wikidata_description for the hand-picked seed
+                                                        #    events that lack them (a proposal; nothing applies it)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
