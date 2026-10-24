@@ -3,7 +3,9 @@
 //
 // Bars show the dates as the data gives them (docs/DATA_POLICY.md): a record
 // whose end comes before its start is drawn at its start year only and marked
-// `reversed` (the event panel explains it), never as a span between the two.
+// `reversed` (the event panel explains it), never as a span between the two;
+// when only its end year is on the axis (the selected years match it there,
+// lib/eventYears.js eventOverlapsRange), it is a point at the end year instead.
 // An event without an end date is a point at its start year: a missing end is
 // not read as "still going on".
 
@@ -71,18 +73,24 @@ export function barGeometry(e, [a0, a1]) {
   const [s, en] = rawEventYears(e);
   if (!Number.isFinite(s) || s <= 0) return null;
   const reversed = en < s;
-  const end = reversed ? s : en;
-  if (end < a0 || s > a1) return null;
+  if (reversed) {
+    // One of its two years, never the years between: the start when it is on the axis, else the end.
+    const y = s >= a0 && s <= a1 ? s : en >= a0 && en <= a1 ? en : null;
+    if (y === null) return null;
+    const cells = a1 - a0 + 1;
+    return { left: pct((y - a0) / cells), width: pct(1 / cells), before: false, after: false, reversed, point: true };
+  }
+  if (en < a0 || s > a1) return null;
   const cells = a1 - a0 + 1;
   const from = Math.max(s, a0);
-  const to = Math.min(end, a1);
+  const to = Math.min(en, a1);
   return {
     left: pct((from - a0) / cells),
     width: pct((to - from + 1) / cells),
     before: s < a0,
-    after: end > a1,
+    after: en > a1,
     reversed,
-    point: s === end,
+    point: s === en,
   };
 }
 

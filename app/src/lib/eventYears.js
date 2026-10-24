@@ -19,18 +19,36 @@ export function rawEventYears(e) {
 }
 
 /**
- * The span of years an event covers, earliest first. A few records have an end
- * date before their start date (as Wikidata gives them; the data is shown
- * unchanged), so the span is the lower to the higher of the two years: those
- * events still appear in every year they name instead of in none.
+ * True when the end year comes before the start year. A few records have their
+ * dates in that order as Wikidata gives them (shown unchanged; the data flags
+ * each one, date_order_invalid, and the validator fails an unflagged one), e.g.
+ * iraqi-invasion-of-kuwait: start 2009-08-02, end 1990-08-04.
+ */
+export function yearsReversed(e) {
+  const [s, en] = rawEventYears(e);
+  return en < s;
+}
+
+/**
+ * The lowest and highest year an event's dates name, earliest first. For a
+ * reversed record that is its two years in order, NOT a span it covers: the
+ * years between them are named by neither date (see eventOverlapsRange).
  */
 export function eventYearRange(e) {
   const [s, en] = rawEventYears(e);
   return s <= en ? [s, en] : [en, s];
 }
 
-/** True when the event's span shares at least one year with [startYear, endYear]. */
+/**
+ * True when the event shares at least one year with [startYear, endYear]. A
+ * reversed record matches only the two years its dates name (Kuwait: 1990 and
+ * 2009), never the years between them, which neither source gives for it.
+ */
 export function eventOverlapsRange(e, startYear, endYear) {
+  if (yearsReversed(e)) {
+    const [s, en] = rawEventYears(e);
+    return (s >= startYear && s <= endYear) || (en >= startYear && en <= endYear);
+  }
   const [s, en] = eventYearRange(e);
   return s <= endYear && en >= startYear;
 }
