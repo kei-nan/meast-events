@@ -25,10 +25,22 @@
       "revolution"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: Young Turk Revolution: the seed date_start is no Wikidata value (Wikidata: P585 1908-07-24, the end of the infobox range). English Wikipedia https://en.wikipedia.org/w/index.php?title=Young_Turk_Revolution&oldid=1380448478: infobox \"3–24 July 1908\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"dissolution of the Ottoman Empire\" (Q1837704); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 46
+    "sitelinks_current": 46,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q1837704",
+        "label": "dissolution of the Ottoman Empire"
+      }
+    ],
+    "resolved_qid": "Q4298662",
+    "wikidata_description": "1908 restoration of constitutional rule in the Ottoman Empire"
   },
   {
     "id": "italo-turkish-war",
@@ -56,15 +68,26 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Scramble for Africa\" (Q179848); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 62,
     "wikidata_aliases": [
       "Tripolitanian War",
       "Libyan War",
       "Turco-Italian War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q179848",
+        "label": "Scramble for Africa"
+      }
+    ],
+    "resolved_qid": "Q203824",
+    "wikidata_description": "1911–12 war between the Ottoman Empire and the Kingdom of Italy"
   },
   {
     "id": "balkan-wars",
@@ -95,7 +118,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 80
+    "sitelinks_current": 80,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q165725",
+    "wikidata_description": "two consecutive wars in 1912 and 1913"
   },
   {
     "id": "ottoman-entry-into-world-war-i",
@@ -126,7 +153,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 8
+    "sitelinks_current": 8,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q1328496",
+    "wikidata_description": "entrance of the Ottoman Empire into the First World War"
   },
   {
     "id": "armenian-genocide",
@@ -165,7 +196,11 @@
       "Armenian Holocaust",
       "Armenian Massacres",
       "Great Crime"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q80034",
+    "wikidata_description": "systematic destruction of the Armenian people and identity in the Ottoman Empire during World War I implemented by the Ottoman authorities through mass murder"
   },
   {
     "id": "gallipoli-campaign",
@@ -194,8 +229,11 @@
       "offensive"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: Gallipoli campaign: the seed date_start is no Wikidata value (Wikidata: P580 1915-04-25, the landings). English Wikipedia https://en.wikipedia.org/w/index.php?title=Gallipoli_campaign&oldid=1379733603: lead \"from 19 February 1915 to 9 January 1916\"; infobox \"19 February 1915 – 9 January 1916\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern theater of World War I\" (Q1765465); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 75,
     "wikidata_aliases": [
@@ -203,7 +241,16 @@
       "Battle of Çanakkale",
       "The Gallipoli Campaign",
       "Dardanelles campaign"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q1765465",
+        "label": "Middle Eastern theater of World War I"
+      }
+    ],
+    "resolved_qid": "Q164983",
+    "wikidata_description": "1915–1916 military campaign during World War I"
   },
   {
     "id": "mcmahon-hussein-correspondence",
@@ -274,7 +321,11 @@
       "Sykes-Picot",
       "Sykes-Picot Agreement",
       "Sykes-Picot Treaty"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q211674",
+    "wikidata_description": "secret agreement signed in 1916 between France and the United Kingdom providing for the division of the Middle East at the end of the First World War"
   },
   {
     "id": "arab-revolt",
@@ -307,11 +358,22 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "country_not_supported_by_wikidata: Saudi Arabia, Jordan not derivable from Wikidata P17/P276/P131 (Wikidata gives: Syria)"
+      "country_not_supported_by_wikidata: Saudi Arabia, Jordan not derivable from Wikidata P17/P276/P131 (Wikidata gives: Syria)",
+      "data_fix F14: Arab Revolt: the seed date_start is no Wikidata value (Wikidata: P580 1916-06 (month)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Arab_Revolt&oldid=1380894633: infobox \"10 June 1916 – 25 October 1918\"; lead \"officially initiated at Mecca on 10 June 1916\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern theater of World War I\" (Q1765465); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 56
+    "sitelinks_current": 56,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q1765465",
+        "label": "Middle Eastern theater of World War I"
+      }
+    ],
+    "resolved_qid": "Q239060",
+    "wikidata_description": "uprising against the ruling Ottoman Turks during World War I"
   },
   {
     "id": "balfour-declaration",
@@ -346,7 +408,11 @@
     "sitelinks_current": 86,
     "wikidata_aliases": [
       "Balfour Declaration of 1917"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q187152",
+    "wikidata_description": "public statement written by Arthur Balfour issued by the British government in 1917 in support of a \"national home for the Jewish people\" in Palestine then an Ottoman region"
   },
   {
     "id": "fall-of-baghdad-1917",
@@ -405,10 +471,21 @@
       "battle"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"World War I\" (Q361); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q361",
+        "label": "World War I"
+      }
+    ],
+    "resolved_qid": "Q1378270",
+    "wikidata_description": "1917 battle"
   },
   {
     "id": "armistice-of-mudros",
@@ -440,7 +517,11 @@
     "sitelinks_current": 50,
     "wikidata_aliases": [
       "Armistice of Moudros"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q328499",
+    "wikidata_description": "armistice ending the war between Ottoman Turkey and the Allies of World War I"
   },
   {
     "id": "san-remo-conference",
@@ -471,7 +552,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 35
+    "sitelinks_current": 35,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q1365425",
+    "wikidata_description": "allocation of League of Nations mandates"
   },
   {
     "id": "iraqi-revolt-against-the-british",
@@ -540,12 +625,16 @@
     "sitelinks_current": 68,
     "wikidata_aliases": [
       "Treaty of Sevres"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q182515",
+    "wikidata_description": "peace treaty between the Ottoman Empire and the Allied Powers at the end of World War I"
   },
   {
     "id": "franco-syrian-war",
     "title": "Franco-Syrian War",
-    "date_start": "1920-04-08",
+    "date_start": "1920-03-08",
     "date_end": "1920-07-25",
     "countries": [
       "Syria"
@@ -568,10 +657,22 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F13: Franco-Syrian War: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P580 1920-03-08 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Franco-Syrian_War&oldid=1379975922: infobox \"8 March – 25 July 1920\" (checked 2026-10-24). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"interwar period\" (Q154611); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 27
+    "sitelinks_current": 27,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q154611",
+        "label": "interwar period"
+      }
+    ],
+    "resolved_qid": "Q2992403",
+    "wikidata_description": "1920 war in the Middle East"
   },
   {
     "id": "turkish-war-of-independence",
@@ -605,7 +706,11 @@
     "sitelinks_current": 68,
     "wikidata_aliases": [
       "Turkish War of Liberation"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q234738",
+    "wikidata_description": "war fought between the Turkish National Movement and the Entente and their proxies"
   },
   {
     "id": "emirate-of-transjordan",
@@ -634,8 +739,10 @@
       "British protectorate"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: Emirate of Transjordan: the seed date_start is no Wikidata value (Wikidata: no P585/P580). English Wikipedia https://en.wikipedia.org/w/index.php?title=Emirate_of_Transjordan&oldid=1377341920: lead \"established on 11 April 1921\"; infobox date_start \"11 April\", year_start 1921 (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 45,
     "wikidata_aliases": [
@@ -643,7 +750,11 @@
       "Emirate of Trans-Jordan",
       "Transjordan",
       "Amirate of Trans-Jordan"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q1121819",
+    "wikidata_description": "former country in the Middle East"
   },
   {
     "id": "treaty-of-lausanne",
@@ -677,7 +788,11 @@
     "sitelinks_current": 74,
     "wikidata_aliases": [
       "Treaty of Peace with Turkey Signed at Lausanne"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q193258",
+    "wikidata_description": "1923 peace treaty between Turkey and the Allies"
   },
   {
     "id": "abolition-of-the-ottoman-caliphate",
@@ -705,10 +820,22 @@
       "reform"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: Abolition of the Caliphate: the seed date_start is no Wikidata value (Wikidata: P585 1924 (year)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Abolition_of_the_Caliphate&oldid=1380313801: lead \"abolished on 3 March 1924\"; infobox date 3 March 1924 (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Atatürk's reforms\" (Q780048); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q780048",
+        "label": "Atatürk's reforms"
+      }
+    ],
+    "resolved_qid": "Q2821698",
+    "wikidata_description": "Abolition of the last remnant of the former monarchy in Turkey on 3 March 1924 by the Turkish Grand National Assembly"
   },
   {
     "id": "great-syrian-revolt",
@@ -775,10 +902,22 @@
       "violent crime"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: 1929 Palestine riots: the seed date_start is no Wikidata value (Wikidata: P585 1929-08-29, the end of the infobox range). English Wikipedia https://en.wikipedia.org/w/index.php?title=1929_Palestine_riots&oldid=1378961464: infobox \"23–29 August 1929\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Intercommunal conflict in Mandatory Palestine\" (Q2992527); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 25
+    "sitelinks_current": 25,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q2992527",
+        "label": "Intercommunal conflict in Mandatory Palestine"
+      }
+    ],
+    "resolved_qid": "Q2281806",
+    "wikidata_description": "series of violent Arab–Jewish clashes in British Mandatory Palestine"
   },
   {
     "id": "unification-of-saudi-arabia",
@@ -869,13 +1008,24 @@
       "rebellion"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Intercommunal conflict in Mandatory Palestine\" (Q2992527); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 36,
     "wikidata_aliases": [
       "1936–39 Arab revolt in Palestine"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q2992527",
+        "label": "Intercommunal conflict in Mandatory Palestine"
+      }
+    ],
+    "resolved_qid": "Q46057",
+    "wikidata_description": "nationalist uprising by Palestinian Arabs in Mandatory Palestine"
   },
   {
     "id": "peel-commission",
@@ -971,13 +1121,24 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Mediterranean and Middle East Theater of World War II\" (Q696817); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 40,
     "wikidata_aliases": [
       "May War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q696817",
+        "label": "Mediterranean and Middle East Theater of World War II"
+      }
+    ],
+    "resolved_qid": "Q696848",
+    "wikidata_description": "British-led Allied military campaign against Iraq under Rashid Ali during World War II"
   },
   {
     "id": "syria-lebanon-campaign",
@@ -1004,10 +1165,21 @@
       "military operation"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Mediterranean and Middle East Theater of World War II\" (Q696817); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 33
+    "sitelinks_current": 33,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q696817",
+        "label": "Mediterranean and Middle East Theater of World War II"
+      }
+    ],
+    "resolved_qid": "Q770698",
+    "wikidata_description": "1941 Allied invasion of Vichy French-controlled Syria and Lebanon"
   },
   {
     "id": "national-pact",
@@ -1064,14 +1236,20 @@
       "United Nations General Assembly resolution"
     ],
     "category_group": "diplomatic",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: United Nations Partition Plan for Palestine: the seed date_start is no Wikidata value (Wikidata: no P585/P580). English Wikipedia https://en.wikipedia.org/w/index.php?title=United_Nations_Partition_Plan_for_Palestine&oldid=1381412191: lead \"adopted by the UN General Assembly on 29 November 1947\"; infobox date \"29 November\", year 1947 (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 50,
     "wikidata_aliases": [
       "United Nations General Assembly Resolution 181",
       "Future government of Palestine"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q846795",
+    "wikidata_description": "1947 UN General Assembly proposal to divide British Mandatory Palestine into a Jewish state and Arab state"
   },
   {
     "id": "1948-palestine-war",
@@ -1112,7 +1290,11 @@
     "wikidata_aliases": [
       "Israeli War of Independence",
       "1947–1949 Palestine war"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q49097",
+    "wikidata_description": "first war of the Arab–Israeli conflict"
   },
   {
     "id": "israeli-declaration-of-independence",
@@ -1143,8 +1325,10 @@
       "resolution"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"declaration of Israeli independence\" (Q25487937); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 54,
     "wikidata_aliases": [
@@ -1155,7 +1339,16 @@
       "Independence of Israel",
       "Declaration of State of Israel",
       "Declaration of Independence of the State of Israel"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q25487937",
+        "label": "declaration of Israeli independence"
+      }
+    ],
+    "resolved_qid": "Q223732",
+    "wikidata_description": "1948 declaration of Israel's independence"
   },
   {
     "id": "nakba",
@@ -1309,15 +1502,26 @@
       "revolution"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 49,
     "wikidata_aliases": [
       "July 23 revolution",
       "1952 Egyptian coup d'état",
       "Egyptian revolution of 1952"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q8683",
+        "label": "Cold War"
+      }
+    ],
+    "resolved_qid": "Q1780431",
+    "wikidata_description": "military overthrow of King Farouk"
   },
   {
     "id": "1953-iranian-coup-d-tat",
@@ -1343,8 +1547,14 @@
       "coup d'état"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: 1953 Iranian coup d'état: the seed date_start is no Wikidata value (Wikidata: P580 1953-08-18). English Wikipedia https://en.wikipedia.org/w/index.php?title=1953_Iranian_coup_d'%C3%A9tat&oldid=1380975077: infobox \"15–19 August 1953\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Abadan Crisis\" (Q304454); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"United States involvement in regime change\" (Q61671409); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Covert United States foreign regime change actions\" (Q5179296); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 51,
     "wikidata_aliases": [
@@ -1354,7 +1564,28 @@
       "Operation Boot",
       "Operation Ajax",
       "TP-AJAX Project"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q304454",
+        "label": "Abadan Crisis"
+      },
+      {
+        "qid": "Q8683",
+        "label": "Cold War"
+      },
+      {
+        "qid": "Q61671409",
+        "label": "United States involvement in regime change"
+      },
+      {
+        "qid": "Q5179296",
+        "label": "Covert United States foreign regime change actions"
+      }
+    ],
+    "resolved_qid": "Q593774",
+    "wikidata_description": "overthrow of the democratically elected government of Iran"
   },
   {
     "id": "suez-crisis",
@@ -1381,8 +1612,11 @@
       "offensive"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 87,
     "wikidata_aliases": [
@@ -1392,7 +1626,20 @@
       "Sinai War 1956",
       "Suez Canal crisis",
       "Suez War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      },
+      {
+        "qid": "Q8683",
+        "label": "Cold War"
+      }
+    ],
+    "resolved_qid": "Q49101",
+    "wikidata_description": "1956 invasion of Egypt by Israel, the United Kingdom, and France"
   },
   {
     "id": "14-july-revolution",
@@ -1420,13 +1667,24 @@
       "coup d'état"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 33,
     "wikidata_aliases": [
       "14 July Revolution"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783165",
+        "label": "Arab Cold War"
+      }
+    ],
+    "resolved_qid": "Q2988530",
+    "wikidata_description": "Iraqi military coup in 1958"
   },
   {
     "id": "north-yemen-civil-war",
@@ -1456,7 +1714,8 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "country_via_place_only: Wikidata P17 of the item is Kingdom of Yemen, Yemen Arab Republic; the tracked country tag comes only from the P276/P131 place"
+      "country_via_place_only: Wikidata P17 of the item is Kingdom of Yemen, Yemen Arab Republic; the tracked country tag comes only from the P276/P131 place",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "approximate",
@@ -1465,7 +1724,16 @@
       "1962 Yemeni revolution",
       "26 September Revolution",
       "Egyptian war in Yemen"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783165",
+        "label": "Arab Cold War"
+      }
+    ],
+    "resolved_qid": "Q521199",
+    "wikidata_description": "1962–1970 civil war in North Yemen"
   },
   {
     "id": "1966-syrian-coup-d-tat",
@@ -1493,10 +1761,21 @@
       "coup d'état"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 19
+    "sitelinks_current": 19,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783165",
+        "label": "Arab Cold War"
+      }
+    ],
+    "resolved_qid": "Q3560385",
+    "wikidata_description": "21–23 February overthrow of government"
   },
   {
     "id": "six-day-war",
@@ -1525,8 +1804,10 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 109,
     "wikidata_aliases": [
@@ -1539,7 +1820,16 @@
       "Third Arab-Israeli War",
       "June War",
       "6 Day War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      }
+    ],
+    "resolved_qid": "Q49077",
+    "wikidata_description": "1967 war between Israel and Egypt, Jordan, and Syria"
   },
   {
     "id": "khartoum-resolution",
@@ -1601,7 +1891,9 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Egypt)"
+      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Egypt)",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "precise",
@@ -1611,7 +1903,20 @@
       "1967-1970 Egypt-Israeli Conflict",
       "War of Attrition 1967-1970",
       "opotřebovací válka (1967-1970)"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      },
+      {
+        "qid": "Q8683",
+        "label": "Cold War"
+      }
+    ],
+    "resolved_qid": "Q322607",
+    "wikidata_description": "1967–1970 war between Israel and Egypt, Syria and Jordan"
   },
   {
     "id": "battle-of-karameh",
@@ -1641,7 +1946,8 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Jordan)"
+      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Jordan)",
+      "part_of: Wikidata (P361) lists this event as part of \"War of Attrition\" (Q322607); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "precise",
@@ -1651,7 +1957,16 @@
       "Operation Inferno",
       "Operation Tofet",
       "Karameh raid"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q322607",
+        "label": "War of Attrition"
+      }
+    ],
+    "resolved_qid": "Q1930278",
+    "wikidata_description": "1968 battle between Israel and the PLO and Jordan"
   },
   {
     "id": "1968-iraqi-coup-d-tat",
@@ -1679,15 +1994,26 @@
       "coup d'état"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 17
+    "sitelinks_current": 17,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783165",
+        "label": "Arab Cold War"
+      }
+    ],
+    "resolved_qid": "Q4120226",
+    "wikidata_description": "1968 Ba'athist coup in Iraq"
   },
   {
     "id": "black-september-in-jordan",
     "title": "Black September",
-    "date_start": "1970-09-16",
+    "date_start": "1970-09-06",
     "date_end": "1971-07-17",
     "countries": [
       "Jordan"
@@ -1711,13 +2037,30 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F13: Black September: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P580 1970-09-06 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Black_September&oldid=1377443084: infobox \"6 September 1970 – 23 July 1971\" (the lead dates the main phase of the fighting 16–27 September 1970) (checked 2026-10-24). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 45,
     "wikidata_aliases": [
       "Jordanian Civil War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      },
+      {
+        "qid": "Q4783165",
+        "label": "Arab Cold War"
+      }
+    ],
+    "resolved_qid": "Q154288",
+    "wikidata_description": "civil war (1970–1971) in Jordan between King Hussein’s forces and the Palestine Liberation Organisation"
   },
   {
     "id": "yom-kippur-war",
@@ -1747,8 +2090,10 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli Wars\" (Q3491398); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 95,
     "wikidata_aliases": [
@@ -1761,7 +2106,16 @@
       "October War 1973",
       "October War",
       "Tishreen Liberation war"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q3491398",
+        "label": "Arab–Israeli Wars"
+      }
+    ],
+    "resolved_qid": "Q49100",
+    "wikidata_description": "October 1973 war between Egypt and Syria at one side and Israel on the other side"
   },
   {
     "id": "1973-oil-crisis",
@@ -1823,8 +2177,13 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Saudi Arabia proxy conflict\" (Q22948406); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Israel proxy conflict\" (Q15059994); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 64,
     "wikidata_aliases": [
@@ -1832,7 +2191,28 @@
       "Lebanon's Civil War",
       "Civil War of Lebanon",
       "الحرب الأهلية اللبنانية"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783165",
+        "label": "Arab Cold War"
+      },
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      },
+      {
+        "qid": "Q22948406",
+        "label": "Iran–Saudi Arabia proxy conflict"
+      },
+      {
+        "qid": "Q15059994",
+        "label": "Iran–Israel proxy conflict"
+      }
+    ],
+    "resolved_qid": "Q208484",
+    "wikidata_description": "1975–1990 Civil War in Lebanon"
   },
   {
     "id": "camp-david-accords",
@@ -1861,10 +2241,21 @@
       "peace treaty"
     ],
     "category_group": "treaty",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab-Israeli peace projects\" (Q4783126); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 50
+    "sitelinks_current": 50,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783126",
+        "label": "Arab-Israeli peace projects"
+      }
+    ],
+    "resolved_qid": "Q309204",
+    "wikidata_description": "1978 political agreement between Egypt and Israel"
   },
   {
     "id": "iranian-revolution",
@@ -1931,13 +2322,24 @@
       "treaty"
     ],
     "category_group": "treaty",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab-Israeli peace projects\" (Q4783126); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 34,
     "wikidata_aliases": [
       "Egypt-Israel Peace Treaty"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783126",
+        "label": "Arab-Israeli peace projects"
+      }
+    ],
+    "resolved_qid": "Q1129412",
+    "wikidata_description": "1979 peace treaty between Egypt and Israel"
   },
   {
     "id": "grand-mosque-seizure",
@@ -1969,7 +2371,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 37
+    "sitelinks_current": 37,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q829839",
+    "wikidata_description": "islamists' terrorist action, 1979"
   },
   {
     "id": "iran-hostage-crisis",
@@ -1996,10 +2402,21 @@
       "international crisis"
     ],
     "category_group": "terrorism",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"consolidation of the Iranian Revolution\" (Q5163326); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 48
+    "sitelinks_current": 48,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q5163326",
+        "label": "consolidation of the Iranian Revolution"
+      }
+    ],
+    "resolved_qid": "Q589673",
+    "wikidata_description": "1979–1981 diplomatic standoff between the US and Iran"
   },
   {
     "id": "iran-iraq-war",
@@ -2029,14 +2446,25 @@
       "war of aggression"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Gulf War\" (Q9001214); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 96,
     "wikidata_aliases": [
       "Gulf War",
       "Iraq-Iran War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q9001214",
+        "label": "Gulf War"
+      }
+    ],
+    "resolved_qid": "Q82664",
+    "wikidata_description": "1980-1988 war between Iran and Iraq"
   },
   {
     "id": "1982-lebanon-war",
@@ -2067,7 +2495,10 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Lebanon, Syria)"
+      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Lebanon, Syria)",
+      "part_of: Wikidata (P361) lists this event as part of \"Lebanese Civil War\" (Q208484); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Lebanese conflict\" (Q3241199); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "approximate",
@@ -2076,7 +2507,24 @@
       "Lebanon War of 1982",
       "First Lebanon War",
       "Operation Peace in Galilee"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q208484",
+        "label": "Lebanese Civil War"
+      },
+      {
+        "qid": "Q3241199",
+        "label": "Israeli–Lebanese conflict"
+      },
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      }
+    ],
+    "resolved_qid": "Q49103",
+    "wikidata_description": "Israeli invasion of Lebanon"
   },
   {
     "id": "sabra-and-shatila-massacre",
@@ -2104,13 +2552,24 @@
       "massacre"
     ],
     "category_group": "atrocity",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Lebanese Civil War\" (Q208484); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 44,
     "wikidata_aliases": [
       "Sabra et Chatila"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q208484",
+        "label": "Lebanese Civil War"
+      }
+    ],
+    "resolved_qid": "Q208199",
+    "wikidata_description": "the killing of between 460 and 3,500 Christians, mostly Arab Palestinians in Beirut, Lebanon; during the1982 Lebanon War"
   },
   {
     "id": "1983-beirut-barracks-bombings",
@@ -2139,10 +2598,21 @@
       "terrorist attack"
     ],
     "category_group": "terrorism",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Lebanese Civil War\" (Q208484); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 28
+    "sitelinks_current": 28,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q208484",
+        "label": "Lebanese Civil War"
+      }
+    ],
+    "resolved_qid": "Q518303",
+    "wikidata_description": "Suicide bombing attack"
   },
   {
     "id": "first-intifada",
@@ -2171,15 +2641,31 @@
       "rebellion"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"intifada\" (Q1753200); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 53,
     "wikidata_aliases": [
       "First Palestinian Intifada",
       "Stone Intifada",
       "1st Intifada"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q151622",
+        "label": "Israeli–Palestinian conflict"
+      },
+      {
+        "qid": "Q1753200",
+        "label": "intifada"
+      }
+    ],
+    "resolved_qid": "Q49105",
+    "wikidata_description": "1987–1993 Palestinian uprising against Israeli occupation"
   },
   {
     "id": "al-anfal-campaign",
@@ -2262,7 +2748,11 @@
       "First Iraq War",
       "Persian Gulf War",
       "Video Game War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q37643",
+    "wikidata_description": "1990–1991 conflict between Iraq and a 42-country coalition"
   },
   {
     "id": "madrid-conference-of-1991",
@@ -2293,7 +2783,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
-    "sitelinks_current": 29
+    "sitelinks_current": 29,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q1343802",
+    "wikidata_description": "Israeli-Palestinian peace conference"
   },
   {
     "id": "oslo-accords",
@@ -2323,10 +2817,21 @@
       "contract"
     ],
     "category_group": "treaty",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian peace process\" (Q3141816); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 63
+    "sitelinks_current": 63,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q3141816",
+        "label": "Israeli–Palestinian peace process"
+      }
+    ],
+    "resolved_qid": "Q17013132",
+    "wikidata_description": "agreements in the Israeli–Palestinian peace process"
   },
   {
     "id": "israel-jordan-peace-treaty",
@@ -2357,10 +2862,21 @@
       "treaty"
     ],
     "category_group": "treaty",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab-Israeli peace projects\" (Q4783126); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 32
+    "sitelinks_current": 32,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783126",
+        "label": "Arab-Israeli peace projects"
+      }
+    ],
+    "resolved_qid": "Q620988",
+    "wikidata_description": "peace treaty"
   },
   {
     "id": "assassination-of-yitzhak-rabin",
@@ -2403,7 +2919,11 @@
       "killing of Yitzhak Rabin",
       "Yitzhak Rabin's killing",
       "Yitzhak Rabin killing"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q2608162",
+    "wikidata_description": "1995 murder in Tel Aviv, Israel"
   },
   {
     "id": "second-intifada",
@@ -2432,13 +2952,24 @@
       "rebellion"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 49,
     "wikidata_aliases": [
       "Al-Aqsa Intifada"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q151622",
+        "label": "Israeli–Palestinian conflict"
+      }
+    ],
+    "resolved_qid": "Q49106",
+    "wikidata_description": "2000–2005 Palestinian uprising against Israeli occupation"
   },
   {
     "id": "israeli-withdrawal-from-lebanon",
@@ -2470,7 +3001,10 @@
     "category_group": "political",
     "review_reasons": [
       "data_fix F1: record was titled \"Israeli withdrawal from Lebanon\", a redirect to a SECTION of the article \"South Lebanon conflict (1985–2000)\"; its url, QID (Q2479435) and extract were already that article's. Title now = the article title; dates = Wikidata Q2479435 (P585 1985-02-16, P582 2000-05-25) (fields: title, date_start, date_end; see docs/data-fixes.md)",
-      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Lebanon)"
+      "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Lebanon)",
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Lebanese conflict\" (Q3241199); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict\" (Q86009289); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "approximate",
@@ -2479,7 +3013,24 @@
       "1985-2000 South Lebanon conflict",
       "South Lebanon Conflict 1985-2000",
       "Security Zone Conflict in Lebanon"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q3241199",
+        "label": "Israeli–Lebanese conflict"
+      },
+      {
+        "qid": "Q86009289",
+        "label": "Hezbollah–Israel conflict"
+      },
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      }
+    ],
+    "resolved_qid": "Q2479435",
+    "wikidata_description": "1985-2000 war between Israel and insurgents in South Lebanon"
   },
   {
     "id": "invasion-of-iraq",
@@ -2507,13 +3058,24 @@
       "invasion"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Iraq War\" (Q545449); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 49,
     "wikidata_aliases": [
       "invasion of Iraq"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q545449",
+        "label": "Iraq War"
+      }
+    ],
+    "resolved_qid": "Q107802",
+    "wikidata_description": "2003 military invasion led by the United States"
   },
   {
     "id": "capture-of-saddam-hussein",
@@ -2541,13 +3103,24 @@
       "military operation"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Iraq War\" (Q545449); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 20,
     "wikidata_aliases": [
       "capture of Saddam Hussein"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q545449",
+        "label": "Iraq War"
+      }
+    ],
+    "resolved_qid": "Q3780506",
+    "wikidata_description": "2003 U.S. military operation in the Iraq War"
   },
   {
     "id": "cedar-revolution",
@@ -2586,7 +3159,11 @@
       "Independence 05",
       "Istiqlal Lubnan",
       "Rabi' el Arz"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q184310",
+    "wikidata_description": "2005 anti-Syrian protest movement in Lebanon"
   },
   {
     "id": "israeli-disengagement-from-gaza",
@@ -2652,7 +3229,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 23
+    "sitelinks_current": 23,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q1193136",
+    "wikidata_description": "Execution of former president of Iraq"
   },
   {
     "id": "2006-lebanon-war",
@@ -2681,8 +3262,12 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Lebanese conflict\" (Q3241199); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict\" (Q86009289); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 74,
     "wikidata_aliases": [
@@ -2692,7 +3277,24 @@
       "Operation Just Reward",
       "Just Reward",
       "Lebanon War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q3241199",
+        "label": "Israeli–Lebanese conflict"
+      },
+      {
+        "qid": "Q86009289",
+        "label": "Hezbollah–Israel conflict"
+      },
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      }
+    ],
+    "resolved_qid": "Q49104",
+    "wikidata_description": "armed conflict primarily between Israel and Hezbollah"
   },
   {
     "id": "battle-of-gaza-2007",
@@ -2720,10 +3322,21 @@
       "battle"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Fatah–Hamas conflict\" (Q1397949); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q1397949",
+        "label": "Fatah–Hamas conflict"
+      }
+    ],
+    "resolved_qid": "Q373655",
+    "wikidata_description": "Hamas takeover of the Gaza Strip from Fatah"
   },
   {
     "id": "gaza-war-2008-09",
@@ -2752,13 +3365,24 @@
       "military operation"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 62,
     "wikidata_aliases": [
       "Operation Cast Lead"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q553184",
+        "label": "Gaza–Israel conflict"
+      }
+    ],
+    "resolved_qid": "Q170682",
+    "wikidata_description": "December 2008–January 2009 armed conflict in the Gaza Strip"
   },
   {
     "id": "iranian-green-movement",
@@ -2828,7 +3452,11 @@
     "wikidata_aliases": [
       "The Arabian Revolutions",
       "Arab Spring revolt"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q33761",
+    "wikidata_description": "protests and revolutions in the Arab world in the 2010s"
   },
   {
     "id": "egyptian-revolution-of-2011",
@@ -2856,8 +3484,10 @@
       "protest"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Spring\" (Q33761); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 73,
     "wikidata_aliases": [
@@ -2866,7 +3496,16 @@
       "Thawret 25 yanāyir",
       "Egyptian Revolution of 2011",
       "Egyptian Revolution of Dignity"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q33761",
+        "label": "Arab Spring"
+      }
+    ],
+    "resolved_qid": "Q29198",
+    "wikidata_description": "political upheaval in Egypt, leading to ouster of President Hosni Mubarak"
   },
   {
     "id": "syrian-civil-war",
@@ -2897,8 +3536,11 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Spring\" (Q33761); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Winter\" (Q17512479); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 117,
     "wikidata_aliases": [
@@ -2909,7 +3551,20 @@
       "Syrian Revolt",
       "Syrian Revolution",
       "Syrian Unrest"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q33761",
+        "label": "Arab Spring"
+      },
+      {
+        "qid": "Q17512479",
+        "label": "Arab Winter"
+      }
+    ],
+    "resolved_qid": "Q178810",
+    "wikidata_description": "2011–2024 armed conflict in Syria"
   },
   {
     "id": "yemeni-revolution",
@@ -2936,10 +3591,21 @@
       "protest"
     ],
     "category_group": "uprising",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab Spring\" (Q33761); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q33761",
+        "label": "Arab Spring"
+      }
+    ],
+    "resolved_qid": "Q210005",
+    "wikidata_description": "Yemeni upheaval occurring simultaneously with the Arab Spring (2011)"
   },
   {
     "id": "egyptian-crisis-2011-2014",
@@ -2997,10 +3663,26 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Yemeni crisis\" (Q15946570); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Saudi Arabia proxy conflict\" (Q22948406); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 61
+    "sitelinks_current": 61,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q15946570",
+        "label": "Yemeni crisis"
+      },
+      {
+        "qid": "Q22948406",
+        "label": "Iran–Saudi Arabia proxy conflict"
+      }
+    ],
+    "resolved_qid": "Q19686631",
+    "wikidata_description": "ongoing civil war in the state of Yemen"
   },
   {
     "id": "saudi-arabian-led-intervention-in-yemen",
@@ -3030,14 +3712,25 @@
     ],
     "category_group": "war",
     "review_reasons": [
-      "country_not_supported_by_wikidata: Saudi Arabia not derivable from Wikidata P17/P276/P131 (Wikidata gives: Yemen)"
+      "country_not_supported_by_wikidata: Saudi Arabia not derivable from Wikidata P17/P276/P131 (Wikidata gives: Yemen)",
+      "data_fix F14: Saudi-led intervention in the Yemeni civil war: the seed date_start is no Wikidata value (Wikidata: P580 2015-03-25). English Wikipedia https://en.wikipedia.org/w/index.php?title=Saudi-led_intervention_in_the_Yemeni_civil_war&oldid=1380996194: lead \"On 26 March 2015, Saudi Arabia ... staged a military intervention\"; infobox (Template:Saudi-led intervention in the Yemeni civil war infobox, revision 1379014728) \"26 March 2015 – ongoing\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Yemeni Civil War\" (Q19686631); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 30,
     "wikidata_aliases": [
       "Saudi Arabian-led intervention in Yemen"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q19686631",
+        "label": "Yemeni Civil War"
+      }
+    ],
+    "resolved_qid": "Q19682450",
+    "wikidata_description": "Saudi war against Houthis in Yemen launched in 2015"
   },
   {
     "id": "joint-comprehensive-plan-of-action",
@@ -3074,7 +3767,11 @@
       "Iran nuclear deal",
       "JCPOA",
       "Iran Deal"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q17001802",
+    "wikidata_description": "International agreement on the nuclear program of Iran"
   },
   {
     "id": "battle-of-aleppo-2012-2016",
@@ -3102,10 +3799,21 @@
       "battle"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Syrian Civil War\" (Q178810); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
-    "sitelinks_current": 32
+    "sitelinks_current": 32,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q178810",
+        "label": "Syrian Civil War"
+      }
+    ],
+    "resolved_qid": "Q1842866",
+    "wikidata_description": "military confrontation in Aleppo (2012–2016)"
   },
   {
     "id": "battle-of-mosul-2016-2017",
@@ -3133,13 +3841,24 @@
       "battle"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Iraqi Civil War of 2014–2017\" (Q17984356); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 37,
     "wikidata_aliases": [
       "Operation \"We Are Coming, Nineveh\""
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q17984356",
+        "label": "Iraqi Civil War of 2014–2017"
+      }
+    ],
+    "resolved_qid": "Q27429856",
+    "wikidata_description": "2016–2017 joint offensive by Iraqi government forces with allied militias to retake the city of Mosul from ISIL"
   },
   {
     "id": "qatar-diplomatic-crisis",
@@ -3181,12 +3900,16 @@
       "2017 Mideast crisis",
       "2017 Qatari diplomatic crisis",
       "Qatari diplomatic crisis"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q30130610",
+    "wikidata_description": "diplomatic crisis between several Arab League countries and Qatar"
   },
   {
     "id": "united-states-recognition-of-jerusalem-as-the-capital-of-israel",
     "title": "United States recognition of Jerusalem as capital of Israel",
-    "date_start": "2018-05-14",
+    "date_start": "2017-12-06",
     "date_end": null,
     "countries": [
       "Israel/Palestine"
@@ -3209,13 +3932,25 @@
       "diplomatic recognition"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F13: United States recognition of Jerusalem as capital of Israel: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P585 2017-12-06 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=United_States_recognition_of_Jerusalem_as_capital_of_Israel&oldid=1379528222: lead \"On December 6, 2017, the United States officially recognized Jerusalem\"; infobox date_signed 2017-12-06 (checked 2026-10-24). date_start = Wikidata P585; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"foreign policy of the Donald Trump administration\" (Q28530597); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 15,
     "wikidata_aliases": [
       "United States recognition of Jerusalem"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q28530597",
+        "label": "foreign policy of the Donald Trump administration"
+      }
+    ],
+    "resolved_qid": "Q45266620",
+    "wikidata_description": "2017 U.S. recognition of Jerusalem as Israel's capital city"
   },
   {
     "id": "united-states-withdrawal-from-the-joint-comprehensive-plan-of-action",
@@ -3243,13 +3978,19 @@
       "incident"
     ],
     "category_group": "diplomatic",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: United States withdrawal from the Iran nuclear deal: the seed date_start is no Wikidata value (Wikidata: P585 2018-05-18). English Wikipedia https://en.wikipedia.org/w/index.php?title=United_States_withdrawal_from_the_Iran_nuclear_deal&oldid=1359899431: lead \"On 8 May 2018, the United States ... announced its withdrawal\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 12,
     "wikidata_aliases": [
       "United States withdrawal from the Joint Comprehensive Plan of Action"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q52836581",
+    "wikidata_description": "2018 US withdrawal from the Iran nuclear deal"
   },
   {
     "id": "killing-of-jamal-khashoggi",
@@ -3297,7 +4038,11 @@
       "Jamal Khashoggi murder",
       "Jamal Khashoggi's killing",
       "Jamal Khashoggi killing"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q57527214",
+    "wikidata_description": "2018 murder of Saudi dissident journalist Jamal Khashoggi on Turkish soil"
   },
   {
     "id": "abraham-accords",
@@ -3325,10 +4070,22 @@
       "contract"
     ],
     "category_group": "treaty",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F14: Abraham Accords: the seed date_start is no Wikidata value (Wikidata: P585 2020 (year)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Abraham_Accords&oldid=1380714856: lead \"signed in Washington, D.C. on September 15, 2020\"; infobox date_signed \"September 15, 2020\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Arab-Israeli peace projects\" (Q4783126); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
-    "sitelinks_current": 40
+    "sitelinks_current": 40,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q4783126",
+        "label": "Arab-Israeli peace projects"
+      }
+    ],
+    "resolved_qid": "Q99495661",
+    "wikidata_description": "2020 normalization of Israeli relations with some Arab countries"
   },
   {
     "id": "2020-beirut-explosion",
@@ -3369,7 +4126,11 @@
       "2020 Beirut explosion",
       "2020 Lebanon explosion",
       "Beirut blast"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q98073118",
+    "wikidata_description": "accidental ammonium nitrate explosion in Beirut, Lebanon"
   },
   {
     "id": "assassination-of-qasem-soleimani",
@@ -3402,14 +4163,29 @@
     ],
     "category_group": "political",
     "review_reasons": [
-      "country_not_supported_by_wikidata: Iran not derivable from Wikidata P17/P276/P131 (Wikidata gives: Iraq)"
+      "country_not_supported_by_wikidata: Iran not derivable from Wikidata P17/P276/P131 (Wikidata gives: Iraq)",
+      "part_of: Wikidata (P361) lists this event as part of \"Persian Gulf crisis (2019–2020)\" (Q65920364); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"US-led intervention in Iraq\" (Q18159629); it may overlap with that larger event"
     ],
     "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 40,
     "wikidata_aliases": [
       "death of Qasem Soleimani"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q65920364",
+        "label": "Persian Gulf crisis (2019–2020)"
+      },
+      {
+        "qid": "Q18159629",
+        "label": "US-led intervention in Iraq"
+      }
+    ],
+    "resolved_qid": "Q80754846",
+    "wikidata_description": "2020 US drone strike in Baghdad, Iraq"
   },
   {
     "id": "2021-israel-palestine-crisis",
@@ -3439,14 +4215,25 @@
       "civil disorder"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "precise",
     "sitelinks_current": 48,
     "wikidata_aliases": [
       "2021 Jerusalem conflict",
       "Operation Guardian of the Walls"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q151622",
+        "label": "Israeli–Palestinian conflict"
+      }
+    ],
+    "resolved_qid": "Q106775117",
+    "wikidata_description": "conflict between Israelis and Palestinians beginning in May 2021"
   },
   {
     "id": "mahsa-amini-protests",
@@ -3479,7 +4266,11 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 53
+    "sitelinks_current": 53,
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q114065797",
+    "wikidata_description": "Iranian protest movement in 2022–2023"
   },
   {
     "id": "2023-israel-hamas-war",
@@ -3505,8 +4296,11 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Gaza–Israel conflict\" (Q553184); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern crisis (2023–present)\" (Q124373310); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 120,
     "wikidata_aliases": [
@@ -3526,12 +4320,25 @@
       "2023 Israel–Hamas war",
       "Gaza War",
       "2023–2025 Hamas–Israel war"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q553184",
+        "label": "Gaza–Israel conflict"
+      },
+      {
+        "qid": "Q124373310",
+        "label": "Middle Eastern crisis (2023–present)"
+      }
+    ],
+    "resolved_qid": "Q122962941",
+    "wikidata_description": "armed conflict around the Gaza Strip that started on 7 October 2023"
   },
   {
     "id": "fall-of-the-assad-regime",
     "title": "Fall of the Assad regime",
-    "date_start": "2024-11-27",
+    "date_start": "2024-12-08",
     "date_end": "2024-12-08",
     "countries": [
       "Syria"
@@ -3554,20 +4361,26 @@
       "regime change"
     ],
     "category_group": "political",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F13: Fall of the Assad regime: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P585 2024-12-08 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Fall_of_the_Assad_regime&oldid=1380552397: lead \"On 8 December 2024, the Assad regime in Syria collapsed\"; infobox date 8 December 2024 (checked 2026-10-24). date_start = Wikidata P585; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 33,
     "wikidata_aliases": [
       "Fall of the Bashar al-Assad",
       "Fall of the Assad government",
       "Fall of the Assad administration"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [],
+    "resolved_qid": "Q131404510",
+    "wikidata_description": "End of Assadist rule in Syria"
   },
   {
     "id": "2024-israel-hezbollah-conflict",
     "title": "Hezbollah–Israel conflict (2023–present)",
-    "date_start": "2024-09-23",
+    "date_start": "2023-10-08",
     "date_end": "2024-11-27",
     "countries": [
       "Lebanon",
@@ -3592,8 +4405,13 @@
       "border conflict"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "data_fix F13: Hezbollah–Israel conflict (2023–present): the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P580 2023-10-08 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)&oldid=1368616555: lead \"began on 8 October 2023\"; infobox (Template:Hezbollah–Israel conflict (2023–present) infobox, revision 1381585493) \"8 October 2023 – present\" (checked 2026-10-24). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
+      "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern crisis (2023–present)\" (Q124373310); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict\" (Q86009289); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli–Lebanese conflict\" (Q3241199); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 31,
     "wikidata_aliases": [
@@ -3602,7 +4420,24 @@
       "Hezbollah–Israel conflict",
       "Hezbollah-Israel conflict",
       "Third Lebanon War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q124373310",
+        "label": "Middle Eastern crisis (2023–present)"
+      },
+      {
+        "qid": "Q86009289",
+        "label": "Hezbollah–Israel conflict"
+      },
+      {
+        "qid": "Q3241199",
+        "label": "Israeli–Lebanese conflict"
+      }
+    ],
+    "resolved_qid": "Q122974556",
+    "wikidata_description": "conflict between Hezbollah and Israel since 2023 till 2024"
   },
   {
     "id": "twelve-day-war",
@@ -3631,15 +4466,31 @@
       "war"
     ],
     "category_group": "war",
-    "review_reasons": [],
-    "needs_review": false,
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern crisis (2023–present)\" (Q124373310); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Israel conflict\" (Q138772633); it may overlap with that larger event"
+    ],
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 77,
     "wikidata_aliases": [
       "12 Day War",
       "Iran–Israel War",
       "Israel–Iran War"
-    ]
+    ],
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q124373310",
+        "label": "Middle Eastern crisis (2023–present)"
+      },
+      {
+        "qid": "Q138772633",
+        "label": "Iran–Israel conflict"
+      }
+    ],
+    "resolved_qid": "Q134900605",
+    "wikidata_description": "2025 armed conflict in the Middle East"
   },
   {
     "id": "battle-of-holy-apostles-monastery",
