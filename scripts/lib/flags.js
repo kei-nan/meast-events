@@ -2,6 +2,8 @@
 // returns hints/reasons that are attached to the event as review notes.
 import { haversineKm, COUNTRY_CAPITALS } from "./geo.js";
 import { yearOf } from "./wiki.js";
+// Plain module (no imports of its own), shared with the app.
+import { isLowPrecisionPin } from "../../app/src/lib/coordPrecision.js";
 
 export const MAX_COUNTRIES_BEFORE_FLAG = 4;
 export const COORD_FAR_KM = 1500;
@@ -63,6 +65,50 @@ export function coordinateFlag(coordinates, countries) {
   return nearest > COORD_FAR_KM
     ? `coordinate_far_from_countries: point is ${Math.round(nearest)} km from the nearest tagged country's reference point (${countries.join(", ")})`
     : null;
+}
+
+// ---------- coordinates rounded to the area (flag only) ----------
+// A precise pin with at most one decimal place in latitude and longitude (app/src/lib/coordPrecision.js, shared
+// with the site, which shows such a marker as approximate). The coordinates are never changed.
+export const LOW_PRECISION_FLAG = "coordinate_low_precision";
+export function lowPrecisionCoordinateFlag(e) {
+  if (!isLowPrecisionPin(e)) return null;
+  const { lat, lon } = e.coordinates;
+  return (
+    `${LOW_PRECISION_FLAG}: the ${e.coordinate_source ?? "source"} coordinates (${lat}, ${lon}) have at most one decimal ` +
+    `place (about 11 km or coarser), so they mark an area, not the site; kept as the source gives them`
+  );
+}
+
+// ---------- years in the title vs the dates (flag only) ----------
+// "2009 ...", "(1982–2000)", "2015–2018 ...", "(2012–13)", "(2023–present)": the years a title names. Only
+// 1900-2099 four-digit years count; a two-digit range end takes the start's century; "present" adds no year.
+const TITLE_YEAR_RE = /(?<!\d)((?:19|20)\d{2})(?:\s*[–-]\s*((?:19|20)\d{2}|\d{2}(?!\d)|present\b))?(?!\d)/g;
+export function titleYears(title) {
+  const out = [];
+  for (const m of String(title ?? "").matchAll(TITLE_YEAR_RE)) {
+    out.push(Number(m[1]));
+    if (m[2] && m[2] !== "present") out.push(Number(m[2].length === 2 ? m[1].slice(0, 2) + m[2] : m[2]));
+  }
+  return [...new Set(out)];
+}
+
+// A year the title names that lies outside date_start..date_end (years only; reversed dates count from the
+// lower to the higher year). With no date_end only years BEFORE the start are outside: a missing end says
+// nothing about later years. FLAG ONLY: the dates and the title are never changed.
+export const TITLE_YEARS_FLAG = "title_years_outside_dates";
+export function titleYearsFlag({ title, date_start, date_end }) {
+  const sy = yearOf(date_start);
+  if (sy === null) return null;
+  const ey = yearOf(date_end);
+  const lo = ey === null ? sy : Math.min(sy, ey);
+  const hi = ey === null ? Infinity : Math.max(sy, ey);
+  const outside = titleYears(title).filter((y) => y < lo || y > hi);
+  if (!outside.length) return null;
+  return (
+    `${TITLE_YEARS_FLAG}: the title names ${outside.join(", ")}, outside the stored dates ` +
+    `(${date_start}${date_end ? ` to ${date_end}` : ", no end date"}); dates and title are kept as the sources give them`
+  );
 }
 
 // ---------- month-precision date vs an exact day in the lead (flag only) ----------

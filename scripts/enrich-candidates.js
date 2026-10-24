@@ -50,6 +50,10 @@ import {
   pruneDuplicateHints,
   monthPrecisionDayFlag,
   MONTH_DAY_FLAG,
+  titleYearsFlag,
+  TITLE_YEARS_FLAG,
+  lowPrecisionCoordinateFlag,
+  LOW_PRECISION_FLAG,
 } from "./lib/flags.js";
 import { keptDatePrecision } from "./lib/fixes.js";
 import { renderMissingReport } from "./lib/missing-report.js";
@@ -388,6 +392,9 @@ ${m}      `),
     setReason(r.review_reasons, "date_precision_coarse",
       code != null && code < 9 ? `date_precision_coarse: Wikidata records the date only to ${r.date_precision} precision` : null);
     setReason(r.review_reasons, MONTH_DAY_FLAG, monthPrecisionDayFlag(r));
+    // On the kept dates and location (after the fix ledger); flags only, nothing is changed.
+    setReason(r.review_reasons, TITLE_YEARS_FLAG, titleYearsFlag(r));
+    setReason(r.review_reasons, LOW_PRECISION_FLAG, lowPrecisionCoordinateFlag(r));
     r._review = r.review_reasons;
   }
 

@@ -349,6 +349,8 @@ but are not shown; an event with any date flag still shows only the years in its
 | `title_differs_from_article` | `review_reasons` | Record title differs from the article title and does not appear in its lead. |
 | `country_not_supported_by_wikidata`, `country_via_place_only` | `review_reasons` | Tracked country tag cannot be derived from Wikidata P17/P276/P131, or comes only from a place while the item's own P17 is another sovereign state. |
 | `coordinate_far_from_countries` | `review_reasons` | Real coordinates more than 1,500 km from every tagged country's reference point. |
+| `coordinate_low_precision` | `review_reasons` | A precise pin whose latitude and longitude both have at most one decimal place (about 11 km, or 111 km for whole degrees), e.g. Al-Anfal campaign 33, 43. Kept as the source gives it; the site shows it as approximate (see "Location quality"). |
+| `title_years_outside_dates` | `review_reasons` | A year the title names lies outside `date_start`..`date_end` (years only; with no `date_end`, only years before the start), e.g. "2009 Iranian presidential election protests", Wikidata 2010-02-11 to 2010-12-07. Neither the title nor the dates are changed. |
 | `many_countries` | `review_reasons` | More than 4 countries tagged. All are kept as Wikidata lists them. |
 | `part_of` | `review_reasons` | Wikidata `P361` says the event is part of a larger event. |
 | `possible_duplicate` | `review_reasons` | Hint that another event may be the same (shared QID, same normalised title, or similar title + date within 1 year + nearby). Nothing is dropped automatically. |
@@ -392,6 +394,12 @@ but are not shown; an event with any date flag still shows only the years in its
 
   The Israel/Palestine point is one point for the combined tag. It is not a statement about the city's status; it is the coordinate commonly
   given for Jerusalem, and it falls in West Jerusalem. The coordinates are unchanged (owner's decision, 2026-10-15); only this description is new.
+- **Rounded precise pins** (since 2026-10-24): a `precise` pin whose latitude and longitude both have at most one decimal place (`isLowPrecisionPin` in
+  `app/src/lib/coordPrecision.js`; 15 curated events on 2026-10-24, e.g. Al-Anfal campaign 33, 43 from Wikidata, Operation Crusader 30, 24 from Wikipedia)
+  marks an area of about 11 km (one decimal) to 111 km (whole degrees), not a site. The data keeps `location_quality` `precise` and the coordinates as the
+  source gives them; the site's build (`app/scripts/split-data.mjs`) publishes such an event as `approximate` with `approximate_reason: "rounded"`, so it gets
+  the approximate treatment (hollow ring, "Approximate location" tag, left out of drawn-area searches, its countries shaded) with its own note: the marker
+  is at the rounded coordinates the source gives, not at a capital. The validator warns about each (`coordinate_low_precision`).
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
   Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 378 of the 816 curated events and 186 of the 254 proposed events
   (counted from `data/events.json` and `data/events.proposed.json`).
@@ -494,8 +502,11 @@ Since 2026-10-14 also: a `wikipedia_url` that is not on English Wikipedia (rule 
 seed events are exempt) a discovery count below the rule's 10, a `sitelinks_current` that has since fallen below 10, and a missing `date_precision`; a
 `date_precision` that is not a Wikidata precision name; a decade-or-coarser `date_start` with no `date_end` (e.g. `israeli-lebanese-conflict`, Wikidata
 P580 "+2000" at century precision, i.e. the 20th century, stored as 2000-01-01); an event tagged with 8 or more countries; and two events sharing a
-`wikipedia_url` or an identical extract, unless all but one of them are events without an article of their own (their `resolved_qid` differs, see above).
-Warnings are for a person to look at; nothing is changed automatically.
+`wikipedia_url` or an identical extract, naming the other event (since 2026-10-24 also when all but one of them are events without an article of their own,
+whose `resolved_qid` differs, see above; the warning then says which one is the article's own event). Since 2026-10-24 also: a hand-picked seed event without
+`date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value), a year in the title outside `date_start`..`date_end`
+(`title_years_outside_dates`), and a precise pin rounded to at most one decimal place (`coordinate_low_precision`); both are also pipeline flags, see
+"Review flags". Warnings are for a person to look at; nothing is changed automatically.
 
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
 `end_year` or `source`, a bad year range or geometry type, or two shapes with the same name in the same year. Warnings: a feature without a `status` or
