@@ -74,6 +74,31 @@ concurrent build and a 20-minute build timeout
 The site's address is the custom domain `https://middleeast.events`; the Worker's own
 `https://meast-events.<account-subdomain>.workers.dev` address keeps working too.
 
+### Non-production hostnames (workers.dev and previews)
+
+The same files are served at the Worker's `workers.dev` address and at each branch's
+preview URL. `_headers` cannot treat them differently: its rules match paths, not
+hostnames, so a static `X-Robots-Tag: noindex` would also de-index `middleeast.events`.
+What already limits duplicate indexing, and the options (none applied; checked against
+Cloudflare's docs on 2026-10-24):
+
+- Every page names `https://middleeast.events/...` as its canonical address (`<link
+  rel="canonical">`, `og:url`), and `sitemap.xml` lists only those addresses.
+- Preview URLs on `workers.dev` get an `X-Robots-Tag: noindex` header from Cloudflare
+  itself ([Previews](https://developers.cloudflare.com/workers/previews/)); the production
+  `workers.dev` address does not.
+- **Option, static, one line:** turn the production `workers.dev` address off with
+  `"workers_dev": false` in `app/wrangler.jsonc` (or **Workers & Pages** -> `meast-events`
+  -> **Settings** -> **Domains & Routes** -> `workers.dev` -> **Disable**; without the
+  config line the next deploy turns it back on,
+  [workers.dev docs](https://developers.cloudflare.com/workers/configuration/routing/workers-dev/)).
+  Per those docs, Version/Preview URLs then default to off too unless `preview_urls` is set
+  explicitly, so add `"preview_urls": true` if branch previews must keep working, and check
+  one branch build afterwards. Not done here: it changes how the site is reached, so it
+  is the owner's call.
+- A per-host `noindex` would need a Worker script in front of the assets
+  (`run_worker_first`), which the site does not have; not worth it for this.
+
 ### Custom domain (middleeast.events)
 
 From Cloudflare's docs (developers.cloudflare.com/workers/configuration/routing/custom-domains/):
@@ -115,11 +140,14 @@ Cloudflare does not deploy it.
      per-script files and unicode-ranges. Output in `app/node_modules/.cache/subset-fonts/`,
      imported by `app/src/main.jsx`. A character outside every subset (Arabic, Hebrew)
      falls back to the system font, as before. In October 2026 this cut the default
-     view's font downloads from 156 KB to 67 KB.
+     view's font downloads from 156 KB to 67 KB. It writes into a private temporary folder
+     and then moves each file into place (fonts first, `fonts.css` last), never emptying the
+     output folder, so a second build or dev server running at the same time never sees it
+     missing or half-written.
    - `scripts/build-search-index.mjs` - writes `app/public/pagefind/`.
 2. `vite build`.
 3. `postbuild`:
-   - `scripts/build-event-pages.mjs` - the `/event/` pages (each event's is the app's `index.html` with the event's own head tags and text) and the sitemap.
+   - `scripts/build-event-pages.mjs` - the `/event/` pages (each event's is the app's `index.html` with the event's own head tags and text, a preload of its full-record bucket, and links to related, earlier and later events), the sitemap (with each event's text retrieval date as `<lastmod>`), and `dist/_redirects` when `data/event-redirects.json` exists ([Renamed event ids](#renamed-event-ids-redirects)).
    - `scripts/expand-headers.mjs` - in `dist/_headers`, an immutable cache rule per
      content-hashed file (each splat marked `#! immutable-per-file` in
      `public/_headers`), so a 404 for a missing hashed file is never cached as immutable.
@@ -129,7 +157,17 @@ Cloudflare does not deploy it.
      `index.html` loads is missing, the search index is missing, **a file under
      `dist/assets/` has no content hash** (each gets an immutable rule in `_headers`),
      `_headers` has an immutable splat rule, was not expanded or has more than 100
-     rules, or `dist/` has more files than the host allows per deploy.
+     rules, an inline `<script>` has a hash the CSP does not list, `favicon.ico` or the
+     180x180 `apple-touch-icon.png` is missing or malformed, an event page does not
+     preload its own (existing) bucket, `_redirects` redirects a live id or points to a
+     missing one, Pagefind was upgraded while its engine files are cached
+     ([Upgrading Pagefind](#upgrading-pagefind)), or `dist/` has more files than the host
+     allows per deploy.
+
+The raster icons (`app/public/favicon.ico`, `app/public/apple-touch-icon.png`) are
+committed, rendered from `app/public/favicon.svg` by `node scripts/make-icons.mjs` (run in
+`app/`; needs an installed Edge or Chrome, which the build does not). Run it again after
+changing `favicon.svg`.
 
 ## CI and the data pipeline
 
@@ -237,10 +275,44 @@ year (every file there is content-hashed, MapLibre's worker included;
 `check-dist.mjs` fails the build otherwise), as are the content-hashed data folders and search
 index chunks, each through its own rule (`scripts/expand-headers.mjs`), so the 404
 for a missing hashed file (a tab older or newer than a deploy) revalidates instead
-of being cached for a year; the other dataset files get 1 h + stale-while-revalidate, and HTML
+of being cached for a year; the other dataset files and the Pagefind engine get 1 h + stale-while-revalidate, and HTML
 and the search entry files revalidate on every visit. If the site ever loads anything from another host, add it to the CSP
-in that file, or the browser will block it. Details and the verification
+in that file, or the browser will block it. The CSP allows one inline script by its
+sha256 hash (index.html's `document.documentElement.classList.add("js")`); changing that
+text means changing the hash in `_headers`, and `check-dist.mjs` fails the build until
+they match. Details and the verification
 notes: [docs/SECURITY.md](docs/SECURITY.md#2-static-site-headers-apppublic_headers).
+
+### Upgrading Pagefind
+
+`pagefind.js`, `pagefind-worker.js` and `wasm.*.pagefind` keep their names across
+releases, and browsers may keep them for up to a day (1 h + stale-while-revalidate). Their
+bytes depend only on the Pagefind release, not on the data (checked 2026-10-24), so data
+deploys are safe; an upgrade is not, since a browser could pair a cached old engine with
+the new index. So `check-dist.mjs` fails the build when the release that built the index
+differs from `PAGEFIND_ENGINE_VERSION` while those files are cached. To upgrade:
+
+1. Deploy first with the three engine rules in `app/public/_headers` set to
+   `Cache-Control: public, no-cache` (the check is then off).
+2. Wait 25 hours (1 h + a day), so no browser still holds an engine fetched under the
+   old caching.
+3. Upgrade Pagefind and deploy (still `no-cache`).
+4. Restore the 1 h + stale-while-revalidate rules and set `PAGEFIND_ENGINE_VERSION` in
+   `app/scripts/check-dist.mjs` to the new release.
+
+### Renamed event ids (redirects)
+
+An event's address is `/event/<id>`, and links to it get shared, so ids are not renamed
+casually (some early ids are spelled oddly, e.g. `treaty-of-s-vres`; they stay). To rename
+one, change the id in the data and add the old one to `data/event-redirects.json`, an
+object of `{"old-id": "new-id"}`. The build then writes `dist/_redirects` with a 301 from
+`/event/old-id` to `/event/new-id` (`app/scripts/redirects.mjs`), and fails if an old id
+is still an event (the redirect would hide its page: redirects apply before files), a new
+id is not an event, or there are more than 2,000 (the host's limit). The file is optional;
+without it there is no `_redirects`. New ids from `scripts/enrich-candidates.js` come from
+`scripts/lib/slug.js`, which keeps accented letters' base letters ("Sèvres" -> `sevres`)
+and drops apostrophes inside words ("Dawson's" -> `dawsons`); an item already in
+`data/events.json` keeps its id.
 
 ## Recommended repository settings (manual)
 
@@ -314,6 +386,20 @@ dashboard. None is needed for the site to work.
 5. **Turn on GitHub private vulnerability reporting** (it was off on 2026-10-18), so the
    "Report a vulnerability" route in [docs/SECURITY.md](docs/SECURITY.md#5-reporting-a-vulnerability)
    works: **Settings → Advanced Security → Private vulnerability reporting → Enable**.
+6. **Stop Cloudflare injecting its "JavaScript detections" script.** Every page on the live
+   site logs a CSP error ("Refused to execute inline script ...") for an inline script
+   Cloudflare adds under `/cdn-cgi/challenge-platform/`. The CSP blocks it on purpose: its
+   content changes per response, so only `'unsafe-inline'` would allow it
+   ([docs/SECURITY.md](docs/SECURITY.md)). Cloudflare's docs (read 2026-10-24) say that
+   with **Bot Fight Mode** (the free plan's bot protection) JavaScript detections are
+   always on and cannot be turned off separately, so:
+   - Free plan: **Security → Settings**, filter by **Bot traffic** → **Bot fight mode** →
+     **Off** ([Bot Fight Mode](https://developers.cloudflare.com/bots/get-started/bot-fight-mode/)).
+     This also stops Bot Fight Mode's challenges to bot-like traffic; the site is static
+     and has no forms or accounts, so there is little for it to protect.
+   - Pro plan or above (Super Bot Fight Mode): **Security → Settings**, filter by **Bot
+     traffic** → **Super Bot fight mode** → the edit icon for **JS detections** → **Off**.
+   Then reload any page with the browser console open: the CSP error should be gone.
 
 ## Verifying a deploy
 

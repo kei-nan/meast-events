@@ -57,6 +57,7 @@ includeSubDomains`, `Cross-Origin-Opener-Policy: same-origin`,
   `rel="noreferrer"`, and nothing it opens needs a handle back to it.
 
 CSP (enforcing, not report-only): `default-src 'self'; script-src 'self'
+'sha256-qOhFsq0QMV2REqNwk5hGH5bZE9SkX6gt6yeyKdYPv+U='
 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self'
 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src
 'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self';
@@ -81,8 +82,14 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   (not re-tested; left as it was).
 
 - `style-src 'unsafe-inline'` is required by MapLibre and React inline
-  `style` attributes; scripts stay locked to same-origin files (no inline
-  script, no `eval`).
+  `style` attributes; scripts stay locked to same-origin files (no `eval`)
+  plus one inline script allowed by its hash: index.html's
+  `document.documentElement.classList.add("js")`, which hides an event page's
+  plain-HTML copy before the first paint (added 2026-10-24, replacing
+  `@media (scripting: enabled)`, which Safari supports only from 17). A hash
+  allows that exact text only; `'unsafe-inline'` stays out, and
+  `app/scripts/check-dist.mjs` fails the build if any inline script in `dist/`
+  has a hash the CSP does not list.
 - `'wasm-unsafe-eval'` lets the full-text search engine (Pagefind, served
   from `/pagefind/`) compile its WebAssembly module. It allows WebAssembly
   compilation only, not JavaScript `eval` or inline scripts.
@@ -143,8 +150,13 @@ expansion or more than 100 rules.
   file in `/data/boundaries/shared/` (large boundary geometries named by a hash
   of their content).
 - `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
-  the engine and the `.pf_meta` keep their names; each content-hashed
-  `/pagefind/index/*` chunk is immutable.
+  `pagefind-entry.json` and the `.pf_meta` keep their names but change with the
+  data; each content-hashed `/pagefind/index/*` chunk is immutable. The engine
+  (`pagefind.js`, `pagefind-worker.js`, `wasm.*`) gets 1 h +
+  stale-while-revalidate: its bytes depend only on the Pagefind release (checked
+  2026-10-24: identical for an index of 100 and of 815 events), and
+  `check-dist.mjs` fails the build on a Pagefind upgrade until
+  `PAGEFIND_ENGINE_VERSION` is updated (DEPLOYMENT.md, "Upgrading Pagefind").
 - `/event/*` (the event pages, the `/event/` index and `event.css`):
   `public, max-age=0, must-revalidate`, set explicitly. An event's page is the
   app's `index.html` filled in, so like the home page it names the deploy's
