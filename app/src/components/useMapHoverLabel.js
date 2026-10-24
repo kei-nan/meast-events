@@ -15,8 +15,10 @@ export default function useMapHoverLabel({ mapRef, mapReady, labelRef, isIdle, c
     const el = labelRef.current;
     if (!map || !el) return;
     // cluster_id -> "zoom" | "list" (what a click does, decided as in MapView);
-    // cluster ids change whenever the data does.
+    // cluster ids change whenever the data does, so a lookup answered after a
+    // change (`generation` moved on) is dropped: its id may be another cluster.
     const actions = new Map();
+    let generation = 0;
     let key = null;
 
     const hide = () => {
@@ -49,10 +51,15 @@ export default function useMapHoverLabel({ mapRef, mapReady, labelRef, isIdle, c
         const source = map.getSource("events");
         if (action == null && key !== k && source) {
           const count = p.point_count;
+          const asked = generation;
           Promise.all([
             source.getClusterExpansionZoom(id).catch(() => NaN),
             count <= LIST_MAX ? source.getClusterLeaves(id, LIST_MAX, 0).catch(() => null) : null,
           ]).then(([expansionZoom, leaves]) => {
+            if (asked !== generation) {
+              if (key === k) key = null; // the next move asks again
+              return;
+            }
             const a = clusterClickAction({ count, expansionZoom, clusterMaxZoom, leaves });
             actions.set(id, a);
             if (key === k && !el.hidden) show(hoverLabel(p, { listable: a === "list" }), e.point);
@@ -66,7 +73,10 @@ export default function useMapHoverLabel({ mapRef, mapReady, labelRef, isIdle, c
       show(hoverLabel(p, { stacked }), e.point);
     };
     const onData = (e) => {
-      if (e.sourceId === "events" && e.sourceDataType !== "metadata") actions.clear();
+      if (e.sourceId === "events" && e.sourceDataType !== "metadata") {
+        actions.clear();
+        generation++;
+      }
     };
 
     map.on("mousemove", onMove);
