@@ -141,12 +141,23 @@ export function paddingOffset(width, height, padding) {
 }
 
 /**
- * The map's size, the padding that keeps clear of what covers it, and the
- * offset to the middle of what is left. Reads the page.
+ * The size of `map` (a MapLibre map), the padding that keeps clear of what
+ * covers it, and the offset to the middle of what is left. Reads the page.
+ *
+ * MapLibre takes up a new container size only on its next ResizeObserver
+ * callback, after the camera move has started. A layout change in the same
+ * render (on phones the timeline under the map is shorter while the sheet is at
+ * full, so "Show on map" dropping the sheet to its peek bar makes the map 46 px
+ * taller) would aim the camera at the old size, and the resize would then shift
+ * everything by half the difference. So the map is brought up to its
+ * container's size first.
  */
-export function mapClearView(container) {
+export function mapClearView(map) {
+  const container = map.getContainer();
   const width = container.clientWidth;
   const height = container.clientHeight;
+  const canvas = map.getCanvas?.();
+  if (canvas && (canvas.clientWidth !== width || canvas.clientHeight !== height)) map.resize();
   const padding = clearPadding(width, height, overlayRects(container));
   return { width, height, padding, offset: paddingOffset(width, height, padding) };
 }

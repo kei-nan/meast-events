@@ -941,7 +941,7 @@ export default function MapView({
     const zoom = Math.min(Math.max(map.getZoom(), target), target + 2);
     // The place goes in the middle of the part of the map that the controls
     // and, on phones, the sheet leave in sight (lib/mapInsets.js), not under them.
-    const { offset } = mapClearView(map.getContainer());
+    const { offset } = mapClearView(map);
     const opts = { center: [focus.lon, focus.lat], zoom, offset };
     // easeTo with no duration, not jumpTo, which has no `offset`.
     if (reducedMotion()) map.easeTo({ ...opts, duration: 0 });

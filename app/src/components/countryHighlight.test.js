@@ -19,8 +19,8 @@ const shape = (name, x, start = 1900, end = 9999) => ({
   geometry: sq(x),
 });
 
-function fakeMap({ hasAreaLayer = true } = {}) {
-  const log = { layers: [], setData: [], fitBounds: [], flyTo: [], easeTo: [], cameraForBounds: [] };
+function fakeMap({ hasAreaLayer = true, canvasHeight } = {}) {
+  const log = { layers: [], setData: [], fitBounds: [], flyTo: [], easeTo: [], cameraForBounds: [], calls: [] };
   let source = null;
   const map = {
     log,
@@ -38,7 +38,11 @@ function fakeMap({ hasAreaLayer = true } = {}) {
       return { center: { lng: (b[0][0] + b[1][0]) / 2, lat: (b[0][1] + b[1][1]) / 2 }, zoom: 4 };
     },
     fitBounds: (b, o) => log.fitBounds.push([b, o]),
-    flyTo: (o) => log.flyTo.push(o),
+    flyTo: (o) => {
+      log.calls.push("flyTo");
+      log.flyTo.push(o);
+    },
+    ...(canvasHeight ? { getCanvas: () => ({ clientWidth: 800, clientHeight: canvasHeight }), resize: () => log.calls.push("resize") } : {}),
     easeTo: (o) => log.easeTo.push(o),
   };
   return map;
@@ -116,6 +120,18 @@ test("a pin outside the fitted countries is kept in sight", () => {
   const [x, y] = screenPoint([25, 32], move, 800, 600);
   assert.ok(x >= PIN_MARGIN_PX && x <= 800 - PIN_MARGIN_PX, `x ${x}`);
   assert.ok(y >= PIN_MARGIN_PX && y <= 600 - PIN_MARGIN_PX, `y ${y}`);
+});
+
+test("a map behind its container's size is resized before the camera is aimed", () => {
+  // The phone timeline grows as the sheet drops to its peek bar ("Show on map"):
+  // the container is already 600 px tall, MapLibre still has 646.
+  const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, lon: 44.4, lat: 33.3, nonce: 6 };
+  const stale = fakeMap({ canvasHeight: 646 });
+  renderHook(useCountryHighlight, { mapRef: { current: stale }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  assert.deepEqual(stale.log.calls, ["resize", "flyTo"]);
+  const inStep = fakeMap({ canvasHeight: 600 });
+  renderHook(useCountryHighlight, { mapRef: { current: inStep }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus: { ...focus, nonce: 7 } });
+  assert.deepEqual(inStep.log.calls, ["flyTo"]);
 });
 
 test("no shape in that year: flies to the event's pin, or does nothing without one", () => {

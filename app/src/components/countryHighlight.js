@@ -82,8 +82,7 @@ export default function useCountryHighlight({ mapRef, mapReady, event, year, fea
     // Fit the countries into the part of the map that the controls (and, on
     // phones, the sheet) leave in sight (lib/mapInsets.js), and always keep the
     // event's pin there.
-    const box = map.getContainer();
-    const { width, height, padding, offset } = mapClearView(box);
+    const { width, height, padding, offset } = mapClearView(map);
     const pin = p.lon != null && p.lat != null ? [p.lon, p.lat] : null;
     // easeTo with no duration, not jumpTo, which has no `offset`.
     const move = (opts) => (reducedMotion() ? map.easeTo({ ...opts, duration: 0 }) : map.flyTo(opts));
