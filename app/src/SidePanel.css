@@ -1491,6 +1491,27 @@ button.sp-chip[aria-pressed="true"] {
     min-height: 44px;
   }
 
+  /* 16px: iOS zooms the page into a field with smaller text when it is focused. */
+  .sp-inputwrap input,
+  .sp-select select {
+    font-size: 16px;
+  }
+
+  .sp-inputwrap input {
+    min-height: 44px;
+  }
+
+  /* A fling at the end of the list or article stops there: it does not carry
+     on to the page, where pulling down would reload it and lose the search. */
+  .sp-scroll {
+    overscroll-behavior: contain;
+  }
+
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   .sp-check {
     min-height: 44px;
   }
