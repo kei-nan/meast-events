@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import {
   CSHAPES_URL,
+  NO_JS_STYLESHEET,
   OCHA_AREAS_URL,
   SHELL_MARKERS,
   escapeHtml,
@@ -114,7 +115,9 @@ test("an event page escapes data, keeps the title exactly and links to itself an
   });
   assert.match(html, /<title>War &amp; &quot;Peace&quot; &lt;1&gt; \(1967\) – Middle East, 1900–present<\/title>/);
   assert.match(html, /<h1>War &amp; &quot;Peace&quot; &lt;1&gt;<\/h1>/);
-  assert.match(html, /<meta property="og:title" content="War &amp; &quot;Peace&quot; &lt;1&gt;">/);
+  // Link previews carry the years too, without the site name (og:site_name has it).
+  assert.match(html, /<meta property="og:title" content="War &amp; &quot;Peace&quot; &lt;1&gt; \(1967\)">/);
+  assert.match(html, /<meta name="twitter:title" content="War &amp; &quot;Peace&quot; &lt;1&gt; \(1967\)">/);
   assert.match(html, /<link rel="canonical" href="https:\/\/middleeast\.events\/event\/a-b">/);
   assert.match(html, /<a class="wiki" href="https:\/\/en\.wikipedia\.org\/wiki\/Six-Day_War" rel="noreferrer">Read on Wikipedia<\/a>/);
   assert.doesNotMatch(html, /open-map|\?e=/); // the page is the map
@@ -124,8 +127,9 @@ test("an event page escapes data, keeps the title exactly and links to itself an
   assert.match(html, /Our framing review found something in this summary/);
   assert.match(html, /action=history/);
   assert.match(html, /<meta name="description" content="It was fought &lt;quickly&gt;\.">/);
-  // The app's script, and the JSON-LD data block, which is never run (CSP script-src does not apply).
-  assert.deepEqual(html.match(/<script[^>]*>/gi), ['<script type="application/ld+json">', '<script type="module" src="/src/main.jsx">']);
+  // index.html's "js" class script (its hash is in the CSP), the JSON-LD data block,
+  // which is never run (CSP script-src does not apply), and the app's script.
+  assert.deepEqual(html.match(/<script[^>]*>/gi), ["<script>", '<script type="application/ld+json">', '<script type="module" src="/src/main.jsx">']);
   assert.ok(!html.includes("<quickly>"));
 });
 
@@ -242,7 +246,20 @@ test("an invalid id is refused", () => {
 test("the sitemap lists home, the index and every event", () => {
   const xml = renderSitemap([{ id: "a" }, { id: "b" }]);
   assert.equal((xml.match(/<loc>/g) ?? []).length, 4);
-  assert.match(xml, /<loc>https:\/\/middleeast\.events\/event\/b<\/loc>/);
+  assert.match(xml, /<loc>https:\/\/middleeast\.events\/event\/b<\/loc><\/url>/);
+  assert.doesNotMatch(xml, /lastmod/);
+});
+
+test("the sitemap dates each event by its text's retrieval, and home and the index by the latest", () => {
+  const xml = renderSitemap([
+    { id: "a", extract_retrieved_at: "2026-09-26T04:00:00Z" },
+    { id: "b", extract_retrieved_at: "2026-10-02" },
+    { id: "c", extract_retrieved_at: "not a date" },
+  ]);
+  assert.match(xml, /<loc>https:\/\/middleeast\.events\/<\/loc><lastmod>2026-10-02<\/lastmod>/);
+  assert.match(xml, /<loc>https:\/\/middleeast\.events\/event\/<\/loc><lastmod>2026-10-02<\/lastmod>/);
+  assert.match(xml, /event\/a<\/loc><lastmod>2026-09-26<\/lastmod>/);
+  assert.match(xml, /event\/c<\/loc><\/url>/);
 });
 
 test("the 404 page is not indexed, names no canonical address and links home with absolute paths", () => {
@@ -293,7 +310,7 @@ test("the tab title has the years as the app shows them and the site name", () =
   assert.equal(eventPageTitle({ id: "n", title: "N" }), "N – Middle East, 1900–present");
 });
 
-test("JSON-LD: a WebPage about an Event, dates at the recorded precision, location only when precise", () => {
+test("JSON-LD: a WebPage about a Thing (not an Event), dates at the recorded precision, a place only when precise", () => {
   const base = { id: "e", title: "E", wikipedia_url: "https://en.wikipedia.org/wiki/E", wikidata_qid: "Q1", extract: "Text." };
   const day = eventJsonLd({ ...base, date_start: "1967-06-05", date_end: "1967-06-10", date_precision: "day", location_quality: "precise", coordinates: { lat: 31.5, lon: 34.4 } });
   assert.equal(day["@type"], "WebPage");
@@ -302,24 +319,25 @@ test("JSON-LD: a WebPage about an Event, dates at the recorded precision, locati
   assert.equal(day.license, "https://creativecommons.org/licenses/by-sa/4.0/");
   assert.equal(day.description, "Text.");
   assert.deepEqual(day.about, {
-    "@type": "Event",
+    "@type": "Thing",
     name: "E",
-    startDate: "1967-06-05",
-    endDate: "1967", // the page's "(ended 1967)": no precision is recorded for an end date
-    location: { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: 31.5, longitude: 34.4 } },
     sameAs: ["https://en.wikipedia.org/wiki/E", "https://www.wikidata.org/wiki/Q1"],
   });
+  // The end is the page's "(ended 1967)": no precision is recorded for an end date.
+  assert.equal(day.temporalCoverage, "1967-06-05/1967");
+  assert.deepEqual(day.spatialCoverage, { "@type": "Place", geo: { "@type": "GeoCoordinates", latitude: 31.5, longitude: 34.4 } });
   const month = eventJsonLd({ ...base, date_start: "1948-05-01", date_end: "1949-03-10", date_precision: "month", location_quality: "approximate", coordinates: { lat: 1, lon: 2 } });
-  assert.equal(month.about.startDate, "1948-05");
-  assert.equal(month.about.endDate, "1949");
-  assert.equal(month.about.location, undefined, "a capital-city fallback is not a location");
-  assert.equal(eventJsonLd({ ...base, date_start: "1910-01-01", date_precision: "decade" }).about.startDate, "1910");
-  assert.equal(eventJsonLd({ ...base, date_start: "1930-05-04", date_precision: "day", date_flags: ["x"] }).about.startDate, "1930");
+  assert.equal(month.temporalCoverage, "1948-05/1949");
+  assert.equal(month.spatialCoverage, undefined, "a capital-city fallback is not a location");
+  assert.equal(eventJsonLd({ ...base, date_start: "1910-01-01", date_precision: "decade" }).temporalCoverage, "1910");
+  assert.equal(eventJsonLd({ ...base, date_start: "1930-05-04", date_precision: "day", date_flags: ["x"] }).temporalCoverage, "1930");
+  assert.equal(eventJsonLd({ ...base, date_start: "1967-06-05", date_end: "1967-06-10", date_precision: "year" }).temporalCoverage, "1967");
   const reversed = eventJsonLd({ ...base, date_start: "2002-03-27", date_end: "2002-01-01", date_precision: "day" });
-  assert.equal(reversed.about.startDate, "2002");
-  assert.equal(reversed.about.endDate, undefined);
+  assert.equal(reversed.temporalCoverage, "2002");
   const bare = eventJsonLd({ id: "bare", title: "Bare", location_quality: "none" });
-  assert.deepEqual(bare.about, { "@type": "Event", name: "Bare" });
+  assert.deepEqual(bare.about, { "@type": "Thing", name: "Bare" });
+  assert.equal(bare.temporalCoverage, undefined);
+  assert.ok(!JSON.stringify(day).includes('"Event"'), "nothing is typed schema.org Event");
   assert.equal(bare.isBasedOn, undefined);
   assert.equal(eventJsonLd({ ...base, wikipedia_url: "javascript:alert(1)" }).isBasedOn, undefined);
 });
@@ -331,7 +349,7 @@ test("JSON-LD cannot close its script element, and parses back to the data", () 
   assert.doesNotMatch(inner, /[<>&\u2028\u2029]/);
   assert.deepEqual(JSON.parse(inner), eventJsonLd(event));
   const html = page(event);
-  assert.equal((html.match(/<\/script>/gi) ?? []).length, 2); // and the app's own script
+  assert.equal((html.match(/<\/script>/gi) ?? []).length, 3); // and the app's own two (the "js" class, the entry)
   assert.equal(ldOf(html).name, event.title);
 });
 
@@ -345,12 +363,43 @@ test("an event page is index.html with the event's head tags and the event insid
   assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1);
   assert.equal((html.match(/property="og:url"/g) ?? []).length, 1);
   assert.doesNotMatch(html, /https:\/\/middleeast\.events\/" \/>/); // the home page's canonical/og:url
-  assert.doesNotMatch(html, /<noscript>/); // the event itself is the no-JavaScript content
+  // The event itself is the no-JavaScript content: index.html's <noscript> note is gone,
+  // and the only <noscript> left is the stylesheet's, in the <head>.
+  assert.equal((html.match(/<noscript>/g) ?? []).length, 1);
+  assert.doesNotMatch(html.slice(html.indexOf("<body")), /<noscript>/);
   assert.doesNotMatch(html, /<!-- \/?page-(meta|body) -->/);
   // The event, inside #root (React replaces it), styled only without JavaScript.
   assert.match(html, /<div id="root"><div class="static-page">\n<header class="site-header">[\s\S]*<h1>T<\/h1>[\s\S]*<\/footer>\n<\/div><\/div>/);
-  assert.match(html, /<link rel="stylesheet" href="\/event\/event\.css" media="\(scripting: none\)">/);
+  assert.ok(html.includes(NO_JS_STYLESHEET));
   assert.equal((html.match(/event\.css/g) ?? []).length, 1);
+  // The script that hides it before the first paint comes before any stylesheet.
+  assert.ok(html.indexOf(`classList.add("js")`) < html.indexOf("stylesheet"));
+  // No preload unless the build names the bucket.
+  assert.doesNotMatch(html, /rel="preload"/);
+});
+
+test("an event page preloads the bucket it is given, as the app's fetch() asks for it", () => {
+  const html = renderEventPage({ id: "a", title: "A" }, TEMPLATE, { preload: "/data/events/v.0123456789ab/full/7.json" });
+  assert.equal((html.match(/rel="preload"/g) ?? []).length, 1);
+  assert.ok(html.includes(`<link rel="preload" href="/data/events/v.0123456789ab/full/7.json" as="fetch" crossorigin="anonymous">`));
+  assert.ok(html.indexOf('rel="preload"') < html.indexOf("</head>"));
+});
+
+test("an event page links to the events before and after it, escaped, and to neither when there is none", () => {
+  const html = renderEventPage({ id: "b", title: "B" }, TEMPLATE, {
+    neighbours: { prev: { id: "a", title: "A <1>", date_start: "1910-01-01" }, next: { id: "c", title: "C" } },
+  });
+  assert.match(html, /<li>Earlier: <a href="\/event\/a" rel="prev">A &lt;1&gt;<\/a> <span class="year">1910<\/span><\/li>/);
+  assert.match(html, /<li>Later: <a href="\/event\/c" rel="next">C<\/a><\/li>/);
+  const last = renderEventPage({ id: "c", title: "C" }, TEMPLATE, { neighbours: { prev: { id: "b", title: "B" }, next: undefined } });
+  assert.doesNotMatch(last, /rel="next"/);
+  assert.doesNotMatch(page({ id: "x", title: "X" }), /class="includes neighbours"/);
+});
+
+test("index.html and the plain pages link every icon", () => {
+  for (const html of [TEMPLATE, renderNotFoundPage(), renderIndexPage([])]) {
+    for (const href of ["/favicon.ico", "/favicon.svg", "/apple-touch-icon.png"]) assert.ok(html.includes(`href="${href}"`), href);
+  }
 });
 
 test("fillAppShell refuses a template whose markers are missing, repeated or out of order", () => {

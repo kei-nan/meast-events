@@ -1,7 +1,7 @@
 /* The plain-HTML pages written by scripts/build-event-pages.mjs: the /event/
    index and 404.html, and on each event's page (/event/<id>, which is the app)
-   the copy of the event shown without JavaScript - there it is linked with
-   media="(scripting: none)", so these global rules never reach the app.
+   the copy of the event shown without JavaScript - there it is linked inside
+   <noscript>, so these global rules never reach the app.
    Colours follow the app (src/index.css, src/SidePanel.css); system fonts. */
 :root {
   --bg: #1d1a15;
@@ -155,4 +155,5 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 .related .year { white-space: nowrap; }
 .includes .year { color: var(--text-tertiary); font-size: 0.85rem; }
 .related h3 { font-size: 0.9rem; margin: 1rem 0 0.3rem; }
+.neighbours ul { list-style: none; padding-left: 0; }
 .related-note { color: var(--text-tertiary); font-size: 0.85rem; }
