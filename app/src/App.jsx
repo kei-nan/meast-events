@@ -126,7 +126,11 @@ export default function App() {
   const [hoverId, setHoverId] = useState(null);
   const [focus, setFocus] = useState(null); // {id, lon, lat, nonce}
   const focusNonceRef = useRef(0);
-  const pendingFocusRef = useRef(initial.eventId); // deep link awaiting its event
+  const pendingFocusRef = useRef(initial.eventId); // deep link (or Back/Forward) awaiting its event
+  const selectedIdRef = useRef(initial.eventId); // for handleNavigate
+  useEffect(() => {
+    selectedIdRef.current = selectedEventId;
+  }, [selectedEventId]);
   const panelRef = useRef(null); // SearchPanel's skipTo (skip link)
   const [notFound, setNotFound] = useState(false);
   const [playState, setPlayState] = useState("stopped"); // timeline Play, see Timeline (SearchPanel holds its announcements)
@@ -364,6 +368,10 @@ export default function App() {
     () => browseList ?? scopedResults,
     [browseList, scopedResults]
   );
+  // A hovered row that leaves the list (typing, a filter, Play) unmounts without
+  // its mouseleave: the hover and its map shading end with it. Set during render
+  // (React re-renders at once, before anything is drawn).
+  if (hoverId && !panelResults.some((e) => e.id === hoverId)) setHoverId(null);
   const panelRange = useMemo(() => [startYear, endYear], [startYear, endYear]);
   const panelTotal = browseList
     ? browseList.length
@@ -396,16 +404,20 @@ export default function App() {
   }, [version]);
 
   // Back/forward: re-apply the parsed URL to every piece of state. Play pauses:
-  // its next step would move the restored years and overwrite the entry.
+  // its next step would move the restored years and overwrite the entry. Area
+  // drawing is disarmed (an armed mode would take the next map drag); "only in
+  // current map view" is not in the URL and stays as it is, like the map's view.
   const handleNavigate = useCallback((parsed) => {
     setPlayState((p) => (p === "playing" ? "paused" : p));
+    setAreaMode("off");
     setQuery(parsed.q);
     setCategories(parsed.categories);
     setCountries(parsed.countries);
     setScope(parsed.scope);
     setArea(parsed.area);
     setRange({ start: parsed.years?.[0] ?? MIN_YEAR, end: parsed.years?.[1] ?? MAX_YEAR });
-    pendingFocusRef.current = parsed.eventId;
+    // Focus only an event this entry opens, not one that stays open.
+    if (parsed.eventId !== selectedIdRef.current) pendingFocusRef.current = parsed.eventId;
     setNotFound(false);
     setSelectedEventId(parsed.eventId);
     setAboutSection(null);
@@ -448,6 +460,9 @@ export default function App() {
   // An id that cannot be resolved is cleared by REPLACING the URL, so Back does
   // not lead to the dead link again.
   useEffect(() => {
+    // A focus pending for another event is stale: it must not fly the map when
+    // that event is opened later (from the map, which only selects).
+    if (pendingFocusRef.current !== selectedEventId) pendingFocusRef.current = null;
     if (!selectedEventId || eventsLoading) return; // wait for the store
     const markNotFound = () => {
       pendingFocusRef.current = null;
