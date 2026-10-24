@@ -148,7 +148,7 @@ export function paddingOffset(width, height, padding) {
  * callback, after the camera move has started. A layout change in the same
  * render (on phones the timeline under the map is shorter while the sheet is at
  * full, so "Show on map" dropping the sheet to its peek bar makes the map 46 px
- * taller) would aim the camera at the old size, and the resize would then shift
+ * shorter) would aim the camera at the old size, and the resize would then shift
  * everything by half the difference. So the map is brought up to its
  * container's size first.
  */
