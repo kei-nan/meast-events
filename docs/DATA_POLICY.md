@@ -35,7 +35,7 @@ rather than a second layer of ours. Concretely:
 | `wikipedia_lead_dates` | Only next to a `date_order_invalid` flag: the dates (or years) the lead mentions, for the shown note (see "Review flags") | Wikipedia |
 | `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
 | `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
-| `wikidata_aliases` | The item's English Wikidata aliases ("also known as"), shown as-is in Wikidata's order; absent when it has none. Refreshed monthly with the sitelink counts. The search also matches them, and the event panel lists them as "Also called (Wikidata)"; the displayed title stays Wikipedia's | Wikidata |
+| `wikidata_aliases` | The item's English Wikidata aliases ("also known as"), kept as-is in Wikidata's order; absent when it has none. Refreshed monthly with the sitelink counts. Used by the search only: a result found through an alias rather than its title names the alias the reader typed ("matched: July War"). They are not listed on the event panel, because some are one side's name for the event; the displayed title stays Wikipedia's | Wikidata |
 
 ### Extract
 

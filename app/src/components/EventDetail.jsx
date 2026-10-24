@@ -16,7 +16,6 @@ import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
-import { shownAliases } from "../lib/aliases.js";
 import { importOr } from "../lib/importOr.js";
 import EventLink from "./EventLink.jsx";
 import RelatedEvents from "./RelatedEvents.jsx";
@@ -179,8 +178,6 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
 
   const quality = event.location_quality; // always set by lib/dataClient.js normalizeEvent
   const classes = (event.wikidata_classes ?? []).filter(Boolean);
-  // Wikidata's English aliases, as-is (lib/aliases.js); the title stays Wikipedia's.
-  const aliases = shownAliases(event);
   // Shown only when they say more than the category does.
   const showClasses = classes.some((c) => c.toLowerCase() !== (event.category ?? "").toLowerCase());
   const flags = (event.date_flags ?? []).filter(Boolean);
@@ -305,9 +302,6 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
           <p className="event-detail-facts">
             <PartOf parents={event.part_of} onSelectEvent={onSelectEvent} />
           </p>
-        )}
-        {aliases.length > 0 && (
-          <p className="event-detail-facts event-detail-aliases">Also called (Wikidata): {aliases.join(", ")}</p>
         )}
       </header>
       {dateNote && (
@@ -441,7 +435,6 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
           )}
           .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
           {event.part_of?.length > 0 && <> &ldquo;Part of&rdquo; is Wikidata&apos;s statement, in its labels (CC0).</>}
-          {aliases.length > 0 && <> &ldquo;Also called&rdquo; lists Wikidata&apos;s English aliases (CC0).</>}
         </p>
       </section>
     </article>
