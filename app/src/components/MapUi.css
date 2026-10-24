@@ -641,6 +641,11 @@
     border-radius: 8px;
     font-size: 12px;
   }
+  /* "Show results" (the toolbar's own row under its buttons, 44px + the 6px
+     gap) takes the tip's place, so the tip goes a row lower. */
+  .mu-toolbar-wrap:has(> .mu-btn) ~ .mu-tip {
+    top: 114px;
+  }
   /* With the sheet up (an event, or a link to one) the tip would fill the
      strip of map left in sight, where the event is shown. */
   .app-body:has(.side-panel:not([data-sheet="peek"])) .mu-tip {
