@@ -73,11 +73,17 @@ test("isRealDate: years 1900 to next year only", () => {
   assert.match(validateEvents([event({ date_start: "1067-06-05", date_end: null })]).errors[0], /date_start invalid/);
 });
 
-test("validateEvents: wikipedia_revid, when present, is a positive integer", () => {
-  assert.deepEqual(validateEvents([event({ wikipedia_revid: 1234567 })]).errors, []);
+test("validateEvents: wikipedia_revid (a positive integer) and its timestamp, both or neither", () => {
+  const ts = "2026-10-15T19:38:37Z";
+  assert.deepEqual(validateEvents([event({ wikipedia_revid: 1234567, wikipedia_revid_timestamp: ts })]).errors, []);
   for (const bad of [0, -1, 1.5, "123", null]) {
-    assert.match(validateEvents([event({ wikipedia_revid: bad })]).errors[0], /wikipedia_revid must be a positive integer/);
+    assert.match(validateEvents([event({ wikipedia_revid: bad, wikipedia_revid_timestamp: ts })]).errors[0], /wikipedia_revid must be a positive integer/);
   }
+  for (const bad of ["2026-10-15", "yesterday", null]) {
+    assert.match(validateEvents([event({ wikipedia_revid: 1, wikipedia_revid_timestamp: bad })]).errors[0], /wikipedia_revid_timestamp must be a UTC timestamp/);
+  }
+  assert.match(validateEvents([event({ wikipedia_revid: 1 })]).errors[0], /present together or not at all/);
+  assert.match(validateEvents([event({ wikipedia_revid_timestamp: ts })]).errors[0], /present together or not at all/);
 });
 
 test("validateEvents: category and category_group come from the pipeline's fixed set", () => {

@@ -43,7 +43,9 @@ export function titleFromWikipediaUrl(url) {
 export async function queryAllParts(titles, { maxParts = 50 } = {}) {
   const base = {
     action: "query",
-    prop: "extracts|pageprops|info",
+    // revisions (latest only, ids|timestamp): the date of the revision the lead comes from (lib/revid.js)
+    prop: "extracts|pageprops|info|revisions",
+    rvprop: "ids|timestamp",
     exintro: "1",
     explaintext: "1",
     exlimit: "max",
@@ -74,6 +76,12 @@ export async function queryAllParts(titles, { maxParts = 50 } = {}) {
     cont = data.continue;
   }
   throw new Error(`lead fetch: still continuing after ${maxParts} parts (${titles.length} titles)`);
+}
+
+/** The timestamp of a page record's latest revision, only when it is the revision `lastrevid` names. */
+export function revisionTimestamp(page) {
+  const r = page?.revisions?.[0];
+  return r && r.revid === page.lastrevid && typeof r.timestamp === "string" ? r.timestamp : null;
 }
 
 // Fetches leads for many titles. `cache` (see cache.js) is consulted/updated per requested
@@ -107,6 +115,8 @@ export async function fetchLeads(titles, { cache = null, delayMs = 400, log = ()
           wikibase_item: p.pageprops?.wikibase_item ?? null,
           pageid: p.pageid,
           lastrevid: p.lastrevid ?? null,
+          // when the latest revision (the one lastrevid names) was saved; null if the API did not say
+          lastrev_timestamp: revisionTimestamp(p),
           url: p.canonicalurl ?? p.fullurl ?? null,
           redirected_from: r !== n ? n : null,
           redirect_fragment: r !== n ? redirFragment.get(n) ?? null : null,

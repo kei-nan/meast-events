@@ -2,11 +2,14 @@
 //
 // What is cited is the Wikipedia article the text comes from (it is Wikipedia's text, unchanged), under the
 // article's own title (from `wikipedia_url`; our event title can be a label for an event without an article of
-// its own). The link is the permanent link of the revision whose lead is exactly the shown text,
-// https://en.wikipedia.org/w/index.php?title=<title>&oldid=<wikipedia_revid>, where that revision is known
-// (docs/DATA_POLICY.md, "Revision"); otherwise the article's URL, which may since show different text. The date
-// is the day the text was retrieved (`extract_retrieved_at`). We do not store the date of the revision itself,
-// so each style's form for a source without a publication date is used, with the retrieval/access date:
+// its own). Two forms, following each style's own rules:
+//
+// - DATED, where the revision whose lead is exactly the shown text is known (`wikipedia_revid` with its
+//   `wikipedia_revid_timestamp`; docs/DATA_POLICY.md, "Revision"): the permanent link of that revision,
+//   https://en.wikipedia.org/w/index.php?title=<title>&oldid=<revid>, under the date that revision was saved
+//   (UTC). No retrieval/access date: the link is to a fixed version.
+// - UNDATED, otherwise: the article's URL, which may since show different text, with each style's form for a
+//   source without a date and the day the text was retrieved (`extract_retrieved_at`) as the retrieval/access date.
 //
 // APA 7 (Publication Manual, 7th ed., 10.3; APA Style, "Wikipedia entry references",
 //   https://apastyle.apa.org/style-grammar-guidelines/references/examples/wikipedia-references):
@@ -16,18 +19,19 @@
 //   information", https://apastyle.apa.org/style-grammar-guidelines/references/missing-information); retrieval
 //   date as "Retrieved January 9, 2020, from https://..." (APA Style, "Webpage on a website references",
 //   https://apastyle.apa.org/style-grammar-guidelines/references/examples/webpage-website-references).
-//   Wikipedia's own APA example has exactly this no-date form with an oldid link: "Plagiarism. (n.d.). In
-//   Wikipedia. Retrieved August 10, 2004, from https://en.wikipedia.org/w/index.php?title=Plagiarism&oldid=5139350"
-//   (https://en.wikipedia.org/wiki/Wikipedia:Citing_Wikipedia).
-//   => Title. (n.d.). In *Wikipedia*. Retrieved Month D, YYYY, from URL
+//   => dated:   Title. (YYYY, Month D). In *Wikipedia*. PERMALINK
+//   => undated: Title. (n.d.). In *Wikipedia*. Retrieved Month D, YYYY, from URL
 //
 // MLA 9 (MLA Style Center, "If I have two works with identical titles and no authors...",
 //   https://style.mla.org/identical-titles-no-authors/): "“Harry Houdini.” Wikipedia: The Free Encyclopedia,
-//   Wikimedia Foundation, 20 Feb. 2018, en.wikipedia.org/wiki/Harry_Houdini." (container in italics, URL without
-//   "https://"; also https://style.mla.org/citing-entries-in-reference-works/). No publication date: omit it and
-//   put an access date in the optional slot at the end, "Accessed 25 Oct. 2015." (https://style.mla.org/web-sites-no-publication-date/,
-//   https://style.mla.org/access-dates/). Months as the MLA Handbook abbreviates them (Sept., not Sep.; May, June, July in full).
-//   => “Title.” *Wikipedia: The Free Encyclopedia*, Wikimedia Foundation, en.wikipedia.org/... Accessed D Mon. YYYY.
+//   Wikimedia Foundation, 20 Feb. 2018, en.wikipedia.org/wiki/Harry_Houdini." (container in italics, the date of
+//   the version as the publication date, URL without "https://", no access date; also
+//   https://style.mla.org/citing-entries-in-reference-works/). An access date is optional, useful when a work
+//   lacks a publication date or may change (https://style.mla.org/access-dates/); with no publication date, omit
+//   it and put the access date at the end, "Accessed 25 Oct. 2015." (https://style.mla.org/web-sites-no-publication-date/).
+//   Months as the MLA Handbook abbreviates them (Sept., not Sep.; May, June, July in full).
+//   => dated:   “Title.” *Wikipedia: The Free Encyclopedia*, Wikimedia Foundation, D Mon. YYYY, en.wikipedia.org/w/index.php?...
+//   => undated: “Title.” *Wikipedia: The Free Encyclopedia*, Wikimedia Foundation, en.wikipedia.org/wiki/... Accessed D Mon. YYYY.
 //
 // Chicago 18th ed., notes and bibliography (14.130-14.131, as quoted by Red Deer Polytechnic Library,
 //   https://guides.rdpolytech.ca/chicago18/citation/referencework): note "Wikipedia, “Vincent van Gogh,” last
@@ -35,7 +39,9 @@
 //   publication or revision date, supply an access date instead"; "s.v." is no longer recommended; well-known
 //   reference works are usually cited in notes only, not in the bibliography (14.130). Chicago's own advice on
 //   Wikipedia as a tertiary source: https://www.chicagomanualofstyle.org/qanda/data/faq/topics/Documentation/faq0376.html
-//   => note: Wikipedia, “Title,” accessed Month D, YYYY, URL.   shortened note: Wikipedia, “Title.”
+//   => dated:   Wikipedia, “Title,” last modified Month D, YYYY, HH:MM (UTC), PERMALINK.
+//   => undated: Wikipedia, “Title,” accessed Month D, YYYY, URL.
+//   => shortened note: Wikipedia, “Title.”
 //
 // The site's event page and the border data's source are named next to the citations, not inside them: the
 // text is Wikipedia's, the borders are CShapes 2.0's (credit as in NOTICE).
@@ -58,8 +64,17 @@ export function isoDay(value) {
   return mo >= 1 && mo <= 12 && d >= 1 && d <= 31 ? { y, m: mo, d } : null;
 }
 
-/** "October 1, 2026" (APA, Chicago). */
+/** {y, m, d, time: "HH:MM"} of a MediaWiki revision timestamp ("2026-10-15T19:38:37Z", UTC), or null. */
+export function revisionDay(value) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):\d{2}Z$/.exec(String(value ?? ""));
+  const day = m && isoDay(value);
+  return day ? { ...day, time: `${m[4]}:${m[5]}` } : null;
+}
+
+/** "October 1, 2026" (APA retrieval date, Chicago). */
 export const longDate = ({ y, m, d }) => `${MONTHS[m - 1]} ${d}, ${y}`;
+/** "2026, October 1" (APA reference date). */
+export const apaDate = ({ y, m, d }) => `${y}, ${MONTHS[m - 1]} ${d}`;
 /** "1 Oct. 2026" (MLA). */
 export const mlaDate = ({ y, m, d }) => `${d} ${MLA_MONTHS[m - 1]} ${y}`;
 
@@ -86,30 +101,41 @@ const endsInMark = (t) => /[?!]$/.test(t);
 const plain = (parts) => parts.map((p) => p.text).join("");
 
 /**
- * The citations of `event` (a full detail record: wikipedia_url, extract_retrieved_at, wikipedia_revid?, id),
- * or null when it has no English Wikipedia article URL. Each style is {id, label, parts, text}: `parts` are
- * {text, italic?} pieces for display, `text` is the same citation as plain text (what "Copy" copies).
+ * The citations of `event` (a full detail record: wikipedia_url, extract_retrieved_at, wikipedia_revid?,
+ * wikipedia_revid_timestamp?, id), or null when it has no English Wikipedia article URL. The revision is used only
+ * with its date (both or neither). Each style is {id, label, parts, text}: `parts` are {text, italic?} pieces for
+ * display, `text` is the same citation as plain text (what "Copy" copies).
  */
 export function citeEvent(event) {
   const title = articleTitle(event?.wikipedia_url);
   if (!title) return null;
-  const revid = isRevid(event.wikipedia_revid) ? event.wikipedia_revid : null;
+  const revDay = isRevid(event.wikipedia_revid) ? revisionDay(event.wikipedia_revid_timestamp) : null;
+  const revid = revDay ? event.wikipedia_revid : null;
   const url = revid ? permalink(title, revid) : String(event.wikipedia_url).split("#")[0];
   const day = isoDay(event.extract_retrieved_at);
   const mlaUrl = url.replace(/^https?:\/\//, "");
   const end = (t, mark) => (endsInMark(t) ? t : t + mark);
 
   const apa = [
-    { text: `${end(title, ".")} (n.d.). In ` },
+    { text: `${end(title, ".")} (${revDay ? apaDate(revDay) : "n.d."}). In ` },
     { text: "Wikipedia", italic: true },
-    { text: day ? `. Retrieved ${longDate(day)}, from ${url}` : `. ${url}` },
+    { text: revDay ? `. ${url}` : day ? `. Retrieved ${longDate(day)}, from ${url}` : `. ${url}` },
   ];
   const mla = [
     { text: `“${end(title, ".")}” ` },
     { text: "Wikipedia: The Free Encyclopedia", italic: true },
-    { text: `, Wikimedia Foundation, ${mlaUrl}.${day ? ` Accessed ${mlaDate(day)}.` : ""}` },
+    {
+      text: revDay
+        ? `, Wikimedia Foundation, ${mlaDate(revDay)}, ${mlaUrl}.`
+        : `, Wikimedia Foundation, ${mlaUrl}.${day ? ` Accessed ${mlaDate(day)}.` : ""}`,
+    },
   ];
-  const chicagoNote = [{ text: `Wikipedia, “${end(title, ",")}” ${day ? `accessed ${longDate(day)}, ` : ""}${url}.` }];
+  const when = revDay
+    ? `last modified ${longDate(revDay)}, ${revDay.time} (UTC), `
+    : day
+      ? `accessed ${longDate(day)}, `
+      : "";
+  const chicagoNote = [{ text: `Wikipedia, “${end(title, ",")}” ${when}${url}.` }];
   const chicagoShort = [{ text: `Wikipedia, “${end(title, ".")}”` }];
 
   const styles = [
@@ -123,6 +149,7 @@ export function citeEvent(event) {
     title,
     url,
     revid,
+    revised: revDay ? longDate(revDay) : null,
     retrieved: day ? longDate(day) : null,
     styles,
     siteName: SITE_NAME,
@@ -132,14 +159,14 @@ export function citeEvent(event) {
 }
 
 /**
- * The plain notes that go with the citations: whether the link is the exact revision, and (Chicago) that
- * Wikipedia is cited in notes only. Strings, so the app and the static page say the same.
+ * The plain notes that go with the citations: which version the link is, and (Chicago) that Wikipedia is cited
+ * in notes only. Strings, so the app and the static page say the same.
  */
 export function citationNotes(cite) {
   if (!cite) return [];
   return [
     cite.revid
-      ? `The link is the Wikipedia revision whose lead is exactly the text shown here (revision ${cite.revid}).`
+      ? `The link is the Wikipedia revision of ${cite.revised} (revision ${cite.revid}), whose lead is exactly the text shown here.`
       : `No revision is recorded for this text, so the link is the live article: Wikipedia’s text may have changed since it was retrieved${cite.retrieved ? ` on ${cite.retrieved}` : ""}.`,
     "Chicago cites well-known reference works such as Wikipedia in notes only, not in the bibliography.",
   ];

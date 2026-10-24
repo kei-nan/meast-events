@@ -29,8 +29,8 @@ export function syncMirrorTexts(events) {
     if (mirror.extract === source.extract) continue;
     mirror.extract = source.extract;
     mirror.extract_retrieved_at = source.extract_retrieved_at;
-    // same article, same text: the source's revision is the mirror's too (lib/revid.js)
-    setRevid(mirror, source.wikipedia_revid);
+    // same article, same text: the source's revision (and its date) is the mirror's too (lib/revid.js)
+    setRevid(mirror, source.wikipedia_revid, source.wikipedia_revid_timestamp);
     changed.push(mirror.id);
   }
   return changed;

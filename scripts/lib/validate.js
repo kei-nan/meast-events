@@ -5,7 +5,7 @@ import { COUNTRIES, EVENT_CLASSES, INCLUSION_MIN_SITELINKS, notEventClasses } fr
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode } from "./wiki.js";
 import { lowPrecisionCoordinateFlag, titleYearsFlag } from "./flags.js";
-import { isRevid } from "./revid.js";
+import { isRevid, isRevTimestamp } from "./revid.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
 // Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
@@ -246,9 +246,15 @@ export function validateEvents(
     if (typeof e.extract_retrieved_at !== "string" || !/^\d{4}-\d{2}-\d{2}/.test(e.extract_retrieved_at)) {
       err(i, e, "extract_retrieved_at must be an ISO date");
     }
-    // The revision whose lead is the stored extract (lib/revid.js); absent when not known.
+    // The revision whose lead is the stored extract, and its date (lib/revid.js): both or neither.
     if ("wikipedia_revid" in e && !isRevid(e.wikipedia_revid)) {
       err(i, e, `wikipedia_revid must be a positive integer when present (got ${JSON.stringify(e.wikipedia_revid)})`);
+    }
+    if ("wikipedia_revid_timestamp" in e && !isRevTimestamp(e.wikipedia_revid_timestamp)) {
+      err(i, e, `wikipedia_revid_timestamp must be a UTC timestamp like 2026-10-15T19:38:37Z (got ${JSON.stringify(e.wikipedia_revid_timestamp)})`);
+    }
+    if (("wikipedia_revid" in e) !== ("wikipedia_revid_timestamp" in e)) {
+      err(i, e, "wikipedia_revid and wikipedia_revid_timestamp must be present together or not at all");
     }
     if ("category_label" in e) err(i, e, "category_label is deprecated and must not be present");
     if (e.location_quality != null && !LOCATION_QUALITIES.includes(e.location_quality)) {

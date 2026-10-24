@@ -471,9 +471,11 @@ async function splitEvents() {
     const record = {
       extract: e.extract ?? "",
       extract_retrieved_at: e.extract_retrieved_at ?? null,
-      // The Wikipedia revision whose lead is exactly `extract`, where known (docs/DATA_POLICY.md,
-      // "Revision"): citations link it (src/lib/citation.js).
-      ...(e.wikipedia_revid ? { wikipedia_revid: e.wikipedia_revid } : {}),
+      // The Wikipedia revision whose lead is exactly `extract` and when it was saved, where known
+      // (docs/DATA_POLICY.md, "Revision"): citations link it under its date (src/lib/citation.js).
+      ...(e.wikipedia_revid && e.wikipedia_revid_timestamp
+        ? { wikipedia_revid: e.wikipedia_revid, wikipedia_revid_timestamp: e.wikipedia_revid_timestamp }
+        : {}),
       ...detailFields(e, fixAnchors),
       // Wikidata's precision of date_start ("day", "month", "year", "decade").
       date_precision: e.date_precision ?? null,
