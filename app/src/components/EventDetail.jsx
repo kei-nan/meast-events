@@ -17,6 +17,9 @@ import { categoryLabel } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
+import { shownClasses } from "../lib/eventClasses.js";
+import { fallbackLocationNote } from "../lib/fallbackPoint.js";
+import { HAND_PICKED_NOTE } from "../lib/handPicked.js";
 import { importOr } from "../lib/importOr.js";
 import EventLink from "./EventLink.jsx";
 import RelatedEvents from "./RelatedEvents.jsx";
@@ -178,9 +181,10 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
   }, []);
 
   const quality = event.location_quality; // always set by lib/dataClient.js normalizeEvent
-  const classes = (event.wikidata_classes ?? []).filter(Boolean);
-  // Shown only when they say more than the category does.
-  const showClasses = classes.some((c) => c.toLowerCase() !== (event.category ?? "").toLowerCase());
+  // Only the classes on the event-class list, and only when they say more than the category does (lib/eventClasses.js).
+  const classes = shownClasses(event);
+  const showClasses = classes.length > 0;
+  const itemUrl = wikidataUrl(event.wikidata_qid);
   const flags = (event.date_flags ?? []).filter(Boolean);
   // Unverified dates show only their years. date_precision comes with the full lead,
   // so the year alone shows until it arrives.
@@ -386,9 +390,7 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
         )}
         {quality === "approximate" && event.approximate_reason !== "rounded" && (
           <p className="event-detail-note">
-            Approximate location: no coordinates were found for this event, so its marker is
-            placed at a national capital. The marker shows the country, not where the event
-            happened. It is left out of drawn-area searches.
+            {fallbackLocationNote(event)} It is left out of drawn-area searches.
             <ShadingNote event={event} year={borderYear} />
           </p>
         )}
@@ -399,6 +401,7 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
             <ShadingNote event={event} year={borderYear} />
           </p>
         )}
+        {event.hand_picked && <p className="event-detail-note">{HAND_PICKED_NOTE}</p>}
         {event.data_fixes?.length > 0 && (
           <p className="event-detail-fixes">
             Corrected by this project (
@@ -414,7 +417,22 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
             in our log of data fixes).
           </p>
         )}
-        {showClasses && <p className="event-detail-classes">Wikidata classes: {classes.join(", ")}</p>}
+        {showClasses && (
+          <p className="event-detail-classes">
+            Wikidata classes on our event-class list: {classes.join(", ")}
+            {itemUrl && (
+              <>
+                {" "}
+                (all its classes:{" "}
+                <a className="event-detail-wd" href={itemUrl} target="_blank" rel="noreferrer">
+                  Wikidata<span aria-hidden="true"> ↗</span>
+                  <span className="sp-sr-status"> item (opens in a new tab)</span>
+                </a>
+                )
+              </>
+            )}
+          </p>
+        )}
         {retrieved && <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>}
         <p className="event-detail-attribution">
           Text from Wikipedia, licensed{" "}

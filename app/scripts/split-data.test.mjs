@@ -106,6 +106,11 @@ test("detailFields: the documented data fixes of an event, with their anchors", 
   assert.equal("data_fixes" in detailFields({ review_reasons: ["part_of: x"] }, anchors), false);
 });
 
+test("detailFields: hand_picked on the seed events, those without a discovery sitelinks count", () => {
+  assert.equal(detailFields({ id: "six-day-war" }).hand_picked, true);
+  assert.equal("hand_picked" in detailFields({ id: "x", sitelinks: 12 }), false);
+});
+
 const square = (x, y, d = 0.1) => ({ type: "Polygon", coordinates: [[[x, y], [x + d, y], [x + d, y + d], [x, y + d], [x, y]]] });
 const boundary = (name, start_year, end_year, geometry = square(35, 31)) => ({
   type: "Feature",

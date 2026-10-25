@@ -6,7 +6,11 @@ rather than a second layer of ours. Concretely:
 
 - We **never rewrite** titles, extracts, dates, countries, or labels. `title`, `extract`, `date_start`, `date_end`,
   `countries` and `wikidata_classes` are copied from Wikipedia/Wikidata as returned. The only change made to text is
-  whitespace normalisation of the extract (see "Extract").
+  whitespace normalisation of the extract (see "Extract"). The exception is the hand-picked seed list: the dates and
+  countries of those 102 events were typed by hand for it (on 2026-10-24, 24 of the 60 seed events the rule also finds had
+  other countries than Wikidata's, and 30 seed start dates were none of the item's Wikidata P585/P580 values, 11 of them
+  checked against the article, `docs/data-fixes.md` F14). They are kept as they are; each such event says so on the site
+  ("Hand-picked event: ... its dates and countries were typed by hand for that list, so they can differ from Wikidata's").
 - Automated checks only **flag** (a note in `review_reasons` or `date_flags`); they never overwrite, "correct" or
   silently drop an event on judgement of its content. The exceptions are the few individually verified fixes listed
   with evidence in `docs/data-fixes.md`.
@@ -46,6 +50,11 @@ text. Only whitespace is normalised (no-break spaces to plain spaces, runs of sp
 characters, mean 476 -> 1,494, max 1,487 -> 5,481; 327 got longer, 66 were already the whole lead, 1 got shorter (Wikipedia rewrote the lead of the
 Battle of Elli in between). The earlier text was mostly the first paragraph only. `extract_retrieved_at` says when the text was fetched, so it can be shown as "as of".
 
+Link previews (`app/scripts/event-page.mjs`): an event page's `description`, `og:description` and `twitter:description` are "Wikipedia: "
+followed by the lead's first paragraph, cut at a word to 160 characters in all. The prefix is the same for every event: previews show the
+text under the site's name, and a label on the flagged summaries only would make the others look checked. The framing review does not fit
+in a preview; the page shows it. The structured data's `description` is the lead's opening alone.
+
 ### Revision (`wikipedia_revid`, `wikipedia_revid_timestamp`)
 
 `wikipedia_revid` is the id of the article revision whose lead is exactly the stored `extract`, and `wikipedia_revid_timestamp` is when that
@@ -82,6 +91,15 @@ the classes come from live Wikidata too (for example Fall of the Assad regime: `
 or "war" that the curated file used to carry as if they were Wikidata's are gone. `category_label` is removed. Number of classes per event across the
 594 events (curated + proposed): 1 class 320, 2: 165, 3: 68, 4: 30, 5: 7, 6: 4.
 
+**What the site lists** (since 2026-10-25; `app/src/lib/eventClasses.js`, the same rule for every event): the event panel and the event
+pages list only the stored classes that are on the event-class list (the table in "Category (our grouping)"), i.e. the classes that decided
+inclusion and, for terrorism and atrocity, the group, with a link to the Wikidata item for all of them. The data keeps every class. The
+other `P31` classes decide nothing on the site and no review reads them, and some are one side's description of the event; on 2026-10-24
+400 of the 815 curated events had one, 218 distinct labels, for example "fake news" (Gaza Strip famine), "friendly fire" (Al-Ahli Arab
+Hospital explosion), "preemptive war" (June 2025 Israeli strikes on Iran), "sea piracy" (2010 Gaza flotilla raid), "liberation" (Turkish
+capture of Smyrna), "crime of aggression" (2026 Iran war) and "counter-terrorist operation" (July 2023 Jenin incursion). 32 events have
+no class on the list (mostly hand-picked ones) and show no class line.
+
 ### Category (our grouping)
 
 `category` is **our own coarse mapping**, not Wikidata's classification, and the UI labels it "Category (our grouping)". It is set by one rule applied to every
@@ -95,7 +113,7 @@ event (`groupForEvent` in `scripts/lib/event-classes.js`):
 Before 2026-09-28 steps 1-2 did not exist: an item Wikidata types as both a "massacre" and a "terrorist attack" was shown as "political" because "massacre"
 happened to be checked first. A full review found that this ordering hid the "terrorist attack" type of 18 events, 16 of them attacks on Israelis
 (October 7 and the kibbutz and Nova attacks among them), while events typed only "terrorist attack" by Wikidata kept that label whoever the perpetrator was.
-The rule still passes Wikidata's typing through without judging it; the UI lists every Wikidata class next to our group.
+The rule still passes Wikidata's typing through without judging it; the UI lists the item's Wikidata classes that are on the event-class list next to our group (see "Wikidata classes").
 
 | Wikidata class | QID | Our group |
 |---|---|---|
@@ -401,7 +419,9 @@ but are not shown; an event with any date flag still shows only the years in its
   **A fallback pin marks the country, not the event's place.** It is the same point for every event of that country, taken from
   `COUNTRY_CAPITALS` in `scripts/lib/geo.js` (also the reference point of the `coordinate_far_from_countries` flag), whatever the event's date:
   a Turkey event from before 1923 sits at Ankara, which became the capital only in 1923, and a Saudi event before 1932 at Riyadh. The event
-  panel and the static event page say so ("The marker shows the country, not where the event happened").
+  panel and the static event page therefore call it a reference point, not a capital, and name it (`app/src/lib/fallbackPoint.js`): "its
+  marker is placed at the one reference point used for every such event of Israel/Palestine (Jerusalem), whatever its date. The marker
+  shows the country, not where the event happened, and says nothing about the status of that city."
 
   | Country tag | Point (lat, lon) | Where it is |
   |---|---|---|

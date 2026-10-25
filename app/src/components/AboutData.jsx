@@ -351,10 +351,15 @@ export default function AboutData({ section = null, onClose }) {
 
         <h3>What is on the map</h3>
         <p>
-          This site shows Wikipedia and Wikidata content as it is. Titles, dates, countries and article text are
-          copied, not rewritten. The exceptions are a small number of documented corrections, where a value was
-          checked against both sources and changed by hand; each of those events says so and links to its entry in
-          our{" "}
+          This site shows Wikipedia and Wikidata content as it is. Titles and article text are copied from
+          Wikipedia, not rewritten, and the dates and countries of the events the rule below finds are
+          Wikidata&apos;s. The dates and countries of the 102 hand-picked events (see below) were typed by hand for
+          that list and can differ from Wikidata&apos;s: of the 60 the rule also finds, 24 have other countries than
+          Wikidata gives, and 30 hand-picked start dates are none of the item&apos;s Wikidata dates (11 of them
+          checked against the article). Each hand-picked event says so. Wikidata&apos;s classes are listed only where
+          they are on our event-class list, with a link to the item for all of them. The other exceptions are a
+          small number of documented corrections, where a value was checked against both sources and changed by
+          hand; each of those events says so and links to its entry in our{" "}
           <a href={`${REPO}/blob/main/docs/data-fixes.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             log of data fixes
           </a>
@@ -369,8 +374,9 @@ export default function AboutData({ section = null, onClose }) {
         </ul>
         <p>
           Events without coordinates are still listed and searchable, tagged “No map location”; they get no map
-          marker and are left out of drawn-area searches. Events pinned at a country capital because no specific site is
-          known, and events whose coordinates the sources give only to the nearest degree or tenth of a degree, are
+          marker and are left out of drawn-area searches. Events pinned at one fixed reference point for their
+          country (a city, the same point whatever the date, not a statement about its status) because no specific
+          site is known, and events whose coordinates the sources give only to the nearest degree or tenth of a degree, are
           marked “Approximate location”. A hand-picked seed list of events is also included; that part is
           our own choice.
         </p>
@@ -407,11 +413,12 @@ export default function AboutData({ section = null, onClose }) {
           </li>
         </ul>
         <p>
-          A missing event says nothing about whether it happened. The full analysis is in the{" "}
+          A missing event says nothing about whether it happened. An earlier, dated analysis is in the{" "}
           <a href={`${REPO}/blob/main/docs/bias-review/dataset-coverage.md`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             dataset coverage review
-          </a>
-          .
+          </a>{" "}
+          of 26 September 2026 (394 events, before several of the rules changed); the current counts are under
+          &ldquo;Coverage&rdquo; and &ldquo;Selection funnel&rdquo; below.
         </p>
 
         <h3>Framing review</h3>
