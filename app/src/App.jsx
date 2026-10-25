@@ -22,6 +22,7 @@ import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
 import { countInBbox } from "./lib/localSearch";
 import { orderBrowseList } from "./lib/browseOrder";
 import { rankEvents } from "./lib/ranking";
+import { countEventsByStartYear } from "./lib/yearCounts";
 import { ShareLinkContext } from "./lib/shareLinkContext.js";
 import { canonicalPath, parseUrlState, shareLink } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
@@ -207,16 +208,13 @@ export default function App() {
     [chronological, startYear, endYear]
   );
 
-  // Per-year event counts for the timeline density chart, from the store.
-  const eventCountsByYear = useMemo(() => {
-    const counts = {};
-    for (const e of storeRef.current.values()) {
-      const y = eventYearRange(e)[0];
-      counts[y] = (counts[y] ?? 0) + 1;
-    }
-    return counts;
+  // Per-year event counts for the timeline density chart, from the store, by
+  // start year (date_start) as everywhere else (lib/yearCounts.js).
+  const eventCountsByYear = useMemo(
+    () => countEventsByStartYear(storeRef.current.values()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [version]);
+    [version]
+  );
 
   const search = useEventSearch({
     query,

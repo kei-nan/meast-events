@@ -28,6 +28,14 @@ export function tokenize(s) {
     .filter(Boolean);
 }
 
+// The text actually searched: the trimmed query, or "" (no text) when it is
+// shorter than MIN_QUERY_LENGTH or has no letters/digits at all ("??", "--"),
+// which would otherwise tokenise to nothing and match every event.
+export function effectiveQuery(q) {
+  const t = String(q ?? "").trim();
+  return t.length >= MIN_QUERY_LENGTH && tokenize(t).length > 0 ? t : "";
+}
+
 function tokenMatches(token, isLast, words) {
   const prefix = isLast && token.length >= 2;
   for (const w of words) {

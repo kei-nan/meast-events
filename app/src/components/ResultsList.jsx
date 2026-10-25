@@ -307,71 +307,70 @@ function ResultsList({
     }
   }
 
+  // The rows in groups, each its own list under its heading (an h2, the
+  // panel's top level like the event title, so screen reader users can jump
+  // between groups): in the Timeline view by decade, with the browse list's
+  // events that began before the selected years last (timelineOrder) under one
+  // heading; in the list only that "ongoing" group has a heading. Rows keep
+  // their index in `visible` (roving tab stop, "Show more" focus).
+  const ongoingOf = (e) => Boolean(browse && range && startedBefore(e, range[0]));
+  const groupOf = timeline ? (e) => (ongoingOf(e) ? "ongoing" : startDecade(e)) : (e) => (ongoingOf(e) ? "ongoing" : "");
+  const groups = [];
+  visible.forEach((ev, idx) => {
+    const g = groupOf(ev);
+    const last = groups[groups.length - 1];
+    if (last && last.key === g) last.rows.push({ ev, idx });
+    else groups.push({ key: g, rows: [{ ev, idx }] });
+  });
+
   return (
     <div className={"sp-results" + (busy ? " sp-results--busy" : "")}>
       {timeline && <TimelineAxis axis={axis} band={band} />}
-      <ul ref={listRef} className="sp-list" onKeyDown={onKeyDown} aria-busy={busy || undefined}>
-        {timeline && visible.map((ev, idx) => {
-          // Headings by decade; in the browse list the events that began
-          // before the selected years come last (timelineOrder), under one heading.
-          const group = (e) => (browse && range && startedBefore(e, range[0]) ? "ongoing" : startDecade(e));
-          const g = group(ev);
-          const first = idx === 0 || group(visible[idx - 1]) !== g;
-          return (
-            <Fragment key={ev.id}>
-              {first && (
-                <li
-                  className={"sp-list-heading" + (g === "ongoing" ? "" : " sp-list-heading--decade")}
-                  role="presentation"
-                >
-                  <h2>{g === "ongoing" ? `Ongoing, started before ${range[0]}` : decadeLabel(g)}</h2>
-                </li>
+      <div ref={listRef} onKeyDown={onKeyDown} aria-busy={busy || undefined}>
+        {groups.map(({ key, rows }, gi) => (
+          <Fragment key={`${gi}:${key}`}>
+            {key !== "" && (
+              <h2 className={"sp-list-heading" + (key === "ongoing" ? "" : " sp-list-heading--decade")}>
+                {key === "ongoing" ? `Ongoing, started before ${range[0]}` : decadeLabel(key)}
+              </h2>
+            )}
+            <ul className="sp-list">
+              {rows.map(({ ev, idx }) =>
+                timeline ? (
+                  <TimelineRow
+                    key={ev.id}
+                    ev={ev}
+                    idx={idx}
+                    query={query}
+                    axis={axis}
+                    band={band}
+                    outside={!inRange(ev, range)}
+                    selected={ev.id === selectedId}
+                    tabbable={idx === tabStop}
+                    onFocusRow={setActive}
+                    onSelect={onSelect}
+                    onHover={onHover}
+                  />
+                ) : (
+                  <ResultRow
+                    key={ev.id}
+                    ev={ev}
+                    idx={idx}
+                    query={query}
+                    outside={!inRange(ev, range)}
+                    ongoing={key === "ongoing"}
+                    selected={ev.id === selectedId}
+                    tabbable={idx === tabStop}
+                    onFocusRow={setActive}
+                    onSelect={onSelect}
+                    onHover={onHover}
+                  />
+                )
               )}
-              <TimelineRow
-                ev={ev}
-                idx={idx}
-                query={query}
-                axis={axis}
-                band={band}
-                outside={!inRange(ev, range)}
-                selected={ev.id === selectedId}
-                tabbable={idx === tabStop}
-                onFocusRow={setActive}
-                onSelect={onSelect}
-                onHover={onHover}
-              />
-            </Fragment>
-          );
-        })}
-        {!timeline && visible.map((ev, idx) => {
-          const outside = !inRange(ev, range);
-          const ongoing = browse && range && startedBefore(ev, range[0]);
-          const firstOngoing = ongoing && (idx === 0 || !startedBefore(visible[idx - 1], range[0]));
-          return (
-            <Fragment key={ev.id}>
-              {firstOngoing && (
-                // A heading (h2: the panel's top level, like the event title)
-                // so screen reader users can jump to the ongoing events.
-                <li className="sp-list-heading" role="presentation">
-                  <h2>Ongoing, started before {range[0]}</h2>
-                </li>
-              )}
-              <ResultRow
-                ev={ev}
-                idx={idx}
-                query={query}
-                outside={outside}
-                ongoing={ongoing}
-                selected={ev.id === selectedId}
-                tabbable={idx === tabStop}
-                onFocusRow={setActive}
-                onSelect={onSelect}
-                onHover={onHover}
-              />
-            </Fragment>
-          );
-        })}
-      </ul>
+            </ul>
+          </Fragment>
+        ))}
+      </div>
       {results.length > shown && (
         <button type="button" className="sp-more" onClick={showMore}>
           Show more ({results.length - shown} remaining)

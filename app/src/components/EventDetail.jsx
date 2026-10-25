@@ -1,4 +1,4 @@
-import { Fragment, Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, Suspense, lazy, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FramingPointer } from "./FramingPointer.jsx";
 import { FramingReviewFailed } from "./LoadFailed.jsx";
 import ShareButton from "./ShareButton.jsx";
@@ -136,8 +136,11 @@ function historyUrl(wikipediaUrl) {
  * its button is shown on narrow screens only (SidePanel.css).
  * `onSelectEvent(id)` opens another event (the "Part of", "Includes" and related links).
  * `borderYear` is the year whose borders the map draws (for the shading note).
+ * Memoized (default export): App re-renders on every Play step, map move and
+ * hover, and this view re-splits and marks its whole lead each render; keep
+ * its props stable (SearchPanel's onShowOnMap is a useCallback).
  */
-export default function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent }) {
+function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent }) {
   const headingRef = useRef(null);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
@@ -461,3 +464,5 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
     </article>
   );
 }
+
+export default memo(EventDetail);

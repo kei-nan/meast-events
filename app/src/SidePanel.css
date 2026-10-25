@@ -203,7 +203,8 @@
 .side-panel input:focus-visible,
 .side-panel select:focus-visible,
 .side-panel a:focus-visible,
-.side-panel h2:focus-visible {
+.side-panel h2:focus-visible,
+.side-panel .sp-status:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
 }
@@ -772,8 +773,11 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 /* "Ongoing, started before <year>" between the two browse-list groups; in the
-   Timeline view also the decades (--decade: "1970s", not "1970S"). */
-.sp-list li.sp-list-heading {
+   Timeline view also the decades (--decade: "1970s", not "1970S"). An h2
+   between the groups' lists (ResultsList), styled as the rows' divider. */
+.sp-results h2.sp-list-heading {
+  margin: 0;
+  font: inherit;
   padding: 14px 8px 6px 11px; /* aligned with .sp-row text */
   font-size: 0.72rem;
   font-weight: 600;
@@ -783,14 +787,8 @@ button.sp-chip[aria-pressed="true"] {
   border-top: 1px solid var(--border);
 }
 
-.sp-list li.sp-list-heading--decade {
+.sp-results h2.sp-list-heading--decade {
   text-transform: none;
-}
-
-.sp-list-heading h2 {
-  margin: 0;
-  font: inherit;
-  letter-spacing: inherit;
 }
 
 .sp-row {
