@@ -129,13 +129,51 @@ test("the bundle's search folder is used; once it is gone, the folder meta.json 
     assert.equal(calls.meta, 0);
     assert.deepEqual(await searchEventIds("q"), ["e1"]);
     assert.equal(calls.meta, 1);
-    // The old folder's engine import may settle after the retry's, so the two
-    // options calls can come in either order.
-    assert.deepEqual(pf.calls.options.map((o) => o.basePath).sort(), ["/pagefind/v.old/", "/pagefind/v.test/"]);
+    // The search ran on the new folder's engine. The old folder's engine import
+    // is not awaited by anyone and may settle before, after or not at all here.
+    const bases = pf.calls.options.map((o) => o.basePath);
+    assert.equal(bases.filter((b) => b === "/pagefind/v.test/").length, 1);
+    assert.ok(bases.every((b) => b === "/pagefind/v.test/" || b === "/pagefind/v.old/"));
     assert.deepEqual(calls, ["/pagefind/v.test/ids.json"]);
   } finally {
     delete globalThis.__SEARCH_DIR__;
     delete globalThis.__goneDir;
+  }
+});
+
+test("an old folder's load failing late does not reset the new folder's", async () => {
+  // A folder name of its own: an engine URL imported by an earlier test stays
+  // cached, so it would not fail here. The old folder's engine fails at once; its id map answers 404 only after
+  // the retry has loaded the new folder.
+  globalThis.__SEARCH_DIR__ = "v.late";
+  globalThis.__fakePagefindDownloadFails = (url) => url.includes("/v.late/");
+  let release;
+  const gate = new Promise((r) => (release = r));
+  let oldIdsDone;
+  const oldIdsSettled = new Promise((r) => (oldIdsDone = r));
+  try {
+    const { searchEventIds } = await fresh();
+    const pf = fakePagefind({ results: [{ id: "p1" }] });
+    const calls = stubIds({ p1: "e1" });
+    const fetchNew = globalThis.fetch;
+    globalThis.fetch = async (url, init) => {
+      if (!url.includes("/v.late/")) return fetchNew(url, init);
+      await gate;
+      setTimeout(oldIdsDone, 0);
+      return new Response("", { status: 404 });
+    };
+    await assert.rejects(searchEventIds("q"), /dynamically imported module/);
+    assert.deepEqual(await searchEventIds("q"), ["e1"]);
+    release();
+    await oldIdsSettled;
+    assert.deepEqual(await searchEventIds("q"), ["e1"]);
+    // Still the retry's one meta.json read, engine and id map.
+    assert.equal(calls.meta, 1);
+    assert.equal(pf.calls.options.length, 1);
+    assert.deepEqual(calls, ["/pagefind/v.test/ids.json"]);
+  } finally {
+    delete globalThis.__SEARCH_DIR__;
+    delete globalThis.__fakePagefindDownloadFails;
   }
 });
 

@@ -62,13 +62,16 @@ async function load() {
     dirPromise = null;
   };
   if (!enginePromise) {
-    enginePromise = import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
+    const p = import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
       await pf.options({ basePath: base });
       await pf.init();
       return pf;
     });
-    // A failed load is retried on the next search.
-    enginePromise.catch(() => {
+    enginePromise = p;
+    // A failed load is retried on the next search. A load from a folder that
+    // has since been replaced may still settle; it must not reset the new one.
+    p.catch(() => {
+      if (enginePromise !== p) return;
       enginePromise = null;
       engineFailures++;
       failed();
@@ -76,11 +79,13 @@ async function load() {
   }
   if (!idsPromise) {
     // {pagefind result id: event id}; replaces a fragment request per result.
-    idsPromise = fetch(`${base}ids.json`).then((res) => {
+    const p = fetch(`${base}ids.json`).then((res) => {
       if (!res.ok) throw new Error(`Failed to load search ids: ${res.status}`);
       return res.json();
     });
-    idsPromise.catch(() => {
+    idsPromise = p;
+    p.catch(() => {
+      if (idsPromise !== p) return;
       idsPromise = null;
       failed();
     });
