@@ -7,6 +7,7 @@ import {
   clampPanelWidth,
   maxPanelWidth,
   parseStoredWidth,
+  widthForClick,
   widthForKey,
 } from "./panelWidth.js";
 
@@ -49,4 +50,11 @@ test("keys: Home and End go to the limits, Enter resets, others are ignored", ()
   assert.equal(widthForKey("a", false, 500, 864), null);
   assert.equal(widthForKey("ArrowRight", false, PANEL_MIN, 864), PANEL_MIN);
   assert.equal(widthForKey("ArrowLeft", false, 864, 864), 864);
+});
+
+test("a click widens by the big step, kept at the widest, and from the widest goes back to the narrowest", () => {
+  assert.equal(widthForClick(400, 900), 400 + PANEL_STEP_BIG);
+  assert.equal(widthForClick(880, 900), 900);
+  assert.equal(widthForClick(900, 900), PANEL_MIN);
+  assert.equal(widthForClick(950, 900), PANEL_MIN);
 });
