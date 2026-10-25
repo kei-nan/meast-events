@@ -62,6 +62,18 @@ export const POINT_PAINT = {
   "circle-stroke-opacity": ["case", IS_MISS, 0.3, 1],
 };
 
+// A thin dark edge around an approximate location's ring: a slightly larger
+// dark disc drawn just under it (mapInstallLayers.js "unclustered-point-edge").
+// The cream fill (1.25:1 on land) and the light inks of the ring (antique gold
+// 1.8:1, dusty lilac 2.3:1, verdigris 2.5:1) were too faint on the light land;
+// the edge is 9:1 there. Not on a dimmed non-match, which keeps its faded look.
+const APPROX_EDGE_PX = 1.5;
+export const APPROX_EDGE_PAINT = {
+  "circle-color": STROKE_DOT,
+  "circle-radius": ["+", POINT_PAINT["circle-radius"], 3 + APPROX_EDGE_PX], // the ring is 3px (above)
+  "circle-opacity": ["case", IS_MISS, 0, 1],
+};
+
 export const CLUSTER_PAINT = {
   "circle-color": "#5c4d38",
   "circle-radius": ["step", ["get", "point_count"], 14, 5, 18, 15, 24],
