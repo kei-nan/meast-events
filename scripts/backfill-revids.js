@@ -22,7 +22,8 @@
 // conversion is trusted for an article only when it reproduces the article's current TextExtracts lead exactly
 // (converted current revision === current lead); otherwise the event is left without a revision. If nothing matches
 // within RECENT_DAYS, it looks further back, to WIDE_DAYS. The stored text and every other field stay as they are.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { fetchLeads, titleFromWikipediaUrl } from "./lib/lead.js";
 import { backfillRevid, isRevid, isRevTimestamp, setRevid } from "./lib/revid.js";
 import { candidateRuns, fetchRevisions, htmlLead, parseRevisionHtml } from "./lib/rev-lead.js";
@@ -52,7 +53,7 @@ if (HISTORICAL) await historical();
 else current();
 
 if (APPLY) {
-  await writeFile(file, JSON.stringify(events, null, 2) + "\n");
+  await writeFileAtomic(file, JSON.stringify(events, null, 2) + "\n");
   console.log("APPLIED: wrote data/events.json (wikipedia_revid and wikipedia_revid_timestamp only).");
 } else {
   console.log("Dry run - nothing written. Re-run with --apply to write.");

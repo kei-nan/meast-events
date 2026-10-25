@@ -32,7 +32,8 @@ export function retryAfterMs(value, now = Date.now()) {
 
 const isTimeout = (err) => err?.name === "TimeoutError" || err?.name === "AbortError";
 
-// opts.fetchImpl / opts.sleepImpl: injectable for tests (default: global fetch, real sleep).
+// opts.fetchImpl / opts.sleepImpl / opts.nowImpl: injectable for tests (default: global fetch,
+// real sleep, the real clock for Retry-After dates).
 export async function politeFetch(
   url,
   options = {},
@@ -43,6 +44,7 @@ export async function politeFetch(
     timeoutMs = DEFAULT_TIMEOUT_MS,
     fetchImpl = globalThis.fetch,
     sleepImpl = sleep,
+    nowImpl = Date.now,
   } = {}
 ) {
   let lastErr;
@@ -66,7 +68,7 @@ export async function politeFetch(
       if ((res.status === 429 || res.status >= 500) && !noRetryStatuses.includes(res.status)) {
         lastErr = err;
         if (attempt < retries) {
-          await sleepImpl(retryAfterMs(res.headers.get("retry-after")) ?? baseDelayMs * 2 ** attempt);
+          await sleepImpl(retryAfterMs(res.headers.get("retry-after"), nowImpl()) ?? baseDelayMs * 2 ** attempt);
           continue;
         }
         throw err;

@@ -21,7 +21,8 @@
 //
 // Read-only requests through lib/http.js politeFetch (the project's User-Agent), cached like the
 // pipeline's (lib/cache.js: the "leads" and "entities" caches enrich-candidates.js uses).
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { openCache } from "./lib/cache.js";
 import { sleep } from "./lib/http.js";
 import { fetchLeads, titleFromWikipediaUrl } from "./lib/lead.js";
@@ -79,7 +80,7 @@ if (APPLY) {
     if (fixFields.length || changed.length) applied.push(e.id);
   }
   const left = seeds.filter(lacking);
-  await writeFile(curatedUrl, JSON.stringify(curated, null, 2) + "\n");
+  await writeFileAtomic(curatedUrl, JSON.stringify(curated, null, 2) + "\n");
   console.log(`\nAPPLIED to ${applied.length} events; events changed per field: ${JSON.stringify(fieldCounts)}`);
   if (fixed.length) console.log(`ledger (F13/F14): ${fixed.join(", ")}`);
   console.log(`left unchanged (date is no Wikidata value and no ledger entry settles it, or nothing could be fetched): ${left.length}`);
@@ -99,5 +100,5 @@ const doc = {
   summary: summarize(proposals),
   events: proposals,
 };
-await writeFile(outUrl, JSON.stringify(doc, null, 2) + "\n");
+await writeFileAtomic(outUrl, JSON.stringify(doc, null, 2) + "\n");
 console.log(`Wrote data/seed-enrichment.proposed.json (${proposals.length} events).${APPLY ? "" : " Dry run: data/events.json is unchanged; re-run with --apply to write it."}`);

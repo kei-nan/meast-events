@@ -16,7 +16,8 @@
 //
 // The aliases are Wikidata's English "also known as" values, stored as-is in Wikidata's order; an item
 // with none has no `wikidata_aliases` field.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { fetchEntities, setWikidataAliases } from "./lib/wd-entities.js";
 
 const APPLY = process.argv.includes("--apply");
@@ -58,7 +59,7 @@ console.log(
 );
 if (missing.length) console.log(`Not fetched (previous count and aliases kept): ${missing.join(", ")}`);
 if (APPLY) {
-  await writeFile(curatedUrl, JSON.stringify(events, null, 2) + "\n");
+  await writeFileAtomic(curatedUrl, JSON.stringify(events, null, 2) + "\n");
   console.log("APPLIED: wrote data/events.json.");
 } else {
   console.log("Dry run - nothing written. Re-run with --apply.");

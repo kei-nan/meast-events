@@ -54,6 +54,7 @@
 // dropped, so a human reviewer can override the cutoff by eye rather than trust it
 // blindly.
 import { readFile, writeFile } from "node:fs/promises";
+import { readJsonIfExists } from "./lib/files.js";
 import { sleep } from "./lib/http.js";
 import { runSparql, qidFromUri, compareQids } from "./lib/wdqs.js";
 import {
@@ -105,7 +106,7 @@ const REQUEST_DELAY_MS = 1500; // WDQS etiquette: no rapid-fire/parallel queryin
 // (the batched fallback below passes a slice of the class's subclass tree).
 function buildQuery(classQid, { transitive = true, classValues = null } = {}) {
   const countryValues = ALL_COUNTRY_QIDS.map((q) => `wd:${q}`).join(" ");
-  const maxYear = new Date().getFullYear() + 1;
+  const maxYear = new Date().getUTCFullYear() + 1;
   const classPath = transitive ? "wdt:P31/wdt:P279*" : "wdt:P31";
   const classTriple = classValues
     ? `VALUES ?cls { ${classValues.map((q) => `wd:${q}`).join(" ")} }\n      ?item wdt:P31 ?cls .`
@@ -205,7 +206,7 @@ function titleFromEnwikiUrl(url) {
 
 // Event classes, dates (the same rule as buildQuery), sitelinks and English article of the given items.
 function predecessorDetailQuery(itemQids) {
-  const maxYear = new Date().getFullYear() + 1;
+  const maxYear = new Date().getUTCFullYear() + 1;
   return `
 SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?enwiki ?classes WHERE {
   {
@@ -311,23 +312,16 @@ async function loadExistingTitlesAndQids() {
   // Cross-check signal: does discovery re-find events already curated by hand? Uses
   // both seed-events.json (title match) and events.json (QID match, more reliable
   // since it's resolved post-ingest) - either file may be absent/stale, so both are
-  // best-effort.
+  // best-effort: an ABSENT file is fine; a malformed or unreadable one throws (read as empty,
+  // every curated event would come back as a new candidate).
   const titles = new Set();
   const qids = new Set();
-  try {
-    const seed = JSON.parse(await readFile(new URL("../data/seed-events.json", import.meta.url), "utf-8"));
-    for (const e of seed) titles.add(e.wikipedia_title.toLowerCase());
-  } catch {
-    // fine, optional
-  }
-  try {
-    const events = JSON.parse(await readFile(new URL("../data/events.json", import.meta.url), "utf-8"));
-    for (const e of events) {
-      if (e.title) titles.add(e.title.toLowerCase());
-      if (e.wikidata_qid) qids.add(e.wikidata_qid);
-    }
-  } catch {
-    // fine, optional
+  const seed = await readJsonIfExists(new URL("../data/seed-events.json", import.meta.url), []);
+  for (const e of seed) titles.add(e.wikipedia_title.toLowerCase());
+  const events = await readJsonIfExists(new URL("../data/events.json", import.meta.url), []);
+  for (const e of events) {
+    if (e.title) titles.add(e.title.toLowerCase());
+    if (e.wikidata_qid) qids.add(e.wikidata_qid);
   }
   return { titles, qids };
 }

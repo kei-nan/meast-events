@@ -10,15 +10,43 @@ import { isRevid, isRevTimestamp } from "./revid.js";
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
 // Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
 import { shapeNamesFor } from "../../app/src/lib/eventCountries.js";
+// The app's own id check (the /event/<id> path and ?e= links) and timeline span: an event the
+// validator passes must be one the app can link to and show.
+import { isValidEventId } from "../../app/src/lib/urlState.js";
+import { MIN_YEAR, MAX_YEAR } from "../../app/src/lib/years.js";
 
+// The pipeline's slugs (lower-case letters, digits and hyphens: safe as a file name everywhere, ":"
+// is not on Windows) that the app also accepts (isValidEventId: a letter or digit first, at most
+// 120 characters), and never a name that collides with a fixed file next to the event pages
+// (index) or a Windows reserved device name (a checkout on Windows could not hold a file or
+// folder named after it).
 const ID_RE = /^[a-z0-9-]+$/;
+export const RESERVED_IDS = new Set([
+  "index",
+  "con",
+  "prn",
+  "aux",
+  "nul",
+  ...Array.from({ length: 9 }, (_, i) => `com${i + 1}`),
+  ...Array.from({ length: 9 }, (_, i) => `lpt${i + 1}`),
+]);
+/** Why `id` is not a valid event id, or null when it is. */
+export function eventIdProblem(id) {
+  if (typeof id !== "string" || !ID_RE.test(id) || !isValidEventId(id)) {
+    return `id must be lower-case letters, digits and hyphens, a letter or digit first, at most 120 characters (got ${JSON.stringify(id)})`;
+  }
+  if (RESERVED_IDS.has(id)) return `id ${JSON.stringify(id)} is a reserved file name (index, or a Windows device name)`;
+  return null;
+}
 const QID_RE = /^Q[1-9][0-9]*$/;
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
-// Inclusion rule 3 (docs/DATA_POLICY.md): events date from 1900 to the present. One year of
-// slack at the top for a scheduled end date; the bound moves with the clock (UTC). A start date
-// after the day its data was fetched (a scheduled election, say) is valid but WARNED about.
-export const MIN_YEAR = 1900;
-export const MAX_YEAR = new Date().getUTCFullYear() + 1;
+// Inclusion rule 3 (docs/DATA_POLICY.md): events date from 1900 to the present. The bounds are
+// the app's timeline span (app/src/lib/years.js; outside a Vite bundle MAX_YEAR is the current
+// UTC year): a start date after it would pass here but never show on the timeline. An END date
+// keeps one year of slack (MAX_END_YEAR) for a scheduled end; the event still shows by its start.
+// A start date after the day its data was fetched (a scheduled election, say) is valid but WARNED about.
+export { MIN_YEAR, MAX_YEAR };
+export const MAX_END_YEAR = MAX_YEAR + 1;
 export const LOCATION_QUALITIES = ["precise", "approximate", "none"];
 
 // The allowed `category` / `category_group` values: the groups the pipeline can assign, "unclassified" included
@@ -118,11 +146,12 @@ export function pinCountryCheck(e, index) {
   return { year, km };
 }
 
-export function isRealDate(s) {
+// A real calendar day YYYY-MM-DD in MIN_YEAR..maxYear (default MAX_YEAR, the app's last year).
+export function isRealDate(s, maxYear = MAX_YEAR) {
   const m = DATE_RE.exec(s);
   if (!m) return false;
   const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  if (y < MIN_YEAR || y > MAX_YEAR || mo < 1 || mo > 12 || d < 1) return false;
+  if (y < MIN_YEAR || y > maxYear || mo < 1 || mo > 12 || d < 1) return false;
   const dim = new Date(Date.UTC(y, mo, 0)).getUTCDate(); // days in month (leap-year aware)
   return d <= dim;
 }
@@ -158,7 +187,8 @@ export function validateEvents(
   events.forEach((e, i) => {
     if (!e || typeof e !== "object") return err(i, e, "not an object");
 
-    if (typeof e.id !== "string" || !ID_RE.test(e.id)) err(i, e, `id must match ${ID_RE} (got ${JSON.stringify(e.id)})`);
+    const idProblem = eventIdProblem(e.id);
+    if (idProblem) err(i, e, idProblem);
     else if (ids.has(e.id)) err(i, e, `duplicate id (also at index ${ids.get(e.id)})`);
     else ids.set(e.id, i);
 
@@ -191,7 +221,7 @@ export function validateEvents(
       err(i, e, "date_flags must be an array of non-empty strings");
     }
     if (e.date_end != null) {
-      if (!isRealDate(e.date_end)) err(i, e, `date_end invalid (${JSON.stringify(e.date_end)})`);
+      if (!isRealDate(e.date_end, MAX_END_YEAR)) err(i, e, `date_end invalid (${JSON.stringify(e.date_end)})`);
       else if (isRealDate(e.date_start) && e.date_end < e.date_start) {
         // v2.1: Wikidata's own date-order errors are kept and flagged, not dropped. The order problem is
         // only tolerated (as a warning) when date_flags carries a date_order_invalid reason explaining it.
@@ -247,8 +277,9 @@ export function validateEvents(
     ) {
       err(i, e, "wikidata_aliases must be a non-empty array of non-empty strings (absent when Wikidata has none)");
     }
-    if (typeof e.extract_retrieved_at !== "string" || !/^\d{4}-\d{2}-\d{2}/.test(e.extract_retrieved_at)) {
-      err(i, e, "extract_retrieved_at must be an ISO date");
+    // A date or a timestamp; its day must be a real calendar day (not 2026-02-30).
+    if (typeof e.extract_retrieved_at !== "string" || !ISO_DAY_RE.test(e.extract_retrieved_at) || !isRealDate(e.extract_retrieved_at.slice(0, 10))) {
+      err(i, e, `extract_retrieved_at must be an ISO date (got ${JSON.stringify(e.extract_retrieved_at)})`);
     }
     // The revision whose lead is the stored extract, and its date (lib/revid.js): both or neither.
     if ("wikipedia_revid" in e && !isRevid(e.wikipedia_revid)) {

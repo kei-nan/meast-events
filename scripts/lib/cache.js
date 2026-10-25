@@ -9,9 +9,10 @@
 //                              also ATLAS_CACHE_MAX_AGE
 // Each entry's storage time is kept next to the cache in <name>.times.json. Entries written by
 // an older version of this file have no time and count as expired whenever a max age is set.
-import { readFileSync, writeFileSync, mkdirSync, renameSync, existsSync } from "node:fs";
+import { readFileSync, mkdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { writeFileAtomicSync } from "./files.js";
 
 const argVal = (argv, name) => argv.find((a) => a.startsWith(`--${name}=`))?.split("=").slice(1).join("=");
 
@@ -44,11 +45,7 @@ const readJson = (file) => {
     return {};
   }
 };
-const writeJson = (file, data) => {
-  const tmp = `${file}.tmp`;
-  writeFileSync(tmp, JSON.stringify(data));
-  renameSync(tmp, file);
-};
+const writeJson = (file, data) => writeFileAtomicSync(file, JSON.stringify(data));
 
 // opts.fresh / opts.maxAgeMs: see above (default: from the command line); opts.now: clock (tests).
 export function openCache(name, dir = defaultCacheDir(), { fresh, maxAgeMs, now = () => Date.now() } = {}) {
