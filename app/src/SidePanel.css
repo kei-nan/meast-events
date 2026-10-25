@@ -163,7 +163,12 @@
   user-select: none !important;
 }
 
+/* Positioned, so the screen-reader-only spans below (absolute) are placed and
+   clipped inside the panel. Otherwise one far down a long event (the Wikidata
+   link's "(opens in a new tab)") sits at its place in the panel's full height
+   and stretches the page, which then shows a second scrollbar. */
 .sp-scroll {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
