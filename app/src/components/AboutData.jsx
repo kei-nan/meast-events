@@ -505,7 +505,8 @@ export default function AboutData({ section = null, onClose }) {
           , non-commercial use, credited to UN OCHA.
         </p>
         <p>
-          Source code: AGPL-3.0. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
+          <a href={REPO} target="_blank" rel="noreferrer" title="Opens in a new tab">Source code</a>:{" "}
+          <a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">AGPL-3.0</a>. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
           link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0) and, for the West
           Bank areas, from UN OCHA data whose terms allow non-commercial use only, so the border data is for
           non-commercial use. Some corrected border points are located with{" "}

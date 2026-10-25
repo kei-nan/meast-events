@@ -12,7 +12,7 @@ import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
 import { timelineOrder } from "../lib/timelineView.js";
-import { downloadText, exportFilename, exportQuery, exportRows, toCSV, toJSON } from "../lib/exportResults.js";
+import { downloadText, exportFileRange, exportFilename, exportQuery, exportRows, toCSV, toJSON } from "../lib/exportResults.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
 import useSheetDrag from "../hooks/useSheetDrag";
@@ -362,7 +362,7 @@ export default function SearchPanel({
     if (!canDownload) return;
     const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0]) : results;
     const rows = exportRows(ordered, { range, browse: !searching });
-    const name = exportFilename(range, rows.length, kind);
+    const name = exportFilename(exportFileRange(range, { searching, scope: filters.scope }), rows.length, kind);
     if (kind === "csv") downloadText(toCSV(rows), name, "text/csv;charset=utf-8");
     else {
       const q = exportQuery({ query: textQuery, filters, area, range, sort, view });
@@ -419,7 +419,9 @@ export default function SearchPanel({
             onKeyDown={(e) => {
               if (e.key !== "Escape" || e.defaultPrevented) return;
               e.preventDefault();
-              onBack();
+              // An armed area drawing goes first: the map's own Escape skips the panel.
+              if (areaMode !== "off") onAreaModeChange?.("off");
+              else onBack();
             }}
           >
             <EventDetail

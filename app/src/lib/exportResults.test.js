@@ -4,6 +4,7 @@ import {
   ATTRIBUTION,
   CSV_COLUMNS,
   csvCell,
+  exportFileRange,
   exportFilename,
   exportQuery,
   exportRow,
@@ -254,4 +255,12 @@ test("exportFilename", () => {
   assert.equal(exportFilename([1917, 2026], 23, "csv"), "middleeast-events-1917-2026-23.csv");
   assert.equal(exportFilename([1967, 1967], 5, "json"), "middleeast-events-1967-5.json");
   assert.equal(exportFilename(null, 0, "csv"), "middleeast-events-all-0.csv");
+});
+
+test("exportFileRange: a whole-timeline search is named 'all', not the timeline's years", () => {
+  const name = (searching, scope) => exportFilename(exportFileRange([1967, 1967], { searching, scope }), 120, "csv");
+  assert.equal(name(true, "all"), "middleeast-events-all-120.csv");
+  assert.equal(name(true, "range"), "middleeast-events-1967-120.csv");
+  // Browsing (no search) lists only the selected years, whatever the scope.
+  assert.equal(name(false, "all"), "middleeast-events-1967-120.csv");
 });
