@@ -236,12 +236,17 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     assert.equal(meta.withoutLocation, 1);
     const all = JSON.parse(fs.readFileSync(path.join(r.out, "events", meta.dir, "all.json"), "utf8"));
     assert.deepEqual(all.map((e) => e.id), ["a", "b"]);
-    assert.ok(fs.existsSync(path.join(r.out, "boundaries", "meta.json")));
+    // The decade chunks are in one versioned folder that boundaries/meta.json names.
+    const bmeta = JSON.parse(fs.readFileSync(path.join(r.out, "boundaries", "meta.json"), "utf8"));
+    assert.match(bmeta.version, /^[0-9a-f]{12}$/);
+    assert.equal(bmeta.dir, `v.${bmeta.version}`);
+    assert.deepEqual(fs.readdirSync(path.join(r.out, "boundaries")).sort(), [bmeta.dir, "meta.json", "shared"].sort());
+    assert.deepEqual(fs.readdirSync(path.join(r.out, "boundaries", bmeta.dir)).sort(), bmeta.decades.map((d) => `${d}.tbin`).sort());
     assert.ok(Array.isArray(decodeGeo(fs.readFileSync(path.join(r.out, "land.tbin"))).cells));
     // Geometry is .tbin only; a deferred group's members are one shared file, "<hash>#<index>".
     const files = fs.readdirSync(r.out, { recursive: true }).filter((p) => /^(land|boundaries)/.test(p) && fs.statSync(path.join(r.out, p)).isFile());
     assert.deepEqual(files.filter((p) => !p.endsWith(".tbin")), [path.join("boundaries", "meta.json")]);
-    const chunk = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", "2020.tbin")));
+    const chunk = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", bmeta.dir, "2020.tbin")));
     const members = chunk.features.filter((f) => f.geometry_ref);
     assert.equal(members.length, DEFERRED_GROUPS[0].members.length);
     const [hash] = members[0].geometry_ref.split("#");
@@ -252,6 +257,24 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
   } finally {
     r.cleanup();
   }
+});
+
+test("CLI: the boundaries folder's version changes when only a shared geometry does", () => {
+  const version = (boundaries) => {
+    const r = runSplit([event("a")], { boundaries });
+    try {
+      assert.equal(r.status, 0, r.stderr);
+      return JSON.parse(fs.readFileSync(path.join(r.out, "boundaries", "meta.json"), "utf8")).version;
+    } finally {
+      r.cleanup();
+    }
+  };
+  // Same bbox, one more vertex on an edge: only the deferred group's shared file changes.
+  const changed = deferredFixture();
+  changed[0].geometry = { type: "Polygon", coordinates: [[[35, 31], [35.05, 31], [35.1, 31], [35.1, 31.1], [35, 31.1], [35, 31]]] };
+  const before = version(deferredFixture());
+  assert.equal(version(deferredFixture()), before);
+  assert.notEqual(version(changed), before);
 });
 
 test("CLI: fails on an event the map can never show (outside MAP_EXTENT)", () => {

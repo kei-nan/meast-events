@@ -9,7 +9,9 @@
 //   - events/meta.json agrees with it, the lite list has no duplicate ids, and
 //     every event's full record is in the bucket its id hashes to;
 //   - every geometry file (.tbin) the app is pointed to exists and decodes: each
-//     decade's boundaries and the shared geometries they name, the land and its cells;
+//     decade's boundaries (in the versioned folder boundaries/v.<BOUNDARIES_VERSION>/,
+//     which boundaries/meta.json and the built JavaScript name too, and no other)
+//     and the shared geometries they name, the land and its cells;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - every event has its page, and each is the app: the same /assets/ as index.html;
 //   - the search index (Pagefind) was built into the versioned folder
@@ -107,9 +109,13 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   // 1. The generated data version and the folder it names.
   let DATA_VERSION = null;
   let FULL_BUCKETS = null;
+  let BOUNDARIES_VERSION = null;
   if (!existsSync(versionFile)) fail("src/lib/dataVersion.js is missing (split-data.mjs did not run)");
-  else ({ DATA_VERSION, FULL_BUCKETS } = await import(pathToFileURL(versionFile).href));
+  else ({ DATA_VERSION, FULL_BUCKETS, BOUNDARIES_VERSION = null } = await import(pathToFileURL(versionFile).href));
   if (DATA_VERSION !== null && !/^[0-9a-f]{12}$/.test(DATA_VERSION)) fail(`DATA_VERSION ${JSON.stringify(DATA_VERSION)} is not 12 hex characters`);
+  if (existsSync(versionFile) && !/^[0-9a-f]{12}$/.test(BOUNDARIES_VERSION ?? "")) {
+    fail(`BOUNDARIES_VERSION ${JSON.stringify(BOUNDARIES_VERSION)} is not 12 hex characters`);
+  }
   if (FULL_BUCKETS !== null && !(Number.isInteger(FULL_BUCKETS) && FULL_BUCKETS > 0)) fail(`FULL_BUCKETS ${FULL_BUCKETS} is not a positive integer`);
 
   const dir = `v.${DATA_VERSION}`;
@@ -161,14 +167,27 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
       return fail(`${rel} does not decode: ${err.message}`), null;
     }
   };
-  // Boundary chunks, and every shared geometry a chunk points to ("<file>#<index>").
+  // Boundary chunks, in the one versioned folder boundaries/v.<BOUNDARIES_VERSION>/
+  // that the bundle and boundaries/meta.json both name, and every shared geometry a
+  // chunk points to ("<file>#<index>").
   const bmeta = readJSON("data/boundaries/meta.json");
+  const bdir = `v.${BOUNDARIES_VERSION}`;
+  if (BOUNDARIES_VERSION) {
+    if (bmeta.version !== BOUNDARIES_VERSION) fail(`boundaries/meta.json version ${bmeta.version} != BOUNDARIES_VERSION ${BOUNDARIES_VERSION}`);
+    if (bmeta.dir !== bdir) fail(`boundaries/meta.json dir ${bmeta.dir} != ${bdir}`);
+    const stale = readdirSync(distFile("data/boundaries")).filter((f) => /^(v\..+|\d{4}\.tbin)$/.test(f) && f !== bdir);
+    if (stale.length) fail(`other or old-layout boundary files in dist/data/boundaries: ${stale.join(", ")}`);
+    const assets = existsSync(distFile("assets")) ? readdirSync(distFile("assets")).filter((f) => f.endsWith(".js")) : [];
+    if (!assets.some((f) => readFileSync(distFile(`assets/${f}`), "utf8").includes(BOUNDARIES_VERSION))) {
+      fail(`no dist/assets/*.js contains BOUNDARIES_VERSION ${BOUNDARIES_VERSION} (the bundle was built against another dataVersion.js)`);
+    }
+  }
   for (const d of bmeta.decades) {
-    for (const f of readGeo(`data/boundaries/${d}.tbin`)?.features ?? []) {
+    for (const f of readGeo(`data/boundaries/${bdir}/${d}.tbin`)?.features ?? []) {
       if (!f.geometry_ref) continue;
       const [file, index = "0"] = f.geometry_ref.split("#");
       const rel = `data/boundaries/shared/${file}.tbin`;
-      if (!existsSync(distFile(rel))) fail(`data/boundaries/${d}.tbin points to missing shared geometry ${f.geometry_ref}`);
+      if (!existsSync(distFile(rel))) fail(`data/boundaries/${bdir}/${d}.tbin points to missing shared geometry ${f.geometry_ref}`);
       else if (!readGeo(rel)?.features?.[Number(index)]?.geometry) fail(`${rel} has no geometry ${index} (named by ${d}.tbin)`);
     }
   }
@@ -281,7 +300,11 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     if (hasMarker(text)) fail(`_headers still has "${MARKER}" lines (expand-headers.mjs did not run)`);
     if (rules.length > MAX_RULES) fail(`_headers has ${rules.length} rules; the host reads only the first ${MAX_RULES}`);
     const immutable = (r) => r.headers.some((h) => /^cache-control:.*\bimmutable\b/i.test(h));
-    const splat = (r) => r.pattern.includes("*") && r.pattern !== `/data/events/${dir}/*` && r.pattern !== `/pagefind/${searchDir}/*`;
+    const splat = (r) =>
+      r.pattern.includes("*") &&
+      r.pattern !== `/data/events/${dir}/*` &&
+      r.pattern !== `/data/boundaries/v.${BOUNDARIES_VERSION}/*` &&
+      r.pattern !== `/pagefind/${searchDir}/*`;
     for (const r of rules) if (splat(r) && immutable(r)) fail(`_headers: the splat rule ${r.pattern} is immutable, so a missing file's 404 would be too`);
     const entry = refs.find((u) => /^\/assets\/index-.*\.js$/.test(u));
     if (entry && !rules.some((r) => r.pattern === entry && r.headers.includes(`Cache-Control: ${IMMUTABLE}`))) {

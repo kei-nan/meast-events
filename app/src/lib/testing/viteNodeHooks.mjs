@@ -20,11 +20,13 @@
 
 export const TEST_DATA_VERSION = "test-v1";
 export const TEST_FULL_BUCKETS = 64;
+export const TEST_BOUNDARIES_VERSION = "test-b1";
 
 const js = (src) => `data:text/javascript,${encodeURIComponent(src)}`;
 
 const DATA_VERSION_URL = js(
-  `export const DATA_VERSION = ${JSON.stringify(TEST_DATA_VERSION)}; export const FULL_BUCKETS = ${TEST_FULL_BUCKETS};`
+  `export const DATA_VERSION = ${JSON.stringify(TEST_DATA_VERSION)}; export const FULL_BUCKETS = ${TEST_FULL_BUCKETS}; ` +
+    `export const BOUNDARIES_VERSION = ${JSON.stringify(TEST_BOUNDARIES_VERSION)};`
 );
 const PAGEFIND_URL = js(
   [

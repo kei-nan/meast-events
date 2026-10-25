@@ -4,7 +4,7 @@ import { register } from "node:module";
 import { topology } from "topojson-server";
 import { fullBucket } from "./fullBucket.js";
 import { encodeGeo } from "./geoCodec.js";
-import { TEST_DATA_VERSION as V1, TEST_FULL_BUCKETS as B1 } from "./testing/viteNodeHooks.mjs";
+import { TEST_BOUNDARIES_VERSION as BV1, TEST_DATA_VERSION as V1, TEST_FULL_BUCKETS as B1 } from "./testing/viteNodeHooks.mjs";
 
 // dataClient.js imports the generated dataVersion.js and reads Vite's
 // import.meta.env; the hooks stub both (DATA_VERSION = V1, FULL_BUCKETS = B1,
@@ -36,6 +36,8 @@ const count = (calls, url) => calls.filter((c) => c.url === url).length;
 const all = (v) => `/data/events/v.${v}/all.json`;
 const bucket = (v, id, n) => `/data/events/v.${v}/full/${fullBucket(id, n)}.json`;
 const META = "/data/events/meta.json";
+const chunk = (v, decade) => `/data/boundaries/v.${v}/${decade}.tbin`;
+const BOUNDARIES_META = "/data/boundaries/meta.json";
 const LITE = [{ id: "e1", date_start: "1948-05-14", coordinates: { lon: 35, lat: 31 } }];
 
 test("failure classes: 4xx and an HTML 200 are not outages, 5xx and network errors are", async () => {
@@ -231,7 +233,7 @@ test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shar
   const feature = (geometry) => ({ type: "Feature", properties: {}, geometry });
   let decadeOk = false;
   const calls = stubFetch({
-    "/data/boundaries/1990.tbin": () =>
+    [chunk(BV1, 1990)]: () =>
       decadeOk
         ? tbin(
             fc(
@@ -258,19 +260,47 @@ test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shar
   assert.deepEqual(await Promise.all([loadDeferredGeometry("h2#0"), loadDeferredGeometry("h2#1")]), [geom, geom2]);
   assert.equal(count(calls, "/data/boundaries/shared/h2.tbin"), 1);
   await assert.rejects(loadDeferredGeometry("h2#2"), /no shared geometry h2#2/);
-  assert.equal(count(calls, "/data/boundaries/1990.tbin"), 2);
+  assert.equal(count(calls, chunk(BV1, 1990)), 2);
 });
 
 test("loadBoundaryDecade: a file without features is evicted and refetched", async () => {
   const { loadBoundaryDecade } = await freshClient();
   let good = false;
   const calls = stubFetch({
-    "/data/boundaries/2000.tbin": () => tbin(good ? fc() : { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] }),
+    [chunk(BV1, 2000)]: () => tbin(good ? fc() : { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] }),
   });
   await assert.rejects(loadBoundaryDecade(2000), /no features/);
   good = true;
   assert.deepEqual((await loadBoundaryDecade(2000)).features, []);
-  assert.equal(count(calls, "/data/boundaries/2000.tbin"), 2);
+  assert.equal(count(calls, chunk(BV1, 2000)), 2);
+});
+
+test("loadBoundaryDecade: this bundle's folder gone (404) -> boundaries/meta.json names the current one, used from then on", async () => {
+  const { loadBoundaryDecade } = await freshClient();
+  const geom = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] };
+  const calls = stubFetch({
+    [BOUNDARIES_META]: () => json({ version: "test-b2", dir: "v.test-b2" }),
+    [chunk("test-b2", 1990)]: () => tbin(fc({ properties: { name: "A" }, geometry: null, geometry_ref: "h9" })),
+    [chunk("test-b2", 2000)]: () => tbin(fc()),
+    "/data/boundaries/shared/h9.tbin": () => tbin(fc({ type: "Feature", properties: {}, geometry: geom })),
+  });
+  assert.deepEqual((await loadBoundaryDecade(1990)).features[0].geometry, geom);
+  const metaCall = calls.find((c) => c.url === BOUNDARIES_META);
+  assert.equal(metaCall.init?.cache, "no-cache");
+  await loadBoundaryDecade(2000);
+  assert.equal(count(calls, chunk(BV1, 1990)), 1);
+  assert.equal(count(calls, chunk(BV1, 2000)), 0); // the switch sticks
+  assert.equal(count(calls, BOUNDARIES_META), 1);
+});
+
+test("loadBoundaryDecade: an outage, or meta.json naming the same folder, does not switch folders", async () => {
+  const { loadBoundaryDecade } = await freshClient();
+  let calls = stubFetch({ [chunk(BV1, 1990)]: () => json({}, 503), [BOUNDARIES_META]: () => json({ version: "test-b2" }) });
+  await assert.rejects(loadBoundaryDecade(1990), (e) => e.outage === true);
+  assert.equal(count(calls, BOUNDARIES_META), 0);
+  calls = stubFetch({ [BOUNDARIES_META]: () => json({ version: BV1 }) });
+  await assert.rejects(loadBoundaryDecade(1990), (e) => e.outage === false && /404/.test(e.message));
+  assert.equal(count(calls, BOUNDARIES_META), 1);
 });
 
 test("BASE_URL prefixes every data path", async () => {

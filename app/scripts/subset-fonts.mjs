@@ -111,9 +111,10 @@ for (const f of dataFiles) walkJSON(JSON.parse(readFileSync(f, "utf8")));
 // The map label characters (see the top of the file).
 const labelChars = new Set();
 for (let cp = 0x20; cp <= 0x7e; cp++) labelChars.add(cp);
-const boundariesDir = path.join(dataDir, "boundaries");
-// The decade files (<decade>.tbin, read decoded). Finding none fails the run: the
-// border names would go unchecked, as happened when they moved from .json to .tbin.
+// The decade files (boundaries/v.<version>/<decade>.tbin, the folder boundaries/meta.json
+// names; read decoded). Finding none fails the run: the border names would go
+// unchecked, as happened when they moved from .json to .tbin.
+const boundariesDir = path.join(dataDir, "boundaries", JSON.parse(readFileSync(path.join(dataDir, "boundaries", "meta.json"), "utf8")).dir ?? "");
 const decadeFiles = readdirSync(boundariesDir).filter((n) => /^\d{4}\.tbin$/.test(n));
 if (!decadeFiles.length) {
   console.error(`subset-fonts: no <decade>.tbin under ${boundariesDir}; run scripts/split-data.mjs first`);
