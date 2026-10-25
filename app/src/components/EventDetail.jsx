@@ -296,7 +296,7 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
           "part of". Where an entry's data comes from is in "About this entry" at the end. */}
       <header className="event-detail-head">
         {event.category && (
-          <p className="event-detail-category">Category (our grouping): {categoryWithBasis(event)}</p>
+          <p className="event-detail-category">Category: {categoryWithBasis(event)}</p>
         )}
         <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
           {event.title}

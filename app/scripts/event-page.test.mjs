@@ -279,6 +279,12 @@ test("classes: only those on the event-class list, with a link to the Wikidata i
   assert.doesNotMatch(page({ id: "g", title: "G" }), /Hand-picked/);
 });
 
+test("category: named with the Wikidata class it comes from, as on the event panel", () => {
+  const html = page({ id: "h", title: "H", category: "atrocity", wikidata_classes: ["famine", "genocide"] });
+  assert.match(html, /<p class="category">Category: Atrocity, from Wikidata’s class “genocide”<\/p>/);
+  assert.doesNotMatch(html, /our grouping/);
+});
+
 test("an invalid id is refused", () => {
   assert.throws(() => page({ id: "../x", title: "X" }));
 });

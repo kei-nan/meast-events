@@ -56,7 +56,11 @@ export function categoryBasis(event) {
   return listed;
 }
 
-/** The header text after "Category (our grouping): ", attributing the group to Wikidata's classes. */
+/**
+ * The header text after "Category: ", attributing the group to Wikidata's classes. That attribution is what tells
+ * the reader the group is ours; "our grouping" itself is said once, where the groups are introduced (legend, About,
+ * the export's column name).
+ */
 export function categoryWithBasis(event) {
   const label = categoryShortLabel(event?.category);
   if (event?.category === "unclassified") return `${label}: none of its Wikidata classes is on our list`;

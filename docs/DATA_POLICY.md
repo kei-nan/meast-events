@@ -102,7 +102,9 @@ no class on the list (mostly hand-picked ones) and show no class line.
 
 ### Category (our grouping)
 
-`category` is **our own coarse mapping**, not Wikidata's classification, and the UI labels it "Category (our grouping)". It is set by one rule applied to every
+`category` is **our own coarse mapping**, not Wikidata's classification. The map legend, About and the export's column say so
+("our grouping"); each event's header names the Wikidata class(es) its category comes from ("Category: War, from Wikidata's
+class “military operation”"). It is set by one rule applied to every
 event (`groupForEvent` in `scripts/lib/event-classes.js`):
 
 1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking, suicide attack), the category is terrorism.
