@@ -140,6 +140,28 @@ test("loadAllLite: a non-array file is an error and the next call tries again", 
   assert.equal(count(calls, all(V1)), 3); // first try, meta retry, next call
 });
 
+// A connection that never answers must end as an outage (not "Loading events…"
+// forever), so useAllEvents shows the outage state and retries.
+test("loadAllLite: a stalled request times out as an outage and the next call tries again", async (t) => {
+  const { loadAllLite, ALL_LITE_TIMEOUT_MS } = await freshClient();
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  let stall = true;
+  const hang = (init) =>
+    new Promise((_, reject) => init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))));
+  globalThis.fetch = async (url, init) => {
+    if (stall) return hang(init);
+    return url === META ? json({ version: V1, fullBuckets: B1 }) : json(LITE);
+  };
+  const first = loadAllLite();
+  const failed = assert.rejects(first, (e) => e.outage === true && !e.aborted);
+  t.mock.timers.tick(ALL_LITE_TIMEOUT_MS); // all.json
+  await new Promise((r) => setImmediate(r));
+  t.mock.timers.tick(ALL_LITE_TIMEOUT_MS); // the meta.json fallback
+  await failed;
+  stall = false;
+  assert.equal((await loadAllLite()).length, 1);
+});
+
 test("loadFullLead: the record, or null when its bucket lacks the id", async () => {
   const { loadFullLead } = await freshClient();
   stubFetch({ [all(V1)]: () => json(LITE), [bucket(V1, "e1", B1)]: () => json({ e1: { extract: "lead" } }) });

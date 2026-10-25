@@ -182,6 +182,11 @@ export function exportFilename(range, count, ext) {
   return `middleeast-events-${years}-${count}.${ext}`;
 }
 
+/** The years a download's filename names: none ("all") for a whole-timeline search, else the selected years. */
+export function exportFileRange(range, { searching, scope }) {
+  return searching && scope !== "range" ? null : range;
+}
+
 /** Saves `text` as a file: a Blob behind an object URL, clicked from a temporary link. */
 export function downloadText(text, filename, type) {
   const url = URL.createObjectURL(new Blob([text], { type }));

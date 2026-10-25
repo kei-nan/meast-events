@@ -195,7 +195,9 @@ export function normalizeEvents(events) {
 // split) the current folder and its bucket count are read from events/meta.json
 // (fetched no-cache). Either way the folder the list came from is remembered,
 // so full records (loadFullLead) are read from the SAME build. Concurrent/repeat
-// callers share one load.
+// callers share one load. Each request is time-limited, so a stalled connection
+// fails as an outage and useAllEvents' retry starts (all.json is ~90 kB gzipped).
+export const ALL_LITE_TIMEOUT_MS = 30000;
 let allLitePromise = null;
 let source = null; // {version, buckets} of the folder the lite set came from
 export function loadAllLite() {
@@ -204,12 +206,12 @@ export function loadAllLite() {
       if (!Array.isArray(list)) throw new Error("events file is not an array");
     };
     const load = (version, buckets) =>
-      fetchJSONCached(dataUrl(`events/v.${version}/all.json`), { check }).then((list) => {
+      fetchJSONCached(dataUrl(`events/v.${version}/all.json`), { check, timeoutMs: ALL_LITE_TIMEOUT_MS }).then((list) => {
         source = { version, buckets };
         return normalizeEvents(list);
       });
     allLitePromise = load(DATA_VERSION, FULL_BUCKETS).catch(() =>
-      fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache" }).then(({ version, fullBuckets }) => load(version, fullBuckets))
+      fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache", timeoutMs: ALL_LITE_TIMEOUT_MS }).then(({ version, fullBuckets }) => load(version, fullBuckets))
     );
     allLitePromise.catch(() => {
       allLitePromise = null;

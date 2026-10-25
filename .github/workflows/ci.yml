@@ -28,9 +28,14 @@ jobs:
   build:
     name: Build app/
     runs-on: ubuntu-latest
+    # Usually about a minute; a hung step (e.g. the smoke test's browser) fails instead of running for hours.
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No step pushes or calls the API: keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -87,9 +92,14 @@ jobs:
   data:
     name: Validate event data
     runs-on: ubuntu-latest
+    # Usually 2-4 minutes (the border checks).
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No step pushes or calls the API: keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -143,6 +153,7 @@ jobs:
   audit:
     name: Dependency audit (${{ matrix.dir }})
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -150,6 +161,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No step pushes or calls the API: keep the token out of .git/config.
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0

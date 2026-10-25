@@ -18,7 +18,12 @@ app/src/lib/dataVersion.js
 # "Retiring the old API").
 server/.env
 worker/.dev.vars
-.env.local
+# Any env or wrangler secrets file, in any folder (e.g. app/.dev.vars).
+.env
+.env.*
+!.env.example
+.dev.vars*
+!.dev.vars.example
 
 # wrangler's local dev state (miniflare SQLite caches, bundled temp output).
 app/.wrangler/

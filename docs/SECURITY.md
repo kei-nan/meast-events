@@ -25,8 +25,9 @@ The site needs none: the build has no environment variables and the Worker has
 no bindings or secrets (`app/wrangler.jsonc`). Keep it that way where possible;
 anything put in a `VITE_*` variable ends up in the public JavaScript.
 
-`.gitignore` still ignores `server/.env`, `worker/.dev.vars` and `.env.local`.
-The first two held the old Redis connection string; delete any local copies
+`.gitignore` ignores `.env`, `.env.*` and `.dev.vars*` files in any folder
+(except `*.example`), so a wrangler `app/.dev.vars` is never committed.
+`server/.env` and `worker/.dev.vars` held the old Redis connection string; delete any local copies
 (DEPLOYMENT.md, "Retiring the old API"). Never commit credentials; if one is
 ever committed, rotate it first, then clean history.
 
