@@ -11,7 +11,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { openCache } from "./lib/cache.js";
 import { fetchEntities } from "./lib/wd-entities.js";
-import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES, COUNTRIES, groupForEvent } from "./lib/event-classes.js";
+import { INCLUSION_MIN_SITELINKS, COUNTRIES, groupForEvent } from "./lib/event-classes.js";
 
 const read = async (n) => JSON.parse(await readFile(new URL(`../data/${n}`, import.meta.url), "utf-8"));
 const candidates = await read("event-candidates.json");
@@ -31,7 +31,6 @@ const committed = OFFLINE ? await readFile(OUT, "utf-8").catch(() => "") : null;
 const dataAsOf =
   [...enriched.map((e) => e.retrieved_at), ...curated.map((e) => e.extract_retrieved_at)].filter(Boolean).map((d) => d.slice(0, 10)).sort().at(-1) ?? null;
 const inc = (o, k, n = 1) => (o[k] = (o[k] ?? 0) + n);
-const group = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
 // ---- sitelink measurement: all Wikimedia projects (what the rule uses) vs Wikipedia editions only ----
 // The only part that needs the network; --check and --offline keep the committed block.
@@ -156,7 +155,7 @@ const bump = (bucket, key, c) => {
 for (const c of candidates) {
   for (const k of c.countries) bump(funnel.breakdowns.by_country, k, c);
   for (const k of c.wikidata_classes ?? []) bump(funnel.breakdowns.by_class, k, c);
-  bump(funnel.breakdowns.by_group, groupForEvent(c.wikidata_classes, group[(c.wikidata_classes ?? [])[0]] ?? c.category), c);
+  bump(funnel.breakdowns.by_group, groupForEvent(c.wikidata_classes), c);
   bump(funnel.breakdowns.by_decade, `${Math.floor(Number(c.date_start.slice(0, 4)) / 10) * 10}s`, c);
 }
 funnel.breakdowns.notes = [
@@ -195,7 +194,7 @@ funnel.coverage = {
   notes: [
     `"regional" is a hand-assigned tag of a few hand-picked events that concern the whole region; it is not a country.`,
     `by_country_without_events_tagged_with_8_or_more_countries: the same count leaving out the ${many.length} events tagged with ${MANY} or more countries (world wars, region-wide conflicts), which otherwise count in each of their 8 to 15 countries.`,
-    "by_decade: the decade of the event's start date. by_category: our coarse grouping (docs/DATA_POLICY.md, Category); hand-picked events count in the group assigned to them.",
+    "by_decade: the decade of the event's start date. by_category: our coarse grouping (docs/DATA_POLICY.md, Category), the same rule for hand-picked and discovered events.",
   ],
 };
 

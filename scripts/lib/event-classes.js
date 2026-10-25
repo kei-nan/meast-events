@@ -120,18 +120,55 @@ export const notEventClasses = (wikidataClasses) =>
 // Objective inclusion threshold: Wikidata sitelinks (number of Wikimedia-project pages).
 export const INCLUSION_MIN_SITELINKS = 10;
 
-export const EVENT_CLASSES = [...ORIGINAL_EVENT_CLASSES, ...NEW_EVENT_CLASSES, ...GAP_EVENT_CLASSES, ...CIVIC_EVENT_CLASSES];
+// Added 2026-10-25. "Ethnic cleansing" (Q154278; English label checked in WDQS on 2026-10-25, a subclass of "forced
+// displacement" and "atrocity" there) is in the overriding atrocity group like genocide and massacre. Before, the five
+// events Wikidata types this way were shown as "migration" through their "population transfer" class. The class has 5
+// dated in-region items with >=10 sitelinks, all already found by other classes, so it adds no new events today.
+export const ATROCITY_GAP_CLASSES = [{ qid: "Q154278", label: "ethnic cleansing", category: "atrocity" }];
+
+export const EVENT_CLASSES = [
+  ...ORIGINAL_EVENT_CLASSES,
+  ...NEW_EVENT_CLASSES,
+  ...GAP_EVENT_CLASSES,
+  ...CIVIC_EVENT_CLASSES,
+  ...ATROCITY_GAP_CLASSES,
+];
+
+// The group of an event whose Wikidata classes include none of the classes above. It is shown as such rather than given
+// a group by hand.
+export const UNCLASSIFIED = "unclassified";
+// The group of an event whose listed classes (none of them overriding) belong to two or more ordinary groups.
+export const MIXED = "mixed";
+
+// Every group an event can have.
+export const GROUPS = [...new Set(EVENT_CLASSES.map((c) => c.category)), MIXED, UNCLASSIFIED];
 
 // Groups that override whatever group an event would otherwise get, checked in this order.
 // An item Wikidata types as both a "massacre" and a "terrorist attack" is shown as terrorism,
-// whichever class discovery happened to match first, and every genocide, massacre or war crime
-// is "atrocity" rather than folded into "political". Applied the same way to every event,
-// curated or discovered; an event matching none keeps its existing group.
+// and every genocide, massacre or war crime is "atrocity" rather than folded into "political".
 export const OVERRIDING_GROUPS = ["terrorism", "atrocity"];
 
-const GROUP_OF_LABEL = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
-export function groupForEvent(wikidataClasses, currentGroup) {
-  const groups = new Set((wikidataClasses ?? []).map((l) => GROUP_OF_LABEL[l]).filter(Boolean));
-  return OVERRIDING_GROUPS.find((g) => groups.has(g)) ?? currentGroup;
+// The one grouping rule (docs/DATA_POLICY.md, "Category (our grouping)"), applied identically to every event, hand-picked
+// or discovered. `wikidataClasses` are the event's stored Wikidata class labels (its P31 classes plus the listed classes
+// it is an instance of through P279*). The order of the class table and of Wikidata's statements plays no part:
+//   1. any class in the terrorism group -> terrorism; else any in the atrocity group -> atrocity;
+//   2. otherwise, if all its listed classes belong to one group, that group;
+//   3. listed classes from two or more groups -> "mixed";
+//   4. no listed class -> "unclassified".
+// Returns the group and the listed classes behind it, as [class label, its group] pairs (for a mixed event, all of them).
+// `table` is a class table like EVENT_CLASSES (a parameter only so a test can show that its order does not matter).
+export function groupBasisFrom(table, wikidataClasses) {
+  const groupOf = new Map(table.map((c) => [c.label, c.category]));
+  const listed = [...new Set(wikidataClasses ?? [])].filter((l) => groupOf.has(l)).map((l) => [l, groupOf.get(l)]);
+  for (const g of OVERRIDING_GROUPS) {
+    const deciding = listed.filter(([, lg]) => lg === g);
+    if (deciding.length) return { group: g, classes: deciding };
+  }
+  const groups = new Set(listed.map(([, g]) => g));
+  if (groups.size === 0) return { group: UNCLASSIFIED, classes: [] };
+  return { group: groups.size === 1 ? [...groups][0] : MIXED, classes: listed };
 }
+
+export const groupBasis = (wikidataClasses) => groupBasisFrom(EVENT_CLASSES, wikidataClasses);
+export const groupForEvent = (wikidataClasses) => groupBasis(wikidataClasses).group;

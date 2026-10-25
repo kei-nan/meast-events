@@ -184,7 +184,7 @@ export function finalizeEvent(ev, ctx) {
 
   // 2. classes + our coarse grouping
   ev.wikidata_classes = buildWikidataClasses(entity, ctx.labels, ctx.matched.get(ev.wikidata_qid) ?? []);
-  const group = groupForEvent(ev.wikidata_classes, ev.category_group ?? (CLASS_GROUP[ev.category] ?? ev.category));
+  const group = groupForEvent(ev.wikidata_classes);
   ev.category = group;
   ev.category_group = group;
   delete ev.category_label;

@@ -7,7 +7,7 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
+    "category": "uprising",
     "retrieved_at": "2026-09-13T14:28:07.712Z",
     "wikidata_qid": "Q4298662",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Young_Turk_Revolution",
@@ -24,7 +24,7 @@
     "wikidata_classes": [
       "revolution"
     ],
-    "category_group": "political",
+    "category_group": "uprising",
     "review_reasons": [
       "data_fix F14: Young Turk Revolution: the seed date_start is no Wikidata value (Wikidata: P585 1908-07-24, the end of the infobox range). English Wikipedia https://en.wikipedia.org/w/index.php?title=Young_Turk_Revolution&oldid=1380448478: infobox \"3–24 July 1908\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"dissolution of the Ottoman Empire\" (Q1837704); it may overlap with that larger event"
@@ -65,7 +65,8 @@
     "wikipedia_revid": 1379616684,
     "wikipedia_revid_timestamp": "2026-10-11T00:27:39Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -112,7 +113,9 @@
     "wikipedia_revid": 1381203958,
     "wikipedia_revid_timestamp": "2026-10-20T17:30:14Z",
     "wikidata_classes": [
-      "series of wars"
+      "series of wars",
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [],
@@ -132,7 +135,7 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:11.721Z",
     "wikidata_qid": "Q1328496",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Ottoman_entry_into_World_War_I",
@@ -149,7 +152,7 @@
     "wikidata_classes": [
       "aspect of history"
     ],
-    "category_group": "war",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -184,7 +187,9 @@
     "wikidata_classes": [
       "genocide",
       "ethnic violence",
-      "forced displacement"
+      "forced displacement",
+      "population transfer",
+      "mass murder"
     ],
     "category_group": "atrocity",
     "review_reasons": [],
@@ -226,7 +231,9 @@
     "wikipedia_revid_timestamp": "2026-10-11T17:00:14Z",
     "wikidata_classes": [
       "military campaign",
-      "offensive"
+      "offensive",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -260,7 +267,7 @@
     "countries": [
       "regional"
     ],
-    "category": "diplomatic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:14.079Z",
     "wikidata_qid": "Q59524",
     "wikipedia_url": "https://en.wikipedia.org/wiki/McMahon%E2%80%93Hussein_correspondence",
@@ -277,7 +284,7 @@
     "wikidata_classes": [
       "correspondence"
     ],
-    "category_group": "diplomatic",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
@@ -338,7 +345,7 @@
       "Syria",
       "regional"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:16.463Z",
     "wikidata_qid": "Q239060",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Arab_Revolt",
@@ -354,9 +361,11 @@
     "wikipedia_revid_timestamp": "2026-10-18T16:11:54Z",
     "wikidata_classes": [
       "rebellion",
-      "revolt"
+      "revolt",
+      "military operation",
+      "armed conflict"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "country_not_supported_by_wikidata: Saudi Arabia, Jordan not derivable from Wikidata P17/P276/P131 (Wikidata gives: Syria)",
       "data_fix F14: Arab Revolt: the seed date_start is no Wikidata value (Wikidata: P580 1916-06 (month)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Arab_Revolt&oldid=1380894633: infobox \"10 June 1916 – 25 October 1918\"; lead \"officially initiated at Mecca on 10 June 1916\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
@@ -383,7 +392,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:17.485Z",
     "wikidata_qid": "Q187152",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Balfour_Declaration",
@@ -401,7 +410,7 @@
       "public statement",
       "document"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -437,7 +446,9 @@
     "wikipedia_revid": 1374873756,
     "wikipedia_revid_timestamp": "2026-09-14T15:28:55Z",
     "wikidata_classes": [
-      "battle"
+      "battle",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [],
@@ -468,7 +479,9 @@
     "wikipedia_revid": 1370444210,
     "wikipedia_revid_timestamp": "2026-08-21T03:58:18Z",
     "wikidata_classes": [
-      "battle"
+      "battle",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -495,7 +508,7 @@
     "countries": [
       "Turkey"
     ],
-    "category": "treaty",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:19.772Z",
     "wikidata_qid": "Q328499",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Armistice_of_Mudros",
@@ -510,9 +523,11 @@
     "wikipedia_revid": 1369160266,
     "wikipedia_revid_timestamp": "2026-08-13T06:59:19Z",
     "wikidata_classes": [
-      "armistice"
+      "armistice",
+      "treaty",
+      "ceasefire"
     ],
-    "category_group": "treaty",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
@@ -533,7 +548,7 @@
     "countries": [
       "regional"
     ],
-    "category": "diplomatic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:20.839Z",
     "wikidata_qid": "Q1365425",
     "wikipedia_url": "https://en.wikipedia.org/wiki/San_Remo_conference",
@@ -550,7 +565,7 @@
     "wikidata_classes": [
       "convention"
     ],
-    "category_group": "diplomatic",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
@@ -568,7 +583,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "uprising",
+    "category": "war",
     "retrieved_at": "2026-09-13T14:28:22.072Z",
     "wikidata_qid": "Q616851",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Iraqi_Revolt",
@@ -583,9 +598,10 @@
     "wikipedia_revid": 1381194751,
     "wikipedia_revid_timestamp": "2026-10-20T16:20:56Z",
     "wikidata_classes": [
-      "revolt"
+      "revolt",
+      "military operation"
     ],
-    "category_group": "uprising",
+    "category_group": "war",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -618,7 +634,8 @@
     "wikipedia_revid_timestamp": "2026-08-14T04:57:19Z",
     "wikidata_classes": [
       "peace treaty",
-      "multilateral treaty"
+      "multilateral treaty",
+      "treaty"
     ],
     "category_group": "treaty",
     "review_reasons": [],
@@ -656,7 +673,8 @@
     "wikipedia_revid": 1379975922,
     "wikipedia_revid_timestamp": "2026-10-13T01:16:16Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -701,7 +719,8 @@
     "wikidata_classes": [
       "war of national liberation",
       "war of independence",
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [],
@@ -724,7 +743,7 @@
     "countries": [
       "Jordan"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:29.138Z",
     "wikidata_qid": "Q1121819",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Emirate_of_Transjordan",
@@ -742,7 +761,7 @@
       "League of Nations mandate",
       "British protectorate"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F14: Emirate of Transjordan: the seed date_start is no Wikidata value (Wikidata: no P585/P580). English Wikipedia https://en.wikipedia.org/w/index.php?title=Emirate_of_Transjordan&oldid=1377341920: lead \"established on 11 April 1921\"; infobox date_start \"11 April\", year_start 1921 (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)"
     ],
@@ -783,7 +802,8 @@
     "wikipedia_revid": 1377987590,
     "wikipedia_revid_timestamp": "2026-10-02T08:00:09Z",
     "wikidata_classes": [
-      "peace treaty"
+      "peace treaty",
+      "treaty"
     ],
     "category_group": "treaty",
     "review_reasons": [],
@@ -806,7 +826,7 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:30.870Z",
     "wikidata_qid": "Q2821698",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Abolition_of_the_Caliphate",
@@ -823,7 +843,7 @@
     "wikidata_classes": [
       "reform"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F14: Abolition of the Caliphate: the seed date_start is no Wikidata value (Wikidata: P585 1924 (year)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Abolition_of_the_Caliphate&oldid=1380313801: lead \"abolished on 3 March 1924\"; infobox date 3 March 1924 (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Atatürk's reforms\" (Q780048); it may overlap with that larger event"
@@ -849,7 +869,7 @@
     "countries": [
       "Syria"
     ],
-    "category": "uprising",
+    "category": "war",
     "retrieved_at": "2026-09-13T14:28:31.778Z",
     "wikidata_qid": "Q1968718",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Great_Syrian_Revolt",
@@ -864,9 +884,10 @@
     "wikipedia_revid": 1379976254,
     "wikipedia_revid_timestamp": "2026-10-13T01:18:40Z",
     "wikidata_classes": [
-      "revolt"
+      "revolt",
+      "military operation"
     ],
-    "category_group": "uprising",
+    "category_group": "war",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -887,7 +908,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "protest",
     "retrieved_at": "2026-09-13T14:28:32.958Z",
     "wikidata_qid": "Q2281806",
     "wikipedia_url": "https://en.wikipedia.org/wiki/1929_Palestine_riots",
@@ -903,9 +924,10 @@
     "wikipedia_revid_timestamp": "2026-10-07T03:08:01Z",
     "wikidata_classes": [
       "riot",
-      "violent crime"
+      "violent crime",
+      "protest"
     ],
-    "category_group": "uprising",
+    "category_group": "protest",
     "review_reasons": [
       "data_fix F14: 1929 Palestine riots: the seed date_start is no Wikidata value (Wikidata: P585 1929-08-29, the end of the infobox range). English Wikipedia https://en.wikipedia.org/w/index.php?title=1929_Palestine_riots&oldid=1378961464: infobox \"23–29 August 1929\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Intercommunal conflict in Mandatory Palestine\" (Q2992527); it may overlap with that larger event"
@@ -931,7 +953,7 @@
     "countries": [
       "Saudi Arabia"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:33.343Z",
     "wikidata_qid": "Q251600",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Formation_of_Saudi_Arabia",
@@ -948,7 +970,7 @@
     "wikidata_classes": [
       "conflict"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -962,7 +984,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
+    "category": "treaty",
     "retrieved_at": "2026-09-13T14:28:34.593Z",
     "wikidata_qid": "Q541372",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Anglo-Iraqi_Treaty_of_1930",
@@ -979,7 +1001,7 @@
     "wikidata_classes": [
       "treaty"
     ],
-    "category_group": "political",
+    "category_group": "treaty",
     "review_reasons": [],
     "date_flags": [
       "date_start_year_not_in_lead: start year 1932 (1932-10-03) is not within 1 year of any year in the Wikipedia lead [1930, 1922, 1927]"
@@ -996,7 +1018,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:35.732Z",
     "wikidata_qid": "Q46057",
     "wikipedia_url": "https://en.wikipedia.org/wiki/1936%E2%80%931939_Arab_revolt_in_Palestine",
@@ -1011,9 +1033,10 @@
     "wikipedia_revid": 1380620568,
     "wikipedia_revid_timestamp": "2026-10-16T21:57:50Z",
     "wikidata_classes": [
-      "rebellion"
+      "rebellion",
+      "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Intercommunal conflict in Mandatory Palestine\" (Q2992527); it may overlap with that larger event"
     ],
@@ -1041,7 +1064,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "diplomatic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:36.923Z",
     "wikidata_qid": "Q655894",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Peel_Commission",
@@ -1058,7 +1081,7 @@
     "wikidata_classes": [
       "committee"
     ],
-    "category_group": "diplomatic",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -1075,7 +1098,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:38.098Z",
     "wikidata_qid": "Q1501775",
     "wikipedia_url": "https://en.wikipedia.org/wiki/White_Paper_of_1939",
@@ -1092,7 +1115,7 @@
     "wikidata_classes": [
       "Palestine white papers"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -1124,7 +1147,8 @@
     "wikipedia_revid": 1381468722,
     "wikipedia_revid_timestamp": "2026-10-22T18:41:45Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -1197,7 +1221,7 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:41.767Z",
     "wikidata_qid": "Q748819",
     "wikipedia_url": "https://en.wikipedia.org/wiki/National_Pact",
@@ -1214,7 +1238,7 @@
     "wikidata_classes": [
       "constitutional convention"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -1228,7 +1252,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "diplomatic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:28:45.053Z",
     "wikidata_qid": "Q846795",
     "wikipedia_url": "https://en.wikipedia.org/wiki/United_Nations_Partition_Plan_for_Palestine",
@@ -1245,7 +1269,7 @@
     "wikidata_classes": [
       "United Nations General Assembly resolution"
     ],
-    "category_group": "diplomatic",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F14: United Nations Partition Plan for Palestine: the seed date_start is no Wikidata value (Wikidata: no P585/P580). English Wikipedia https://en.wikipedia.org/w/index.php?title=United_Nations_Partition_Plan_for_Palestine&oldid=1381412191: lead \"adopted by the UN General Assembly on 29 November 1947\"; infobox date \"29 November\", year 1947 (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)"
     ],
@@ -1288,7 +1312,8 @@
     "wikipedia_revid": 1379281169,
     "wikipedia_revid_timestamp": "2026-10-09T01:14:40Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -1386,7 +1411,8 @@
       "historical event",
       "historical period",
       "concept",
-      "forced displacement"
+      "forced displacement",
+      "population transfer"
     ],
     "category_group": "migration",
     "review_reasons": [],
@@ -1423,7 +1449,7 @@
       "Syria",
       "Lebanon"
     ],
-    "category": "treaty",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:50.310Z",
     "wikidata_qid": "Q999143",
     "wikipedia_url": "https://en.wikipedia.org/wiki/1949_Armistice_Agreements",
@@ -1438,9 +1464,11 @@
     "wikipedia_revid": 1373406233,
     "wikipedia_revid_timestamp": "2026-09-05T20:08:07Z",
     "wikidata_classes": [
-      "armistice"
+      "armistice",
+      "treaty",
+      "ceasefire"
     ],
-    "category_group": "treaty",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -1458,7 +1486,7 @@
       "Syria",
       "regional"
     ],
-    "category": "migration",
+    "category": "atrocity",
     "retrieved_at": "2026-09-13T14:28:51.359Z",
     "wikidata_qid": "Q276172",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Jewish_exodus_from_the_Muslim_world",
@@ -1478,7 +1506,7 @@
       "exodus",
       "population transfer"
     ],
-    "category_group": "migration",
+    "category_group": "atrocity",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -1625,7 +1653,10 @@
     "wikipedia_revid_timestamp": "2026-09-14T12:31:20Z",
     "wikidata_classes": [
       "military expedition",
-      "offensive"
+      "offensive",
+      "military operation",
+      "armed conflict",
+      "military campaign"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -1665,7 +1696,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "uprising",
+    "category": "political",
     "retrieved_at": "2026-09-13T14:28:57.464Z",
     "wikidata_qid": "Q2988530",
     "wikipedia_url": "https://en.wikipedia.org/wiki/14_July_Revolution",
@@ -1682,7 +1713,7 @@
     "wikidata_classes": [
       "coup d'état"
     ],
-    "category_group": "uprising",
+    "category_group": "political",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Arab Cold War\" (Q4783165); it may overlap with that larger event"
     ],
@@ -1726,7 +1757,8 @@
     "wikipedia_revid_timestamp": "2026-10-05T22:10:44Z",
     "wikidata_classes": [
       "civil war",
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -1819,7 +1851,8 @@
     "wikipedia_revid": 1375500255,
     "wikipedia_revid_timestamp": "2026-09-18T04:09:39Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -1857,7 +1890,7 @@
     "countries": [
       "regional"
     ],
-    "category": "diplomatic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:03.678Z",
     "wikidata_qid": "Q1740597",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Khartoum_Resolution",
@@ -1874,7 +1907,7 @@
     "wikidata_classes": [
       "resolution"
     ],
-    "category_group": "diplomatic",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
@@ -1905,7 +1938,8 @@
     "wikipedia_revid_timestamp": "2026-10-06T05:30:59Z",
     "wikidata_classes": [
       "war",
-      "attrition warfare"
+      "attrition warfare",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -1960,7 +1994,9 @@
     "wikipedia_revid": 1374545421,
     "wikipedia_revid_timestamp": "2026-09-12T18:33:30Z",
     "wikidata_classes": [
-      "battle"
+      "battle",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -2052,7 +2088,8 @@
     "wikipedia_revid_timestamp": "2026-09-29T11:48:48Z",
     "wikidata_classes": [
       "civil war",
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -2105,7 +2142,8 @@
     "wikipedia_revid": 1375181066,
     "wikipedia_revid_timestamp": "2026-09-16T07:38:51Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -2144,7 +2182,7 @@
       "Saudi Arabia",
       "regional"
     ],
-    "category": "economic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:11.203Z",
     "wikidata_qid": "Q316817",
     "wikipedia_url": "https://en.wikipedia.org/wiki/1973_oil_crisis",
@@ -2162,7 +2200,7 @@
       "oil crisis",
       "economic crisis"
     ],
-    "category_group": "economic",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -2192,7 +2230,8 @@
     "wikipedia_revid_timestamp": "2026-10-17T07:47:01Z",
     "wikidata_classes": [
       "civil war",
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -2256,7 +2295,8 @@
     "wikipedia_revid": 1374583077,
     "wikipedia_revid_timestamp": "2026-09-12T23:04:05Z",
     "wikidata_classes": [
-      "peace treaty"
+      "peace treaty",
+      "treaty"
     ],
     "category_group": "treaty",
     "review_reasons": [
@@ -2383,7 +2423,9 @@
     "wikipedia_revid_timestamp": "2026-10-23T18:12:08Z",
     "wikidata_classes": [
       "military occupation",
-      "hostage taking"
+      "hostage taking",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "terrorism",
     "review_reasons": [],
@@ -2419,7 +2461,8 @@
     "wikipedia_revid_timestamp": "2026-08-26T21:17:30Z",
     "wikidata_classes": [
       "hostage taking",
-      "international crisis"
+      "international crisis",
+      "political crisis"
     ],
     "category_group": "terrorism",
     "review_reasons": [
@@ -2463,7 +2506,8 @@
     "wikipedia_revid_timestamp": "2026-10-18T11:26:44Z",
     "wikidata_classes": [
       "war",
-      "war of aggression"
+      "war of aggression",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -2569,7 +2613,8 @@
     "wikipedia_revid": 1380138266,
     "wikipedia_revid_timestamp": "2026-10-14T00:58:17Z",
     "wikidata_classes": [
-      "massacre"
+      "massacre",
+      "mass murder"
     ],
     "category_group": "atrocity",
     "review_reasons": [
@@ -2617,7 +2662,8 @@
       "suicide attack",
       "suicide car bombing",
       "vehicle-ramming attack",
-      "terrorist attack"
+      "terrorist attack",
+      "mass murder"
     ],
     "category_group": "terrorism",
     "review_reasons": [
@@ -2644,7 +2690,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:23.266Z",
     "wikidata_qid": "Q49105",
     "wikipedia_url": "https://en.wikipedia.org/wiki/First_Intifada",
@@ -2660,9 +2706,10 @@
     "wikipedia_revid_timestamp": "2026-10-06T07:10:12Z",
     "wikidata_classes": [
       "intifada",
-      "rebellion"
+      "rebellion",
+      "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"intifada\" (Q1753200); it may overlap with that larger event"
@@ -2697,7 +2744,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
+    "category": "war",
     "retrieved_at": "2026-09-13T14:29:25.679Z",
     "wikidata_qid": "Q529723",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Anfal_campaign",
@@ -2712,9 +2759,11 @@
     "wikipedia_revid": 1377434227,
     "wikipedia_revid_timestamp": "2026-09-29T10:32:00Z",
     "wikidata_classes": [
-      "military campaign"
+      "military campaign",
+      "military operation",
+      "armed conflict"
     ],
-    "category_group": "political",
+    "category_group": "war",
     "review_reasons": [
       "title_differs_from_article: record title \"Al-Anfal campaign\" differs from the Wikipedia article title \"Anfal campaign\" and does not appear in its lead"
     ],
@@ -2755,7 +2804,8 @@
     "wikipedia_revid": 1381292968,
     "wikipedia_revid_timestamp": "2026-10-21T11:09:17Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [],
@@ -2819,7 +2869,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "treaty",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:29.572Z",
     "wikidata_qid": "Q17013132",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Oslo_Accords",
@@ -2838,7 +2888,7 @@
       "political event",
       "contract"
     ],
-    "category_group": "treaty",
+    "category_group": "unclassified",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian peace process\" (Q3141816); it may overlap with that larger event"
     ],
@@ -2955,7 +3005,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:32.177Z",
     "wikidata_qid": "Q49106",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Second_Intifada",
@@ -2971,9 +3021,10 @@
     "wikipedia_revid_timestamp": "2026-10-16T14:18:14Z",
     "wikidata_classes": [
       "intifada",
-      "rebellion"
+      "rebellion",
+      "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event"
     ],
@@ -3002,7 +3053,7 @@
       "Lebanon",
       "Israel/Palestine"
     ],
-    "category": "political",
+    "category": "war",
     "retrieved_at": "2026-09-13T14:29:33.539Z",
     "wikidata_qid": "Q2479435",
     "wikipedia_url": "https://en.wikipedia.org/wiki/South_Lebanon_conflict_(1985%E2%80%932000)",
@@ -3018,9 +3069,10 @@
     "wikipedia_revid_timestamp": "2026-10-19T13:51:26Z",
     "wikidata_classes": [
       "war",
-      "low-intensity conflict"
+      "low-intensity conflict",
+      "armed conflict"
     ],
-    "category_group": "political",
+    "category_group": "war",
     "review_reasons": [
       "data_fix F1: record was titled \"Israeli withdrawal from Lebanon\", a redirect to a SECTION of the article \"South Lebanon conflict (1985–2000)\"; its url, QID (Q2479435) and extract were already that article's. Title now = the article title; dates = Wikidata Q2479435 (P585 1985-02-16, P582 2000-05-25) (fields: title, date_start, date_end; see docs/data-fixes.md)",
       "country_not_supported_by_wikidata: Israel/Palestine not derivable from Wikidata P17/P276/P131 (Wikidata gives: Lebanon)",
@@ -3062,7 +3114,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:34.553Z",
     "wikidata_qid": "Q107802",
     "wikipedia_url": "https://en.wikipedia.org/wiki/2003_invasion_of_Iraq",
@@ -3077,9 +3129,13 @@
     "wikipedia_revid": 1381285178,
     "wikipedia_revid_timestamp": "2026-10-21T09:06:13Z",
     "wikidata_classes": [
-      "invasion"
+      "invasion",
+      "military operation",
+      "armed conflict",
+      "political crisis",
+      "international crisis"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Iraq War\" (Q545449); it may overlap with that larger event"
     ],
@@ -3107,7 +3163,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
+    "category": "war",
     "retrieved_at": "2026-09-13T14:29:35.891Z",
     "wikidata_qid": "Q3780506",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Capture_of_Saddam_Hussein",
@@ -3124,7 +3180,7 @@
     "wikidata_classes": [
       "military operation"
     ],
-    "category_group": "political",
+    "category_group": "war",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Iraq War\" (Q545449); it may overlap with that larger event"
     ],
@@ -3195,7 +3251,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:37.515Z",
     "wikidata_qid": "Q196122",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Israeli_disengagement_from_the_Gaza_Strip",
@@ -3212,9 +3268,10 @@
     "wikidata_classes": [
       "relocation",
       "population transfer",
-      "withdrawal"
+      "withdrawal",
+      "military operation"
     ],
-    "category_group": "political",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3228,7 +3285,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:38.746Z",
     "wikidata_qid": "Q1193136",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Execution_of_Saddam_Hussein",
@@ -3247,7 +3304,7 @@
       "hanging to death",
       "capital punishment"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3281,7 +3338,8 @@
     "wikipedia_revid": 1381081786,
     "wikipedia_revid_timestamp": "2026-10-19T22:24:59Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3341,7 +3399,9 @@
     "wikipedia_revid": 1381695693,
     "wikipedia_revid_timestamp": "2026-10-24T05:19:12Z",
     "wikidata_classes": [
-      "battle"
+      "battle",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3384,7 +3444,8 @@
     "wikipedia_revid_timestamp": "2026-10-13T10:40:51Z",
     "wikidata_classes": [
       "war",
-      "military operation"
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3414,7 +3475,7 @@
     "countries": [
       "Iran"
     ],
-    "category": "uprising",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:42.649Z",
     "wikidata_qid": "Q2626387",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Iranian_Green_Movement",
@@ -3431,7 +3492,7 @@
     "wikidata_classes": [
       "social movement"
     ],
-    "category_group": "uprising",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3448,7 +3509,7 @@
     "countries": [
       "regional"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:43.813Z",
     "wikidata_qid": "Q33761",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Arab_Spring",
@@ -3464,9 +3525,10 @@
       "rebellion",
       "civil war",
       "revolution",
-      "war"
+      "war",
+      "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "none",
@@ -3488,7 +3550,7 @@
     "countries": [
       "Egypt"
     ],
-    "category": "uprising",
+    "category": "protest",
     "retrieved_at": "2026-09-13T14:29:44.934Z",
     "wikidata_qid": "Q29198",
     "wikipedia_url": "https://en.wikipedia.org/wiki/2011_Egyptian_revolution",
@@ -3505,7 +3567,7 @@
     "wikidata_classes": [
       "protest"
     ],
-    "category_group": "uprising",
+    "category_group": "protest",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Arab Spring\" (Q33761); it may overlap with that larger event"
     ],
@@ -3555,7 +3617,8 @@
       "civil war",
       "proxy war",
       "communal violence",
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3596,7 +3659,7 @@
     "countries": [
       "Yemen"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:46.664Z",
     "wikidata_qid": "Q210005",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Yemeni_revolution",
@@ -3612,9 +3675,10 @@
     "wikipedia_revid_timestamp": "2026-09-22T00:11:58Z",
     "wikidata_classes": [
       "rebellion",
-      "protest"
+      "protest",
+      "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Arab Spring\" (Q33761); it may overlap with that larger event"
     ],
@@ -3639,7 +3703,7 @@
     "countries": [
       "Egypt"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:49.152Z",
     "wikidata_qid": "Q577539",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Egyptian_Crisis_(2011%E2%80%932014)",
@@ -3656,7 +3720,7 @@
     "wikidata_classes": [
       "crisis"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3686,7 +3750,8 @@
     "wikipedia_revid_timestamp": "2026-09-26T07:21:35Z",
     "wikidata_classes": [
       "civil war",
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3766,7 +3831,7 @@
     "countries": [
       "Iran"
     ],
-    "category": "treaty",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:55.348Z",
     "wikidata_qid": "Q17001802",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Iran_nuclear_deal",
@@ -3784,7 +3849,7 @@
       "document",
       "agreement"
     ],
-    "category_group": "treaty",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3822,7 +3887,9 @@
     "wikipedia_revid": 1378726305,
     "wikipedia_revid_timestamp": "2026-10-05T22:17:03Z",
     "wikidata_classes": [
-      "battle"
+      "battle",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3864,7 +3931,9 @@
     "wikipedia_revid": 1381695712,
     "wikipedia_revid_timestamp": "2026-10-24T05:19:21Z",
     "wikidata_classes": [
-      "battle"
+      "battle",
+      "military operation",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -3896,7 +3965,7 @@
       "Saudi Arabia",
       "regional"
     ],
-    "category": "diplomatic",
+    "category": "political",
     "retrieved_at": "2026-09-13T14:29:57.044Z",
     "wikidata_qid": "Q30130610",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Qatar_diplomatic_crisis",
@@ -3911,9 +3980,10 @@
     "wikipedia_revid": 1381713846,
     "wikipedia_revid_timestamp": "2026-10-24T08:44:14Z",
     "wikidata_classes": [
-      "international crisis"
+      "international crisis",
+      "political crisis"
     ],
-    "category_group": "diplomatic",
+    "category_group": "political",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3940,7 +4010,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:58.264Z",
     "wikidata_qid": "Q45266620",
     "wikipedia_url": "https://en.wikipedia.org/wiki/United_States_recognition_of_Jerusalem_as_capital_of_Israel",
@@ -3957,7 +4027,7 @@
     "wikidata_classes": [
       "diplomatic recognition"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F13: United States recognition of Jerusalem as capital of Israel: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P585 2017-12-06 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=United_States_recognition_of_Jerusalem_as_capital_of_Israel&oldid=1379528222: lead \"On December 6, 2017, the United States officially recognized Jerusalem\"; infobox date_signed 2017-12-06 (checked 2026-10-24). date_start = Wikidata P585; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"foreign policy of the Donald Trump administration\" (Q28530597); it may overlap with that larger event"
@@ -3986,7 +4056,7 @@
     "countries": [
       "Iran"
     ],
-    "category": "diplomatic",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:29:59.273Z",
     "wikidata_qid": "Q52836581",
     "wikipedia_url": "https://en.wikipedia.org/wiki/United_States_withdrawal_from_the_Iran_nuclear_deal",
@@ -4003,7 +4073,7 @@
     "wikidata_classes": [
       "incident"
     ],
-    "category_group": "diplomatic",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F14: United States withdrawal from the Iran nuclear deal: the seed date_start is no Wikidata value (Wikidata: P585 2018-05-18). English Wikipedia https://en.wikipedia.org/w/index.php?title=United_States_withdrawal_from_the_Iran_nuclear_deal&oldid=1359899431: lead \"On 8 May 2018, the United States ... announced its withdrawal\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)"
     ],
@@ -4080,7 +4150,7 @@
       "UAE",
       "Bahrain"
     ],
-    "category": "treaty",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:30:00.826Z",
     "wikidata_qid": "Q99495661",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Abraham_Accords",
@@ -4097,7 +4167,7 @@
     "wikidata_classes": [
       "contract"
     ],
-    "category_group": "treaty",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F14: Abraham Accords: the seed date_start is no Wikidata value (Wikidata: P585 2020 (year)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Abraham_Accords&oldid=1380714856: lead \"signed in Washington, D.C. on September 15, 2020\"; infobox date_signed \"September 15, 2020\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Arab-Israeli peace projects\" (Q4783126); it may overlap with that larger event"
@@ -4123,7 +4193,7 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:30:01.896Z",
     "wikidata_qid": "Q98073118",
     "wikipedia_url": "https://en.wikipedia.org/wiki/2020_Beirut_explosion",
@@ -4142,7 +4212,7 @@
       "explosion",
       "industrial fire"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
@@ -4169,7 +4239,7 @@
       "Iraq",
       "Iran"
     ],
-    "category": "political",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:30:02.291Z",
     "wikidata_qid": "Q80754846",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Assassination_of_Qasem_Soleimani",
@@ -4187,9 +4257,13 @@
       "drone warfare",
       "assassination",
       "targeted killing",
-      "missile strike"
+      "missile strike",
+      "military operation",
+      "armed conflict",
+      "airstrike",
+      "bombardment"
     ],
-    "category_group": "political",
+    "category_group": "mixed",
     "review_reasons": [
       "country_not_supported_by_wikidata: Iran not derivable from Wikidata P17/P276/P131 (Wikidata gives: Iraq)",
       "part_of: Wikidata (P361) lists this event as part of \"Persian Gulf crisis (2019–2020)\" (Q65920364); it may overlap with that larger event",
@@ -4271,7 +4345,7 @@
     "countries": [
       "Iran"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:30:03.723Z",
     "wikidata_qid": "Q114065797",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Mahsa_Amini_protests",
@@ -4288,9 +4362,10 @@
     "wikidata_classes": [
       "demonstration",
       "protest",
-      "rebellion"
+      "rebellion",
+      "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -4323,7 +4398,8 @@
     "wikipedia_revid": 1377864011,
     "wikipedia_revid_timestamp": "2026-10-01T16:20:05Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -4373,7 +4449,7 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
+    "category": "unclassified",
     "retrieved_at": "2026-09-13T14:30:06.224Z",
     "wikidata_qid": "Q131404510",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Fall_of_the_Assad_regime",
@@ -4390,7 +4466,7 @@
     "wikidata_classes": [
       "regime change"
     ],
-    "category_group": "political",
+    "category_group": "unclassified",
     "review_reasons": [
       "data_fix F13: Fall of the Assad regime: the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P585 2024-12-08 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Fall_of_the_Assad_regime&oldid=1380552397: lead \"On 8 December 2024, the Assad regime in Syria collapsed\"; infobox date 8 December 2024 (checked 2026-10-24). date_start = Wikidata P585; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
@@ -4416,7 +4492,7 @@
       "Lebanon",
       "Israel/Palestine"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:30:07.141Z",
     "wikidata_qid": "Q122974556",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)",
@@ -4432,9 +4508,11 @@
     "wikipedia_revid_timestamp": "2026-08-10T02:57:05Z",
     "wikidata_classes": [
       "armed conflict",
-      "border conflict"
+      "border conflict",
+      "political crisis",
+      "international crisis"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "data_fix F13: Hezbollah–Israel conflict (2023–present): the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P580 2023-10-08 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)&oldid=1368616555: lead \"began on 8 October 2023\"; infobox (Template:Hezbollah–Israel conflict (2023–present) infobox, revision 1381585493) \"8 October 2023 – present\" (checked 2026-10-24). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern crisis (2023–present)\" (Q124373310); it may overlap with that larger event",
@@ -4493,7 +4571,8 @@
     "wikipedia_revid": 1381056396,
     "wikipedia_revid_timestamp": "2026-10-19T18:57:06Z",
     "wikidata_classes": [
-      "war"
+      "war",
+      "armed conflict"
     ],
     "category_group": "war",
     "review_reasons": [
@@ -5227,8 +5306,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "siege",
       "battle",
@@ -5317,8 +5396,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "battle",
       "siege",
@@ -5413,8 +5492,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "battle",
       "rebellion"
@@ -6486,8 +6565,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "treaty",
-    "category_group": "treaty",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "armistice",
       "treaty",
@@ -7511,8 +7590,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "migration",
-    "category_group": "migration",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "exodus",
       "ethnic cleansing",
@@ -7825,8 +7904,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "political crisis",
       "proxy war",
@@ -11468,8 +11547,8 @@
     "countries": [
       "Bahrain"
     ],
-    "category": "uprising",
-    "category_group": "uprising",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "rebellion",
       "protest",
@@ -15890,8 +15969,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "airstrike",
       "assassination"
@@ -16220,8 +16299,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "assassination",
       "airstrike",
@@ -16581,8 +16660,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "assassination",
       "airstrike",
@@ -16687,8 +16766,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "assassination",
       "airstrike"
@@ -17168,8 +17247,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "rebellion",
       "civil war",
@@ -17362,8 +17441,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "treaty",
-    "category_group": "treaty",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "armistice",
       "treaty",
@@ -17649,8 +17728,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "migration",
-    "category_group": "migration",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "ethnic cleansing",
       "population transfer"
@@ -18564,8 +18643,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "migration",
-    "category_group": "migration",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "mass migration",
       "exodus",
@@ -21984,8 +22063,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "revolution",
       "war phase",
@@ -22815,8 +22894,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "attempted coup d'état",
       "coup d'état",
@@ -23707,8 +23786,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "migration",
-    "category_group": "migration",
+    "category": "atrocity",
+    "category_group": "atrocity",
     "wikidata_classes": [
       "population transfer",
       "evacuation",
@@ -24893,8 +24972,8 @@
     "countries": [
       "Yemen"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "airstrike",
       "assassination"
@@ -24995,8 +25074,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "uprising",
-    "category_group": "uprising",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "demonstration",
       "rebellion",
@@ -25995,8 +26074,8 @@
     "countries": [
       "Egypt"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -26172,8 +26251,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -27452,8 +27531,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -28490,8 +28569,8 @@
       "Lebanon",
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "international conflict",
       "armed conflict",
@@ -30488,8 +30567,8 @@
       "Iran",
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -30816,8 +30895,8 @@
       "Syria",
       "Iraq"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -30906,8 +30985,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -31042,8 +31121,8 @@
     "countries": [
       "Saudi Arabia"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -31173,8 +31252,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -32219,8 +32298,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "civil disorder",
       "armed conflict",
@@ -33959,8 +34038,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -34214,8 +34293,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -35516,8 +35595,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -36485,8 +36564,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",

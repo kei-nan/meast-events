@@ -11,7 +11,7 @@
 // it. The app replaces that content when it starts, reads the event from the path
 // (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
-import { categoryLabel } from "../src/lib/categoryLabels.js";
+import { categoryWithBasis } from "../src/lib/categoryLabels.js";
 import { citationNotes, citeEvent } from "../src/lib/citation.js";
 import { roundedLocationNote } from "../src/lib/coordPrecision.js";
 import { dataFixUrl } from "../src/lib/dataFixes.js";
@@ -544,7 +544,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
 
   const meta = [dateText, countries.map(countryLabel).join(", ")].filter(Boolean).map(escapeHtml).join(" · ");
   const body = [
-    event.category && `<p class="category">Category (our grouping): ${escapeHtml(categoryLabel(event.category))}</p>`,
+    event.category && `<p class="category">Category: ${escapeHtml(categoryWithBasis(event))}</p>`,
     `<h1>${escapeHtml(title)}</h1>`,
     meta && `<p class="meta">${meta}</p>`,
     renderPartOf(event.part_of),

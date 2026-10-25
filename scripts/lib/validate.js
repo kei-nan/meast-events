@@ -1,7 +1,7 @@
 // Structural validation for event files. This checks FORMAT and internal consistency
 // only - it never judges whether an event is "right" (that would be editorial).
 import { createHash } from "node:crypto";
-import { COUNTRIES, EVENT_CLASSES, INCLUSION_MIN_SITELINKS, notEventClasses } from "./event-classes.js";
+import { COUNTRIES, GROUPS, INCLUSION_MIN_SITELINKS, groupForEvent, notEventClasses } from "./event-classes.js";
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode } from "./wiki.js";
 import { lowPrecisionCoordinateFlag, titleYearsFlag } from "./flags.js";
@@ -21,10 +21,10 @@ export const MIN_YEAR = 1900;
 export const MAX_YEAR = new Date().getUTCFullYear() + 1;
 export const LOCATION_QUALITIES = ["precise", "approximate", "none"];
 
-// The allowed `category` / `category_group` values: the groups the pipeline can assign
+// The allowed `category` / `category_group` values: the groups the pipeline can assign, "unclassified" included
 // (scripts/lib/event-classes.js). The app's CATEGORY_LABELS has one label per group
 // (checked in validate.test.js).
-export const CATEGORIES = [...new Set(EVENT_CLASSES.map((c) => c.category))];
+export const CATEGORIES = GROUPS;
 
 // Which coordinate_source goes with which location_quality, as the pipeline writes them:
 // scripts/ingest.js (wikipedia -> wikidata -> manual-override -> country-fallback:<country>),
@@ -216,6 +216,10 @@ export function validateEvents(
     }
     if (typeof e.category !== "string" || !e.category) err(i, e, "category missing");
     else if (!CATEGORIES.includes(e.category)) err(i, e, `category must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category)})`);
+    else if (Array.isArray(e.wikidata_classes) && e.category !== groupForEvent(e.wikidata_classes)) {
+      // The grouping rule (groupForEvent) is the only source of the group: no event keeps one set by hand.
+      err(i, e, `category ${e.category} is not what the grouping rule gives for its wikidata_classes (${groupForEvent(e.wikidata_classes)})`);
+    }
     if (e.category_group != null) {
       if (!CATEGORIES.includes(e.category_group)) {
         err(i, e, `category_group must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category_group)})`);

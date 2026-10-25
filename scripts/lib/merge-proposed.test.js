@@ -97,8 +97,8 @@ test("merge-proposed: an invalid proposed file is refused, even with --apply", (
 });
 
 test("merge-proposed: not events are removed from the curated file and never added; --no-add adds nothing", () => {
-  const history = event("x", "Q9", { wikidata_classes: ["history of a country or state"] });
-  const t = setup({ curated: [...curated, history], proposed: [event("c", "Q3"), event("y", "Q8", { wikidata_classes: ["human"] })] });
+  const history = event("x", "Q9", { wikidata_classes: ["history of a country or state", "war"] });
+  const t = setup({ curated: [...curated, history], proposed: [event("c", "Q3"), event("y", "Q8", { wikidata_classes: ["human", "war"] })] });
   try {
     const dry = run(t.dir);
     assert.match(dry, /removed, not events \(rule\):\s+1/);
