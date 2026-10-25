@@ -142,9 +142,9 @@ test("the bundle's search folder is used; once it is gone, the folder meta.json 
 });
 
 test("an old folder's load failing late does not reset the new folder's", async () => {
-  // A folder name of its own: an engine URL imported by an earlier test stays
-  // cached, so it would not fail here. The old folder's engine fails at once; its id map answers 404 only after
-  // the retry has loaded the new folder.
+  // The old folder's engine fails at once; its id map answers 404 only after
+  // the retry has loaded the new folder. The folder has a name of its own: an
+  // engine URL imported by an earlier test stays cached and would not fail.
   globalThis.__SEARCH_DIR__ = "v.late";
   globalThis.__fakePagefindDownloadFails = (url) => url.includes("/v.late/");
   let release;
