@@ -23,6 +23,8 @@ export const CATEGORY_COLORS = {
   economic: "#8b7938", // olive mustard
   terrorism: "#783e4d", // oxblood
   atrocity: "#2b251c", // lamp black
+  // No listed Wikidata class: the neutral warm grey the map already used for an unknown group.
+  unclassified: "#6b6151",
 };
 const FALLBACK_COLOR = "#6b6151";
 

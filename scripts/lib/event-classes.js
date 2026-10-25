@@ -120,18 +120,49 @@ export const notEventClasses = (wikidataClasses) =>
 // Objective inclusion threshold: Wikidata sitelinks (number of Wikimedia-project pages).
 export const INCLUSION_MIN_SITELINKS = 10;
 
-export const EVENT_CLASSES = [...ORIGINAL_EVENT_CLASSES, ...NEW_EVENT_CLASSES, ...GAP_EVENT_CLASSES, ...CIVIC_EVENT_CLASSES];
+// Added 2026-10-25. "Ethnic cleansing" (Q154278; English label checked in WDQS on 2026-10-25, a subclass of "forced
+// displacement" and "atrocity" there) is in the overriding atrocity group like genocide and massacre. Before, the five
+// events Wikidata types this way were shown as "migration" through their "population transfer" class. The class has 5
+// dated in-region items with >=10 sitelinks, all already found by other classes, so it adds no new events today.
+export const ATROCITY_GAP_CLASSES = [{ qid: "Q154278", label: "ethnic cleansing", category: "atrocity" }];
+
+export const EVENT_CLASSES = [
+  ...ORIGINAL_EVENT_CLASSES,
+  ...NEW_EVENT_CLASSES,
+  ...GAP_EVENT_CLASSES,
+  ...CIVIC_EVENT_CLASSES,
+  ...ATROCITY_GAP_CLASSES,
+];
+
+// The group of an event whose Wikidata classes include none of the classes above. It is shown as such rather than given
+// a group by hand.
+export const UNCLASSIFIED = "unclassified";
+
+// Every group an event can have.
+export const GROUPS = [...new Set(EVENT_CLASSES.map((c) => c.category)), UNCLASSIFIED];
 
 // Groups that override whatever group an event would otherwise get, checked in this order.
 // An item Wikidata types as both a "massacre" and a "terrorist attack" is shown as terrorism,
-// whichever class discovery happened to match first, and every genocide, massacre or war crime
-// is "atrocity" rather than folded into "political". Applied the same way to every event,
-// curated or discovered; an event matching none keeps its existing group.
+// and every genocide, massacre or war crime is "atrocity" rather than folded into "political".
 export const OVERRIDING_GROUPS = ["terrorism", "atrocity"];
 
 const GROUP_OF_LABEL = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
+const TABLE_ORDER = EVENT_CLASSES.map((c) => c.label);
 
-export function groupForEvent(wikidataClasses, currentGroup) {
-  const groups = new Set((wikidataClasses ?? []).map((l) => GROUP_OF_LABEL[l]).filter(Boolean));
-  return OVERRIDING_GROUPS.find((g) => groups.has(g)) ?? currentGroup;
+// The one grouping rule (docs/DATA_POLICY.md, "Category (our grouping)"), applied identically to every event, hand-picked
+// or discovered. `wikidataClasses` are the event's stored Wikidata class labels (its P31 classes plus the listed classes
+// it is an instance of through P279*). Returns the group and the classes that decided it:
+//   1. any class in the terrorism group -> terrorism; else any in the atrocity group -> atrocity (every such class listed);
+//   2. otherwise the group of the listed class that comes first in EVENT_CLASSES;
+//   3. otherwise "unclassified" (no deciding class).
+export function groupBasis(wikidataClasses) {
+  const classes = (wikidataClasses ?? []).filter((l) => GROUP_OF_LABEL[l]);
+  for (const g of OVERRIDING_GROUPS) {
+    const deciding = classes.filter((l) => GROUP_OF_LABEL[l] === g);
+    if (deciding.length) return { group: g, classes: deciding };
+  }
+  const first = TABLE_ORDER.find((l) => classes.includes(l));
+  return first ? { group: GROUP_OF_LABEL[first], classes: [first] } : { group: UNCLASSIFIED, classes: [] };
 }
+
+export const groupForEvent = (wikidataClasses) => groupBasis(wikidataClasses).group;

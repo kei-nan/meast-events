@@ -7,6 +7,9 @@ import {
   EVENT_CLASSES,
   OVERRIDING_GROUPS,
   groupForEvent,
+  groupBasis,
+  GROUPS,
+  UNCLASSIFIED,
 } from "./event-classes.js";
 
 test("15 tracked countries/territories; every QID maps back to exactly one of them", () => {
@@ -29,24 +32,42 @@ test("event classes: unique QIDs and labels, each with a known coarse group", ()
 });
 
 test("groupForEvent: terrorism outranks atrocity, whatever order Wikidata lists the classes in", () => {
-  assert.equal(groupForEvent(["massacre", "terrorist attack"], "political"), "terrorism");
-  assert.equal(groupForEvent(["terrorist attack", "massacre"], "political"), "terrorism");
-  assert.equal(groupForEvent(["war crime", "battle"], "war"), "atrocity");
-  assert.equal(groupForEvent(["genocide"], "political"), "atrocity");
-  assert.equal(groupForEvent(["hostage taking", "siege"], "war"), "terrorism");
+  assert.equal(groupForEvent(["massacre", "terrorist attack"]), "terrorism");
+  assert.equal(groupForEvent(["terrorist attack", "massacre"]), "terrorism");
+  assert.equal(groupForEvent(["war crime", "battle"]), "atrocity");
+  assert.equal(groupForEvent(["genocide"]), "atrocity");
+  assert.equal(groupForEvent(["hostage taking", "siege"]), "terrorism");
   // 2026-10-07: a suicide attack is terrorism whether or not Wikidata also types it "terrorist attack".
-  assert.equal(groupForEvent(["suicide attack"], "war"), "terrorism");
-  assert.equal(groupForEvent(["suicide attack", "mass murder"], "war"), "terrorism");
-  assert.equal(groupForEvent(["pogrom"], "protest"), "atrocity");
-  assert.equal(groupForEvent(["riot", "protest"], "protest"), "protest", "protest is not overriding");
+  assert.equal(groupForEvent(["suicide attack"]), "terrorism");
+  assert.equal(groupForEvent(["suicide attack", "mass murder"]), "terrorism");
+  assert.equal(groupForEvent(["pogrom"]), "atrocity");
+  assert.equal(groupForEvent(["riot", "protest"]), "protest", "protest is not overriding");
 });
 
-test("groupForEvent: without an overriding class the event keeps its group", () => {
-  assert.equal(groupForEvent(["battle", "siege"], "war"), "war");
-  assert.equal(groupForEvent(["treaty"], "diplomatic"), "diplomatic", "a non-overriding class does not regroup");
-  assert.equal(groupForEvent(["some class we do not track", "Q12345"], "political"), "political");
-  assert.equal(groupForEvent([], "treaty"), "treaty");
-  assert.equal(groupForEvent(undefined, "war"), "war");
+test("groupForEvent: without an overriding class, the first listed class in table order decides; no hand-kept group", () => {
+  assert.equal(groupForEvent(["battle", "siege"]), "war");
+  assert.equal(groupForEvent(["treaty"]), "treaty");
+  // Table order, not Wikidata's statement order: "military operation" comes before "assassination".
+  assert.equal(groupForEvent(["assassination", "airstrike", "military operation"]), "war");
+  assert.equal(groupForEvent(["peace treaty", "treaty"]), "treaty", "an unlisted class is skipped");
+  assert.equal(groupForEvent(["coup d'état"]), "political");
+  assert.equal(groupForEvent(["some class we do not track", "Q12345"]), UNCLASSIFIED);
+  assert.equal(groupForEvent([]), UNCLASSIFIED);
+  assert.equal(groupForEvent(undefined), UNCLASSIFIED);
+  assert.ok(GROUPS.includes(UNCLASSIFIED));
+});
+
+test("groupForEvent: ethnic cleansing is in the overriding atrocity group, whoever the victims are", () => {
+  assert.equal(EVENT_CLASSES.find((c) => c.label === "ethnic cleansing").qid, "Q154278");
+  assert.equal(groupForEvent(["population transfer", "ethnic cleansing"]), "atrocity");
+  assert.equal(groupForEvent(["population transfer"]), "migration");
+});
+
+test("groupBasis: names the classes that decided the group", () => {
+  assert.deepEqual(groupBasis(["suicide attack", "battle"]), { group: "terrorism", classes: ["suicide attack"] });
+  assert.deepEqual(groupBasis(["massacre", "genocide", "war"]), { group: "atrocity", classes: ["massacre", "genocide"] });
+  assert.deepEqual(groupBasis(["revolt", "armed conflict", "military operation"]), { group: "war", classes: ["military operation"] });
+  assert.deepEqual(groupBasis(["regime change"]), { group: UNCLASSIFIED, classes: [] });
 });
 
 test("not events: unique QIDs/labels, none of them an event class; matched by stored label", async () => {

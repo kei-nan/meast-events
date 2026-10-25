@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import { REVIEW_TABS, TAB_NAMES, tabStatus } from "../lib/reviewTabs.js";
 import { safeUrl } from "../lib/safeUrl.js";
+import { categoryNoteOutdated, categoryShortLabel } from "../lib/categoryLabels.js";
 
 // The Popover API (Safari 17+, Chrome 114+, Firefox 125+). Where it is missing, the
 // popover attribute does nothing (the note would show all the time) and
@@ -198,6 +199,11 @@ export default function FramingReview({ event, tab, onTab }) {
       {review.category_note && (
         <p>
           <strong>Category note:</strong> {review.category_note}
+          {/* Written about a group the grouping rule no longer gives (docs/DATA_POLICY.md): kept, and dated by what it describes. */}
+          {categoryNoteOutdated(review.category_note, event.category) &&
+            ` (Written when this entry was grouped as “${categoryShortLabel(
+              categoryNoteOutdated(review.category_note, event.category)
+            )}”; the grouping rule now gives “${categoryShortLabel(event.category)}”.)`}
         </p>
       )}
       {review.data_note && (

@@ -196,7 +196,8 @@ function Coverage({ state }) {
       <BarList rows={Object.entries(c.by_category).map(([k, v]) => ({ label: k, count: v }))} />
       {eco && (
         <p>
-          {eco.total === 1 ? "Only one event is" : `${fmt(eco.total)} events are`} in the economic category
+          {eco.total === 0 ? "No event is" : eco.total === 1 ? "Only one event is" : `${fmt(eco.total)} events are`} in the
+          economic category
           {eco.titles?.length ? ` (${eco.titles.join(", ")})` : ""}
           {eco.total > 0 && eco.from_hand_picked_list === eco.total
             ? `, and ${eco.total === 1 ? "it comes" : "all come"} from the hand-picked list, not from the inclusion rule.`
@@ -405,7 +406,10 @@ export default function AboutData({ section = null, onClose }) {
           <li>
             <strong>Our own choices.</strong> The list of Wikidata event classes, the set of tracked countries, the
             coarse “category (our grouping)” used for colours and filters, and the hand-picked seed list are
-            decisions made by this project, not by Wikipedia.
+            decisions made by this project, not by Wikipedia. The category comes from one published rule applied to
+            every event, hand-picked or not: terrorism or atrocity if any of its Wikidata classes is in that group,
+            otherwise the group of its first listed class; an event with none of the listed classes is
+            “Unclassified”. Each entry names the Wikidata class its category comes from.
           </li>
           <li>
             <strong>Wikidata is modelled unevenly.</strong> Only events someone has classified, dated and located

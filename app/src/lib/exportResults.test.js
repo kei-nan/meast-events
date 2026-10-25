@@ -109,7 +109,7 @@ test("a row: displayed countries and category, lat/lon only for a precise locati
   const a = exportRow(rounded);
   assert.equal(a.lat, null);
   assert.equal(a.lon, null);
-  assert.equal(a.category, "Atrocity (genocide, massacre, war crime)");
+  assert.equal(a.category, "Atrocity (genocide, massacre, war crime, ethnic cleansing)");
 
   const n = exportRow(regional);
   assert.deepEqual(n.countries, ["Region-wide"]);

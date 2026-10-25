@@ -13,7 +13,7 @@ import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 import { countryLabel, countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
-import { categoryLabel } from "../lib/categoryLabels.js";
+import { categoryWithBasis } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
@@ -296,7 +296,7 @@ export default function EventDetail({ event, borderYear = null, onBack, onShowOn
           "part of". Where an entry's data comes from is in "About this entry" at the end. */}
       <header className="event-detail-head">
         {event.category && (
-          <p className="event-detail-category">Category (our grouping): {categoryLabel(event.category)}</p>
+          <p className="event-detail-category">Category (our grouping): {categoryWithBasis(event)}</p>
         )}
         <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
           {event.title}
