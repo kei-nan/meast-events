@@ -15,21 +15,21 @@ test("short labels drop only the parenthetical gloss", () => {
   assert.equal(categoryShortLabel("famine"), "Famine");
 });
 
-test("the header names the Wikidata class that decided the group, the same way for every event", () => {
+test("the header names the Wikidata classes behind the group, the same way for every event", () => {
   const sbarro = { category: "terrorism", wikidata_classes: ["suicide attack"] };
-  assert.deepEqual(categoryBasis(sbarro), ["suicide attack"]);
-  assert.equal(categoryWithBasis(sbarro), "Terrorism, from Wikidata’s class “suicide attack”");
+  assert.deepEqual(categoryBasis(sbarro), [["suicide attack", "terrorism"]]);
+  assert.equal(categoryWithBasis(sbarro), "Terrorism, from Wikidata\u2019s class \u201csuicide attack\u201d");
   const bahr = { category: "terrorism", wikidata_classes: ["bomb attack", "terrorist attack"] };
-  assert.equal(categoryWithBasis(bahr), "Terrorism, from Wikidata’s class “terrorist attack”");
+  assert.equal(categoryWithBasis(bahr), "Terrorism, from Wikidata\u2019s class \u201cterrorist attack\u201d");
   const gaza = { category: "atrocity", wikidata_classes: ["military operation", "bombardment", "genocide"] };
-  assert.deepEqual(categoryBasis(gaza), ["genocide"]);
-  const exodus = { category: "atrocity", wikidata_classes: ["ethnic cleansing", "population transfer"] };
-  assert.deepEqual(categoryBasis(exodus), ["ethnic cleansing"]);
-  // Table order: "military operation" before "assassination", whatever order Wikidata lists them in.
-  const strike = { category: "war", wikidata_classes: ["assassination", "airstrike", "military operation"] };
-  assert.equal(categoryWithBasis(strike), "War, from Wikidata’s class “military operation”");
-  const twoAtrocity = { category: "atrocity", wikidata_classes: ["massacre", "mass murder"] };
-  assert.match(categoryWithBasis(twoAtrocity), /classes “massacre”, “mass murder”$/);
+  assert.deepEqual(categoryBasis(gaza), [["genocide", "atrocity"]]);
+  const war = { category: "war", wikidata_classes: ["war", "armed conflict"] };
+  assert.equal(categoryWithBasis(war), "War, from Wikidata\u2019s classes \u201cwar\u201d, \u201carmed conflict\u201d");
+  const spring = { category: "mixed", wikidata_classes: ["protest", "civil war", "revolution", "war"] };
+  assert.equal(
+    categoryWithBasis(spring),
+    "Mixed \u2014 Wikidata\u2019s classes point to more than one group: protest (Protest), revolution (Uprising), war (War)"
+  );
   assert.equal(
     categoryWithBasis({ category: "unclassified", wikidata_classes: ["regime change"] }),
     "Unclassified: none of its Wikidata classes is on our list"

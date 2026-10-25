@@ -11,11 +11,23 @@ export const CATEGORY_LABELS = {
   economic: "Economic",
   terrorism: "Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, hijacking)",
   atrocity: "Atrocity (genocide, massacre, war crime, ethnic cleansing)",
+  mixed: "Mixed (classes from more than one group)",
   unclassified: "Unclassified (no listed Wikidata class)",
 };
 
-// The grouping rule's class table (scripts/lib/event-classes.js EVENT_CLASSES, in its order: label -> group); kept equal
-// to it by scripts/lib/validate.test.js. Only used to say which Wikidata class decided an event's group.
+/** Label for a category id; an unknown id is shown capitalized, never dropped. */
+export function categoryLabel(id) {
+  if (!id) return "";
+  return CATEGORY_LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1);
+}
+
+/** Label without its parenthetical gloss, for tight spots (active-filter chips). */
+export function categoryShortLabel(id) {
+  return categoryLabel(id).replace(/\s*\(.*\)$/, "");
+}
+
+// The grouping rule's class table (scripts/lib/event-classes.js EVENT_CLASSES: label -> group); kept equal to it by
+// scripts/lib/validate.test.js. Only used to name the Wikidata classes behind an event's group.
 export const CLASS_GROUPS = [
   ["battle", "war"], ["war", "war"], ["military operation", "war"], ["treaty", "treaty"], ["coup d'état", "political"],
   ["assassination", "political"], ["genocide", "atrocity"], ["massacre", "atrocity"], ["terrorist attack", "terrorism"],
@@ -31,36 +43,31 @@ export const CLASS_GROUPS = [
 ];
 const GROUP_OF = new Map(CLASS_GROUPS);
 
+const OVERRIDING = ["terrorism", "atrocity"];
+
 /**
- * The Wikidata classes of an event that gave it its group (the overriding terrorism/atrocity classes, else the first
- * listed class in table order), or [] for an unclassified event or one whose classes are not loaded.
+ * The listed Wikidata classes behind an event's group, as [class, group] pairs: the terrorism or atrocity classes for
+ * those groups, otherwise every listed class (one group, or several for "mixed"); [] for an unclassified event or one
+ * whose classes are not loaded. The same rule as scripts/lib/event-classes.js groupBasis.
  */
 export function categoryBasis(event) {
-  const classes = (event?.wikidata_classes ?? []).filter((l) => GROUP_OF.get(l) === event?.category);
-  if (event?.category === "terrorism" || event?.category === "atrocity") return classes;
-  const first = CLASS_GROUPS.find(([l]) => (event?.wikidata_classes ?? []).includes(l));
-  return first && first[1] === event?.category ? [first[0]] : [];
+  const listed = [...new Set(event?.wikidata_classes ?? [])].filter((l) => GROUP_OF.has(l)).map((l) => [l, GROUP_OF.get(l)]);
+  if (OVERRIDING.includes(event?.category)) return listed.filter(([, g]) => g === event.category);
+  return listed;
 }
 
-/** "Terrorism, from Wikidata's class “suicide attack”": the header text, attributing the group to Wikidata's class. */
+/** The header text after "Category (our grouping): ", attributing the group to Wikidata's classes. */
 export function categoryWithBasis(event) {
   const label = categoryShortLabel(event?.category);
-  const basis = categoryBasis(event);
   if (event?.category === "unclassified") return `${label}: none of its Wikidata classes is on our list`;
+  const basis = categoryBasis(event);
   if (!basis.length) return label;
-  const quoted = basis.map((l) => `“${l}”`).join(", ");
+  if (event.category === "mixed") {
+    const list = basis.map(([l, g]) => `${l} (${categoryShortLabel(g)})`).join(", ");
+    return `${label} — Wikidata’s classes point to more than one group: ${list}`;
+  }
+  const quoted = basis.map(([l]) => `“${l}”`).join(", ");
   return `${label}, from Wikidata’s class${basis.length > 1 ? "es" : ""} ${quoted}`;
-}
-
-/** Label for a category id; an unknown id is shown capitalized, never dropped. */
-export function categoryLabel(id) {
-  if (!id) return "";
-  return CATEGORY_LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1);
-}
-
-/** Label without its parenthetical gloss, for tight spots (active-filter chips). */
-export function categoryShortLabel(id) {
-  return categoryLabel(id).replace(/\s*\(.*\)$/, "");
 }
 
 /**

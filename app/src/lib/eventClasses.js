@@ -16,6 +16,7 @@ export const RULE_CLASS_LABELS = [
   "armed conflict", "military campaign", "military occupation", "airstrike", "bombardment", "aircraft shootdown",
   "suicide attack", "pogrom", "mass murder", "riot", "political crisis", "international crisis",
   "public election", "protest", "demonstration", "summit",
+  "ethnic cleansing",
 ];
 const ON_LIST = new Set(RULE_CLASS_LABELS);
 

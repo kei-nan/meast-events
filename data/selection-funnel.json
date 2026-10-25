@@ -559,31 +559,40 @@
     },
     "by_group": {
       "war": {
-        "raw": 1508,
-        "no_english_article": 216,
-        "fewer_than_min_sitelinks": 904,
-        "passed_filters": 388,
-        "proposed_location_none": 67,
+        "raw": 1452,
+        "no_english_article": 215,
+        "fewer_than_min_sitelinks": 878,
+        "passed_filters": 359,
+        "proposed_location_none": 57,
         "date_order_flagged": 1,
-        "in_curated": 359
+        "in_curated": 330
       },
       "political": {
-        "raw": 1860,
-        "no_english_article": 1089,
-        "fewer_than_min_sitelinks": 630,
-        "passed_filters": 141,
+        "raw": 1821,
+        "no_english_article": 1084,
+        "fewer_than_min_sitelinks": 602,
+        "passed_filters": 135,
         "proposed_location_none": 99,
         "date_order_flagged": 0,
-        "in_curated": 141
+        "in_curated": 135
+      },
+      "mixed": {
+        "raw": 167,
+        "no_english_article": 13,
+        "fewer_than_min_sitelinks": 91,
+        "passed_filters": 63,
+        "proposed_location_none": 10,
+        "date_order_flagged": 0,
+        "in_curated": 63
       },
       "uprising": {
-        "raw": 76,
-        "no_english_article": 6,
-        "fewer_than_min_sitelinks": 38,
-        "passed_filters": 32,
+        "raw": 7,
+        "no_english_article": 0,
+        "fewer_than_min_sitelinks": 1,
+        "passed_filters": 6,
         "proposed_location_none": 0,
         "date_order_flagged": 0,
-        "in_curated": 32
+        "in_curated": 6
       },
       "atrocity": {
         "raw": 550,
@@ -595,13 +604,13 @@
         "in_curated": 73
       },
       "treaty": {
-        "raw": 42,
-        "no_english_article": 9,
+        "raw": 39,
+        "no_english_article": 8,
         "fewer_than_min_sitelinks": 8,
-        "passed_filters": 25,
+        "passed_filters": 23,
         "proposed_location_none": 0,
         "date_order_flagged": 0,
-        "in_curated": 25
+        "in_curated": 23
       },
       "protest": {
         "raw": 185,
@@ -847,13 +856,14 @@
       "2020s": 165
     },
     "by_category": {
-      "war": 368,
-      "political": 141,
+      "war": 341,
+      "political": 136,
       "terrorism": 95,
       "atrocity": 79,
-      "uprising": 33,
-      "treaty": 32,
+      "mixed": 43,
       "protest": 30,
+      "treaty": 28,
+      "uprising": 26,
       "unclassified": 23,
       "diplomatic": 13,
       "migration": 1

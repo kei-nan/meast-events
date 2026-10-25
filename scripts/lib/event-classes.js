@@ -137,32 +137,38 @@ export const EVENT_CLASSES = [
 // The group of an event whose Wikidata classes include none of the classes above. It is shown as such rather than given
 // a group by hand.
 export const UNCLASSIFIED = "unclassified";
+// The group of an event whose listed classes (none of them overriding) belong to two or more ordinary groups.
+export const MIXED = "mixed";
 
 // Every group an event can have.
-export const GROUPS = [...new Set(EVENT_CLASSES.map((c) => c.category)), UNCLASSIFIED];
+export const GROUPS = [...new Set(EVENT_CLASSES.map((c) => c.category)), MIXED, UNCLASSIFIED];
 
 // Groups that override whatever group an event would otherwise get, checked in this order.
 // An item Wikidata types as both a "massacre" and a "terrorist attack" is shown as terrorism,
 // and every genocide, massacre or war crime is "atrocity" rather than folded into "political".
 export const OVERRIDING_GROUPS = ["terrorism", "atrocity"];
 
-const GROUP_OF_LABEL = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
-const TABLE_ORDER = EVENT_CLASSES.map((c) => c.label);
 
 // The one grouping rule (docs/DATA_POLICY.md, "Category (our grouping)"), applied identically to every event, hand-picked
 // or discovered. `wikidataClasses` are the event's stored Wikidata class labels (its P31 classes plus the listed classes
-// it is an instance of through P279*). Returns the group and the classes that decided it:
-//   1. any class in the terrorism group -> terrorism; else any in the atrocity group -> atrocity (every such class listed);
-//   2. otherwise the group of the listed class that comes first in EVENT_CLASSES;
-//   3. otherwise "unclassified" (no deciding class).
-export function groupBasis(wikidataClasses) {
-  const classes = (wikidataClasses ?? []).filter((l) => GROUP_OF_LABEL[l]);
+// it is an instance of through P279*). The order of the class table and of Wikidata's statements plays no part:
+//   1. any class in the terrorism group -> terrorism; else any in the atrocity group -> atrocity;
+//   2. otherwise, if all its listed classes belong to one group, that group;
+//   3. listed classes from two or more groups -> "mixed";
+//   4. no listed class -> "unclassified".
+// Returns the group and the listed classes behind it, as [class label, its group] pairs (for a mixed event, all of them).
+// `table` is a class table like EVENT_CLASSES (a parameter only so a test can show that its order does not matter).
+export function groupBasisFrom(table, wikidataClasses) {
+  const groupOf = new Map(table.map((c) => [c.label, c.category]));
+  const listed = [...new Set(wikidataClasses ?? [])].filter((l) => groupOf.has(l)).map((l) => [l, groupOf.get(l)]);
   for (const g of OVERRIDING_GROUPS) {
-    const deciding = classes.filter((l) => GROUP_OF_LABEL[l] === g);
+    const deciding = listed.filter(([, lg]) => lg === g);
     if (deciding.length) return { group: g, classes: deciding };
   }
-  const first = TABLE_ORDER.find((l) => classes.includes(l));
-  return first ? { group: GROUP_OF_LABEL[first], classes: [first] } : { group: UNCLASSIFIED, classes: [] };
+  const groups = new Set(listed.map(([, g]) => g));
+  if (groups.size === 0) return { group: UNCLASSIFIED, classes: [] };
+  return { group: groups.size === 1 ? [...groups][0] : MIXED, classes: listed };
 }
 
+export const groupBasis = (wikidataClasses) => groupBasisFrom(EVENT_CLASSES, wikidataClasses);
 export const groupForEvent = (wikidataClasses) => groupBasis(wikidataClasses).group;

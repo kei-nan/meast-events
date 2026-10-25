@@ -23,8 +23,10 @@ export const CATEGORY_COLORS = {
   economic: "#8b7938", // olive mustard
   terrorism: "#783e4d", // oxblood
   atrocity: "#2b251c", // lamp black
-  // No listed Wikidata class: the neutral warm grey the map already used for an unknown group.
-  unclassified: "#6b6151",
+  // Two neutral greys told apart by hue (cool slate, warm grey). WCAG contrast against land #d5dbd7 / sea #b9d5e3:
+  // mixed 4.58 / 4.19, unclassified 4.33 / 3.96.
+  mixed: "#5a5f66", // slate grey: listed classes from more than one group
+  unclassified: "#6b6151", // warm grey: no listed Wikidata class
 };
 const FALLBACK_COLOR = "#6b6151";
 

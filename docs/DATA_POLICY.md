@@ -107,18 +107,28 @@ event (`groupForEvent` in `scripts/lib/event-classes.js`):
 
 1. If any of the event's `wikidata_classes` is in the **terrorism** group (terrorist attack, hostage taking, aircraft hijacking, suicide attack), the category is terrorism.
 2. Otherwise, if any is in the **atrocity** group (genocide, massacre, war crime, pogrom, mass murder, ethnic cleansing), the category is atrocity.
-3. Otherwise the category is the group of the event's listed class that comes **first in the table below**.
-4. Otherwise (none of its classes is listed) the category is **unclassified**. No event keeps a group set by hand.
+3. Otherwise, if all of the event's listed classes (those in the table below) belong to **one group**, the category is that group.
+4. If they belong to **two or more groups**, the category is **mixed**.
+5. If none of its classes is listed, the category is **unclassified**. No event keeps a group set by hand, and neither the order of the
+   table nor the order of Wikidata's statements plays any part (a test regroups every shown event under shuffled orders).
 
 `wikidata_classes` holds the item's own `P31` classes and the listed classes it is an instance of through `P279*` (the classes discovery matched), for
 hand-picked and discovered events alike, so the rule can be re-applied to the stored data; `scripts/validate-events.js` fails an event whose category is
-not what the rule gives. The event's header names the class that decided its group ("Terrorism, from Wikidata's class "suicide attack"",
-"Unclassified: none of its Wikidata classes is on our list"), generated the same way for every event.
+not what the rule gives. The event's header names the classes behind its group ("Terrorism, from Wikidata's class "suicide attack"";
+"Mixed — Wikidata's classes point to more than one group: protest (Protest), revolution (Uprising), war (War)";
+"Unclassified: none of its Wikidata classes is on our list"), generated the same way for every event. On the map, mixed is a slate grey
+and unclassified a warm grey (contrast against land/sea 4.58/4.19 and 4.33/3.96).
+
+**2026-10-25: "mixed" replaced the table order.** The rule's first version (same day) took the group of the listed class that came first in the
+table, so the table's order decided, for example, that an "assassination" also typed "military operation" was war. An event whose listed classes span
+several ordinary groups is now "mixed" instead. Compared with the groups shown before 2026-10-25, 82 events changed group: 43 to mixed (30 of them
+discovered events, such as the Israeli invasion of the Gaza Strip, the Russian intervention in Syria and the 2024 Hezbollah headquarters strike), 23 to
+unclassified, 5 from migration to atrocity, 5 to war and 6 others.
 
 **2026-10-25: the rule replaced the hand-assigned groups.** Until then step 3 applied only to discovered events (in the order discovery happened to match
 classes), and the 102 hand-picked events kept the group typed into `data/seed-events.json`, unless step 1 or 2 applied: 43 of them had a group that none
 of their own Wikidata classes supported. The hand-picked events were given the listed classes they are instances of through `P279*` (one WDQS query,
-2026-10-25; 79 class labels added to 56 of them; the other classes were already there) and every event was regrouped by the rule. 43 events changed group: 23 to unclassified (for example the
+2026-10-25; 79 class labels added to 56 of them; the other classes were already there) and every event was regrouped by the rule's first version, in which 43 events changed group: 23 to unclassified (for example the
 Balfour Declaration, the Oslo and Abraham Accords, the 1973 oil crisis, the 2020 Beirut explosion and the fall of the Assad regime, whose Wikidata classes,
 such as "public statement", "agreement", "oil crisis", "industrial disaster" and "regime change", are not on the list), 9 to war (among them the al-Anfal
 campaign, typed "military campaign", the Iraqi revolt of 1920 and the Great Syrian Revolt, typed "revolt", which Wikidata places under "military operation", the capture of Saddam Hussein, the Israeli withdrawal from Lebanon and from Gaza, and the 2024 Hezbollah headquarters

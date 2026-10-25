@@ -345,7 +345,7 @@
       "Syria",
       "regional"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:16.463Z",
     "wikidata_qid": "Q239060",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Arab_Revolt",
@@ -365,7 +365,7 @@
       "military operation",
       "armed conflict"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "country_not_supported_by_wikidata: Saudi Arabia, Jordan not derivable from Wikidata P17/P276/P131 (Wikidata gives: Syria)",
       "data_fix F14: Arab Revolt: the seed date_start is no Wikidata value (Wikidata: P580 1916-06 (month)). English Wikipedia https://en.wikipedia.org/w/index.php?title=Arab_Revolt&oldid=1380894633: infobox \"10 June 1916 – 25 October 1918\"; lead \"officially initiated at Mecca on 10 June 1916\" (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article (fields: date_precision; see docs/data-fixes.md)",
@@ -508,7 +508,7 @@
     "countries": [
       "Turkey"
     ],
-    "category": "treaty",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:19.772Z",
     "wikidata_qid": "Q328499",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Armistice_of_Mudros",
@@ -527,7 +527,7 @@
       "treaty",
       "ceasefire"
     ],
-    "category_group": "treaty",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "precise",
@@ -1018,7 +1018,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:35.732Z",
     "wikidata_qid": "Q46057",
     "wikipedia_url": "https://en.wikipedia.org/wiki/1936%E2%80%931939_Arab_revolt_in_Palestine",
@@ -1036,7 +1036,7 @@
       "rebellion",
       "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Intercommunal conflict in Mandatory Palestine\" (Q2992527); it may overlap with that larger event"
     ],
@@ -1449,7 +1449,7 @@
       "Syria",
       "Lebanon"
     ],
-    "category": "treaty",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:28:50.310Z",
     "wikidata_qid": "Q999143",
     "wikipedia_url": "https://en.wikipedia.org/wiki/1949_Armistice_Agreements",
@@ -1468,7 +1468,7 @@
       "treaty",
       "ceasefire"
     ],
-    "category_group": "treaty",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -2690,7 +2690,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:23.266Z",
     "wikidata_qid": "Q49105",
     "wikipedia_url": "https://en.wikipedia.org/wiki/First_Intifada",
@@ -2709,7 +2709,7 @@
       "rebellion",
       "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event",
       "part_of: Wikidata (P361) lists this event as part of \"intifada\" (Q1753200); it may overlap with that larger event"
@@ -3005,7 +3005,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:32.177Z",
     "wikidata_qid": "Q49106",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Second_Intifada",
@@ -3024,7 +3024,7 @@
       "rebellion",
       "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Israeli–Palestinian conflict\" (Q151622); it may overlap with that larger event"
     ],
@@ -3114,7 +3114,7 @@
     "countries": [
       "Iraq"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:34.553Z",
     "wikidata_qid": "Q107802",
     "wikipedia_url": "https://en.wikipedia.org/wiki/2003_invasion_of_Iraq",
@@ -3135,7 +3135,7 @@
       "political crisis",
       "international crisis"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Iraq War\" (Q545449); it may overlap with that larger event"
     ],
@@ -3251,7 +3251,7 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:37.515Z",
     "wikidata_qid": "Q196122",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Israeli_disengagement_from_the_Gaza_Strip",
@@ -3271,7 +3271,7 @@
       "withdrawal",
       "military operation"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -3509,7 +3509,7 @@
     "countries": [
       "regional"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:43.813Z",
     "wikidata_qid": "Q33761",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Arab_Spring",
@@ -3528,7 +3528,7 @@
       "war",
       "armed conflict"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "none",
@@ -3659,7 +3659,7 @@
     "countries": [
       "Yemen"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:29:46.664Z",
     "wikidata_qid": "Q210005",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Yemeni_revolution",
@@ -3678,7 +3678,7 @@
       "protest",
       "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Arab Spring\" (Q33761); it may overlap with that larger event"
     ],
@@ -4239,7 +4239,7 @@
       "Iraq",
       "Iran"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:30:02.291Z",
     "wikidata_qid": "Q80754846",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Assassination_of_Qasem_Soleimani",
@@ -4263,7 +4263,7 @@
       "airstrike",
       "bombardment"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "country_not_supported_by_wikidata: Iran not derivable from Wikidata P17/P276/P131 (Wikidata gives: Iraq)",
       "part_of: Wikidata (P361) lists this event as part of \"Persian Gulf crisis (2019–2020)\" (Q65920364); it may overlap with that larger event",
@@ -4345,7 +4345,7 @@
     "countries": [
       "Iran"
     ],
-    "category": "uprising",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:30:03.723Z",
     "wikidata_qid": "Q114065797",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Mahsa_Amini_protests",
@@ -4365,7 +4365,7 @@
       "rebellion",
       "armed conflict"
     ],
-    "category_group": "uprising",
+    "category_group": "mixed",
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
@@ -4492,7 +4492,7 @@
       "Lebanon",
       "Israel/Palestine"
     ],
-    "category": "war",
+    "category": "mixed",
     "retrieved_at": "2026-09-13T14:30:07.141Z",
     "wikidata_qid": "Q122974556",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)",
@@ -4512,7 +4512,7 @@
       "political crisis",
       "international crisis"
     ],
-    "category_group": "war",
+    "category_group": "mixed",
     "review_reasons": [
       "data_fix F13: Hezbollah–Israel conflict (2023–present): the seed date_start was none of the item's Wikidata P585/P580 values. Wikidata P580 2023-10-08 (day precision); English Wikipedia https://en.wikipedia.org/w/index.php?title=Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)&oldid=1368616555: lead \"began on 8 October 2023\"; infobox (Template:Hezbollah–Israel conflict (2023–present) infobox, revision 1381585493) \"8 October 2023 – present\" (checked 2026-10-24). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)",
       "part_of: Wikidata (P361) lists this event as part of \"Middle Eastern crisis (2023–present)\" (Q124373310); it may overlap with that larger event",
@@ -5306,8 +5306,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "siege",
       "battle",
@@ -5396,8 +5396,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "battle",
       "siege",
@@ -5492,8 +5492,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "battle",
       "rebellion"
@@ -6565,8 +6565,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "treaty",
-    "category_group": "treaty",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "armistice",
       "treaty",
@@ -7904,8 +7904,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "political crisis",
       "proxy war",
@@ -11547,8 +11547,8 @@
     "countries": [
       "Bahrain"
     ],
-    "category": "uprising",
-    "category_group": "uprising",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "rebellion",
       "protest",
@@ -15969,8 +15969,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "airstrike",
       "assassination"
@@ -16299,8 +16299,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "assassination",
       "airstrike",
@@ -16660,8 +16660,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "assassination",
       "airstrike",
@@ -16766,8 +16766,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "assassination",
       "airstrike"
@@ -17247,8 +17247,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "rebellion",
       "civil war",
@@ -17441,8 +17441,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "treaty",
-    "category_group": "treaty",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "armistice",
       "treaty",
@@ -22063,8 +22063,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "revolution",
       "war phase",
@@ -22894,8 +22894,8 @@
     "countries": [
       "Turkey"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "attempted coup d'état",
       "coup d'état",
@@ -24972,8 +24972,8 @@
     "countries": [
       "Yemen"
     ],
-    "category": "political",
-    "category_group": "political",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "airstrike",
       "assassination"
@@ -25074,8 +25074,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "uprising",
-    "category_group": "uprising",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "demonstration",
       "rebellion",
@@ -26074,8 +26074,8 @@
     "countries": [
       "Egypt"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -26251,8 +26251,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -27531,8 +27531,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -28569,8 +28569,8 @@
       "Lebanon",
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "international conflict",
       "armed conflict",
@@ -30567,8 +30567,8 @@
       "Iran",
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -30895,8 +30895,8 @@
       "Syria",
       "Iraq"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -30985,8 +30985,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -31121,8 +31121,8 @@
     "countries": [
       "Saudi Arabia"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -31252,8 +31252,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -32298,8 +32298,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "civil disorder",
       "armed conflict",
@@ -34038,8 +34038,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -34293,8 +34293,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -35595,8 +35595,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -36564,8 +36564,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",

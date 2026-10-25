@@ -407,9 +407,10 @@ export default function AboutData({ section = null, onClose }) {
             <strong>Our own choices.</strong> The list of Wikidata event classes, the set of tracked countries, the
             coarse “category (our grouping)” used for colours and filters, and the hand-picked seed list are
             decisions made by this project, not by Wikipedia. The category comes from one published rule applied to
-            every event, hand-picked or not: terrorism or atrocity if any of its Wikidata classes is in that group,
-            otherwise the group of its first listed class; an event with none of the listed classes is
-            “Unclassified”. Each entry names the Wikidata class its category comes from.
+            every event, hand-picked or not: terrorism or atrocity if any of its Wikidata classes is in that group;
+            otherwise the group its listed classes belong to, or “Mixed” when they belong to more than one; an
+            event with none of the listed classes is “Unclassified”. The order of the class list plays no part.
+            Each entry names the Wikidata classes its category comes from.
           </li>
           <li>
             <strong>Wikidata is modelled unevenly.</strong> Only events someone has classified, dated and located

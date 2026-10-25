@@ -724,8 +724,8 @@
     "countries": [
       "Egypt"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -878,8 +878,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -2009,8 +2009,8 @@
     "countries": [
       "Lebanon"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -2912,8 +2912,8 @@
       "Lebanon",
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "international conflict",
       "armed conflict",
@@ -4666,8 +4666,8 @@
       "Iran",
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -4952,8 +4952,8 @@
       "Syria",
       "Iraq"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -5030,8 +5030,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -5149,8 +5149,8 @@
     "countries": [
       "Saudi Arabia"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -5264,8 +5264,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "military intervention",
       "armed conflict",
@@ -6184,8 +6184,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "civil disorder",
       "armed conflict",
@@ -7826,8 +7826,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -8056,8 +8056,8 @@
     "countries": [
       "Iran"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "border conflict",
       "armed conflict",
@@ -8248,8 +8248,8 @@
     "countries": [
       "Israel/Palestine"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
@@ -9348,8 +9348,8 @@
     "countries": [
       "Syria"
     ],
-    "category": "war",
-    "category_group": "war",
+    "category": "mixed",
+    "category_group": "mixed",
     "wikidata_classes": [
       "invasion",
       "armed conflict",
