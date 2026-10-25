@@ -472,8 +472,20 @@ export default function AboutData({ section = null, onClose }) {
             &ldquo;State of Palestine &ndash; Oslo Agreement in the West Bank&rdquo;
           </a>{" "}
           (source: Palestinian Authority Ministry of Planning, published on HDX), used under its terms: non-commercial
-          use with credit to UN OCHA. The map draws the borders of the last year in the selected period. Dashed borders mark territory under a
-          mandate, occupation, unrecognized annexation, or a since-resolved sovereignty dispute.
+          use with credit to UN OCHA. The map draws the borders of the last year in the selected period.
+        </p>
+        <p>
+          Dashed borders mark a shape with a status: a mandate, an occupation, an unrecognized annexation, a dispute (current or
+          resolved), shared sovereignty, an Oslo-era area, or a divided or contested territory. An occupied or annexed area gets a
+          dashed shape of its own only where a source gives us its outline (the West Bank, Gaza, the Golan Heights, Kuwait in
+          1990&ndash;1991, Abu Musa and Greater Tunb); we never draw a front line or zone by hand. Others are shown inside the state
+          that holds or held them, with a note where we have one: Sinai in 1967&ndash;1978 inside Israel, East Jerusalem inside the West
+          Bank shapes (from 2000 inside Area C), and, without a shape or note, Israel&apos;s zone in southern Lebanon, Iraqi-held parts of
+          Iran in the Iran&ndash;Iraq War and Turkish-held parts of northern Syria. The{" "}
+          <a href={`${REPO}/blob/main/docs/DATA_POLICY.md#map-borders-which-cases-are-drawn-as-flagged-shapes`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            data policy
+          </a>{" "}
+          lists these cases and the rule.
         </p>
 
         {/* The footer's "Sources & licences" opens the dialog here: these are

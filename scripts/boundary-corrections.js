@@ -66,6 +66,21 @@ const OSLO_GEOMETRY_CREDIT =
   "- Oslo Agreement in the West Bank\" (source: Palestinian Authority Ministry of " +
   "Planning), https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 
+// The ICJ advisory opinion of 19 July 2024 (Legal Consequences arising from the Policies and
+// Practices of Israel in the Occupied Palestinian Territory, including East Jerusalem), as
+// transmitted to the General Assembly in UN document A/78/968; quoted in the notes below.
+const ICJ_2024_OPINION = "https://documents.un.org/api/symbol/access?s=A/78/968&l=en&t=pdf";
+// Oslo II did not change the legal status of the areas it created; the same sentence goes on
+// every shape whose status describes the Oslo-era regime rather than the occupation.
+const OSLO_ICJ_SENTENCE =
+  "The accords did not end the occupation in law: the ICJ's non-binding advisory opinion of " +
+  "19 July 2024 treats the West Bank, East Jerusalem and Gaza as \"a single territorial unit\" " +
+  "and held that \"the Oslo Accords cannot be understood to detract from Israel's obligations " +
+  "under the pertinent rules of international law applicable in the Occupied Palestinian " +
+  "Territory\" (paras. 78, 102).";
+const UNSC_252 = "https://documents.un.org/api/symbol/access?s=S/RES/252(1968)&l=en&t=pdf";
+const UNSC_478 = "https://documents.un.org/api/symbol/access?s=S/RES/478(1980)&l=en&t=pdf";
+
 export const CORRECTIONS = [
   // --- Renames / mandate-to-independence progressions ---
   {
@@ -272,6 +287,18 @@ export const CORRECTIONS = [
   {
     type: "flag",
     target: "Egypt",
+    fromYear: 1967,
+    toYear: 1978,
+    status: null,
+    note:
+      "Sinai, occupied by Israel in the Six-Day War of June 1967, is not part of this shape in " +
+      "these years: CShapes 2.0 draws it inside Israel's shape until 1979, and it is not drawn " +
+      "as a flagged shape of its own (see Israel's note).",
+    source: "https://en.wikipedia.org/wiki/Israeli_occupation_of_the_Sinai_Peninsula",
+  },
+  {
+    type: "flag",
+    target: "Egypt",
     fromYear: 1979,
     toYear: 1981,
     note:
@@ -433,8 +460,9 @@ export const CORRECTIONS = [
   //
   // Both sit inside another polygon or in none: Israel's CShapes shape includes the Golan
   // from 1967, and no CShapes polygon includes Abu Musa or the Tunbs. Drawn on top, like
-  // the West Bank entries, so every occupation or annexation in the region gets its own
-  // labelled shape rather than only some.
+  // the West Bank entries. Not every occupation in the region gets a shape of its own: only
+  // those whose outline a source gives us (see "Map borders: which cases are drawn as
+  // flagged shapes" in docs/DATA_POLICY.md for the rule and the cases left undrawn).
   {
     type: "add",
     name: "Golan Heights (Israeli military occupation)",
@@ -496,10 +524,13 @@ export const CORRECTIONS = [
       "run by an Israeli military governorate until 1981, when Military Order 947 created " +
       "the Israeli Civil Administration to handle civil matters - still under, not instead " +
       "of, the military government. East Jerusalem was placed under Israeli law and " +
-      "administration on 28 June 1967, a step the UN Security Council declared null and " +
-      "void; this shape (CShapes 2.0's West Bank record, 1949 Armistice Line) includes it " +
-      "throughout. No part of the West Bank passed to Palestinian control in this period.",
-    source: "https://en.wikipedia.org/wiki/Israeli_occupation_of_the_West_Bank",
+      "administration on 28 June 1967; UN Security Council Resolution 252 (1968) called such " +
+      "measures \"invalid\", and Resolution 478 (1980) declared the 1980 Basic Law on " +
+      "Jerusalem \"null and void\". This shape (CShapes 2.0's West Bank record, 1949 Armistice " +
+      "Line) includes East Jerusalem throughout, also after 1980: no source we use outlines " +
+      "it on its own before 2000, so it is not drawn as an annexed shape like the Golan " +
+      "Heights. No part of the West Bank passed to Palestinian control in this period.",
+    source: `https://en.wikipedia.org/wiki/Israeli_occupation_of_the_West_Bank; ${UNSC_252}; ${UNSC_478}`,
   },
   {
     type: "add",
@@ -550,8 +581,9 @@ export const CORRECTIONS = [
       "immediate surroundings, in about fifteen disconnected blocks, plus Hebron's H1 " +
       "sector (Palestinian-controlled under the 1997 Hebron Protocol), which is merged " +
       "into this shape. Since Operation Defensive Shield (29 March - 10 May 2002) the " +
-      "Israeli military has also conducted operations inside Area A.",
-    source: "https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord",
+      "Israeli military has also conducted operations inside Area A. " +
+      OSLO_ICJ_SENTENCE,
+    source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}`,
   },
   {
     type: "add",
@@ -566,8 +598,9 @@ export const CORRECTIONS = [
       "security control. 1,203 km2, 21.2% of the West Bank, in roughly 210 separate " +
       "enclaves - some 440 Palestinian villages and their built-up areas, each ringed by " +
       "Area C. Includes the Oslo nature reserves, which OCHA's dataset classes separately " +
-      "but which Oslo II placed under the Area B regime with building restricted.",
-    source: "https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord",
+      "but which Oslo II placed under the Area B regime with building restricted. " +
+      OSLO_ICJ_SENTENCE,
+    source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}`,
   },
   {
     type: "add",
@@ -586,8 +619,12 @@ export const CORRECTIONS = [
       "settlements are here. This shape also absorbs two categories that sit outside the " +
       "Oslo A/B/C scheme entirely but are likewise under Israeli control - Israeli-declared " +
       "East Jerusalem (~69 km2) and the 1949-1967 no-man's-land (~50 km2) - so that the " +
-      "three areas tile the West Bank without holes; that merge is ours, not OCHA's.",
-    source: "https://en.wikipedia.org/wiki/Area_C_(West_Bank)",
+      "three areas tile the West Bank without holes; that merge is ours, not OCHA's. East " +
+      "Jerusalem is therefore drawn and labelled as Area C here although Oslo II did not make " +
+      "it part of Area C: Israel applied its law there in June 1967 and declared Jerusalem its " +
+      "capital in the 1980 Basic Law, which UN Security Council Resolution 478 (1980) declared " +
+      "\"null and void\". It is not drawn as an annexed shape of its own, unlike the Golan Heights.",
+    source: `https://en.wikipedia.org/wiki/Area_C_(West_Bank); ${UNSC_478}`,
   },
 
   // --- Gaza Strip after 1967 ---
@@ -620,8 +657,9 @@ export const CORRECTIONS = [
       "settlements, their access roads, the military zones around them and the Philadelphi " +
       "corridor along the Egyptian border stayed under Israeli control, leaving the PA " +
       "with roughly 60% of the Strip's land until 2005. This shape is the whole Strip: we " +
-      "have not sourced polygons for the settlement blocs, so it overstates PA control.",
-    source: "https://en.wikipedia.org/wiki/Gaza%E2%80%93Jericho_Agreement",
+      "have not sourced polygons for the settlement blocs, so it overstates PA control. " +
+      OSLO_ICJ_SENTENCE,
+    source: `https://en.wikipedia.org/wiki/Gaza%E2%80%93Jericho_Agreement; ${ICJ_2024_OPINION}`,
   },
   {
     type: "add",
@@ -636,10 +674,13 @@ export const CORRECTIONS = [
       "Israeli soldier left on 12 September 2005, taking the share of Gaza nominally " +
       "governed by the PA from about 60% to 100%. Israel declared the Strip " +
       "\"extraterritorial\" on 21 September 2005 but kept control of its airspace, " +
-      "territorial waters, population registry and all but one land crossing, so the UN, " +
-      "most states and the ICJ's 2024 advisory opinion continued to treat Gaza as " +
-      "occupied; Israel and the United States disagree.",
-    source: "https://en.wikipedia.org/wiki/Israeli_disengagement_from_the_Gaza_Strip",
+      "territorial waters, population registry and all but one land crossing, so the UN and " +
+      "most states continued to treat Gaza as occupied; Israel and the United States " +
+      "disagree. The ICJ's non-binding advisory opinion of 19 July 2024 took a graded view: " +
+      "Israel's withdrawal \"has not entirely released it of its obligations under the law of " +
+      "occupation\", obligations that \"have remained commensurate with the degree of its " +
+      "effective control over the Gaza Strip\" (para. 94).",
+    source: `https://en.wikipedia.org/wiki/Israeli_disengagement_from_the_Gaza_Strip; ${ICJ_2024_OPINION}`,
   },
   {
     type: "add",
@@ -657,8 +698,10 @@ export const CORRECTIONS = [
       "administrations - Hamas in Gaza, the Ramallah-based PA still nominally governing " +
       "the West Bank - and Gaza remained de jure PA territory throughout. Israel " +
       "designated Gaza a \"hostile entity\" in September 2007; the Israeli-Egyptian " +
-      "blockade dates from this point.",
-    source: "https://en.wikipedia.org/wiki/Battle_of_Gaza_(2007)",
+      "blockade dates from this point. On the law of occupation, the ICJ's 2024 advisory " +
+      "opinion found that Israel's obligations in Gaza after 2005 \"have remained " +
+      "commensurate with the degree of its effective control over the Gaza Strip\" (para. 94).",
+    source: `https://en.wikipedia.org/wiki/Battle_of_Gaza_(2007); ${ICJ_2024_OPINION}`,
   },
   {
     type: "add",
