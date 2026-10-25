@@ -15,6 +15,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { CORRECTIONS } from "./boundary-corrections.js";
 import * as turf from "@turf/turf";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
+import { dropRepeatedPositionsInGeometry } from "./lib/ring-positions.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
@@ -240,9 +241,10 @@ async function main() {
       if (!main) throw new Error(`reshape: no piece of ${r.geometry} contains keepPoint`);
       shape = turf.polygon(main);
     }
-    // Coordinates keep full source precision - never rounded. cleanCoords only drops
-    // repeated or redundant vertices the cuts can leave behind.
-    correctionsGeometry[r.geometry] = turf.cleanCoords(shape).geometry;
+    // Coordinates keep full source precision - never rounded, never simplified. Only exact
+    // repeats of the previous vertex (which the cuts can leave behind) are dropped;
+    // collinear vertices are source vertices and are kept.
+    correctionsGeometry[r.geometry] = dropRepeatedPositionsInGeometry(turf.getGeom(shape), r.geometry);
   }
   for (const c of CORRECTIONS) {
     if (c.type !== "add") continue;

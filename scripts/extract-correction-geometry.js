@@ -63,6 +63,7 @@
 //    printed on every run so the reconstruction stays falsifiable.
 import { readFile, writeFile } from "node:fs/promises";
 import { stringifyKeyPerLine } from "./lib/json-lines.js";
+import { dropRepeatedPositions } from "./lib/ring-positions.js";
 import * as turf from "@turf/turf";
 import * as shapefile from "shapefile";
 
@@ -75,11 +76,7 @@ function roundTo6Decimals(geometry, label) {
   const polys = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
   const roundRing = (ring) => {
     const rounded = turf.truncate(turf.lineString(ring), { precision: 6, coordinates: 2 }).geometry.coordinates;
-    try {
-      return turf.cleanCoords(turf.polygon([rounded])).geometry.coordinates[0];
-    } catch {
-      return null; // fewer than 4 positions left
-    }
+    return dropRepeatedPositions(rounded); // null if fewer than 4 positions left
   };
   const out = [];
   polys.forEach((rings, p) => {
@@ -363,7 +360,8 @@ async function main() {
     osloTotalKm2 += osloAreasKm2[key];
     // Never simplified. Coordinates are rounded to 6 decimals (~10 cm, the precision
     // CShapes itself uses): OCHA's 14-15 decimals past that are floating-point noise.
-    // Rounding can make neighbouring vertices identical - cleanCoords drops those - and
+    // Rounding can make neighbouring vertices identical - only those exact repeats are
+    // dropped (collinear vertices are kept; see lib/ring-positions.js) - and
     // a tiny ring can collapse below a valid polygon (4 positions); such rings are dropped
     // and reported.
     osloGeometry[key] = roundTo6Decimals(turf.getGeom(merged), key);
