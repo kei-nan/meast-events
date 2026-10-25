@@ -2,6 +2,7 @@
 // mapLayers.js because that file is also imported by the eagerly loaded search
 // panel and filter bar, while this one only ships with the lazy-loaded map.
 import {
+  APPROX_EDGE_PAINT,
   CATEGORY_COLOR_EXPRESSION,
   CLUSTER_COUNT_TEXT,
   CLUSTER_LABEL_PAINT,
@@ -140,6 +141,16 @@ export function installLayers(map, { land, boundaries, labels, events }) {
     source: "events",
     filter: ["has", "point_count"],
     paint: CLUSTER_PAINT,
+  });
+
+  // The dark edge of an approximate location (mapLayers.js APPROX_EDGE_PAINT),
+  // just under its ring: same source and filter, so it comes and goes with it.
+  map.addLayer({
+    id: "unclustered-point-edge",
+    type: "circle",
+    source: "events",
+    filter: ["all", ["!", ["has", "point_count"]], IS_APPROX],
+    paint: APPROX_EDGE_PAINT,
   });
 
   map.addLayer({
@@ -298,6 +309,8 @@ export function installLayers(map, { land, boundaries, labels, events }) {
     },
   });
   // Approximate locations stay hollow when selected, like their regular dot.
+  // (No extra dark edge here: selected-halo's dark ring already frames it, and
+  // one more ring would stack into a target.)
   map.addLayer({
     id: "selected-point",
     type: "circle",

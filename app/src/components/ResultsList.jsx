@@ -1,4 +1,5 @@
-import { Fragment, memo, useId, useMemo, useState } from "react";
+import { Fragment, memo, useId, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { eventYears, highlight, inRange } from "./resultsUtil.jsx";
 import { categoryLabel } from "../lib/categoryLabels.js";
 import { startedBefore } from "../lib/browseOrder.js";
@@ -264,6 +265,20 @@ function ResultsList({
   // The list can shrink under a remembered row (the timeline narrowed): the last
   // row then takes the tab stop, so the list always has one.
   const tabStop = Math.min(active, visible.length - 1);
+  const listRef = useRef(null);
+
+  // The last "Show more" goes away with its click, and focus with it (to the
+  // page): focus the first of the rows it showed instead.
+  function showMore() {
+    const first = shown;
+    const last = results.length <= shown + PAGE;
+    if (!last) return setShown(shown + PAGE);
+    flushSync(() => {
+      setShown(shown + PAGE);
+      setActive(first);
+    });
+    listRef.current?.querySelectorAll("button.sp-row")[first]?.focus();
+  }
 
   function onKeyDown(e) {
     const btns = [...e.currentTarget.querySelectorAll("button.sp-row")];
@@ -295,7 +310,7 @@ function ResultsList({
   return (
     <div className={"sp-results" + (busy ? " sp-results--busy" : "")}>
       {timeline && <TimelineAxis axis={axis} band={band} />}
-      <ul className="sp-list" onKeyDown={onKeyDown} aria-busy={busy || undefined}>
+      <ul ref={listRef} className="sp-list" onKeyDown={onKeyDown} aria-busy={busy || undefined}>
         {timeline && visible.map((ev, idx) => {
           // Headings by decade; in the browse list the events that began
           // before the selected years come last (timelineOrder), under one heading.
@@ -358,7 +373,7 @@ function ResultsList({
         })}
       </ul>
       {results.length > shown && (
-        <button type="button" className="sp-more" onClick={() => setShown(shown + PAGE)}>
+        <button type="button" className="sp-more" onClick={showMore}>
           Show more ({results.length - shown} remaining)
         </button>
       )}

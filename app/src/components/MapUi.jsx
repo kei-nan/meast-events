@@ -430,6 +430,13 @@ function LegendPanel() {
 }
 
 export function MapNotices({ loading, borderError, onRetry }) {
+  // "Loading map data…" is announced for the first load only: later loads (a
+  // new decade's borders, every few seconds during Play) still show it, but
+  // outside the live region. A failure is announced by the alert below.
+  const [phase, setPhase] = useState(loading ? "loading" : "before"); // before -> loading -> done
+  if (loading && phase === "before") setPhase("loading");
+  if (!loading && phase === "loading") setPhase("done");
+  const live = phase !== "done";
   return (
     <div className="mu-notices">
       {/* The alert is always in the page and its text changes, so screen
@@ -446,7 +453,7 @@ export function MapNotices({ loading, borderError, onRetry }) {
           </div>
         )}
       </div>
-      <div className="mu-loading" role="status" aria-live="polite">
+      <div className="mu-loading" role={live ? "status" : undefined} aria-live={live ? "polite" : "off"}>
         {loading && !borderError ? "Loading map data…" : ""}
       </div>
     </div>

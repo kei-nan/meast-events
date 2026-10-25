@@ -14,6 +14,12 @@
   .app:has(.event-detail) {
     display: block;
     height: auto;
+  }
+
+  /* Black on white also with no event open (the list, the map view): the
+     browser leaves out the dark backgrounds, and the cream text was left on
+     white paper (about 1.2:1). */
+  .app {
     background: #fff;
     color: #000;
     --bg-0: #fff;

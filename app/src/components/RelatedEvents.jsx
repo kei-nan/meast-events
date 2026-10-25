@@ -280,6 +280,7 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
             className={`rel-tab${count(t) ? "" : " rel-tab--empty"}`}
             onClick={() => choose(t.key)}
             onKeyDown={(e) => onKeyDown(e, t)}
+            aria-label={`${t.name}, ${count(t)}`}
           >
             <span className="rel-tab-name">{t.name}</span>
             <span className="rel-tab-count">{count(t)}</span>
