@@ -150,14 +150,11 @@ expansion or more than 100 rules.
   its files, `app/scripts/split-data.mjs`; any other `v.*` revalidates) and each
   file in `/data/boundaries/shared/` (large boundary geometries named by a hash
   of their content).
-- `/pagefind/*`: revalidates on every visit (`no-cache`), since `ids.json`,
-  `pagefind-entry.json` and the `.pf_meta` keep their names but change with the
-  data; each content-hashed `/pagefind/index/*` chunk is immutable. The engine
-  (`pagefind.js`, `pagefind-worker.js`, `wasm.*`) gets 1 h +
-  stale-while-revalidate: its bytes depend only on the Pagefind release (checked
-  2026-10-24: identical for an index of 100 and of 815 events), and
-  `check-dist.mjs` fails the build on a Pagefind upgrade until
-  `PAGEFIND_ENGINE_VERSION` is updated (DEPLOYMENT.md, "Upgrading Pagefind").
+- `/pagefind/*`: the whole search index, engine included, is one folder
+  `/pagefind/v.<hash of every file in it>/` (`scripts/build-search-index.mjs`),
+  immutable through one rule for the build's folder; everything else there
+  (`/pagefind/meta.json`, which names the folder, and a request into another
+  build's folder) revalidates on every visit (`no-cache`).
 - `/event/*` (the event pages, the `/event/` index and `event.css`):
   `public, max-age=0, must-revalidate`, set explicitly. An event's page is the
   app's `index.html` filled in, so like the home page it names the deploy's

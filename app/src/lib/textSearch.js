@@ -7,40 +7,87 @@
 // Answers only WHICH events match, as event ids in Pagefind's relevance order;
 // filters, drawn areas and the final ranking are applied by the caller from
 // the static store (hooks/useEventSearch.js).
+//
+// All of it (engine, index, ids.json) is in one versioned folder,
+// pagefind/v.<version>/ (scripts/build-search-index.mjs), cached immutably. The
+// bundle names its build's folder (__SEARCH_DIR__, vite.config.js). Without one
+// (the dev server), or after a load failed (a page older than the deploy, whose
+// folder is gone), the current folder is read from pagefind/meta.json.
 
-const BASE = `${import.meta.env.BASE_URL}pagefind/`;
+const ROOT = `${import.meta.env.BASE_URL}pagefind/`;
+/* global __SEARCH_DIR__ */
+const BUILD_DIR = typeof __SEARCH_DIR__ === "string" ? __SEARCH_DIR__ : null;
 
+let dirPromise = BUILD_DIR ? Promise.resolve(BUILD_DIR) : null;
+let loadedDir = null; // the folder enginePromise and idsPromise come from
 let enginePromise = null;
 let idsPromise = null;
 let engineFailures = 0;
+
+function currentDir() {
+  if (!dirPromise) {
+    dirPromise = fetch(`${ROOT}meta.json`, { cache: "no-cache" })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load the search folder: ${res.status}`);
+        return res.json();
+      })
+      .then(({ dir } = {}) => {
+        if (typeof dir !== "string" || !/^v\.[\w-]+$/.test(dir)) throw new Error("pagefind/meta.json names no folder");
+        return dir;
+      });
+    dirPromise.catch(() => {
+      dirPromise = null;
+    });
+  }
+  return dirPromise;
+}
 
 // A browser remembers a failed module import by URL and rejects a second
 // import of it at once, without a request (lib/importOr.js), so each retry
 // asks for a new URL. Pagefind finds its own files (worker, wasm, index) from
 // basePath, not from this URL, and the query is still same-origin for the CSP.
-const engineUrl = () => `${BASE}pagefind.js${engineFailures ? `?r=${engineFailures}` : ""}`;
+const engineUrl = (base) => `${base}pagefind.js${engineFailures ? `?r=${engineFailures}` : ""}`;
 
-function load() {
+async function load() {
+  const dir = await currentDir();
+  // Engine, index and ids must come from the same build.
+  if (dir !== loadedDir) {
+    loadedDir = dir;
+    enginePromise = null;
+    idsPromise = null;
+  }
+  const base = `${ROOT}${dir}/`;
+  // After a failure, read meta.json before the next try: the folder may be gone.
+  const failed = () => {
+    dirPromise = null;
+  };
   if (!enginePromise) {
-    enginePromise = import(/* @vite-ignore */ engineUrl()).then(async (pf) => {
-      await pf.options({ basePath: BASE });
+    const p = import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
+      await pf.options({ basePath: base });
       await pf.init();
       return pf;
     });
-    // A failed load is retried on the next search.
-    enginePromise.catch(() => {
+    enginePromise = p;
+    // A failed load is retried on the next search. A load from a folder that
+    // has since been replaced may still settle; it must not reset the new one.
+    p.catch(() => {
+      if (enginePromise !== p) return;
       enginePromise = null;
       engineFailures++;
+      failed();
     });
   }
   if (!idsPromise) {
     // {pagefind result id: event id}; replaces a fragment request per result.
-    idsPromise = fetch(`${BASE}ids.json`).then((res) => {
+    const p = fetch(`${base}ids.json`).then((res) => {
       if (!res.ok) throw new Error(`Failed to load search ids: ${res.status}`);
       return res.json();
     });
-    idsPromise.catch(() => {
+    idsPromise = p;
+    p.catch(() => {
+      if (idsPromise !== p) return;
       idsPromise = null;
+      failed();
     });
   }
   return Promise.all([enginePromise, idsPromise]);

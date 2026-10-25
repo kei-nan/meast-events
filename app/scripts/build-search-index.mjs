@@ -10,8 +10,20 @@
 // {hash: event id} map read from those fragments: one small file instead of a
 // request per result.
 //
+// Like the event data (scripts/split-data.mjs, events/v.<version>/), everything
+// Pagefind writes (engine, wasm, entry, meta, index chunks) and ids.json lives in
+// ONE versioned folder, pagefind/v.<version>/, where <version> is a hash of every
+// file in it. So the whole folder is cached immutably by one _headers rule
+// (public/_headers; a rule per index chunk ran out of the host's 100 rules at
+// about twice the 815 events of October 2026), a page never pairs an engine or index from two builds, and
+// a Pagefind upgrade changes the folder name too. pagefind/meta.json (the one
+// mutable file, {version, dir}) names the current folder; vite.config.js compiles
+// it into the bundle (__SEARCH_DIR__) and lib/textSearch.js falls back to it
+// for a page whose folder a deploy removed.
+//
 // Run via `npm run build` / `npm run dev` (pre-steps) or directly.
-import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
@@ -23,7 +35,27 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR
   ? path.resolve(process.env.ATLAS_DATA_DIR)
   : path.join(__dirname, "..", "..", "data");
-const OUT_DIR = path.join(__dirname, "..", "public", "pagefind");
+const ROOT_OUT_DIR = path.join(__dirname, "..", "public", "pagefind");
+// Written here first, then renamed to v.<version> once the files are final.
+const OUT_DIR = path.join(ROOT_OUT_DIR, "staging");
+
+// Every file under `dir`, as sorted paths relative to it (with "/").
+async function filesUnder(dir, rel = "") {
+  const out = [];
+  for (const e of await readdir(path.join(dir, rel), { withFileTypes: true })) {
+    const p = rel ? `${rel}/${e.name}` : e.name;
+    if (e.isDirectory()) out.push(...(await filesUnder(dir, p)));
+    else out.push(p);
+  }
+  return out.sort();
+}
+
+// 12 hex characters of a hash over every file's path and bytes.
+async function folderVersion(dir) {
+  const hash = createHash("sha256");
+  for (const rel of await filesUnder(dir)) hash.update(rel).update("\0").update(await readFile(path.join(dir, rel))).update("\0");
+  return hash.digest("hex").slice(0, 12);
+}
 
 // Fragment files are gzip; their JSON follows Pagefind's "pagefind_dcd" marker.
 const FRAGMENT_MARKER = "pagefind_dcd";
@@ -49,7 +81,7 @@ async function main() {
     if (res.errors.length) throw new Error(`pagefind: ${e.id}: ${res.errors.join("; ")}`);
   }
 
-  await rm(OUT_DIR, { recursive: true, force: true });
+  await rm(ROOT_OUT_DIR, { recursive: true, force: true });
   const written = await index.writeFiles({ outputPath: OUT_DIR });
   if (written.errors.length) throw new Error(`pagefind: ${written.errors.join("; ")}`);
   await pagefind.close();
@@ -74,7 +106,12 @@ async function main() {
   for (const name of await readdir(OUT_DIR)) {
     if (/^pagefind-(component-ui|modular-ui|ui|highlight)\./.test(name)) await rm(path.join(OUT_DIR, name));
   }
-  console.log(`search index: ${events.length} events -> ${path.relative(process.cwd(), OUT_DIR)}`);
+  const version = await folderVersion(OUT_DIR);
+  const dir = `v.${version}`;
+  await rename(OUT_DIR, path.join(ROOT_OUT_DIR, dir));
+  await writeFile(path.join(ROOT_OUT_DIR, "meta.json"), JSON.stringify({ version, dir }));
+  const files = (await filesUnder(path.join(ROOT_OUT_DIR, dir))).length;
+  console.log(`search index: ${events.length} events -> ${path.relative(process.cwd(), path.join(ROOT_OUT_DIR, dir))} (${files} files)`);
 }
 
 main().catch((err) => {

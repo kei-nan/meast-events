@@ -52,9 +52,27 @@ function dataMaxYear(command) {
   return year ? { __DATA_MAX_YEAR__: JSON.stringify(year) } : {}
 }
 
+// The search index's versioned folder (pagefind/v.<version>, named in
+// pagefind/meta.json by scripts/build-search-index.mjs), compiled into the bundle
+// as __SEARCH_DIR__ for src/lib/textSearch.js. A build without it fails; the dev
+// server then has textSearch.js read meta.json at run time.
+function searchDir(command) {
+  let dir = null
+  try {
+    dir = JSON.parse(readFileSync(new URL('./public/pagefind/meta.json', import.meta.url), 'utf8')).dir
+  } catch {
+    // missing: handled below
+  }
+  if (!/^v\.[0-9a-f]{12}$/.test(dir ?? '')) {
+    if (command === 'build') throw new Error('vite.config.js: no search folder in public/pagefind/meta.json (run scripts/build-search-index.mjs)')
+    return {}
+  }
+  return { __SEARCH_DIR__: JSON.stringify(dir) }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
-  define: dataMaxYear(command),
+  define: { ...dataMaxYear(command), ...searchDir(command) },
   plugins: [
     react(),
     preloadEventList(),

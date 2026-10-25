@@ -7,7 +7,8 @@
 //    replaced by a fixed stub, so tests never depend on a local data build;
 //  - the Pagefind engine (`<BASE_URL>pagefind/pagefind.js`, any query) is a
 //    stub that delegates to globalThis.__fakePagefind, and fails to "download"
-//    while globalThis.__fakePagefindDownloadFails() is true; each distinct
+//    while globalThis.__fakePagefindDownloadFails(url) is true (url ends in
+//    the specifier that was imported); each distinct
 //    URL (base or query) is its own module, so a failed import stays failed
 //    for that URL only, as in a browser;
 //  - extensionless relative imports ("../lib/x") resolve to x.js, as in Vite;
@@ -27,7 +28,7 @@ const DATA_VERSION_URL = js(
 );
 const PAGEFIND_URL = js(
   [
-    "if (globalThis.__fakePagefindDownloadFails?.()) throw new TypeError('Failed to fetch dynamically imported module');",
+    "if (globalThis.__fakePagefindDownloadFails?.(decodeURIComponent(import.meta.url))) throw new TypeError('Failed to fetch dynamically imported module');",
     "const pf = () => globalThis.__fakePagefind;",
     "export const options = (o) => pf().options(o);",
     "export const init = () => pf().init();",
@@ -48,7 +49,7 @@ export async function resolve(specifier, context, next) {
   if (specifier === "./dataVersion.js" && /\/src\/lib\/[^/]+$/.test(parent.split("?")[0])) {
     return { url: DATA_VERSION_URL, shortCircuit: true };
   }
-  if (/(^|\/)pagefind\/pagefind\.js(\?.*)?$/.test(specifier)) {
+  if (/(^|\/)pagefind\/(v\.[^/]+\/)?pagefind\.js(\?.*)?$/.test(specifier)) {
     return { url: PAGEFIND_URL + encodeURIComponent(`\n// ${specifier}`), shortCircuit: true };
   }
   try {

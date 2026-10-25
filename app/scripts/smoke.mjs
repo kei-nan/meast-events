@@ -185,7 +185,10 @@ async function run(browser) {
   const pagefind = new Set();
   page.on("response", (r) => {
     const u = new URL(r.url());
-    if (u.pathname.startsWith("/pagefind/") && r.ok()) pagefind.add(u.pathname.replace(/\/index\/.*/, "/index/*").replace(/\/fragment\/.*/, "/fragment/*"));
+    // The build's versioned folder (pagefind/v.<version>/) is written as v.*.
+    if (u.pathname.startsWith("/pagefind/") && r.ok()) {
+      pagefind.add(u.pathname.replace(/^\/pagefind\/v\.[^/]+\//, "/pagefind/v.*/").replace(/\/index\/.*/, "/index/*").replace(/\/fragment\/.*/, "/fragment/*"));
+    }
   });
 
   await page.goto(`${ORIGIN}/`);
@@ -199,7 +202,7 @@ async function run(browser) {
   const banner = page.locator(".sp-banner");
   await row.first().or(banner).waitFor({ state: "visible" });
   if (await banner.isVisible()) throw new Error(`the full-text search did not load: "${await banner.innerText()}"`);
-  const engine = ["/pagefind/pagefind.js", "/pagefind/ids.json"].filter((p) => !pagefind.has(p));
+  const engine = ["/pagefind/v.*/pagefind.js", "/pagefind/v.*/ids.json"].filter((p) => !pagefind.has(p));
   if (engine.length || ![...pagefind].some((p) => p.endsWith(".pagefind"))) {
     throw new Error(`Pagefind files not loaded: ${engine.join(", ") || "its WebAssembly"} (loaded: ${[...pagefind].join(", ")})`);
   }
