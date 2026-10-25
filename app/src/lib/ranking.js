@@ -38,18 +38,26 @@ function tokenMatches(token, isLast, words) {
 
 // Words of an event's searchable text, cached per event object: every keystroke
 // matches all events, and tokenising them again each time was most of its cost.
-// The text is stored with its words, so an event that later gains its extract
-// is tokenised again.
-const wordCache = new WeakMap(); // event -> { text, words }
+// The fields the words came from are stored with them and compared by identity
+// (no text is rebuilt on a hit), so an event that later gains its extract, or
+// gets a new title, aliases array or snippet, is tokenised again. (Records are
+// replaced, not edited in place: an aliases array changed in place would keep
+// its old words.)
+const wordCache = new WeakMap(); // event -> { title, aliases, body, words }
 const aliasesOf = (event) => (Array.isArray(event.aliases) ? event.aliases : []);
 
 function eventWords(event) {
-  const text = `${event.title ?? ""} ${aliasesOf(event).join(" ")} ${event.extract ?? event.snippet ?? ""}`;
+  const body = event.extract ?? event.snippet ?? "";
   const hit = wordCache.get(event);
-  if (hit && hit.text === text) return hit.words;
-  const words = tokenize(text);
-  wordCache.set(event, { text, words });
+  if (hit && hit.title === event.title && hit.aliases === event.aliases && hit.body === body) return hit.words;
+  const words = tokenize(`${event.title ?? ""} ${aliasesOf(event).join(" ")} ${body}`);
+  wordCache.set(event, { title: event.title, aliases: event.aliases, body, words });
   return words;
+}
+
+/** Tokenises the events' searchable text ahead of the first keystroke (warms the cache). */
+export function warmWords(events) {
+  for (const e of events) eventWords(e);
 }
 
 export function matchesTokens(event, tokens) {
@@ -58,12 +66,14 @@ export function matchesTokens(event, tokens) {
   return tokens.every((t, i) => tokenMatches(t, i === tokens.length - 1, words));
 }
 
-export function matchesFilters(event, { q = "", area = null, categories = [], countries = [] } = {}) {
+// `tokens` (tokenize(q)) may be passed so a search over many events tokenises
+// the query once, not once per event.
+export function matchesFilters(event, { q = "", tokens = null, area = null, categories = [], countries = [] } = {}) {
   const coords = eventCoords(event);
   // Coordinate-less events (location_quality "none") match text/category/country
   // but can never be inside a drawn area.
   if (area && !coords) return false;
-  if (!matchesTokens(event, tokenize(q))) return false;
+  if (!matchesTokens(event, tokens ?? tokenize(q))) return false;
   if (categories.length && !categories.includes(event.category)) return false;
   if (countries.length && !(event.countries ?? []).some((c) => countries.includes(c))) return false;
   if (area) {

@@ -5,7 +5,7 @@
 // needs more: a static index, see hooks/useEventSearch.js.
 
 import { eventCoords, inBbox } from "./geo.js";
-import { matchesFilters, rankEvents } from "./ranking.js";
+import { matchesFilters, rankEvents, tokenize } from "./ranking.js";
 
 // Lite view for matching: the list shows title + snippet, so local matching must
 // use exactly those (an event whose full lead happens to be loaded because it
@@ -15,7 +15,7 @@ const liteView = (e) => (e.extract === undefined ? e : { ...e, extract: undefine
 // Filter + rank. Area rule: coordinate-less and approximate (capital-pin)
 // events are excluded (matchesFilters); circle areas are trimmed by distance.
 export function localSearch(events, { q = "", area = null, categories = [], countries = [] } = {}) {
-  const filters = { q, area, categories, countries };
+  const filters = { q, tokens: tokenize(q), area, categories, countries };
   const hits = [];
   for (const e of events) if (matchesFilters(liteView(e), filters)) hits.push(e);
   return rankEvents(hits, q);
