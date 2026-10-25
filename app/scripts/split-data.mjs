@@ -179,8 +179,8 @@ export function publicEvent(e) {
     // Wikidata sitelink count (all projects), for the default "most covered" order.
     sitelinks: Number.isFinite(e.sitelinks_current) ? e.sitelinks_current : null,
     // Wikidata's English aliases (data wikidata_aliases, as-is), only on events that have them: the
-    // local search matches and ranks them, a result row names the one a query matched, and the
-    // event panel lists them.
+    // local search matches and ranks them and a result row names the one a query matched; they are
+    // not listed on the event panel (docs/DATA_POLICY.md, wikidata_aliases).
     ...(strings(e.wikidata_aliases).length ? { aliases: strings(e.wikidata_aliases) } : {}),
   };
 }
@@ -201,6 +201,8 @@ export function detailFields(e, fixAnchors = new Map()) {
     coordinate_source: e.coordinate_source ?? null,
     // Set when the text is the article of another Wikidata item (no article of its own).
     text_from_article: otherArticleTitle(e),
+    // A hand-picked seed event (no discovery sitelinks count): its dates and countries were typed by hand.
+    ...(e.sitelinks === undefined ? { hand_picked: true } : {}),
   };
 }
 

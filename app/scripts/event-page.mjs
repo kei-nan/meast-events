@@ -22,6 +22,9 @@ import { rawEventYears } from "../src/lib/eventYears.js";
 import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
+import { shownClasses } from "../src/lib/eventClasses.js";
+import { fallbackLocationNote } from "../src/lib/fallbackPoint.js";
+import { HAND_PICKED_NOTE } from "../src/lib/handPicked.js";
 import { NEARBY_KM, RELATED_SHOWN } from "../src/lib/related.js";
 import { compassPoint, formatKm } from "../src/lib/relatedViz.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
@@ -40,6 +43,9 @@ export const CSHAPES_URL = "https://icr.ethz.ch/data/cshapes/";
 export const OCHA_AREAS_URL = "https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 const OG_IMAGE = `${SITE}/og-image.png`;
 export const DESCRIPTION_LENGTH = 160;
+// Link previews show the description under our site name, so it says whose words they are.
+// The same for every event: a label on the flagged ones only would make the others look checked.
+export const PREVIEW_SOURCE = "Wikipedia: ";
 
 const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };
 
@@ -313,7 +319,7 @@ function locationNote(quality, event) {
     return `<p class="note">${escapeHtml(roundedLocationNote(event))}</p>`;
   }
   if (quality === "approximate") {
-    return `<p class="note">Approximate location: no coordinates were found for this event, so its marker on the map is placed at a national capital. The marker shows the country, not where the event happened.</p>`;
+    return `<p class="note">${escapeHtml(fallbackLocationNote(event))}</p>`;
   }
   if (quality === "none") {
     return `<p class="note">No map location: Wikipedia and Wikidata give no coordinates for this event, so it has no marker on the map.</p>`;
@@ -523,12 +529,15 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
   const canonical = SITE + eventPath(event.id);
   const review = event.framing_review ?? null;
   const extract = String(event.extract ?? "");
-  const description = metaDescription(extract);
+  const lead = metaDescription(extract, DESCRIPTION_LENGTH - PREVIEW_SOURCE.length);
+  const description = lead && PREVIEW_SOURCE + lead;
   const wiki = safeUrl(event.wikipedia_url);
   const dateText = eventDateText(event);
   const countries = (event.countries ?? []).filter((c) => typeof c === "string" && c);
-  const classes = (event.wikidata_classes ?? []).filter(Boolean);
-  const showClasses = classes.some((c) => c.toLowerCase() !== String(event.category ?? "").toLowerCase());
+  // Only the classes on the event-class list (src/lib/eventClasses.js), as the event panel shows them.
+  const classes = shownClasses(event);
+  const showClasses = classes.length > 0;
+  const itemUrl = wikidataUrl(event.wikidata_qid);
   const dateNote = dateOrderNote(event);
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
   const paragraphs = extract.split(/\n+/).filter((p) => p.trim());
@@ -539,7 +548,10 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
     `<h1>${escapeHtml(title)}</h1>`,
     meta && `<p class="meta">${meta}</p>`,
     renderPartOf(event.part_of),
-    showClasses && `<p class="classes">Wikidata classes: ${escapeHtml(classes.join(", "))}</p>`,
+    showClasses &&
+      `<p class="classes">Wikidata classes on our event-class list: ${escapeHtml(classes.join(", "))}${
+        itemUrl ? ` (all its classes: <a class="wd" href="${escapeHtml(itemUrl)}" rel="noreferrer">Wikidata item</a>)` : ""
+      }</p>`,
     dateNote && `<p class="note" role="note">${escapeHtml(dateNote)}</p>`,
     wiki && `<p class="actions"><a class="wiki" href="${escapeHtml(wiki)}" rel="noreferrer">Read on Wikipedia</a></p>`,
     event.text_from_article && `<p class="note" role="note">${escapeHtml(otherArticleNote(event.text_from_article))}</p>`,
@@ -552,6 +564,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
     renderRelated(event.related),
     renderNeighbours(neighbours),
     locationNote(event.location_quality, event),
+    event.hand_picked && `<p class="note">${escapeHtml(HAND_PICKED_NOTE)}</p>`,
     renderDataFixes(event.data_fixes),
     `<p class="attribution">Text from Wikipedia, licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
       wiki ? link(historyUrl(wiki), "Wikipedia contributors", { external: true }) : "Wikipedia contributors"

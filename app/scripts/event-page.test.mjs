@@ -126,7 +126,8 @@ test("an event page escapes data, keeps the title exactly and links to itself an
   assert.match(html, /Note &lt;b&gt;about&lt;\/b&gt; balance\./);
   assert.match(html, /Our framing review found something in this summary/);
   assert.match(html, /action=history/);
-  assert.match(html, /<meta name="description" content="It was fought &lt;quickly&gt;\.">/);
+  assert.match(html, /<meta name="description" content="Wikipedia: It was fought &lt;quickly&gt;\.">/);
+  assert.match(html, /<meta property="og:description" content="Wikipedia: It was fought &lt;quickly&gt;\.">/);
   // index.html's "js" class script (its hash is in the CSP), the JSON-LD data block,
   // which is never run (CSP script-src does not apply), and the app's script.
   assert.deepEqual(html.match(/<script[^>]*>/gi), ["<script>", '<script type="application/ld+json">', '<script type="module" src="/src/main.jsx">']);
@@ -264,8 +265,18 @@ test("a documented data fix is noted with a link to its entry; a rounded pin get
     coordinates: { lat: 33, lon: 43 },
   });
   assert.ok(anfal.includes("Approximate location: Wikidata gives this event’s coordinates only to the nearest degree or tenth of a degree (33, 43)"));
-  assert.doesNotMatch(anfal, /national capital/);
-  assert.match(page({ id: "c", title: "C", location_quality: "approximate", coordinates: { lat: 33.3152, lon: 44.3661 } }), /national capital/);
+  assert.doesNotMatch(anfal, /reference point/);
+  const capital = page({ id: "c", title: "C", location_quality: "approximate", coordinate_source: "country-fallback:Iraq", coordinates: { lat: 33.3152, lon: 44.3661 } });
+  assert.match(capital, /reference point used for every such event of Iraq \(Baghdad\), whatever its date/);
+  assert.doesNotMatch(capital, /capital/);
+});
+
+test("classes: only those on the event-class list, with a link to the Wikidata item; the seed note", () => {
+  const html = page({ id: "f", title: "F", category: "atrocity", wikidata_qid: "Q1", wikidata_classes: ["famine", "fake news", "genocide"], hand_picked: true });
+  assert.match(html, /Wikidata classes on our event-class list: genocide \(all its classes: <a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q1"/);
+  assert.doesNotMatch(html, /fake news/);
+  assert.match(html, /Hand-picked event: it is on this project’s own list of events/);
+  assert.doesNotMatch(page({ id: "g", title: "G" }), /Hand-picked/);
 });
 
 test("an invalid id is refused", () => {

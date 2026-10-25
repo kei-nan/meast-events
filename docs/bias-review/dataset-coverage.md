@@ -1,5 +1,16 @@
 # Are the events we list biased? Dataset selection bias review
 
+> **A dated snapshot (2026-09-26), not the current state.** Every number below describes the data of that day: 394 events
+> shown, 112 hand-picked. The rules have changed since, partly in answer to this review: events without coordinates are no
+> longer dropped (they are listed without a map marker), nor are events with reversed Wikidata dates (they are flagged);
+> 16 event classes were added on 2026-10-06 (among them suicide attack, airstrike, pogrom, election, protest, summit);
+> terrorism and atrocity classes now override the class order; and nine non-events were removed from the seed list. On
+> 2026-10-14, 815 events were shown (102 hand-picked, 42 of them not reachable by the rule), 8 of them typed "genocide",
+> 10 "referendum" and 10 "revolution", so statements such as "zero genocides" and "the coordinates filter" no longer hold.
+> The current, machine-computed counts are in [`data/selection-funnel.json`](../../data/selection-funnel.json) (shown on
+> the site's About page) and the current rules in [`docs/DATA_POLICY.md`](../DATA_POLICY.md). The analysis below is kept
+> unchanged as the record of what was found.
+
 Scope: which events are on the map at all (selection bias), not how articles are worded. Everything below was
 computed from the repository files (`data/events.json`, `data/event-candidates.json`, `data/enriched-candidates.json`,
 `data/events.proposed.json`, `data/seed-events.json`, `scripts/discover-events.js`, `scripts/lib/event-classes.js`)
