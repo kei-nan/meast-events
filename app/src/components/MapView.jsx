@@ -8,9 +8,7 @@ import {
   eventFeature,
   eventSignature,
   eventsToGeoJSON,
-  makeCircleArea,
   makeRectArea,
-  oppositeCorner,
   pointFeature,
 } from "./mapLayers";
 import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";
@@ -58,13 +56,10 @@ import { cellsInBounds, createLandStore, wantsBackgroundDetail } from "../lib/la
 import { DEFAULT_BOUNDS, DEFAULT_PADDING, SEA_COLOR } from "../lib/mapBase";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
-import { haversineKm } from "../lib/geo";
 import { isUnhandledEscape } from "../lib/escapeKey";
 import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
 import { mapClearView } from "../lib/mapInsets";
-
-// Distance between two [lon, lat] points (the drawing code works in pairs).
-const distanceKm = (a, b) => haversineKm(a[0], a[1], b[0], b[1]);
+import { dragArea, handleBox, pickHandle } from "../lib/areaDrag";
 
 // MapLibre GL resolves its worker script relative to its own module URL at
 // runtime (via a dynamic import.meta.url template), which Vite's static
@@ -187,6 +182,8 @@ export default function MapView({
   const focusRef = useRef(focus);
   const propsRef = useRef({});
   const draggingRef = useRef(false);
+  // Drops the area drag in progress, if any (the pointer effect sets it).
+  const abortDragRef = useRef(null);
   const suppressClickRef = useRef(false);
   const [mapReady, setMapReady] = useState(false);
   const [landDrawn, setLandDrawn] = useState(false); // the canvas shows the opening view: MapLoading can go
@@ -666,9 +663,21 @@ export default function MapView({
   // those wait until this decade is in and the map has drawn it ("idle"), so
   // they never compete with what is on screen. Nothing is fetched while the
   // year is still unknown (`yearPending`: an event link waiting for its event).
+  // The settled year held while the year was pending is the mount year (the
+  // timeline end), not the event's: as the pending ends, the year the map now
+  // shows is fetched instead of that stale one (a decade nobody looks at). When
+  // the debounce catches up the decade is cached or already on its way
+  // (dataClient shares the request).
+  const pendingYearRef = useRef(null);
   useEffect(() => {
-    if (yearPending) return undefined;
-    const decade = decadeFloor(debouncedYear);
+    if (yearPending) {
+      pendingYearRef.current = debouncedYear;
+      return undefined;
+    }
+    // Kept until the debounced year moves (a map getting ready meanwhile re-runs this).
+    const stale = pendingYearRef.current != null && pendingYearRef.current === debouncedYear;
+    if (!stale) pendingYearRef.current = null;
+    const decade = decadeFloor(stale ? yearRef.current : debouncedYear);
     let cancelled = false;
     let onIdle = null;
     const prefetchNeighbours = () => {
@@ -809,7 +818,7 @@ export default function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [year, boundaryVersion]
   );
-  useCountryHighlight({ mapRef, mapReady, event: highlightEvent, year, features: yearFeatures, focus });
+  useCountryHighlight({ mapRef, mapReady, event: highlightEvent, year, features: yearFeatures, focus, openEventId: selectedEventId ?? null });
   // Borders drawn for the year the map currently shows (for the keyboard-reachable
   // list) - the previous year's while a new decade is still loading.
   const yearBorders = useMemo(() => {
@@ -970,11 +979,13 @@ export default function MapView({
   }, [areaMode, area, mapReady]);
 
   // Escape leaves draw mode, unless something else took that Escape (lib/escapeKey.js).
+  // A shape being dragged out is dropped first, so its release commits nothing.
   useEffect(() => {
     if (areaMode === "off") return;
     const onKey = (e) => {
       if (!isUnhandledEscape(e)) return;
       e.preventDefault();
+      abortDragRef.current?.();
       propsRef.current.onAreaModeChange?.("off");
     };
     window.addEventListener("keydown", onKey);
@@ -987,6 +998,7 @@ export default function MapView({
     const map = mapRef.current;
     const el = map.getCanvasContainer();
     let drag = null;
+    let aborted = null; // pointer id of a drag dropped by Escape, until its release
 
     const locate = (ev) => {
       const r = el.getBoundingClientRect();
@@ -995,33 +1007,10 @@ export default function MapView({
       return { pt, ll: [ll.lng, ll.lat] };
     };
 
+    // The area handle under the pointer (lib/areaDrag.js), or null.
     const handleAt = (pt, pointerType) => {
       const r = HANDLE_HIT_PX[pointerType] ?? HANDLE_HIT_PX.mouse;
-      const hits = map.queryRenderedFeatures(
-        [
-          [pt[0] - r, pt[1] - r],
-          [pt[0] + r, pt[1] + r],
-        ],
-        { layers: ["area-handles"] }
-      );
-      if (!hits.length) return null;
-      // Prefer the radius handle over the centre when they overlap.
-      return (hits.find((h) => h.properties.kind !== "center") ?? hits[0]).properties.kind;
-    };
-
-    const compute = (d, ll) => {
-      switch (d.kind) {
-        case "rect":
-          return makeRectArea(d.start, ll);
-        case "circle":
-          return makeCircleArea(d.start, distanceKm(d.start, ll));
-        case "radius":
-          return makeCircleArea(d.area0.center, Math.max(0.1, distanceKm(d.area0.center, ll)));
-        case "center":
-          return makeCircleArea(ll, d.area0.radiusKm);
-        default:
-          return makeRectArea(oppositeCorner(d.area0.bbox, d.kind), ll);
-      }
+      return pickHandle(map.queryRenderedFeatures(handleBox(pt, r), { layers: ["area-handles"] }));
     };
 
     const end = (commit) => {
@@ -1047,6 +1036,7 @@ export default function MapView({
 
     const onDown = (ev) => {
       if (drag || !ev.isPrimary || (ev.pointerType === "mouse" && ev.button !== 0)) return;
+      aborted = null; // a new press: the dropped drag's release is long gone
       const p = propsRef.current;
       const { pt, ll } = locate(ev);
       let kind = null;
@@ -1077,22 +1067,49 @@ export default function MapView({
         if (Math.hypot(pt[0] - drag.startPt[0], pt[1] - drag.startPt[1]) < MIN_DRAW_PX) return;
         drag.moved = true;
       }
-      drag.current = compute(drag, ll);
+      drag.current = dragArea(drag, ll);
       setAreaSources(drag.current, drag.kind !== "rect" && drag.kind !== "circle");
     };
 
+    const releaseAborted = (ev) => {
+      if (aborted !== ev.pointerId) return false;
+      aborted = null;
+      suppressClickRef.current = true;
+      setTimeout(() => (suppressClickRef.current = false), 60);
+      return true;
+    };
     const onUp = (ev) => {
+      if (releaseAborted(ev)) return;
       if (drag && ev.pointerId === drag.id) end(true);
     };
     const onCancel = (ev) => {
+      if (releaseAborted(ev)) return;
       if (drag && ev.pointerId === drag.id) end(false);
+    };
+    // Escape mid-drag drops the drag: the area stays as it was, and the release
+    // that follows commits nothing. In draw mode the Escape handler above calls
+    // this before leaving the mode; a handle edit (no draw mode) is handled here.
+    // The pointer is still down, so its release (a click, for the map) is
+    // swallowed as well (`aborted`, in onUp/onCancel).
+    const abort = () => {
+      aborted = drag.id;
+      end(false);
+    };
+    abortDragRef.current = () => drag && abort();
+    const onKey = (e) => {
+      if (!drag || propsRef.current.areaMode !== "off" || !isUnhandledEscape(e)) return;
+      e.preventDefault();
+      abort();
     };
 
     el.addEventListener("pointerdown", onDown);
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerup", onUp);
     el.addEventListener("pointercancel", onCancel);
+    window.addEventListener("keydown", onKey);
     return () => {
+      abortDragRef.current = null;
+      window.removeEventListener("keydown", onKey);
       el.removeEventListener("pointerdown", onDown);
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerup", onUp);

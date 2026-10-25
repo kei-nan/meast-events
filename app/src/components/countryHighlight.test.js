@@ -91,7 +91,7 @@ test("a fitCountries focus waits for the borders, then fits them once", () => {
   const map = fakeMap();
   const mapRef = { current: map };
   const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, nonce: 1 };
-  const props = { mapRef, mapReady: true, event: EVENT, year: 2003, features: null, focus };
+  const props = { mapRef, mapReady: true, event: EVENT, year: 2003, features: null, focus, openEventId: "e" };
   const h = renderHook(useCountryHighlight, props);
   assert.equal(map.log.flyTo.length, 0);
   h.rerender({ ...props, features: FEATURES });
@@ -109,12 +109,37 @@ test("a fitCountries focus waits for the borders, then fits them once", () => {
   assert.equal(map.log.flyTo.length, 1);
 });
 
+test("a fit still waiting for its borders is dropped when the event closes or another opens", () => {
+  const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, nonce: 8 };
+  // Closed (Back, Esc) before the decade came in: no move once it does.
+  const map = fakeMap();
+  const props = { mapRef: { current: map }, mapReady: true, event: EVENT, year: 2003, features: null, focus, openEventId: "e" };
+  const h = renderHook(useCountryHighlight, props);
+  h.rerender({ ...props, event: null, openEventId: null });
+  h.rerender({ ...props, event: null, openEventId: null, features: FEATURES });
+  assert.equal(map.log.flyTo.length + map.log.easeTo.length, 0);
+  // Another event (one that does not fit its countries) opened meanwhile.
+  const map2 = fakeMap();
+  const props2 = { ...props, mapRef: { current: map2 } };
+  const h2 = renderHook(useCountryHighlight, props2);
+  h2.rerender({ ...props2, openEventId: "other" });
+  h2.rerender({ ...props2, openEventId: "other", features: FEATURES });
+  assert.equal(map2.log.flyTo.length + map2.log.easeTo.length, 0);
+  // Still open: the fit goes ahead.
+  const map3 = fakeMap();
+  const props3 = { ...props, mapRef: { current: map3 } };
+  const h3 = renderHook(useCountryHighlight, props3);
+  h3.rerender({ ...props3, year: 2004 });
+  h3.rerender({ ...props3, year: 2004, features: FEATURES });
+  assert.equal(map3.log.flyTo.length, 1);
+});
+
 test("a pin outside the fitted countries is kept in sight", () => {
   const map = fakeMap();
   // Far to the west of Iraq and Kuwait: at zoom 4 (~23 px a degree) 20
   // degrees off the middle would be off the 800 px map.
   const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, lon: 25, lat: 32, nonce: 5 };
-  renderHook(useCountryHighlight, { mapRef: { current: map }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  renderHook(useCountryHighlight, { mapRef: { current: map }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus, openEventId: "e" });
   const [move] = map.log.flyTo;
   assert.equal(move.zoom, 4);
   const [x, y] = screenPoint([25, 32], move, 800, 600);
@@ -127,10 +152,10 @@ test("a map behind its container's size is resized before the camera is aimed", 
   // the container is already 600 px tall, MapLibre still has 646.
   const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, lon: 44.4, lat: 33.3, nonce: 6 };
   const stale = fakeMap({ canvasHeight: 646 });
-  renderHook(useCountryHighlight, { mapRef: { current: stale }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  renderHook(useCountryHighlight, { mapRef: { current: stale }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus, openEventId: "e" });
   assert.deepEqual(stale.log.calls, ["resize", "flyTo"]);
   const inStep = fakeMap({ canvasHeight: 600 });
-  renderHook(useCountryHighlight, { mapRef: { current: inStep }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus: { ...focus, nonce: 7 } });
+  renderHook(useCountryHighlight, { mapRef: { current: inStep }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus: { ...focus, nonce: 7 }, openEventId: "e" });
   assert.deepEqual(inStep.log.calls, ["flyTo"]);
 });
 
@@ -138,19 +163,19 @@ test("no shape in that year: flies to the event's pin, or does nothing without o
   const map = fakeMap();
   const mapRef = { current: map };
   const focus = { id: "e", countries: ["Atlantis"], fitCountries: true, lon: 35, lat: 31, nonce: 2 };
-  renderHook(useCountryHighlight, { mapRef, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  renderHook(useCountryHighlight, { mapRef, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus, openEventId: "e" });
   assert.equal(map.log.fitBounds.length, 0);
   assert.deepEqual(map.log.flyTo, [{ center: [35, 31], zoom: 5, offset: [0, 0] }]);
 
   const map2 = fakeMap();
   const noPin = { ...focus, lon: undefined, lat: undefined, nonce: 3 };
-  renderHook(useCountryHighlight, { mapRef: { current: map2 }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus: noPin });
+  renderHook(useCountryHighlight, { mapRef: { current: map2 }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus: noPin, openEventId: "e" });
   assert.equal(map2.log.flyTo.length + map2.log.fitBounds.length + map2.log.easeTo.length, 0);
 });
 
 test("a focus without fitCountries never moves the map", () => {
   const map = fakeMap();
   const focus = { id: "e", countries: ["Iraq"], lon: 35, lat: 31, nonce: 4 };
-  renderHook(useCountryHighlight, { mapRef: { current: map }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus });
+  renderHook(useCountryHighlight, { mapRef: { current: map }, mapReady: true, event: EVENT, year: 2003, features: FEATURES, focus, openEventId: "e" });
   assert.equal(map.log.flyTo.length + map.log.fitBounds.length + map.log.easeTo.length, 0);
 });

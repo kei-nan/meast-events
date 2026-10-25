@@ -48,8 +48,9 @@ function addLayers(map) {
  * @param year      displayed border year
  * @param features  the loaded boundary decade covering `year` (null while loading)
  * @param focus     App's focus request ({id, lon?, lat?, countries, fitCountries, nonce})
+ * @param openEventId  id of the open event (null = none): a fit for any other is dropped
  */
-export default function useCountryHighlight({ mapRef, mapReady, event, year, features, focus }) {
+export default function useCountryHighlight({ mapRef, mapReady, event, year, features, focus, openEventId }) {
   const shaded = useMemo(() => countryHighlightFeatures(event, year, features), [event, year, features]);
 
   // `shaded` is rebuilt on every year step, but its features are the loaded
@@ -68,11 +69,17 @@ export default function useCountryHighlight({ mapRef, mapReady, event, year, fea
     map.getSource(SOURCE).setData(shaded);
   }, [mapRef, mapReady, shaded]);
 
-  // A fit waits until the borders of the displayed year are loaded.
+  // A fit waits until the borders of the displayed year are loaded, for as
+  // long as its event stays open: closing it (Back, Esc) or opening another
+  // drops the fit, so a decade arriving later (or loading only after a
+  // failure) does not fly the map to an event no longer shown.
   const pendingRef = useRef(null);
   useEffect(() => {
     pendingRef.current = focus?.fitCountries ? focus : null;
   }, [focus]);
+  useEffect(() => {
+    if (pendingRef.current && pendingRef.current.id !== openEventId) pendingRef.current = null;
+  }, [openEventId]);
   useEffect(() => {
     const p = pendingRef.current;
     if (!mapReady || !p || !features) return;
