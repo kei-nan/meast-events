@@ -99,6 +99,14 @@
 .mu-btn:hover {
   background: #e9e2d2;
 }
+/* The map itself: its ring drawn inside, where the map's edges cannot clip it. */
+.maplibregl-canvas:focus-visible {
+  outline-offset: -2px;
+}
+/* The attribution's links sit on MapLibre's white box: the map controls' blue ring. */
+.maplibregl-ctrl a:focus-visible {
+  outline-color: #1f5a8a;
+}
 .mu-btn:focus-visible,
 .mu-close:focus-visible,
 .mu-b-list-item summary:focus-visible {

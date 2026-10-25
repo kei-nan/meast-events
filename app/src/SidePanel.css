@@ -1481,6 +1481,26 @@ button.sp-chip[aria-pressed="true"] {
     height: calc(100% - 120px);
   }
 
+  /* Short screens (a landscape phone; 400% zoom, 320x256): the header,
+     timeline and footer leave the map area too little for the open sheet to
+     show any results (80px at 568x320, 16px at 320x256). While it is open the
+     page scrolls instead: the map area grows to the screen plus the strip, so
+     the sheet is exactly one screen tall and the strip, the timeline and the
+     footer are a scroll away. Grows by the same 120px as the strip above, so
+     the drag heights (lib/sheetSnap.js) still match. At peek nothing changes. */
+  @media (max-height: 500px) {
+    .app:has(.side-panel:not([data-sheet="peek"])) {
+      height: auto;
+      min-height: 100dvh;
+    }
+
+    .app-body:has(.side-panel:not([data-sheet="peek"])) {
+      flex: none;
+      height: calc(100vh + 120px);
+      height: calc(100dvh + 120px);
+    }
+  }
+
   /* Half of the map area (lib/sheetSnap.js HALF_SHARE). While its bar is
      dragged (data-sheet="drag") the height is set inline and follows the
      finger; between resting heights it slides. */

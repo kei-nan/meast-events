@@ -37,6 +37,15 @@ body {
   margin: 0;
 }
 
+/* Every focusable thing gets a visible gold ring by default: the browser's own
+   ring is near-black (about 1.3:1 on --bg-2), lost on the dark theme. Controls
+   with their own focus style (side panel, timeline, map controls, dialogs)
+   override it with more specific rules. */
+:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
 /* An event's page (/event/<id>) carries the event as plain HTML inside #root
    (scripts/event-page.mjs fillAppShell), for readers without JavaScript and
    crawlers that do not run it; React replaces it when the app starts. Where
