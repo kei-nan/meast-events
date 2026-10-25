@@ -129,7 +129,9 @@ test("the bundle's search folder is used; once it is gone, the folder meta.json 
     assert.equal(calls.meta, 0);
     assert.deepEqual(await searchEventIds("q"), ["e1"]);
     assert.equal(calls.meta, 1);
-    assert.deepEqual(pf.calls.options, [{ basePath: "/pagefind/v.old/" }, { basePath: "/pagefind/v.test/" }]);
+    // The old folder's engine import may settle after the retry's, so the two
+    // options calls can come in either order.
+    assert.deepEqual(pf.calls.options.map((o) => o.basePath).sort(), ["/pagefind/v.old/", "/pagefind/v.test/"]);
     assert.deepEqual(calls, ["/pagefind/v.test/ids.json"]);
   } finally {
     delete globalThis.__SEARCH_DIR__;
