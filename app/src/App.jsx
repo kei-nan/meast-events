@@ -347,11 +347,21 @@ export default function App() {
     return [...byId.values()];
   }, [visibleEvents, scopedResults, selectedEventRaw]);
 
+  // While the text is still being typed the map keeps its last dimming: each
+  // keystroke would otherwise re-send every marker whose match changed to the
+  // map's worker (over a thousand at 8,000 events). It updates once the text
+  // settles (useEventSearch's debounce), and at once for filters or a cleared search.
+  const lastMatchIdsRef = useRef(null);
+  const typing = search.typing;
   const matchIds = useMemo(() => {
     if (search.status === "idle") return null;
+    if (typing) return lastMatchIdsRef.current;
     if (search.status !== "ready" && scopedResults.length === 0) return null; // don't dim everything while loading/erroring
     return new Set(scopedResults.map((e) => e.id));
-  }, [search.status, scopedResults]);
+  }, [search.status, scopedResults, typing]);
+  useEffect(() => {
+    lastMatchIdsRef.current = matchIds;
+  }, [matchIds]);
 
   // What the panel lists: idle => the browse list for the selected years
   // (events starting in them first, then ones ongoing from earlier, each most

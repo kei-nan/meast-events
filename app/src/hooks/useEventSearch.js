@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { localSearch, textMatchesFromStore } from "../lib/localSearch";
-import { MIN_QUERY_LENGTH, rankEvents } from "../lib/ranking";
+import { MIN_QUERY_LENGTH, rankEvents, warmWords } from "../lib/ranking";
 import { searchEventIds } from "../lib/textSearch";
 import useDebouncedValue from "./useDebouncedValue";
 
@@ -14,6 +14,7 @@ const IDLE = {
   source: null,
   interim: false,
   textSearch: false,
+  typing: false,
 };
 
 // Text shorter than MIN_QUERY_LENGTH counts as no text.
@@ -74,6 +75,28 @@ export default function useEventSearch({
   const active = Boolean(q || area || cats.length || cs.length);
   const settledQ = effectiveQ(debouncedQuery);
 
+  // Tokenise every event's text once the list has loaded, while the browser is
+  // idle, so the first keystroke does not pay for it (8,000 events: ~400 ms on
+  // a 4x-slowed phone CPU). Same words either way (lib/ranking.js caches them).
+  // In slices of 200 events, so it never blocks the page for long.
+  useEffect(() => {
+    if (!ready) return undefined;
+    const events = [...storeRef.current.values()];
+    const idle = typeof requestIdleCallback === "function";
+    let i = 0;
+    let id;
+    const step = (deadline) => {
+      do {
+        warmWords(events.slice(i, i + 200));
+        i += 200;
+      } while (i < events.length && deadline && deadline.timeRemaining() > 5);
+      if (i < events.length) id = idle ? requestIdleCallback(step) : setTimeout(step, 50);
+    };
+    id = idle ? requestIdleCallback(step) : setTimeout(step, 50);
+    return () => (idle ? cancelIdleCallback(id) : clearTimeout(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, version]);
+
   // Instant local answer for the current inputs (not debounced).
   const local = useMemo(
     () => (ready && active ? localSearch([...storeRef.current.values()], { q, area, categories: cats, countries: cs }) : []),
@@ -128,8 +151,10 @@ export default function useEventSearch({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, full, q, area, cats, cs, version]);
 
+  // The text is still changing (the debounce has not caught up with it).
+  const typing = q !== settledQ;
   if (!active) return IDLE;
-  if (!ready) return { ...IDLE, status: "loading", textSearch: Boolean(q) };
+  if (!ready) return { ...IDLE, status: "loading", textSearch: Boolean(q), typing };
 
   const localState = (source) => ({
     status: "ready",
@@ -139,6 +164,7 @@ export default function useEventSearch({
     source,
     interim: false,
     textSearch: Boolean(q),
+    typing,
   });
 
   if (!q) return localState("local");
@@ -151,6 +177,7 @@ export default function useEventSearch({
       truncated: false,
       source: "fulltext",
       textSearch: true,
+      typing,
     };
   }
   if (degraded || (full.q === q && full.status === "failed")) {

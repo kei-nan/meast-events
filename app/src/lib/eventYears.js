@@ -45,10 +45,23 @@ export function eventYearRange(e) {
  * 2009), never the years between them, which neither source gives for it.
  */
 export function eventOverlapsRange(e, startYear, endYear) {
-  if (yearsReversed(e)) {
-    const [s, en] = rawEventYears(e);
-    return (s >= startYear && s <= endYear) || (en >= startYear && en <= endYear);
-  }
-  const [s, en] = eventYearRange(e);
+  const { s, en } = parsedYears(e);
+  if (en < s) return (s >= startYear && s <= endYear) || (en >= startYear && en <= endYear);
   return s <= endYear && en >= startYear;
+}
+
+// rawEventYears per event object, kept with the date strings it was parsed
+// from (a changed date is parsed again): every timeline step checks every event.
+const yearCache = new WeakMap(); // event -> { ds, de, s, en }
+function parsedYears(e) {
+  if (e === null || typeof e !== "object") {
+    const [s, en] = rawEventYears(e);
+    return { s, en };
+  }
+  const hit = yearCache.get(e);
+  if (hit && hit.ds === e.date_start && hit.de === e.date_end) return hit;
+  const [s, en] = rawEventYears(e);
+  const entry = { ds: e.date_start, de: e.date_end, s, en };
+  yearCache.set(e, entry);
+  return entry;
 }
