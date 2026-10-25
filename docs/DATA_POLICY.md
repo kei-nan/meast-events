@@ -498,7 +498,8 @@ node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichmen
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
-node scripts/build-selection-funnel.js [--check]        # -> data/selection-funnel.json (dated by its input data, not the clock)
+node scripts/build-selection-funnel.js [--check|--offline] # -> data/selection-funnel.json (dated by its input data, not the clock;
+                                                        #    --offline keeps the committed sitelink_measurement, no network)
 node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)

@@ -3,6 +3,8 @@
 //   node scripts/build-selection-funnel.js [--cache-dir=...]
 //   node scripts/build-selection-funnel.js --check   no network: recompute everything except sitelink_measurement (kept
 //                                                    from the committed file) and exit 1 if the file differs (CI)
+//   node scripts/build-selection-funnel.js --offline no network: the same recomputation as --check, written to the file
+//                                                    (the monthly refresh, after leads or titles changed)
 // Inputs: data/event-candidates.json (raw discovery), data/enriched-candidates.json + data/events.proposed.json
 // (enrichment result), data/events.json (curated, shown), data/seed-events.json, data/proposed-exclusions.json.
 // Network: only to measure Wikipedia-editions-only sitelink counts (Wikidata wbgetentities, cached; see lib/cache.js).
@@ -21,8 +23,9 @@ const exclusions = await read("proposed-exclusions.json");
 
 const MIN = INCLUSION_MIN_SITELINKS;
 const CHECK = process.argv.includes("--check");
+const OFFLINE = CHECK || process.argv.includes("--offline");
 const OUT = new URL("../data/selection-funnel.json", import.meta.url);
-const committed = CHECK ? await readFile(OUT, "utf-8").catch(() => "") : null;
+const committed = OFFLINE ? await readFile(OUT, "utf-8").catch(() => "") : null;
 // Dated by its inputs, not the wall clock, so re-running on unchanged data gives an identical
 // file: the newest retrieval time among the enriched candidates and the curated summaries.
 const dataAsOf =
@@ -31,7 +34,7 @@ const inc = (o, k, n = 1) => (o[k] = (o[k] ?? 0) + n);
 const group = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
 
 // ---- sitelink measurement: all Wikimedia projects (what the rule uses) vs Wikipedia editions only ----
-// The only part that needs the network; --check keeps the committed block.
+// The only part that needs the network; --check and --offline keep the committed block.
 async function measureSitelinks() {
   const ents = await fetchEntities(candidates.map((c) => c.wikidata_qid), {
     cache: openCache("entities"),
@@ -65,7 +68,11 @@ async function measureSitelinks() {
   sitelinkMeasurement.median_wikipedia_editions_of_passing = med(passing.map(wpEditions));
   return sitelinkMeasurement;
 }
-const sitelinkMeasurement = CHECK ? (JSON.parse(committed || "{}").sitelink_measurement ?? null) : await measureSitelinks();
+const sitelinkMeasurement = OFFLINE ? (JSON.parse(committed || "{}").sitelink_measurement ?? null) : await measureSitelinks();
+if (OFFLINE && !CHECK && !sitelinkMeasurement) {
+  console.error("FAIL --offline keeps the committed sitelink_measurement, and data/selection-funnel.json has none: run without --offline");
+  process.exit(1);
+}
 
 // ---- funnel ----
 const enrichedByQid = new Map(enriched.map((e) => [e.wikidata_qid, e]));
