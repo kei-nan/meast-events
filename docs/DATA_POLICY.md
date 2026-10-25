@@ -461,6 +461,37 @@ but are not shown; an event with any date flag still shows only the years in its
   It is generated from the two event files without network (`node scripts/build-missing-coordinates-report.js`; `enrich-candidates.js` writes the same), and CI fails
   when the committed copy no longer matches them (`--check`; the monthly refresh regenerates it).
 
+## Map borders: which cases are drawn as flagged shapes
+
+A border is dashed when its shape carries a `status` (mandate, occupation, unrecognised annexation, dispute, shared sovereignty,
+an Oslo-era area, a separate administration, active conflict or a ceasefire partition; labels in `app/src/components/mapBorders.js`).
+A shape whose status ends in `-included` (Israel from 1967) stays solid: it contains flagged areas drawn on top of it.
+
+The rule for giving an occupied, annexed or disputed area a dashed shape of its own: **only where a source gives us its outline**
+(a CShapes 2.0 record, a shape computed from CShapes records, UN OCHA's West Bank layer, Natural Earth, or a treaty's own
+coordinates). We never hand-draw a front line or a zone. The cases drawn this way are the West Bank and Gaza Strip (1948 on),
+the Golan Heights (1967 on), Kuwait in 1990-1991, Abu Musa and Greater Tunb, the Sanjak of Alexandretta (1922-1938), and the two
+Uqair neutral zones.
+
+Known cases that are therefore **not** drawn as shapes of their own (checked 2026-10-25 by testing a point in each against
+`data/boundaries.json`); they show as part of the state named:
+
+| Case | Map shows it inside | Why not drawn |
+|---|---|---|
+| Sinai under Israeli occupation, 1967-1978 | Israel (CShapes' own record; Egypt's note says so) | Could be computed from CShapes records (Egypt 1979 minus Egypt 1967), not done yet |
+| East Jerusalem after 1967 | the West Bank shapes; from 2000 Area C (both notes say so) | OCHA's layer has it as its own class from 2000 only; earlier no source outlines it |
+| Israel's occupation of part of southern Lebanon (UN Security Council Resolution 425 (1978) called on Israel to "withdraw forthwith its forces from all Lebanese territory") | Lebanon | No sourced outline of the zone |
+| Iraqi-held Iranian territory in the Iran-Iraq War (e.g. Khorramshahr; Resolution 514 (1982) called for "a withdrawal of forces to internationally recognized boundaries") | Iran | Front lines, no sourced outline |
+| Turkish-held areas of northern Syria (e.g. Afrin) | Syria | No sourced outline |
+| The US-led occupation of Iraq, 2003 (Resolution 1483 (2003) names the US and UK "occupying powers") | Iraq | Whole state; not flagged |
+
+Two cases sometimes compared with these are of a different kind: Hatay, ceded to Turkey by France, the mandatory power, in 1939
+(drawn as the Sanjak of Alexandretta until 1938, inside Turkey after), and the Halaib Triangle, administered by Egypt and claimed by
+Sudan, which CShapes draws inside Egypt in every year (the map draws no Sudan). Neither is a military occupation; neither carries
+a dispute flag, unlike Abu Musa and Greater Tunb. Legal characterisations in the notes quote their source: the ICJ advisory opinion
+of 19 July 2024 ([UN doc. A/78/968](https://documents.un.org/api/symbol/access?s=A/78/968&l=en&t=pdf)) on Gaza (para. 94) and on
+the Oslo areas (paras. 78, 102), and Security Council Resolutions 252 (1968) and 478 (1980) on East Jerusalem.
+
 ## Map borders: where there is no shape
 
 The time-driven borders (`data/boundaries.json`) come from CShapes 2.0 plus our documented corrections (`scripts/boundary-corrections.js`).
