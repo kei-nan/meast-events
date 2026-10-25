@@ -25,6 +25,7 @@ import {
   BorderYearChoice,
   ZoomButtons,
 } from "./MapUi";
+import PanButtons from "./PanButtons";
 import useMediaQuery from "../hooks/useMediaQuery";
 import MapLoading from "./MapLoading";
 import { diffById } from "../lib/sourceDiff";
@@ -1130,6 +1131,16 @@ export default function MapView({
     else map.zoomOut(opts);
     if (hintOpen) dismissHint();
   };
+  // Pan buttons: a third of the map's width or height per press, eased the same way.
+  const panBy = (dx, dy) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const el = map.getContainer();
+    map.panBy([Math.round((dx * el.clientWidth) / 3), Math.round((dy * el.clientHeight) / 3)], {
+      duration: reducedMotion() ? 0 : 300,
+    });
+    if (hintOpen) dismissHint();
+  };
 
   const toggle = (mode) => onAreaModeChange?.(areaMode === mode ? "off" : mode);
   const hint =
@@ -1180,6 +1191,7 @@ export default function MapView({
           />
         )}
         <ZoomButtons onZoomIn={() => zoomBy(1)} onZoomOut={() => zoomBy(-1)} />
+        <PanButtons onPan={panBy} />
         <MapNotices
           loading={eventsLoading || !mapReady || !decadeCached}
           borderError={relevantError}

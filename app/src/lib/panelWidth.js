@@ -55,3 +55,12 @@ export function widthForKey(key, shiftKey, current, max) {
   else return null;
   return clampPanelWidth(next, max);
 }
+
+/**
+ * The width a click on the panel's edge (no drag) asks for: PANEL_STEP_BIG
+ * wider, and from the widest back to the narrowest, so a single pointer can
+ * reach every width without dragging (WCAG 2.5.7).
+ */
+export function widthForClick(current, max) {
+  return current >= max ? PANEL_MIN : clampPanelWidth(current + PANEL_STEP_BIG, max);
+}

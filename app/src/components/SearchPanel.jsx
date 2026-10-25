@@ -184,13 +184,21 @@ export default function SearchPanel({
   }, [selectedId]);
 
   // Back restores focus to
-  // the originating row (or the search box if that row is gone).
+  // the originating row (or the search box if that row is gone). With the
+  // phone sheet at its peek bar (system Back after "Show on map") the list is
+  // hidden and focusing the search box would open the sheet (its onFocus) and
+  // perhaps the keyboard, so focus goes to the sheet's bar instead.
   useEffect(() => {
     if (selectedEvent) {
       lastSelectedRef.current = selectedEvent.id;
       hadSelectionRef.current = true;
     } else if (hadSelectionRef.current) {
       hadSelectionRef.current = false;
+      const toggle = toggleRef.current;
+      if (toggle?.getClientRects().length && toggle.getAttribute("aria-expanded") === "false") {
+        toggle.focus();
+        return;
+      }
       const id = lastSelectedRef.current;
       const row = [...(listWrapRef.current?.querySelectorAll("button.sp-row") ?? [])].find(
         (b) => b.dataset.id === id
