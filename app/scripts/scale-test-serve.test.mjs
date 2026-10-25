@@ -32,6 +32,24 @@ function get(port, rawPath) {
   });
 }
 
+test("geometry (.tbin) is served compressed, as the host does", async () => {
+  const dist = fs.mkdtempSync(path.join(os.tmpdir(), "serve-test-"));
+  fs.writeFileSync(path.join(dist, "a.tbin"), Buffer.alloc(4096, 7));
+  const server = createServer(dist);
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const res = await new Promise((resolve, reject) =>
+      http.get({ host: "127.0.0.1", port: server.address().port, path: "/a.tbin", headers: { "accept-encoding": "br" } }, resolve).on("error", reject)
+    );
+    res.resume();
+    assert.equal(res.headers["content-encoding"], "br");
+    assert.equal(res.headers["content-type"], "application/x-protobuf");
+  } finally {
+    server.close();
+    fs.rmSync(dist, { recursive: true, force: true });
+  }
+});
+
 test("the server refuses an encoded ../ into a sibling folder and listens on 127.0.0.1", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "serve-test-"));
   const dist = path.join(tmp, "dist");

@@ -48,7 +48,7 @@ export async function resolve(specifier, context, next) {
   if (specifier === "./dataVersion.js" && /\/src\/lib\/[^/]+$/.test(parent.split("?")[0])) {
     return { url: DATA_VERSION_URL, shortCircuit: true };
   }
-  if (/(^|\/)pagefind\/pagefind\.js(\?.*)?$/.test(specifier)) {
+  if (/(^|\/)pagefind\/(v\.[^/]+\/)?pagefind\.js(\?.*)?$/.test(specifier)) {
     return { url: PAGEFIND_URL + encodeURIComponent(`\n// ${specifier}`), shortCircuit: true };
   }
   try {

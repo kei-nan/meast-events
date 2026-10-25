@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PAGEFIND_ENGINE_VERSION, checkDist, scriptHash } from "./check-dist.mjs";
+import { checkDist, scriptHash } from "./check-dist.mjs";
 import { NO_JS_STYLESHEET, preloadTag } from "./event-page.mjs";
 import { topology } from "topojson-server";
 import { fullBucket } from "../src/lib/fullBucket.js";
@@ -19,6 +19,7 @@ const DIR = `v.${VERSION}`;
 const BUCKETS = 2;
 const IDS = ["suez-crisis", "six-day-war", "oslo-i-accord"];
 const ENTRY = "/assets/index-AbCd_-12.js";
+const SEARCH_DIR = "v.0123456789ab";
 // A geometry file (.tbin) holding `doc`.
 const tbin = (doc) => encodeGeo(doc, { topology });
 const fc = (features = [], extra = {}) => ({ type: "FeatureCollection", ...extra, features });
@@ -94,7 +95,7 @@ function fixture() {
   for (const id of IDS) buckets[fullBucket(id, BUCKETS)][id] = { extract: "" };
   buckets.forEach((b, i) => write(`data/events/${DIR}/full/${i}.json`, b));
   write("data/events/meta.json", { version: VERSION, dir: DIR, fullBuckets: BUCKETS, totalEvents: IDS.length });
-  write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";`);
+  write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const SEARCH_DIR="${SEARCH_DIR}";`);
   write("data/boundaries/meta.json", { decades: [1950] });
   write("data/boundaries/1950.tbin", tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#1" }, { type: "Feature", properties: {}, geometry: polygon }])));
   write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([0, 1].map(() => ({ type: "Feature", properties: {}, geometry: polygon })))));
@@ -103,8 +104,8 @@ function fixture() {
   write("data/land-cells/n30e030.tbin", tbin(fc()));
   write("index.html", shell());
   for (const id of IDS) write(`event/${id}.html`, eventPage(id));
-  write("pagefind/pagefind.js", "");
-  write("pagefind/pagefind-entry.json", { version: PAGEFIND_ENGINE_VERSION });
+  write("pagefind/meta.json", { version: SEARCH_DIR.slice(2), dir: SEARCH_DIR });
+  for (const file of ["pagefind.js", "pagefind-entry.json", "ids.json"]) write(`pagefind/${SEARCH_DIR}/${file}`, "{}");
   write("favicon.svg", "<svg/>");
   write("favicon.ico", new Uint8Array(ico()));
   write("apple-touch-icon.png", new Uint8Array(png(180, 180)));
@@ -237,17 +238,15 @@ test("_redirects: a redirect from a live event or to a missing one", async () =>
   await assertProblem((f) => f.write("_redirects", "/event/old-name /event/gone 301\n"), /_redirects: redirect old-name -> gone: gone is not an event/);
 });
 
-test("Pagefind: a new release while its engine files are cached is a problem until reviewed", async () => {
-  const engine = "/pagefind/pagefind.js\n  ! Cache-Control\n  Cache-Control: public, max-age=3600, stale-while-revalidate=86400\n";
-  const upgraded = (f) => f.write("pagefind/pagefind-entry.json", { version: "9.9.9" });
-  await assertProblem((f) => (f.write("_headers", HEADERS() + engine), upgraded(f)), /Pagefind 9\.9\.9 built the search index, but public\/_headers caches the engine files for/);
-  // Not cached (no-cache): any release is fine.
-  assert.deepEqual(await problemsAfter((f) => (f.write("_headers", HEADERS() + engine.replace(/max-age=3600, stale-while-revalidate=86400/, "no-cache")), upgraded(f))), []);
-  assert.deepEqual(await problemsAfter((f) => f.write("_headers", HEADERS() + engine)), []);
+test("Pagefind: one versioned search folder, named by meta.json and by the bundle", async () => {
+  await assertProblem((f) => f.remove(`pagefind/${SEARCH_DIR}/ids.json`), /pagefind\/v\.0123456789ab\/ids\.json is missing/);
+  await assertProblem((f) => f.write("pagefind/v.ffffffffffff/pagefind.js", ""), /other files in dist\/pagefind besides meta\.json and v\.0123456789ab: v\.ffffffffffff/);
+  await assertProblem((f) => f.write("pagefind/meta.json", { dir: "index" }), /pagefind\/meta\.json dir "index" is not/);
+  await assertProblem((f) => f.write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";`), /no dist\/assets\/\*\.js names the search folder v\.0123456789ab/);
 });
 
 test("search index and 404 page missing", async () => {
-  await assertProblem((f) => f.remove("pagefind"), /pagefind\/pagefind\.js is missing/);
+  await assertProblem((f) => f.remove("pagefind"), /pagefind\/meta\.json is missing/);
   await assertProblem((f) => f.remove("404.html"), /404\.html is missing/);
 });
 

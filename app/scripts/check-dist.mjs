@@ -12,7 +12,9 @@
 //     decade's boundaries and the shared geometries they name, the land and its cells;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - every event has its page, and each is the app: the same /assets/ as index.html;
-//   - the search index (Pagefind) was built;
+//   - the search index (Pagefind) was built into the versioned folder
+//     pagefind/meta.json names (scripts/build-search-index.mjs), there is no other,
+//     and the built JavaScript names that folder;
 //   - 404.html exists (wrangler.jsonc not_found_handling "404-page" serves it);
 //   - every file under dist/assets/ is content-hashed (Vite's name-<8 char hash>):
 //     each gets an immutable rule in _headers, so an unhashed name there would
@@ -28,8 +30,6 @@
 //   - each event page preloads its own full-record bucket, and that file exists;
 //   - dist/_redirects, when there is one, redirects only ids that are no longer
 //     events to ids that are (scripts/redirects.mjs);
-//   - the Pagefind engine files are cached only for the Pagefind release
-//     PAGEFIND_ENGINE_VERSION names (see public/_headers);
 //   - dist/ has fewer files than the host allows per deploy (MAX_DIST_FILES,
 //     default 20,000: Cloudflare Workers static assets on the free plan,
 //     https://developers.cloudflare.com/workers/platform/limits/). Every event
@@ -44,14 +44,6 @@ import { fullBucket } from "../src/lib/fullBucket.js";
 import { IMMUTABLE, MARKER, MAX_RULES, hasMarker, parseRules } from "./expand-headers.mjs";
 import { NO_JS_STYLESHEET, preloadTag } from "./event-page.mjs";
 import { checkRedirectsText } from "./redirects.mjs";
-
-// The Pagefind release whose engine files (pagefind.js, its worker, the wasm)
-// public/_headers lets browsers cache for an hour plus a day of
-// stale-while-revalidate. Their names never change, so after an upgrade a
-// browser could pair an old engine with the new index: update this only after
-// the steps in DEPLOYMENT.md ("Upgrading Pagefind").
-export const PAGEFIND_ENGINE_VERSION = "1.5.2";
-const ENGINE_PATHS = ["/pagefind/pagefind.js", "/pagefind/pagefind-worker.js", "/pagefind/wasm.*"];
 
 // Inline scripts (no src, and not a data block such as JSON-LD) in an HTML page.
 export function inlineScripts(html) {
@@ -236,7 +228,23 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   }
 
   // 4. Search index.
-  if (!existsSync(distFile("pagefind/pagefind.js"))) fail("pagefind/pagefind.js is missing (build-search-index.mjs did not run)");
+  let searchDir = null;
+  if (!existsSync(distFile("pagefind/meta.json"))) fail("pagefind/meta.json is missing (build-search-index.mjs did not run)");
+  else {
+    ({ dir: searchDir } = readJSON("pagefind/meta.json"));
+    if (!/^v\.[0-9a-f]{12}$/.test(searchDir ?? "")) fail(`pagefind/meta.json dir ${JSON.stringify(searchDir)} is not v.<12 hex>`);
+    else {
+      for (const f of ["pagefind.js", "pagefind-entry.json", "ids.json"]) {
+        if (!existsSync(distFile(`pagefind/${searchDir}/${f}`))) fail(`pagefind/${searchDir}/${f} is missing`);
+      }
+      const other = readdirSync(distFile("pagefind")).filter((f) => f !== "meta.json" && f !== searchDir);
+      if (other.length) fail(`other files in dist/pagefind besides meta.json and ${searchDir}: ${other.join(", ")}`);
+      const scripts = readdirSync(distFile("assets")).filter((f) => f.endsWith(".js"));
+      if (!scripts.some((f) => readFileSync(distFile(`assets/${f}`), "utf8").includes(searchDir))) {
+        fail(`no dist/assets/*.js names the search folder ${searchDir} (built against another pagefind/meta.json)`);
+      }
+    }
+  }
 
   // 5. The page the host serves for a missing path (wrangler.jsonc not_found_handling
   // "404-page"), written by build-event-pages.mjs.
@@ -262,8 +270,8 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   // 6b. The cache rules (scripts/expand-headers.mjs). Workers matches a rule
   // against the requested path, so a splat rule's headers also go on the 404 for a
   // missing file under it: an immutable splat would keep that 404 for a year. The
-  // one exception is this build's events folder: its hash covers all of it, so a
-  // file missing there is missing for good.
+  // exceptions are this build's events and search folders: the hash covers all of
+  // each, so a file missing there is missing for good.
   let headerRules = 0;
   if (!existsSync(distFile("_headers"))) fail("_headers is missing (Vite copies it from public/)");
   else {
@@ -273,7 +281,7 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     if (hasMarker(text)) fail(`_headers still has "${MARKER}" lines (expand-headers.mjs did not run)`);
     if (rules.length > MAX_RULES) fail(`_headers has ${rules.length} rules; the host reads only the first ${MAX_RULES}`);
     const immutable = (r) => r.headers.some((h) => /^cache-control:.*\bimmutable\b/i.test(h));
-    const splat = (r) => r.pattern.includes("*") && r.pattern !== `/data/events/${dir}/*`;
+    const splat = (r) => r.pattern.includes("*") && r.pattern !== `/data/events/${dir}/*` && r.pattern !== `/pagefind/${searchDir}/*`;
     for (const r of rules) if (splat(r) && immutable(r)) fail(`_headers: the splat rule ${r.pattern} is immutable, so a missing file's 404 would be too`);
     const entry = refs.find((u) => /^\/assets\/index-.*\.js$/.test(u));
     if (entry && !rules.some((r) => r.pattern === entry && r.headers.includes(`Cache-Control: ${IMMUTABLE}`))) {
@@ -316,21 +324,6 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     const text = readFileSync(distFile("_redirects"), "utf8");
     redirectCount = text.split(/\r?\n/).filter((l) => l.trim() && !l.startsWith("#")).length;
     for (const p of checkRedirectsText(text, new Set(Array.isArray(all) ? all.map((e) => e.id) : []))) fail(p);
-  }
-
-  // 6f. The Pagefind engine is cached under fixed names (public/_headers): only
-  // for the release that was checked for it.
-  const engineCached = rules.some(
-    (r) => ENGINE_PATHS.includes(r.pattern) && r.headers.some((h) => /^cache-control:.*\bmax-age=[1-9]/i.test(h))
-  );
-  if (engineCached && existsSync(distFile("pagefind/pagefind-entry.json"))) {
-    const { version } = readJSON("pagefind/pagefind-entry.json");
-    if (version !== PAGEFIND_ENGINE_VERSION) {
-      fail(
-        `Pagefind ${version} built the search index, but public/_headers caches the engine files for ${PAGEFIND_ENGINE_VERSION}: ` +
-          `follow "Upgrading Pagefind" in DEPLOYMENT.md, then set PAGEFIND_ENGINE_VERSION in scripts/check-dist.mjs`
-      );
-    }
   }
 
   // 7. File count against the host's per-deploy limit. _headers and _redirects are

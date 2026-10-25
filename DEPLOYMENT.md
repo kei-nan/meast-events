@@ -160,8 +160,8 @@ Cloudflare does not deploy it.
      rules, an inline `<script>` has a hash the CSP does not list, `favicon.ico` or the
      180x180 `apple-touch-icon.png` is missing or malformed, an event page does not
      preload its own (existing) bucket, `_redirects` redirects a live id or points to a
-     missing one, Pagefind was upgraded while its engine files are cached
-     ([Upgrading Pagefind](#upgrading-pagefind)), or `dist/` has more files than the host
+     missing one, the search index is not the one versioned folder `pagefind/meta.json` and
+     the bundle name, or `dist/` has more files than the host
      allows per deploy.
 
 The raster icons (`app/public/favicon.ico`, `app/public/apple-touch-icon.png`) are
@@ -273,11 +273,11 @@ The static-assets Worker `meast-events` serves `dist/_headers` (copied from
 `app/public/_headers` by Vite): a CSP, `nosniff`, `X-Frame-Options`,
 `Referrer-Policy`, and cache rules: every file under `/assets/` is immutable for a
 year (every file there is content-hashed, MapLibre's worker included;
-`check-dist.mjs` fails the build otherwise), as are the content-hashed data folders and search
-index chunks, each through its own rule (`scripts/expand-headers.mjs`), so the 404
+`check-dist.mjs` fails the build otherwise), as are the content-hashed data folder and search
+index folder, each through its own rule (`scripts/expand-headers.mjs`), so the 404
 for a missing hashed file (a tab older or newer than a deploy) revalidates instead
-of being cached for a year; the other dataset files and the Pagefind engine get 1 h + stale-while-revalidate, and HTML
-and the search entry files revalidate on every visit. If the site ever loads anything from another host, add it to the CSP
+of being cached for a year; the other dataset files get 1 h + stale-while-revalidate, and HTML
+and `pagefind/meta.json` revalidate on every visit. If the site ever loads anything from another host, add it to the CSP
 in that file, or the browser will block it. The CSP allows one inline script by its
 sha256 hash (index.html's `document.documentElement.classList.add("js")`); changing that
 text means changing the hash in `_headers`, and `check-dist.mjs` fails the build until
@@ -286,20 +286,10 @@ notes: [docs/SECURITY.md](docs/SECURITY.md#2-static-site-headers-apppublic_heade
 
 ### Upgrading Pagefind
 
-`pagefind.js`, `pagefind-worker.js` and `wasm.*.pagefind` keep their names across
-releases, and browsers may keep them for up to a day (1 h + stale-while-revalidate). Their
-bytes depend only on the Pagefind release, not on the data (checked 2026-10-24), so data
-deploys are safe; an upgrade is not, since a browser could pair a cached old engine with
-the new index. So `check-dist.mjs` fails the build when the release that built the index
-differs from `PAGEFIND_ENGINE_VERSION` while those files are cached. To upgrade:
-
-1. Deploy first with the three engine rules in `app/public/_headers` set to
-   `Cache-Control: public, no-cache` (the check is then off).
-2. Wait 25 hours (1 h + a day), so no browser still holds an engine fetched under the
-   old caching.
-3. Upgrade Pagefind and deploy (still `no-cache`).
-4. Restore the 1 h + stale-while-revalidate rules and set `PAGEFIND_ENGINE_VERSION` in
-   `app/scripts/check-dist.mjs` to the new release.
+Nothing special: the engine (`pagefind.js`, `pagefind-worker.js`, `wasm.*.pagefind`) is in the
+search index's versioned folder `pagefind/v.<hash>/` (`app/scripts/build-search-index.mjs`),
+and the hash covers its bytes, so a new release gets a new folder and a browser never
+pairs an old engine with a new index.
 
 ### Renamed event ids (redirects)
 

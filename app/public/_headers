@@ -50,35 +50,19 @@
   Cache-Control: public, max-age=0, must-revalidate
 
 # /pagefind/*: the full-text search index (app/scripts/build-search-index.mjs).
-# ids.json, pagefind-entry.json and the .pf_meta keep their names across data
-# changes, and a stale ids.json would silently drop results for changed events,
-# so they revalidate on every visit (a 304 when unchanged). The index chunks are
-# named by content hash, so they are immutable (one rule per chunk, see above; a
-# missing chunk keeps no-cache).
+# Everything Pagefind writes (engine, worker, wasm, entry, .pf_meta, index chunks)
+# and ids.json lives in ONE versioned folder, pagefind/v.<12-hex-content-hash>/:
+# the hash covers every file in it, so the whole folder is immutable (one rule
+# for the build's folder, see above, like /data/events/v.*), a page never pairs
+# an engine or index from two builds, and a Pagefind upgrade renames the folder.
+# The splat holds for pagefind/meta.json (the one mutable file, naming the
+# current folder) and for a request into another build's folder (a 404 that
+# must not outlive the deploy): revalidate on every visit.
 /pagefind/*
   Cache-Control: public, no-cache
 
-# The engine: pagefind.js, its worker and the wasm. Their names are fixed, but
-# their bytes depend only on the Pagefind release (package-lock.json), not on the
-# data, so a data deploy leaves them unchanged and they can be cached like
-# /data/*. A Pagefind upgrade changes them under the same names: check-dist.mjs
-# fails the build until PAGEFIND_ENGINE_VERSION there is updated, after
-# following DEPLOYMENT.md ("Upgrading Pagefind"), so a stale engine is never
-# served with a new index by accident.
-/pagefind/pagefind.js
-  ! Cache-Control
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
-
-/pagefind/pagefind-worker.js
-  ! Cache-Control
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
-
-/pagefind/wasm.*
-  ! Cache-Control
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
-
 #! immutable-per-file
-/pagefind/index/*
+/pagefind/v.*
   ! Cache-Control
   Cache-Control: public, no-cache
 

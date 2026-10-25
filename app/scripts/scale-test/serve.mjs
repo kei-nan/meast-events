@@ -14,6 +14,10 @@ const TYPES = {
   ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
   ".json": "application/json", ".svg": "image/svg+xml", ".wasm": "application/wasm",
   ".woff2": "font/woff2", ".png": "image/png", ".pbf": "application/x-protobuf",
+  // The map's binary geometry (src/lib/geoCodec.js). The host labels it
+  // application/x-protobuf (public/_headers, "/data/*.tbin") so that Cloudflare
+  // compresses it, so it is compressed here too.
+  ".tbin": "application/x-protobuf",
 };
 
 /** True when `file` is `dir` itself or inside it (a sibling such as dist-old/ is not). */
@@ -53,7 +57,7 @@ export function createServer(root) {
     const ext = path.extname(file);
     const type = TYPES[ext] ?? "application/octet-stream";
     const headers = { "Content-Type": type, "Cache-Control": "no-store" };
-    const compressible = /text|json|javascript|svg/.test(type) || ext === ".pagefind" || ext === ".pf_meta";
+    const compressible = /text|json|javascript|svg/.test(type) || [".pagefind", ".pf_meta", ".tbin"].includes(ext);
     if (compressible && /\bbr\b/.test(req.headers["accept-encoding"] ?? "")) {
       const key = `${file}@${fs.statSync(file).mtimeMs}`; // a redeployed folder is not served stale
       if (!compressed.has(key)) {
