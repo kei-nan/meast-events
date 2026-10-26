@@ -1,7 +1,27 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { matchedAlias, matchesFilters, matchesTokens, normalizeText, rankEvents, tokenize } from "./ranking.js";
+import {
+  effectiveQuery,
+  matchedAlias,
+  matchesFilters,
+  matchesTokens,
+  normalizeText,
+  rankEvents,
+  tokenize,
+} from "./ranking.js";
 import { makeCircleArea, makeRectArea } from "./geo.js";
+
+test("effectiveQuery: short or letter-less text is no query", () => {
+  assert.equal(effectiveQuery(""), "");
+  assert.equal(effectiveQuery(" a "), "");
+  assert.equal(effectiveQuery("??"), "");
+  assert.equal(effectiveQuery("--"), "");
+  assert.equal(effectiveQuery("  ... !! "), "");
+  assert.equal(effectiveQuery(" suez "), "suez");
+  assert.equal(effectiveQuery("1967"), "1967");
+  assert.equal(effectiveQuery("حرب"), "حرب");
+  assert.equal(effectiveQuery("?a"), "?a"); // has a letter: searched
+});
 
 const ev = (id, title, extra = {}) => ({
   id,

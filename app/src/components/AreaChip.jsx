@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 /**
  * Area row: shows the active area (removable) and the "Only in current map
  * view" toggle. The area itself is drawn with the map's own buttons (the one
@@ -43,23 +45,35 @@ export function AreaTag({ area, areaMode, onAreaChange, onRemoved }) {
   return null;
 }
 
+/**
+ * Removing the area unmounts its × button, so focus moves on: to `onRemoved`
+ * when given, else to the "Only in current map view" checkbox right under it.
+ */
 export default function AreaChip({
   area,
   areaMode,
   onAreaChange,
+  onRemoved,
   inView,
   onInViewChange,
   viewCount,
 }) {
+  const checkRef = useRef(null);
   return (
     <div className="sp-area">
       {(area || (areaMode && areaMode !== "off")) && (
         <div className="sp-area-row">
-          <AreaTag area={area} areaMode={areaMode} onAreaChange={onAreaChange} />
+          <AreaTag
+            area={area}
+            areaMode={areaMode}
+            onAreaChange={onAreaChange}
+            onRemoved={onRemoved ?? (() => checkRef.current?.focus())}
+          />
         </div>
       )}
       <label className="sp-check">
         <input
+          ref={checkRef}
           type="checkbox"
           checked={!!inView}
           onChange={(e) => onInViewChange?.(e.target.checked)}

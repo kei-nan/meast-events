@@ -10,7 +10,7 @@ import { CATEGORY_COLORS } from "./mapLayers";
 import EventDetail from "./EventDetail.jsx";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
-import { MIN_QUERY_LENGTH } from "../lib/ranking.js";
+import { effectiveQuery } from "../lib/ranking.js";
 import { timelineOrder } from "../lib/timelineView.js";
 import { downloadText, exportFileRange, exportFilename, exportQuery, exportRows, toCSV, toJSON } from "../lib/exportResults.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
@@ -136,6 +136,7 @@ export default function SearchPanel({
   const inputRef = useRef(null);
   const toggleRef = useRef(null);
   const listWrapRef = useRef(null);
+  const statusRef = useRef(null); // the status line: Back's focus when the event's row is not in the list
   const scrollRef = useRef(null);
   const listScrollRef = useRef(0); // the list's scroll position, restored by Back
   const lastSelectedRef = useRef(null);
@@ -161,12 +162,15 @@ export default function SearchPanel({
 
   const loading = status === "loading";
   const offline = source === "static";
-  // What App lists follows the search hook: below 2 characters a query is no
-  // search and the browse list shows, so it is styled and counted as one.
-  // "In map view" is not part of the search, but trims the list like a filter.
-  const searching = status !== "idle" || !!filters.inView;
+  // What App lists follows the search hook: below 2 characters (or with no
+  // letters or digits) a query is no search and the browse list shows, so it is
+  // styled and counted as one. "In map view" is not part of the search: on its
+  // own App still lists the browse list (its order, Sort, the Ongoing group),
+  // only trimmed to the view, so the panel treats it as browsing too.
+  const searching = status !== "idle";
+  const inView = !!filters.inView;
   // The text being searched for (highlighted in the rows), "" while it is no search.
-  const textQuery = query.trim().length >= MIN_QUERY_LENGTH ? query.trim() : "";
+  const textQuery = effectiveQuery(query);
   const { key: sortKey, dir: sortDir } = parseSort(sort);
   const sortNow = sortValue(sortKey, sortDir); // normalised: an unknown value is the default sort
 
@@ -183,11 +187,13 @@ export default function SearchPanel({
     el.scrollTop = selectedId ? 0 : listScrollRef.current;
   }, [selectedId]);
 
-  // Back restores focus to
-  // the originating row (or the search box if that row is gone). With the
-  // phone sheet at its peek bar (system Back after "Show on map") the list is
-  // hidden and focusing the search box would open the sheet (its onFocus) and
-  // perhaps the keyboard, so focus goes to the sheet's bar instead.
+  // Back restores focus to the originating row, or, if that row is gone or not
+  // rendered (rows render 50 at a time), to the status line above the list
+  // ("N results"; tabIndex -1). Not the search box: its onFocus opens the
+  // phone sheet to full and preloads the full-text index, and on a phone it
+  // would bring up the keyboard. With the phone sheet at its peek bar (system
+  // Back after "Show on map") the list is hidden, so focus goes to the sheet's
+  // bar instead.
   useEffect(() => {
     if (selectedEvent) {
       lastSelectedRef.current = selectedEvent.id;
@@ -203,7 +209,7 @@ export default function SearchPanel({
       const row = [...(listWrapRef.current?.querySelectorAll("button.sp-row") ?? [])].find(
         (b) => b.dataset.id === id
       );
-      (row ?? inputRef.current)?.focus();
+      (row ?? statusRef.current)?.focus();
     }
   }, [selectedEvent]);
 
@@ -226,11 +232,12 @@ export default function SearchPanel({
   // which is now near the top, under the toolbar. Both updates land in one
   // render, so the camera move reads the sheet at its peek bar. Focus moves to
   // the toggle, which reopens the event.
-  function showOnMap() {
+  // Stable, so the memoized EventDetail skips App's Play/map/hover re-renders.
+  const showOnMap = useCallback(() => {
     setSheet("peek");
     onRefocus?.();
     toggleRef.current?.focus();
-  }
+  }, [setSheet, onRefocus]);
 
   function clearAll() {
     onQueryChange("");
@@ -314,7 +321,11 @@ export default function SearchPanel({
     if (loading && interim && results.length > 0)
       return { text: `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`, extra: "" };
     if (loading && results.length === 0) return { text: "Searching…", extra: "" };
-    if (!searching) return { text: `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}`, extra: "" };
+    if (!searching)
+      return {
+        text: `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}${inView ? ", in map view" : ""}`,
+        extra: "",
+      };
     if (filters.scope === "range") return { text: `${plural(total)} in ${sel}`, extra: "" };
     if (total === 0) return { text: "0 results", extra: "" };
     if (shownInRange === 0) return { text: `${plural(total)} (none in ${sel})`, extra: "" };
@@ -336,6 +347,18 @@ export default function SearchPanel({
   } else if (settled && filters.scope !== "range" && total > 0 && shownInRange && shownInRange !== total) {
     scopeAction = { label: `Show the ${shownInRange} in selected years`, aria: null, scope: "range" };
   }
+
+  // The button usually flips in place, but "Show all N" with none of the N in
+  // the selected years leaves no "Show the M in selected years" to flip to: the
+  // button goes, and the focus it held moves to the status line (which then
+  // says "N results (none in selected years)") instead of the page body.
+  const scopeBtnRef = useRef(null);
+  const scopeFocusRef = useRef(false); // the scope button was pressed while focused
+  useEffect(() => {
+    if (!scopeFocusRef.current) return;
+    scopeFocusRef.current = false;
+    if (!scopeBtnRef.current) statusRef.current?.focus();
+  });
 
   // Screen reader announcements. The visible status line is not a live region:
   // Play changes it every 350 ms. This hidden one stays empty while Play runs
@@ -497,7 +520,7 @@ export default function SearchPanel({
           {/* Line 1: what is listed (and the scope button), and Download, which
               saves exactly that. */}
           <div className="sp-statusline">
-            <p className="sp-status">
+            <p className="sp-status" ref={statusRef} tabIndex={-1}>
               {statusText}
               {statusExtra && <span className="sp-sr">{statusExtra}</span>}
             </p>
@@ -505,10 +528,14 @@ export default function SearchPanel({
                 scopes, so keyboard focus stays on it after pressing it. */}
             {scopeAction && (
               <button
+                ref={scopeBtnRef}
                 type="button"
                 className="sp-scope-link"
                 aria-label={scopeAction.aria ?? undefined}
-                onClick={() => onFiltersChange({ ...filters, scope: scopeAction.scope })}
+                onClick={(e) => {
+                  scopeFocusRef.current = document.activeElement === e.currentTarget;
+                  onFiltersChange({ ...filters, scope: scopeAction.scope });
+                }}
               >
                 {scopeAction.label}
               </button>
@@ -698,13 +725,15 @@ export default function SearchPanel({
                     ? `No events in this atlas match “${textQuery}”.`
                     : searching
                       ? "No events in this atlas match these filters."
-                      : "No events in the selected years."}
+                      : inView
+                        ? "No events in the selected years in this map view."
+                        : "No events in the selected years."}
                 </p>
                 <p className="sp-muted">
                   The atlas covers only a partial selection of events, so a missing result says
                   nothing about whether something happened.
                 </p>
-                {searching && (
+                {(searching || inView) && (
                   <button type="button" className="sp-btn" onClick={clearAll}>
                     Clear filters
                   </button>

@@ -141,6 +141,27 @@ test("filters alone are answered locally, without the index", () => {
   assert.deepEqual(index.calls, []);
 });
 
+test("a query of only punctuation is no search (idle, no index call), not every event", () => {
+  for (const query of ["??", "--", " ... "]) {
+    const index = stubIndex();
+    const p = props({ query, degraded: true });
+    const h = renderHook(useEventSearch, p);
+    const s = h.rerender(p);
+    assert.equal(s.status, "idle", query);
+    assert.deepEqual(ids(s), [], query);
+    assert.deepEqual(index.calls, [], query);
+  }
+  // With a filter, the filter alone answers.
+  const index = stubIndex();
+  const p = props({ query: "??", categories: ["treaty"] });
+  const h = renderHook(useEventSearch, p);
+  const s = h.rerender(p);
+  assert.equal(s.source, "local");
+  assert.equal(s.textSearch, false);
+  assert.deepEqual(ids(s), ["e2"]);
+  assert.deepEqual(index.calls, []);
+});
+
 test("while degraded, a probe that went stale still ends the outage, and the current text is searched", async () => {
   const index = stubIndex();
   let recovered = 0;

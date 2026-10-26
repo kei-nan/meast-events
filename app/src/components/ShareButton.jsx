@@ -99,6 +99,11 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
   const rootRef = useRef(null);
   const buttonRef = useRef(null);
   const panelRef = useRef(null);
+  // What the status region last said about the QR code (cleared by "Copy link",
+  // so "Link copied" ending does not repeat it).
+  const [qrSay, setQrSay] = useState("");
+  const pngBtnRef = useRef(null);
+  const qrFocusRef = useRef(false); // "QR code" was pressed while focused
   // Counts QR requests and closes: a QR whose (lazy) library arrives after the
   // panel closed, or after a newer request, is dropped, so reopening never
   // shows a code for an older link.
@@ -112,6 +117,8 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
     setOpen(false);
     qrRequestRef.current++;
     setQr(null);
+    setQrSay("");
+    qrFocusRef.current = false;
     if (returnFocus) buttonRef.current?.focus();
   };
 
@@ -137,6 +144,14 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
     };
   }, [open]);
 
+  // The finished QR code replaces its button: focus, if it was there, moves to
+  // the code's Download PNG instead of falling to the page body.
+  useEffect(() => {
+    if (!qr?.data || !qrFocusRef.current) return;
+    qrFocusRef.current = false;
+    pngBtnRef.current?.focus();
+  }, [qr]);
+
   useEffect(() => {
     if (!copied) return undefined;
     const t = setTimeout(() => setCopied(false), 2500);
@@ -156,6 +171,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
     const url = link();
     try {
       await navigator.clipboard.writeText(url);
+      setQrSay("");
       setCopied(true);
     } catch {
       window.prompt("Copy this link", url);
@@ -171,12 +187,16 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
     const url = link();
     const request = ++qrRequestRef.current;
     setQr("loading");
+    setQrSay("Making the QR code…");
     try {
       const { encode } = await loadQr();
       if (request !== qrRequestRef.current) return;
       setQr({ url, data: encode(url, { ecc: "M", border: QR_BORDER }).data });
+      setQrSay("QR code shown, with a Download PNG button.");
     } catch {
-      if (request === qrRequestRef.current) setQr("error");
+      if (request !== qrRequestRef.current) return;
+      setQr("error");
+      setQrSay("The QR code could not be made. Press QR code to try again.");
     }
   }
 
@@ -203,8 +223,20 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
           <button type="button" className="sp-btn" onClick={copyLink}>
             {copied ? "Link copied" : "Copy link"}
           </button>
-          {qr === null && (
-            <button type="button" className="sp-btn" onClick={showQr}>
+          {/* Stays while the code is made (aria-disabled, so it keeps focus) and
+              after a failure (pressing it again retries); the finished code
+              replaces it, and focus moves to its Download PNG. */}
+          {!qr?.data && (
+            <button
+              type="button"
+              className="sp-btn"
+              aria-disabled={qr === "loading" || undefined}
+              onClick={(e) => {
+                if (qr === "loading") return;
+                qrFocusRef.current = document.activeElement === e.currentTarget;
+                showQr();
+              }}
+            >
               QR code
             </button>
           )}
@@ -229,6 +261,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
               <button
                 type="button"
                 className="sp-btn"
+                ref={pngBtnRef}
                 onClick={() => downloadPng(qr.data, `${slug(title) || "middleeast-events"}-qr.png`)}
               >
                 Download PNG
@@ -236,7 +269,7 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
             </figure>
           )}
           <span className="sp-sr-status" role="status">
-            {copied ? "Link copied" : ""}
+            {copied ? "Link copied" : qrSay}
           </span>
         </div>
       )}

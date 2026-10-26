@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { localSearch, textMatchesFromStore } from "../lib/localSearch";
-import { MIN_QUERY_LENGTH, rankEvents, warmWords } from "../lib/ranking";
+import { effectiveQuery, rankEvents, warmWords } from "../lib/ranking";
 import { searchEventIds } from "../lib/textSearch";
 import useDebouncedValue from "./useDebouncedValue";
 
@@ -17,11 +17,9 @@ const IDLE = {
   typing: false,
 };
 
-// Text shorter than MIN_QUERY_LENGTH counts as no text.
-function effectiveQ(q) {
-  const t = q.trim();
-  return t.length >= MIN_QUERY_LENGTH ? t : "";
-}
+// Text shorter than MIN_QUERY_LENGTH, or with no letters/digits, counts as no
+// text (lib/ranking.js effectiveQuery).
+const effectiveQ = effectiveQuery;
 
 // Combined search: text + area + categories + countries, over the WHOLE
 // timeline (the year scope is applied by the caller, so toggling it needs no
