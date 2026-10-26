@@ -9,7 +9,11 @@ import {
   CATEGORIES,
   MIN_YEAR,
   MAX_YEAR,
+  MAX_END_YEAR,
+  eventIdProblem,
 } from "./validate.js";
+import { isValidEventId } from "../../app/src/lib/urlState.js";
+import { MIN_YEAR as APP_MIN_YEAR, MAX_YEAR as APP_MAX_YEAR } from "../../app/src/lib/years.js";
 import { CATEGORY_LABELS, CLASS_GROUPS } from "../../app/src/lib/categoryLabels.js";
 import { EVENT_CLASSES } from "./event-classes.js";
 
@@ -64,14 +68,48 @@ test("validateEvents: an event needs a tracked country", () => {
   assert.match(validateEvents([event({ countries: ["France"] })]).errors[0], /no tracked country/);
 });
 
-test("isRealDate: years 1900 to next year only", () => {
+test("isRealDate: years from the app's first to its last timeline year", () => {
+  // The same bounds as the app's timeline (outside a Vite bundle its last year is the UTC year).
+  assert.equal(MIN_YEAR, APP_MIN_YEAR);
+  assert.equal(MAX_YEAR, APP_MAX_YEAR);
   assert.equal(MIN_YEAR, 1900);
-  assert.equal(MAX_YEAR, new Date().getUTCFullYear() + 1);
+  assert.equal(MAX_YEAR, new Date().getUTCFullYear());
+  assert.equal(MAX_END_YEAR, MAX_YEAR + 1);
   assert.equal(isRealDate("1900-01-01"), true);
   assert.equal(isRealDate("1899-12-31"), false);
   assert.equal(isRealDate(`${MAX_YEAR}-12-31`), true);
   assert.equal(isRealDate(`${MAX_YEAR + 1}-01-01`), false);
+  assert.equal(isRealDate(`${MAX_YEAR + 1}-01-01`, MAX_END_YEAR), true);
   assert.match(validateEvents([event({ date_start: "1067-06-05", date_end: null })]).errors[0], /date_start invalid/);
+  // A start next year would never show on the timeline; a scheduled end next year is fine.
+  assert.match(validateEvents([event({ date_start: `${MAX_YEAR + 1}-01-05`, date_end: null })]).errors[0], /date_start invalid/);
+  const scheduledEnd = event({ date_start: `${MAX_YEAR}-01-05`, date_end: `${MAX_YEAR + 1}-03-01`, extract_retrieved_at: `${MAX_YEAR}-12-31` });
+  assert.deepEqual(validateEvents([scheduledEnd]).errors, []);
+  assert.match(validateEvents([event({ date_end: `${MAX_YEAR + 2}-01-01` })]).errors[0], /date_end invalid/);
+});
+
+test("validateEvents: ids the app can link to, never a reserved file name", () => {
+  for (const bad of ["-war", "Six-Day-War", "six_day_war", "six:day", "a.b", "", "a".repeat(121), 42, null, "index", "con", "nul", "com1", "lpt9", "aux"]) {
+    assert.ok(eventIdProblem(bad), `expected ${JSON.stringify(bad)} to be rejected`);
+    assert.equal(validateEvents([event({ id: bad })]).errors.length, 1, JSON.stringify(bad));
+  }
+  for (const good of ["six-day-war", "1967", "a".repeat(120), "com10", "con-1", "index-of-x"]) {
+    assert.equal(eventIdProblem(good), null, good);
+    assert.equal(isValidEventId(good), true, good);
+  }
+});
+
+test("validateEvents: every id the validator accepts is one the app accepts", () => {
+  // A sample around the edges of both checks: the validator never passes an id the app drops.
+  const samples = ["a", "-", "0-", "a-", "-a", "A", "a.", "~a", "a~", "a".repeat(120), "a".repeat(121), "ab c", "é"];
+  for (const id of samples) if (!eventIdProblem(id)) assert.equal(isValidEventId(id), true, id);
+});
+
+test("validateEvents: extract_retrieved_at must name a real day", () => {
+  assert.deepEqual(validateEvents([event({ extract_retrieved_at: "2026-02-28" })]).errors, []);
+  for (const bad of ["2026-02-30T00:00:00Z", "2026-13-01", "2026-00-10", "1899-12-31", "26-01-01", "", null]) {
+    assert.match(validateEvents([event({ extract_retrieved_at: bad })]).errors.join("\n"), /extract_retrieved_at must be an ISO date/, String(bad));
+  }
 });
 
 test("validateEvents: wikipedia_revid (a positive integer) and its timestamp, both or neither", () => {

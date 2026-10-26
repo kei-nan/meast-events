@@ -130,6 +130,12 @@ jobs:
           node scripts/build-missing-coordinates-report.js --check
           node scripts/build-selection-funnel.js --check
 
+      # Before the app's unit tests: they import app/ dependencies.
+      - name: Install app/ dependencies
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: app
+        run: npm ci
+
       - name: Unit tests
         if: steps.diff.outputs.changed == 'true'
         run: |
@@ -144,9 +150,7 @@ jobs:
       - name: Build the site
         if: steps.diff.outputs.changed == 'true'
         working-directory: app
-        run: |
-          npm ci
-          npm run build
+        run: npm run build
 
       # The PR description is capped (GitHub allows 65,536 characters), so the
       # full report is kept as a workflow artifact and linked from the PR.

@@ -61,14 +61,16 @@ test("politeFetch: identifies itself, returns the body, does not retry a 404 or 
 });
 
 test("politeFetch: 429/5xx retried, honouring Retry-After as seconds or an HTTP date", async () => {
-  const date = new Date(Date.now() + 20_000).toUTCString();
+  // A pinned clock: the HTTP-date wait does not depend on the real time or how long the test takes.
+  const now = Date.parse("2026-10-07T12:00:00Z");
+  const date = new Date(now + 20_000).toUTCString();
   const m = mockFetch([status(429, { "Retry-After": "7" }), status(503, { "Retry-After": date }), status(500), ok()]);
   const s = recordSleeps();
-  const res = await politeFetch("https://x.test/", {}, { fetchImpl: m.impl, sleepImpl: s.sleepImpl, baseDelayMs: 100 });
+  const res = await politeFetch("https://x.test/", {}, { fetchImpl: m.impl, sleepImpl: s.sleepImpl, baseDelayMs: 100, nowImpl: () => now });
   assert.equal(res.status, 200);
   assert.equal(m.calls.length, 4);
   assert.equal(s.waits[0], 7000);
-  assert.ok(s.waits[1] > 15_000 && s.waits[1] <= 20_000, `HTTP-date wait ${s.waits[1]}`);
+  assert.equal(s.waits[1], 20_000);
   assert.equal(s.waits[2], 400); // no header: exponential backoff (100 * 2^2)
 });
 

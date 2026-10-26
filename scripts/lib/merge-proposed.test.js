@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -114,7 +114,30 @@ test("merge-proposed: not events are removed from the curated file and never add
   }
 });
 
-const COARSE = "date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it";
+test("merge-proposed: a missing exclusions file means none; a malformed one fails, never read as empty", () => {
+  const t = setup({ curated, proposed: [event("c", "Q3")] });
+  try {
+    rmSync(join(t.dir, "proposed-exclusions.json"));
+    assert.match(run(t.dir), /Excluded by review \(data\/proposed-exclusions.json\): 0/);
+    writeFileSync(join(t.dir, "proposed-exclusions.json"), "[{\"id\": \"c\",");
+    assert.throws(() => run(t.dir, "--apply"), (err) => err.status !== 0 && /proposed-exclusions\.json is not valid JSON/.test(err.stderr));
+    assert.equal(t.read(), t.text);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+test("merge-proposed: --apply leaves no temporary file behind", () => {
+  const t = setup({ curated, proposed: [event("c", "Q3")] });
+  try {
+    run(t.dir, "--apply");
+    assert.deepEqual(readdirSync(t.dir).filter((f) => f.endsWith(".tmp")), []);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+const COARSE ="date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it";
 test("merge-proposed: re-derived date-order flags reach the curated record, nothing else does", () => {
   const order = { date_start: "2002-03-27", date_end: "2002-01-01", review_reasons: ["part_of: x"], needs_review: true };
   const old = event("p", "Q7", { ...order, date_flags: ["date_order_invalid: old", "wikipedia_dates_note: old"], wikipedia_lead_dates: ["2002-03-27"] });

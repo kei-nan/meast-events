@@ -18,7 +18,8 @@
 //     QID, same dates and extract) takes the proposed record's date_order_invalid / date_end_precision_coarse /
 //     wikipedia_dates_note flags and wikipedia_lead_dates, so a pipeline fix to those flags reaches the curated record.
 //     Nothing else of the curated record changes.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { readJsonIfExists, writeFileAtomic } from "./lib/files.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { validateEvents, findClashes } from "./lib/validate.js";
@@ -41,7 +42,8 @@ const notEvent = (e) => notEventClasses(e.wikidata_classes).map((c) => c.label);
 const removedNotEvents = curatedIn.filter((e) => notEvent(e).length);
 const curated = curatedIn.filter((e) => !notEvent(e).length);
 const exclusionsUrl = new URL("proposed-exclusions.json", dataDir);
-const exclusions = await read(exclusionsUrl).catch(() => []);
+// Absent: no reviewed exclusions. Present but unreadable or malformed: fail, never merge as if empty.
+const exclusions = await readJsonIfExists(exclusionsUrl, []);
 const excludedIds = new Set(exclusions.map((x) => x.id));
 // Reviewed duplicates (data/proposed-exclusions.json, each with a stated reason) are left out.
 const proposed = (await read(proposedUrl)).filter((e) => !excludedIds.has(e.id));
@@ -97,6 +99,6 @@ console.log(`  by category:`, byCat);
 if (!APPLY) {
   console.log(`\nDry run only - nothing was written. Re-run with --apply to write it.`);
 } else {
-  await writeFile(curatedUrl, JSON.stringify(merged, null, 2) + "\n");
+  await writeFileAtomic(curatedUrl, JSON.stringify(merged, null, 2) + "\n");
   console.log(`\nWrote data/events.json (${merged.length} events).`);
 }

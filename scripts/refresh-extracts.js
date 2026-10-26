@@ -25,6 +25,7 @@
 // redirects). Cases that are not a plain rename (redirect to a section, another Wikidata item, a stored title that
 // Wikipedia does not redirect to the article) are held: never applied, only listed. Event ids never change.
 import { readFile, writeFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { fetchLeads, titleFromWikipediaUrl } from "./lib/lead.js";
 import {
   detectTitleChange,
@@ -157,8 +158,8 @@ if (mirrored.length) {
 
 if (APPLY) {
   const text = JSON.stringify(curated, null, 2) + "\n";
-  await writeFile(curatedUrl, text);
-  if (propRes) await writeFile(proposedUrl, JSON.stringify(propRes.events, null, 2) + "\n");
+  await writeFileAtomic(curatedUrl, text);
+  if (propRes) await writeFileAtomic(proposedUrl, JSON.stringify(propRes.events, null, 2) + "\n");
   say(`\nAPPLIED: wrote data/events.json${propRes ? " and data/events.proposed.json" : ""}: changed leads (extract_retrieved_at = ${today}) and titles.`);
 } else {
   say("\nDry run - nothing written. Review the title changes and lead diffs above, then re-run with --apply.");
