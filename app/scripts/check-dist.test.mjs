@@ -20,6 +20,9 @@ const BUCKETS = 2;
 const IDS = ["suez-crisis", "six-day-war", "oslo-i-accord"];
 const ENTRY = "/assets/index-AbCd_-12.js";
 const SEARCH_DIR = "v.0123456789ab";
+const BVERSION = "fedcba987654";
+const BDIR = `v.${BVERSION}`;
+const VERSION_JS = `export const DATA_VERSION = "${VERSION}";\nexport const FULL_BUCKETS = ${BUCKETS};\nexport const BOUNDARIES_VERSION = "${BVERSION}";\n`;
 // A geometry file (.tbin) holding `doc`.
 const tbin = (doc) => encodeGeo(doc, { topology });
 const fc = (features = [], extra = {}) => ({ type: "FeatureCollection", ...extra, features });
@@ -41,6 +44,9 @@ const HEADERS = (entryRule = ENTRY, csp = CSP()) =>
     "  Cache-Control: public, max-age=31536000, immutable",
     "",
     `/data/events/${DIR}/*`,
+    "  Cache-Control: public, max-age=31536000, immutable",
+    "",
+    `/data/boundaries/${BDIR}/*`,
     "  Cache-Control: public, max-age=31536000, immutable",
     "",
   ].join("\n");
@@ -89,15 +95,15 @@ function fixture() {
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, typeof content === "string" || content instanceof Uint8Array ? content : JSON.stringify(content));
   };
-  fs.writeFileSync(versionFile, `export const DATA_VERSION = "${VERSION}";\nexport const FULL_BUCKETS = ${BUCKETS};\n`);
+  fs.writeFileSync(versionFile, VERSION_JS);
   write(`data/events/${DIR}/all.json`, IDS.map((id) => ({ id })));
   const buckets = Array.from({ length: BUCKETS }, () => ({}));
   for (const id of IDS) buckets[fullBucket(id, BUCKETS)][id] = { extract: "" };
   buckets.forEach((b, i) => write(`data/events/${DIR}/full/${i}.json`, b));
   write("data/events/meta.json", { version: VERSION, dir: DIR, fullBuckets: BUCKETS, totalEvents: IDS.length });
-  write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const SEARCH_DIR="${SEARCH_DIR}";`);
-  write("data/boundaries/meta.json", { decades: [1950] });
-  write("data/boundaries/1950.tbin", tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#1" }, { type: "Feature", properties: {}, geometry: polygon }])));
+  write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const BOUNDARIES_VERSION="${BVERSION}";const SEARCH_DIR="${SEARCH_DIR}";`);
+  write("data/boundaries/meta.json", { decades: [1950], version: BVERSION, dir: BDIR });
+  write(`data/boundaries/${BDIR}/1950.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#1" }, { type: "Feature", properties: {}, geometry: polygon }])));
   write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([0, 1].map(() => ({ type: "Feature", properties: {}, geometry: polygon })))));
   write("data/land.tbin", tbin(fc([], { cells: ["n30e030"] })));
   write("data/land-far.tbin", tbin(fc()));
@@ -188,8 +194,8 @@ test("full records: a missing bucket, duplicate ids, a record outside its bucket
 test("boundaries and land: a missing or undecodable geometry file, shared geometry, land file or land cell", async () => {
   await assertProblem((f) => f.remove("data/boundaries/shared/aaaaaaaaaaaa.tbin"), /1950\.tbin points to missing shared geometry aaaaaaaaaaaa#1/);
   await assertProblem((f) => f.write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([{ type: "Feature", properties: {}, geometry: polygon }]))), /aaaaaaaaaaaa\.tbin has no geometry 1/);
-  await assertProblem((f) => f.remove("data/boundaries/1950.tbin"), /data\/boundaries\/1950\.tbin is missing/);
-  await assertProblem((f) => f.write("data/boundaries/1950.tbin", fc()), /1950\.tbin does not decode: geoCodec: not a \.tbin file/);
+  await assertProblem((f) => f.remove(`data/boundaries/${BDIR}/1950.tbin`), /data\/boundaries\/v\.fedcba987654\/1950\.tbin is missing/);
+  await assertProblem((f) => f.write(`data/boundaries/${BDIR}/1950.tbin`, fc()), /1950\.tbin does not decode: geoCodec: not a \.tbin file/);
   await assertProblem((f) => f.remove("data/land-far.tbin"), /data\/land-far\.tbin is missing/);
   await assertProblem((f) => f.write("data/land-far.tbin", tbin(polygon)), /land-far\.tbin is not a FeatureCollection/);
   await assertProblem((f) => f.remove("data/land-cells/n30e030.tbin"), /land-cells\/n30e030\.tbin is missing/);
@@ -264,7 +270,25 @@ test("_headers: missing, not expanded, an immutable splat, no rule for the entry
   );
   await assertProblem((f) => f.write("_headers", HEADERS("/assets/other-ZZZZZZZZ.js")), /no immutable rule for the entry script \/assets\/index-/);
   const many = Array.from({ length: 100 }, (_, i) => `/p${i}\n  X: 1\n`).join("");
-  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 104 rules; the host reads only the first 100/);
+  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 105 rules; the host reads only the first 100/);
+});
+
+test("boundaries folder: the bundle, meta.json and dist/ must agree on boundaries/v.<BOUNDARIES_VERSION>/", async () => {
+  await assertProblem(
+    (f) => fs.writeFileSync(f.versionFile, `export const DATA_VERSION = "${VERSION}";\nexport const FULL_BUCKETS = ${BUCKETS};\n`),
+    /BOUNDARIES_VERSION null is not 12 hex characters/
+  );
+  await assertProblem((f) => f.write("data/boundaries/meta.json", { decades: [1950], version: "111111111111", dir: BDIR }), /boundaries\/meta\.json version 111111111111 != BOUNDARIES_VERSION/);
+  await assertProblem((f) => f.write("data/boundaries/meta.json", { decades: [1950], version: BVERSION, dir: "v.x" }), /boundaries\/meta\.json dir v\.x != v\.fedcba987654/);
+  await assertProblem((f) => f.write("data/boundaries/v.000000000000/1950.tbin", tbin(fc())), /other or old-layout boundary files in dist\/data\/boundaries: v\.000000000000/);
+  await assertProblem((f) => f.write("data/boundaries/1950.tbin", tbin(fc())), /old-layout boundary files.*1950\.tbin/);
+  await assertProblem((f) => f.write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const SEARCH_DIR="${SEARCH_DIR}";`), /no dist\/assets\/\*\.js contains BOUNDARIES_VERSION/);
+  // The build's own folder may be immutable; any other boundaries splat may not.
+  assert.deepEqual(await problemsAfter(() => {}), []);
+  await assertProblem(
+    (f) => f.write("_headers", HEADERS() + "\n/data/boundaries/v.000000000000/*\n  Cache-Control: public, max-age=31536000, immutable\n"),
+    /the splat rule \/data\/boundaries\/v\.000000000000\/\* is immutable/
+  );
 });
 
 test("file count: a problem at the host's limit, a warning from 75% of it", async () => {

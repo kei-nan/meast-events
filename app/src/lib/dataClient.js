@@ -14,7 +14,7 @@
 import { eventCoords } from "./geo.js";
 import { fullBucket } from "./fullBucket.js";
 import { decodeGeo } from "./geoCodec.js";
-import { DATA_VERSION, FULL_BUCKETS } from "./dataVersion.js";
+import { BOUNDARIES_VERSION, DATA_VERSION, FULL_BUCKETS } from "./dataVersion.js";
 
 // Pure year helpers live in eventYears.js (testable without the generated
 // dataVersion.js); re-exported for the existing importers.
@@ -118,27 +118,45 @@ function loadSharedGeometry(ref) {
   });
 }
 
-// A decade's FeatureCollection. A geometry stored apart (`geometry_ref`, see
-// split-data.mjs) is put back here, so callers get plain features - except
-// deferred ones (a `minzoom`, lib/deferredBoundaries.js), which stay pending until
-// the map asks for them with loadDeferredGeometry.
+// A decade's FeatureCollection, from the versioned folder
+// boundaries/v.<BOUNDARIES_VERSION>/<decade>.tbin (split-data.mjs): the version
+// hashes every chunk, and a chunk names its shared files by content hash, so a
+// bundle only ever reads chunks of its own build, whose shared files exist. If
+// the folder is missing (a 4xx: a page whose bundle is older than the deployed
+// data), the current folder is read from boundaries/meta.json (fetched no-cache)
+// and used from then on, as loadAllLite does for events.
+// A geometry stored apart (`geometry_ref`, see split-data.mjs) is put back here,
+// so callers get plain features - except deferred ones (a `minzoom`,
+// lib/deferredBoundaries.js), which stay pending until the map asks for them
+// with loadDeferredGeometry.
 // Concurrent/repeat callers share one load per decade.
 const boundaryDecades = new Map(); // decade -> Promise<FeatureCollection>
+let boundariesVersion = BOUNDARIES_VERSION;
 export function loadBoundaryDecade(decade) {
   if (!boundaryDecades.has(decade)) {
     const check = (fc) => {
       if (!Array.isArray(fc?.features)) throw new Error("boundaries file has no features");
     };
-    const promise = fetchGeoCached(`boundaries/${decade}`, { check }).then(async (fc) => {
-      const features = await Promise.all(
-        fc.features.map(async (f) => {
-          if (!f.geometry_ref || f.minzoom != null) return f;
-          const { geometry_ref: ref, ...rest } = f;
-          return { ...rest, geometry: await loadSharedGeometry(ref) };
-        })
-      );
-      return { ...fc, features };
-    });
+    const chunk = (version) => fetchGeoCached(`boundaries/v.${version}/${decade}`, { check });
+    const tried = boundariesVersion;
+    const promise = chunk(tried)
+      .catch(async (err) => {
+        if (err.outage !== false) throw err;
+        const meta = await fetchJSON(dataUrl("boundaries/meta.json"), { cache: "no-cache" });
+        if (!meta?.version || meta.version === tried) throw err;
+        boundariesVersion = meta.version;
+        return chunk(meta.version);
+      })
+      .then(async (fc) => {
+        const features = await Promise.all(
+          fc.features.map(async (f) => {
+            if (!f.geometry_ref || f.minzoom != null) return f;
+            const { geometry_ref: ref, ...rest } = f;
+            return { ...rest, geometry: await loadSharedGeometry(ref) };
+          })
+        );
+        return { ...fc, features };
+      });
     promise.catch(() => boundaryDecades.delete(decade));
     boundaryDecades.set(decade, promise);
   }
