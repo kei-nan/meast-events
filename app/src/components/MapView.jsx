@@ -21,9 +21,8 @@ import {
   MapTip,
   MapToolbar,
   BorderYearChoice,
-  ZoomButtons,
 } from "./MapUi";
-import PanButtons from "./PanButtons";
+import MapNav from "./MapNav";
 import useMediaQuery from "../hooks/useMediaQuery";
 import MapLoading from "./MapLoading";
 import { diffById } from "../lib/sourceDiff";
@@ -1174,7 +1173,6 @@ export default function MapView({
         onToggleMode={toggle}
         onClearArea={() => onAreaChange?.(null)}
         onUseView={areaFromView}
-        onReset={resetView}
         matchCount={matchBounds?.count ?? null}
         matchTotal={matchIds?.size ?? null}
         onShowMatches={showMatches}
@@ -1201,14 +1199,21 @@ export default function MapView({
             onChoose={onChooseBorderYear}
           />
         )}
-        <ZoomButtons onZoomIn={() => zoomBy(1)} onZoomOut={() => zoomBy(-1)} />
-        <PanButtons onPan={panBy} />
         <MapNotices
           loading={eventsLoading || !mapReady || !decadeCached}
           borderError={relevantError}
           onRetry={retryBorders}
         />
       </div>
+      <MapNav
+        onZoomIn={() => zoomBy(1)}
+        onZoomOut={() => zoomBy(-1)}
+        onReset={() => {
+          resetView();
+          if (hintOpen) dismissHint();
+        }}
+        onPan={panBy}
+      />
       {hintOpen && <MapTip onDismiss={dismissHint} />}
       {borderPopup && <BoundaryPopup popup={borderPopup} onClose={closePopup} width={size.w} height={size.h} />}
       {stackList && (
