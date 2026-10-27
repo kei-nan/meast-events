@@ -4,7 +4,7 @@
 // (TextExtracts). "exintro" = everything before the first heading, i.e. the whole lead,
 // not only the first paragraph. The text is Wikipedia's own; the ONLY change we make is
 // whitespace normalisation (see normalizeLead). Never edited, summarised or reworded.
-import { politeFetch, sleep } from "./http.js";
+import { politeFetch, sleep, mediaWikiJson } from "./http.js";
 
 const API = "https://en.wikipedia.org/w/api.php";
 export const LEAD_BATCH = 20; // TextExtracts hard limit with exintro (exlimit max 20)
@@ -62,8 +62,8 @@ export async function queryAllParts(titles, { maxParts = 50 } = {}) {
   let cont = null;
   for (let part = 0; part < maxParts; part++) {
     const res = await politeFetch(`${API}?${new URLSearchParams({ ...base, ...cont })}`);
-    if (!res.ok) throw new Error(`lead fetch HTTP ${res.status}`);
-    const data = await res.json();
+    // An API error (HTTP 200 with an `error` body) throws: never read as "every title missing" and cached as null.
+    const data = await mediaWikiJson(res, "lead fetch");
     const q = data.query ?? {};
     for (const n of q.normalized ?? []) normalized.set(n.from, n);
     for (const r of q.redirects ?? []) redirects.set(r.from, r);

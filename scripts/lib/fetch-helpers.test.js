@@ -1,10 +1,12 @@
-// lead.js fetchLeads (API continuation), wiki.js fetchLabels (failed chunks) and wd-entities.js aliases against a mocked
-// global fetch - no network.
+// lead.js fetchLeads (API continuation), wiki.js fetchLabels (failed chunks), wd-entities.js aliases and MediaWiki API
+// error bodies (http.js mediaWikiJson) against a mocked global fetch - no network.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fetchLeads } from "./lead.js";
-import { fetchLabels } from "./wiki.js";
-import { fetchEntities, setWikidataAliases } from "./wd-entities.js";
+import { fetchLabels, fetchCategories } from "./wiki.js";
+import { fetchEntities, fetchLabelsCached, setWikidataAliases } from "./wd-entities.js";
+import { fetchRevisions } from "./rev-lead.js";
+import { mediaWikiJson } from "./http.js";
 
 async function withFetch(handler, fn) {
   const real = globalThis.fetch;
@@ -114,6 +116,65 @@ test("fetchEntities: English aliases as values in Wikidata's order, [] when none
     () => json({ entities: { Q1: { id: "Q1", sitelinks: {} } } }),
     async () => assert.equal((await fetchEntities(["Q1"], { props: "sitelinks", delayMs: 0 })).get("Q1").aliases, undefined)
   );
+});
+
+// ---- MediaWiki API errors (HTTP 200 with an `error` body): thrown, never cached as "missing" ----
+
+// A cache with the lib/cache.js interface that records what was stored.
+function memoryCache() {
+  const data = new Map();
+  return { data, has: (k) => data.has(k), get: (k) => data.get(k), set: (k, v) => data.set(k, v), flush() {} };
+}
+const apiError = (code = "ratelimited", info = "You've exceeded your rate limit.") =>
+  new Response(JSON.stringify({ error: { code, info } }), {
+    status: 200,
+    headers: { "Content-Type": "application/json", "MediaWiki-API-Error": code },
+  });
+
+test("mediaWikiJson: returns the body; throws on an error body, on the MediaWiki-API-Error header alone, and on HTTP errors", async () => {
+  assert.deepEqual(await mediaWikiJson(json({ query: {} }), "x"), { query: {} });
+  await assert.rejects(mediaWikiJson(apiError(), "lead fetch"), /lead fetch: API error ratelimited \(You've exceeded/);
+  const headerOnly = new Response("{}", { status: 200, headers: { "MediaWiki-API-Error": "readonly" } });
+  await assert.rejects(mediaWikiJson(headerOnly, "x"), /x: API error readonly/);
+  await assert.rejects(mediaWikiJson(json({}, 404), "x"), /x HTTP 404/);
+});
+
+test("fetchLeads: an API error body throws and nothing is cached", async () => {
+  const cache = memoryCache();
+  await withFetch(
+    () => apiError(),
+    async () => assert.rejects(fetchLeads(["Alpha", "Beta"], { cache, delayMs: 0 }), /lead fetch: API error ratelimited/)
+  );
+  assert.equal(cache.data.size, 0);
+});
+
+test("fetchEntities: an API error body throws; earlier batches stay cached, the failed batch is not cached as null", async () => {
+  const cache = memoryCache();
+  const qids = Array.from({ length: 41 }, (_, i) => `Q${i + 1}`); // two batches (40 + 1)
+  await withFetch(
+    (url, n) =>
+      n === 1
+        ? json({ entities: Object.fromEntries(url.searchParams.get("ids").split("|").map((q) => [q, { id: q, sitelinks: {} }])) })
+        : apiError("no-such-entity", "Could not find an entity"),
+    async () => assert.rejects(fetchEntities(qids, { cache, props: "sitelinks", delayMs: 0 }), /wbgetentities: API error no-such-entity/)
+  );
+  assert.equal(cache.data.size, 40);
+  assert.equal(cache.has("sitelinks::Q41"), false);
+  assert.ok([...cache.data.values()].every((v) => v !== null));
+});
+
+test("fetchLabelsCached / fetchLabels / fetchCategories / fetchRevisions: an API error body throws (nothing cached)", async () => {
+  const cache = memoryCache();
+  await withFetch(
+    () => apiError(),
+    async () => {
+      await assert.rejects(fetchLabelsCached(["Q1"], { cache, delayMs: 0 }), /labels: API error ratelimited/);
+      await assert.rejects(fetchLabels(["Q1"]), /labels: API error ratelimited/);
+      await assert.rejects(fetchCategories("Alpha"), /categories: API error ratelimited/);
+      await assert.rejects(fetchRevisions("Alpha", "2020-01-01T00:00:00Z", { delayMs: 0 }), /revisions \(Alpha\): API error ratelimited/);
+    }
+  );
+  assert.equal(cache.data.size, 0);
 });
 
 test("setWikidataAliases: sets, replaces or removes the field; undefined (not fetched) leaves it", () => {

@@ -30,6 +30,23 @@ export function retryAfterMs(value, now = Date.now()) {
   return ms > 0 ? Math.min(ms, MAX_RETRY_AFTER_MS) : null;
 }
 
+// The JSON body of a MediaWiki Action API response (Wikipedia or Wikidata api.php). That API reports a failed request
+// (bad parameter, rate limit, read-only mode, internal error, ...) as HTTP 200 with an `error` object in the body and
+// a `MediaWiki-API-Error: <code>` header, not as an HTTP error. Read naively, such a body has no pages/entities, so every
+// title or item in the batch would look "missing" - and be cached as null. This throws instead, so the caller writes
+// nothing for the batch. `what` names the request in the message.
+export async function mediaWikiJson(res, what) {
+  if (!res.ok) throw new Error(`${what} HTTP ${res.status}`);
+  const header = res.headers?.get?.("mediawiki-api-error") ?? null;
+  const data = await res.json();
+  const err = data?.error;
+  if (err || header) {
+    const code = err?.code ?? header;
+    throw new Error(`${what}: API error ${code}${err?.info ? ` (${err.info})` : ""}`);
+  }
+  return data;
+}
+
 const isTimeout = (err) => err?.name === "TimeoutError" || err?.name === "AbortError";
 
 // opts.fetchImpl / opts.sleepImpl / opts.nowImpl: injectable for tests (default: global fetch,
