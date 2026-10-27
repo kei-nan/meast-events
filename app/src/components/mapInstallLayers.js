@@ -297,9 +297,9 @@ export function installLayers(map, { land, boundaries, labels, events }) {
   });
 
   map.addSource("selected", { type: "geojson", data: EMPTY_FC });
-  // A soft gold disc behind the selected dot, with no outer stroke: dot, white
-  // ring, gold disc and a dark outer ring stacked into a bullseye (project rule:
-  // no target-like visuals).
+  // A soft gold disc behind the selected dot, with no outer stroke: a dark outer
+  // ring around the dot, white ring and gold disc read as a bullseye (project
+  // rule: no target-like visuals).
   map.addLayer({
     id: "selected-halo",
     type: "circle",
