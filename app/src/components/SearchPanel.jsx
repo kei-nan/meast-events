@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
@@ -7,12 +7,13 @@ import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
 import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
 import { CATEGORY_COLORS } from "./mapLayers";
-import EventDetail from "./EventDetail.jsx";
+import { EventDetailFailed } from "./LoadFailed.jsx";
+import { importOr } from "../lib/importOr.js";
+import { loadEventDetail, loadExportResults } from "../lib/lazyChunks.js";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { effectiveQuery } from "../lib/ranking.js";
 import { timelineOrder } from "../lib/timelineView.js";
-import { downloadText, exportFileRange, exportFilename, exportQuery, exportRows, toCSV, toJSON } from "../lib/exportResults.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
 import useSheetDrag from "../hooks/useSheetDrag";
@@ -33,6 +34,35 @@ const SORT_OPTIONS = [
   { value: "date", label: "Oldest first", title: "By start date" },
   { value: "date-desc", label: "Newest first", title: "By start date" },
 ];
+
+// The open event's view is its own chunk (with its related events and citation),
+// so the first view does not wait for it; an event link starts it early (App.jsx).
+const EventDetail = lazy(() => importOr(loadEventDetail, EventDetailFailed));
+
+// Until that chunk is in (one round trip, usually alongside the event's full
+// record): the action row's Back and the event's title, styled as the real view
+// (SidePanel.css), so the panel does not jump. The title takes focus as the real
+// heading does, and hands it on when the view replaces it (EventDetail).
+function EventDetailLoading({ event, onBack }) {
+  const headingRef = useRef(null);
+  useEffect(() => {
+    headingRef.current?.focus({ preventScroll: true });
+  }, [event.id]);
+  return (
+    <article className="event-detail" aria-labelledby="event-detail-title" aria-busy="true">
+      <div className="event-detail-actions">
+        <button type="button" className="sp-btn" onClick={onBack}>
+          <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
+        </button>
+      </div>
+      <header className="event-detail-head">
+        <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
+          {event.title}
+        </h2>
+      </header>
+    </article>
+  );
+}
 
 // The results view switch (ResultsList layout).
 const VIEWS = [
@@ -385,12 +415,23 @@ export default function SearchPanel({
   // The download is the list as the panel shows it: the same results, in the
   // order ResultsList lists them (the Timeline view: timelineOrder, as there),
   // every row, not only the ones "Show more" has revealed. Built from the lite
-  // records in memory (lib/exportResults.js says what that leaves out).
+  // records in memory (lib/exportResults.js says what that leaves out). Its code
+  // is a chunk of its own: opening the menu starts it, a choice waits for it.
   const showDownload = !eventsLoading && !eventsError;
   const canDownload = showDownload && !loading && results.length > 0;
   const downloadLabel = `Download ${results.length === 1 ? "this result" : `these ${results.length} results`}`;
-  function download(kind) {
+  const [downloadFailed, setDownloadFailed] = useState(false);
+  async function download(kind) {
     if (!canDownload) return;
+    let lib;
+    try {
+      lib = await loadExportResults();
+    } catch {
+      setDownloadFailed(true);
+      return;
+    }
+    setDownloadFailed(false);
+    const { downloadText, exportFileRange, exportFilename, exportQuery, exportRows, toCSV, toJSON } = lib;
     const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0]) : results;
     const rows = exportRows(ordered, { range, browse: !searching });
     const name = exportFilename(exportFileRange(range, { searching, scope: filters.scope }), rows.length, kind);
@@ -455,13 +496,15 @@ export default function SearchPanel({
               else onBack();
             }}
           >
-            <EventDetail
-              event={selectedEvent}
-              borderYear={mapBorderYear}
-              onBack={onBack}
-              onShowOnMap={showOnMap}
-              onSelectEvent={onSelect}
-            />
+            <Suspense fallback={<EventDetailLoading event={selectedEvent} onBack={onBack} />}>
+              <EventDetail
+                event={selectedEvent}
+                borderYear={mapBorderYear}
+                onBack={onBack}
+                onShowOnMap={showOnMap}
+                onSelectEvent={onSelect}
+              />
+            </Suspense>
           </div>
         )}
 
@@ -553,7 +596,10 @@ export default function SearchPanel({
                 aria-label={canDownload ? downloadLabel : "Download (no results to save)"}
                 title={canDownload ? `${downloadLabel} as CSV or JSON` : undefined}
                 disabled={!canDownload}
-                onClick={() => setDownloadOpen(!downloadOpen)}
+                onClick={() => {
+                  if (!downloadOpen) loadExportResults().catch(() => {}); // a choice reports a failure
+                  setDownloadOpen(!downloadOpen);
+                }}
               >
                 <span className="sp-caret" aria-hidden="true" />
                 Download
@@ -591,6 +637,11 @@ export default function SearchPanel({
                 Titles are Wikipedia text (CC BY-SA 4.0, credited in the file). No summaries or borders
                 are included; each row links its event page.
               </p>
+              {downloadFailed && (
+                <p className="load-failed" role="alert">
+                  The download could not be prepared. Please reload the page.
+                </p>
+              )}
             </div>
           )}
 

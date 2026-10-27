@@ -635,23 +635,39 @@ export function geometryBbox(geometry) {
   return b;
 }
 
+// Whether a cell's 1:10m features and its light pieces are the same land: the same
+// geometries, coordinate for coordinate (no tolerance, no simplification), in any order.
+export function sameLand(detail, light) {
+  if (detail.length !== light.length) return false;
+  const key = (fs) => fs.map((f) => JSON.stringify(f.geometry)).sort();
+  const b = key(light);
+  return key(detail).every((g, i) => g === b[i]);
+}
+
 // The light land (src/data/land.json, built by scripts/build-land.js) covers the whole
 // world, but the map never shows land outside MAP_EXTENT. Polygons entirely outside it
 // are dropped from the shipped copy; the rest are split, whole, into land.json (touching
 // NEAR_LAND_EXTENT, needed by the first view) and land-far.json. land.json also carries
-// the list of Middle East cells, whose Natural Earth 1:10m files (src/data/land-cells/)
-// are written as they are to data/land-cells/<cell>.tbin (lib/landStore.js). All of
-// them are .tbin (writeGeo), as land.tbin and land-far.tbin are; land-far's
+// the list of Middle East cells whose Natural Earth 1:10m files (src/data/land-cells/)
+// are written as they are to data/land-cells/<cell>.tbin (lib/landStore.js). A cell
+// whose 1:10m land is exactly its light pieces (an all-land cell: both are the cell's
+// square) is left out of the list and gets no file: the light piece already shipped
+// is that land, so fetching it would only swap a square for the same square.
+// All of them are .tbin (writeGeo), as land.tbin and land-far.tbin are; land-far's
 // 2-decimal source fits the codec's scale 100 exactly.
 async function copyLand() {
-  const { features, ...manifest } = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
+  const { features, ...source } = JSON.parse(await readFile(path.join(SRC_DIR, "land.json"), "utf8"));
   const cellsOut = path.join(OUT_DIR, "land-cells");
   await rm(cellsOut, { recursive: true, force: true });
   await mkdir(cellsOut, { recursive: true });
-  for (const cell of manifest.cells) {
+  const cells = [];
+  for (const cell of source.cells) {
     const fc = JSON.parse(await readFile(path.join(SRC_DIR, "land-cells", `${cell}.json`), "utf8"));
+    if (sameLand(fc.features, features.filter((f) => f.properties?.cell === cell))) continue;
+    cells.push(cell);
     await writeGeo(path.join(cellsOut, `${cell}.tbin`), fc);
   }
+  const manifest = { ...source, cells };
   const touches = (b, [minLon, minLat, maxLon, maxLat]) =>
     b[2] >= minLon && b[0] <= maxLon && b[3] >= minLat && b[1] <= maxLat;
   const near = [];
@@ -665,7 +681,8 @@ async function copyLand() {
   await writeGeo(path.join(OUT_DIR, "land-far.tbin"), { type: "FeatureCollection", features: far });
   console.log(
     `land: ${near.length + far.length} of ${features.length} polygons inside MAP_EXTENT: ` +
-      `${near.length} in land.tbin, ${far.length} in land-far.tbin; ${manifest.cells.length} 1:10m cells`
+      `${near.length} in land.tbin, ${far.length} in land-far.tbin; ${cells.length} 1:10m cells ` +
+      `(${source.cells.length - cells.length} more are exactly their light pieces: no file)`
   );
 }
 

@@ -201,6 +201,8 @@ test("boundaries and land: a missing or undecodable geometry file, shared geomet
   await assertProblem((f) => f.remove("data/land-cells/n30e030.tbin"), /land-cells\/n30e030\.tbin is missing/);
   await assertProblem((f) => f.write("data/land-cells/n30e030.tbin", tbin(fc()).slice(0, 9)), /n30e030\.tbin does not decode/);
   await assertProblem((f) => f.write("data/land.tbin", tbin(fc([], { cells: [] }))), /lists no land cells/);
+  // A cell left out of the list (its light piece is exact) ships no file either.
+  await assertProblem((f) => f.write("data/land-cells/n30e035.tbin", tbin(fc())), /land-cells\/ has 1 files land\.tbin does not list \(n30e035\.tbin\)/);
 });
 
 test("index.html: no entry script, or a reference to a file not in dist/", async () => {

@@ -198,11 +198,19 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     land[name] = readGeo(`data/${name}.tbin`);
     if (land[name] && !Array.isArray(land[name].features)) fail(`data/${name}.tbin is not a FeatureCollection`);
   }
-  // ...and the Middle East's 1:10m cells land.tbin lists (lib/landStore.js).
+  // ...and the Middle East's 1:10m cells land.tbin lists (lib/landStore.js). A cell
+  // whose 1:10m land is exactly its light piece is not listed and has no file
+  // (split-data.mjs copyLand): a file nobody lists is one the map never fetches.
   if (land.land) {
     const cells = land.land.cells;
     if (!Array.isArray(cells) || !cells.length) fail("data/land.tbin lists no land cells");
-    else for (const c of cells) readGeo(`data/land-cells/${c}.tbin`);
+    else {
+      for (const c of cells) readGeo(`data/land-cells/${c}.tbin`);
+      const listed = new Set(cells.map((c) => `${c}.tbin`));
+      const dir = distFile("data/land-cells");
+      const extra = existsSync(dir) ? readdirSync(dir).filter((f) => !listed.has(f)) : [];
+      if (extra.length) fail(`data/land-cells/ has ${extra.length} files land.tbin does not list (${extra.slice(0, 3).join(", ")})`);
+    }
   }
 
   // 3. index.html's local references.

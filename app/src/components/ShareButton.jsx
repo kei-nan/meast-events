@@ -1,7 +1,18 @@
-import { useContext, useEffect, useId, useRef, useState } from "react";
+import { Suspense, lazy, useContext, useEffect, useId, useRef, useState } from "react";
 import { ShareLinkContext } from "../lib/shareLinkContext.js";
-import { CiteDialog } from "./Citation.jsx";
+import { importOr } from "../lib/importOr.js";
 import "./ShareButton.css";
+
+// "Cite" is offered only inside the open event's view (EventDetail passes `cite`),
+// whose chunk already holds Citation.jsx: imported lazily so the header's Share
+// (in the entry bundle) does not pull the citation code in with it. Nothing to
+// show if it somehow cannot load: the dialog does not open.
+const CiteDialog = lazy(() =>
+  importOr(
+    () => import("./Citation.jsx").then((m) => ({ default: m.CiteDialog })),
+    () => null
+  )
+);
 
 // The QR library is only downloaded when someone opens a QR code.
 const loadQr = () => import("uqr");
@@ -274,13 +285,15 @@ export default function ShareButton({ title, align = "start", className = "sp-bt
         </div>
       )}
       {citing && cite && (
-        <CiteDialog
-          event={cite}
-          onClose={() => {
-            setCiting(false);
-            buttonRef.current?.focus();
-          }}
-        />
+        <Suspense fallback={null}>
+          <CiteDialog
+            event={cite}
+            onClose={() => {
+              setCiting(false);
+              buttonRef.current?.focus();
+            }}
+          />
+        </Suspense>
       )}
     </div>
   );

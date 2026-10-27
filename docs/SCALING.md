@@ -11,7 +11,7 @@ guards them in the build, and what to do when one is reached. Numbers were measu
 | `data/events/v.<version>/all.json` | on every page load, preloaded from `index.html` | **yes, linearly**: the lite record of every event (id, title, dates, countries, category, 160-character snippet, coordinates, location quality, Wikidata sitelink count, Wikidata aliases). 82 bytes per event with brotli, 105 with gzip (65 / 84 KB for 815 events) |
 | `data/events/v.<version>/full/<bucket>.json` | when an event is opened | per bucket, no: at least 64 buckets, doubling as the dataset doubles, so a bucket holds at most about 32 events (~20 KB compressed) on average (`app/src/lib/fullBucket.js`) |
 | `pagefind/v.<version>/*` | on the first search | the index is chunked by Pagefind (21 chunks for 815 events, 170 for 8,150); `ids.json` (~40 bytes per event) is loaded whole |
-| `data/boundaries/v.<version>/<decade>.tbin`, `data/land.tbin` (binary geometry, `app/src/lib/geoCodec.js`) | when the map starts; `data/boundaries/shared/<hash>.tbin` (the West Bank Areas A/B/C) once zoomed in over them; `data/land-far.tbin` and the Middle East's 1:10m `data/land-cells/<cell>.tbin` (80 cells, 136 KB with brotli in all) once its first view has drawn - in view first, the rest in the background unless the visitor saves data | no (borders, not events) |
+| `data/boundaries/v.<version>/<decade>.tbin`, `data/land.tbin` (binary geometry, `app/src/lib/geoCodec.js`) | when the map starts; `data/boundaries/shared/<hash>.tbin` (the West Bank Areas A/B/C) once zoomed in over them; `data/land-far.tbin` and the Middle East's 1:10m `data/land-cells/<cell>.tbin` (45 cells, 132 KB with brotli in all; the 35 all-land cells whose 1:10m land is exactly their light square have no file, 2026-10-27) once its first view has drawn - in view first, the rest in the background unless the visitor saves data | no (borders, not events) |
 | `/event/<id>` | every visit to an event's link (it is the app, with the event's own title, preview tags and text) | one page per event: **counts against the host's file limit** |
 
 Both `<version>`s are a hash of every file in their folder, so each folder is cached immutably through one rule (`app/public/_headers`,
@@ -78,7 +78,7 @@ unthrottled; full-text search is chunked by Pagefind.
 
 ## Borders
 
-Borders do not grow with events. All geometry together is 96 `.tbin` files, 1.30 MiB (0.77 MiB with brotli). The default view (2020) needs its
+Borders do not grow with events. All geometry together is 61 `.tbin` files, 1.30 MiB (0.76 MiB with brotli; 2026-10-27). The default view (2020) needs its
 decade file, 36 KB with brotli (57 KB raw), plus the opening land (`land.tbin`, 33 KB with brotli); the neighbouring decades are prefetched. The
 West Bank Areas A/B/C (`boundaries/shared/`, 202 KB with brotli) load only once zoomed in over them (zoom 7, `DEFERRED_GROUPS` in `split-data.mjs`).
 The binary format stores coordinates as integers at 6 decimal places (about 10 cm, `app/src/lib/geoCodec.js`); borders are never simplified.

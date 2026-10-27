@@ -51,6 +51,17 @@ test("a cell with no land in its detail file still drops its light pieces", () =
   assert.deepEqual(tags(store), []);
 });
 
+test("an unlisted cell (its light piece already exact) is never offered for fetching and keeps its light piece", () => {
+  const store = createLandStore();
+  store.addLow(fc(piece("10_10", "all-land-square"), piece("35_30", "levant-light")));
+  const listed = ["35_30"]; // land.json's cells: 10_10 has no 1:10m file
+  const wanted = cellsInBounds(listed, 5, [0, 0, 40, 40]);
+  assert.deepEqual(wanted, ["35_30"]);
+  for (const c of wanted) store.addDetail(c, fc(piece(c, "levant-10m")));
+  assert.deepEqual(tags(store), ["all-land-square", "levant-10m"]);
+  assert.ok(!store.isDetailed("10_10"));
+});
+
 test("cellsInBounds: overlap on the grid, edges that only touch excluded", () => {
   const cells = ["30_30", "35_30", "40_30", "35_35"];
   assert.deepEqual(cellsInBounds(cells, 5, [34, 31, 36, 34]), ["30_30", "35_30"]);
