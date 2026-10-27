@@ -579,9 +579,13 @@ north-west corner are Kuwait from 1961 and blank before, like the rest of Kuwait
 ```
 node scripts/discover-events.js [--classes=Q...,Q...]   # WDQS -> data/event-candidates.json (bounded runs merge)
 node scripts/discover-events.js --predecessors-only     # only the predecessor-state pass; adds its new items (rule 2)
-node scripts/enrich-candidates.js [--reuse] [--limit=N] [--keep-existing]
+node scripts/enrich-candidates.js [--reuse] [--limit=N --keep-existing|--out-suffix=.test]
                                                         # -> data/enriched-candidates.json, data/events.proposed.json,
                                                         #    data/missing-coordinates-report.md   (full lead, classes, flags)
+                                                        #    A bounded run (--limit / --classes) refuses to start without
+                                                        #    --keep-existing or --out-suffix (its subset would replace the files).
+                                                        #    A failed fetch or a proposed set that fails validation exits 1
+                                                        #    and writes neither file; --reuse never reuses a record with an error
 node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichment.proposed.json: date_precision, part_of,
                                                         #    resolved_qid, wikidata_description for the hand-picked seed
                                                         #    events that lack them; --apply writes them into data/events.json
@@ -605,7 +609,8 @@ node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
 Cached entries do not expire by default; `--fresh` ignores the whole cache for a run, and `--cache-max-age=7d` (or `ATLAS_CACHE_MAX_AGE`) ignores entries
-older than that (units s, m, h, d; `scripts/lib/cache.js`). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
+older than that (units s, m, h, d; `scripts/lib/cache.js`). A Wikipedia/Wikidata API error (which that API returns as HTTP 200 with an `error` body)
+fails the request like an HTTP error and is never cached (`mediaWikiJson` in `scripts/lib/http.js`). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
 is then retried like a dropped connection.
 
 Pipeline output never touches `data/events.json`. Only an explicit `merge-proposed.js --apply` run by a person does, plus `refresh-extracts.js --apply`

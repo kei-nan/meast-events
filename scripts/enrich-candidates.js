@@ -17,21 +17,28 @@
 //
 // CLI:
 //   --limit=N            only process the first N selected candidates (bounded run)
-//   --classes=a,b        only candidates whose Wikidata classes include one of these labels
-//   --reuse              reuse already-enriched entries (same QID, enrich_version current)
-//                        from the existing data/enriched-candidates.json instead of refetching
+//   --classes=a,b        only candidates whose Wikidata classes include one of these labels (bounded run)
+//                        A bounded run must be given --keep-existing or --out-suffix: written over the real
+//                        output files, its subset would drop every other record (the run refuses to start).
+//   --reuse              reuse already-enriched entries (same QID and title, enrich_version current, no error)
+//                        from the existing data/enriched-candidates.json instead of refetching; countries,
+//                        sitelinks, classes and description are re-applied from the current candidate
 //   --no-report          skip data/missing-coordinates-report.md (no network; the same report
 //                        node scripts/build-missing-coordinates-report.js writes)
 //   --out-suffix=.test   write *.test.json variants instead of the real output files
 //   --keep-existing      keep every record already in the output files as it is and only add new candidates
 //                        (see keepExisting below)
+//
+// FAILURES: a candidate whose fetch fails (network or API error) is not an exclusion. If any fetch failed, or the
+// proposed set fails validation, the run exits non-zero and writes none of the real output files (with --out-suffix
+// the suffixed files are still written, for inspection). Re-run; nothing is cached from a failed fetch.
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { sleep } from "./lib/http.js";
 import { compareQids } from "./lib/wdqs.js";
 import { buildContext } from "./lib/context.js";
 import { finalizeEvent, hasTrackedCountry } from "./lib/v21.js";
-import { INCLUSION_MIN_SITELINKS, EVENT_CLASSES, notEventClasses } from "./lib/event-classes.js";
+import { INCLUSION_MIN_SITELINKS, notEventClasses } from "./lib/event-classes.js";
 import {
   fetchSummary,
   fetchEntity,
@@ -42,7 +49,6 @@ import {
   yearsIn,
 } from "./lib/wiki.js";
 import {
-  MAX_COUNTRIES_BEFORE_FLAG,
   categoryYears,
   dateFlags,
   coordinateFlag,
@@ -60,16 +66,19 @@ import { renderMissingReport } from "./lib/missing-report.js";
 import { refreshOrderFlags } from "./lib/order-flags.js";
 import { slugify } from "./lib/slug.js";
 import { validateEvents, borrowedSource, BORROWED_SOURCE } from "./lib/validate.js";
+// setReason: replaces the review reason starting with `prefix` in place (keeps the list order stable across re-runs),
+// removes it when `text` is null, appends it when absent.
+import {
+  boundedRunError,
+  candidateFields,
+  fetchErrors,
+  manyCountriesFlag,
+  reuseRecord,
+  setReason,
+  FETCH_ERROR,
+} from "./lib/enrich-run.js";
 
 const PRECISION_CODE = Object.fromEntries(Array.from({ length: 15 }, (_, c) => [precisionName(c), c]));
-// Replaces the review reason starting with `prefix` in place (keeps the list order stable across re-runs),
-// removes it when `text` is null, appends it when absent.
-function setReason(list, prefix, text) {
-  const i = list.findIndex((r) => r.startsWith(prefix));
-  if (i >= 0 && text) list[i] = text;
-  else if (i >= 0) list.splice(i, 1);
-  else if (text) list.push(text);
-}
 
 const ENRICH_VERSION = 3;
 const REUSABLE_VERSIONS = [2, 3]; // v2 entries are upgraded by the post-processing step (leads, classes, locations, flags)
@@ -84,25 +93,23 @@ const KEEP_EXISTING = flag("keep-existing");
 const path = (name) => new URL(`../data/${name}`, import.meta.url);
 const outName = (base, ext) => `${base}${SUFFIX}.${ext}`;
 
-const CLASS_GROUP = Object.fromEntries(EVENT_CLASSES.map((c) => [c.label, c.category]));
-
 async function resolveCandidate(candidate, index, total) {
   const label = `[${index + 1}/${total}] ${candidate.wikipedia_title}`;
-  const classes = candidate.wikidata_classes ?? [];
+  const { title, countries, category, category_group, wikidata_classes, sitelinks, wikidata_description } =
+    candidateFields(candidate);
   const base = {
     id: slugify(candidate.wikipedia_title) || candidate.wikidata_qid.toLowerCase(),
-    title: candidate.wikipedia_title,
+    title,
     date_start: candidate.date_start,
     date_end: candidate.date_end,
-    countries: candidate.countries,
-    // Category is Wikidata's own class label (first class the item was found under).
-    category: classes[0] ?? candidate.category,
-    category_group: CLASS_GROUP[classes[0]] ?? candidate.category,
-    wikidata_classes: classes,
+    countries,
+    category,
+    category_group,
+    wikidata_classes,
     retrieved_at: new Date().toISOString(),
     source_qid: candidate.wikidata_qid,
-    sitelinks: candidate.sitelinks,
-    wikidata_description: candidate.wikidata_description ?? null,
+    sitelinks,
+    wikidata_description,
     enrich_version: ENRICH_VERSION,
   };
   const reasons = [];
@@ -114,7 +121,8 @@ async function resolveCandidate(candidate, index, total) {
     return {
       ...base, wikidata_qid: candidate.wikidata_qid, wikipedia_url: null, extract: null,
       coordinates: null, coordinate_source: null, needs_manual_coordinates: true,
-      needs_review: true, review_reasons: ["summary_not_found"], error: "summary_not_found",
+      // _review / _part_of_qids like every other record (the post-processing steps read both).
+      needs_review: true, _review: ["summary_not_found"], _part_of_qids: [], error: "summary_not_found",
       exclusion_reason: "no_wikipedia_summary",
     };
   }
@@ -163,11 +171,8 @@ async function resolveCandidate(candidate, index, total) {
     const cf = coordinateFlag(coordinates, candidate.countries);
     if (cf) reasons.push(cf);
   }
-  if ((candidate.countries?.length ?? 0) > MAX_COUNTRIES_BEFORE_FLAG) {
-    reasons.push(
-      `many_countries: ${candidate.countries.length} countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)`
-    );
-  }
+  const many = manyCountriesFlag(candidate.countries);
+  if (many) reasons.push(many);
 
   const partOfQids = entity?.partOf ?? [];
   console.log(
@@ -240,7 +245,16 @@ async function keepExisting({ proposed, persist }) {
   return { proposed: outProposed, persist: outEnriched };
 }
 
+// A run that must not write the real output files: the reason is printed and the process exits 1 before any write.
+function refuse(message) {
+  console.error(`\nERROR: ${message}`);
+  process.exit(1);
+}
+
 async function main() {
+  // Before any network request: a bounded run would overwrite the real files with its subset.
+  const bounded = boundedRunError({ limit: LIMIT, classes: ONLY_CLASSES, keepExisting: KEEP_EXISTING, outSuffix: SUFFIX });
+  if (bounded) refuse(bounded);
   const allCandidates = await loadJson("event-candidates.json");
   let batch = allCandidates.filter(
     (c) => c.has_en_wikipedia && c.sitelinks >= INCLUSION_MIN_SITELINKS && !c.already_curated
@@ -253,17 +267,18 @@ async function main() {
     }${LIMIT ? `, limit ${LIMIT}` : ""}).\n`
   );
 
+  // --reuse: records with an error (failed fetch, missing summary) are never reused; see lib/enrich-run.js reuseRecord.
   const cache = new Map();
   if (flag("reuse")) {
     for (const r of await loadJson("enriched-candidates.json")) {
-      if (REUSABLE_VERSIONS.includes(r.enrich_version) && r._review) cache.set(r.wikidata_qid, r);
+      if (REUSABLE_VERSIONS.includes(r.enrich_version) && r._review && !r.error) cache.set(r.wikidata_qid, r);
     }
     console.log(`Reuse: ${cache.size} cached enriched entries available.`);
   }
 
   const results = [];
   for (let i = 0; i < batch.length; i++) {
-    const cached = cache.get(batch[i].wikidata_qid);
+    const cached = reuseRecord(cache.get(batch[i].wikidata_qid), batch[i], REUSABLE_VERSIONS);
     if (cached) {
       results.push(cached);
       continue;
@@ -279,9 +294,20 @@ async function main() {
         source_qid: batch[i].wikidata_qid, wikidata_qid: batch[i].wikidata_qid, sitelinks: batch[i].sitelinks,
         wikipedia_url: null, extract: null, coordinates: null, coordinate_source: null,
         needs_manual_coordinates: true, error: err.message, enrich_version: ENRICH_VERSION,
-        _review: ["exception: " + err.message], _part_of_qids: [], exclusion_reason: "fetch_error",
+        _review: ["exception: " + err.message], _part_of_qids: [], exclusion_reason: FETCH_ERROR,
       });
     }
+  }
+
+  // A failed fetch is not an exclusion: written out, the event would silently drop out of the proposed file.
+  const failed = fetchErrors(results);
+  const reportFailed = () => {
+    console.error(`\n${failed.length} candidate fetch${failed.length === 1 ? "" : "es"} failed:`);
+    for (const r of failed) console.error(`  ${r.wikidata_qid} ${r.title}: ${r.error}`);
+  };
+  if (failed.length && !SUFFIX) {
+    reportFailed();
+    refuse("data/events.proposed.json and data/enriched-candidates.json were NOT written. Re-run (nothing was cached from the failed fetches).");
   }
 
   // ---- unique ids (never rename silently: suffix with the QID on a clash) ----
@@ -434,7 +460,12 @@ ${m}      `),
   if (KEEP_EXISTING) ({ proposed, persist } = await keepExisting({ proposed, persist }));
 
   const { errors } = validateEvents(proposed, { name: "events.proposed" });
-  if (errors.length) console.warn(`WARNING: proposed set failed validation:\n  ${errors.slice(0, 20).join("\n  ")}`);
+  if (errors.length) {
+    refuse(
+      `the proposed set failed validation (${errors.length} error${errors.length === 1 ? "" : "s"}); nothing was written:\n  ` +
+        errors.slice(0, 20).join("\n  ")
+    );
+  }
 
   await writeFile(path(outName("enriched-candidates", "json")), JSON.stringify(persist, null, 2));
   await writeFile(path(outName("events.proposed", "json")), JSON.stringify(proposed, null, 2) + "\n");
@@ -455,6 +486,11 @@ ${m}      `),
   console.log(`  Flags on proposed events:`, flagCounts);
   if (report) console.log(`  Missing-coordinates report: ${report.curated} curated, ${report.candidates} candidates`);
   console.log(`Wrote data/${outName("events.proposed", "json")} and data/${outName("enriched-candidates", "json")}`);
+  // --out-suffix run with failed fetches: the suffixed files are written for inspection, but the run still fails.
+  if (failed.length) {
+    reportFailed();
+    process.exit(1);
+  }
 }
 
 main();

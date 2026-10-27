@@ -96,11 +96,20 @@ import { openCache } from "./lib/cache.js";
 // A class query that fails (after the fallbacks below) makes the run write NOTHING and exit
 // non-zero, listing the failed classes: rewriting the file without them would silently drop
 // every candidate only that class finds. Re-run (or run the failed classes with --classes=).
+// In a full run, a class that only the last-resort direct-P31 fallback answered counts as failed
+// too: that answer misses every instance of the class's subclasses, and the full run rewrites the
+// file, so those candidates would be dropped just as silently. A bounded --classes run merges into
+// the existing file (it removes nothing), so there the partial P31 answer is still added.
+//
+// Each candidate's `countries` is sorted (by name), so the same Wikidata state always gives the
+// same file whatever order WDQS returns the rows and the GROUP_CONCAT values in.
 const argVal = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
 const MIN_SITELINKS = Number(argVal("min-sitelinks") ?? INCLUSION_MIN_SITELINKS);
 const ONLY_CLASSES = argVal("classes")?.split(",").filter(Boolean) ?? null;
 const PREDECESSORS_ONLY = process.argv.includes("--predecessors-only");
 const REQUEST_DELAY_MS = 1500; // WDQS etiquette: no rapid-fire/parallel querying.
+// Distinct country names in a fixed order (code-unit sort: no locale dependence).
+const sortedCountries = (list) => [...new Set(list)].sort();
 
 // classValues: query P31 instances of exactly these classes instead of classQid's tree
 // (the batched fallback below passes a slice of the class's subclass tree).
@@ -163,7 +172,9 @@ ORDER BY DESC(?nSitelinks) ?item
 //      P31 instances of SUBCLASS_BATCH subclasses at a time - the same rule as the
 //      transitive query, split into requests that finish in time;
 //   2. only if that fails too, retries with plain P31 (no subclass expansion) - less
-//      complete (misses instances of subclasses) but far better than zero results.
+//      complete (misses instances of subclasses) but far better than zero results. Kept
+//      only by a bounded --classes run (merged into the file); a full run counts it as a
+//      failed class (see "A class query that fails" above).
 const SUBCLASS_BATCH = 250;
 
 async function subclassTree(classQid) {
@@ -280,7 +291,7 @@ async function predecessorPass(byQid, { keepExisting = false } = {}) {
     if (existing) {
       if (keepExisting) continue;
       const before = existing.countries.length;
-      existing.countries = [...new Set([...existing.countries, ...rule.countries])];
+      existing.countries = sortedCountries([...existing.countries, ...rule.countries]);
       if (existing.countries.length > before) {
         existing.predecessor_rule = predecessor_rule;
         tagged++;
@@ -294,7 +305,7 @@ async function predecessorPass(byQid, { keepExisting = false } = {}) {
       wikidata_description: row.itemDescription?.value ?? null,
       date_start: toDateString(row.eventDate?.value),
       date_end: toDateString(row.eventDateEnd?.value),
-      countries: rule.countries,
+      countries: sortedCountries(rule.countries),
       category: classes[0].category,
       wikidata_classes: classes.map((c) => c.label),
       sitelinks: Number(row.nSitelinks?.value ?? 0),
@@ -359,12 +370,18 @@ async function main() {
       continue;
     }
     console.log(`${rows.length} raw results${usedFallback ? " (via direct-P31 fallback, no subclass expansion)" : ""}`);
+    if (usedFallback && !ONLY_CLASSES) {
+      // Full run: the partial answer would drop this class's subclass instances from the rewritten file (see the top).
+      failed.push({ cls, message: "only the direct-P31 fallback answered (instances of subclasses missing)" });
+      if (i < classes.length - 1) await sleep(REQUEST_DELAY_MS);
+      continue;
+    }
 
     for (const row of rows) {
       const qid = qidFromUri(row.item.value);
       const sitelinks = Number(row.nSitelinks?.value ?? 0);
       const countryQids = (row.countries?.value ?? "").split("|").filter(Boolean).map(qidFromUri);
-      const countries = [...new Set(countryQids.map((q) => QID_TO_COUNTRY[q]).filter(Boolean))];
+      const countries = sortedCountries(countryQids.map((q) => QID_TO_COUNTRY[q]).filter(Boolean));
       if (countries.length === 0) continue; // shouldn't happen given the VALUES filter, but be defensive
 
       const existing = byQid.get(qid);
@@ -389,7 +406,7 @@ async function main() {
       } else {
         if (!existing.wikidata_classes.includes(cls.label)) existing.wikidata_classes.push(cls.label);
         existing.sitelinks = Math.max(existing.sitelinks, sitelinks);
-        existing.countries = [...new Set([...existing.countries, ...countries])];
+        existing.countries = sortedCountries([...existing.countries, ...countries]);
       }
     }
 

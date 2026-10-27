@@ -14,7 +14,7 @@
 // article's CURRENT revision this way and only trusts the conversion for that article when it equals the current
 // TextExtracts lead exactly. An entity it does not know makes the conversion fail (null) rather than guess.
 // Pure, except parseRevisionHtml / fetchRevisions (network, through lib/http.js politeFetch).
-import { politeFetch, sleep } from "./http.js";
+import { politeFetch, sleep, mediaWikiJson } from "./http.js";
 import { normalizeLead } from "./lead.js";
 
 const API = "https://en.wikipedia.org/w/api.php";
@@ -184,9 +184,8 @@ export async function fetchRevisions(title, until, { maxRequests = 20, delayMs =
       formatversion: "2",
       ...cont,
     });
-    const res = await politeFetch(`${API}?${params}`);
-    if (!res.ok) throw new Error(`revisions HTTP ${res.status} (${title})`);
-    const data = await res.json();
+    // An API error (HTTP 200 with an `error` body) throws rather than reading as a missing page (null).
+    const data = await mediaWikiJson(await politeFetch(`${API}?${params}`), `revisions (${title})`);
     const page = data.query?.pages?.[0];
     if (!page || page.missing || page.invalid) return null;
     for (const r of page.revisions ?? []) {
