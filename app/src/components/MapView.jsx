@@ -131,7 +131,7 @@ function applyInteractivity(map, mode, hasArea) {
   const el = map.getCanvasContainer();
   // Touch drags must reach our pointer handlers instead of scrolling the page.
   el.style.touchAction = drawing || hasArea ? "none" : "";
-  map.getCanvas().style.cursor = drawing ? "crosshair" : "";
+  map.getCanvas().style.cursor = drawing ? "cell" : ""; // drag-to-select cursor, not a crosshair (no weapon-like visuals)
 }
 
 const RETRY_DELAY_MS = 1500;

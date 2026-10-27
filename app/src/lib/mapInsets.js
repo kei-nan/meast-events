@@ -12,8 +12,7 @@
 // ignored then (the sheet is not: what it covers is never in sight).
 const MIN_CLEAR_PX = 40;
 // How far inside the clear area a pin is kept, at least: the selected marker's
-// halo (mapInstallLayers.js selected-halo: 20 px and a 2.5 px stroke) and a
-// little air.
+// halo (mapInstallLayers.js selected-halo: 20 px) and a little air.
 export const PIN_MARGIN_PX = 28;
 
 const isPhone = () => typeof window !== "undefined" && !!window.matchMedia?.("(max-width: 768px)").matches;

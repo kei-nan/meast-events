@@ -48,9 +48,17 @@
 
 export const SITE = "https://middleeast.events";
 export const SITE_NAME = "Middle East, 1900–present";
-// NOTICE, "CShapes 2.0 - historical country borders" (and data/LICENSE).
+// The border data's credits, worded as in NOTICE (and data/LICENSE): CShapes 2.0, plus the two
+// other sources the drawn borders carry - UN OCHA's West Bank Areas A/B/C (not a Creative Commons
+// licence: the legacy HumanitarianResponse.info terms) and GeoNames (the treaty wells and capes
+// located in scripts/extract-correction-geometry.js).
 export const CSHAPES_CREDIT =
   "CShapes 2.0 - historical country borders. Schvitz, G., et al. (2022). CC BY-NC-SA 4.0. https://icr.ethz.ch/data/cshapes/ (modified by middleeast.events)";
+export const OCHA_CREDIT =
+  "West Bank Areas A/B/C: UN OCHA / HDX \"Oslo Agreement\" Areas A/B/C (West Bank). Distributed under the legacy HumanitarianResponse.info terms: non-commercial use with credit to UN OCHA. https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
+export const GEONAMES_CREDIT =
+  "some corrected border points: GeoNames - CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). https://www.geonames.org/";
+export const BORDERS_CREDIT = [CSHAPES_CREDIT, OCHA_CREDIT, GEONAMES_CREDIT].join("; ");
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 // MLA Handbook abbreviations.
@@ -154,7 +162,7 @@ export function citeEvent(event) {
     styles,
     siteName: SITE_NAME,
     eventPage: `${SITE}/event/${encodeURIComponent(event.id)}`,
-    borders: CSHAPES_CREDIT,
+    borders: BORDERS_CREDIT,
   };
 }
 

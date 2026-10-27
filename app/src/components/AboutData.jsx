@@ -390,7 +390,8 @@ export default function AboutData({ section = null, onClose }) {
         <ul>
           <li>
             <strong>Language-edition counts favour European-language coverage.</strong> The 10-link threshold
-            counts how many Wikipedia communities wrote about an event, not how important it is. Events with
+            counts how many Wikimedia sites (mostly Wikipedia language editions) link to an event&apos;s Wikidata
+            item, not how important it is. Events with
             many translations pass; events covered mainly in regional languages (for example Arabic, Hebrew,
             Turkish or Persian) can fall below the threshold.
           </li>
