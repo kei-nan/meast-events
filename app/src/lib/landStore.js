@@ -2,7 +2,9 @@
 // the light land (data/land.json, land-far.json), its Middle East polygons cut into cells,
 // and per cell the Natural Earth 1:10m coast (data/land-cells/<cell>.json). A cell shows
 // its light pieces until its 1:10m file has arrived, then only that: never both, never
-// neither. Feature ids let the map swap one cell at a time (GeoJSONSource.updateData)
+// neither. A cell land.json does not list has no 1:10m file and is never detailed: its
+// 1:10m land is exactly its light pieces (scripts/split-data.mjs copyLand), which stay.
+// Feature ids let the map swap one cell at a time (GeoJSONSource.updateData)
 // instead of re-sending the world. Kept free of MapLibre so it can be unit-tested.
 
 export function createLandStore() {

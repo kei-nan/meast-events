@@ -20,12 +20,22 @@ import {
   locationQuality,
   makeSnippet,
   publicEvent,
+  sameLand,
 } from "./split-data.mjs";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 import { decadeFloor } from "../src/lib/eventYears.js";
 import { decodeGeo } from "../src/lib/geoCodec.js";
 
 const SCRIPT = fileURLToPath(new URL("./split-data.mjs", import.meta.url));
+
+test("sameLand: identical geometries in any order; any coordinate difference or extra piece is not", () => {
+  const sq = (x, y, d = 5) => ({ type: "Feature", properties: { cell: `${x}_${y}` }, geometry: { type: "Polygon", coordinates: [[[x, y], [x + d, y], [x + d, y + d], [x, y + d], [x, y]]] } });
+  assert.ok(sameLand([sq(10, 10)], [sq(10, 10)]));
+  assert.ok(sameLand([sq(10, 10), sq(11, 11, 1)], [sq(11, 11, 1), sq(10, 10)]));
+  assert.ok(!sameLand([sq(10, 10, 4.9999999)], [sq(10, 10)]), "no tolerance");
+  assert.ok(!sameLand([sq(10, 10), sq(11, 11, 1)], [sq(10, 10)]));
+  assert.ok(!sameLand([], [sq(10, 10)]), "a cell whose 1:10m file is empty still drops its light piece");
+});
 
 test("importing split-data.mjs does not run the split", () => {
   // The import above would have thrown or written files if main() ran; it exports helpers only.
@@ -242,7 +252,16 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     assert.equal(bmeta.dir, `v.${bmeta.version}`);
     assert.deepEqual(fs.readdirSync(path.join(r.out, "boundaries")).sort(), [bmeta.dir, "meta.json", "shared"].sort());
     assert.deepEqual(fs.readdirSync(path.join(r.out, "boundaries", bmeta.dir)).sort(), bmeta.decades.map((d) => `${d}.tbin`).sort());
-    assert.ok(Array.isArray(decodeGeo(fs.readFileSync(path.join(r.out, "land.tbin"))).cells));
+    // Land cells: a file for exactly the cells listed, and none listed whose 1:10m land
+    // is just its light pieces (src/data/land.json and land-cells/, the real ones).
+    const land = decodeGeo(fs.readFileSync(path.join(r.out, "land.tbin")));
+    assert.ok(Array.isArray(land.cells) && land.cells.length);
+    assert.deepEqual(fs.readdirSync(path.join(r.out, "land-cells")).sort(), land.cells.map((c) => `${c}.tbin`).sort());
+    const srcData = fileURLToPath(new URL("../src/data/", import.meta.url));
+    const srcLand = JSON.parse(fs.readFileSync(path.join(srcData, "land.json"), "utf8"));
+    const lightOf = (c) => srcLand.features.filter((f) => f.properties?.cell === c);
+    const detailOf = (c) => JSON.parse(fs.readFileSync(path.join(srcData, "land-cells", `${c}.json`), "utf8")).features;
+    for (const c of srcLand.cells) assert.equal(land.cells.includes(c), !sameLand(detailOf(c), lightOf(c)), c);
     // Geometry is .tbin only; a deferred group's members are one shared file, "<hash>#<index>".
     const files = fs.readdirSync(r.out, { recursive: true }).filter((p) => /^(land|boundaries)/.test(p) && fs.statSync(path.join(r.out, p)).isFile());
     assert.deepEqual(files.filter((p) => !p.endsWith(".tbin")), [path.join("boundaries", "meta.json")]);

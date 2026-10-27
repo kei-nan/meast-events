@@ -222,9 +222,8 @@ export default function MapView({
   const landArrivedRef = useRef(null);
   landStoreRef.current ??= createLandStore();
   const landData = () => landStoreRef.current.data();
-  // Only the settled year triggers a new fetch; boundariesForYear/labels below
-  // still run against the live `year` for instant filtering of whatever decade
-  // is already cached, so scrubbing within a loaded decade has zero lag.
+  // The settled year re-checks the deferred geometries in view (below); border
+  // decades are fetched as soon as the shown year enters them (the fetch trigger).
   const debouncedYear = useDebouncedValue(year, 150);
 
   eventsRef.current = events;
@@ -548,7 +547,8 @@ export default function MapView({
       // scripts/build-land.js): first the cells in and around the view once zoomed in past
       // DETAIL_FETCH_ZOOM, then - unless the visitor asked to save data or the link looks
       // slow (wantsBackgroundDetail) - all the others in the background, nearest first, so
-      // a zoom-in finds its coast already drawn.
+      // a zoom-in finds its coast already drawn. Only the cells land.json lists have a
+      // file: an unlisted cell's light piece is already its exact 1:10m land, and stays.
       const DETAIL_FETCH_ZOOM = 5;
       const store = landStoreRef.current;
       const requested = new Set();
@@ -657,27 +657,21 @@ export default function MapView({
     mapRef.current.triggerRepaint(); // an already idle map fires "idle" after this frame
   }, [eventsLoading, mapReady]);
 
-  // Fetch trigger: only fires when the *settled* year lands in a decade that
-  // isn't cached yet. Also opportunistically warms the neighboring decades, so
-  // crossing a decade boundary while scrubbing usually finds data already there;
-  // those wait until this decade is in and the map has drawn it ("idle"), so
-  // they never compete with what is on screen. Nothing is fetched while the
-  // year is still unknown (`yearPending`: an event link waiting for its event).
-  // The settled year held while the year was pending is the mount year (the
-  // timeline end), not the event's: as the pending ends, the year the map now
-  // shows is fetched instead of that stale one (a decade nobody looks at). When
-  // the debounce catches up the decade is cached or already on its way
-  // (dataClient shares the request).
-  const pendingYearRef = useRef(null);
+  // Fetch trigger: keyed on the decade of the year shown, which changes at most
+  // once per ten years, so a continuous scrub or drag fetches each decade it
+  // crosses as it crosses it (not only once it stops); fetchDecade skips a cached
+  // decade and dataClient shares a request already on its way. Also
+  // opportunistically warms the neighboring decades, so crossing a decade
+  // boundary while scrubbing usually finds data already there; those wait until
+  // this decade is in and the map has drawn it ("idle"), so they never compete
+  // with what is on screen (a decade left before then drops them). Nothing is
+  // fetched while the year is still unknown (`yearPending`: an event link waiting
+  // for its event); the render that ends the pending already shows the event's
+  // year, so its decade - not the mount year's (2020) - is the one fetched.
+  const shownDecade = decadeFloor(year);
   useEffect(() => {
-    if (yearPending) {
-      pendingYearRef.current = debouncedYear;
-      return undefined;
-    }
-    // Kept until the debounced year moves (a map getting ready meanwhile re-runs this).
-    const stale = pendingYearRef.current != null && pendingYearRef.current === debouncedYear;
-    if (!stale) pendingYearRef.current = null;
-    const decade = decadeFloor(stale ? yearRef.current : debouncedYear);
+    if (yearPending) return undefined;
+    const decade = shownDecade;
     let cancelled = false;
     let onIdle = null;
     const prefetchNeighbours = () => {
@@ -702,7 +696,7 @@ export default function MapView({
       cancelled = true;
       if (onIdle) mapRef.current?.off("idle", onIdle);
     };
-  }, [debouncedYear, fetchDecade, mapReady, yearPending]);
+  }, [shownDecade, fetchDecade, mapReady, yearPending]);
 
   // Apply trigger: runs against the live (non-debounced) `year` so that once a
   // decade is cached, filtering/rendering it is instant with no debounce lag.

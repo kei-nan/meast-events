@@ -13,6 +13,31 @@ export function FramingReviewFailed() {
   );
 }
 
+/** In place of an open event's view: Back, its title (focused, as the view's heading would be) and the notice. */
+export function EventDetailFailed({ event, onBack }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.focus({ preventScroll: true });
+  }, [event.id]);
+  return (
+    <article className="event-detail" aria-labelledby="event-detail-title">
+      <div className="event-detail-actions">
+        <button type="button" className="sp-btn" onClick={onBack}>
+          <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
+        </button>
+      </div>
+      <header className="event-detail-head">
+        <h2 id="event-detail-title" ref={ref} tabIndex={-1}>
+          {event.title}
+        </h2>
+      </header>
+      <p className="load-failed" role="alert">
+        This event&apos;s details could not be loaded. Please reload the page.
+      </p>
+    </article>
+  );
+}
+
 /** In place of the About the data dialog: says so, and closes like it (Close, Esc, a backdrop click). */
 export function AboutDataFailed({ onClose }) {
   const ref = useRef(null);

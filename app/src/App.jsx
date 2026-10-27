@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AboutDataFailed } from "./components/LoadFailed.jsx";
 import { importOr } from "./lib/importOr.js";
+import { loadEventDetail } from "./lib/lazyChunks.js";
 import MapLoading from "./components/MapLoading.jsx";
 import SearchPanel from "./components/SearchPanel.jsx";
 import ShareButton from "./components/ShareButton.jsx";
@@ -169,10 +170,13 @@ export default function App() {
     start();
     return undefined;
   }, [initial]);
-  // An event link: the event's detail record downloads alongside the event
+  // An event link: the event's detail record, and the code of the view that
+  // shows it (its own chunk, lib/lazyChunks.js), download alongside the event
   // list instead of after it.
   useEffect(() => {
-    if (initial.eventId) prefetchFullLead(initial.eventId);
+    if (!initial.eventId) return;
+    prefetchFullLead(initial.eventId);
+    loadEventDetail().catch(() => {}); // SearchPanel's lazy() retries and reports a failure
   }, [initial]);
 
   // The whole lite event set is loaded ONCE from static data (no API call);
