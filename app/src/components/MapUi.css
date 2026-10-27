@@ -70,23 +70,6 @@
   width: 18px;
   height: 18px;
 }
-/* Zoom in / out: stacked under the Borders control (side by side on phones),
-   a hairline between the two. */
-.mu-zoom {
-  grid-template-rows: repeat(2, var(--key));
-}
-.mu-zoom .mu-key {
-  position: relative;
-}
-.mu-zoom .mu-key + .mu-key::before {
-  content: "";
-  position: absolute;
-  top: -0.5px;
-  left: 6px;
-  right: 6px;
-  height: 1px;
-  background: #d6ccb6;
-}
 .mu-tool {
   display: inline-flex;
   align-items: center;
@@ -168,7 +151,11 @@
   outline: 3px solid #1f5a8a;
   outline-offset: 2px;
 }
-.mu-btn[aria-pressed="true"] {
+/* Pressed, and a panel's button while its panel is open (Legend, Borders;
+   Draw area below): one dark "on" look. */
+.mu-btn[aria-pressed="true"],
+.mu-legend-btn[aria-expanded="true"],
+.mu-borders-btn[aria-expanded="true"] {
   color: #f4f1ea;
   background: #5c4d38;
 }
@@ -662,13 +649,13 @@
   /* With an event open the Borders chip and the [1917][2026] choice sit side by side in
      one row (stacked they covered the map where the event was zoomed to);
      only a very narrow phone (320px) wraps the button under the chip. The
-     right edge of the 3-button toolbar is at ~185px. */
+     right edge of the 2-button toolbar is at ~140px. */
   .mu-ctrl-right {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-end;
     align-items: flex-start;
-    max-width: calc(100% - 195px);
+    max-width: calc(100% - 150px);
   }
   /* The opened Borders list goes on its own row under both buttons, not
      between them. */
@@ -678,28 +665,26 @@
   .mu-ctrl-right .mu-borders-panel {
     order: 5;
   }
-  .mu-ctrl-right .mu-borders-panel,
-  .mu-ctrl-right > .mu-notices {
-    flex-basis: 100%;
-    box-sizing: border-box;
-  }
+  /* Both keep left of the navigation column (MapNav.css: 52px wide at the
+     right edge, under the chips). */
   .mu-ctrl-right > .mu-notices {
     order: 6;
+    flex-basis: calc(100% - 58px);
+    box-sizing: border-box;
+    margin-right: 58px;
   }
-  /* Zoom: side by side, under the chips (in the strip the open event's sheet
-     leaves in sight). */
-  .mu-zoom {
-    grid-template-rows: none;
-    grid-template-columns: repeat(2, var(--key));
-    order: 4;
+  /* The list on a line of its own, wider than the chip row's column: it
+     reaches left under the toolbar (the column is right-aligned, so it grows
+     leftwards). */
+  .mu-ctrl-right .mu-borders-panel {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    width: min(280px, calc(100vw - 88px));
+    margin-left: 100%;
+    margin-right: 58px;
   }
-  .mu-zoom .mu-key + .mu-key::before {
-    top: 6px;
-    bottom: 6px;
-    left: -0.5px;
-    right: auto;
-    width: 1px;
-    height: auto;
+  .mu-legend-panel {
+    width: min(250px, calc(100vw - 88px));
   }
   .mu-borders-btn {
     padding: 5px 8px;
@@ -727,13 +712,13 @@
   .mu-borders-panel {
     max-height: 34dvh;
   }
-  /* Under the toolbar, clear of the sheet and left of the zoom buttons; the ×
-     stays a 44px target. */
+  /* Under the toolbar, clear of the sheet and left of the navigation column;
+     the × stays a 44px target. */
   .mu-tip {
     top: 64px;
     bottom: auto;
     left: 10px;
-    right: 112px;
+    right: 68px;
     transform: none;
     max-width: none;
     z-index: 1; /* an opened draw row or legend goes over it */
@@ -752,10 +737,56 @@
   }
 }
 
+/* Short screens (a phone held sideways: the map is ~210px tall): the opened
+   legend and Borders list stay inside the map. */
+@media (max-height: 500px) {
+  .mu-legend-panel,
+  .mu-borders-panel {
+    max-height: max(96px, calc(100dvh - 280px));
+  }
+}
+/* Short and wide (not a phone): the Borders chip and the "Borders as of" pair
+   in one row left of the navigation column (MapNav.css: 52px wide from the
+   top-right corner), the pair as two bare years as on phones (their names
+   keep the words). */
+@media (max-height: 500px) and (min-width: 769px) {
+  .mu-ctrl-right {
+    right: 68px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+  .mu-ctrl-right .mu-borders {
+    display: contents;
+  }
+  .mu-ctrl-right .mu-borders-panel,
+  .mu-ctrl-right > .mu-notices {
+    order: 5;
+    flex-basis: 100%;
+    box-sizing: border-box;
+  }
+  .mu-year-choice {
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  /* The caption, labels and count would wrap the pair under the chip, where
+     the opened pan pad covers it (their names and the list keep them). */
+  .mu-year-choice-cap,
+  .mu-year-seg-sub,
+  .mu-borders-main .mu-badge-sub {
+    display: none;
+  }
+}
+
 /* Windows high contrast (forced colours): a pressed tool keeps a visible
    "on" state in the system's selection colours. */
 @media (forced-colors: active) {
   .mu-btn[aria-pressed="true"],
+  .mu-legend-btn[aria-expanded="true"],
+  .mu-borders-btn[aria-expanded="true"],
   .mu-draw > .mu-tool.is-on {
     forced-color-adjust: none; /* else the text keeps the forced ButtonText, unreadable on Highlight */
     color: HighlightText;

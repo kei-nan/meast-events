@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
 import { humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import { categoryLabel } from "../lib/categoryLabels";
@@ -193,11 +193,32 @@ const pointerVerb = () =>
 
 const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// The one map toolbar (top-left): draw an area, reset view, legend - plus
-// "Show N results on map" while a search or filter has mapped matches. Zoom
-// has its own buttons (ZoomButtons, with the Borders control), besides the
-// wheel, pinch, double-click and MapLibre's keyboard handler (+ / - with the
-// map focused).
+// On phones the results sheet covers the bottom of the map: an opened panel
+// (legend, Borders list) ends above it - measured as it opens and on resize -
+// so none of its rows sit under the sheet (WCAG 2.4.11).
+const PANEL_MAX_PX = 380;
+function useClearOfSheet(ref, open) {
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!open || !el) return undefined;
+    const fit = () => {
+      const view = el.closest(".map-view");
+      const cover = sheetCover(view);
+      if (!view || !cover) return el.style.removeProperty("max-height");
+      const room = view.getBoundingClientRect().bottom - cover - el.getBoundingClientRect().top - 8;
+      el.style.maxHeight = `${Math.max(96, Math.min(PANEL_MAX_PX, Math.round(room)))}px`;
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [ref, open]);
+}
+
+// The one map toolbar (top-left): draw an area and the legend - plus "Show N
+// results on map" while a search or filter has mapped matches. Zoom, reset and
+// moving the map are in MapNav (bottom right), besides the wheel, pinch,
+// double-click and MapLibre's keyboard handler (+ / - and arrows with the map
+// focused).
 export function MapToolbar({
   areaMode,
   hasArea,
@@ -205,7 +226,6 @@ export function MapToolbar({
   onToggleMode,
   onClearArea,
   onUseView,
-  onReset,
   matchCount,
   matchTotal,
   onShowMatches,
@@ -224,7 +244,8 @@ export function MapToolbar({
           onClear={onClearArea}
           onUseView={onUseView}
         />
-        <ToolButton icon={"↺"} label="Reset view" className="mu-icon-only" onClick={onReset} />
+        {/* One name open or shut (aria-expanded says which; MapUi.css shows
+            it pressed), so the button keeps its width. */}
         <button
           type="button"
           className="mu-btn mu-legend-btn"
@@ -232,7 +253,7 @@ export function MapToolbar({
           aria-controls="mu-legend-panel"
           onClick={() => setLegendOpen((v) => !v)}
         >
-          {legendOpen ? "Hide legend" : "Legend"}
+          Legend
         </button>
       </div>
       {matchCount != null && (
@@ -254,20 +275,6 @@ export function KeyIcon({ d }) {
     <svg className="mu-key-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
       <path d={d} fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-// Zoom in / out by one level, animated unless reduced motion is asked for (MapView).
-export function ZoomButtons({ onZoomIn, onZoomOut }) {
-  return (
-    <div className="mu-keys mu-zoom" role="group" aria-label="Zoom">
-      <button type="button" className="mu-key" title="Zoom in" aria-label="Zoom in" onClick={onZoomIn}>
-        <KeyIcon d="M10 4.5v11M4.5 10h11" />
-      </button>
-      <button type="button" className="mu-key" title="Zoom out" aria-label="Zoom out" onClick={onZoomOut}>
-        <KeyIcon d="M4.5 10h11" />
-      </button>
-    </div>
   );
 }
 
@@ -343,6 +350,8 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
 // row); its accessible name and the opened list still give the year.
 export function BordersList({ year, shownYear, updating, eventYearShown, items, compact, yearBeside = false }) {
   const [open, setOpen] = useState(false);
+  const panelRef = useRef(null);
+  useClearOfSheet(panelRef, open && shownYear != null);
   const flagged = items.filter((b) => isDashedStatus(b.status)).length;
   if (shownYear == null) return null;
   const sub = updating ? `updating to ${year}` : null;
@@ -369,7 +378,7 @@ export function BordersList({ year, shownYear, updating, eventYearShown, items, 
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
       </button>
       {open && (
-        <div id="mu-borders-panel" className="mu-borders-panel" role="region" aria-label={`Borders drawn for ${shownYear}`}>
+        <div ref={panelRef} id="mu-borders-panel" className="mu-borders-panel" role="region" aria-label={`Borders drawn for ${shownYear}`}>
           <p className="mu-borders-head">
             Borders drawn for {shownYear}
             {eventYearShown && !updating ? " (the open event's year)" : ""}: {items.length}
@@ -399,8 +408,10 @@ const LEGEND_CATEGORIES = Object.entries(CATEGORY_COLORS)
   .sort((a, b) => a.label.localeCompare(b.label));
 
 function LegendPanel() {
+  const ref = useRef(null);
+  useClearOfSheet(ref, true);
   return (
-    <div id="mu-legend-panel" className="mu-legend-panel" role="region" aria-label="Map legend">
+    <div ref={ref} id="mu-legend-panel" className="mu-legend-panel" role="region" aria-label="Map legend">
       <h3>Borders</h3>
       <ul>
         <li>

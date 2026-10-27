@@ -1,6 +1,7 @@
 // Where an opened event lands on the map. Parts of the map are covered: the
-// toolbar (top left), the Borders control, the "Borders as of" years and the
-// zoom buttons (top right), the attribution, the first-visit tip and, on
+// toolbar (top left), the Borders control and the "Borders as of" years (top
+// right), the navigation keys (bottom right; under the Borders row on phones),
+// the attribution, the first-visit tip and, on
 // phones, the bottom sheet (peek, half or all but a strip along its top:
 // lib/sheetSnap.js; the reader can drag it between). On wider screens the side
 // panel sits beside the map, not over it, so it covers nothing (it is still
@@ -30,11 +31,11 @@ export function sheetCover(container) {
   return Math.max(0, Math.round(box.bottom - Math.max(box.top, sheet.getBoundingClientRect().top)));
 }
 
-// What lies over the map: the toolbar's and the right-hand column's own parts
-// (each measured on its own: the column is a ragged stack, and on phones a row
-// with the zoom buttons under it), MapLibre's own controls (the attribution),
-// the tip, and the panel.
-const OVERLAY_GROUPS = [".mu-toolbar-wrap", ".mu-ctrl-right"];
+// What lies over the map: the toolbar's, the right-hand column's and the
+// navigation's own parts (each measured on its own: the column is a ragged
+// stack, and the navigation's pan pad opens beside its keys), MapLibre's own
+// controls (the attribution), the tip, and the panel.
+const OVERLAY_GROUPS = [".mu-toolbar-wrap", ".mu-ctrl-right", ".mu-nav"];
 const OVERLAY_EACH = ".maplibregl-ctrl";
 const OVERLAY_SINGLES = [".mu-tip", ".side-panel"];
 

@@ -1,0 +1,153 @@
+/* The map's navigation (MapNav.jsx): one key panel (MapUi.css .mu-keys) with
+   zoom in, zoom out, reset view and "Move map", and the pan pad that opens
+   beside it. It has a place of its own, so the Borders chip, the "Borders as
+   of" years, the notices and the opened lists never move it:
+   - wider screens: a column in the bottom-right corner, above MapLibre's
+     attribution;
+   - short screens (a phone held sideways): a column down from the top-right
+     corner;
+   - phones: a column at the right edge under the Borders chip row.
+   The pad opens to the column's left, bottom-aligned. */
+
+.mu-nav {
+  position: absolute;
+  right: 10px;
+  bottom: 42px; /* clear of the attribution (10px + its 24px button) */
+  z-index: 2;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.mu-nav-keys {
+  grid-auto-rows: var(--key);
+  grid-template-columns: var(--key);
+}
+/* A hairline between keys (along the panel: across a column, down a row). */
+.mu-nav-keys .mu-key {
+  position: relative;
+}
+.mu-nav-keys .mu-key + .mu-key::before {
+  content: "";
+  position: absolute;
+  top: -0.5px;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: #d6ccb6;
+}
+/* Open: the pressed look of the map's other toggles (MapUi.css). */
+.mu-key[aria-expanded="true"] {
+  color: #f4f1ea;
+  background: #5c4d38;
+}
+
+/* The pad: up on top, left and right side by side, down below, the middle
+   empty (an arrow cross with a centre would read as a crosshair). */
+.mu-pan-pad {
+  grid-template-columns: repeat(3, var(--key));
+  grid-template-rows: repeat(3, var(--key));
+  grid-template-areas:
+    ".    up    ."
+    "left .     right"
+    ".    down  .";
+}
+.mu-pan-up {
+  grid-area: up;
+}
+.mu-pan-left {
+  grid-area: left;
+}
+.mu-pan-right {
+  grid-area: right;
+}
+.mu-pan-down {
+  grid-area: down;
+}
+
+/* Short screens (a phone held sideways: a map ~210px tall): the column runs
+   down from the top-right corner, the Borders chips beside it on its left
+   (MapUi.css); the attribution and the first-visit tip give way (the credits
+   are in the footer's Sources & licences, as on phones). */
+@media (max-height: 500px) and (min-width: 769px) {
+  .mu-nav {
+    top: 10px;
+    bottom: auto;
+  }
+  .map-view :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) .maplibregl-ctrl {
+    visibility: hidden;
+  }
+  .mu-tip {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* A column at the right edge under the Borders chip row (MapUi.css
+     .mu-ctrl-right: 10px + 44px + a gap), at a fixed height whatever that row
+     shows; the toolbar's rows and panels on the left stay clear of it, the
+     pad opens to its left. */
+  .mu-nav {
+    top: 64px;
+    bottom: auto;
+  }
+
+  /* With the sheet at full height only a strip of the map shows: only zoom
+     stays in it, as a row (the rest would sit under the sheet, WCAG 2.4.11). */
+  .app-body:has(.side-panel[data-sheet="full"]) :is(.mu-nav-extra, .mu-pan-pad) {
+    display: none;
+  }
+  .app-body:has(.side-panel[data-sheet="full"]) .mu-nav-keys {
+    grid-auto-rows: auto;
+    grid-template-columns: none;
+    grid-template-rows: var(--key);
+    grid-auto-flow: column;
+    grid-auto-columns: var(--key);
+  }
+  .app-body:has(.side-panel[data-sheet="full"]) .mu-nav-keys .mu-key + .mu-key::before {
+    top: 6px;
+    bottom: 6px;
+    left: -0.5px;
+    right: auto;
+    width: 1px;
+    height: auto;
+  }
+
+  /* A short phone (a 320x640 screen) with the sheet at half: the four keys
+     would reach under it, so reset view gives way (lowering the sheet brings
+     it back); "Move map" stays. */
+  @media (max-height: 700px) {
+    .app-body:has(.side-panel[data-sheet="half"]) .mu-nav-reset {
+      display: none;
+    }
+  }
+
+  /* MapLibre's attribution sits in the map's bottom corner, which the sheet
+     covers at every height (its peek bar included), so it could take focus
+     out of sight (WCAG 2.4.11). The credits are in the footer's Sources &
+     licences. */
+  .map-view :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) .maplibregl-ctrl {
+    visibility: hidden;
+  }
+}
+
+/* Windows high contrast: the panels and keys keep visible edges, an open key
+   its "on" state. */
+@media (forced-colors: active) {
+  .mu-keys {
+    border-color: ButtonText;
+  }
+  .mu-key {
+    border: 1px solid transparent;
+  }
+  .mu-key:hover,
+  .mu-key:focus-visible {
+    border-color: Highlight;
+  }
+  .mu-key[aria-expanded="true"] {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background: Highlight;
+  }
+}
