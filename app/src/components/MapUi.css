@@ -12,8 +12,7 @@
   gap: 6px;
   max-width: calc(100% - 230px); /* leaves room for the Borders control */
 }
-.mu-toolbar,
-.mu-zoom {
+.mu-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -23,14 +22,70 @@
   background: rgba(244, 241, 234, 0.92);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
-.mu-toolbar .mu-btn,
-.mu-zoom .mu-btn {
+.mu-toolbar .mu-btn {
   box-shadow: none;
   border-width: 1px;
 }
-/* Zoom in / out: stacked under the Borders control (side by side on phones). */
+
+/* ---- key panels: zoom (ZoomButtons) and pan (PanButtons.jsx) ----
+   One panel in the map buttons' look (.mu-btn) holding borderless keys with
+   line icons, so each control reads as one object. */
+.mu-keys {
+  --key: 30px;
+  display: grid;
+  gap: 0;
+  padding: 2px;
+  border: 2px solid #5c4d38;
+  border-radius: 10px;
+  background: #f4f1ea;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.mu-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--key);
+  height: var(--key);
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: #3a3020;
+  background: transparent;
+  cursor: pointer;
+}
+.mu-key:hover {
+  background: #e9e2d2;
+}
+.mu-key:active {
+  color: #f4f1ea;
+  background: #5c4d38;
+}
+/* Inside the panel, so a neighbouring key does not clip the ring. */
+.mu-key:focus-visible {
+  outline: 3px solid #1f5a8a;
+  outline-offset: -3px;
+}
+.mu-key-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+/* Zoom in / out: stacked under the Borders control (side by side on phones),
+   a hairline between the two. */
 .mu-zoom {
-  flex-direction: column;
+  grid-template-rows: repeat(2, var(--key));
+}
+.mu-zoom .mu-key {
+  position: relative;
+}
+.mu-zoom .mu-key + .mu-key::before {
+  content: "";
+  position: absolute;
+  top: -0.5px;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: #d6ccb6;
 }
 .mu-tool {
   display: inline-flex;
@@ -538,6 +593,13 @@
   .mu-icon-only {
     min-width: 44px;
   }
+  .mu-keys {
+    --key: 44px;
+  }
+  .mu-key-icon {
+    width: 22px;
+    height: 22px;
+  }
   .mu-borders-btn {
     min-height: 44px;
   }
@@ -627,8 +689,17 @@
   /* Zoom: side by side, under the chips (in the strip the open event's sheet
      leaves in sight). */
   .mu-zoom {
-    flex-direction: row;
+    grid-template-rows: none;
+    grid-template-columns: repeat(2, var(--key));
     order: 4;
+  }
+  .mu-zoom .mu-key + .mu-key::before {
+    top: 6px;
+    bottom: 6px;
+    left: -0.5px;
+    right: auto;
+    width: 1px;
+    height: auto;
   }
   .mu-borders-btn {
     padding: 5px 8px;

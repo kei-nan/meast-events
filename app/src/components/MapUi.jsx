@@ -247,12 +247,26 @@ export function MapToolbar({
   );
 }
 
+// A key panel's line icon (MapUi.css .mu-keys): an SVG path in a 20x20 box, so
+// every platform draws the same shape at the same weight.
+export function KeyIcon({ d }) {
+  return (
+    <svg className="mu-key-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+      <path d={d} fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 // Zoom in / out by one level, animated unless reduced motion is asked for (MapView).
 export function ZoomButtons({ onZoomIn, onZoomOut }) {
   return (
-    <div className="mu-zoom" role="group" aria-label="Zoom">
-      <ToolButton icon="+" label="Zoom in" className="mu-icon-only" onClick={onZoomIn} />
-      <ToolButton icon="−" label="Zoom out" className="mu-icon-only" onClick={onZoomOut} />
+    <div className="mu-keys mu-zoom" role="group" aria-label="Zoom">
+      <button type="button" className="mu-key" title="Zoom in" aria-label="Zoom in" onClick={onZoomIn}>
+        <KeyIcon d="M10 4.5v11M4.5 10h11" />
+      </button>
+      <button type="button" className="mu-key" title="Zoom out" aria-label="Zoom out" onClick={onZoomOut}>
+        <KeyIcon d="M4.5 10h11" />
+      </button>
     </div>
   );
 }

@@ -1,15 +1,14 @@
-/* The pan buttons (PanButtons.jsx) take the zoom buttons' look (.mu-zoom,
-   MapUi.css), under them. Desktop: the four arrows always shown, as a cross
-   (up on top, left and right side by side, down below; the middle stays
-   empty). Phones: one "Move map" button that opens them as a row. */
+/* The pan pad (PanButtons.jsx), a key panel (MapUi.css .mu-keys) under the
+   zoom pair: up on top, left and right side by side, down below, the middle
+   empty. Phones: one "Move map" button that opens it. */
 
 .mu-pan-toggle {
   display: none;
 }
 
-.mu-pan .mu-pan-arrows {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* equal: "←" is wider than "↑" */
+.mu-pan-pad {
+  grid-template-columns: repeat(3, var(--key));
+  grid-template-rows: repeat(3, var(--key));
   grid-template-areas:
     ".    up    ."
     "left .     right"
@@ -28,36 +27,32 @@
   grid-area: down;
 }
 
-.mu-pan-toggle-icon {
-  display: block;
-}
-
 @media (max-width: 768px) {
   /* A row of its own under the zoom pair (MapUi.css .mu-zoom), right-aligned:
      beside the pair it would push it left over the first-visit tip's ×. Open,
-     the arrows wrap onto the next row. */
+     the pad goes under the button. */
   .mu-pan {
     order: 4;
     flex-basis: 100%;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
     gap: 6px;
   }
   .mu-pan-toggle {
     display: inline-flex;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    border-radius: 10px; /* the key panels' corners (MapUi.css .mu-keys) */
   }
+  /* Open: the pressed look of the map's other toggles (MapUi.css). */
   .mu-pan-toggle[aria-expanded="true"] {
-    background: #e7dcc4;
+    color: #f4f1ea;
+    background: #5c4d38;
   }
-  .mu-pan .mu-pan-arrows {
+  .mu-pan-pad {
     display: none;
   }
-  .mu-pan[data-open] .mu-pan-arrows {
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
+  .mu-pan[data-open] .mu-pan-pad {
+    display: grid;
   }
 
   /* With the sheet at full height only a 120px strip of the map shows, and
@@ -73,5 +68,19 @@
      licences. */
   .map-view :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) .maplibregl-ctrl {
     visibility: hidden;
+  }
+}
+
+/* Windows high contrast: the panels and keys keep visible edges. */
+@media (forced-colors: active) {
+  .mu-keys {
+    border-color: ButtonText;
+  }
+  .mu-key {
+    border: 1px solid transparent;
+  }
+  .mu-key:hover,
+  .mu-key:focus-visible {
+    border-color: Highlight;
   }
 }
