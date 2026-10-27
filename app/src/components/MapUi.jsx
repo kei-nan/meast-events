@@ -21,6 +21,9 @@ function ToolButton({ icon, label, className = "", ...rest }) {
   );
 }
 
+// Icons are plain shapes and arrows, never a crosshair, scope or bullseye
+// (project rule: no weapon-like visuals). "Use map view" is a dashed square like
+// the drawn area's outline; "Show results on map" is fit-to-view arrows.
 const DRAW_MODES = [
   { mode: "rect", icon: "▭", short: "Rectangle" },
   { mode: "circle", icon: "◯", short: "Circle" },
@@ -75,7 +78,7 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear, onUseView }) {
         />
       ))}
       <ToolButton
-        icon={"⛶"}
+        icon={"⬚"}
         label="Use map view"
         aria-label="Use map view as the search area"
         onClick={() => {
@@ -137,7 +140,7 @@ function ShowMatchesButton({ count, total, compact, onClick }) {
       title={why ?? undefined}
       aria-label={`${text}${why ? `; ${why}` : ""}`}
     >
-      {"◎"} {text}
+      <span aria-hidden="true">{"⤢"}</span> {text}
     </button>
   );
 }

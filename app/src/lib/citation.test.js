@@ -60,6 +60,9 @@ test("with a revision and its date: each style's dated form and the permanent li
   });
   assert.equal(c.eventPage, "https://middleeast.events/event/six-day-war");
   assert.match(c.borders, /^CShapes 2\.0 - historical country borders\. Schvitz, G\., et al\. \(2022\)\. CC BY-NC-SA 4\.0\./);
+  // Every source of the drawn borders that NOTICE credits, with its own terms: OCHA's are not a CC licence.
+  assert.match(c.borders, /UN OCHA \/ HDX "Oslo Agreement" Areas A\/B\/C \(West Bank\)\. Distributed under the legacy HumanitarianResponse\.info terms: non-commercial use with credit to UN OCHA\. https:\/\/data\.humdata\.org\/dataset\/state-of-palestine-other-0-0-0-0-0/);
+  assert.match(c.borders, /GeoNames - CC BY 4\.0 \(https:\/\/creativecommons\.org\/licenses\/by\/4\.0\/\)\. https:\/\/www\.geonames\.org\//);
   assert.equal(citationNotes(c)[0], "The link is the Wikipedia revision of October 5, 2026 (revision 1300000000), whose lead is exactly the text shown here.");
 });
 

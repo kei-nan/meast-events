@@ -154,6 +154,9 @@ test("Cite this: the Wikipedia article in APA, MLA and Chicago, the revision's p
   assert.doesNotMatch(html, /Retrieved September|Accessed 26|accessed September/);
   assert.match(html, /This event on Middle East, 1900–present: https:\/\/middleeast\.events\/event\/six-day-war/);
   assert.match(html, /CShapes 2\.0 - historical country borders\. Schvitz, G\., et al\. \(2022\)/);
+  // "If you use the map's borders" names every border source NOTICE credits, OCHA with its own (non-CC) terms.
+  assert.match(html, /UN OCHA \/ HDX &quot;Oslo Agreement&quot; Areas A\/B\/C \(West Bank\)\. Distributed under the legacy HumanitarianResponse\.info terms: non-commercial use with credit to UN OCHA\./);
+  assert.match(html, /GeoNames - CC BY 4\.0/);
   assert.doesNotMatch(html, /cite-live/);
 
   const live = page(base);

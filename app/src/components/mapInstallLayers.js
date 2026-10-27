@@ -297,6 +297,9 @@ export function installLayers(map, { land, boundaries, labels, events }) {
   });
 
   map.addSource("selected", { type: "geojson", data: EMPTY_FC });
+  // A soft gold disc behind the selected dot, with no outer stroke: dot, white
+  // ring, gold disc and a dark outer ring stacked into a bullseye (project rule:
+  // no target-like visuals).
   map.addLayer({
     id: "selected-halo",
     type: "circle",
@@ -304,13 +307,10 @@ export function installLayers(map, { land, boundaries, labels, events }) {
     paint: {
       "circle-radius": 20,
       "circle-color": "rgba(255,210,90,0.35)",
-      "circle-stroke-width": 2.5,
-      "circle-stroke-color": "#1b1b1b",
     },
   });
   // Approximate locations stay hollow when selected, like their regular dot.
-  // (No extra dark edge here: selected-halo's dark ring already frames it, and
-  // one more ring would stack into a target.)
+  // (No extra dark edge here either: one more ring would stack into a target.)
   map.addLayer({
     id: "selected-point",
     type: "circle",

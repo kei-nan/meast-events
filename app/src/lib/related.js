@@ -79,7 +79,7 @@ export function emptyReason(key, event) {
   if (key === "nearby") {
     if (event.location_quality === "none") return "This event has no map location (Wikipedia and Wikidata give no coordinates), so nothing can be measured from it.";
     if (!precise(event)) {
-      const where = event.approximate_reason === "rounded" ? "coordinates rounded to the area" : "a national capital";
+      const where = event.approximate_reason === "rounded" ? "coordinates rounded to the area" : "a fixed reference point for one of its countries"; // fallbackPoint.js wording: not a capital
       return `This event’s marker is only an approximate place (${where}), so distances from it would be misleading.`;
     }
     return `No other event with a precise location is within ${NEARBY_KM} km.`;

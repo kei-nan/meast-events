@@ -96,7 +96,9 @@ test("emptyReason says which rule left a group empty", () => {
   assert.match(emptyReason("shared_parent", base), /does not list this event as part of/);
   assert.match(emptyReason("shared_parent", { ...base, part_of: [{ qid: "Q1" }] }), /No other event .* shares/);
   assert.match(emptyReason("nearby", { ...base, location_quality: "none", coordinates: null }), /no map location/);
-  assert.match(emptyReason("nearby", { ...base, location_quality: "approximate" }), /approximate place \(a national capital\)/);
+  const fallback = emptyReason("nearby", { ...base, location_quality: "approximate" });
+  assert.match(fallback, /approximate place \(a fixed reference point for one of its countries\)/);
+  assert.doesNotMatch(fallback, /capital/);
   assert.match(
     emptyReason("nearby", { ...base, location_quality: "approximate", approximate_reason: "rounded" }),
     /approximate place \(coordinates rounded to the area\)/
