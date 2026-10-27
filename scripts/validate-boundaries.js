@@ -1,6 +1,7 @@
 // Validates data/boundaries.json: required properties, per-name year continuity, and areas
 // that two features shown in the same year both cover. Reports only; never changes the file.
-// Exits non-zero only on structural errors; gaps and unexpected overlaps are warnings.
+// Exits non-zero on structural errors and on ring crossings not in ACCEPTED_RING_CROSSINGS;
+// gaps and unexpected overlaps are warnings.
 //   node scripts/validate-boundaries.js [path]
 // Needs the repo-root dependencies (`npm ci` at the root) for @turf/turf.
 import { readFile } from "node:fs/promises";

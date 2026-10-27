@@ -7,6 +7,8 @@ import {
   findOverlaps,
   ringCrossings,
   findSelfIntersections,
+  checkSelfIntersections,
+  ACCEPTED_RING_CROSSINGS,
 } from "./boundary-checks.js";
 
 // The overlap tests need @turf/turf (repo-root devDependency). CI's "Validate boundaries" step
@@ -103,7 +105,7 @@ test("ringCrossings: a bow tie crosses once; touching vertices and plain rings d
   assert.deepEqual(ringCrossings([[0, 0], [2, 0], [1, 0], [1, 1], [0, 0]]), []);
 });
 
-test("findSelfIntersections / checkBoundaries: one warning per feature, listing ring, segments and place", () => {
+test("findSelfIntersections / checkBoundaries: a crossing is an error, one per feature, listing ring, segments and place", () => {
   const holed = {
     type: "Polygon",
     coordinates: [
@@ -114,6 +116,26 @@ test("findSelfIntersections / checkBoundaries: one warning per feature, listing 
   const r = findSelfIntersections([feature({ name: "Ok" }), feature({ name: "Bad" }, holed)]);
   assert.equal(r.length, 1);
   assert.deepEqual(r[0].crossings, [{ polygon: 0, ring: 1, segments: [0, 2], at: [3, 3] }]);
-  const w = checkBoundaries(fc(feature({ name: "Bad" }, holed))).warnings;
-  assert.deepEqual(w, ["self-intersection: Bad 1900-1950: 1 ring crossing(s): polygon 0 ring 1 (hole) segments 0/2 near (3, 3)"]);
+  const res = checkBoundaries(fc(feature({ name: "Bad" }, holed)));
+  assert.deepEqual(res.errors, ["self-intersection: Bad 1900-1950: 1 ring crossing(s): polygon 0 ring 1 (hole) segments 0/2 near (3, 3)"]);
+  assert.deepEqual(res.warnings, []);
+});
+
+test("checkSelfIntersections: an accepted source crossing is a warning; a stale accepted entry is reported", () => {
+  const bowtie = { type: "Polygon", coordinates: [[[0, 0], [2, 2], [2, 0], [0, 2], [0, 0]]] };
+  const accepted = [{ name: "Src", start_year: 1900, end_year: 1950, at: [1, 1], why: "in the source" }];
+  const ok = checkSelfIntersections([feature({ name: "Src" }, bowtie)], accepted);
+  assert.deepEqual(ok.errors, []);
+  assert.deepEqual(ok.warnings, ["accepted source self-intersection: Src 1900-1950: 1 ring crossing(s): polygon 0 ring 0 (outer) segments 0/2 near (1, 1)"]);
+  // The same crossing in another feature is not covered by the entry.
+  const other = checkSelfIntersections([feature({ name: "Ours" }, bowtie)], accepted);
+  assert.equal(other.errors.length, 1);
+  assert.deepEqual(other.warnings, ["accepted ring crossing no longer found: Src 1900-1950 near (1, 1); remove it from ACCEPTED_RING_CROSSINGS"]);
+  // checkBoundaries passes the list through.
+  assert.deepEqual(checkBoundaries(fc(feature({ name: "Src" }, bowtie)), { acceptedCrossings: accepted }).errors, []);
+  // The committed list: every entry needs name, years, a reason and a 6-decimal place.
+  for (const a of ACCEPTED_RING_CROSSINGS) {
+    assert.ok(a.name && Number.isInteger(a.start_year) && Number.isInteger(a.end_year) && a.why, JSON.stringify(a));
+    assert.deepEqual(a.at, a.at.map((v) => Math.round(v * 1e6) / 1e6));
+  }
 });

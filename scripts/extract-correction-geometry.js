@@ -64,6 +64,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { stringifyKeyPerLine } from "./lib/json-lines.js";
 import { dropRepeatedPositions } from "./lib/ring-positions.js";
+import { roundRingWithoutCrossings } from "./lib/ring-repair.js";
 import * as turf from "@turf/turf";
 import * as shapefile from "shapefile";
 
@@ -71,18 +72,23 @@ const dms = (deg, min, sec = 0) => deg + min / 60 + sec / 3600;
 
 // Rounds a (Multi)Polygon to 6 decimals (~10 cm) and drops the vertices that become
 // repeats, ring by ring; a ring left with fewer than 4 positions is dropped (with its
-// polygon, if it is an outer ring) and reported.
+// polygon, if it is an outer ring) and reported. Where plain rounding would make a ring
+// cross itself, a vertex of the two crossing edges is rounded to another 6-decimal
+// neighbour of its source position instead (lib/ring-repair.js); each such vertex is reported.
 function roundTo6Decimals(geometry, label) {
   const polys = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
-  const roundRing = (ring) => {
-    const rounded = turf.truncate(turf.lineString(ring), { precision: 6, coordinates: 2 }).geometry.coordinates;
+  const roundRing = (ring, where) => {
+    const { ring: rounded, rerounded } = roundRingWithoutCrossings(ring, `${label} ${where}`);
+    for (const k of rerounded) {
+      console.log(`  ${label}: ${where} vertex ${k} ${JSON.stringify(ring[k])} rounded to ${JSON.stringify(rounded[k])}, not the nearest 6-decimal position, so the ring does not cross itself`);
+    }
     return dropRepeatedPositions(rounded); // null if fewer than 4 positions left
   };
   const out = [];
   polys.forEach((rings, p) => {
     const kept = [];
     for (const [r, ring] of rings.entries()) {
-      const clean = roundRing(ring);
+      const clean = roundRing(ring, `polygon ${p} ring ${r}`);
       if (!clean) {
         console.log(`  ${label}: polygon ${p} ring ${r} (${ring.length} positions, at ${JSON.stringify(ring[0])}) collapsed at 6 decimals - dropped`);
         if (r === 0) return; // the outer ring takes its polygon (and holes) with it
@@ -363,7 +369,9 @@ async function main() {
     // Rounding can make neighbouring vertices identical - only those exact repeats are
     // dropped (collinear vertices are kept; see lib/ring-positions.js) - and
     // a tiny ring can collapse below a valid polygon (4 positions); such rings are dropped
-    // and reported.
+    // and reported. Where OCHA's hairline (millimetre-wide) channels would cross themselves
+    // after plain rounding, the vertex is rounded to its other 6-decimal neighbour instead
+    // (3 vertices in Area C, reported; see roundTo6Decimals).
     osloGeometry[key] = roundTo6Decimals(turf.getGeom(merged), key);
   }
 

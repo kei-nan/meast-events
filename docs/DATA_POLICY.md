@@ -638,10 +638,18 @@ whose `resolved_qid` differs, see above; the warning then says which one is the 
 "Review flags". Warnings are for a person to look at; nothing is changed automatically.
 
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
-`end_year` or `source`, a bad year range or geometry type, or two shapes with the same name in the same year. Warnings: a feature without a `status` or
-`note` key, a status value with no label in the app, a year gap between shapes of the same name, a ring that crosses itself (two of its segments
-cross at a point inside both; touching at a vertex is not counted; one warning per feature listing ring, segments and place), and an area of at
-least 0.5 km² covered by two shapes shown in the same year. Overlaps between a shape whose status ends in `-included` (for example Israel from 1967, `occupied-territory-included`) and a
+`end_year` or `source`, a bad year range or geometry type, two shapes with the same name in the same year, or (since 2026-10-27) a ring that
+crosses itself (two of its segments cross at a point inside both; touching at a vertex is not counted; one error per feature listing ring, segments
+and place) unless the crossing is in a source's own data and listed in `ACCEPTED_RING_CROSSINGS` (empty: none reaches the file). Warnings: a feature
+without a `status` or `note` key, a status value with no label in the app, a year gap between shapes of the same name, an accepted crossing, an
+accepted entry that no longer matches one, and an area of at least 0.5 km² covered by two shapes shown in the same year.
+The five crossings found until then were all made by our own processing, and are now prevented where they arose (`scripts/lib/ring-repair.js`):
+rounding OCHA's Area C to 6 decimals pushed hairline (millimetre-wide) channels across themselves at three places, so
+`extract-correction-geometry.js` rounds those three vertices to their other 6-decimal neighbour (still under 1e-6 degrees from OCHA's position);
+and two polygon unions in `ingest-boundaries.js` returned a ring folded back over its own edge, a zero-area spike (Israel 1948-1966 along the
+Gaza Strip's coast at 34.4895E 31.6004N, 180 m; a hole in French Syria 1922-1938 by the sanjak, 5 km to 36.6611E 36.3110N), which
+`dissolveParts` now drops, keeping every other vertex. The ring the Syria hole leaves is a 0.007 km² pocket of land between the CShapes
+Syria line and the sanjak that the snap does not fill (unchanged). Overlaps between a shape whose status ends in `-included` (for example Israel from 1967, `occupied-territory-included`) and a
 flagged shape drawn on top of it (the West Bank, Gaza Strip and Golan Heights) are intentional and not listed. Smaller slivers along shared borders
 (at most about 0.13 km² on the current data) come from two separately sourced lines not coinciding exactly and are only counted. It never edits geometry.
 

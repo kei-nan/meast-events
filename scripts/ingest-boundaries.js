@@ -16,6 +16,7 @@ import { CORRECTIONS } from "./boundary-corrections.js";
 import * as turf from "@turf/turf";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
 import { dropRepeatedPositionsInGeometry } from "./lib/ring-positions.js";
+import { untangleRing } from "./lib/ring-repair.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
@@ -340,6 +341,12 @@ function cutBeyondCoastEnd(shape, countryGeometry, [border, coastEnd], keepPoint
 // part's edge is inserted into that edge (its exact coordinates; the edge moves by less
 // than NODE_EPS_DEG), so the shared stretch becomes exactly shared and a union dissolves
 // it; then parts under SLIVER_MAX_M2 - zero-area spikes, not territory - are dropped.
+// Last, a ring the operations returned crossing itself is untangled (lib/ring-repair.js):
+// split at the crossing, the loop that is a fold back over the ring's own edge (enclosing
+// under SLIVER_MAX_M2) is dropped, the other kept as it is; any other crossing throws.
+// Israel 1948-1966 had such a fold at the Gaza Strip's northern coast end (a 180 m spike
+// along Gaza's coast, from the coastal-gap union), French Syria 1922-1938 one in a hole by
+// the sanjak (a 5 km spike along its own CShapes edge, from the snap union).
 const NODE_EPS_DEG = 1e-9; // ~0.1 mm
 const SLIVER_MAX_M2 = 1;
 function segDistDeg(p, a, b) {
@@ -386,9 +393,15 @@ function dissolveParts(geometry, label) {
       return false;
     }
     return true;
-  })]);
+  })]).map((rings, p) => rings.map((ring, r) => {
+    const where = `${label} polygon ${p} ring ${r}`;
+    const { ring: untangled, dropped } = untangleRing(ring, { areaM2: ringM2, minM2: SLIVER_MAX_M2, epsDeg: NODE_EPS_DEG, label: where });
+    for (const l of dropped) console.log(`  ${where}: crossed itself; dropped the ${ringM2(l).toFixed(3)} m2 fold ${JSON.stringify(l)}`);
+    return untangled;
+  }));
   return kept.length === 1 ? { type: "Polygon", coordinates: kept[0] } : { type: "MultiPolygon", coordinates: kept };
 }
+const ringM2 = (ring) => (ring.length < 4 ? 0 : turf.area(turf.polygon([ring])));
 
 // Raw CShapes records (set in main), for `notOnCShapes`.
 let RAW_RECORDS = [];
