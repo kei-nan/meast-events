@@ -182,6 +182,42 @@ export function selfIntersectionWarning({ feature, crossings }) {
   return `self-intersection: ${label(feature.properties)}: ${crossings.length} ring crossing(s): ${where}`;
 }
 
+// Ring crossings that are in a source's own data and are kept as the source draws them
+// (we do not "fix" a source). Any other crossing is an error: the ones found so far were all
+// made by our own processing and are prevented where they arose (scripts/ingest-boundaries.js,
+// scripts/extract-correction-geometry.js; see lib/ring-repair.js). Empty at present: CShapes'
+// own crossings (its Israel records at Eilat) do not reach data/boundaries.json.
+// Entry: { name, start_year, end_year, at: [lon, lat] as the message prints it (6 decimals), why }.
+export const ACCEPTED_RING_CROSSINGS = [];
+
+const acceptedMatch = (accepted, p, c) =>
+  accepted.find((a) => a.name === p.name && a.start_year === p.start_year && a.end_year === p.end_year &&
+    a.at[0] === round6(c.at[0]) && a.at[1] === round6(c.at[1]));
+
+// Splits findSelfIntersections' result into errors (crossings not accepted) and warnings
+// (accepted ones, and accepted entries that no longer match a crossing, so the list cannot go stale).
+export function checkSelfIntersections(features, accepted = ACCEPTED_RING_CROSSINGS) {
+  const errors = [];
+  const warnings = [];
+  const used = new Set();
+  for (const s of findSelfIntersections(features)) {
+    const p = s.feature.properties;
+    const known = [];
+    const fresh = [];
+    for (const c of s.crossings) {
+      const a = acceptedMatch(accepted, p, c);
+      if (a) used.add(a);
+      (a ? known : fresh).push(c);
+    }
+    if (fresh.length) errors.push(selfIntersectionWarning({ feature: s.feature, crossings: fresh }));
+    if (known.length) warnings.push(`accepted source ${selfIntersectionWarning({ feature: s.feature, crossings: known })}`);
+  }
+  for (const a of accepted) {
+    if (!used.has(a)) warnings.push(`accepted ring crossing no longer found: ${label(a)} near (${a.at[0]}, ${a.at[1]}); remove it from ACCEPTED_RING_CROSSINGS`);
+  }
+  return { errors, warnings };
+}
+
 // opts.turf: the @turf/turf module; without it the overlap check is skipped (overlaps: null).
 export function checkBoundaries(geojson, opts = {}) {
   if (geojson?.type !== "FeatureCollection" || !Array.isArray(geojson.features)) {
@@ -192,9 +228,14 @@ export function checkBoundaries(geojson, opts = {}) {
   const cont = checkNameContinuity(features);
   const errors = [...props.errors, ...cont.errors];
   const warnings = [...props.warnings, ...cont.warnings];
-  if (!props.errors.length) for (const s of findSelfIntersections(features)) warnings.push(selfIntersectionWarning(s));
+  const structureBroken = errors.length > 0;
+  if (!props.errors.length) {
+    const rings = checkSelfIntersections(features, opts.acceptedCrossings);
+    errors.push(...rings.errors);
+    warnings.push(...rings.warnings);
+  }
   // Overlap geometry needs valid features; skip it when the structure is already broken.
-  if (errors.length || !opts.turf) return { errors, warnings, overlaps: null, slivers: 0 };
+  if (structureBroken || !opts.turf) return { errors, warnings, overlaps: null, slivers: 0 };
   const { overlaps, slivers } = findOverlaps(features, opts);
   for (const o of overlaps.filter((o) => !o.intentional)) {
     warnings.push(`overlap ${o.km2.toFixed(2)} km2 in ${o.years}: ${o.a} x ${o.b}`);
