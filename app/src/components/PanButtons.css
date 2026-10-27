@@ -1,15 +1,68 @@
 /* The pan buttons (PanButtons.jsx) take the zoom buttons' look (.mu-zoom,
-   MapUi.css): a column under them, a row on phones. */
+   MapUi.css), under them. Desktop: the four arrows always shown, as a cross
+   (up on top, left and right side by side, down below; the middle stays
+   empty). Phones: one "Move map" button that opens them as a row. */
+
+.mu-pan-toggle {
+  display: none;
+}
+
+.mu-pan .mu-pan-arrows {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* equal: "←" is wider than "↑" */
+  grid-template-areas:
+    ".    up    ."
+    "left .     right"
+    ".    down  .";
+}
+.mu-pan-up {
+  grid-area: up;
+}
+.mu-pan-left {
+  grid-area: left;
+}
+.mu-pan-right {
+  grid-area: right;
+}
+.mu-pan-down {
+  grid-area: down;
+}
+
+.mu-pan-toggle-icon {
+  display: block;
+}
 
 @media (max-width: 768px) {
-  /* Four 44px buttons in the column's 195px (MapUi.css .mu-ctrl-right). */
+  /* A row of its own under the zoom pair (MapUi.css .mu-zoom), right-aligned:
+     beside the pair it would push it left over the first-visit tip's ×. Open,
+     the arrows wrap onto the next row. */
   .mu-pan {
+    order: 4;
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .mu-pan-toggle {
+    display: inline-flex;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  }
+  .mu-pan-toggle[aria-expanded="true"] {
+    background: #e7dcc4;
+  }
+  .mu-pan .mu-pan-arrows {
+    display: none;
+  }
+  .mu-pan[data-open] .mu-pan-arrows {
+    display: flex;
+    flex-direction: row;
     gap: 2px;
   }
 
   /* With the sheet at full height only a 120px strip of the map shows, and
-     this row would sit under the sheet (WCAG 2.4.11): it goes until the
-     sheet is lowered. */
+     these would sit under the sheet (WCAG 2.4.11): they go until the sheet is
+     lowered. */
   .app-body:has(.side-panel[data-sheet="full"]) .mu-pan {
     display: none;
   }
