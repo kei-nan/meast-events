@@ -129,7 +129,7 @@ test("validateEvents: category and category_group come from the pipeline's fixed
   // The app labels exactly the groups the pipeline can assign.
   assert.deepEqual([...CATEGORIES].sort(), Object.keys(CATEGORY_LABELS).sort());
   // The app's copy of the class table (it names the deciding class in the event header) is the pipeline's, in order.
-  assert.deepEqual(CLASS_GROUPS, EVENT_CLASSES.map((c) => [c.label, c.category]));
+  assert.deepEqual(CLASS_GROUPS, EVENT_CLASSES.map((c) => [c.label, c.category, c.qid]));
   assert.match(validateEvents([event({ category: "battle" })]).errors[0], /category must be one of/);
   assert.match(validateEvents([event({ category_group: "battle" })]).errors[0], /category_group must be one of/);
   assert.match(validateEvents([event({ category_group: "treaty" })]).errors[0], /differs from category/);
