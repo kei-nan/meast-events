@@ -536,6 +536,9 @@ export default function App() {
     const f = ev && focusFor(ev, focusNonceRef);
     if (f) setFocus(f);
   }, [storeRef, selectedEventId]);
+  // The phone sheet moved with an event open: MapView keeps its pin in sight.
+  const [keepPinNonce, setKeepPinNonce] = useState(0);
+  const handleSheetMove = useCallback(() => setKeepPinNonce((n) => n + 1), []);
 
   // The tab title names the open event (and is restored when it closes), as the
   // event's page has it (scripts/event-page.mjs eventPageTitle).
@@ -608,6 +611,7 @@ export default function App() {
                 selectedEventId={selectedEventId}
                 hoverId={hoverId}
                 focus={focus}
+                keepPinNonce={keepPinNonce}
                 areaMode={areaMode}
                 area={area}
                 onAreaModeChange={setAreaMode}
@@ -646,6 +650,7 @@ export default function App() {
             onHover={setHoverId}
             onBack={handleBack}
             onRefocus={handleRefocus}
+            onSheetMove={handleSheetMove}
             sort={sort}
             onSortChange={setSort}
             view={view}

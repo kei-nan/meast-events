@@ -16,7 +16,7 @@ import { loadLabelFont } from "../lib/labelFont";
 import { readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
 import {
   BoundaryPopup,
-  BordersList,
+  MapKey,
   MapNotices,
   MapTip,
   MapToolbar,
@@ -57,7 +57,8 @@ import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
 import { isUnhandledEscape } from "../lib/escapeKey";
 import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
-import { mapClearView } from "../lib/mapInsets";
+import { keepPinInside, mapClearView, screenPoint } from "../lib/mapInsets";
+import { eventCoords } from "../lib/geo";
 import { dragArea, handleBox, pickHandle } from "../lib/areaDrag";
 
 // MapLibre GL resolves its worker script relative to its own module URL at
@@ -160,6 +161,7 @@ export default function MapView({
   selectedEventId,
   hoverId,
   focus,
+  keepPinNonce = 0, // bumped when the phone sheet moves with an event open (App.jsx)
   areaMode = "off",
   area = null,
   onAreaModeChange,
@@ -952,6 +954,29 @@ export default function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus?.nonce, mapReady]);
 
+  // The phone sheet moved with an event open: more or less of the map is in
+  // sight now, and the pin may sit under the controls or the sheet. Nudge the
+  // camera just enough to keep it inside what is in sight (lib/mapInsets.js
+  // keepPinInside), without changing the zoom. A pin the reader had already
+  // moved off the map is left alone.
+  useEffect(() => {
+    if (!mapReady || !keepPinNonce || !selectedEventId) return;
+    const map = mapRef.current;
+    const ev = eventsRef.current.find((e) => e.id === selectedEventId);
+    const c = ev && eventCoords(ev);
+    if (!c) return;
+    const pin = [c.lon, c.lat];
+    const { width, height, padding } = mapClearView(map);
+    const at = map.getCenter();
+    const cam = { center: [at.lng, at.lat], zoom: map.getZoom() };
+    const [sx, sy] = screenPoint(pin, cam, width, height);
+    if (sx < 0 || sy < 0 || sx > width || sy > height) return;
+    const center = keepPinInside(pin, cam, width, height, padding);
+    if (center === cam.center) return;
+    map.easeTo({ center, duration: reducedMotion() ? 0 : 350 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keepPinNonce]);
+
   // Search-area layers follow the `area` prop (URL state, chip removal, edits).
   const setAreaSources = (a, showHandles = true) => {
     const map = mapRef.current;
@@ -1180,13 +1205,12 @@ export default function MapView({
         onInteract={hintOpen ? dismissHint : undefined}
       />
       <div className="mu-ctrl-right">
-        <BordersList
+        <MapKey
           year={year}
           shownYear={shownBorderYear}
           updating={!decadeCached}
           eventYearShown={borderYear != null}
           items={yearBorders}
-          compact={compact}
           yearBeside={eventYear != null && eventYear !== timelineYear}
         />
         {eventYear != null && eventYear !== timelineYear && (

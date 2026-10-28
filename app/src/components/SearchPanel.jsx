@@ -113,6 +113,7 @@ const VIEWS = [
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
  * @param {()=>void}               [props.onRefocus] aim the map at the open event again (phone "Show on map")
+ * @param {()=>void}               [props.onSheetMove] the phone sheet moved with an event open (keep its pin in sight)
  * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
  * @param {(s:string)=>void}       [props.onSortChange]
  * @param {"list"|"timeline"}      [props.view]   how results are shown: the list, or oldest first with
@@ -149,6 +150,7 @@ export default function SearchPanel({
   onHover,
   onBack,
   onRefocus,
+  onSheetMove,
   sort = "coverage",
   onSortChange,
   view = "list",
@@ -263,11 +265,30 @@ export default function SearchPanel({
   // render, so the camera move reads the sheet at its peek bar. Focus moves to
   // the toggle, which reopens the event.
   // Stable, so the memoized EventDetail skips App's Play/map/hover re-renders.
+  const refocusedRef = useRef(false);
   const showOnMap = useCallback(() => {
+    // Aimed here, so the effect below skips the move this makes (none at peek).
+    if (panelRef.current?.dataset.sheet !== "peek") refocusedRef.current = true;
     setSheet("peek");
     onRefocus?.();
     toggleRef.current?.focus();
   }, [setSheet, onRefocus]);
+
+  // Mobile: the reader moved the sheet (dragged it, its bar, a key) with an
+  // event open, so more or less of the map is in sight: App keeps the event's
+  // pin inside it (MapView keepPinNonce) - unless "Show on map" just aimed it,
+  // or the event itself changed (it is aimed anyway).
+  const sheetSeenRef = useRef({ sheet, selectedId });
+  useEffect(() => {
+    const prev = sheetSeenRef.current;
+    sheetSeenRef.current = { sheet, selectedId };
+    if (prev.sheet === sheet) return;
+    if (refocusedRef.current) {
+      refocusedRef.current = false;
+      return;
+    }
+    if (selectedId && prev.selectedId === selectedId) onSheetMove?.();
+  }, [sheet, selectedId, onSheetMove]);
 
   function clearAll() {
     onQueryChange("");
