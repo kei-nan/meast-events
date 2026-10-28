@@ -183,8 +183,9 @@ nothing. Its jobs (the names GitHub shows as status checks):
   (`node scripts/validate-events.js`), runs the data-pipeline tests (`npm test` at the
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
   plugin, `.oxlintrc.json`; `import/named` is an error, other findings are warnings),
-  validates `data/boundaries.json` (`npm run validate-boundaries`) and runs the border
-  check (`node scripts/verify-borders.js --check`).
+  validates `data/boundaries.json` (`npm run validate-boundaries`; it also fails if a shape
+  has fewer vertices or coarser coordinates than in `data/border-geometry-baseline.json`)
+  and runs the border check (`node scripts/verify-borders.js --check`, every border period).
 - **Dependency audit (.)** and **Dependency audit (app)** - `npm audit` of production
   dependencies (high and critical block) plus a report-only audit of everything.
 

@@ -6,9 +6,11 @@
 // two shapes meet, so coastlines do not count - and the two shapes that meet there.
 //
 //   node scripts/verify-borders.js [--year=2026] [--report=docs/border-verification.md]
-//   node scripts/verify-borders.js --write-baseline   (years in BASELINE_YEARS -> data/border-check-baseline.json)
+//   node scripts/verify-borders.js --write-baseline   (baselineYears() -> data/border-check-baseline.json)
 //   node scripts/verify-borders.js --check            (fails if any independent point moved
 //                                                      more than ${TOLERANCE_KM} km further from the border than in the baseline)
+// The baseline years are derived from the data: at least one year inside every distinct
+// start_year..end_year period, so every shape ever drawn is compared.
 //
 // It reports; it does not decide which source is right. A large distance means the drawn
 // line, the Wikidata coordinate, or both are off - each listed point links to Wikidata.
@@ -16,11 +18,11 @@
 // line, often CShapes' own, so they are shown but not counted as independent evidence.
 import { readFile, writeFile } from "node:fs/promises";
 import * as turf from "@turf/turf";
+import { baselineYears } from "./lib/boundary-checks.js";
 
 const arg = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=")[1];
 const YEAR = Number(arg("year") ?? new Date().getUTCFullYear());
 const REPORT = arg("report");
-const BASELINE_YEARS = [1930, 1960, 1990, 2026];
 const TOLERANCE_KM = 0.25; // how much further from a reference point a border may move before --check fails
 const SEARCH_KM = 10; // look for borders within this distance of a point
 const SHARED_KM = 0.3; // an edge counts as a land border if another shape is this close to it
@@ -58,7 +60,10 @@ function segmentsNear(feature, area) {
 export function measure(point, features) {
   const p = turf.point([point.lon, point.lat]);
   const area = turf.buffer(p, SEARCH_KM);
-  const near = features.filter((f) => turf.booleanIntersects(f, area));
+  return measureNear(p, area, features.filter((f) => turf.booleanIntersects(f, area)));
+}
+
+function measureNear(p, area, near) {
   let best = null;
   for (const a of near) {
     for (const seg of segmentsNear(a, area)) {
@@ -72,10 +77,30 @@ export function measure(point, features) {
   return best;
 }
 
-function measureYear(points, all, year) {
-  const features = all.filter((f) => f.properties.start_year <= year && year <= f.properties.end_year);
+// Same result as measure(point, features of the year), but the year-independent work (the
+// point's search area and the shapes of any year near it) is done once per point, and a point
+// whose nearby shapes are the same in two years is measured once.
+function yearMeasurer(all) {
+  const ctx = new Map();
+  const memo = new Map();
+  return (pt, year) => {
+    let c = ctx.get(pt.id);
+    if (!c) {
+      const p = turf.point([pt.lon, pt.lat]);
+      const area = turf.buffer(p, SEARCH_KM);
+      c = { p, area, near: all.map((f, i) => [f, i]).filter(([f]) => turf.booleanIntersects(f, area)) };
+      ctx.set(pt.id, c);
+    }
+    const near = c.near.filter(([f]) => f.properties.start_year <= year && year <= f.properties.end_year);
+    const key = `${pt.id}:${near.map(([, i]) => i).join(",")}`;
+    if (!memo.has(key)) memo.set(key, measureNear(c.p, c.area, near.map(([f]) => f)));
+    return memo.get(key);
+  };
+}
+
+function measureYear(points, all, year, measureAt = yearMeasurer(all)) {
   return points.map((pt) => {
-    const m = measure(pt, features);
+    const m = measureAt(pt, year);
     return {
       ...pt,
       km: m ? m.km : Infinity,
@@ -90,23 +115,28 @@ async function main() {
   const all = (await read("../data/boundaries.json")).features;
   const baselineUrl = new URL("../data/border-check-baseline.json", import.meta.url);
   if (process.argv.includes("--write-baseline") || process.argv.includes("--check")) {
+    const writing = process.argv.includes("--write-baseline");
+    const base = JSON.parse(await readFile(baselineUrl, "utf-8")).years;
+    // The years the data needs now plus any year already in the baseline (1930, 1960, 1990 were
+    // chosen by hand before the years were derived).
+    const BASELINE_YEARS = [...new Set([...baselineYears(all), ...Object.keys(base).map(Number)])].sort((a, b) => a - b);
+    const measureAt = yearMeasurer(all);
     const now = Object.fromEntries(BASELINE_YEARS.map((y) => [y, Object.fromEntries(
-      measureYear(points.filter((p) => !p.bulk), all, y).map((r) => [r.id, Number.isFinite(r.km) ? Number(r.km.toFixed(3)) : null])
+      measureYear(points.filter((p) => !p.bulk), all, y, measureAt).map((r) => [r.id, Number.isFinite(r.km) ? Number(r.km.toFixed(3)) : null])
     )]));
-    if (process.argv.includes("--write-baseline")) {
+    if (writing) {
       await writeFile(baselineUrl, JSON.stringify({ tolerance_km: TOLERANCE_KM, years: now }, null, 2) + "\n");
       console.log(`Wrote data/border-check-baseline.json (${BASELINE_YEARS.join(", ")})`);
       return;
     }
-    const base = JSON.parse(await readFile(baselineUrl, "utf-8")).years;
-    const worse = [];
+    const worse = BASELINE_YEARS.filter((y) => !base[y]).map((y) => `${y}: no baseline for this year (a new border period?)`);
     for (const y of BASELINE_YEARS) for (const [id, km] of Object.entries(now[y])) {
       const was = base[y]?.[id];
       if (was == null) continue; // new point, or no land border near it before
       if (km == null || km > was + TOLERANCE_KM) worse.push(`${y} ${id} ${points.find((p) => p.id === id).label}: ${was} km -> ${km ?? "no border nearby"} km`);
     }
     if (worse.length) {
-      console.error(`${worse.length} reference point(s) are now further from the drawn border than the baseline allows (${TOLERANCE_KM} km):\n  ${worse.join("\n  ")}`);
+      console.error(`${worse.length} year(s) or reference point(s) fail: a point is now further from the drawn border than the baseline allows (${TOLERANCE_KM} km), or a year has no baseline:\n  ${worse.join("\n  ")}`);
       console.error("If the change is intended and checked, update the baseline: node scripts/verify-borders.js --write-baseline");
       process.exit(1);
     }

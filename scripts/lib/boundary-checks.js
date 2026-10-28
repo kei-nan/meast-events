@@ -218,7 +218,72 @@ export function checkSelfIntersections(features, accepted = ACCEPTED_RING_CROSSI
   return { errors, warnings };
 }
 
+// Guard against simplified or coarsened geometry (the rule: borders are never simplified;
+// rounding to 6 decimal places, ~10 cm, is the coarsest allowed without approval). Per
+// feature the baseline (data/border-geometry-baseline.json) records how many vertices it has
+// and how many coordinate values are written with at least FINE_DECIMALS decimals. A drop in
+// either fails; more vertices, or more precision, is fine. Rewriting the baseline is the
+// deliberate step for an approved change: node scripts/validate-boundaries.js --write-geometry-baseline
+export const FINE_DECIMALS = 6;
+
+// Decimal places a number is written with. JSON keeps the shortest form, so 31.5 -> 1 and a
+// value rounded to 4 places can never show more than 4.
+export function decimals(n) {
+  const [mantissa, exp] = String(n).split("e");
+  const dot = mantissa.indexOf(".");
+  return Math.max(0, (dot < 0 ? 0 : mantissa.length - dot - 1) - Number(exp ?? 0));
+}
+
+const featureKey = (f) => label(f.properties);
+
+export function geometryFingerprint(features) {
+  const out = {};
+  for (const f of features) {
+    let vertices = 0;
+    let fine = 0;
+    const rings = f.geometry?.type === "MultiPolygon" ? f.geometry.coordinates.flat() : (f.geometry?.coordinates ?? []);
+    for (const ring of rings) {
+      for (const pos of ring) {
+        vertices++;
+        fine += (decimals(pos[0]) >= FINE_DECIMALS) + (decimals(pos[1]) >= FINE_DECIMALS);
+      }
+    }
+    out[featureKey(f)] = { vertices, fine };
+  }
+  return out;
+}
+
+export function checkGeometryBaseline(features, baseline) {
+  const errors = [];
+  const now = geometryFingerprint(features);
+  for (const [key, was] of Object.entries(baseline)) {
+    const is = now[key];
+    if (!is) errors.push(`${key}: in the geometry baseline but no longer in the file`);
+    else if (is.vertices < was.vertices) errors.push(`${key}: ${was.vertices} -> ${is.vertices} vertices (simplified?)`);
+    else if (is.fine < was.fine) {
+      errors.push(`${key}: coordinate values with >= ${FINE_DECIMALS} decimals ${was.fine} -> ${is.fine} (coarsened?)`);
+    }
+  }
+  return errors;
+}
+
+// Years for scripts/verify-borders.js's baseline: the fewest years that fall inside every
+// distinct start_year..end_year period (sort periods by end; take a period's end year unless a
+// year already chosen is inside it), so every feature is present in at least one of them. A
+// still-current period (end 9999) counts as ending in the last year any shape starts, so the
+// set does not change with the calendar.
+export function baselineYears(features) {
+  const last = Math.max(...features.map((f) => f.properties.start_year));
+  const periods = features
+    .map(({ properties: p }) => [p.start_year, Math.min(p.end_year, last)])
+    .sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+  const years = [];
+  for (const [s, e] of periods) if (!years.some((y) => s <= y && y <= e)) years.push(e);
+  return years;
+}
+
 // opts.turf: the @turf/turf module; without it the overlap check is skipped (overlaps: null).
+// opts.geometryBaseline: a geometryFingerprint() result to compare against (skipped if absent).
 export function checkBoundaries(geojson, opts = {}) {
   if (geojson?.type !== "FeatureCollection" || !Array.isArray(geojson.features)) {
     return { errors: ["top level must be a GeoJSON FeatureCollection"], warnings: [], overlaps: null, slivers: 0 };
@@ -229,6 +294,7 @@ export function checkBoundaries(geojson, opts = {}) {
   const errors = [...props.errors, ...cont.errors];
   const warnings = [...props.warnings, ...cont.warnings];
   const structureBroken = errors.length > 0;
+  if (opts.geometryBaseline) errors.push(...checkGeometryBaseline(features, opts.geometryBaseline));
   if (!props.errors.length) {
     const rings = checkSelfIntersections(features, opts.acceptedCrossings);
     errors.push(...rings.errors);
