@@ -21,12 +21,21 @@ function ToolButton({ icon, label, className = "", ...rest }) {
   );
 }
 
-// Icons are plain shapes and arrows, never a crosshair, scope or bullseye
-// (project rule: no weapon-like visuals). "Use map view" is a dashed square like
-// the drawn area's outline; "Show results on map" is fit-to-view arrows.
+// Icons are line drawings (KeyIcon, the navigation keys' weight), plain shapes
+// and arrows, never a crosshair, scope or bullseye (project rule: no
+// weapon-like visuals). "Use map view" is a dashed square like the drawn area's
+// outline; "Show results on map" is fit-to-view arrows.
+const ICONS = {
+  draw: "M4 16l.9-3.6L13 4.3a1.5 1.5 0 0 1 2.1 0l.6.6a1.5 1.5 0 0 1 0 2.1L7.6 15.1z",
+  rect: "M3.5 5.5h13v9h-13z",
+  circle: "M10 4a6 6 0 1 1 0 12a6 6 0 1 1 0-12z",
+  view: "M3.5 3.5h13v13h-13z",
+  clear: "M5.5 5.5l9 9M14.5 5.5l-9 9",
+  fit: "M11.5 3.5h5v5M16.5 3.5l-5 5M8.5 16.5h-5v-5M3.5 16.5l5-5",
+};
 const DRAW_MODES = [
-  { mode: "rect", icon: "▭", short: "Rectangle" },
-  { mode: "circle", icon: "◯", short: "Circle" },
+  { mode: "rect", icon: <KeyIcon d={ICONS.rect} />, short: "Rectangle" },
+  { mode: "circle", icon: <KeyIcon d={ICONS.circle} />, short: "Circle" },
 ];
 
 // Search-area drawing: one "Draw area" button opens the shapes (and Clear area)
@@ -78,7 +87,7 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear, onUseView }) {
         />
       ))}
       <ToolButton
-        icon={"⬚"}
+        icon={<KeyIcon d={ICONS.view} dash="2.5 2" />}
         label="Use map view"
         aria-label="Use map view as the search area"
         onClick={() => {
@@ -88,7 +97,7 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear, onUseView }) {
       />
       {hasArea && (
         <ToolButton
-          icon={"✕"}
+          icon={<KeyIcon d={ICONS.clear} />}
           label="Clear area"
           onClick={() => {
             onClear();
@@ -107,7 +116,7 @@ function DrawTools({ areaMode, hasArea, onToggle, onClear, onUseView }) {
       <ToolButton
         ref={buttonRef}
         className={active ? "is-on" : ""}
-        icon={active ? active.icon : "✎"}
+        icon={active ? active.icon : <KeyIcon d={ICONS.draw} />}
         label={active ? `Drawing ${active.short.toLowerCase()}` : "Draw area"}
         aria-expanded={open}
         aria-controls="mu-draw-menu"
@@ -135,12 +144,12 @@ function ShowMatchesButton({ count, total, compact, onClick }) {
   return (
     <button
       type="button"
-      className="mu-btn"
+      className="mu-btn mu-show-results"
       onClick={onClick}
       title={why ?? undefined}
       aria-label={`${text}${why ? `; ${why}` : ""}`}
     >
-      <span aria-hidden="true">{"⤢"}</span> {text}
+      <KeyIcon d={ICONS.fit} /> {text}
     </button>
   );
 }
@@ -193,19 +202,25 @@ const pointerVerb = () =>
 
 const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// On phones the results sheet covers the bottom of the map: an opened panel
-// (legend, Borders list) ends above it - measured as it opens and on resize -
-// so none of its rows sit under the sheet (WCAG 2.4.11).
-const PANEL_MAX_PX = 380;
+// An opened panel (the Map key) ends above what lies under it - the phone's
+// results sheet, and the navigation keys (MapNav) when they sit below it -
+// measured as it opens and on resize, so none of its rows are hidden
+// (WCAG 2.4.11).
+const PANEL_MAX_PX = 420;
 function useClearOfSheet(ref, open) {
   useLayoutEffect(() => {
     const el = ref.current;
     if (!open || !el) return undefined;
     const fit = () => {
       const view = el.closest(".map-view");
-      const cover = sheetCover(view);
-      if (!view || !cover) return el.style.removeProperty("max-height");
-      const room = view.getBoundingClientRect().bottom - cover - el.getBoundingClientRect().top - 8;
+      if (!view) return;
+      const box = el.getBoundingClientRect();
+      let bottom = view.getBoundingClientRect().bottom - sheetCover(view);
+      for (const below of view.querySelectorAll(".mu-nav-keys, .mu-pan-pad")) {
+        const b = below.getBoundingClientRect();
+        if (b.top > box.top && b.left < box.right && b.right > box.left) bottom = Math.min(bottom, b.top);
+      }
+      const room = bottom - box.top - 8;
       el.style.maxHeight = `${Math.max(96, Math.min(PANEL_MAX_PX, Math.round(room)))}px`;
     };
     fit();
@@ -214,8 +229,9 @@ function useClearOfSheet(ref, open) {
   }, [ref, open]);
 }
 
-// The one map toolbar (top-left): draw an area and the legend - plus "Show N
-// results on map" while a search or filter has mapped matches. Zoom, reset and
+// The one map toolbar (top-left): searching on the map - draw an area, and
+// "Show N results on map" while a search or filter has mapped matches. What
+// the map shows is explained by the Map key (top right); zoom, reset and
 // moving the map are in MapNav (bottom right), besides the wheel, pinch,
 // double-click and MapLibre's keyboard handler (+ / - and arrows with the map
 // focused).
@@ -232,7 +248,6 @@ export function MapToolbar({
   drawHint,
   onInteract,
 }) {
-  const [legendOpen, setLegendOpen] = useState(false);
   return (
     // onInteract: any use of the toolbar also retires the first-visit tip.
     <div className="mu-toolbar-wrap" onClickCapture={onInteract}>
@@ -244,17 +259,6 @@ export function MapToolbar({
           onClear={onClearArea}
           onUseView={onUseView}
         />
-        {/* One name open or shut (aria-expanded says which; MapUi.css shows
-            it pressed), so the button keeps its width. */}
-        <button
-          type="button"
-          className="mu-btn mu-legend-btn"
-          aria-expanded={legendOpen}
-          aria-controls="mu-legend-panel"
-          onClick={() => setLegendOpen((v) => !v)}
-        >
-          Legend
-        </button>
       </div>
       {matchCount != null && (
         <ShowMatchesButton count={matchCount} total={matchTotal} compact={compact} onClick={onShowMatches} />
@@ -263,17 +267,24 @@ export function MapToolbar({
       <div className="mu-draw-status" role="status">
         {drawHint && <div className="mu-draw-hint">{drawHint}</div>}
       </div>
-      {legendOpen && <LegendPanel />}
     </div>
   );
 }
 
 // A key panel's line icon (MapUi.css .mu-keys): an SVG path in a 20x20 box, so
 // every platform draws the same shape at the same weight.
-export function KeyIcon({ d }) {
+export function KeyIcon({ d, dash }) {
   return (
     <svg className="mu-key-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-      <path d={d} fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={d}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={dash}
+      />
     </svg>
   );
 }
@@ -340,61 +351,126 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
   );
 }
 
-// Keyboard-reachable alternative to clicking polygons: every border drawn for
-// the shown year, each expandable to the same details. Its button doubles as
-// the "borders as of YEAR" indicator, with a sub-line while the decade for a
-// newly picked year is still loading (which year it is, event or range end, is
-// said by BorderYearChoice beside it).
+// The Map key (top right): one button and one panel for what the map shows,
+// with two tabs - the legend, and the Borders list (a keyboard-reachable
+// alternative to clicking polygons: every border drawn for the shown year,
+// each expandable to the same details). The button doubles as the "borders as
+// of YEAR" indicator, so the map never leaves in doubt which year its borders
+// are from, with a sub-line while the decade for a newly picked year is still
+// loading (which year it is, event or range end, is said by BorderYearChoice
+// beside it).
 // `yearBeside`: the "Borders as of" choice beside it already prints the drawn
-// year (pressed), so the chip says just "Borders" (a phone fits the two in one
-// row); its accessible name and the opened list still give the year.
-export function BordersList({ year, shownYear, updating, eventYearShown, items, compact, yearBeside = false }) {
+// year (pressed), so the button says just "Borders" (a phone fits the two in
+// one row); its accessible name and the Borders tab still give the year.
+const KEY_TABS = ["legend", "borders"];
+export function MapKey({ year, shownYear, updating, eventYearShown, items, yearBeside = false }) {
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState("legend"); // kept while the page is open
   const panelRef = useRef(null);
-  useClearOfSheet(panelRef, open && shownYear != null);
+  const tabRefs = useRef({});
+  useClearOfSheet(panelRef, open);
+  // Escape closes the panel (focus back to its button) unless something inside
+  // took that Escape first (lib/escapeKey.js).
+  const wrapRef = useRef(null);
+  const buttonRef = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => {
+      if (!isUnhandledEscape(e, wrapRef.current)) return;
+      e.preventDefault();
+      setOpen(false);
+      if (wrapRef.current?.contains(document.activeElement)) buttonRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   const flagged = items.filter((b) => isDashedStatus(b.status)).length;
-  if (shownYear == null) return null;
-  const sub = updating ? `updating to ${year}` : null;
+  const sub = updating && shownYear != null ? `updating to ${year}` : null;
   const n = items.length;
-  const countText = `${n} ${n === 1 ? "border" : "borders"} drawn for ${shownYear}`;
+  const yearText = shownYear == null ? "" : yearBeside && !updating ? "" : ` ${shownYear}`;
+  const bordersTab = shownYear == null ? "Borders" : `Borders ${shownYear}`;
+  // Tabs: arrows, Home and End move between them (and select), as the panel's
+  // other tab lists do.
+  const onTabKey = (e) => {
+    const i = KEY_TABS.indexOf(tab);
+    const next =
+      e.key === "ArrowRight" ? KEY_TABS[(i + 1) % KEY_TABS.length]
+      : e.key === "ArrowLeft" ? KEY_TABS[(i + KEY_TABS.length - 1) % KEY_TABS.length]
+      : e.key === "Home" ? KEY_TABS[0]
+      : e.key === "End" ? KEY_TABS[KEY_TABS.length - 1]
+      : null;
+    if (!next) return;
+    e.preventDefault();
+    setTab(next);
+    tabRefs.current[next]?.focus();
+  };
+  const tabProps = (k) => ({
+    ref: (el) => (tabRefs.current[k] = el),
+    type: "button",
+    role: "tab",
+    id: `mu-key-tab-${k}`,
+    className: "mu-key-tab",
+    "aria-selected": tab === k,
+    "aria-controls": `mu-key-panel-${k}`,
+    tabIndex: tab === k ? 0 : -1,
+    onClick: () => setTab(k),
+    onKeyDown: onTabKey,
+  });
+
   return (
-    <div className="mu-borders">
-      {/* A bare "(21)" read as unexplained, so the count says what it counts.
-          Phones leave it out to keep the chip one line; the opened list
-          starts with the same count, and the title / name carry it too. */}
+    <div className="mu-borders" ref={wrapRef}>
       <button
+        ref={buttonRef}
         type="button"
         className="mu-btn mu-borders-btn"
         aria-expanded={open}
         aria-controls="mu-borders-panel"
-        aria-label={`Borders ${shownYear}${n ? `: ${n} drawn` : ""}${sub ? `, ${sub}` : ""}. Show the list`}
-        title={n ? countText : undefined}
+        aria-label={`Map key${shownYear != null ? `: borders ${shownYear}${n ? `, ${n} drawn` : ""}` : ""}${sub ? `, ${sub}` : ""}`}
+        title={shownYear != null && n ? `Legend, and the ${n} ${n === 1 ? "border" : "borders"} drawn for ${shownYear}` : undefined}
         onClick={() => setOpen((v) => !v)}
       >
         <span className="mu-borders-main">
-          Borders{yearBeside && !updating ? "" : ` ${shownYear}`}
-          {n > 0 && !compact ? <span className="mu-badge-sub"> · {n} drawn</span> : null}
+          Map key <span className="mu-borders-sep">·</span> Borders{yearText}
         </span>
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
       </button>
       {open && (
-        <div ref={panelRef} id="mu-borders-panel" className="mu-borders-panel" role="region" aria-label={`Borders drawn for ${shownYear}`}>
-          <p className="mu-borders-head">
-            Borders drawn for {shownYear}
-            {eventYearShown && !updating ? " (the open event's year)" : ""}: {items.length}
-            {flagged ? `, ${flagged} status-flagged (dashed)` : ""}. Expand one for its status, note and source.
-          </p>
-          {updating && <p className="mu-b-note">Borders for {year} are still loading.</p>}
-          {items.length === 0 && <p className="mu-b-note">No borders are loaded for this year yet.</p>}
-          {items.map((b) => (
-            <details key={`${b.name}|${b.start_year}|${b.end_year}`} className="mu-b-list-item">
-              <summary>
-                <span className={`mu-swatch-line ${isDashedStatus(b.status) ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
-                {b.name} <span className="mu-b-years-inline">{yearsLabel(b)}</span>
-              </summary>
-              <BoundaryDetails b={b} />
-            </details>
-          ))}
+        <div ref={panelRef} id="mu-borders-panel" className="mu-borders-panel" role="region" aria-label="Map key">
+          <div className="mu-key-tabs" role="tablist" aria-label="Map key">
+            <button {...tabProps("legend")}>Legend</button>
+            <button {...tabProps("borders")}>{bordersTab}</button>
+          </div>
+          {tab === "legend" ? (
+            <div role="tabpanel" id="mu-key-panel-legend" aria-labelledby="mu-key-tab-legend" className="mu-legend">
+              <LegendContent />
+            </div>
+          ) : (
+            <div role="tabpanel" id="mu-key-panel-borders" aria-labelledby="mu-key-tab-borders">
+              {shownYear == null ? (
+                <p className="mu-b-note">The borders are still loading.</p>
+              ) : (
+                <>
+                  <p className="mu-borders-head">
+                    Borders drawn for {shownYear}
+                    {eventYearShown && !updating ? " (the open event's year)" : ""}: {n}
+                    {flagged ? `, ${flagged} status-flagged (dashed)` : ""}. Expand one for its status, note and source.
+                  </p>
+                  {updating && <p className="mu-b-note">Borders for {year} are still loading.</p>}
+                  {n === 0 && <p className="mu-b-note">No borders are loaded for this year yet.</p>}
+                  {items.map((b) => (
+                    <details key={`${b.name}|${b.start_year}|${b.end_year}`} className="mu-b-list-item">
+                      <summary>
+                        <span className={`mu-swatch-line ${isDashedStatus(b.status) ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
+                        {b.name} <span className="mu-b-years-inline">{yearsLabel(b)}</span>
+                      </summary>
+                      <BoundaryDetails b={b} />
+                    </details>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -407,11 +483,9 @@ const LEGEND_CATEGORIES = Object.entries(CATEGORY_COLORS)
   .map(([k, color]) => ({ k, color, label: categoryLabel(k) }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
-function LegendPanel() {
-  const ref = useRef(null);
-  useClearOfSheet(ref, true);
+function LegendContent() {
   return (
-    <div ref={ref} id="mu-legend-panel" className="mu-legend-panel" role="region" aria-label="Map legend">
+    <>
       <h3>Borders</h3>
       <ul>
         <li>
@@ -453,7 +527,7 @@ function LegendPanel() {
           Blue dashed outline: area drawn with Draw area
         </li>
       </ul>
-    </div>
+    </>
   );
 }
 
