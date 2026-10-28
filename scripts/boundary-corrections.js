@@ -78,6 +78,20 @@ const OSLO_ICJ_SENTENCE =
   "and held that \"the Oslo Accords cannot be understood to detract from Israel's obligations " +
   "under the pertinent rules of international law applicable in the Occupied Palestinian " +
   "Territory\" (paras. 78, 102).";
+// Both readings of the West Bank's status, quoted from primary texts: UN Security Council
+// Resolution 2334 (2016), operative para. 1, and the Israel Ministry of Foreign Affairs page
+// "Israeli Settlements and International Law" (archived 17 March 2016,
+// https://web.archive.org/web/20160317104350/http://www.mfa.gov.il/mfa/foreignpolicy/peace/guide/pages/israeli%20settlements%20and%20international%20law.aspx).
+const WEST_BANK_READINGS_SENTENCE =
+  "UN Security Council Resolution 2334 (2016) refers to \"the Palestinian territory occupied " +
+  "since 1967, including East Jerusalem\"; Israel disagrees, its Ministry of Foreign Affairs " +
+  "holding that \"the West Bank is best regarded as territory over which there are competing " +
+  "claims which should be resolved in peace process negotiations\".";
+// Israel's position on Gaza after the 2005 disengagement, from the Israel Ministry of Foreign
+// Affairs paper "The Operation in Gaza: Factual and Legal Aspects" (July 2009), para. 30
+// (archived: https://web.archive.org/web/20160624013314/http://www.mfa.gov.il/MFA_Graphics/MFA%20Gallery/Documents/GazaOperation%20w%20Links.pdf).
+const ISRAEL_GAZA_2009_QUOTE =
+  "\"the Gaza Strip is neither a State nor a territory occupied or controlled by Israel\"";
 const UNSC_252 = "https://documents.un.org/api/symbol/access?s=S/RES/252(1968)&l=en&t=pdf";
 const UNSC_478 = "https://documents.un.org/api/symbol/access?s=S/RES/478(1980)&l=en&t=pdf";
 
@@ -582,7 +596,9 @@ export const CORRECTIONS = [
       "sector (Palestinian-controlled under the 1997 Hebron Protocol), which is merged " +
       "into this shape. Since Operation Defensive Shield (29 March - 10 May 2002) the " +
       "Israeli military has also conducted operations inside Area A. " +
-      OSLO_ICJ_SENTENCE,
+      OSLO_ICJ_SENTENCE +
+      " " +
+      WEST_BANK_READINGS_SENTENCE,
     source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}`,
   },
   {
@@ -599,7 +615,9 @@ export const CORRECTIONS = [
       "enclaves - some 440 Palestinian villages and their built-up areas, each ringed by " +
       "Area C. Includes the Oslo nature reserves, which OCHA's dataset classes separately " +
       "but which Oslo II placed under the Area B regime with building restricted. " +
-      OSLO_ICJ_SENTENCE,
+      OSLO_ICJ_SENTENCE +
+      " " +
+      WEST_BANK_READINGS_SENTENCE,
     source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}`,
   },
   {
@@ -623,7 +641,8 @@ export const CORRECTIONS = [
       "Jerusalem is therefore drawn and labelled as Area C here although Oslo II did not make " +
       "it part of Area C: Israel applied its law there in June 1967 and declared Jerusalem its " +
       "capital in the 1980 Basic Law, which UN Security Council Resolution 478 (1980) declared " +
-      "\"null and void\". It is not drawn as an annexed shape of its own, unlike the Golan Heights.",
+      "\"null and void\". It is not drawn as an annexed shape of its own, unlike the Golan Heights. " +
+      WEST_BANK_READINGS_SENTENCE,
     source: `https://en.wikipedia.org/wiki/Area_C_(West_Bank); ${UNSC_478}`,
   },
 
@@ -700,7 +719,10 @@ export const CORRECTIONS = [
       "designated Gaza a \"hostile entity\" in September 2007; the Israeli-Egyptian " +
       "blockade dates from this point. On the law of occupation, the ICJ's 2024 advisory " +
       "opinion found that Israel's obligations in Gaza after 2005 \"have remained " +
-      "commensurate with the degree of its effective control over the Gaza Strip\" (para. 94).",
+      "commensurate with the degree of its effective control over the Gaza Strip\" (para. 94); " +
+      "Israel's Ministry of Foreign Affairs stated in July 2009 that " +
+      ISRAEL_GAZA_2009_QUOTE +
+      ".",
     source: `https://en.wikipedia.org/wiki/Battle_of_Gaza_(2007); ${ICJ_2024_OPINION}`,
   },
   {
@@ -715,7 +737,14 @@ export const CORRECTIONS = [
       "invasion from 27 October 2023 and a war lasting until the ceasefire of 10 October " +
       "2025. Control of the Strip was divided and shifting throughout; this dataset keeps " +
       "a single shape for the period because the front lines were not fixed and we have no " +
-      "sourced geometry for them.",
+      "sourced geometry for them. On the law of occupation, the ICJ's non-binding advisory " +
+      "opinion of 19 July 2024 held that Israel's obligations in Gaza \"have remained " +
+      "commensurate with the degree of its effective control over the Gaza Strip\" (para. 94) " +
+      "but did not cover \"conduct by Israel in the Gaza Strip in response to the attack " +
+      "carried out against it by Hamas and other armed groups on 7 October 2023\" (para. 81). " +
+      "Israel's Ministry of Foreign Affairs stated in July 2009 that " +
+      ISRAEL_GAZA_2009_QUOTE +
+      "; we have not found an official Israeli statement on Gaza's status during this war.",
     source: "https://en.wikipedia.org/wiki/Gaza_war",
   },
   {
