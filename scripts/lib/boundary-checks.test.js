@@ -9,6 +9,10 @@ import {
   findSelfIntersections,
   checkSelfIntersections,
   ACCEPTED_RING_CROSSINGS,
+  decimals,
+  geometryFingerprint,
+  checkGeometryBaseline,
+  baselineYears,
 } from "./boundary-checks.js";
 
 // The overlap tests need @turf/turf (repo-root devDependency). CI's "Validate boundaries" step
@@ -137,5 +141,71 @@ test("checkSelfIntersections: an accepted source crossing is a warning; a stale 
   for (const a of ACCEPTED_RING_CROSSINGS) {
     assert.ok(a.name && Number.isInteger(a.start_year) && Number.isInteger(a.end_year) && a.why, JSON.stringify(a));
     assert.deepEqual(a.at, a.at.map((v) => Math.round(v * 1e6) / 1e6));
+  }
+});
+
+// A 6-decimal ring like the real data: 12 vertices around (35.5, 31.5), closed.
+const detailed = () => {
+  const ring = [];
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * 2 * Math.PI;
+    ring.push([Number((35.5 + Math.cos(a) * 0.3 + 1e-6).toFixed(6)), Number((31.5 + Math.sin(a) * 0.3 + 1e-6).toFixed(6))]);
+  }
+  ring.push(ring[0]);
+  return { type: "Polygon", coordinates: [ring] };
+};
+
+test("decimals: counts the decimal places a coordinate is written with", () => {
+  assert.equal(decimals(35), 0);
+  assert.equal(decimals(31.5), 1);
+  assert.equal(decimals(35.123456), 6);
+  assert.equal(decimals(35.12345678901), 11);
+  assert.equal(decimals(1e-7), 7);
+});
+
+test("checkGeometryBaseline: unchanged and finer geometry pass; simplified, coarsened or missing features fail", () => {
+  const original = [feature({ name: "Israel", start_year: 1967, end_year: 1978 }, detailed())];
+  const baseline = geometryFingerprint(original);
+  assert.deepEqual(baseline, { "Israel 1967-1978": { vertices: 13, fine: 26 } });
+  assert.deepEqual(checkGeometryBaseline(original, baseline), []);
+  // Rounding 11-15 decimals down to 6 is allowed; it does not lose a 6-decimal value.
+  assert.equal(geometryFingerprint([feature({}, { type: "Polygon", coordinates: [[[35.123456789012, 31.1], [35.123457, 31.2]]] })])["A 1900-1950"].fine, 2);
+
+  // Simplified: every other vertex removed (ring still closed).
+  const ring = detailed().coordinates[0];
+  const thinned = ring.filter((_, i) => i % 2 === 0);
+  const simplified = [feature({ name: "Israel", start_year: 1967, end_year: 1978 }, { type: "Polygon", coordinates: [thinned] })];
+  assert.match(checkGeometryBaseline(simplified, baseline)[0], /^Israel 1967-1978: 13 -> 7 vertices \(simplified\?\)$/);
+
+  // Coarsened: same vertices, coordinates rounded to 4 decimals.
+  const rounded = ring.map(([x, y]) => [Number(x.toFixed(4)), Number(y.toFixed(4))]);
+  const coarse = [feature({ name: "Israel", start_year: 1967, end_year: 1978 }, { type: "Polygon", coordinates: [rounded] })];
+  assert.match(checkGeometryBaseline(coarse, baseline)[0], /coordinate values with >= 6 decimals 26 -> 0 \(coarsened\?\)/);
+
+  // MultiPolygon parts count too; a feature gone from the file fails.
+  const multi = [feature({ name: "Israel", start_year: 1967, end_year: 1978 }, { type: "MultiPolygon", coordinates: [detailed().coordinates] })];
+  assert.deepEqual(checkGeometryBaseline(multi, baseline), []);
+  assert.match(checkGeometryBaseline([], baseline)[0], /no longer in the file/);
+
+  // checkBoundaries reports it as an error when given the baseline.
+  assert.match(checkBoundaries(fc(...coarse), { geometryBaseline: baseline }).errors[0], /coarsened/);
+});
+
+test("baselineYears: at least one year inside every distinct period, few years, stable over time", () => {
+  const f = (start_year, end_year) => feature({ name: `N${start_year}-${end_year}`, start_year, end_year });
+  const features = [f(1900, 1966), f(1967, 1978), f(1979, 1999), f(1995, 1999), f(1970, 1981), f(2007, 2022), f(2023, 2025), f(2026, 9999), f(1950, 9999)];
+  const years = baselineYears(features);
+  for (const { properties: p } of features) assert.ok(years.some((y) => p.start_year <= y && y <= p.end_year), `${p.start_year}-${p.end_year}`);
+  assert.deepEqual(years, [1966, 1978, 1999, 2022, 2025, 2026]);
+});
+
+test("baselineYears: the committed boundaries put every feature into a year of the committed baseline", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const read = async (p) => JSON.parse(await readFile(new URL(p, import.meta.url), "utf-8"));
+  const { features } = await read("../../data/boundaries.json");
+  const years = Object.keys((await read("../../data/border-check-baseline.json")).years).map(Number);
+  for (const y of baselineYears(features)) assert.ok(years.includes(y), `${y} missing: node scripts/verify-borders.js --write-baseline`);
+  for (const { properties: p } of features) {
+    assert.ok(years.some((y) => p.start_year <= y && y <= p.end_year), `${p.name} ${p.start_year}-${p.end_year} is in no baseline year`);
   }
 });

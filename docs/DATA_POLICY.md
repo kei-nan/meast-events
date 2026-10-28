@@ -601,7 +601,7 @@ node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coo
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
-npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings (runs in CI; needs root npm ci)
+npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings, simplified/coarsened shapes (runs in CI; needs root npm ci)
 node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --apply writes data/events.json. Every run also
                                                         #    applies the "Not events" rule and carries re-derived date-order
                                                         #    flags to curated records (--no-add: only that, nothing added)
@@ -657,6 +657,19 @@ Gaza Strip's coast at 34.4895E 31.6004N, 180 m; a hole in French Syria 1922-1938
 Syria line and the sanjak that the snap does not fill (unchanged). Overlaps between a shape whose status ends in `-included` (for example Israel from 1967, `occupied-territory-included`) and a
 flagged shape drawn on top of it (the West Bank, Gaza Strip and Golan Heights) are intentional and not listed. Smaller slivers along shared borders
 (at most about 0.13 km² on the current data) come from two separately sourced lines not coinciding exactly and are only counted. It never edits geometry.
+
+Borders are never simplified; 6 decimal places (about 10 cm) is the coarsest rounding allowed without approval. Since 2026-10-28
+`validate-boundaries.js` also fails when a feature has fewer vertices, or fewer coordinate values written with at least 6 decimals, than in
+`data/border-geometry-baseline.json` (per feature; 103 features, 189,472 vertices counting each ring's closing point), or when a feature in that
+file is gone. More vertices or more decimals pass. After an approved geometry change the baseline is rewritten on purpose with
+`node scripts/validate-boundaries.js --write-geometry-baseline`, so the diff shows which shapes changed.
+
+`node scripts/verify-borders.js --check` (CI) measures the independent Wikidata reference points against the drawn borders of every year in
+`data/border-check-baseline.json` and fails if one moved more than 0.25 km further from its border. Since 2026-10-28 those years are derived
+from the data (`baselineYears` in `scripts/lib/boundary-checks.js`: the fewest years that fall inside every distinct `start_year`..`end_year`
+period, 23 on the current data) plus the earlier hand-picked 1930, 1960 and 1990, so every shape ever drawn is compared (before, only 1930, 1960,
+1990 and 2026 were, missing for example Israel 1967-1978 and the Gaza Strip 2007-2022). A border period with no baseline year fails the check
+until `node scripts/verify-borders.js --write-baseline` is run.
 
 ## Refreshing extracts (monthly, automatic)
 

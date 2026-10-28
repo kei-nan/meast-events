@@ -1,0 +1,414 @@
+{
+  "Persia 1886-1934": {
+    "vertices": 1197,
+    "fine": 2184
+  },
+  "Iran 1935-present": {
+    "vertices": 1197,
+    "fine": 2184
+  },
+  "Ottoman Empire 1886-1912": {
+    "vertices": 3900,
+    "fine": 7024
+  },
+  "Ottoman Empire 1913-1914": {
+    "vertices": 2585,
+    "fine": 4661
+  },
+  "Ottoman Empire 1915-1917": {
+    "vertices": 2209,
+    "fine": 3978
+  },
+  "Ottoman Empire 1918": {
+    "vertices": 2230,
+    "fine": 4012
+  },
+  "Ottoman Empire 1919": {
+    "vertices": 2064,
+    "fine": 3717
+  },
+  "Ottoman Empire 1920-1921": {
+    "vertices": 1164,
+    "fine": 2101
+  },
+  "Ottoman Empire 1922-1923": {
+    "vertices": 1164,
+    "fine": 2100
+  },
+  "Turkey 1924-1938": {
+    "vertices": 1166,
+    "fine": 2104
+  },
+  "Turkey 1939-present": {
+    "vertices": 1164,
+    "fine": 2101
+  },
+  "British Mandate of Mesopotamia 1920": {
+    "vertices": 359,
+    "fine": 657
+  },
+  "British Mandate of Mesopotamia 1921": {
+    "vertices": 349,
+    "fine": 639
+  },
+  "Kingdom of Iraq (British Mandate) 1922": {
+    "vertices": 346,
+    "fine": 633
+  },
+  "Kingdom of Iraq (British Mandate) 1923-1932": {
+    "vertices": 346,
+    "fine": 633
+  },
+  "Kingdom of Iraq 1933-1958": {
+    "vertices": 346,
+    "fine": 633
+  },
+  "Iraq 1959-1981": {
+    "vertices": 346,
+    "fine": 633
+  },
+  "Iraq 1982-present": {
+    "vertices": 349,
+    "fine": 639
+  },
+  "Egypt 1899-1914": {
+    "vertices": 848,
+    "fine": 1533
+  },
+  "Egypt 1915-1921": {
+    "vertices": 848,
+    "fine": 1533
+  },
+  "Egypt 1922-1925": {
+    "vertices": 848,
+    "fine": 1533
+  },
+  "Egypt 1926-1947": {
+    "vertices": 808,
+    "fine": 1454
+  },
+  "Egypt 1948-1966": {
+    "vertices": 752,
+    "fine": 1350
+  },
+  "Egypt 1967-1978": {
+    "vertices": 638,
+    "fine": 1159
+  },
+  "Egypt 1979-1981": {
+    "vertices": 752,
+    "fine": 1350
+  },
+  "Egypt 1982-present": {
+    "vertices": 752,
+    "fine": 1350
+  },
+  "French Mandate of Syria 1920": {
+    "vertices": 277,
+    "fine": 512
+  },
+  "French Mandate of Syria 1921": {
+    "vertices": 266,
+    "fine": 491
+  },
+  "French Mandate of Syria 1922": {
+    "vertices": 330,
+    "fine": 607
+  },
+  "French Mandate of Syria 1923": {
+    "vertices": 330,
+    "fine": 607
+  },
+  "French Mandate of Syria 1924-1938": {
+    "vertices": 363,
+    "fine": 673
+  },
+  "French Mandate of Syria 1939-1945": {
+    "vertices": 266,
+    "fine": 491
+  },
+  "Syria 1946-1966": {
+    "vertices": 266,
+    "fine": 491
+  },
+  "Syria 1967-present": {
+    "vertices": 252,
+    "fine": 465
+  },
+  "Lebanon (French Mandate) 1920": {
+    "vertices": 118,
+    "fine": 212
+  },
+  "Lebanon (French Mandate) 1921-1943": {
+    "vertices": 118,
+    "fine": 212
+  },
+  "Lebanon 1944": {
+    "vertices": 118,
+    "fine": 212
+  },
+  "Lebanon 1945-present": {
+    "vertices": 118,
+    "fine": 212
+  },
+  "Transjordan 1920": {
+    "vertices": 121,
+    "fine": 216
+  },
+  "Transjordan 1921-1923": {
+    "vertices": 121,
+    "fine": 216
+  },
+  "Transjordan 1924-1925": {
+    "vertices": 119,
+    "fine": 214
+  },
+  "Transjordan 1926-1945": {
+    "vertices": 119,
+    "fine": 214
+  },
+  "Jordan 1946-1999": {
+    "vertices": 119,
+    "fine": 214
+  },
+  "Jordan 2000-present": {
+    "vertices": 3477,
+    "fine": 6254
+  },
+  "Mandatory Palestine 1920": {
+    "vertices": 165,
+    "fine": 297
+  },
+  "Mandatory Palestine 1921-1923": {
+    "vertices": 165,
+    "fine": 297
+  },
+  "Mandatory Palestine 1924-1947": {
+    "vertices": 165,
+    "fine": 297
+  },
+  "Israel 1948-1966": {
+    "vertices": 194,
+    "fine": 343
+  },
+  "Israel 1967-1978": {
+    "vertices": 273,
+    "fine": 488
+  },
+  "Israel 1979-1999": {
+    "vertices": 164,
+    "fine": 300
+  },
+  "Israel 2000-present": {
+    "vertices": 3523,
+    "fine": 6343
+  },
+  "Saudi Arabia 1933-1934": {
+    "vertices": 737,
+    "fine": 1317
+  },
+  "Saudi Arabia 1935-1960": {
+    "vertices": 737,
+    "fine": 1317
+  },
+  "Saudi Arabia 1961-1969": {
+    "vertices": 735,
+    "fine": 1313
+  },
+  "Saudi Arabia 1970-1981": {
+    "vertices": 733,
+    "fine": 1307
+  },
+  "Saudi Arabia 1982-1999": {
+    "vertices": 882,
+    "fine": 1583
+  },
+  "Saudi Arabia 2000-present": {
+    "vertices": 886,
+    "fine": 1584
+  },
+  "Mutawakkilite Kingdom of Yemen 1919-1933": {
+    "vertices": 204,
+    "fine": 368
+  },
+  "Mutawakkilite Kingdom of Yemen 1934-1962": {
+    "vertices": 204,
+    "fine": 368
+  },
+  "Yemen Arab Republic 1963-1989": {
+    "vertices": 204,
+    "fine": 368
+  },
+  "Yemen 1990-1999": {
+    "vertices": 556,
+    "fine": 978
+  },
+  "Yemen 2000-present": {
+    "vertices": 558,
+    "fine": 976
+  },
+  "People's Republic of South Yemen 1968-1970": {
+    "vertices": 381,
+    "fine": 662
+  },
+  "People's Democratic Republic of Yemen 1971-1989": {
+    "vertices": 381,
+    "fine": 662
+  },
+  "Aden Colony and Western Aden Protectorate 1937-1961": {
+    "vertices": 185,
+    "fine": 328
+  },
+  "Kuwait 1961-1969": {
+    "vertices": 499,
+    "fine": 983
+  },
+  "Kuwait 1970-1989": {
+    "vertices": 136,
+    "fine": 254
+  },
+  "Kuwait (annexed by Iraq) 1990-1991": {
+    "vertices": 136,
+    "fine": 254
+  },
+  "Kuwait 1992-present": {
+    "vertices": 136,
+    "fine": 254
+  },
+  "Bahrain 1972-2001": {
+    "vertices": 87,
+    "fine": 151
+  },
+  "Bahrain 2002-present": {
+    "vertices": 87,
+    "fine": 151
+  },
+  "Qatar 1917-1971": {
+    "vertices": 151,
+    "fine": 274
+  },
+  "Qatar 1972-present": {
+    "vertices": 151,
+    "fine": 274
+  },
+  "Trucial States 1892-1913": {
+    "vertices": 271,
+    "fine": 491
+  },
+  "Trucial States 1914-1951": {
+    "vertices": 271,
+    "fine": 491
+  },
+  "Trucial States 1952-1971": {
+    "vertices": 271,
+    "fine": 491
+  },
+  "United Arab Emirates 1972-1974": {
+    "vertices": 271,
+    "fine": 491
+  },
+  "United Arab Emirates 1975-present": {
+    "vertices": 271,
+    "fine": 491
+  },
+  "Muscat and Oman 1886-1970": {
+    "vertices": 517,
+    "fine": 937
+  },
+  "Oman 1971-1989": {
+    "vertices": 517,
+    "fine": 937
+  },
+  "Oman 1990-present": {
+    "vertices": 517,
+    "fine": 937
+  },
+  "Federation of South Arabia 1962-1967": {
+    "vertices": 381,
+    "fine": 662
+  },
+  "Eastern Aden Protectorate 1937-1961": {
+    "vertices": 280,
+    "fine": 495
+  },
+  "Sanjak of Alexandretta (Hatay) 1922-1938": {
+    "vertices": 168,
+    "fine": 304
+  },
+  "West Bank (Jordanian military administration) 1948-1949": {
+    "vertices": 67,
+    "fine": 116
+  },
+  "West Bank (annexed by Jordan) 1950-1966": {
+    "vertices": 67,
+    "fine": 116
+  },
+  "Gaza Strip (Egyptian military administration) 1948-1966": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Golan Heights (Israeli military occupation) 1967-1981": {
+    "vertices": 27,
+    "fine": 52
+  },
+  "Golan Heights (annexed by Israel) 1982-present": {
+    "vertices": 27,
+    "fine": 52
+  },
+  "Abu Musa and Greater Tunb (held by Iran, claimed by the UAE) 1972-present": {
+    "vertices": 27,
+    "fine": 48
+  },
+  "West Bank (Israeli military occupation) 1967-1994": {
+    "vertices": 67,
+    "fine": 116
+  },
+  "West Bank (Israeli occupation, phased Oslo transfers) 1995-1999": {
+    "vertices": 67,
+    "fine": 116
+  },
+  "West Bank Area A (Palestinian Authority) 2000-present": {
+    "vertices": 14717,
+    "fine": 26601
+  },
+  "West Bank Area B (Palestinian civil, joint security) 2000-present": {
+    "vertices": 53213,
+    "fine": 95707
+  },
+  "West Bank Area C (Israeli control) 2000-present": {
+    "vertices": 67752,
+    "fine": 121908
+  },
+  "Gaza Strip (Israeli military occupation) 1967-1993": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Gaza Strip (Palestinian Authority, Israeli settlements retained) 1994-2004": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Gaza Strip (Palestinian Authority, post-disengagement) 2005-2006": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Gaza Strip (Hamas government, under blockade) 2007-2022": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Gaza Strip (Israeli ground offensive) 2023-2025": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Gaza Strip (ceasefire, divided at the Yellow Line) 2026-present": {
+    "vertices": 30,
+    "fine": 55
+  },
+  "Saudi-Kuwaiti Neutral Zone 1922-1969": {
+    "vertices": 451,
+    "fine": 890
+  },
+  "Saudi-Iraqi Neutral Zone 1922-1981": {
+    "vertices": 5,
+    "fine": 6
+  }
+}
