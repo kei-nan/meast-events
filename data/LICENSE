@@ -22,7 +22,8 @@ Two other sources in the border data keep their own terms:
   not a Creative Commons licence: non-commercial use with credit to
   UN OCHA (derivative works are permitted subject to the inclusion of
   credit to the source; see scripts/extract-correction-geometry.js).
-  Carried in each feature's `geometry_source`.
+  The credit is carried in the `source` field of the boundaries.json
+  features drawn from it (Areas A/B/C) or fitted to it.
 - Some corrected border points (the wells and capes that treaties name)
   are located with GeoNames gazetteer coordinates, CC BY 4.0
   (https://creativecommons.org/licenses/by/4.0/), https://www.geonames.org/

@@ -37,7 +37,7 @@ import { eventPath, shareLink } from "./urlState.js";
 export const SITE_ORIGIN = "https://middleeast.events";
 export const TEXT_LICENSE = "CC BY-SA 4.0";
 export const TEXT_LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/";
-export const ATTRIBUTION = `Text: Wikipedia contributors, ${TEXT_LICENSE} (${TEXT_LICENSE_URL}); dates, places and identifiers: Wikidata, CC0; source article linked from site_url`;
+export const ATTRIBUTION = `Text: Wikipedia contributors, ${TEXT_LICENSE} (${TEXT_LICENSE_URL}); identifiers: Wikidata, CC0; dates and places: mostly Wikidata (CC0), others from the event's Wikipedia article or set by hand by middleeast.events; source article linked from site_url`;
 export const NOTICE_URL = "https://github.com/kei-nan/meast-events/blob/main/NOTICE";
 
 /** The CSV header, in column order: [key, header text]. */
@@ -163,7 +163,8 @@ export function toJSON(rows, { query, generatedAt = new Date() } = {}) {
       text: `Event titles are Wikipedia text by Wikipedia contributors, ${TEXT_LICENSE}; each event's site_url links its Wikipedia article.`,
       text_license: TEXT_LICENSE,
       text_license_url: TEXT_LICENSE_URL,
-      facts: "Dates, places and identifiers come from Wikidata (CC0).",
+      facts:
+        "Identifiers come from Wikidata (CC0). Dates and places mostly come from Wikidata (CC0); the others come from the event's Wikipedia article or were set by hand by middleeast.events.",
       not_included: "No Wikipedia extract text and no border geometry (the borders are CC BY-NC-SA 4.0, CShapes 2.0, and UN OCHA's non-commercial terms).",
       credits: NOTICE_URL,
     },

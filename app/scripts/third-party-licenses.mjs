@@ -7,7 +7,12 @@
 // Which packages: every node_modules package with a module in the production bundle (Rollup's module graph,
 // so a dependency that is installed but not bundled is not listed), plus EXTRA, which ship without passing
 // through the module graph: the fontsource fonts that scripts/subset-fonts.mjs subsets into the bundle, and
-// Pagefind, whose search runtime scripts/build-search-index.mjs writes to dist/pagefind/. For each package the
+// Pagefind, whose search runtime scripts/build-search-index.mjs writes to dist/pagefind/. A package that ships
+// a prebuilt bundle (maplibre-gl's dist/maplibre-gl.mjs and its worker inline kdbush, earcut, pbf, gl-matrix,
+// the @mapbox/* and @maplibre/* packages and others) shows up in the module graph as itself only, so for each
+// bundled module that has a source map next to it, the packages named in the map's `sources` are listed too
+// (bundledPackagesOf), read from the installed copy (the package's own node_modules first, then the app's).
+// For each package the
 // file holds its name, version, declared licence, homepage and its LICENSE/LICENCE/COPYING file as shipped in
 // the package; a package without such a file is listed with its declared licence and says so.
 // No dependency: node built-ins only. Fails the build if it finds no package at all (a broken module scan).
@@ -27,7 +32,21 @@ export function packageOf(id) {
   return { name: last[1], dir: path.slice(0, last.index + last[0].length) };
 }
 
-const LICENSE_FILE = /^(licen[cs]e|copying)(\.(md|txt|markdown))?$/i;
+// The packages inlined into a prebuilt file, from the source map beside it ("<file>.map"): every node_modules
+// package its `sources` name, other than `self` (the package that ships the file). [] without a map.
+export function bundledPackagesOf(file, self) {
+  const map = `${String(file).split("?")[0]}.map`;
+  if (!existsSync(map)) return [];
+  const { sources = [] } = JSON.parse(readFileSync(map, "utf8"));
+  const names = new Set();
+  for (const s of sources) {
+    const p = packageOf(`/${s}`);
+    if (p && p.name !== self) names.add(p.name);
+  }
+  return [...names].sort();
+}
+
+const LICENSE_FILE =/^(licen[cs]e|copying)(\.(md|txt|markdown))?$/i;
 
 // One package's entry as plain text.
 export function packageNotice(dir) {
@@ -53,7 +72,15 @@ export default function thirdPartyLicenses() {
       const dirs = new Map();
       for (const id of this.getModuleIds()) {
         const p = packageOf(id);
-        if (p && existsSync(join(p.dir, "package.json"))) dirs.set(p.name, p.dir);
+        if (!p || !existsSync(join(p.dir, "package.json"))) continue;
+        dirs.set(p.name, p.dir);
+        for (const name of bundledPackagesOf(id, p.name)) {
+          const dir = [join(p.dir, "node_modules", name), join(root, "node_modules", name)].find((d) =>
+            existsSync(join(d, "package.json"))
+          );
+          if (!dir) this.error(`third-party-licenses: ${name}, bundled in ${p.name}, is not installed`);
+          dirs.set(name, dir);
+        }
       }
       // app/node_modules/<name> directly: not every package exports its package.json to require.resolve
       for (const name of EXTRA) dirs.set(name, join(root, "node_modules", name));
