@@ -412,10 +412,19 @@ export default function MapView({
         });
       };
 
+      // Cluster ids change whenever the events data does (each Play step, a new
+      // search): a lookup answered after a change (`eventsGeneration` moved on) is
+      // dropped, as its id may now be another cluster (as in useMapHoverLabel.js).
+      let eventsGeneration = 0;
+      map.on("data", (e) => {
+        if (e.sourceId === "events" && e.sourceDataType === "content") eventsGeneration++;
+      });
+
       const clickCluster = async (e, feature) => {
         const center = feature.geometry.coordinates;
         const { cluster_id: clusterId, point_count: count } = feature.properties;
         const source = map.getSource("events");
+        const asked = eventsGeneration;
         // Visible click feedback: flash the cluster while the map zooms into it.
         map.getSource("cluster-flash")?.setData(ringFor(feature, 8));
         setTimeout(() => map.getSource("cluster-flash")?.setData(EMPTY_FC), 550);
@@ -431,7 +440,7 @@ export default function MapView({
         // lists its events instead of zooming in to a single unclickable dot.
         const leaves =
           count <= LIST_MAX ? await source.getClusterLeaves(clusterId, LIST_MAX, 0).catch(() => null) : null;
-        if (cancelled) return;
+        if (cancelled || asked !== eventsGeneration) return;
         const action = clusterClickAction({ count, expansionZoom: expansion, clusterMaxZoom: CLUSTER_MAX_ZOOM, leaves });
         if (action === "list" && leaves?.length) return openStack(e, leaves, count);
         map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 });
@@ -773,6 +782,30 @@ export default function MapView({
   }, [areaMode]);
   // A listed stack goes stale once the events (year range, search) change.
   useEffect(() => setStackList(null), [events]);
+  // Both are placed at the clicked pixel and describe that year's map: a new year
+  // (a scrub, each Play step) or a pan/zoom by the user leaves them pointing at the
+  // wrong place, so they close. Moves the app makes itself carry no originalEvent
+  // and leave them open.
+  // The map's own zoom/pan/reset buttons are user moves too (MapNav, below).
+  const closeMapPopups = () => {
+    setBorderPopup(null);
+    setStackList(null);
+  };
+  useEffect(() => {
+    setBorderPopup(null);
+    setStackList(null);
+  }, [year]);
+  useEffect(() => {
+    if (!mapReady) return;
+    const map = mapRef.current;
+    const onMoveStart = (e) => {
+      if (!e.originalEvent) return;
+      setBorderPopup(null);
+      setStackList(null);
+    };
+    map.on("movestart", onMoveStart);
+    return () => map.off("movestart", onMoveStart);
+  }, [mapReady]);
 
   useMapHoverLabel({
     mapRef,
@@ -1230,13 +1263,23 @@ export default function MapView({
         />
       </div>
       <MapNav
-        onZoomIn={() => zoomBy(1)}
-        onZoomOut={() => zoomBy(-1)}
+        onZoomIn={() => {
+          closeMapPopups();
+          zoomBy(1);
+        }}
+        onZoomOut={() => {
+          closeMapPopups();
+          zoomBy(-1);
+        }}
         onReset={() => {
+          closeMapPopups();
           resetView();
           if (hintOpen) dismissHint();
         }}
-        onPan={panBy}
+        onPan={(dx, dy) => {
+          closeMapPopups();
+          panBy(dx, dy);
+        }}
       />
       {hintOpen && <MapTip onDismiss={dismissHint} />}
       {borderPopup && <BoundaryPopup popup={borderPopup} onClose={closePopup} width={size.w} height={size.h} />}

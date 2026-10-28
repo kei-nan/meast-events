@@ -120,7 +120,6 @@ test("strict validation rejects malformed input", () => {
   assert.equal(bad("?y=1800-2000").years, null);
   assert.equal(bad("?y=1990-1950").years, null);
   assert.equal(bad("?y=abc").years, null);
-  assert.equal(bad("?y=1900-2027").years, null);
   assert.equal(bad("?scope=bogus").scope, "all");
   assert.equal(bad("?area=r:1,2,3").area, null);
   assert.equal(bad("?area=r:40,10,30,20").area, null); // min > max
@@ -149,7 +148,11 @@ test("serialize omits invalid pieces, and the event (it is the path)", () => {
 test("the last year follows the clock, not a fixed year", () => {
   assert.equal(YEAR_MAX, new Date().getUTCFullYear());
   assert.deepEqual(parseUrlState(`?y=2000-${YEAR_MAX}`).years, [2000, YEAR_MAX]);
-  assert.equal(parseUrlState(`?y=2000-${YEAR_MAX + 1}`).years, null);
+  // An end past the last year is clamped to it; the start is kept.
+  assert.deepEqual(parseUrlState(`?y=2000-${YEAR_MAX + 1}`).years, [2000, YEAR_MAX]);
+  assert.deepEqual(parseUrlState("?y=1900-9999").years, [1900, YEAR_MAX]);
+  // A start past the last year still leaves nothing to show.
+  assert.equal(parseUrlState(`?y=${YEAR_MAX + 1}-${YEAR_MAX + 2}`).years, null);
 });
 
 test("urlWriteMode: pushes event changes, debounces the rest, replaces on request", () => {

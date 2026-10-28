@@ -33,6 +33,7 @@ import { countryLabel } from "./eventCountries.js";
 import { rawEventYears, eventOverlapsRange, yearsReversed } from "./eventYears.js";
 import { startedBefore } from "./browseOrder.js";
 import { eventPath, shareLink } from "./urlState.js";
+import { downloadBlob } from "./downloadFile.js";
 
 export const SITE_ORIGIN = "https://middleeast.events";
 export const TEXT_LICENSE = "CC BY-SA 4.0";
@@ -189,14 +190,5 @@ export function exportFileRange(range, { searching, scope }) {
 
 /** Saves `text` as a file: a Blob behind an object URL, clicked from a temporary link. */
 export function downloadText(text, filename, type) {
-  const url = URL.createObjectURL(new Blob([text], { type }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.hidden = true;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  // After the click has handed the URL to the download (revoking at once can cancel it in some browsers).
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  downloadBlob(new Blob([text], { type }), filename);
 }
