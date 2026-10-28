@@ -284,8 +284,19 @@ test("classes: only those on the event-class list, with a link to the Wikidata i
 
 test("category: named with the Wikidata class it comes from, as on the event panel", () => {
   const html = page({ id: "h", title: "H", category: "atrocity", wikidata_classes: ["famine", "genocide"] });
-  assert.match(html, /<p class="category">Category: Atrocity, from Wikidata’s class “genocide”<\/p>/);
+  assert.match(
+    html,
+    /<p class="category">Category: Atrocity, from Wikidata’s class “<a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q41397" rel="noreferrer" aria-label="genocide \(Wikidata class\)">genocide<\/a>”<\/p>/
+  );
   assert.doesNotMatch(html, /our grouping/);
+});
+
+test("category: the class behind terrorism is linked the same way whoever the victims were", () => {
+  const bahr = page({ id: "b", title: "B", category: "terrorism", wikidata_classes: ["bomb attack", "terrorist attack"] });
+  const oct7 = page({ id: "o", title: "O", category: "terrorism", wikidata_classes: ["coordinated terrorist attack", "massacre", "terrorist attack"] });
+  const line = /<p class="category">Category: Terrorism, from Wikidata’s class “<a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q2223653" rel="noreferrer" aria-label="terrorist attack \(Wikidata class\)">terrorist attack<\/a>”<\/p>/;
+  assert.match(bahr, line);
+  assert.match(oct7, line);
 });
 
 test("an invalid id is refused", () => {

@@ -11,7 +11,7 @@
 // it. The app replaces that content when it starts, reads the event from the path
 // (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
-import { categoryWithBasis } from "../src/lib/categoryLabels.js";
+import { categoryBasisParts } from "../src/lib/categoryLabels.js";
 import { citationNotes, citeEvent } from "../src/lib/citation.js";
 import { roundedLocationNote } from "../src/lib/coordPrecision.js";
 import { dataFixUrl } from "../src/lib/dataFixes.js";
@@ -201,6 +201,20 @@ ${notes.join("\n")}
 // Wikidata's "part of" (P361), in Wikidata's labels (src/lib/partOf.js): a parent
 // that is one of our events links to its page, any other is plain text with a
 // small link to its Wikidata item.
+// The category and the Wikidata classes it comes from (src/lib/categoryLabels.js), each class linked to its own
+// Wikidata item, as the event panel shows it. Everything escaped.
+function renderCategoryBasis(event) {
+  return categoryBasisParts(event)
+    .map((p) => {
+      if (typeof p === "string") return escapeHtml(p);
+      const url = safeUrl(p.url);
+      return url
+        ? `<a class="wd" href="${escapeHtml(url)}" rel="noreferrer" aria-label="${escapeHtml(`${p.label} (Wikidata class)`)}">${escapeHtml(p.label)}</a>`
+        : escapeHtml(p.label);
+    })
+    .join("");
+}
+
 function renderPartOf(parents) {
   const list = (parents ?? []).filter((p) => p && typeof p.label === "string");
   if (!list.length) return "";
@@ -544,7 +558,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
 
   const meta = [dateText, countries.map(countryLabel).join(", ")].filter(Boolean).map(escapeHtml).join(" · ");
   const body = [
-    event.category && `<p class="category">Category: ${escapeHtml(categoryWithBasis(event))}</p>`,
+    event.category && `<p class="category">Category: ${renderCategoryBasis(event)}</p>`,
     `<h1>${escapeHtml(title)}</h1>`,
     meta && `<p class="meta">${meta}</p>`,
     renderPartOf(event.part_of),

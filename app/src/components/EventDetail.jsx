@@ -13,7 +13,7 @@ import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 import { countryLabel, countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
-import { categoryWithBasis } from "../lib/categoryLabels.js";
+import { categoryBasisParts } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
@@ -67,6 +67,23 @@ function PartOf({ parents, onSelectEvent }) {
         );
       })}
     </span>
+  );
+}
+
+// The category and the Wikidata classes it comes from (lib/categoryLabels.js); each class, in Wikidata's label,
+// links to that class's own Wikidata item. The same for every group.
+function CategoryBasis({ event }) {
+  return categoryBasisParts(event).map((p, i) =>
+    typeof p === "string" ? (
+      <Fragment key={i}>{p}</Fragment>
+    ) : p.url ? (
+      <a key={i} href={p.url} target="_blank" rel="noreferrer">
+        {p.label}
+        <span className="sp-sr-status"> (Wikidata class, opens in a new tab)</span>
+      </a>
+    ) : (
+      <Fragment key={i}>{p.label}</Fragment>
+    )
   );
 }
 
@@ -299,7 +316,9 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
           "part of". Where an entry's data comes from is in "About this entry" at the end. */}
       <header className="event-detail-head">
         {event.category && (
-          <p className="event-detail-category">Category: {categoryWithBasis(event)}</p>
+          <p className="event-detail-category">
+            Category: <CategoryBasis event={event} />
+          </p>
         )}
         <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
           {event.title}

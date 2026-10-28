@@ -26,22 +26,39 @@ export function categoryShortLabel(id) {
   return categoryLabel(id).replace(/\s*\(.*\)$/, "");
 }
 
-// The grouping rule's class table (scripts/lib/event-classes.js EVENT_CLASSES: label -> group); kept equal to it by
-// scripts/lib/validate.test.js. Only used to name the Wikidata classes behind an event's group.
+import { wikidataUrl } from "./partOf.js";
+
+// The grouping rule's class table (scripts/lib/event-classes.js EVENT_CLASSES: label -> group, and the class's own
+// Wikidata QID); kept equal to it by scripts/lib/validate.test.js. Only used to name, and link to, the Wikidata classes
+// behind an event's group.
 export const CLASS_GROUPS = [
-  ["battle", "war"], ["war", "war"], ["military operation", "war"], ["treaty", "treaty"], ["coup d'état", "political"],
-  ["assassination", "political"], ["genocide", "atrocity"], ["massacre", "atrocity"], ["terrorist attack", "terrorism"],
-  ["revolution", "uprising"], ["rebellion", "uprising"], ["population transfer", "migration"], ["siege", "war"],
-  ["war crime", "atrocity"], ["hostage taking", "terrorism"], ["aircraft hijacking", "terrorism"], ["ceasefire", "diplomatic"],
-  ["armistice", "treaty"], ["peace conference", "diplomatic"], ["embargo", "economic"], ["nationalization", "economic"],
-  ["declaration of independence", "political"], ["referendum", "political"], ["armed conflict", "war"],
-  ["military campaign", "war"], ["military occupation", "war"], ["airstrike", "war"], ["bombardment", "war"],
-  ["aircraft shootdown", "war"], ["suicide attack", "terrorism"], ["pogrom", "atrocity"], ["mass murder", "atrocity"],
-  ["riot", "protest"], ["political crisis", "political"], ["international crisis", "political"],
-  ["public election", "political"], ["protest", "protest"], ["demonstration", "protest"], ["summit", "diplomatic"],
-  ["ethnic cleansing", "atrocity"],
+  ["battle", "war", "Q178561"], ["war", "war", "Q198"], ["military operation", "war", "Q645883"],
+  ["treaty", "treaty", "Q131569"], ["coup d'état", "political", "Q45382"],
+  ["assassination", "political", "Q3882219"], ["genocide", "atrocity", "Q41397"],
+  ["massacre", "atrocity", "Q3199915"], ["terrorist attack", "terrorism", "Q2223653"],
+  ["revolution", "uprising", "Q10931"], ["rebellion", "uprising", "Q124734"],
+  ["population transfer", "migration", "Q15589476"], ["siege", "war", "Q188055"],
+  ["war crime", "atrocity", "Q135010"], ["hostage taking", "terrorism", "Q1371150"],
+  ["aircraft hijacking", "terrorism", "Q898712"], ["ceasefire", "diplomatic", "Q208383"],
+  ["armistice", "treaty", "Q107706"], ["peace conference", "diplomatic", "Q7157512"],
+  ["embargo", "economic", "Q989265"], ["nationalization", "economic", "Q178564"],
+  ["declaration of independence", "political", "Q1464916"], ["referendum", "political", "Q43109"],
+  ["armed conflict", "war", "Q350604"], ["military campaign", "war", "Q831663"],
+  ["military occupation", "war", "Q188686"], ["airstrike", "war", "Q2380335"], ["bombardment", "war", "Q678146"],
+  ["aircraft shootdown", "war", "Q6539177"], ["suicide attack", "terrorism", "Q217327"],
+  ["pogrom", "atrocity", "Q177716"], ["mass murder", "atrocity", "Q750215"], ["riot", "protest", "Q124757"],
+  ["political crisis", "political", "Q3002772"], ["international crisis", "political", "Q5791104"],
+  ["public election", "political", "Q40231"], ["protest", "protest", "Q273120"],
+  ["demonstration", "protest", "Q175331"], ["summit", "diplomatic", "Q1072326"],
+  ["ethnic cleansing", "atrocity", "Q154278"],
 ];
-const GROUP_OF = new Map(CLASS_GROUPS);
+const GROUP_OF = new Map(CLASS_GROUPS.map(([label, group]) => [label, group]));
+const QID_OF = new Map(CLASS_GROUPS.map(([label, , qid]) => [label, qid]));
+
+/** The Wikidata page of a class on the grouping rule's list (by its label), or null for any other label. */
+export function classUrl(label) {
+  return wikidataUrl(QID_OF.get(label));
+}
 
 const OVERRIDING = ["terrorism", "atrocity"];
 
@@ -62,16 +79,30 @@ export function categoryBasis(event) {
  * the export's column name).
  */
 export function categoryWithBasis(event) {
+  return categoryBasisParts(event)
+    .map((p) => (typeof p === "string" ? p : p.label))
+    .join("");
+}
+
+/**
+ * The same text as categoryWithBasis, as pieces for the event panel and the event pages to render: plain strings, and
+ * {label, url} for each Wikidata class named (its label, unchanged, and the Wikidata page of that class), so the
+ * class can be linked. The same for every group and every event.
+ */
+export function categoryBasisParts(event) {
   const label = categoryShortLabel(event?.category);
-  if (event?.category === "unclassified") return `${label}: none of its Wikidata classes is on our list`;
+  if (event?.category === "unclassified") return [`${label}: none of its Wikidata classes is on our list`];
   const basis = categoryBasis(event);
-  if (!basis.length) return label;
+  if (!basis.length) return label ? [label] : [];
+  const cls = (l) => ({ label: l, url: classUrl(l) });
   if (event.category === "mixed") {
-    const list = basis.map(([l, g]) => `${l} (${categoryShortLabel(g)})`).join(", ");
-    return `${label} — Wikidata’s classes point to more than one group: ${list}`;
+    const parts = [`${label} — Wikidata’s classes point to more than one group: `];
+    basis.forEach(([l, g], i) => parts.push(...(i ? [", "] : []), cls(l), ` (${categoryShortLabel(g)})`));
+    return parts;
   }
-  const quoted = basis.map(([l]) => `“${l}”`).join(", ");
-  return `${label}, from Wikidata’s class${basis.length > 1 ? "es" : ""} ${quoted}`;
+  const parts = [`${label}, from Wikidata’s class${basis.length > 1 ? "es" : ""} `];
+  basis.forEach(([l], i) => parts.push(i ? ", “" : "“", cls(l), "”"));
+  return parts;
 }
 
 /**
