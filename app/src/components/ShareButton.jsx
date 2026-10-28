@@ -1,6 +1,7 @@
 import { Suspense, lazy, useContext, useEffect, useId, useRef, useState } from "react";
 import { ShareLinkContext } from "../lib/shareLinkContext.js";
 import { importOr } from "../lib/importOr.js";
+import { downloadBlob } from "../lib/downloadFile.js";
 import "./ShareButton.css";
 
 // "Cite" is offered only inside the open event's view (EventDetail passes `cite`),
@@ -47,12 +48,7 @@ function downloadPng(data, filename) {
     })
   );
   canvas.toBlob((blob) => {
-    if (!blob) return;
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 0);
+    if (blob) downloadBlob(blob, filename);
   }, "image/png");
 }
 

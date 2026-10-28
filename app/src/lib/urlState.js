@@ -115,8 +115,11 @@ export function parseUrlState(search, pathname = "/") {
   const ym = /^(\d{4})-(\d{4})$/.exec(p.get("y") ?? "");
   if (ym) {
     const s = Number(ym[1]);
-    const e = Number(ym[2]);
-    if (s >= YEAR_MIN && e <= YEAR_MAX && s <= e) years = [s, e];
+    // The last year follows the visitor's clock (lib/years.js): a link made where
+    // the year had already turned, or one ending in a year the data never reaches,
+    // keeps its start and ends at the last year shown here.
+    const e = Math.min(Number(ym[2]), YEAR_MAX);
+    if (s >= YEAR_MIN && s <= e) years = [s, e];
   }
 
   const e = p.get("e"); // an older link (see the top of the file)
