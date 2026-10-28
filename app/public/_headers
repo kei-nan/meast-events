@@ -127,3 +127,10 @@
 /data/boundaries/shared/*
   ! Cache-Control
   Cache-Control: public, max-age=0, must-revalidate
+
+# The raw border files carry their licence (CC BY-NC-SA 4.0 for the CShapes 2.0
+# part, UN OCHA's non-commercial terms for the West Bank Areas A/B/C; data/LICENSE).
+# The site does not serve that file, so the link is to the repository's copy.
+# Adds only Link, which no other rule sets, so nothing is comma-joined onto it.
+/data/boundaries/*
+  Link: <https://github.com/kei-nan/meast-events/blob/main/data/LICENSE>; rel="license"

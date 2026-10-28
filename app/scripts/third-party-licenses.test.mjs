@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { packageNotice, packageOf } from "./third-party-licenses.mjs";
+import { bundledPackagesOf, packageNotice, packageOf } from "./third-party-licenses.mjs";
 
 test("packageOf: the package a bundled module belongs to", () => {
   assert.deepEqual(packageOf("/a/app/node_modules/maplibre-gl/dist/maplibre-gl.js"), {
@@ -60,6 +60,30 @@ test("packageNotice: a package without a licence file says so", () => {
   const { root, dir } = fakePackage({ "package.json": JSON.stringify({ name: "maplibre-gl", version: "1.0.0", license: "MIT" }) });
   try {
     assert.ok(packageNotice(dir).text.includes("(The package ships no licence file; its package.json declares MIT.)"));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("bundledPackagesOf: the packages a prebuilt file inlines, from the source map beside it", () => {
+  const { root, dir } = fakePackage({
+    "maplibre-gl.mjs": "",
+    "maplibre-gl.mjs.map": JSON.stringify({
+      version: 3,
+      sources: [
+        "../src/ui/map.ts", // the package's own source
+        "../node_modules/kdbush/index.js",
+        "../node_modules/@mapbox/point-geometry/index.js",
+        "../node_modules/earcut/src/earcut.js",
+        "../node_modules/kdbush/index.js", // listed once
+        "../node_modules/maplibre-gl/src/x.ts", // the package itself
+      ],
+    }),
+    "no-map.mjs": "",
+  });
+  try {
+    assert.deepEqual(bundledPackagesOf(join(dir, "maplibre-gl.mjs?url"), "maplibre-gl"), ["@mapbox/point-geometry", "earcut", "kdbush"]);
+    assert.deepEqual(bundledPackagesOf(join(dir, "no-map.mjs"), "maplibre-gl"), []);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
