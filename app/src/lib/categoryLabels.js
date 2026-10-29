@@ -73,34 +73,47 @@ export function categoryBasis(event) {
   return listed;
 }
 
-/**
- * The header text after "Category: ", attributing the group to Wikidata's classes. That attribution is what tells
- * the reader the group is ours; "our grouping" itself is said once, where the groups are introduced (legend, About,
- * the export's column name).
- */
-export function categoryWithBasis(event) {
-  return categoryBasisParts(event)
-    .map((p) => (typeof p === "string" ? p : p.label))
-    .join("");
+// The groups behind a "mixed" event, as [group, its classes] in one fixed order (the order of CATEGORY_LABELS), so
+// the order of Wikidata's class list plays no part.
+function mixedGroups(basis) {
+  return Object.keys(CATEGORY_LABELS)
+    .map((g) => [g, basis.filter(([, lg]) => lg === g).map(([l]) => l)])
+    .filter(([, classes]) => classes.length);
 }
 
 /**
- * The same text as categoryWithBasis, as pieces for the event panel and the event pages to render: plain strings, and
- * {label, url} for each Wikidata class named (its label, unchanged, and the Wikidata page of that class), so the
- * class can be linked. The same for every group and every event.
+ * The header text after "Category: ": the group alone, or for "mixed" the groups its classes belong to ("Mixed: War,
+ * Political"). Where it comes from is in categorySourceParts, one tap away. "Our grouping" itself is said once, where
+ * the groups are introduced (legend, About, the export's column name).
  */
-export function categoryBasisParts(event) {
+export function categorySummary(event) {
   const label = categoryShortLabel(event?.category);
-  if (event?.category === "unclassified") return [`${label}: none of its Wikidata classes is on our list`];
+  if (event?.category !== "mixed") return label;
+  const groups = mixedGroups(categoryBasis(event)).map(([g]) => categoryShortLabel(g));
+  return groups.length ? `${label}: ${groups.join(", ")}` : label;
+}
+
+/**
+ * Where the group comes from, as pieces for the event panel and the event pages to render: plain strings, and
+ * {label, url} for each Wikidata class named (its label, unchanged, and the Wikidata page of that class, or null), so
+ * the class can be linked. [] when there is nothing to say (no group, or the classes are not loaded). The same rule
+ * for every group and every event.
+ */
+export function categorySourceParts(event) {
+  if (event?.category === "unclassified") return ["None of its Wikidata classes is on our list"];
   const basis = categoryBasis(event);
-  if (!basis.length) return label ? [label] : [];
+  if (!event?.category || !basis.length) return [];
   const cls = (l) => ({ label: l, url: classUrl(l) });
   if (event.category === "mixed") {
-    const parts = [`${label} — Wikidata’s classes point to more than one group: `];
-    basis.forEach(([l, g], i) => parts.push(...(i ? [", "] : []), cls(l), ` (${categoryShortLabel(g)})`));
+    const parts = ["From Wikidata’s classes: "];
+    mixedGroups(basis).forEach(([g, classes], i) => {
+      if (i) parts.push("; ");
+      classes.forEach((l, j) => parts.push(...(j ? [", "] : []), cls(l)));
+      parts.push(` (${categoryShortLabel(g)})`);
+    });
     return parts;
   }
-  const parts = [`${label}, from Wikidata’s class${basis.length > 1 ? "es" : ""} `];
+  const parts = [`From Wikidata’s class${basis.length > 1 ? "es" : ""} `];
   basis.forEach(([l], i) => parts.push(i ? ", “" : "“", cls(l), "”"));
   return parts;
 }

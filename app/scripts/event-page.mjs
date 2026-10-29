@@ -11,7 +11,7 @@
 // it. The app replaces that content when it starts, reads the event from the path
 // (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
-import { categoryBasisParts } from "../src/lib/categoryLabels.js";
+import { categorySourceParts, categorySummary } from "../src/lib/categoryLabels.js";
 import { citationNotes, citeEvent } from "../src/lib/citation.js";
 import { roundedLocationNote } from "../src/lib/coordPrecision.js";
 import { dataFixUrl } from "../src/lib/dataFixes.js";
@@ -198,13 +198,13 @@ ${notes.join("\n")}
 </aside>`;
 }
 
-// Wikidata's "part of" (P361), in Wikidata's labels (src/lib/partOf.js): a parent
-// that is one of our events links to its page, any other is plain text with a
-// small link to its Wikidata item.
-// The category and the Wikidata classes it comes from (src/lib/categoryLabels.js), each class linked to its own
-// Wikidata item, as the event panel shows it. Everything escaped.
-function renderCategoryBasis(event) {
-  return categoryBasisParts(event)
+// The category (src/lib/categoryLabels.js), as the event panel shows it: the group, and behind a native disclosure
+// (no script needed) the Wikidata classes it comes from, each linked to its own Wikidata item. Everything escaped.
+function renderCategory(event) {
+  const summary = `Category: ${escapeHtml(categorySummary(event))}`;
+  const parts = categorySourceParts(event);
+  if (!parts.length) return `<p class="category">${summary}</p>`;
+  const source = parts
     .map((p) => {
       if (typeof p === "string") return escapeHtml(p);
       const url = safeUrl(p.url);
@@ -213,7 +213,12 @@ function renderCategoryBasis(event) {
         : escapeHtml(p.label);
     })
     .join("");
+  return `<details class="category"><summary>${summary}<span class="info" aria-hidden="true">ⓘ</span><span class="sr">, where this category comes from</span></summary><p class="category-source">${source}</p></details>`;
 }
+
+// Wikidata's "part of" (P361), in Wikidata's labels (src/lib/partOf.js): a parent
+// that is one of our events links to its page, any other is plain text with a
+// small link to its Wikidata item.
 
 function renderPartOf(parents) {
   const list = (parents ?? []).filter((p) => p && typeof p.label === "string");
@@ -558,7 +563,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
 
   const meta = [dateText, countries.map(countryLabel).join(", ")].filter(Boolean).map(escapeHtml).join(" · ");
   const body = [
-    event.category && `<p class="category">Category: ${renderCategoryBasis(event)}</p>`,
+    event.category && renderCategory(event),
     `<h1>${escapeHtml(title)}</h1>`,
     meta && `<p class="meta">${meta}</p>`,
     renderPartOf(event.part_of),

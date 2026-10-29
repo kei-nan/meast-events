@@ -411,7 +411,7 @@ export default function AboutData({ section = null, onClose }) {
             every event, hand-picked or not: terrorism or atrocity if any of its Wikidata classes is in that group;
             otherwise the group its listed classes belong to, or “Mixed” when they belong to more than one; an
             event with none of the listed classes is “Unclassified”. The order of the class list plays no part.
-            Each entry names the Wikidata classes its category comes from.
+            The ⓘ by an entry’s category shows the Wikidata classes it comes from.
           </li>
           <li>
             <strong>Wikidata is modelled unevenly.</strong> Only events someone has classified, dated and located

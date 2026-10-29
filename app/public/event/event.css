@@ -61,6 +61,23 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 }
 
 .category { margin: 1.5rem 0 0; color: var(--text-tertiary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+/* The whole "Category: ... ⓘ" line opens where the category comes from; at least 24px tall (44px on touch). */
+.category summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 24px;
+  cursor: pointer;
+  list-style: none;
+}
+.category summary::-webkit-details-marker { display: none; }
+.category summary:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+.category .info { font-size: 1.1em; line-height: 1; text-transform: none; }
+.category-source { margin: 0.2rem 0 0; font-size: 0.85rem; text-transform: none; letter-spacing: 0; color: var(--text-secondary); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (pointer: coarse) {
+  .category summary { min-height: 44px; }
+}
 .meta { margin: 0; color: var(--text-secondary); }
 .classes, .asof, .attribution { color: var(--text-tertiary); font-size: 0.85rem; }
 .note { color: var(--text-secondary); font-size: 0.9rem; }

@@ -4,11 +4,14 @@ import {
   categoryLabel,
   categoryShortLabel,
   categoryBasis,
-  categoryBasisParts,
-  categoryWithBasis,
+  categorySummary,
+  categorySourceParts,
   categoryNoteOutdated,
   classUrl,
 } from "./categoryLabels.js";
+
+const W = "https://www.wikidata.org/wiki/";
+const text = (parts) => parts.map((p) => (typeof p === "string" ? p : p.label)).join("");
 
 test("category labels match the legend and never drop unknown ids", () => {
   assert.equal(categoryLabel("war"), "War");
@@ -23,48 +26,19 @@ test("short labels drop only the parenthetical gloss", () => {
   assert.equal(categoryShortLabel("famine"), "Famine");
 });
 
-test("the header names the Wikidata classes behind the group, the same way for every event", () => {
+test("a single group: the group alone, and the Wikidata classes behind it when opened", () => {
   const sbarro = { category: "terrorism", wikidata_classes: ["suicide attack"] };
   assert.deepEqual(categoryBasis(sbarro), [["suicide attack", "terrorism"]]);
-  assert.equal(categoryWithBasis(sbarro), "Terrorism, from Wikidata\u2019s class \u201csuicide attack\u201d");
-  const bahr = { category: "terrorism", wikidata_classes: ["bomb attack", "terrorist attack"] };
-  assert.equal(categoryWithBasis(bahr), "Terrorism, from Wikidata\u2019s class \u201cterrorist attack\u201d");
+  assert.equal(categorySummary(sbarro), "Terrorism");
+  assert.deepEqual(categorySourceParts(sbarro), ["From Wikidata’s class ", "“", { label: "suicide attack", url: `${W}Q217327` }, "”"]);
   const gaza = { category: "atrocity", wikidata_classes: ["military operation", "bombardment", "genocide"] };
   assert.deepEqual(categoryBasis(gaza), [["genocide", "atrocity"]]);
+  assert.equal(categorySummary(gaza), "Atrocity");
+  assert.equal(text(categorySourceParts(gaza)), "From Wikidata’s class “genocide”");
   const war = { category: "war", wikidata_classes: ["war", "armed conflict"] };
-  assert.equal(categoryWithBasis(war), "War, from Wikidata\u2019s classes \u201cwar\u201d, \u201carmed conflict\u201d");
-  const spring = { category: "mixed", wikidata_classes: ["protest", "civil war", "revolution", "war"] };
-  assert.equal(
-    categoryWithBasis(spring),
-    "Mixed \u2014 Wikidata\u2019s classes point to more than one group: protest (Protest), revolution (Uprising), war (War)"
-  );
-  assert.equal(
-    categoryWithBasis({ category: "unclassified", wikidata_classes: ["regime change"] }),
-    "Unclassified: none of its Wikidata classes is on our list"
-  );
-  assert.equal(categoryWithBasis({ category: "war" }), "War", "classes not loaded: the group alone");
-});
-
-test("each class named in the header links to its own Wikidata class item, for every group alike", () => {
-  const W = "https://www.wikidata.org/wiki/";
-  // Bahr el-Baqar primary school bombing: Wikidata's classes as stored in data/events.json.
-  const bahr = { category: "terrorism", wikidata_classes: ["bomb attack", "terrorist attack"] };
-  assert.deepEqual(categoryBasisParts(bahr), [
-    "Terrorism, from Wikidata’s class ",
-    "“",
-    { label: "terrorist attack", url: `${W}Q2223653` },
-    "”",
-  ]);
-  // October 7 attacks: the same rule and the same class.
-  const oct7 = {
-    category: "terrorism",
-    wikidata_classes: ["coordinated terrorist attack", "massacre", "offensive", "military raid", "border incident", "terrorist attack"],
-  };
-  assert.deepEqual(categoryBasisParts(oct7).filter((p) => typeof p !== "string"), [{ label: "terrorist attack", url: `${W}Q2223653` }]);
-  assert.equal(categoryWithBasis(oct7), "Terrorism, from Wikidata’s class “terrorist attack”");
-  const war = { category: "war", wikidata_classes: ["war", "armed conflict"] };
-  assert.deepEqual(categoryBasisParts(war), [
-    "War, from Wikidata’s classes ",
+  assert.equal(categorySummary(war), "War");
+  assert.deepEqual(categorySourceParts(war), [
+    "From Wikidata’s classes ",
     "“",
     { label: "war", url: `${W}Q198` },
     "”",
@@ -72,19 +46,64 @@ test("each class named in the header links to its own Wikidata class item, for e
     { label: "armed conflict", url: `${W}Q350604` },
     "”",
   ]);
-  const spring = { category: "mixed", wikidata_classes: ["protest", "revolution"] };
-  assert.deepEqual(categoryBasisParts(spring), [
-    "Mixed — Wikidata’s classes point to more than one group: ",
-    { label: "protest", url: `${W}Q273120` },
-    " (Protest)",
+});
+
+test("mixed: the distinct groups in a fixed order, and the classes grouped by group when opened", () => {
+  // Invasion of Iraq: Wikidata's classes as stored in data/events.json.
+  const iraq = { category: "mixed", wikidata_classes: ["invasion", "military operation", "armed conflict", "political crisis", "international crisis"] };
+  assert.equal(categorySummary(iraq), "Mixed: War, Political");
+  assert.deepEqual(categorySourceParts(iraq), [
+    "From Wikidata’s classes: ",
+    { label: "military operation", url: `${W}Q645883` },
     ", ",
-    { label: "revolution", url: `${W}Q10931` },
-    " (Uprising)",
+    { label: "armed conflict", url: `${W}Q350604` },
+    " (War)",
+    "; ",
+    { label: "political crisis", url: `${W}Q3002772` },
+    ", ",
+    { label: "international crisis", url: `${W}Q5791104` },
+    " (Political)",
   ]);
-  assert.deepEqual(categoryBasisParts({ category: "war" }), ["War"]);
-  assert.deepEqual(categoryBasisParts({}), []);
+  // The order of Wikidata's class list plays no part.
+  const reversed = { ...iraq, wikidata_classes: [...iraq.wikidata_classes].reverse() };
+  assert.equal(categorySummary(reversed), "Mixed: War, Political");
+  assert.equal(
+    text(categorySourceParts(reversed)),
+    "From Wikidata’s classes: armed conflict, military operation (War); international crisis, political crisis (Political)"
+  );
+  const spring = { category: "mixed", wikidata_classes: ["protest", "civil war", "revolution", "war"] };
+  assert.equal(categorySummary(spring), "Mixed: War, Uprising, Protest");
+  assert.equal(text(categorySourceParts(spring)), "From Wikidata’s classes: war (War); revolution (Uprising); protest (Protest)");
+});
+
+test("unclassified, unknown classes and classes not loaded", () => {
+  const regime = { category: "unclassified", wikidata_classes: ["regime change"] };
+  assert.equal(categorySummary(regime), "Unclassified");
+  assert.deepEqual(categorySourceParts(regime), ["None of its Wikidata classes is on our list"]);
+  // A class that is not on the rule's list is never named, and has no link.
+  const bomb = { category: "terrorism", wikidata_classes: ["bomb attack"] };
+  assert.deepEqual(categorySourceParts(bomb), []);
   assert.equal(classUrl("bomb attack"), null, "only classes on the rule's list have a link");
   assert.equal(classUrl(undefined), null);
+  assert.equal(categorySummary({ category: "war" }), "War", "classes not loaded: the group alone");
+  assert.deepEqual(categorySourceParts({ category: "war" }), [], "classes not loaded: nothing to open");
+  assert.equal(categorySummary({ category: "mixed" }), "Mixed");
+  assert.equal(categorySummary({}), "");
+  assert.deepEqual(categorySourceParts({}), []);
+});
+
+test("Bahr el-Baqar and October 7 render identically apart from the data", () => {
+  // Wikidata's classes as stored in data/events.json.
+  const bahr = { category: "terrorism", wikidata_classes: ["bomb attack", "terrorist attack"] };
+  const oct7 = {
+    category: "terrorism",
+    wikidata_classes: ["coordinated terrorist attack", "massacre", "offensive", "military raid", "border incident", "terrorist attack"],
+  };
+  const expected = ["From Wikidata’s class ", "“", { label: "terrorist attack", url: `${W}Q2223653` }, "”"];
+  assert.equal(categorySummary(bahr), "Terrorism");
+  assert.equal(categorySummary(oct7), "Terrorism");
+  assert.deepEqual(categorySourceParts(bahr), expected);
+  assert.deepEqual(categorySourceParts(oct7), expected);
 });
 
 test("a framing-review category note about a group the event no longer has is recognised", () => {

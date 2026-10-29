@@ -1096,6 +1096,49 @@ button.sp-chip[aria-pressed="true"] {
   letter-spacing: 0.08em;
   color: var(--accent);
 }
+/* The whole "Category: ... ⓘ" line opens where the category comes from (a native <details>, closed by default; the
+   default triangle hidden). At least 24px tall, 44px on touch screens; the negative margin keeps the header's spacing. */
+.event-detail-category summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  width: fit-content;
+  min-height: 24px;
+  margin: -4px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.event-detail-category summary::-webkit-details-marker {
+  display: none;
+}
+.side-panel .event-detail-category summary:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+.event-detail-category-info {
+  font-size: 1.25em;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: none;
+}
+/* Where the category comes from: one small line under it, in the panel's secondary text. */
+.event-detail-category-source {
+  margin: 6px 0 4px;
+  font-size: 0.78rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-secondary);
+}
+@media (pointer: coarse) {
+  .event-detail-category summary {
+    min-height: 44px;
+    margin: -10px 0;
+  }
+  .event-detail-category-source {
+    margin-top: 12px;
+  }
+}
 /* The Wikidata class names, linked to their Wikidata items (underlined, in the line's own size and colour). */
 .event-detail .event-detail-category a {
   color: inherit;
