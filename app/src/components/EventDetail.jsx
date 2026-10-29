@@ -13,7 +13,7 @@ import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 import { countryLabel, countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
-import { categoryBasisParts } from "../lib/categoryLabels.js";
+import { categorySourceParts, categorySummary } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
 import { wikidataUrl } from "../lib/partOf.js";
@@ -70,10 +70,31 @@ function PartOf({ parents, onSelectEvent }) {
   );
 }
 
-// The category and the Wikidata classes it comes from (lib/categoryLabels.js); each class, in Wikidata's label,
-// links to that class's own Wikidata item. The same for every group.
-function CategoryBasis({ event }) {
-  return categoryBasisParts(event).map((p, i) =>
+// The category (lib/categoryLabels.js): the group, and behind a native disclosure, collapsed, the Wikidata classes it
+// comes from, each class, in Wikidata's label, linked to that class's own Wikidata item. The same for every group.
+// Keyed by event where it is used, so it is closed again when another event is opened.
+function Category({ event }) {
+  const summary = `Category: ${categorySummary(event)}`;
+  const parts = categorySourceParts(event);
+  if (!parts.length) return <p className="event-detail-category">{summary}</p>;
+  return (
+    <details className="event-detail-category">
+      <summary>
+        {summary}
+        <span className="event-detail-category-info" aria-hidden="true">
+          ⓘ
+        </span>
+        <span className="sp-sr-status">, where this category comes from</span>
+      </summary>
+      <p className="event-detail-category-source">
+        <CategorySource parts={parts} />
+      </p>
+    </details>
+  );
+}
+
+function CategorySource({ parts }) {
+  return parts.map((p, i) =>
     typeof p === "string" ? (
       <Fragment key={i}>{p}</Fragment>
     ) : p.url ? (
@@ -315,11 +336,7 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
       {/* Our category above the title, the title, then when and where and Wikidata's
           "part of". Where an entry's data comes from is in "About this entry" at the end. */}
       <header className="event-detail-head">
-        {event.category && (
-          <p className="event-detail-category">
-            Category: <CategoryBasis event={event} />
-          </p>
-        )}
+        {event.category && <Category key={event.id} event={event} />}
         <h2 id="event-detail-title" ref={headingRef} tabIndex={-1}>
           {event.title}
         </h2>

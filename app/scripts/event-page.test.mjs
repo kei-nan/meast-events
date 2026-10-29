@@ -282,19 +282,33 @@ test("classes: only those on the event-class list, with a link to the Wikidata i
   assert.doesNotMatch(page({ id: "g", title: "G" }), /Hand-picked/);
 });
 
-test("category: named with the Wikidata class it comes from, as on the event panel", () => {
+test("category: the group, with the Wikidata class it comes from behind a native disclosure, as on the event panel", () => {
   const html = page({ id: "h", title: "H", category: "atrocity", wikidata_classes: ["famine", "genocide"] });
   assert.match(
     html,
-    /<p class="category">Category: Atrocity, from Wikidata’s class “<a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q41397" rel="noreferrer" aria-label="genocide \(Wikidata class\)">genocide<\/a>”<\/p>/
+    /<details class="category"><summary>Category: Atrocity<span class="info" aria-hidden="true">ⓘ<\/span><span class="sr">, where this category comes from<\/span><\/summary><p class="category-source">From Wikidata’s class “<a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q41397" rel="noreferrer" aria-label="genocide \(Wikidata class\)">genocide<\/a>”<\/p><\/details>/
   );
+  assert.doesNotMatch(html, /<details class="category" open/, "collapsed by default");
   assert.doesNotMatch(html, /our grouping/);
+  assert.match(page({ id: "w", title: "W", category: "war" }), /<p class="category">Category: War<\/p>/, "classes not loaded: no disclosure");
+});
+
+test("category: a mixed event names its groups, and its classes grouped by group when opened", () => {
+  const html = page({
+    id: "i",
+    title: "I",
+    category: "mixed",
+    wikidata_classes: ["invasion", "military operation", "armed conflict", "political crisis", "international crisis"],
+  });
+  assert.match(html, /<summary>Category: Mixed: War, Political<span/);
+  const text = html.match(/<p class="category-source">(.*?)<\/p>/)[1].replace(/<[^>]+>/g, "");
+  assert.equal(text, "From Wikidata’s classes: military operation, armed conflict (War); political crisis, international crisis (Political)");
 });
 
 test("category: the class behind terrorism is linked the same way whoever the victims were", () => {
   const bahr = page({ id: "b", title: "B", category: "terrorism", wikidata_classes: ["bomb attack", "terrorist attack"] });
   const oct7 = page({ id: "o", title: "O", category: "terrorism", wikidata_classes: ["coordinated terrorist attack", "massacre", "terrorist attack"] });
-  const line = /<p class="category">Category: Terrorism, from Wikidata’s class “<a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q2223653" rel="noreferrer" aria-label="terrorist attack \(Wikidata class\)">terrorist attack<\/a>”<\/p>/;
+  const line = /<details class="category"><summary>Category: Terrorism<span class="info" aria-hidden="true">ⓘ<\/span><span class="sr">, where this category comes from<\/span><\/summary><p class="category-source">From Wikidata’s class “<a class="wd" href="https:\/\/www\.wikidata\.org\/wiki\/Q2223653" rel="noreferrer" aria-label="terrorist attack \(Wikidata class\)">terrorist attack<\/a>”<\/p><\/details>/;
   assert.match(bahr, line);
   assert.match(oct7, line);
 });
