@@ -548,7 +548,7 @@ export const CORRECTIONS = [
   },
   {
     type: "add",
-    name: "West Bank (Israeli occupation, phased Oslo transfers)",
+    name: "West Bank (held by Israel, phased Oslo transfers)",
     start_year: 1995,
     end_year: 1999,
     status: "occupied-administered",
@@ -622,7 +622,7 @@ export const CORRECTIONS = [
   },
   {
     type: "add",
-    name: "West Bank Area C (Israeli control)",
+    name: "West Bank Area C (held by Israel)",
     start_year: 2000,
     end_year: 9999,
     status: "occupied-administered",
