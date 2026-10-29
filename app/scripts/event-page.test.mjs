@@ -15,8 +15,10 @@ import {
   renderSitemap,
   eventJsonLd,
   eventPageTitle,
+  eventShareTitle,
   jsonLdScript,
   safeUrl,
+  titleHasYear,
 } from "./event-page.mjs";
 
 // The app's own index.html (its source; the build fills in the built one, which
@@ -382,6 +384,25 @@ test("the tab title has the years as the app shows them and the site name", () =
   // A reversed range stays in the order given, like the app.
   assert.equal(eventPageTitle({ id: "r", title: "R", date_start: "2002-03-27", date_end: "2001-01-01" }), "R (2002–2001) – Middle East, 1900–present");
   assert.equal(eventPageTitle({ id: "n", title: "N" }), "N – Middle East, 1900–present");
+});
+
+test("share and tab titles: a title that names a year gets no (years) added", () => {
+  // The same years: not repeated.
+  assert.equal(eventShareTitle({ id: "b", title: "Capture of Baghdad (1917)", date_start: "1917-03-11" }), "Capture of Baghdad (1917)");
+  assert.equal(eventShareTitle({ id: "p", title: "1929 Palestine riots", date_start: "1929-08-23", date_end: "1929-08-29" }), "1929 Palestine riots");
+  // Different years from the dates: the title's own are not followed by another range.
+  assert.equal(
+    eventShareTitle({ id: "t", title: "Political violence in Turkey (1976–1980)", date_start: "1968-01-01", date_end: "1980-09-12" }),
+    "Political violence in Turkey (1976–1980)"
+  );
+  assert.equal(
+    eventPageTitle({ id: "t", title: "Anglo-Iraqi Treaty of 1930", date_start: "1932-10-03" }),
+    "Anglo-Iraqi Treaty of 1930 – Middle East, 1900–present"
+  );
+  // A longer number is not a year.
+  assert.equal(eventShareTitle({ id: "m", title: "Metrojet Flight 9268", date_start: "2015-10-31" }), "Metrojet Flight 9268 (2015)");
+  assert.equal(titleHasYear("Flight 19480"), false);
+  assert.equal(titleHasYear("2015–2016 Latakia offensive"), true);
 });
 
 test("JSON-LD: a WebPage about a Thing (not an Event), dates at the recorded precision, a place only when precise", () => {

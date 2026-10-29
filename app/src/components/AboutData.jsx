@@ -429,7 +429,8 @@ export default function AboutData({ section = null, onClose }) {
 
         <h3>Framing review</h3>
         <p>
-          Wikipedia&apos;s summaries are shown unchanged, and some of them tell an event from one side. Every event
+          Each summary is the lead section of a Wikipedia article as plain text, references removed; its words are
+          not edited, and some summaries tell an event from one side. Every event
           therefore carries a separately boxed <strong>framing review</strong> with two separate reviews, and the words
           in question are highlighted. <strong>Overall fairness</strong> is our judgement of what no word list can
           catch, such as emphasis, a story told only from one side, or what is left out. The{" "}
@@ -532,7 +533,7 @@ export default function AboutData({ section = null, onClose }) {
         <p>
           <a href={REPO} target="_blank" rel="noreferrer" title="Opens in a new tab">Source code</a>:{" "}
           <a href={`${REPO}/blob/main/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">AGPL-3.0</a>. Event text from Wikipedia: CC BY-SA 4.0, credited to Wikipedia contributors, with a
-          link to each article. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0) and, for the West
+          link to each article; each summary is the article&apos;s lead section as plain text, references removed. Wikidata: CC0. Borders adapted from CShapes 2.0 (CC BY-NC-SA 4.0) and, for the West
           Bank areas, from UN OCHA data whose terms allow non-commercial use only, so the border data is for
           non-commercial use. Some corrected border points are located with{" "}
           <a href="https://www.geonames.org/" target="_blank" rel="noreferrer" title="Opens in a new tab">

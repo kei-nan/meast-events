@@ -1,6 +1,6 @@
 # Framing review: how we check the Wikipedia summaries
 
-Every event on the map shows the lead section of its English Wikipedia article, unchanged. Below that text the event page shows a **framing review**: two separate reviews of how the summary is written, in two tabs, with the words in question highlighted in the text. This page explains how findings are made, who made them, and how to challenge one.
+Every event on the map shows the lead section of its English Wikipedia article as plain text, with references removed; the words are not edited. Below that text the event page shows a **framing review**: two separate reviews of how the summary is written, in two tabs, with the words in question highlighted in the text. This page explains how findings are made, who made them, and how to challenge one.
 
 ## What it is and is not
 

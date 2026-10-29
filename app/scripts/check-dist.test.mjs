@@ -49,6 +49,7 @@ const HEADERS = (entryRule = ENTRY, csp = CSP()) =>
     `/data/boundaries/${BDIR}/*`,
     "  Cache-Control: public, max-age=31536000, immutable",
     "",
+    ...["/favicon.svg", "/favicon.ico", "/apple-touch-icon.png"].flatMap((icon) => [icon, "  Cache-Control: public, max-age=86400", ""]),
   ].join("\n");
 
 const ICONS = `<link rel="icon" href="/favicon.ico"><link rel="icon" href="/favicon.svg"><link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
@@ -115,6 +116,7 @@ function fixture() {
   write("favicon.svg", "<svg/>");
   write("favicon.ico", new Uint8Array(ico()));
   write("apple-touch-icon.png", new Uint8Array(png(180, 180)));
+  write("og-image.png", new Uint8Array(png(1200, 630)));
   write("404.html", "");
   write("_headers", HEADERS());
   const remove = (rel) => fs.rmSync(path.join(dist, ...rel.split("/")), { recursive: true, force: true });
@@ -238,6 +240,10 @@ test("icons: missing, not an ICO, a touch icon of the wrong size, or not linked"
   await assertProblem((f) => f.write("apple-touch-icon.png", "GIF89a"), /apple-touch-icon\.png is not a PNG/);
   await assertProblem((f) => f.remove("apple-touch-icon.png"), /apple-touch-icon\.png is missing/);
   await assertProblem((f) => f.write("index.html", shell().replace('<link rel="apple-touch-icon" href="/apple-touch-icon.png">', "")), /does not link \/apple-touch-icon\.png/);
+  const uncached = HEADERS().replace("/favicon.svg\n  Cache-Control: public, max-age=86400", "/favicon.svg\n  Cache-Control: public, max-age=0, must-revalidate");
+  await assertProblem((f) => f.write("_headers", uncached), /no caching rule for \/favicon\.svg/);
+  await assertProblem((f) => f.write("og-image.png", new Uint8Array(png(1200, 600))), /og-image\.png is 1200x600, not 1200x630/);
+  await assertProblem((f) => f.remove("og-image.png"), /og-image\.png is missing/);
 });
 
 test("_redirects: a redirect from a live event or to a missing one", async () => {
@@ -272,7 +278,7 @@ test("_headers: missing, not expanded, an immutable splat, no rule for the entry
   );
   await assertProblem((f) => f.write("_headers", HEADERS("/assets/other-ZZZZZZZZ.js")), /no immutable rule for the entry script \/assets\/index-/);
   const many = Array.from({ length: 100 }, (_, i) => `/p${i}\n  X: 1\n`).join("");
-  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 105 rules; the host reads only the first 100/);
+  await assertProblem((f) => f.write("_headers", HEADERS() + many), /_headers has 108 rules; the host reads only the first 100/);
 });
 
 test("boundaries folder: the bundle, meta.json and dist/ must agree on boundaries/v.<BOUNDARIES_VERSION>/", async () => {

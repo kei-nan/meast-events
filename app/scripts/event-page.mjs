@@ -1,7 +1,8 @@
 // Renders the per-event pages (/event/<id>), the /event/ index and sitemap.xml.
 // Pure functions over the records split-data.mjs writes (the lite record merged
 // with its full-lead record), so the page shows exactly what the app's detail view
-// shows: Wikipedia's title and lead unchanged, Wikidata's dates and classes as
+// shows: Wikipedia's title, and its lead as plain text with references removed
+// (the words not edited), Wikidata's dates and classes as
 // given, and our framing review boxed off as ours. Driven by
 // build-event-pages.mjs; tested in event-page.test.mjs.
 //
@@ -194,7 +195,7 @@ ${wording}
 </section>
 ${notes.join("\n")}
 <p class="framing-review-meta"><button type="button" class="ai-btn" popovertarget="ai-note">Reviewed by AI</button> · ${link(METHOD_URL, "How we review", { external: true })} · ${link(contestUrl(event, review), "Disagree with this review?", { external: true })}</p>
-<div id="ai-note" popover class="ai-note">This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It looks at how the summary is written, not whether the events happened, and the Wikipedia text is shown unchanged.</div>
+<div id="ai-note" popover class="ai-note">This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It looks at how the summary is written, not whether the events happened, and it does not change the Wikipedia text (the article’s lead section as plain text, references removed).</div>
 </aside>`;
 }
 
@@ -440,20 +441,34 @@ export function eventDateText(event) {
 }
 
 /**
- * The tab title, as the app sets it (App.jsx): "Title (1912–1913) – site", with
- * the years as the dates give them (rawEventYears). No dates: "Title – site".
+ * The tab title: the share title and the site name, "Title (1912–1913) – site".
+ * No dates, or a title that names its own years: "Title – site".
  */
 export function eventPageTitle(event) {
   return `${eventShareTitle(event)} – ${SITE_NAME}`;
 }
 
+// A year (1800-2099) standing alone in a title: "1929 Palestine riots",
+// "Capture of Baghdad (1917)". Longer numbers (Metrojet Flight 9268) do not count.
+const TITLE_YEAR_RE = /(?<!\d)(?:1[89]|20)\d\d(?!\d)/;
+
+/** Whether a title already names a year, so no "(years)" is added to it. */
+export function titleHasYear(title) {
+  return TITLE_YEAR_RE.test(String(title ?? ""));
+}
+
 /**
  * The link-preview title (og:title, twitter:title): "Title (1912–1913)", the tab
- * title without the site name, which og:site_name already gives. No dates: the
- * title alone.
+ * title without the site name, which og:site_name already gives, with the years
+ * as the dates give them (rawEventYears). No dates: the title alone. A title that
+ * already names a year is left alone too: "Capture of Baghdad (1917)" is not
+ * followed by "(1917)" again, nor "Political violence in Turkey (1976–1980)" by
+ * the dates' different "(1968–1980)" (Wikipedia's title and Wikidata's dates can
+ * disagree; the page itself shows the dates).
  */
 export function eventShareTitle(event) {
   const title = String(event.title ?? event.id);
+  if (titleHasYear(title)) return title;
   const [s, e] = rawEventYears(event);
   const years = event.date_start && Number.isFinite(s) ? (e !== s ? `${s}–${e}` : `${s}`) : "";
   return `${title}${years ? ` (${years})` : ""}`;
@@ -480,7 +495,7 @@ function isoDate(date, precision) {
  * temporalCoverage (an ISO 8601 date or "start/end" interval) carries the dates
  * at the precision recorded, and spatialCoverage a precise pin only: a
  * capital-city fallback is not where the event happened. Name and description
- * are Wikipedia's, unchanged (the description is the meta description).
+ * are Wikipedia's words (the description is the meta description).
  */
 export function eventJsonLd(event) {
   const title = String(event.title ?? event.id);
@@ -585,7 +600,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
     locationNote(event.location_quality, event),
     event.hand_picked && `<p class="note">${escapeHtml(HAND_PICKED_NOTE)}</p>`,
     renderDataFixes(event.data_fixes),
-    `<p class="attribution">Text from Wikipedia, licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
+    `<p class="attribution">Text from Wikipedia (the article’s lead section as plain text, references removed), licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
       wiki ? link(historyUrl(wiki), "Wikipedia contributors", { external: true }) : "Wikipedia contributors"
     }${wiki ? `, from the article ${link(wiki, escapeHtml(title), { external: true })}` : ""}.${showClasses ? " Classes are Wikidata’s labels (CC0)." : ""}${
       event.part_of?.length ? " “Part of” is Wikidata’s statement, in its labels (CC0)." : ""
