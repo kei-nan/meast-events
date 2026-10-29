@@ -39,6 +39,31 @@ test("lang comes only from a bare Arabic/Hebrew/Persian label", () => {
   assert.equal(rtlTexts("known as حرب in").at(0).lang, null);
 });
 
+test("a run without a label takes the language of a labelled run before it in the same sentence", () => {
+  // As in the Arab Revolt, Cedar Revolution and Iran nuclear deal extracts.
+  const langs = (text) => rtlTexts(text).map((p) => p.lang);
+  assert.deepEqual(
+    langs("The Arab Revolt (Arabic: الثورة العربية al-Thawra al-'Arabiyya), also known as the Great Arab Revolt (الثورة العربية الكبرى al-Thawra), was"),
+    ["ar", "ar"]
+  );
+  assert.deepEqual(
+    langs("(Arabic: ثورة الأرز, romanized: thawrat al-arz), known in Lebanon as the Independence intifada (انتفاضة الاستقلال, intifada)"),
+    ["ar", "ar"]
+  );
+  assert.deepEqual(langs("(JCPOA; Persian: برنامه جامع اقدام مشترک, romanized: barnāmeye (برجام, BARJAM))"), ["fa", "fa"]);
+  // Not across a sentence end outside parentheses ("lit." inside them is no end).
+  assert.deepEqual(langs("Badr (Arabic: عملية بدر). In the attack, known as the crossing (العبور al-'obour)"), ["ar", null]);
+  assert.deepEqual(langs("(Hebrew: מאורעות, lit. Events) and (ירושלים)"), ["he", "he"]);
+  // Not past another language label, even one that gives no lang itself.
+  assert.deepEqual(langs("Mudros (Arabic: مودروس; Ottoman Turkish: موندروس متارکه‌نامه‌سی)"), ["ar", null]);
+  assert.deepEqual(langs("(Arabic: الأزمة) and Cairo (Egyptian Arabic: مصر)"), ["ar", null]);
+  // Not to a run of another script.
+  assert.deepEqual(langs("Jerusalem (Arabic: القدس) or Yerushalayim (ירושלים)"), ["ar", null]);
+  assert.deepEqual(langs("Jerusalem (Hebrew: ירושלים) or al-Quds (القدس)"), ["he", null]);
+  // Never from script alone: no labelled run before, no lang.
+  assert.deepEqual(langs("Yarden (יַרְדֵּן) and Shiri (שִׁירִי)"), [null, null]);
+});
+
 test("Arabic vowel marks stay inside the run", () => {
   const text = "(Arabic: مُحَمَّد) x";
   assert.deepEqual(rtlTexts(text).map((p) => p.text), ["مُحَمَّد"]);
