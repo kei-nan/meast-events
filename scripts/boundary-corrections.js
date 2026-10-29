@@ -419,7 +419,7 @@ export const CORRECTIONS = [
   },
   {
     type: "add",
-    name: "West Bank (Jordanian military administration)",
+    name: "West Bank (held by Jordan)",
     start_year: 1948,
     end_year: 1949,
     status: "occupied-administered",
@@ -453,7 +453,7 @@ export const CORRECTIONS = [
   },
   {
     type: "add",
-    name: "Gaza Strip (Egyptian military administration)",
+    name: "Gaza Strip (held by Egypt)",
     start_year: 1948,
     end_year: 1966,
     status: "occupied-administered",
@@ -479,7 +479,7 @@ export const CORRECTIONS = [
   // flagged shapes" in docs/DATA_POLICY.md for the rule and the cases left undrawn).
   {
     type: "add",
-    name: "Golan Heights (Israeli military occupation)",
+    name: "Golan Heights (held by Israel)",
     start_year: 1967,
     end_year: 1981,
     status: "occupied-administered",
@@ -528,7 +528,7 @@ export const CORRECTIONS = [
   // 1995-1999 one existing precisely because the picture was changing too fast to map:
   {
     type: "add",
-    name: "West Bank (Israeli military occupation)",
+    name: "West Bank (held by Israel)",
     start_year: 1967,
     end_year: 1994,
     status: "occupied-administered",
@@ -649,7 +649,7 @@ export const CORRECTIONS = [
   // --- Gaza Strip after 1967 ---
   {
     type: "add",
-    name: "Gaza Strip (Israeli military occupation)",
+    name: "Gaza Strip (held by Israel)",
     start_year: 1967,
     end_year: 1993,
     status: "occupied-administered",

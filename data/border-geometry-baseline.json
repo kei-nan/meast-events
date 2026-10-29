@@ -335,7 +335,7 @@
     "vertices": 168,
     "fine": 304
   },
-  "West Bank (Jordanian military administration) 1948-1949": {
+  "West Bank (held by Jordan) 1948-1949": {
     "vertices": 67,
     "fine": 116
   },
@@ -343,11 +343,11 @@
     "vertices": 67,
     "fine": 116
   },
-  "Gaza Strip (Egyptian military administration) 1948-1966": {
+  "Gaza Strip (held by Egypt) 1948-1966": {
     "vertices": 30,
     "fine": 55
   },
-  "Golan Heights (Israeli military occupation) 1967-1981": {
+  "Golan Heights (held by Israel) 1967-1981": {
     "vertices": 27,
     "fine": 52
   },
@@ -359,7 +359,7 @@
     "vertices": 27,
     "fine": 48
   },
-  "West Bank (Israeli military occupation) 1967-1994": {
+  "West Bank (held by Israel) 1967-1994": {
     "vertices": 67,
     "fine": 116
   },
@@ -379,7 +379,7 @@
     "vertices": 67752,
     "fine": 121908
   },
-  "Gaza Strip (Israeli military occupation) 1967-1993": {
+  "Gaza Strip (held by Israel) 1967-1993": {
     "vertices": 30,
     "fine": 55
   },
