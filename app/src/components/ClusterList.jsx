@@ -2,11 +2,13 @@ import { useEffect, useRef } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
 import { isUnhandledEscape } from "../lib/escapeKey";
 import { sheetCover } from "../lib/mapInsets";
+import { warmEvent } from "../lib/warmEvent";
 
 // Events that share one spot on the map (capital-pinned "approximate" events,
 // or a cluster no zoom level can split): listed in a card at the click point.
 // Same placement rules as BoundaryPopup: clamped to the map, clear of the
-// phone results sheet, Escape closes (MapView then puts focus back).
+// phone results sheet, Escape closes (MapView then puts focus back). Pointing
+// at, focusing or pressing an item starts its event downloads (lib/warmEvent.js).
 export default function ClusterList({ list, onSelect, onClose, width, height }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -60,6 +62,9 @@ export default function ClusterList({ list, onSelect, onClose, width, height }) 
               type="button"
               className={`mu-stack-item${it.match ? "" : " is-miss"}`}
               onClick={() => onSelect(it.id)}
+              onPointerEnter={() => warmEvent(it.id)}
+              onPointerDown={() => warmEvent(it.id)}
+              onFocus={() => warmEvent(it.id)}
             >
               <span
                 className={`mu-dot${it.approx ? " is-ring is-small" : ""}`}

@@ -14,6 +14,7 @@ import {
   timelineAxis,
   timelineOrder,
 } from "../lib/timelineView.js";
+import { warmEvent } from "../lib/warmEvent.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 
 const PAGE = 50;
@@ -25,7 +26,8 @@ function yearLabel(e) {
 
 // One result row. Its accessible name is the title and the year/place line;
 // the snippet and tags are its description, so a screen reader reads the
-// short name first. Memoized: only rows whose props change re-render.
+// short name first. Pointing at, focusing or pressing a row starts what opening
+// its event downloads (lib/warmEvent.js). Memoized: only rows whose props change re-render.
 const ResultRow = memo(function ResultRow({
   ev,
   idx,
@@ -57,7 +59,12 @@ const ResultRow = memo(function ResultRow({
         aria-labelledby={`${id}-title ${id}-meta`}
         aria-describedby={describedBy || undefined}
         aria-current={selected ? "true" : undefined}
-        onFocus={() => onFocusRow(idx)}
+        onFocus={() => {
+          onFocusRow(idx);
+          warmEvent(ev.id);
+        }}
+        onPointerEnter={() => warmEvent(ev.id)}
+        onPointerDown={() => warmEvent(ev.id)}
         onClick={() => onSelect?.(ev.id)}
         onMouseEnter={() => onHover?.(ev.id)}
         onMouseLeave={() => onHover?.(null)}
@@ -146,7 +153,12 @@ const TimelineRow = memo(function TimelineRow({
         aria-labelledby={`${id}-title ${id}-meta`}
         aria-describedby={hasTags ? `${id}-tags` : undefined}
         aria-current={selected ? "true" : undefined}
-        onFocus={() => onFocusRow(idx)}
+        onFocus={() => {
+          onFocusRow(idx);
+          warmEvent(ev.id);
+        }}
+        onPointerEnter={() => warmEvent(ev.id)}
+        onPointerDown={() => warmEvent(ev.id)}
         onClick={() => onSelect?.(ev.id)}
         onMouseEnter={() => onHover?.(ev.id)}
         onMouseLeave={() => onHover?.(null)}

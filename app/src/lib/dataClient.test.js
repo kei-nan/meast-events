@@ -226,6 +226,51 @@ test("prefetchFullLead warms the bucket loadFullLead then reuses; a failed prefe
   }
 });
 
+// A row or event link pointed at after startup (lib/warmEvent.js).
+test("prefetchFullLead after startup reads the folder the lite set came from, shared with loadFullLead", async () => {
+  const { loadAllLite, prefetchFullLead, loadFullLead } = await freshClient();
+  const calls = stubFetch({
+    [META]: () => json({ version: "v2", fullBuckets: 128 }),
+    [all("v2")]: () => json(LITE),
+    [bucket("v2", "e1", 128)]: () => json({ e1: { extract: "from v2" } }),
+  });
+  await loadAllLite(); // this bundle's folder is gone: the list came from v2
+  prefetchFullLead("e1");
+  assert.equal(count(calls, bucket("v2", "e1", 128)), 1);
+  assert.deepEqual(await loadFullLead("e1"), { extract: "from v2" });
+  assert.equal(count(calls, bucket("v2", "e1", 128)), 1);
+  assert.equal(count(calls, bucket(V1, "e1", B1)), 0);
+});
+
+test("prefetchFullLead into a folder a deploy removed: loadFullLead still falls back to meta.json", async () => {
+  const { loadAllLite, prefetchFullLead, loadFullLead } = await freshClient();
+  const calls = stubFetch({
+    [all(V1)]: () => json(LITE),
+    [bucket(V1, "e1", B1)]: () => json({}, 404),
+    [META]: () => json({ version: "v2", fullBuckets: 256 }),
+    [bucket("v2", "e1", 256)]: () => json({ e1: { extract: "new" } }),
+  });
+  await loadAllLite();
+  prefetchFullLead("e1");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.deepEqual(await loadFullLead("e1"), { extract: "new" });
+  assert.equal(count(calls, META), 1);
+});
+
+test("only the full-record bucket is fetched at high priority", async () => {
+  const { loadFullLead, loadLand } = await freshClient();
+  const calls = stubFetch({
+    [all(V1)]: () => json(LITE),
+    [bucket(V1, "e1", B1)]: () => json({ e1: { extract: "lead" } }),
+    "/data/land.tbin": () => tbin(fc()),
+  });
+  await loadFullLead("e1");
+  await loadLand();
+  assert.equal(calls.find((c) => c.url === bucket(V1, "e1", B1)).init?.priority, "high");
+  assert.equal(calls.find((c) => c.url === all(V1)).init?.priority, undefined);
+  assert.equal(calls.find((c) => c.url === "/data/land.tbin").init, undefined);
+});
+
 test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shares and evicts", async () => {
   const { loadBoundaryDecade, loadDeferredGeometry } = await freshClient();
   const geom = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] };

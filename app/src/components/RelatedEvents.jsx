@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import EventLink from "./EventLink.jsx";
 import { formatEventDate } from "../lib/eventDate.js";
+import { warmEvent } from "../lib/warmEvent.js";
 import { NEARBY_KM, RELATED_SHOWN, emptyReason, relatedTabFor } from "../lib/related.js";
 import { compassLayout, compassPoint, compassScale, formatKm, stripLayout } from "../lib/relatedViz.js";
 
@@ -21,7 +22,8 @@ const TAB_KEYS = RELATED_TABS.map((t) => t.key);
 
 const DOT_R = 9;
 
-// A numbered dot in a diagram: clicking it opens the event, hovering it marks its list row.
+// A numbered dot in a diagram: clicking it opens the event, hovering it marks its
+// list row (and, like the row link, starts the event downloads: lib/warmEvent.js).
 function Dot({ x, y, n, item, hot, onHot, onSelectEvent, label }) {
   return (
     <g
@@ -29,6 +31,8 @@ function Dot({ x, y, n, item, hot, onHot, onSelectEvent, label }) {
       transform={`translate(${x} ${y})`}
       onClick={() => onSelectEvent?.(item.id)}
       onMouseEnter={() => onHot(item.id)}
+      onPointerEnter={() => onSelectEvent && warmEvent(item.id)}
+      onPointerDown={() => onSelectEvent && warmEvent(item.id)}
       onMouseLeave={() => onHot(null)}
     >
       <title>{`${item.title}: ${label}`}</title>

@@ -303,7 +303,9 @@ export default function App() {
   const hoverEvent = hoverId ? (storeRef.current.get(hoverId) ?? null) : null;
   const highlightEvent = [hoverEvent, selectedEventRaw].find(needsCountryShading) ?? null;
 
-  // Full leads are fetched lazily, only for the opened event (never for lists).
+  // Full leads are fetched lazily, only for the opened event (never for lists);
+  // usually the request is already under way, started when its row or link was
+  // pointed at, focused or pressed (lib/warmEvent.js), and loadFullLead shares it.
   // id -> {extract, extract_retrieved_at, framing_review} | "error"
   const [leads, setLeads] = useState({});
   const leadRequestedRef = useRef(new Set());
