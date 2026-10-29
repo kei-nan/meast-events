@@ -25,7 +25,7 @@
 // indexer drops them: "US$500" is indexed as "us500", "8000+" as "8000"), but
 // pagefind.js keeps them in the query, where they could only ever match through
 // the fallback. So they are removed from the query before it is searched.
-const NOT_INDEXED = /[\p{S}‎‏‪-‮⁦-⁩]/gu;
+const NOT_INDEXED = /[\p{S}\u200e\u200f\u202a-\u202e\u2066-\u2069]/gu;
 export const pagefindQuery = (q) => String(q ?? "").replace(NOT_INDEXED, "");
 
 // Punctuation pagefind.js removes from the query (its regex, precedence and all).

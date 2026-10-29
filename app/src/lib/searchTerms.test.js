@@ -12,8 +12,8 @@ test("queryTerms cuts and folds the query as pagefind.js does", () => {
 
 test("pagefindQuery drops symbols and bidi marks, never part of an indexed word", () => {
   assert.equal(pagefindQuery("US$500 8000+ ~60 ₪85"), "US500 8000 60 85");
-  assert.equal(pagefindQuery("iran‎"), "iran");
-  assert.equal(pagefindQuery("می‌خواهم"), "می‌خواهم"); // ZWNJ is part of Persian words
+  assert.equal(pagefindQuery("iran\u200e"), "iran");
+  assert.equal(pagefindQuery("می\u200cخواهم"), "می\u200cخواهم"); // ZWNJ is part of Persian words
 });
 
 test("stemEnglish follows Snowball 3.0.0 English", () => {
