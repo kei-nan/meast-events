@@ -15,6 +15,7 @@ import {
   stateUrl,
   urlWriteMode,
   YEAR_MAX,
+  YEAR_MIN,
 } from "./urlState.js";
 
 const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
@@ -63,7 +64,7 @@ test("round trip of a full state", () => {
   const state = {
     q: "coup d'état",
     categories: ["war", "political"],
-    countries: ["Israel", "Türkiye"],
+    countries: ["Israel/Palestine", "Turkey"],
     startYear: 1948,
     endYear: 1973,
     scope: "range",
@@ -117,8 +118,9 @@ test("rect area round trip", () => {
 
 test("strict validation rejects malformed input", () => {
   const bad = (s) => parseUrlState(s);
-  assert.equal(bad("?y=1800-2000").years, null);
   assert.equal(bad("?y=1990-1950").years, null);
+  assert.equal(bad("?y=1800-1850").years, null); // entirely before the timeline
+  assert.equal(bad("?y=19500-1960").years, null);
   assert.equal(bad("?y=abc").years, null);
   assert.equal(bad("?scope=bogus").scope, "all");
   assert.equal(bad("?area=r:1,2,3").area, null);
@@ -134,8 +136,31 @@ test("strict validation rejects malformed input", () => {
   assert.equal(bad("?e=" + "a".repeat(200)).eventId, null);
   assert.equal(bad("?q=" + "x".repeat(101)).q, "");
   assert.equal(bad("?q=a%00b").q, "");
-  assert.equal(bad("?cat=" + Array.from({ length: 50 }, (_, i) => "c" + i).join(",")).categories.length, 20);
   assert.deepEqual(bad("?cat=war,,war, ").categories, ["war"]);
+});
+
+test("categories and countries: only known values, matched case-insensitively, as the data spells them", () => {
+  assert.deepEqual(parseUrlState("?cat=War").categories, ["war"]);
+  assert.deepEqual(parseUrlState("?cat=WAR,war,Treaty").categories, ["war", "treaty"]);
+  assert.deepEqual(parseUrlState("?cat=Nonexistent").categories, []);
+  assert.deepEqual(parseUrlState("?cat=war,Nonexistent,atrocity").categories, ["war", "atrocity"]);
+  assert.deepEqual(parseUrlState("?c=Atlantis").countries, []);
+  assert.deepEqual(parseUrlState("?c=uae,israel%2Fpalestine,Saudi%20Arabia,Region").countries, ["UAE", "Israel/Palestine", "Saudi Arabia"]);
+  assert.deepEqual(parseUrlState("?c=regional").countries, ["regional"]);
+  assert.deepEqual(parseUrlState("?cat=" + Array.from({ length: 50 }, (_, i) => "c" + i).join(",")).categories, []);
+  // A parsed link writes back canonical.
+  const p = parseUrlState("?cat=War&c=uae");
+  assert.equal(serializeUrlState({ ...base, categories: p.categories, countries: p.countries }), "?cat=war&c=UAE");
+});
+
+test("every category and country in data/events.json is accepted in a link", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const events = JSON.parse(await readFile(new URL("../../../data/events.json", import.meta.url), "utf8"));
+  const cats = [...new Set(events.map((e) => e.category).filter(Boolean))];
+  const countries = [...new Set(events.flatMap((e) => e.countries ?? []))];
+  const p = parseUrlState(`?cat=${cats.map(encodeURIComponent).join(",")}&c=${countries.map(encodeURIComponent).join(",")}`);
+  assert.deepEqual(p.categories, cats);
+  assert.deepEqual(p.countries, countries);
 });
 
 test("serialize omits invalid pieces, and the event (it is the path)", () => {
@@ -153,6 +178,15 @@ test("the last year follows the clock, not a fixed year", () => {
   assert.deepEqual(parseUrlState("?y=1900-9999").years, [1900, YEAR_MAX]);
   // A start past the last year still leaves nothing to show.
   assert.equal(parseUrlState(`?y=${YEAR_MAX + 1}-${YEAR_MAX + 2}`).years, null);
+});
+
+test("a year range reaching outside the timeline is cut to it at either end", () => {
+  assert.deepEqual(parseUrlState("?y=1950-2100").years, [1950, YEAR_MAX]);
+  assert.deepEqual(parseUrlState("?y=1800-1950").years, [YEAR_MIN, 1950]);
+  assert.deepEqual(parseUrlState("?y=1800-2100").years, [YEAR_MIN, YEAR_MAX]);
+  assert.deepEqual(parseUrlState(`?y=1800-${YEAR_MIN}`).years, [YEAR_MIN, YEAR_MIN]);
+  assert.equal(parseUrlState(`?y=1800-${YEAR_MIN - 1}`).years, null);
+  assert.equal(parseUrlState("?y=1950-1800").years, null);
 });
 
 test("urlWriteMode: pushes event changes, debounces the rest, replaces on request", () => {

@@ -112,7 +112,7 @@ function fixture() {
   write("index.html", shell());
   for (const id of IDS) write(`event/${id}.html`, eventPage(id));
   write("pagefind/meta.json", { version: SEARCH_DIR.slice(2), dir: SEARCH_DIR });
-  for (const file of ["pagefind.js", "pagefind-entry.json", "ids.json"]) write(`pagefind/${SEARCH_DIR}/${file}`, "{}");
+  for (const file of ["pagefind.js", "pagefind-entry.json", "ids.json", "words.json"]) write(`pagefind/${SEARCH_DIR}/${file}`, "{}");
   write("favicon.svg", "<svg/>");
   write("favicon.ico", new Uint8Array(ico()));
   write("apple-touch-icon.png", new Uint8Array(png(180, 180)));
@@ -254,6 +254,7 @@ test("_redirects: a redirect from a live event or to a missing one", async () =>
 
 test("Pagefind: one versioned search folder, named by meta.json and by the bundle", async () => {
   await assertProblem((f) => f.remove(`pagefind/${SEARCH_DIR}/ids.json`), /pagefind\/v\.0123456789ab\/ids\.json is missing/);
+  await assertProblem((f) => f.remove(`pagefind/${SEARCH_DIR}/words.json`), /pagefind\/v\.0123456789ab\/words\.json is missing/);
   await assertProblem((f) => f.write("pagefind/v.ffffffffffff/pagefind.js", ""), /other files in dist\/pagefind besides meta\.json and v\.0123456789ab: v\.ffffffffffff/);
   await assertProblem((f) => f.write("pagefind/meta.json", { dir: "index" }), /pagefind\/meta\.json dir "index" is not/);
   await assertProblem((f) => f.write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";`), /no dist\/assets\/\*\.js names the search folder v\.0123456789ab/);

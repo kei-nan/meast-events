@@ -7,7 +7,8 @@
 // that previews as the event and opens on the map. Without an event: /.
 // Everything else is the query string:
 //
-//   q, cat (comma list), c (comma list of countries), y=start-end,
+//   q, cat (comma list of category ids), c (comma list of countries; both
+//   known values only), y=start-end (cut to YEAR_MIN-YEAR_MAX),
 //   scope=all|range, area=r:minLon,minLat,maxLon,maxLat | c:lon,lat,radiusKm,
 //   about=1 (the "About the data" dialog is open),
 //   sort=coverage-asc|date|date-desc (browse list order, lib/browseOrder.js; the
@@ -18,6 +19,8 @@
 // if both are given), and rewritten to /event/<id> by the next URL write.
 
 import { SORTS } from "./browseOrder.js";
+import { CATEGORY_LABELS } from "./categoryLabels.js";
+import { COUNTRY_SHAPES } from "./eventCountries.js";
 import { MAX_RADIUS_KM, makeCircleArea, makeRectArea } from "./geo.js";
 import { MAX_YEAR, MIN_YEAR } from "./years.js";
 
@@ -53,13 +56,25 @@ export function eventIdFromPath(pathname) {
   return isValidEventId(id) ? id : null;
 }
 
-function parseList(raw) {
+// The values a list parameter may hold, by lower case: the category ids
+// (lib/categoryLabels.js) and the `countries` vocabulary of data/events.json
+// (lib/eventCountries.js, whose tests check that every country in the data has
+// an entry). Matched case-insensitively and written back as the data spells
+// them (?cat=War -> war, ?c=uae -> UAE); anything else is dropped, so a link
+// can never show a filter chip that matches no event.
+const byLowerCase = (values) => new Map(values.map((v) => [v.toLowerCase(), v]));
+const KNOWN_CATEGORIES = byLowerCase(Object.keys(CATEGORY_LABELS));
+const KNOWN_COUNTRIES = byLowerCase(Object.keys(COUNTRY_SHAPES));
+
+function parseList(raw, known) {
   if (!raw) return [];
   const out = [];
   for (const item of raw.split(",")) {
     const t = item.trim();
-    if (!t || t.length > MAX_ITEM_LENGTH || CTRL_RE.test(t) || out.includes(t)) continue;
-    out.push(t);
+    if (!t || t.length > MAX_ITEM_LENGTH || CTRL_RE.test(t)) continue;
+    const v = known.get(t.toLowerCase());
+    if (!v || out.includes(v)) continue;
+    out.push(v);
     if (out.length >= MAX_ITEMS) break;
   }
   return out;
@@ -114,19 +129,20 @@ export function parseUrlState(search, pathname = "/") {
   let years = null;
   const ym = /^(\d{4})-(\d{4})$/.exec(p.get("y") ?? "");
   if (ym) {
-    const s = Number(ym[1]);
-    // The last year follows the visitor's clock (lib/years.js): a link made where
-    // the year had already turned, or one ending in a year the data never reaches,
-    // keeps its start and ends at the last year shown here.
-    const e = Math.min(Number(ym[2]), YEAR_MAX);
-    if (s >= YEAR_MIN && s <= e) years = [s, e];
+    const [s, e] = [Number(ym[1]), Number(ym[2])];
+    // A range reaching outside the timeline is cut to it, at either end: the last
+    // year follows the visitor's clock (lib/years.js), so a link made where the
+    // year had already turned ends at the last year shown here; one starting
+    // before the first year starts there. An inverted range, or one entirely
+    // outside the timeline, is dropped.
+    if (s <= e && e >= YEAR_MIN && s <= YEAR_MAX) years = [Math.max(s, YEAR_MIN), Math.min(e, YEAR_MAX)];
   }
 
   const e = p.get("e"); // an older link (see the top of the file)
   return {
     q,
-    categories: parseList(p.get("cat")),
-    countries: parseList(p.get("c")),
+    categories: parseList(p.get("cat"), KNOWN_CATEGORIES),
+    countries: parseList(p.get("c"), KNOWN_COUNTRIES),
     years,
     scope: p.get("scope") === "range" ? "range" : "all",
     area: parseArea(p.get("area")),
