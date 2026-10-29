@@ -22,14 +22,15 @@ export { DECADE_SIZE, decadeFloor, eventOverlapsRange, eventYearRange } from "./
 
 const inFlight = new Map(); // url -> Promise<data>, so concurrent callers share one fetch
 
-// One fetch, optionally cancellable (`signal`) and time-limited (`timeoutMs`).
+// One fetch, optionally cancellable (`signal`), time-limited (`timeoutMs`) and
+// prioritised (`priority`, the fetch() hint; only the full-record bucket uses it).
 // A caller-initiated abort rejects with err.aborted === true and NOT as an
 // outage; a timeout, network failure or 5xx is err.outage === true; a 4xx is
 // a bad request and says nothing about availability.
 // The answer is parsed as JSON, or with `decode(arrayBuffer)` when given (the
 // .tbin geometry files, lib/geoCodec.js); a file that does not parse or decode
 // fails like a truncated download.
-function fetchJSON(url, { timeoutMs, signal, cache, decode } = {}) {
+function fetchJSON(url, { timeoutMs, signal, cache, priority, decode } = {}) {
   const controller = timeoutMs || signal ? new AbortController() : null;
   const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
   const onAbort = () => controller.abort();
@@ -40,7 +41,8 @@ function fetchJSON(url, { timeoutMs, signal, cache, decode } = {}) {
   const init = {};
   if (controller) init.signal = controller.signal;
   if (cache) init.cache = cache;
-  return fetch(url, controller || cache ? init : undefined)
+  if (priority) init.priority = priority;
+  return fetch(url, controller || cache || priority ? init : undefined)
     .then((res) => {
       if (!res.ok) {
         const err = new Error(`Failed to load ${url}: ${res.status}`);
@@ -71,9 +73,9 @@ function fetchJSON(url, { timeoutMs, signal, cache, decode } = {}) {
 
 // `check(data)` throws on a file of the wrong shape; it runs before the answer
 // counts as a success, so a bad file is evicted like a failed fetch.
-function fetchJSONCached(url, { timeoutMs, cache, check, decode } = {}) {
+function fetchJSONCached(url, { timeoutMs, cache, priority, check, decode } = {}) {
   if (!inFlight.has(url)) {
-    const promise = fetchJSON(url, { timeoutMs, cache, decode }).then((data) => {
+    const promise = fetchJSON(url, { timeoutMs, cache, priority, decode }).then((data) => {
       check?.(data);
       return data;
     });
@@ -251,9 +253,11 @@ export function loadFramingReviewSummary() {
 // The detail record of one event: {extract, extract_retrieved_at, wikipedia_url,
 // wikidata_classes, framing_review, ...}. Lives in a small static bucket file
 // (events/v.<version>/full/<bucket>.json, see lib/fullBucket.js) that is fetched
-// only when an event is opened - lists never download it. Read from the same
-// versioned folder as the lite set. Resolves null if the id is not in its
-// bucket; rejects if the file is unreachable.
+// when an event is opened, or just before (prefetchFullLead) - lists never
+// download it. Read from the same versioned folder as the lite set, at high
+// fetch priority: the open panel waits on it, while the map's geometry for the
+// same event downloads alongside. Resolves null if the id is not in its bucket;
+// rejects if the file is unreachable.
 //
 // A page left open across a deploy still points at the folder it loaded, which
 // the deploy removed (the host keeps only the current files). When that folder's
@@ -261,11 +265,12 @@ export function loadFramingReviewSummary() {
 // events/meta.json and the record is taken from there: ids are stable, so the
 // open page keeps working instead of showing "could not be loaded" until reload.
 const bucketUrl = (id, { version, buckets }) => dataUrl(`events/v.${version}/full/${fullBucket(id, buckets)}.json`);
+const fetchBucket = (id, from) => fetchJSONCached(bucketUrl(id, from), { priority: "high" });
 
 export async function loadFullLead(id) {
   await loadAllLite();
   const read = async (from) => {
-    const bucket = await fetchJSONCached(bucketUrl(id, from));
+    const bucket = await fetchBucket(id, from);
     return Object.prototype.hasOwnProperty.call(bucket, id) ? bucket[id] : null;
   };
   try {
@@ -279,11 +284,13 @@ export async function loadFullLead(id) {
   }
 }
 
-// Fire-and-forget, for an event link: starts the event's bucket download in
-// parallel with all.json, from the folder this bundle names (where the lite set
-// comes from too, unless that folder is gone). loadFullLead then shares the
-// cached request; a failed one is dropped from the cache, so it retries.
+// Fire-and-forget: starts the event's bucket download before it is opened - for
+// an event link, in parallel with all.json; later, as a list row or event link
+// is pointed at, focused or pressed (lib/warmEvent.js). It reads the folder the
+// lite set came from, or before that is known the folder this bundle names
+// (where the lite set comes from too, unless that folder is gone). loadFullLead
+// then shares the cached request; a failed one is dropped from the cache, so
+// loadFullLead tries again, with its meta.json fallback.
 export function prefetchFullLead(id) {
-  if (source) return;
-  fetchJSONCached(bucketUrl(id, { version: DATA_VERSION, buckets: FULL_BUCKETS })).catch(() => {});
+  fetchBucket(id, source ?? { version: DATA_VERSION, buckets: FULL_BUCKETS }).catch(() => {});
 }

@@ -4,7 +4,8 @@
 
 // The open event's view (components/EventDetail.jsx, with RelatedEvents, Citation and
 // lib/citation.js): SearchPanel renders it lazily; App starts it at once for an event
-// link, alongside the event's full record (dataClient prefetchFullLead).
+// link, and lib/warmEvent.js as a row or event link is pointed at, each alongside the
+// event's full record (dataClient prefetchFullLead).
 export const loadEventDetail = () => import("../components/EventDetail.jsx");
 
 // The results download (lib/exportResults.js): SearchPanel's Download menu warms it as

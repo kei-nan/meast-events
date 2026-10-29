@@ -165,6 +165,19 @@ function historyUrl(wikipediaUrl) {
   return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
 }
 
+// "Loading the full text…", shown only once the wait is noticeable, so a quick
+// load (often started earlier by lib/warmEvent.js) does not flash it. Keyed by
+// the event, so the wait restarts for the next one.
+const LOADING_NOTE_DELAY_MS = 300;
+function LoadingNote() {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setShown(true), LOADING_NOTE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
+  return shown ? <p className="event-detail-note">Loading the full text…</p> : null;
+}
+
 /**
  * Selected-event view. Wikipedia's title/lead and Wikidata's class labels are
  * rendered as-is. `event.leadStatus` is "loading"/"error" while only the
@@ -396,7 +409,7 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
       {/* One live region for the full text's state, in the page while the
           event is open, so a failure that comes later is announced. */}
       <div role="status">
-        {event.leadStatus === "loading" && <p className="event-detail-note">Loading the full text…</p>}
+        {event.leadStatus === "loading" && <LoadingNote key={event.id} />}
         {event.leadStatus === "error" && (
           <p className="event-detail-note">
             The full text could not be loaded; only the opening is shown. Read the whole article on Wikipedia.
