@@ -499,8 +499,9 @@
 }
 
 /* Mobile: Play, play mode, the years and the presets (scrolling sideways) on
-   one row, the strip on the next, so the timeline stays short. Below about
-   360px the presets wrap to a row of their own rather than shrink to a sliver. */
+   one row, the strip on the next, so the timeline stays short. A 360px phone
+   leaves the presets ~76px (a preset and a half, scrolling); below about 350px
+   they wrap to a row of their own rather than shrink to a sliver. */
 @media (max-width: 768px) {
   .timeline {
     --tl-thumb: 44px;
@@ -520,7 +521,7 @@
 
   .timeline-presets {
     --tl-fade: 22px;
-    flex: 1 1 96px;
+    flex: 1 1 66px;
     padding: 2px 0;
   }
 
@@ -557,15 +558,16 @@
     display: none;
   }
 
+  /* Sized so both fields and Done keep one row down to a 360px phone. */
   .timeline-edit {
     flex-basis: 100%;
     justify-content: flex-start;
-    gap: 4px 8px;
+    gap: 4px 6px;
     padding: 2px 0;
   }
 
   .timeline-edit-field {
-    gap: 3px;
+    gap: 2px;
   }
 
   .timeline-edit-field label {
@@ -578,17 +580,17 @@
 
   .timeline-edit-field + .timeline-edit-field::before {
     content: "–";
-    margin-right: 5px;
+    margin-right: 3px;
     color: var(--text-secondary);
   }
 
   .timeline-edit-field input {
-    width: 2.9em;
+    width: 2.6em;
     padding: 0;
   }
 
   .timeline-edit-done {
-    padding: 0 8px;
+    padding: 0 6px;
   }
 
   /* In the flow under its field: floating, it would cover the End field. */
@@ -631,6 +633,30 @@
   .app:has(.side-panel[data-sheet="full"]) .timeline:not(:has(.timeline-edit)) .timeline-strip {
     flex: 1;
     min-width: 0;
+  }
+}
+
+/* Short screens (a phone held sideways, a laptop at 200% zoom): the same one
+   row, Play, the years and the strip, at every sheet height, so the map and
+   the panel keep most of the ~390px. The play mode and the presets come back
+   on a taller screen; typing exact years still opens the editor's row. */
+@media (max-height: 500px) {
+  .timeline:not(:has(.timeline-edit)) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  .timeline:not(:has(.timeline-edit)) :is(.timeline-mode, .timeline-presets, .timeline-bound) {
+    display: none;
+  }
+
+  .timeline:not(:has(.timeline-edit)) .timeline-strip {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
   }
 }
 

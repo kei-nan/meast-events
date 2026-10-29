@@ -879,7 +879,7 @@ export default function MapView({
     onSelectEvent?.(id);
   };
 
-  // "Show results on map": fit the view around the search/filter matches that
+  // "Zoom to results": fit the view around the search/filter matches that
   // have coordinates. Only on request - never on each keystroke.
   const matchBounds = useMemo(() => (matchIds ? eventsBounds(events, matchIds) : null), [events, matchIds]);
   const showMatches = () => {

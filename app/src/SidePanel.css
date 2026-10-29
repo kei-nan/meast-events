@@ -481,8 +481,10 @@
   color: var(--text-secondary);
 }
 
+/* A long category name wraps left-aligned beside its dot, not centred. */
 button.sp-chip {
   cursor: pointer;
+  text-align: start;
 }
 
 button.sp-chip:hover {
@@ -580,8 +582,10 @@ button.sp-chip[aria-pressed="true"] {
   margin-left: auto;
 }
 
+/* An h2 (the list's heading) that looks like the rest of the line. */
 .sp-status {
   margin: 0;
+  font: inherit;
   font-size: 0.82rem;
   color: var(--text-secondary);
 }
@@ -1588,6 +1592,14 @@ button.sp-chip[aria-pressed="true"] {
     height: 4px;
     border-radius: 2px;
     background: var(--border);
+  }
+
+  /* The open event's title on the lowered sheet: one line, cut with an ellipsis. */
+  .sp-sheet-title {
+    max-width: calc(100% - 32px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .sp-scroll {

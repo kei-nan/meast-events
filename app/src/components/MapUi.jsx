@@ -24,7 +24,7 @@ function ToolButton({ icon, label, className = "", ...rest }) {
 // Icons are line drawings (KeyIcon, the navigation keys' weight), plain shapes
 // and arrows, never a crosshair, scope or bullseye (project rule: no
 // weapon-like visuals). "Use map view" is a dashed square like the drawn area's
-// outline; "Show results on map" is fit-to-view arrows.
+// outline; "Zoom to results" is fit-to-view arrows.
 const ICONS = {
   draw: "M4 16l.9-3.6L13 4.3a1.5 1.5 0 0 1 2.1 0l.6.6a1.5 1.5 0 0 1 0 2.1L7.6 15.1z",
   rect: "M3.5 5.5h13v9h-13z",
@@ -138,7 +138,8 @@ function ShowMatchesButton({ count, total, compact, onClick }) {
   const unmapped = total != null && total > count ? total - count : 0;
   const why = unmapped ? `${unmapped} ${unmapped === 1 ? "has" : "have"} no map location` : null;
   const shown = unmapped ? `${count} of ${total}` : `${count}`;
-  const text = compact ? `Show results (${shown})` : `Show ${shown} results on map`;
+  // "Zoom to", not "Show": the phone sheet's bar is "Show results" (opens the list).
+  const text = compact ? `Zoom to results (${shown})` : `Zoom to ${shown} results`;
   // The accessible name starts with the visible text (voice control users say
   // what they see).
   return (
@@ -230,7 +231,7 @@ function useClearOfSheet(ref, open) {
 }
 
 // The one map toolbar (top-left): searching on the map - draw an area, and
-// "Show N results on map" while a search or filter has mapped matches. What
+// "Zoom to N results" while a search or filter has mapped matches. What
 // the map shows is explained by the Map key (top right); zoom, reset and
 // moving the map are in MapNav (bottom right), besides the wheel, pinch,
 // double-click and MapLibre's keyboard handler (+ / - and arrows with the map

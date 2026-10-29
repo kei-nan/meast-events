@@ -530,7 +530,7 @@ export default function App() {
     },
     [storeRef, playState]
   );
-  // The phone's "Show on map": the camera aimed the event at the strip above the
+  // The phone's "Find on map": the camera aimed the event at the strip above the
   // open sheet, so as the sheet drops to its peek bar it is aimed again, at the
   // map now in sight (lib/mapInsets.js).
   const handleRefocus = useCallback(() => {

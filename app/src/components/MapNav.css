@@ -6,7 +6,9 @@
      attribution;
    - short screens (a phone held sideways): a column down from the top-right
      corner;
-   - phones: a column at the right edge under the Borders chip row.
+   - phones: a column at the right edge under the Borders chip row;
+   - short phones (or the phone layout zoomed in, 683x400): a row in the
+     top-right corner, the pad a row under it.
    The pad opens to the column's left, bottom-aligned. */
 
 .mu-nav {
@@ -119,6 +121,43 @@
      it back); "Move map" stays. */
   @media (max-height: 700px) {
     .app-body:has(.side-panel[data-sheet="half"]) .mu-nav-reset {
+      display: none;
+    }
+  }
+
+  /* A short screen in the phone layout (a phone held sideways, a laptop at
+     200% zoom, 683x400): the lowered sheet leaves ~140-190px of map, where the
+     column (184px) reached under it (WCAG 2.4.11). The keys go in a row in the
+     top-right corner, the Borders chips beside it on its left (MapUi.css), and
+     the pad opens under the row as a row of four arrows. The first-visit tip
+     gives way, as on wider short screens. */
+  @media (max-height: 500px) {
+    .mu-nav {
+      top: 10px;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .mu-nav-keys {
+      grid-auto-rows: auto;
+      grid-template-columns: none;
+      grid-template-rows: var(--key);
+      grid-auto-flow: column;
+      grid-auto-columns: var(--key);
+    }
+    .mu-nav-keys .mu-key + .mu-key::before {
+      top: 6px;
+      bottom: 6px;
+      left: -0.5px;
+      right: auto;
+      width: 1px;
+      height: auto;
+    }
+    .mu-pan-pad {
+      grid-template-columns: repeat(4, var(--key));
+      grid-template-rows: var(--key);
+      grid-template-areas: "left up down right";
+    }
+    .mu-tip {
       display: none;
     }
   }

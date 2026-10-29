@@ -332,8 +332,10 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
           <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
         </button>
         {onShowOnMap && quality !== "none" && (
+          // "Find on map": lowers the sheet and aims the map at the event (the
+          // sheet's bar, "Show map", only lowers it).
           <button type="button" className="sp-btn event-detail-showmap" onClick={onShowOnMap}>
-            Show on map
+            Find on map
           </button>
         )}
         {/* "Cite" once the full record (retrieval date, revision) is in. */}
