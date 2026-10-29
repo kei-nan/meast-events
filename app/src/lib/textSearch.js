@@ -8,11 +8,13 @@
 // filters, drawn areas and the final ranking are applied by the caller from
 // the static store (hooks/useEventSearch.js).
 //
-// All of it (engine, index, ids.json) is in one versioned folder,
+// All of it (engine, index, ids.json, words.json) is in one versioned folder,
 // pagefind/v.<version>/ (scripts/build-search-index.mjs), cached immutably. The
 // bundle names its build's folder (__SEARCH_DIR__, vite.config.js). Without one
 // (the dev server), or after a load failed (a page older than the deploy, whose
 // folder is gone), the current folder is read from pagefind/meta.json.
+
+import { everyTermIndexed, pagefindQuery } from "./searchTerms.js";
 
 const ROOT = `${import.meta.env.BASE_URL}pagefind/`;
 /* global __SEARCH_DIR__ */
@@ -78,10 +80,16 @@ async function load() {
     });
   }
   if (!idsPromise) {
-    // {pagefind result id: event id}; replaces a fragment request per result.
-    const p = fetch(`${base}ids.json`).then((res) => {
-      if (!res.ok) throw new Error(`Failed to load search ids: ${res.status}`);
-      return res.json();
+    // ids.json: {pagefind result id: event id}, replacing a fragment request
+    // per result. words.json: the index's sorted word list (searchTerms.js).
+    const json = (name, what) =>
+      fetch(`${base}${name}`).then((res) => {
+        if (!res.ok) throw new Error(`Failed to load search ${what}: ${res.status}`);
+        return res.json();
+      });
+    const p = Promise.all([json("ids.json", "ids"), json("words.json", "words")]).then(([ids, words]) => {
+      if (!Array.isArray(words)) throw new Error("search words.json is not a list");
+      return { ids, words };
     });
     idsPromise = p;
     p.catch(() => {
@@ -93,11 +101,16 @@ async function load() {
   return Promise.all([enginePromise, idsPromise]);
 }
 
-// Event ids matching every word of q (the last word also as a prefix, for
-// search-as-you-type), most relevant first.
+// Event ids matching every word of q (each word, stemmed, also as a prefix, so
+// search-as-you-type works), most relevant first. A word the index does not
+// hold means no events: Pagefind would instead answer it with the events of a
+// shorter indexed word ("jerusalemxyz" -> "jerusalem"), or ignore it in a
+// longer query (searchTerms.js).
 export async function searchEventIds(q) {
-  const [pf, ids] = await load();
-  const res = await pf.search(q);
+  const [pf, { ids, words }] = await load();
+  const query = pagefindQuery(q);
+  if (!everyTermIndexed(query, words)) return [];
+  const res = await pf.search(query);
   const out = [];
   for (const r of res?.results ?? []) {
     const id = ids[r.id];

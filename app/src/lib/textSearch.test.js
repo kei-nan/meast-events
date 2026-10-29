@@ -30,16 +30,23 @@ function fakePagefind({ results = [], initFails = 0 } = {}) {
 
 // ids.json answers `map` (calls lists those requests); pagefind/meta.json, read
 // when the bundle names no folder (as here: no __SEARCH_DIR__) or after a
-// failure, names folder v.test (calls.meta counts it).
-function stubIds(map, { failFirst = 0 } = {}) {
+// failure, names folder v.test (calls.meta counts it). words.json (the index's
+// word list) answers `words` (calls.words lists those requests).
+const WORDS = ["a", "b", "c", "canal", "q", "suez", "x"];
+function stubIds(map, { failFirst = 0, words = WORDS } = {}) {
   const calls = [];
   Object.defineProperty(calls, "meta", { value: 0, writable: true, enumerable: false }); // not part of deepEqual
+  Object.defineProperty(calls, "words", { value: [], enumerable: false });
   globalThis.fetch = async (url) => {
     if (url.endsWith("/pagefind/meta.json")) {
       calls.meta++;
       return new Response(JSON.stringify({ version: "test", dir: "v.test" }), { headers: { "content-type": "application/json" } });
     }
     if (globalThis.__goneDir && url.includes(`/${globalThis.__goneDir}/`)) return new Response("", { status: 404 });
+    if (url.endsWith("/words.json")) {
+      calls.words.push(url);
+      return new Response(JSON.stringify(words), { headers: { "content-type": "application/json" } });
+    }
     calls.push(url);
     if (failFirst-- > 0) return new Response("", { status: 503 });
     return new Response(JSON.stringify(map), { headers: { "content-type": "application/json" } });
@@ -197,4 +204,37 @@ test("the engine is looked up under BASE_URL", async () => {
   } finally {
     delete globalThis.__VITE_ENV__;
   }
+});
+
+test("a word no indexed word starts with answers no events, without Pagefind's prefix fallback", async () => {
+  const { searchEventIds } = await fresh();
+  // Pagefind would answer "suezxyz" with the "suez" events, and ignore "qqq" in "suez qqq".
+  const pf = fakePagefind({ results: [{ id: "p1" }] });
+  const calls = stubIds({ p1: "e1" }, { words: ["jerusalem", "suez", "suezkan", "war"] });
+  assert.deepEqual(await searchEventIds("suezxyz"), []);
+  assert.deepEqual(await searchEventIds("suez qqq"), []);
+  assert.deepEqual(await searchEventIds("Jerusalm"), []);
+  assert.deepEqual(pf.calls.search, []);
+  // Real words, prefixes of them and inflected forms (stemmed as Pagefind does) are searched.
+  assert.deepEqual(await searchEventIds("Suez"), ["e1"]);
+  assert.deepEqual(await searchEventIds("jerus"), ["e1"]);
+  assert.deepEqual(await searchEventIds("Suez wars"), ["e1"]);
+  assert.deepEqual(pf.calls.search, ["Suez", "jerus", "Suez wars"]);
+  assert.deepEqual(calls.words, ["/pagefind/v.test/words.json"]);
+});
+
+test("symbols, never part of an indexed word, are left out of the query", async () => {
+  const { searchEventIds } = await fresh();
+  const pf = fakePagefind({ results: [{ id: "p1" }] });
+  stubIds({ p1: "e1" }, { words: ["8000", "us500"] });
+  assert.deepEqual(await searchEventIds("8000+"), ["e1"]);
+  assert.deepEqual(await searchEventIds("US$500"), ["e1"]);
+  assert.deepEqual(pf.calls.search, ["8000", "US500"]);
+});
+
+test("a word list that is not a list is a failed load", async () => {
+  const { searchEventIds } = await fresh();
+  fakePagefind({ results: [{ id: "p1" }] });
+  stubIds({ p1: "e1" }, { words: { nope: 1 } });
+  await assert.rejects(searchEventIds("q"), /words.json is not a list/);
 });

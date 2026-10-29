@@ -261,7 +261,7 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     ({ dir: searchDir } = readJSON("pagefind/meta.json"));
     if (!/^v\.[0-9a-f]{12}$/.test(searchDir ?? "")) fail(`pagefind/meta.json dir ${JSON.stringify(searchDir)} is not v.<12 hex>`);
     else {
-      for (const f of ["pagefind.js", "pagefind-entry.json", "ids.json"]) {
+      for (const f of ["pagefind.js", "pagefind-entry.json", "ids.json", "words.json"]) {
         if (!existsSync(distFile(`pagefind/${searchDir}/${f}`))) fail(`pagefind/${searchDir}/${f} is missing`);
       }
       const other = readdirSync(distFile("pagefind")).filter((f) => f !== "meta.json" && f !== searchDir);
