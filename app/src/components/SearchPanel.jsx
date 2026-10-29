@@ -112,7 +112,7 @@ const VIEWS = [
  * @param {(id:string)=>void}      props.onSelect
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
- * @param {()=>void}               [props.onRefocus] aim the map at the open event again (phone "Show on map")
+ * @param {()=>void}               [props.onRefocus] aim the map at the open event again (phone "Find on map")
  * @param {()=>void}               [props.onSheetMove] the phone sheet moved with an event open (keep its pin in sight)
  * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
  * @param {(s:string)=>void}       [props.onSortChange]
@@ -224,7 +224,7 @@ export default function SearchPanel({
   // ("N results"; tabIndex -1). Not the search box: its onFocus opens the
   // phone sheet to full and preloads the full-text index, and on a phone it
   // would bring up the keyboard. With the phone sheet at its peek bar (system
-  // Back after "Show on map") the list is hidden, so focus goes to the sheet's
+  // Back after "Find on map") the list is hidden, so focus goes to the sheet's
   // bar instead.
   useEffect(() => {
     if (selectedEvent) {
@@ -276,7 +276,7 @@ export default function SearchPanel({
 
   // Mobile: the reader moved the sheet (dragged it, its bar, a key) with an
   // event open, so more or less of the map is in sight: App keeps the event's
-  // pin inside it (MapView keepPinNonce) - unless "Show on map" just aimed it,
+  // pin inside it (MapView keepPinNonce) - unless "Find on map" just aimed it,
   // or the event itself changed (it is aimed anyway).
   const sheetSeenRef = useRef({ sheet, selectedId });
   useEffect(() => {
@@ -496,7 +496,18 @@ export default function SearchPanel({
         {...barProps}
       >
         <span className="sp-sheet-grip" aria-hidden="true" />
-        {sheetOpen ? "Show map" : selectedEvent ? "Show event" : "Show results"}
+        {/* Lowered with an event open, the bar names the event (one line, cut
+            with an ellipsis); its accessible name says what the bar does. */}
+        {sheetOpen ? (
+          "Show map"
+        ) : selectedEvent ? (
+          <span className="sp-sheet-title">
+            {selectedEvent.title}
+            <span className="sp-sr"> (show event)</span>
+          </span>
+        ) : (
+          "Show results"
+        )}
       </button>
 
       <div
@@ -584,10 +595,11 @@ export default function SearchPanel({
           {/* Line 1: what is listed (and the scope button), and Download, which
               saves exactly that. */}
           <div className="sp-statusline">
-            <p className="sp-status" ref={statusRef} tabIndex={-1}>
+            {/* The list's heading (the Timeline view's decades are h2s under it). */}
+            <h2 className="sp-status" ref={statusRef} tabIndex={-1}>
               {statusText}
               {statusExtra && <span className="sp-sr">{statusExtra}</span>}
-            </p>
+            </h2>
             {/* One button in a fixed place whose text flips between the two
                 scopes, so keyboard focus stays on it after pressing it. */}
             {scopeAction && (

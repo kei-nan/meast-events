@@ -148,7 +148,7 @@ test("a pin outside the fitted countries is kept in sight", () => {
 });
 
 test("a map behind its container's size is resized before the camera is aimed", () => {
-  // The phone timeline grows as the sheet drops to its peek bar ("Show on map"):
+  // The phone timeline grows as the sheet drops to its peek bar ("Find on map"):
   // the container is already 600 px tall, MapLibre still has 646.
   const focus = { id: "e", countries: ["Iraq", "Kuwait"], fitCountries: true, lon: 44.4, lat: 33.3, nonce: 6 };
   const stale = fakeMap({ canvasHeight: 646 });

@@ -779,7 +779,7 @@
     border-radius: 8px;
     font-size: 12px;
   }
-  /* "Show results" (the toolbar's own row under its buttons, 44px + the 6px
+  /* "Zoom to results" (the toolbar's own row under its buttons, 44px + the 6px
      gap) takes the tip's place, so the tip goes a row lower. */
   .mu-toolbar-wrap:has(> .mu-btn) ~ .mu-tip {
     top: 114px;
@@ -831,6 +831,34 @@
   .mu-year-choice-cap,
   .mu-year-seg-sub {
     display: none;
+  }
+  /* Draw area as its icon, as on phones (its name keeps the words): the map
+     is ~270px tall here, and the label covered the clusters under it. */
+  .mu-tool {
+    justify-content: center;
+    min-width: 44px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .mu-tool .mu-tool-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* Short phone layout: the navigation is a row in the top-right corner
+   (MapNav.css, 4 x 44px + its border), so the Borders chips sit left of it. */
+@media (max-height: 500px) and (max-width: 768px) {
+  .mu-ctrl-right {
+    right: 198px;
+    max-width: calc(100% - 262px); /* clear of Draw area on the left */
+  }
+  .mu-ctrl-right > .mu-notices,
+  .mu-ctrl-right .mu-borders-panel {
+    margin-right: 0;
   }
 }
 
