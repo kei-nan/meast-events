@@ -245,8 +245,8 @@ export default function FramingReview({ event, tab, onTab }) {
         className={HAS_POPOVER ? "fr-ai-note" : "fr-ai-note fr-ai-note--inline"}
       >
         This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It
-        looks at how the summary is written, not whether the events happened, and the Wikipedia text is shown
-        unchanged.
+        looks at how the summary is written, not whether the events happened, and it does not change the Wikipedia
+        text (the article&apos;s lead section as plain text, references removed).
       </div>
     </section>
   );

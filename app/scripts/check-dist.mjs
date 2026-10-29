@@ -28,7 +28,8 @@
 //   - every inline <script> in the HTML (index.html's "js" class script) has its
 //     sha256 hash in the CSP's script-src, or the browser would block it;
 //   - the icons index.html links are valid: favicon.ico an ICO, apple-touch-icon.png
-//     a 180x180 PNG (scripts/make-icons.mjs);
+//     a 180x180 PNG (scripts/make-icons.mjs), each with a caching rule in _headers,
+//     and og-image.png a 1200x630 PNG (scripts/make-og-image.mjs);
 //   - each event page preloads its own full-record bucket, and that file exists;
 //   - dist/_redirects, when there is one, redirects only ids that are no longer
 //     events to ids that are (scripts/redirects.mjs);
@@ -345,8 +346,15 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     if (!size) fail("apple-touch-icon.png is not a PNG");
     else if (size.width !== 180 || size.height !== 180) fail(`apple-touch-icon.png is ${size.width}x${size.height}, not 180x180`);
   }
+  // The link-preview image every page names (scripts/make-og-image.mjs), at the size og:image:width/height state.
+  const og = existsSync(distFile("og-image.png")) ? pngSize(readFileSync(distFile("og-image.png"))) : null;
+  if (!og) fail("og-image.png is missing or not a PNG (scripts/make-og-image.mjs)");
+  else if (og.width !== 1200 || og.height !== 630) fail(`og-image.png is ${og.width}x${og.height}, not 1200x630`);
   for (const icon of ["/favicon.ico", "/favicon.svg", "/apple-touch-icon.png"]) {
     if (!html.includes(`href="${icon}"`)) fail(`index.html does not link ${icon}`);
+    // Cached (public/_headers): with the default, Chromium asks again on every history.replaceState.
+    const cache = rules.find((r) => r.pattern === icon)?.headers.find((h) => /^cache-control:/i.test(h));
+    if (!cache || !/max-age=[1-9]/.test(cache)) fail(`_headers has no caching rule for ${icon}`);
   }
 
   // 6e. Redirects for renamed ids (scripts/redirects.mjs).
