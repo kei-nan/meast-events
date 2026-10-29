@@ -19,6 +19,18 @@ test("normalizeLead: no character other than whitespace changes", () => {
   assert.equal(strip(normalizeLead(messy)), strip(messy.replace(/[  -  　]/g, " ")));
 });
 
+test("normalizeLead: an empty \"()\" left by stripped markup is dropped with the space before it", () => {
+  // Sykes–Picot Agreement, TextExtracts lead of revision 1379657240.
+  assert.equal(
+    normalizeLead("The Sykes–Picot Agreement () was a 1916 secret treaty."),
+    "The Sykes–Picot Agreement was a 1916 secret treaty."
+  );
+  assert.equal(normalizeLead("A ( ) b ( ).\n\n() C."), "A b.\n\nC.");
+  // Parentheses with anything inside are Wikipedia's text and stay.
+  for (const kept of ["Fatah (; Hamas)", "The war (1967) ended.", "x (.) y", "f(x)"]) assert.equal(normalizeLead(kept), kept);
+  assert.equal(normalizeLead("()"), null, "nothing left");
+});
+
 test("normalizeLead: empty or non-string input gives null", () => {
   assert.equal(normalizeLead(""), null);
   assert.equal(normalizeLead(" \n \r\n "), null);

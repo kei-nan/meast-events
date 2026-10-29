@@ -36,7 +36,7 @@
   {
     "id": "russian-occupation-of-tabriz",
     "title": "Russian occupation of Tabriz",
-    "date_start": "1911-01-01",
+    "date_start": "1909-04-30",
     "date_end": "1918-02-28",
     "countries": [
       "Iran"
@@ -57,7 +57,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q4397975",
@@ -66,12 +66,10 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Russian involvement in the Persian Constitutional Revolution\" (Q4397975); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Russian involvement in the Persian Constitutional Revolution\" (Q4397975); it may overlap with that larger event",
+      "data_fix F15: Russian occupation of Tabriz: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1909-04-30, P585 1911 (year), P582 1918-02-28 (revision 2402259382); English Wikipedia https://en.wikipedia.org/w/index.php?title=Russian_occupation_of_Tabriz&oldid=1372095714: lead \"lasted from 30 April 1909 to 28 February 1918\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start, date_precision; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 1911 (1911-01-01) is not within 1 year of any year in the Wikipedia lead [1909, 1918, 1915]"
-    ],
     "needs_review": true,
     "wikidata_description": "1909 military occupation"
   },
@@ -992,7 +990,7 @@
   {
     "id": "iran-crisis-of-1946",
     "title": "Iran crisis of 1946",
-    "date_start": "1946-01-01",
+    "date_start": "1945-11-01",
     "date_end": "1946-12-15",
     "countries": [
       "Iran"
@@ -1013,7 +1011,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "month",
     "part_of": [
       {
         "qid": "Q8683",
@@ -1022,7 +1020,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event",
+      "data_fix F15: Iran crisis of 1946: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1945-11 (month), P585 1946 (year), P582 1946-12-15 (revision 2533867483); English Wikipedia https://en.wikipedia.org/w/index.php?title=Iran_crisis_of_1946&oldid=1374789395: infobox \"November 1945 – December 15, 1946\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start, date_precision; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,
@@ -4032,7 +4031,7 @@
   {
     "id": "2009-iranian-presidential-election-protests",
     "title": "2009 Iranian presidential election protests",
-    "date_start": "2010-02-11",
+    "date_start": "2009-06-13",
     "date_end": "2010-12-07",
     "countries": [
       "Iran"
@@ -4063,7 +4062,8 @@
       }
     ],
     "review_reasons": [
-      "possible_duplicate: possible duplicate of \"2009 Iranian presidential election\" (2009-iranian-presidential-election) - similar title, date within 1 year and nearby / same country"
+      "possible_duplicate: possible duplicate of \"2009 Iranian presidential election\" (2009-iranian-presidential-election) - similar title, date within 1 year and nearby / same country",
+      "data_fix F15: 2009 Iranian presidential election protests: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 2009-06-13, P585 2010-02-11, P582 2010-12-07 (revision 2559664551); English Wikipedia https://en.wikipedia.org/w/index.php?title=2009_Iranian_presidential_election_protests&oldid=1381691345: infobox \"13 June 2009 – 7 December 2010\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
     "needs_review": true,

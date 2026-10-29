@@ -15,3 +15,12 @@ Q3241199	P580	+1948-05-15T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org
 # Arab Cold War (Q4783165): P585 point in time 1979-02-11 (day) sits on a period item that also has P580 1952 and P582 1970 (both year precision), and is after that end. The infobox says "23 July 1952 – 6 September 1991" with a note that sources variously end it c. 1979, 1990 or 1991 (rev 1380203502).
 # NOT suggested as a statement: which end is right is a matter of sources, not a typo. A Wikidata editor could remove or deprecate the P585 (a point in time on a decades-long period) and give P582 the sourced alternatives; ask on the item's talk page first.
 # Passover massacre (Q2660905): no error. P585 2002-03-27 (day) plus P580 and P582 "2002" (year precision); our pipeline used to read the year-precision end as 1 January 2002 and flag the event as reversed (fixed in scripts/lib/v21.js dateOrderFlags, 2026-10-14). Nothing to suggest.
+#
+# Added 2026-10-29 (Wikidata wbgetentities and the English articles read live that day, at the revisions named; docs/data-fixes.md, "Checks of 2026-10-29"):
+# 2023 Afghanistan–Iran clash (Q118779713, revision 2459851515): P580 start time 2022-05-27 (day) is a year before the event; P585 is 2023-05 (month); infobox "27 May 2023" and lead "On 27 May 2023" (rev 1370424795). The year looks mistyped. Confidence: high.
+-Q118779713	P580	+2022-05-27T00:00:00Z/11
+Q118779713	P580	+2023-05-27T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1370424795"
+# Battle of Gaza (2007) (Q373655, revision 2517661614): P580 start time 2007-06-10; infobox "7–15 June 2007" and lead "from 7 to 15 June 2007" (rev 1381695693); the infobox cites a PCHR report on the fighting of 7-14 June 2007. Confidence: medium (a source-based start, not a typo).
+-Q373655	P580	+2007-06-10T00:00:00Z/11
+Q373655	P580	+2007-06-07T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1381695693"
+# Saudi–Yemeni war (1934) (Q1367731, revision 2538358965): P580 1934-03 (month), P582 1934-05-20 (day); infobox "20 March 1934 – 14 June 1934" (rev 1381123348). The start month agrees; the end differs by more than three weeks. NOT suggested: not traced which source either end follows.

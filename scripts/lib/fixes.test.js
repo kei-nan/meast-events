@@ -94,6 +94,28 @@ test("reconcileStartDate: decade-precision P585 -> year-or-finer P580", () => {
   assert.equal(reconcileStartDate("1940-01-01", entity).date_start, "1948-05-15");
 });
 
+test("reconcileStartDate: P585 strictly between P580 and P582 -> P580", () => {
+  // 2009 Iranian presidential election protests (Q854206), live 2026-10-29.
+  const protests = {
+    p585: [{ time: "2010-02-11", precision: 11 }],
+    p580: [{ time: "2009-06-13", precision: 11 }],
+    p582: [{ time: "2010-12-07", precision: 11 }],
+  };
+  const r = reconcileStartDate("2010-02-11", protests);
+  assert.equal(r.date_start, "2009-06-13");
+  assert.match(r.reason, /strictly between .*P580 2009-06-13.*P582 2010-12-07/);
+  // A month-precision P580 is stored as the 1st, like the discovery date.
+  const month = { ...protests, p580: [{ time: "2009-06-00", precision: 10 }] };
+  assert.equal(reconcileStartDate("2010-02-11", month).date_start, "2009-06-01");
+  // Not inside: P585 on the start day, before it, after the end (the F6 pattern stays a flag), or no end at all.
+  assert.equal(reconcileStartDate("2009-06-13", { ...protests, p585: [{ time: "2009-06-13", precision: 11 }] }), null);
+  assert.equal(reconcileStartDate("2009-01-01", { ...protests, p585: [{ time: "2009-01-01", precision: 11 }] }), null);
+  assert.equal(reconcileStartDate("2011-01-01", { ...protests, p585: [{ time: "2011-01-01", precision: 11 }] }), null);
+  assert.equal(reconcileStartDate("2010-02-11", { ...protests, p582: [] }), null);
+  // A decade-or-coarser P580 is no better a start.
+  assert.equal(reconcileStartDate("2010-02-11", { ...protests, p580: [{ time: "2000-00-00", precision: 8 }] }), null);
+});
+
 test("reconcileStartDate: leaves ordinary dates alone", () => {
   const entity = { p585: [{ time: "1967-06-05", precision: 11 }], p580: [{ time: "1967-06-05", precision: 11 }] };
   assert.equal(reconcileStartDate("1967-06-05", entity), null);
