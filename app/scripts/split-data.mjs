@@ -97,12 +97,12 @@ export const DEFERRED_GROUPS = [
     members: [
       "West Bank Area A (Palestinian Authority)",
       "West Bank Area B (Palestinian civil, joint security)",
-      "West Bank Area C (Israeli control)",
+      "West Bank Area C (held by Israel)",
     ],
     // Map zoom from which the members load (the West Bank is ~130 px wide at 7).
     minzoom: 7,
     placeholder: {
-      geometryFrom: "West Bank (Israeli occupation, phased Oslo transfers)",
+      geometryFrom: "West Bank (held by Israel, phased Oslo transfers)",
       name: "West Bank",
       note:
         "At this zoom the map draws only the West Bank's outline. Zoom in to draw the " +
