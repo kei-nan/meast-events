@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { COUNTRIES, GROUPS, INCLUSION_MIN_SITELINKS, groupForEvent, notEventClasses } from "./event-classes.js";
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode } from "./wiki.js";
-import { lowPrecisionCoordinateFlag, titleYearsFlag } from "./flags.js";
+import { leadStartDayFlag, lowPrecisionCoordinateFlag, titleYearsFlag } from "./flags.js";
 import { isRevid, isRevTimestamp } from "./revid.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
@@ -373,6 +373,9 @@ export function validateEvents(
     if (typeof e.title === "string" && isRealDate(e.date_start)) {
       const ty = titleYearsFlag(e);
       if (ty) warn(i, e, ty);
+      // A day-precision start the lead's first sentence does not name, next to another day of that year (advisory).
+      const ld = leadStartDayFlag(e);
+      if (ld) warn(i, e, ld);
     }
     // A precise pin rounded to whole degrees or tenths (app/src/lib/coordPrecision.js): the site shows it as approximate.
     const lowPin = lowPrecisionCoordinateFlag(e);
@@ -445,7 +448,11 @@ export function validateEvents(
         }
         continue;
       }
-      for (const i of idx) warn(i, events[i], `same ${label} as ${others(i)}${sameUrl ? "" : " (different wikipedia_url)"}, and not explained as an event without an article of its own`);
+      // Two or more events that each claim the shared article as their own (no resolved_qid other than their
+      // wikidata_qid): one of them shows another item's text with no note on the site. An error since 2026-10-29
+      // (docs/data-fixes.md, checks of 2026-10-29). The same text under different URLs stays a warning.
+      const report = field === "wikipedia_url" ? err : warn;
+      for (const i of idx) report(i, events[i], `same ${label} as ${others(i)}${sameUrl ? "" : " (different wikipedia_url)"}, and not explained as an event without an article of its own`);
     }
   }
 

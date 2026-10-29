@@ -67,7 +67,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 48 | June 2025 Israeli strikes on Iran | 2025-06-01 | 48 | no location | [article](https://en.wikipedia.org/wiki/List_of_attacks_during_the_Twelve-Day_War) | [Q134884640](https://www.wikidata.org/wiki/Q134884640) |
 | 49 | Young Turk Revolution | 1908-07-03 | 46 | pin at Turkey capital (approximate) | [article](https://en.wikipedia.org/wiki/Young_Turk_Revolution) | [Q4298662](https://www.wikidata.org/wiki/Q4298662) |
 | 50 | Qatar diplomatic crisis | 2017-06-05 | 46 | pin at Qatar capital (approximate) | [article](https://en.wikipedia.org/wiki/Qatar_diplomatic_crisis) | [Q30130610](https://www.wikidata.org/wiki/Q30130610) |
-| 51 | 2024 Lebanon electronic device attacks | 2024-09-18 | 46 | no location | [article](https://en.wikipedia.org/wiki/2024_Lebanon_electronic_device_attacks) | [Q130314422](https://www.wikidata.org/wiki/Q130314422) |
+| 51 | 2024 Lebanon electronic device attacks | 2024-09-17 | 46 | no location | [article](https://en.wikipedia.org/wiki/2024_Lebanon_electronic_device_attacks) | [Q130314422](https://www.wikidata.org/wiki/Q130314422) |
 | 52 | Black September | 1970-09-06 | 45 | pin at Jordan capital (approximate) | [article](https://en.wikipedia.org/wiki/Black_September) | [Q154288](https://www.wikidata.org/wiki/Q154288) |
 | 53 | Iraqi invasion of Kuwait | 2009-08-02 | 45 | no location | [article](https://en.wikipedia.org/wiki/Iraqi_invasion_of_Kuwait) | [Q856650](https://www.wikidata.org/wiki/Q856650) |
 | 54 | 2025 United States strikes on Iranian nuclear sites | 2025-06-22 | 45 | no location | [article](https://en.wikipedia.org/wiki/2025_United_States_strikes_on_Iranian_nuclear_sites) | [Q135005864](https://www.wikidata.org/wiki/Q135005864) |
@@ -85,7 +85,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 66 | 2017–2018 Iranian protests | 2017-12-28 | 37 | no location | [article](https://en.wikipedia.org/wiki/2017%E2%80%932018_Iranian_protests) | [Q46999835](https://www.wikidata.org/wiki/Q46999835) |
 | 67 | 2023 Turkish presidential election | 2023-05-14 | 37 | no location | [article](https://en.wikipedia.org/wiki/2023_Turkish_presidential_election) | [Q55636316](https://www.wikidata.org/wiki/Q55636316) |
 | 68 | 1936–1939 Arab revolt in Palestine | 1936-04-19 | 36 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/1936%E2%80%931939_Arab_revolt_in_Palestine) | [Q46057](https://www.wikidata.org/wiki/Q46057) |
-| 69 | Iran crisis of 1946 | 1946-01-01 | 36 | no location | [article](https://en.wikipedia.org/wiki/Iran_crisis_of_1946) | [Q1132835](https://www.wikidata.org/wiki/Q1132835) |
+| 69 | Iran crisis of 1946 | 1945-11-01 | 36 | no location | [article](https://en.wikipedia.org/wiki/Iran_crisis_of_1946) | [Q1132835](https://www.wikidata.org/wiki/Q1132835) |
 | 70 | Constitutionalization attempts in Iran | 1905-01-01 | 36 | no location | [article](https://en.wikipedia.org/wiki/Constitutionalization_attempts_in_Iran) | [Q1368440](https://www.wikidata.org/wiki/Q1368440) |
 | 71 | 2017 Kurdistan Region independence referendum | 2017-09-25 | 36 | no location | [article](https://en.wikipedia.org/wiki/2017_Kurdistan_Region_independence_referendum) | [Q18206659](https://www.wikidata.org/wiki/Q18206659) |
 | 72 | Red Sea crisis | 2023-10-19 | 36 | no location | [article](https://en.wikipedia.org/wiki/Red_Sea_crisis) | [Q123285238](https://www.wikidata.org/wiki/Q123285238) |
@@ -138,13 +138,13 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 119 | 1998 bombing of Iraq | 1998-01-01 | 26 | no location | [article](https://en.wikipedia.org/wiki/1998_bombing_of_Iraq) | [Q1327861](https://www.wikidata.org/wiki/Q1327861) |
 | 120 | Great Syrian Revolt | 1925-07-18 | 26 | pin at Syria capital (approximate) | [article](https://en.wikipedia.org/wiki/Great_Syrian_Revolt) | [Q1968718](https://www.wikidata.org/wiki/Q1968718) |
 | 121 | 1963 Syrian coup d'état | 1963-03-08 | 26 | no location | [article](https://en.wikipedia.org/wiki/1963_Syrian_coup_d'%C3%A9tat) | [Q2475925](https://www.wikidata.org/wiki/Q2475925) |
-| 122 | Operation Inherent Resolve | 2014-09-22 | 26 | no location | [article](https://en.wikipedia.org/wiki/Operation_Inherent_Resolve) | [Q18357664](https://www.wikidata.org/wiki/Q18357664) |
+| 122 | Operation Inherent Resolve | 2014-06-15 | 26 | no location | [article](https://en.wikipedia.org/wiki/Operation_Inherent_Resolve) | [Q18357664](https://www.wikidata.org/wiki/Q18357664) |
 | 123 | Black Sea Grain Initiative | 2022-07-22 | 26 | no location | [article](https://en.wikipedia.org/wiki/Black_Sea_Grain_Initiative) | [Q113295397](https://www.wikidata.org/wiki/Q113295397) |
 | 124 | 2025–2026 Turkish protests | 2025-03-19 | 26 | no location | [article](https://en.wikipedia.org/wiki/2025%E2%80%932026_Turkish_protests) | [Q133441461](https://www.wikidata.org/wiki/Q133441461) |
 | 125 | June 2025 Iranian strikes on Israel | 2025-06-01 | 26 | no location | [article](https://en.wikipedia.org/wiki/List_of_attacks_during_the_Twelve-Day_War) | [Q134890505](https://www.wikidata.org/wiki/Q134890505) |
 | 126 | Israeli disengagement from the Gaza Strip | 2005-08-15 | 25 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Israeli_disengagement_from_the_Gaza_Strip) | [Q196122](https://www.wikidata.org/wiki/Q196122) |
 | 127 | Sheikh Said rebellion | 1925-02-13 | 25 | no location | [article](https://en.wikipedia.org/wiki/Sheikh_Said_rebellion) | [Q619712](https://www.wikidata.org/wiki/Q619712) |
-| 128 | 2009 Iranian presidential election protests | 2010-02-11 | 25 | no location | [article](https://en.wikipedia.org/wiki/2009_Iranian_presidential_election_protests) | [Q854206](https://www.wikidata.org/wiki/Q854206) |
+| 128 | 2009 Iranian presidential election protests | 2009-06-13 | 25 | no location | [article](https://en.wikipedia.org/wiki/2009_Iranian_presidential_election_protests) | [Q854206](https://www.wikidata.org/wiki/Q854206) |
 | 129 | 2012 Egyptian presidential election | 2012-06-16 | 25 | no location | [article](https://en.wikipedia.org/wiki/2012_Egyptian_presidential_election) | [Q861684](https://www.wikidata.org/wiki/Q861684) |
 | 130 | 2009 Israeli legislative election | 2009-02-10 | 25 | no location | [article](https://en.wikipedia.org/wiki/2009_Israeli_legislative_election) | [Q911180](https://www.wikidata.org/wiki/Q911180) |
 | 131 | 1960 Turkish coup d'état | 1960-05-27 | 25 | no location | [article](https://en.wikipedia.org/wiki/1960_Turkish_coup_d'%C3%A9tat) | [Q1859259](https://www.wikidata.org/wiki/Q1859259) |
@@ -442,7 +442,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 423 | Goharshad Mosque rebellion | 1935-08-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/Goharshad_Mosque_rebellion) | [Q11161771](https://www.wikidata.org/wiki/Q11161771) |
 | 424 | 1979 Khuzestan insurgency | 1979-04-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/1979_Khuzestan_insurgency) | [Q12182813](https://www.wikidata.org/wiki/Q12182813) |
 | 425 | Stalemate in Southern Palestine | 1917-04-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/Stalemate_in_Southern_Palestine) | [Q16932897](https://www.wikidata.org/wiki/Q16932897) |
-| 426 | Russian occupation of Tabriz | 1911-01-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/Russian_occupation_of_Tabriz) | [Q19906312](https://www.wikidata.org/wiki/Q19906312) |
+| 426 | Russian occupation of Tabriz | 1909-04-30 | 10 | no location | [article](https://en.wikipedia.org/wiki/Russian_occupation_of_Tabriz) | [Q19906312](https://www.wikidata.org/wiki/Q19906312) |
 | 427 | Turkey–Islamic State conflict | 2013-05-11 | 10 | no location | [article](https://en.wikipedia.org/wiki/Turkey%E2%80%93Islamic_State_conflict) | [Q20743978](https://www.wikidata.org/wiki/Q20743978) |
 | 428 | 2015–2016 Lebanese protests | 2015-08-22 | 10 | no location | [article](https://en.wikipedia.org/wiki/2015%E2%80%932016_Lebanese_protests) | [Q20859038](https://www.wikidata.org/wiki/Q20859038) |
 | 429 | 2015–2016 Latakia offensive | 2015-01-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/2015%E2%80%932016_Latakia_offensive) | [Q21805447](https://www.wikidata.org/wiki/Q21805447) |

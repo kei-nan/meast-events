@@ -5,6 +5,8 @@ import {
   exactDaysIn,
   monthPrecisionDayFlag,
   MONTH_DAY_FLAG,
+  leadStartDayFlag,
+  LEAD_DAY_FLAG,
   pruneDuplicateHints,
   titleYears,
   titleYearsFlag,
@@ -91,4 +93,19 @@ test("pruneDuplicateHints: drops hints (and their review notes) to ids that are 
   const r = { possible_duplicates: [{ id: "a" }], _review: ['possible_duplicate: possible duplicate of "A" (a) - x'] };
   pruneDuplicateHints(r, new Set(), "_review");
   assert.deepEqual(r, { possible_duplicates: [], _review: [] });
+});
+
+test("leadStartDayFlag: a day-precision start the first sentence does not name, next to another day that year", () => {
+  // Battle of Gaza (2007): stored 2007-06-10 (Wikidata P580); the lead's first sentence says "from 7 to 15 June 2007".
+  const gaza = "The Battle of Gaza, also known as the Gaza civil war, was a brief civil war between Fatah and Hamas that took place in the Gaza Strip from 7 to 15 June 2007. It was a prominent event.";
+  const f = leadStartDayFlag({ date_start: "2007-06-10", date_end: "2007-06-15", date_precision: "day", extract: gaza });
+  assert.ok(f.startsWith(`${LEAD_DAY_FLAG}: date_start 2007-06-10`), f);
+  assert.match(f, /names 2007-06-07;/, "the range's first day; the end day 15 June is not listed");
+  // Named start, the end day only, another year only, or a coarser precision: no flag.
+  assert.equal(leadStartDayFlag({ date_start: "2007-06-07", date_end: "2007-06-15", date_precision: "day", extract: gaza }), null);
+  const endOnly = "The battle ended on 30 December 1917 with the capture of the city.";
+  assert.equal(leadStartDayFlag({ date_start: "1917-11-17", date_end: "1917-12-30", date_precision: "day", extract: endOnly }), null);
+  assert.equal(leadStartDayFlag({ date_start: "2008-06-10", date_precision: "day", extract: gaza }), null);
+  assert.equal(leadStartDayFlag({ date_start: "2007-06-01", date_precision: "month", extract: gaza }), null);
+  assert.equal(leadStartDayFlag({ date_start: "2007-06-10", date_precision: "day", extract: "" }), null);
 });

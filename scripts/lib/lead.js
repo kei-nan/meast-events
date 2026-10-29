@@ -2,23 +2,28 @@
 //
 // Source: MediaWiki API action=query&prop=extracts&exintro=1&explaintext=1&redirects=1
 // (TextExtracts). "exintro" = everything before the first heading, i.e. the whole lead,
-// not only the first paragraph. The text is Wikipedia's own; the ONLY change we make is
-// whitespace normalisation (see normalizeLead). Never edited, summarised or reworded.
+// not only the first paragraph. The text is Wikipedia's own; the ONLY changes we make are
+// whitespace normalisation and dropping empty "()" left by stripped markup (see normalizeLead).
+// Never edited, summarised or reworded.
 import { politeFetch, sleep, mediaWikiJson } from "./http.js";
 
 const API = "https://en.wikipedia.org/w/api.php";
 export const LEAD_BATCH = 20; // TextExtracts hard limit with exintro (exlimit max 20)
 
-// Whitespace normalisation only: CRLF -> LF, no-break/other Unicode spaces -> plain space,
+// Whitespace normalisation: CRLF -> LF, no-break/other Unicode spaces -> plain space,
 // runs of spaces/tabs collapsed, lines trimmed, paragraphs (one or more line breaks in the
-// API output) joined with exactly one blank line. No characters other than whitespace change.
+// API output) joined with exactly one blank line. The one other change: an EMPTY pair of
+// parentheses "()" (only whitespace inside), with the spaces before it, is dropped. TextExtracts
+// leaves one where it strips everything a pair of brackets held (e.g. a pronunciation template):
+// "The Sykes–Picot Agreement () was a 1916 secret treaty" (docs/data-fixes.md, checks of
+// 2026-10-29). Parentheses with any other character inside are kept. Nothing else changes.
 export function normalizeLead(text) {
   if (typeof text !== "string") return null;
   const paras = text
     .replace(/\r\n?/g, "\n")
     .replace(/[   -   　]/g, " ")
     .split(/\n+/)
-    .map((l) => l.replace(/[ \t\f\v]+/g, " ").trim())
+    .map((l) => l.replace(/[ \t\f\v]*\([ \t\f\v]*\)/g, "").replace(/[ \t\f\v]+/g, " ").trim())
     .filter(Boolean);
   const out = paras.join("\n\n");
   return out || null;

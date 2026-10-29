@@ -6,7 +6,7 @@ rather than a second layer of ours. Concretely:
 
 - We **never rewrite** titles, extracts, dates, countries, or labels. `title`, `extract`, `date_start`, `date_end`,
   `countries` and `wikidata_classes` are copied from Wikipedia/Wikidata as returned. The only change made to text is
-  whitespace normalisation of the extract (see "Extract"). The exception is the hand-picked seed list: the dates and
+  whitespace normalisation of the extract, plus dropping an empty "()" left by stripped markup (see "Extract"). The exception is the hand-picked seed list: the dates and
   countries of those 102 events were typed by hand for it (on 2026-10-24, 24 of the 60 seed events the rule also finds had
   other countries than Wikidata's, and 30 seed start dates were none of the item's Wikidata P585/P580 values, 11 of them
   checked against the article, `docs/data-fixes.md` F14). They are kept as they are; each such event says so on the site
@@ -45,7 +45,10 @@ rather than a second layer of ours. Concretely:
 ### Extract
 
 Fetched with the MediaWiki API (`action=query&prop=extracts&exintro=1&explaintext=1&redirects=1`), i.e. all paragraphs of the lead as plain
-text. Only whitespace is normalised (no-break spaces to plain spaces, runs of spaces collapsed, paragraphs separated by one blank line).
+text. Only whitespace is normalised (no-break spaces to plain spaces, runs of spaces collapsed, paragraphs separated by one blank line), and
+since 2026-10-29 an empty pair of parentheses "()" that TextExtracts leaves where it strips a bracketed template is dropped with the space before it
+("The Sykes–Picot Agreement () was" -> "The Sykes–Picot Agreement was"; 1 stored extract changed; `docs/data-fixes.md`, checks of 2026-10-29).
+Parentheses with anything inside are kept.
 `snippet` (lite data/UI) is the first 160 characters of it. Length before and after the change for the 394 curated events: median 435 -> 1,207
 characters, mean 476 -> 1,494, max 1,487 -> 5,481; 327 got longer, 66 were already the whole lead, 1 got shorter (Wikipedia rewrote the lead of the
 Battle of Elli in between). The earlier text was mostly the first paragraph only. `extract_retrieved_at` says when the text was fetched, so it can be shown as "as of".
@@ -433,7 +436,8 @@ but are not shown; an event with any date flag still shows only the years in its
 | `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. The same dates, as data, are in `wikipedia_lead_dates` ("YYYY-MM-DD", or "YYYY" years when the lead gives no full date; `wikipediaLeadDates`), set only next to `date_order_invalid`, for the shown note. |
 | `date_end_precision_coarse` | `date_flags` | Wikidata's end time is coarser than a day (e.g. the year "2002", stored as 2002-01-01) and the stored `date_end` is before `date_start` only because of that: the whole year (month, decade, century) reaches the start, so the dates are not reversed. Replaces `date_order_invalid` in that case (Passover massacre: P585 27 March 2002, P582 "2002"; added 2026-10-14, `dateOrderFlags` in `scripts/lib/v21.js`). When a coarse end is reversed even at its precision, `date_order_invalid` names the precision. Not shown; the stored dates are unchanged. |
 | `date_start_year_not_in_lead` | `date_flags` | Start year is not within 1 year of any year in the full lead. A heuristic on prose: "look", not "wrong". |
-| `date_source_adjusted` | `date_flags` | The discovery date came from an implausible P585; P580 was used instead (rule in `docs/data-fixes.md` F2, both values in the text). |
+| `date_source_adjusted` | `date_flags` | The discovery date came from an implausible P585; P580 was used instead (rule in `docs/data-fixes.md` F2, extended by F15 to a P585 strictly between P580 and P582; both values in the text). |
+| `lead_start_day_differs` | `review_reasons` | A day-precision start that the lead's first sentence does not name, while it names another day of that year before the end (`docs/data-fixes.md`, checks of 2026-10-29). A heuristic: "look", not "wrong"; also a validator warning. |
 | `date_precision_coarse`, `unverified_date`, `category_year_mismatch` | `review_reasons` | Date precision coarser than a year; no year in the lead and no confirming year category; Wikipedia year categories disagree. |
 | `title_differs_from_article` | `review_reasons` | Record title differs from the article title and does not appear in its lead. |
 | `country_not_supported_by_wikidata`, `country_via_place_only` | `review_reasons` | Tracked country tag cannot be derived from Wikidata P17/P276/P131, or comes only from a place while the item's own P17 is another sovereign state. |
@@ -637,7 +641,8 @@ seed events are exempt) a discovery count below the rule's 10, a `sitelinks_curr
 `date_precision` that is not a Wikidata precision name; a decade-or-coarser `date_start` with no `date_end` (e.g. `israeli-lebanese-conflict`, Wikidata
 P580 "+2000" at century precision, i.e. the 20th century, stored as 2000-01-01); an event tagged with 8 or more countries; and two events sharing a
 `wikipedia_url` or an identical extract, naming the other event (since 2026-10-24 also when all but one of them are events without an article of their own,
-whose `resolved_qid` differs, see above; the warning then says which one is the article's own event). Since 2026-10-24 also: a hand-picked seed event without
+whose `resolved_qid` differs, see above; the warning then says which one is the article's own event; since 2026-10-29 a shared `wikipedia_url` with
+two or more of the article's own events is an **error**). Since 2026-10-24 also: a hand-picked seed event without
 `date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value; 19 left after its 2026-10-24 `--apply`), a year in the title outside `date_start`..`date_end`
 (`title_years_outside_dates`), and a precise pin rounded to at most one decimal place (`coordinate_low_precision`); both are also pipeline flags, see
 "Review flags". Warnings are for a person to look at; nothing is changed automatically.

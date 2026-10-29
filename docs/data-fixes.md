@@ -373,3 +373,108 @@ put them outside the tracked set; the validator now rejects any event without a 
 | Israeli disengagement from the Gaza Strip (Q196122) | 2005-08-15 / 2005-09-12 | 2005-08 (month) / - / - | lead "A deadline was issued for August 15, 2005, after which the IDF began evicting", no infobox ([1380235471](https://en.wikipedia.org/w/index.php?title=Israeli_disengagement_from_the_Gaza_Strip&oldid=1380235471)) | a deadline, not stated as the start |
 | Iranian Green Movement (Q2626387) | 2009-06-13 / 2010-02-11 | none | lead "arose after the 12 June 2009 Iranian presidential election and lasted until early 2010" ([1375717703](https://en.wikipedia.org/w/index.php?title=Iranian_Green_Movement&oldid=1375717703)) | start day not stated |
 | Egyptian Crisis (2011–2014) (Q577539) | 2012-06-30 / 2014-06-08 | - / 2011-01-25 / 2014-05 (month) | lead "began with the 2011 Egyptian revolution and ended with the presidency of Abdel Fattah el-Sisi in 2014" ([1374697190](https://en.wikipedia.org/w/index.php?title=Egyptian_Crisis_(2011%E2%80%932014)&oldid=1374697190)) | year only (2011, against the stored 2012) |
+
+## F15 - nine start dates that were a Wikidata "point in time" inside or at the end of the item's own range
+
+- Cause: the discovery query's start is COALESCE(P585, P580). The F2 rule (`reconcileStartDate`, `scripts/lib/fixes.js`) replaced a P585 only
+  when it was decade-or-coarser or equal to the item's end time P582, and only for new candidates. It missed a P585 that falls **strictly
+  between** P580 and P582: the 2009 Iranian presidential election protests (Q854206: P580 2009-06-13, P585 2010-02-11, P582 2010-12-07) were
+  stored as starting on 11 February 2010.
+- Rule (generic, for new candidates, flagged `date_source_adjusted` as before): case (c) added, P585 strictly between P580 and P582 (compared
+  as stored dates, P580 year-or-finer) -> P580. Unit test in `scripts/lib/fixes.test.js`.
+- Re-run over every stored event with live Wikidata (2026-10-29, `wbgetentities`): 13 curated events would change (8 by case (c), 5 by case (b),
+  which F2 never applied to curated records), plus 5 proposed copies of curated events. As the rule is not applied to curated records, each was
+  checked against the English article at the revision named; F15 applies the 9 where the article gives the item's P580 as the start:
+
+| Event (QID, Wikidata revision) | Stored | Wikidata P580 / P585 / P582 | English Wikipedia (revision) | Fix |
+|---|---|---|---|---|
+| 2009 Iranian presidential election protests (Q854206, 2559664551) | 2010-02-11 | 2009-06-13 / 2010-02-11 / 2010-12-07 | infobox "13 June 2009 – 7 December 2010" ([1381691345](https://en.wikipedia.org/w/index.php?title=2009_Iranian_presidential_election_protests&oldid=1381691345)) | 2009-06-13 |
+| Operation Inherent Resolve (Q18357664, 2536701308) | 2014-09-22 | 2014-06-15 / 2014-09-22 / 2026-04-16 | infobox "15 June 2014 – present" ([1382364857](https://en.wikipedia.org/w/index.php?title=Operation_Inherent_Resolve&oldid=1382364857)) | 2014-06-15 |
+| 2024 Lebanon electronic device attacks (Q130314422, 2516289931) | 2024-09-18 | 2024-09-17 / 2024-09-18 and 2024-09-17 / 2024-09-19 | lead "On 17 and 18 September 2024"; infobox "17–18 September 2024" ([1381300697](https://en.wikipedia.org/w/index.php?title=2024_Lebanon_electronic_device_attacks&oldid=1381300697)) | 2024-09-17 |
+| Russian occupation of Tabriz (Q19906312, 2402259382) | 1911-01-01 (year) | 1909-04-30 / 1911 (year) / 1918-02-28 | lead "lasted from 30 April 1909 to 28 February 1918" ([1372095714](https://en.wikipedia.org/w/index.php?title=Russian_occupation_of_Tabriz&oldid=1372095714)) | 1909-04-30 (day) |
+| Iran crisis of 1946 (Q1132835, 2533867483) | 1946-01-01 (year) | 1945-11 (month) / 1946 (year) / 1946-12-15 | infobox "November 1945 – December 15, 1946" ([1374789395](https://en.wikipedia.org/w/index.php?title=Iran_crisis_of_1946&oldid=1374789395)) | 1945-11-01 (month) |
+| Operation Brevity (Q764714, 2491925305) | 1941-05-16 | 1941-05-15 / 1941-05-16 / 1941-05-16 | infobox "15–16 May 1941" ([1370631131](https://en.wikipedia.org/w/index.php?title=Operation_Brevity&oldid=1370631131)) | 1941-05-15 |
+| Operation Skorpion (Q2756836, 2491874101) | 1941-05-27 | 1941-05-26 / 1941-05-27 / 1941-05-27 | lead "from 26 to 27 May 1941"; infobox "26–27 May 1941" ([1370699589](https://en.wikipedia.org/w/index.php?title=Operation_Skorpion&oldid=1370699589)) | 1941-05-26 |
+| Siege of Basra (Q19996727, 2511629204) | 1987-02-26 | 1987-01-08 / 1987-02-26 / 1987-02-26 | infobox "8 January – mid April 1987" ([1370739316](https://en.wikipedia.org/w/index.php?title=Siege_of_Basra&oldid=1370739316)) | 1987-01-08 |
+| Battle of Idlib (2015) (Q19678056, 2500221864) | 2015-03-28 | 2015-03-24 / 2015-03-28 / 2015-03-28 | infobox "24–28 March 2015" ([1373023827](https://en.wikipedia.org/w/index.php?title=Battle_of_Idlib_(2015)&oldid=1373023827)) | 2015-03-24 |
+
+- Wikipedia and Wikidata's P580 agree on the start against our record. -> `date_start` = P580, `date_precision` = that statement's precision
+  (ledger entry F15), applied to `data/events.json` and to the proposed copies (Tabriz, Iran crisis, 2009 protests) in `data/events.proposed.json`.
+  Tabriz's `date_start_year_not_in_lead` flag no longer applies and was removed. `date_end` is unchanged in all nine, including where the article
+  differs from Wikidata's P582 (Inherent Resolve "present" vs 2026-04-16; Basra "mid April" vs 1987-02-26; electronic device attacks 18 vs 19 September).
+- Not changed (the article does not give P580 as the start, or contradicts itself):
+  - `siege-of-kobani` (Q18071930): stored 2014-09-15 (P585); P580 2014-09-13. The infobox shows "15 September 2014 – 20 March 2015" but its
+    age counter starts on 13 September, and the lead says it "was launched ... on 13 September 2014" (rev 1381716237).
+  - `caucasus-campaign` (Q523154): stored 1914-10-29 (P585) is the infobox start "October 29, 1914" (rev 1381463257); P580 says 1914-10-24.
+  - `middle-eastern-theatre-of-world-war-i` (Q1765465): stored 1914-10-30 (P585) is the lead's "between 30 October 1914 and 30 October 1918";
+    the infobox says 29 October 1914 (= P580) (rev 1381474065).
+  - `1966-syrian-coup-d-tat` (Q3560385, hand-picked seed): stored 1966-02-23 is Wikidata's P585 and P582; P580 1966-02-21 matches the lead
+    "(21–23 February)" and the infobox "21–23 February 1966" (rev 1373445341). Seed dates are kept as typed (DATA_POLICY.md); F13 replaced only
+    seed dates that are no Wikidata value, and this one is one. Left for the owner.
+
+## Checks of 2026-10-29 (no data value changed unless stated)
+
+### Five pairs of events share one article: kept, as the F12 rule says
+
+- Reported as "the child shows the parent's text". Cause: each child's English sitelink is a Wikipedia **redirect**, created when its article was
+  merged into the parent's (the redirect pages carry `{{R from merge}}`). Checked live 2026-10-29: Wikidata `wbgetentities` (sitelink badges),
+  MediaWiki `redirects=1`, and each redirect page's own current revision:
+
+| Event (QID) | enwiki sitelink badge | Redirect page revision | Leads to | That article's item |
+|---|---|---|---|---|
+| `ein-hashlosha-massacre` (Q123027684) | Q70893996 (sitelink to redirect) | [1292341323](https://en.wikipedia.org/w/index.php?oldid=1292341323) | October 7 attacks, section "Ein HaShlosha" | Q122976243 (`october-7-attacks`) |
+| `operation-guardian-of-the-walls` (Q106786309) | Q70893996 | [1252974746](https://en.wikipedia.org/w/index.php?oldid=1252974746) | 2021 Israel–Palestine crisis | Q106775117 (`2021-israel-palestine-crisis`) |
+| `israeli-invasion-of-the-gaza-strip` (Q123036458) | Q70893996 | [1355324836](https://en.wikipedia.org/w/index.php?oldid=1355324836) | Gaza war | Q122962941 (`2023-israel-hamas-war`) |
+| `june-2025-iranian-strikes-on-israel` (Q134890505) | Q70894304 (intentional sitelink to redirect) | [1340981469](https://en.wikipedia.org/w/index.php?oldid=1340981469) | List of attacks during the Twelve-Day War, section "Operation True Promise III" | Q134961914 (a list; no event of its own) |
+| `june-2025-israeli-strikes-on-iran` (Q134884640) | Q70893996 | [1358688908](https://en.wikipedia.org/w/index.php?oldid=1358688908) | the same list, section "Operation Rising Lion" | Q134961914 |
+| `attack-on-the-united-states-embassy-in-baghdad` (Q80438042) | Q70893996 | [1358210097](https://en.wikipedia.org/w/index.php?oldid=1358210097) | December 2019 United States airstrikes in Iraq and Syria, section "U.S. embassy attack" | Q26847124 (`december-2019-united-states-airstrikes-in-iraq-and-syria`) |
+
+- A title search (`list=search`, `intitle:`) finds no separate article for any of them ("Ein HaShlosha" is the kibbutz, "Embassy of the United
+  States, Baghdad" the building). None has an article of its own, so there is no lead of its own to show.
+- Decision: none changed. The owner's rule (2026-10-10, DATA_POLICY.md "Events without an article of their own", F12) includes every such event,
+  with the note above its text; each of the six has a `resolved_qid` different from its `wikidata_qid`, which is what shows that note. A merge with
+  a 301 (`data/event-redirects.json`) is for renamed ids only (DEPLOYMENT.md, "Renamed event ids") and would undo F12.
+- Guard: `validate-events.js` now **fails** when two events share a `wikipedia_url` and more than one of them is the article's own event (no
+  `resolved_qid` different from its `wikidata_qid`), i.e. when an event would show another item's text with no note. The F12 case (all but at most
+  one sharer marked as having no article of its own) stays a listed warning; the same extract under different URLs stays a warning.
+
+### Single-event date checks
+
+| Event (QID) | Stored | Wikidata | English Wikipedia (revision) | Decision |
+|---|---|---|---|---|
+| `2023-afghanistan-iran-clash` (Q118779713, rev 2459851515) | 2023-05-01 (month) | P585 2023-05 (month); P580 **2022**-05-27 (day) | infobox "27 May 2023", lead "On 27 May 2023" ([1370424795](https://en.wikipedia.org/w/index.php?title=2023_Afghanistan%E2%80%93Iran_clash&oldid=1370424795)) | not fixed: Wikidata's only day value (P580) is a year off, so the two sources do not agree on the day (as `2022-gaza-israel-clashes`, F8). Stays flagged `month_precision_day_in_lead`; upstream correction drafted in `data/wikidata-date-suggestions.tsv` |
+| `battle-of-gaza-2007` (Q373655, rev 2517661614; seed) | 2007-06-10 | P580 2007-06-10, P582 2007-06-15 | infobox "7–15 June 2007", lead "from 7 to 15 June 2007" ([1381695693](https://en.wikipedia.org/w/index.php?title=Battle_of_Gaza_(2007)&oldid=1381695693)) | not fixed: the stored date is Wikidata's P580, the article disagrees. Flagged by the new `lead_start_day_differs` check; drafted in the TSV (medium confidence) |
+| `operation-provide-comfort` (Q2281470, rev 2556713063) | 1991-03-01 (month) | P580 1991-03 (month), P582 1996-12-31 | infobox "March 1991 – 31 December 1996"; lead "starting in April 1991" ([1380221795](https://en.wikipedia.org/w/index.php?title=Operation_Provide_Comfort&oldid=1380221795)) | not changed: stored = Wikidata = infobox; only the article's lead says April |
+| `saudi-yemeni-war-1934` (Q1367731, rev 2538358965) | 1934-03-01 (month) to 1934-05-20 | P580 1934-03 (month), P582 1934-05-20 | infobox "20 March 1934 – 14 June 1934" ([1381123348](https://en.wikipedia.org/w/index.php?title=Saudi%E2%80%93Yemeni_war_(1934)&oldid=1381123348)) | not changed: the start month agrees (the day is the article's only); the end differs from Wikidata. Described in the TSV, not suggested |
+| `2024-israel-hezbollah-conflict` (Q122974556, rev 2554064390; seed) | end 2024-11-27 | P580 2023-10-08, no P582 | lead "An ongoing conflict ... began on 8 October 2023" ([1368616555](https://en.wikipedia.org/w/index.php?title=Hezbollah%E2%80%93Israel_conflict_(2023%E2%80%93present)&oldid=1368616555)) | not changed: F13 records "the Hezbollah–Israel conflict keeps 2024-11-27 although the article says "present"" under its rule "`date_end` is never changed here", and seed dates are kept as typed (DATA_POLICY.md). Left for the owner |
+
+### New advisory flag: `lead_start_day_differs` (flag only)
+
+- A day-precision `date_start` that the first sentence of the lead does not name, while that sentence names another exact day of the same year
+  before the stored end (`leadStartDayFlag`, `scripts/lib/flags.js`; a range "7 to 15 June 2007" counts from its first day). Like
+  `month_precision_day_in_lead` it never changes a date: Wikidata and the article may simply differ, and the sentence may name another day of the
+  event (an election's first round, a later massacre). `validate-events.js` lists it as a warning; `enrich-candidates.js` writes it into
+  `review_reasons` of proposed events from its next run (the stored files were not re-enriched for it).
+- On 2026-10-29 (after F15) it lists 37 curated events: `turkish-war-of-independence` 1919-05-19 (lead 1919-05-15), `battle-of-gaza-2007` 2007-06-10
+  (2007-06-07), `2021-israel-palestine-crisis` 2021-05-06 (2021-05-10), `fao-landing`, `zilan-massacre`, `battle-of-palmyra-1941`,
+  `second-battle-of-el-alamein`, `ma-alot-massacre`, `first-battle-of-al-faw`, `second-battle-of-fallujah` 2004-12-23 (2004-11-07),
+  `2006-israeli-operation-in-beit-hanoun`, `battle-of-ras-al-ayn-2012-13`, `siege-of-kobani` (see F15), `ahvaz-military-parade-attack`,
+  `israel-united-arab-emirates-normalization-agreement`, `operation-marg-bar-sarmachar`, `july-2024-houthi-israel-attacks`,
+  `attempted-assassination-of-abdul-hamid-ii` 1905-06-21 (1905-07-21), `naval-operations-in-the-dardanelles-campaign`, `operation-morvarid`,
+  `operation-hot-winter`, `2016-turkish-coup-d-etat-attempt`, `may-2025-gaza-offensive`, `2025-gaza-strip-aid-distribution-killings`,
+  `occupation-of-constantinople`, `1947-anti-jewish-riots-in-aden`, `israeli-occupation-of-the-west-bank`, `2009-iranian-presidential-election`,
+  `2012-egyptian-presidential-election`, `2013-israeli-legislative-election`, `2016-iranian-legislative-election`, `battle-of-tal-afar-2017`,
+  `2020-syrian-parliamentary-election`, `2020-iranian-legislative-election`, `al-shati-refugee-camp-airstrikes`,
+  `attacks-on-us-bases-during-the-middle-eastern-crisis-2023-present`, `attack-on-the-united-states-embassy-in-baghdad`. Not checked one by one;
+  no date was changed from it.
+
+### Empty "()" in extracts
+
+- TextExtracts leaves an empty pair of parentheses where it strips everything a pair of brackets held: the Sykes–Picot lead read "The Sykes–Picot
+  Agreement () was a 1916 secret treaty ...". `normalizeLead` (`scripts/lib/lead.js`) now also drops an empty "()" (only whitespace inside) with
+  the spaces before it; parentheses with any other character inside are kept. It is used for every fetched lead and for the revision leads
+  `backfill-revids.js` compares, so stored and fetched text stay comparable.
+- Re-applied to the stored extracts (no network): **1 of 815** curated extracts changed (`sykes-picot-agreement`), none of the 255 proposed. Its
+  `wikipedia_revid` 1379657240 still holds: that revision's parsed lead, normalised the same way, equals the new extract (checked live 2026-10-29).
+  Its framing review's fingerprint (`text_sha1`) was updated to the new text (3cdaae19260a -> 6753ab5b901f): no word changed, and neither review
+  finding is on the first sentence.

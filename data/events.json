@@ -305,7 +305,7 @@
     "retrieved_at": "2026-09-13T14:28:15.116Z",
     "wikidata_qid": "Q211674",
     "wikipedia_url": "https://en.wikipedia.org/wiki/Sykes%E2%80%93Picot_Agreement",
-    "extract": "The Sykes–Picot Agreement () was a 1916 secret treaty between the United Kingdom and France, with assent from Russia and Italy, to define their mutually agreed spheres of influence and control in an eventual partition of the Ottoman Empire.\n\nThe agreement was based on the premise that the Triple Entente would achieve success in defeating the Ottoman Empire during World War I and formed part of a series of secret agreements contemplating its partition. The primary negotiations leading to the agreement took place between 23 November 1915 and 3 January 1916, on which date the British and French diplomats, Mark Sykes and François Georges-Picot, initialled an agreed memorandum. The agreement was ratified by their respective governments on 9 and 16 May 1916.\n\nThe agreement effectively divided the Ottoman provinces outside the Arabian Peninsula into areas of British and French control and influence. The British- and French-controlled countries were divided by the Sykes–Picot line. The agreement allocated to the UK control of what is today southern Israel, Jordan and southern Iraq, and an additional small area that included the ports of Haifa and Acre to allow access to the Mediterranean. France was to control southeastern Turkey, the Kurdistan Region, Syria and Lebanon.\n\nAs a result of the included Sazonov–Paléologue Agreement, Russia was to get Western Armenia in addition to Constantinople and the Turkish Straits already promised under the 1915 Constantinople Agreement. Italy assented to the agreement in 1917 via the Agreement of Saint-Jean-de-Maurienne and received southern Anatolia. The Palestine region, with a smaller area than the later Mandatory Palestine, was to fall under an \"international administration\".\n\nThe agreement was initially used directly as the basis for the 1918 Anglo–French Modus Vivendi, which provided a framework for the Occupied Enemy Territory Administration in the Levant. More broadly it was to lead, indirectly, to the subsequent partitioning of the Ottoman Empire following Ottoman defeat in 1918. Shortly after the war, the French ceded Palestine and Mosul to the British. Mandates in the Levant and Mesopotamia were assigned at the April 1920 San Remo conference following the Sykes–Picot framework; the British Mandate for Palestine ran until 1948, the British Mandate for Mesopotamia was to be replaced by a similar treaty with Mandatory Iraq, and the French Mandate for Syria and the Lebanon lasted until 1946. The Anatolian parts of the agreement were assigned by the August 1920 Treaty of Sèvres; however, these ambitions were thwarted by the 1919–23 Turkish War of Independence and the subsequent Treaty of Lausanne.\n\nThe agreement is seen by many as a turning point in Western and Arab relations. Arabs saw it as the failure to keep a British promise in the McMahon–Hussein correspondence with Hussein bin Ali, King of Hejaz regarding a national Arab homeland in exchange for supporting the British against the Ottoman Empire. The British later claimed that Palestine was meant to be excluded from the area of Arab rule, as it is technically located west of Damascus: for obvious reasons the Zionists took the same position. The Arabs interpreted the letter as it reads: Lebanon, not Palestine, is to the west of Damascus and the other areas mentioned. The agreement, along with others, was made public by the Bolsheviks in Moscow on 23 November 1917 and repeated in The Manchester Guardian on 26 November 1917, such that \"the British were embarrassed, the Arabs dismayed and the Turks delighted\". The agreement's legacy has led to much resentment in the region, among Arabs in particular but also among Kurds who were denied an independent state.",
+    "extract": "The Sykes–Picot Agreement was a 1916 secret treaty between the United Kingdom and France, with assent from Russia and Italy, to define their mutually agreed spheres of influence and control in an eventual partition of the Ottoman Empire.\n\nThe agreement was based on the premise that the Triple Entente would achieve success in defeating the Ottoman Empire during World War I and formed part of a series of secret agreements contemplating its partition. The primary negotiations leading to the agreement took place between 23 November 1915 and 3 January 1916, on which date the British and French diplomats, Mark Sykes and François Georges-Picot, initialled an agreed memorandum. The agreement was ratified by their respective governments on 9 and 16 May 1916.\n\nThe agreement effectively divided the Ottoman provinces outside the Arabian Peninsula into areas of British and French control and influence. The British- and French-controlled countries were divided by the Sykes–Picot line. The agreement allocated to the UK control of what is today southern Israel, Jordan and southern Iraq, and an additional small area that included the ports of Haifa and Acre to allow access to the Mediterranean. France was to control southeastern Turkey, the Kurdistan Region, Syria and Lebanon.\n\nAs a result of the included Sazonov–Paléologue Agreement, Russia was to get Western Armenia in addition to Constantinople and the Turkish Straits already promised under the 1915 Constantinople Agreement. Italy assented to the agreement in 1917 via the Agreement of Saint-Jean-de-Maurienne and received southern Anatolia. The Palestine region, with a smaller area than the later Mandatory Palestine, was to fall under an \"international administration\".\n\nThe agreement was initially used directly as the basis for the 1918 Anglo–French Modus Vivendi, which provided a framework for the Occupied Enemy Territory Administration in the Levant. More broadly it was to lead, indirectly, to the subsequent partitioning of the Ottoman Empire following Ottoman defeat in 1918. Shortly after the war, the French ceded Palestine and Mosul to the British. Mandates in the Levant and Mesopotamia were assigned at the April 1920 San Remo conference following the Sykes–Picot framework; the British Mandate for Palestine ran until 1948, the British Mandate for Mesopotamia was to be replaced by a similar treaty with Mandatory Iraq, and the French Mandate for Syria and the Lebanon lasted until 1946. The Anatolian parts of the agreement were assigned by the August 1920 Treaty of Sèvres; however, these ambitions were thwarted by the 1919–23 Turkish War of Independence and the subsequent Treaty of Lausanne.\n\nThe agreement is seen by many as a turning point in Western and Arab relations. Arabs saw it as the failure to keep a British promise in the McMahon–Hussein correspondence with Hussein bin Ali, King of Hejaz regarding a national Arab homeland in exchange for supporting the British against the Ottoman Empire. The British later claimed that Palestine was meant to be excluded from the area of Arab rule, as it is technically located west of Damascus: for obvious reasons the Zionists took the same position. The Arabs interpreted the letter as it reads: Lebanon, not Palestine, is to the west of Damascus and the other areas mentioned. The agreement, along with others, was made public by the Bolsheviks in Moscow on 23 November 1917 and repeated in The Manchester Guardian on 26 November 1917, such that \"the British were embarrassed, the Arabs dismayed and the Turks delighted\". The agreement's legacy has led to much resentment in the region, among Arabs in particular but also among Kurds who were denied an independent state.",
     "coordinates": {
       "lat": 33.5138,
       "lon": 36.2765
@@ -6769,7 +6769,7 @@
   {
     "id": "operation-brevity",
     "title": "Operation Brevity",
-    "date_start": "1941-05-16",
+    "date_start": "1941-05-15",
     "date_end": "1941-05-16",
     "countries": [
       "Egypt"
@@ -6801,7 +6801,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Western Desert campaign\" (Q625798); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Western Desert campaign\" (Q625798); it may overlap with that larger event",
+      "data_fix F15: Operation Brevity: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1941-05-15, P585 = P582 1941-05-16 (revision 2491925305); English Wikipedia https://en.wikipedia.org/w/index.php?title=Operation_Brevity&oldid=1370631131: infobox \"15–16 May 1941\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "World War II military offensive",
@@ -6813,7 +6814,7 @@
   {
     "id": "operation-skorpion",
     "title": "Operation Skorpion",
-    "date_start": "1941-05-27",
+    "date_start": "1941-05-26",
     "date_end": "1941-05-27",
     "countries": [
       "Egypt"
@@ -6845,7 +6846,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Western Desert campaign\" (Q625798); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Western Desert campaign\" (Q625798); it may overlap with that larger event",
+      "data_fix F15: Operation Skorpion: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1941-05-26, P585 = P582 1941-05-27 (revision 2491874101); English Wikipedia https://en.wikipedia.org/w/index.php?title=Operation_Skorpion&oldid=1370699589: lead \"from 26 to 27 May 1941\"; infobox \"26–27 May 1941\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "1941 military operation",
@@ -9507,7 +9509,7 @@
   {
     "id": "siege-of-basra",
     "title": "Siege of Basra",
-    "date_start": "1987-02-26",
+    "date_start": "1987-01-08",
     "date_end": "1987-02-26",
     "countries": [
       "Iraq"
@@ -9539,7 +9541,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Iran–Iraq War\" (Q82664); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Iraq War\" (Q82664); it may overlap with that larger event",
+      "data_fix F15: Siege of Basra: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1987-01-08, P585 = P582 1987-02-26 (revision 2511629204); English Wikipedia https://en.wikipedia.org/w/index.php?title=Siege_of_Basra&oldid=1370739316: infobox \"8 January – mid April 1987\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "1987 battle of the Iran–Iraq War",
@@ -12885,7 +12888,7 @@
   {
     "id": "battle-of-idlib-2015",
     "title": "Battle of Idlib (2015)",
-    "date_start": "2015-03-28",
+    "date_start": "2015-03-24",
     "date_end": "2015-03-28",
     "countries": [
       "Syria"
@@ -12917,7 +12920,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Syrian Civil War\" (Q178810); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Syrian Civil War\" (Q178810); it may overlap with that larger event",
+      "data_fix F15: Battle of Idlib (2015): stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 2015-03-24, P585 = P582 2015-03-28 (revision 2500221864); English Wikipedia https://en.wikipedia.org/w/index.php?title=Battle_of_Idlib_(2015)&oldid=1373023827: infobox \"24–28 March 2015\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "wikidata_description": "military operation",
@@ -22704,7 +22708,7 @@
   {
     "id": "operation-inherent-resolve",
     "title": "Operation Inherent Resolve",
-    "date_start": "2014-09-22",
+    "date_start": "2014-06-15",
     "date_end": "2026-04-16",
     "countries": [
       "Iraq",
@@ -22734,14 +22738,15 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"War against the Islamic State\" (Q17507684); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"War against the Islamic State\" (Q17507684); it may overlap with that larger event",
+      "data_fix F15: Operation Inherent Resolve: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 2014-06-15, P585 2014-09-22, P582 2026-04-16 (revision 2536701308); English Wikipedia https://en.wikipedia.org/w/index.php?title=Operation_Inherent_Resolve&oldid=1382364857: infobox \"15 June 2014 – present\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-10",
     "wikipedia_revid": 1379450694,
     "wikipedia_revid_timestamp": "2026-10-10T02:06:56Z",
     "date_flags": [
-      "date_start_year_not_in_lead: start year 2014 (2014-09-22) is not within 1 year of any year in the Wikipedia lead [2018, 2017, 2019]"
+      "date_start_year_not_in_lead: start year 2014 (2014-06-15) is not within 1 year of any year in the Wikipedia lead [2018, 2017, 2019]"
     ],
     "wikidata_description": "2014–present military intervention against the Islamic State of Iraq and the Levant",
     "sitelinks_current": 26,
@@ -24321,7 +24326,7 @@
   {
     "id": "2024-lebanon-electronic-device-attacks",
     "title": "2024 Lebanon electronic device attacks",
-    "date_start": "2024-09-18",
+    "date_start": "2024-09-17",
     "date_end": "2024-09-19",
     "countries": [
       "Lebanon"
@@ -24360,7 +24365,8 @@
     "possible_duplicates": [],
     "review_reasons": [
       "part_of: Wikidata (P361) lists this event as part of \"Hezbollah–Israel conflict (2023–present)\" (Q122974556); it may overlap with that larger event",
-      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event",
+      "data_fix F15: 2024 Lebanon electronic device attacks: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 2024-09-17, P585 2024-09-18 and 2024-09-17, P582 2024-09-19 (revision 2516289931); English Wikipedia https://en.wikipedia.org/w/index.php?title=2024_Lebanon_electronic_device_attacks&oldid=1381300697: lead \"On 17 and 18 September 2024\"; infobox \"17–18 September 2024\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-10-01",
@@ -25356,7 +25362,7 @@
   {
     "id": "russian-occupation-of-tabriz",
     "title": "Russian occupation of Tabriz",
-    "date_start": "1911-01-01",
+    "date_start": "1909-04-30",
     "date_end": "1918-02-28",
     "countries": [
       "Iran"
@@ -25377,7 +25383,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q4397975",
@@ -25386,14 +25392,12 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Russian involvement in the Persian Constitutional Revolution\" (Q4397975); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Russian involvement in the Persian Constitutional Revolution\" (Q4397975); it may overlap with that larger event",
+      "data_fix F15: Russian occupation of Tabriz: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1909-04-30, P585 1911 (year), P582 1918-02-28 (revision 2402259382); English Wikipedia https://en.wikipedia.org/w/index.php?title=Russian_occupation_of_Tabriz&oldid=1372095714: lead \"lasted from 30 April 1909 to 28 February 1918\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start, date_precision; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
     "wikipedia_revid": 1372095714,
     "wikipedia_revid_timestamp": "2026-08-30T07:48:21Z",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 1911 (1911-01-01) is not within 1 year of any year in the Wikipedia lead [1909, 1918, 1915]"
-    ],
     "needs_review": true,
     "wikidata_description": "1909 military occupation",
     "sitelinks_current": 10
@@ -26381,7 +26385,7 @@
   {
     "id": "iran-crisis-of-1946",
     "title": "Iran crisis of 1946",
-    "date_start": "1946-01-01",
+    "date_start": "1945-11-01",
     "date_end": "1946-12-15",
     "countries": [
       "Iran"
@@ -26402,7 +26406,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "month",
     "part_of": [
       {
         "qid": "Q8683",
@@ -26411,7 +26415,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Cold War\" (Q8683); it may overlap with that larger event",
+      "data_fix F15: Iran crisis of 1946: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 1945-11 (month), P585 1946 (year), P582 1946-12-15 (revision 2533867483); English Wikipedia https://en.wikipedia.org/w/index.php?title=Iran_crisis_of_1946&oldid=1374789395: infobox \"November 1945 – December 15, 1946\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start, date_precision; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
     "wikipedia_revid": 1374789395,
@@ -29860,7 +29865,7 @@
   {
     "id": "2009-iranian-presidential-election-protests",
     "title": "2009 Iranian presidential election protests",
-    "date_start": "2010-02-11",
+    "date_start": "2009-06-13",
     "date_end": "2010-12-07",
     "countries": [
       "Iran"
@@ -29891,7 +29896,8 @@
       }
     ],
     "review_reasons": [
-      "possible_duplicate: possible duplicate of \"2009 Iranian presidential election\" (2009-iranian-presidential-election) - similar title, date within 1 year and nearby / same country"
+      "possible_duplicate: possible duplicate of \"2009 Iranian presidential election\" (2009-iranian-presidential-election) - similar title, date within 1 year and nearby / same country",
+      "data_fix F15: 2009 Iranian presidential election protests: stored date_start was Wikidata P585, which is not the item's start. Wikidata P580 2009-06-13, P585 2010-02-11, P582 2010-12-07 (revision 2559664551); English Wikipedia https://en.wikipedia.org/w/index.php?title=2009_Iranian_presidential_election_protests&oldid=1381691345: infobox \"13 June 2009 – 7 December 2010\" (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "extract_retrieved_at": "2026-10-06",
     "wikipedia_revid": 1381691345,

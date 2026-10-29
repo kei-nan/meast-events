@@ -147,6 +147,29 @@ export function monthPrecisionDayFlag({ date_start, date_precision, extract }) {
   );
 }
 
+// A day-precision date_start that the first sentence of the Wikipedia lead does not name, while that sentence names
+// another exact day in the same year (the earliest such day is given; a range "7 to 15 June 2007" counts from its
+// first day). Advisory only, like MONTH_DAY_FLAG: Wikidata and the article may simply differ, the sentence may name
+// another day of the event, and the date is never changed here; a fix needs the ledger (docs/data-fixes.md).
+export const LEAD_DAY_FLAG = "lead_start_day_differs";
+const RANGE_DAY_MONTH_YEAR = new RegExp(`\\b(\\d{1,2})\\s*(?:[–-]|to|and)\\s*\\d{1,2} (${M}) (\\d{4})\\b`, "g");
+export function leadStartDayFlag({ date_start, date_end, date_precision, extract }) {
+  if (date_precision !== "day" || !/^\d{4}-\d{2}-\d{2}$/.test(String(date_start ?? "")) || !extract) return null;
+  const sentence = firstSentence(extract);
+  const days = new Set(exactDaysIn(sentence));
+  const iso = (y, m, d) => `${y}-${String(MONTH_NAMES.indexOf(m) + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  for (const x of sentence.matchAll(RANGE_DAY_MONTH_YEAR)) days.add(iso(x[3], x[2], x[1]));
+  if (days.has(date_start)) return null;
+  // A day on or after the stored end is the end (or later news), not a different start.
+  const end = /^\d{4}-\d{2}-\d{2}$/.test(String(date_end ?? "")) ? date_end : null;
+  const sameYear = [...days].filter((d) => d.slice(0, 4) === date_start.slice(0, 4) && (!end || d < end)).sort();
+  if (!sameYear.length) return null;
+  return (
+    `${LEAD_DAY_FLAG}: date_start ${date_start} is not named in the first sentence of the Wikipedia lead, which names ` +
+    `${sameYear.join(", ")}; the stored date is kept as the source gives it`
+  );
+}
+
 // ---------- duplicate hints (never auto-drop) ----------
 export function normTitle(t) {
   return (t ?? "")

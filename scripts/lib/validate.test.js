@@ -58,7 +58,11 @@ test("validateEvents: end before start is an error unless flagged date_order_inv
 });
 
 test("validateEvents: duplicate ids and QIDs, invented coordinates", () => {
-  const r = validateEvents([event(), event({ coordinates: null, coordinate_source: null, location_quality: "none", wikidata_qid: "Q2" }), event({ id: "b" })]);
+  const r = validateEvents([
+    event(),
+    event({ coordinates: null, coordinate_source: null, location_quality: "none", wikidata_qid: "Q2", wikipedia_url: "https://en.wikipedia.org/wiki/Two" }),
+    event({ id: "b", wikipedia_url: "https://en.wikipedia.org/wiki/B" }),
+  ]);
   assert.equal(r.errors.length, 2, r.errors.join("\n")); // duplicate id, duplicate QID
   const none = validateEvents([event({ location_quality: "none" })]);
   assert.match(none.errors[0], /requires coordinates: null/);
@@ -158,19 +162,21 @@ test("validateEvents: coordinates abroad are a warning, a lat/lon swap is an err
 });
 
 test("validateEvents: location_quality and coordinate_source must agree", () => {
+  // Each with its own article (a shared wikipedia_url would be an error of its own).
+  const own = (id) => ({ id, wikipedia_url: `https://en.wikipedia.org/wiki/${id.toUpperCase()}` });
   const ok = [
     event(),
-    event({ id: "b", wikidata_qid: "Q2", coordinate_source: "manual-override" }),
-    event({ id: "c", wikidata_qid: "Q3", location_quality: "approximate", coordinate_source: "country-fallback:Israel/Palestine" }),
-    event({ id: "d", wikidata_qid: "Q4", location_quality: "none", coordinates: null, coordinate_source: null }),
+    event({ ...own("b"), wikidata_qid: "Q2", coordinate_source: "manual-override" }),
+    event({ ...own("c"), wikidata_qid: "Q3", location_quality: "approximate", coordinate_source: "country-fallback:Israel/Palestine" }),
+    event({ ...own("d"), wikidata_qid: "Q4", location_quality: "none", coordinates: null, coordinate_source: null }),
   ];
   assert.deepEqual(validateEvents(ok).errors, []);
   const bad = [
     event({ coordinate_source: "country-fallback:Iraq" }),
-    event({ id: "b", wikidata_qid: "Q2", location_quality: "approximate", coordinate_source: "wikipedia" }),
-    event({ id: "c", wikidata_qid: "Q3", location_quality: "approximate", coordinate_source: "country-fallback:France" }),
-    event({ id: "d", wikidata_qid: "Q4", location_quality: "none", coordinates: null, coordinate_source: "wikidata" }),
-    event({ id: "e", wikidata_qid: "Q5", coordinate_source: null }),
+    event({ ...own("b"), wikidata_qid: "Q2", location_quality: "approximate", coordinate_source: "wikipedia" }),
+    event({ ...own("c"), wikidata_qid: "Q3", location_quality: "approximate", coordinate_source: "country-fallback:France" }),
+    event({ ...own("d"), wikidata_qid: "Q4", location_quality: "none", coordinates: null, coordinate_source: "wikidata" }),
+    event({ ...own("e"), wikidata_qid: "Q5", coordinate_source: null }),
   ];
   const r = validateEvents(bad);
   assert.equal(r.errors.length, 5, r.errors.join("\n"));
@@ -448,11 +454,17 @@ test("validateEvents: shared wikipedia_url or extract is a warning naming the ot
   const both = validateEvents([n1, n2]).warnings.filter((w) => /same wikipedia_url/.test(w));
   assert.equal(both.length, 2, both.join("\n"));
   assert.match(both[0], /n1: same wikipedia_url as n2: this event has no English article of its own/);
-  // Two events that are each the article's own item: listed.
+  // Two events that are each the article's own item: an ERROR for the shared wikipedia_url (one of them would show
+  // another item's text with no note), a warning for the shared extract.
   const c = found({ id: "c", wikidata_qid: "Q3" });
-  const r = validateEvents([a, c]).warnings;
-  assert.equal(r.filter((w) => /same wikipedia_url as/.test(w)).length, 2);
+  const rc = validateEvents([a, c]);
+  assert.equal(rc.errors.filter((w) => /same wikipedia_url as .*not explained/.test(w)).length, 2, rc.errors.join("\n"));
+  assert.ok(rc.errors.some((w) => /\ba: same wikipedia_url as c\b/.test(w)));
+  const r = rc.warnings;
+  assert.equal(r.filter((w) => /same wikipedia_url as/.test(w)).length, 0);
   assert.equal(r.filter((w) => /same extract as/.test(w)).length, 2);
+  // Marking the second as an event without an article of its own (resolved_qid = a's item) explains it.
+  assert.deepEqual(validateEvents([a, { ...c, resolved_qid: "Q1", coordinate_source: "wikidata" }]).errors, []);
   // Same text under different URLs: listed.
   const d = found({ id: "d", wikidata_qid: "Q4", wikipedia_url: "https://en.wikipedia.org/wiki/Other" });
   assert.match(validateEvents([a, d]).warnings.join("\n"), /same extract as d \(different wikipedia_url\)/);

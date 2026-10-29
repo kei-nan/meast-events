@@ -231,6 +231,40 @@ for (const [qid, label, wikidata, title, revid, says] of [
   });
 }
 
+// F15: discovered events whose stored date_start is a Wikidata P585 (point in time) that is not the start: it lies
+// strictly between the item's P580 and P582 (the rule's new case (c), reconcileStartDate) or equals its P582 (case (b),
+// which F2 applied to new candidates only). In each, the English article's infobox or lead gives the item's P580 as the
+// start (Wikidata entity and article read live 2026-10-29, at the revisions named). date_end is not changed.
+for (const [qid, date, precision, label, wikidata, title, revid, says] of [
+  ["Q854206", "2009-06-13", "day", "2009 Iranian presidential election protests", "P580 2009-06-13, P585 2010-02-11, P582 2010-12-07 (revision 2559664551)",
+    "2009 Iranian presidential election protests", 1381691345, 'infobox "13 June 2009 – 7 December 2010"'],
+  ["Q18357664", "2014-06-15", "day", "Operation Inherent Resolve", "P580 2014-06-15, P585 2014-09-22, P582 2026-04-16 (revision 2536701308)",
+    "Operation Inherent Resolve", 1382364857, 'infobox "15 June 2014 – present"'],
+  ["Q130314422", "2024-09-17", "day", "2024 Lebanon electronic device attacks", "P580 2024-09-17, P585 2024-09-18 and 2024-09-17, P582 2024-09-19 (revision 2516289931)",
+    "2024 Lebanon electronic device attacks", 1381300697, 'lead "On 17 and 18 September 2024"; infobox "17–18 September 2024"'],
+  ["Q19906312", "1909-04-30", "day", "Russian occupation of Tabriz", "P580 1909-04-30, P585 1911 (year), P582 1918-02-28 (revision 2402259382)",
+    "Russian occupation of Tabriz", 1372095714, 'lead "lasted from 30 April 1909 to 28 February 1918"'],
+  ["Q1132835", "1945-11-01", "month", "Iran crisis of 1946", "P580 1945-11 (month), P585 1946 (year), P582 1946-12-15 (revision 2533867483)",
+    "Iran crisis of 1946", 1374789395, 'infobox "November 1945 – December 15, 1946"'],
+  ["Q764714", "1941-05-15", "day", "Operation Brevity", "P580 1941-05-15, P585 = P582 1941-05-16 (revision 2491925305)",
+    "Operation Brevity", 1370631131, 'infobox "15–16 May 1941"'],
+  ["Q2756836", "1941-05-26", "day", "Operation Skorpion", "P580 1941-05-26, P585 = P582 1941-05-27 (revision 2491874101)",
+    "Operation Skorpion", 1370699589, 'lead "from 26 to 27 May 1941"; infobox "26–27 May 1941"'],
+  ["Q19996727", "1987-01-08", "day", "Siege of Basra", "P580 1987-01-08, P585 = P582 1987-02-26 (revision 2511629204)",
+    "Siege of Basra", 1370739316, 'infobox "8 January – mid April 1987"'],
+  ["Q19678056", "2015-03-24", "day", "Battle of Idlib (2015)", "P580 2015-03-24, P585 = P582 2015-03-28 (revision 2500221864)",
+    "Battle of Idlib (2015)", 1373023827, 'infobox "24–28 March 2015"'],
+]) {
+  DATA_FIXES.push({
+    qid,
+    ref: "F15",
+    set: { date_start: date, date_precision: precision },
+    note:
+      `${label}: stored date_start was Wikidata P585, which is not the item's start. Wikidata ${wikidata}; ` +
+      `English Wikipedia ${revisionUrl(title, revid)}: ${says} (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged`,
+  });
+}
+
 // The only ledger entries scripts/enrich-seed.js --apply applies (to hand-picked seed events).
 export const SEED_FIX_REFS = ["F13", "F14"];
 
@@ -330,9 +364,13 @@ export function lastDayOfPeriod(date, code) {
 }
 
 // Rule for Wikidata "point in time" (P585) mis-used as a range bound. The pipeline's date is
-// COALESCE(P585, P580). Use the item's own P580 (start time) instead when EITHER
+// COALESCE(P585, P580). Use the item's own P580 (start time) instead when ANY of
 //   (a) P585 is only decade-or-coarser precise while P580 is year-or-finer, or
-//   (b) P585 is identical to the item's end time (P582), i.e. the "point in time" is the END of the event.
+//   (b) P585 is identical to the item's end time (P582), i.e. the "point in time" is the END of the event, or
+//   (c) P585 falls strictly between the item's P580 and P582 (docs/data-fixes.md F15): the item has a start and an
+//       end, and its "point in time" is a day inside that range, so it is not the start (2009 Iranian presidential
+//       election protests, Q854206: P580 2009-06-13, P585 2010-02-11, P582 2010-12-07). Compared as stored dates
+//       ("-00" read as "-01"), and only when P580 is year-or-finer.
 // Nothing else is changed; both original values stay visible in the flag.
 export function reconcileStartDate(candidateStart, entity) {
   if (!entity) return null;
@@ -343,11 +381,14 @@ export function reconcileStartDate(candidateStart, entity) {
   if (!p585 || !p580 || norm(p585.time) !== norm(candidateStart)) return null;
   const coarse = p585.precision < 9 && p580.precision >= 9;
   const isEnd = p582 && p585.time === p582.time && p580.time !== p585.time;
-  if (!coarse && !isEnd) return null;
+  const inside = p582 && p580.precision >= 9 && norm(p580.time) < norm(p585.time) && norm(p585.time) < norm(p582.time);
+  if (!coarse && !isEnd && !inside) return null;
   return {
-    date_start: p580.time.replace(/-00(?=-|$)/g, "-01"),
+    date_start: norm(p580.time),
     reason: coarse
       ? `Wikidata P585 ${p585.time} is only ${p585.precision <= 8 ? "decade-or-coarser" : "coarse"} precision; used P580 start time ${p580.time}`
-      : `Wikidata P585 ${p585.time} equals the item's end time (P582); used P580 start time ${p580.time}`,
+      : isEnd
+        ? `Wikidata P585 ${p585.time} equals the item's end time (P582); used P580 start time ${p580.time}`
+        : `Wikidata P585 ${p585.time} lies strictly between the item's start time (P580 ${p580.time}) and end time (P582 ${p582.time}); used P580 start time ${p580.time}`,
   };
 }
