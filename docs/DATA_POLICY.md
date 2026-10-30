@@ -310,8 +310,10 @@ Bias in the wording of individual summaries is handled the same way: it is not c
 ### Known gaps: major events the rule does not reach
 
 Some well-known events fail the rule because of how Wikidata models them, not because of their significance. They are listed here, with the
-reason read from their Wikidata items (wbgetentities, 2026-10-15), and they are **not** added by hand: no seeds are added for them. The
+reason read from their Wikidata items (wbgetentities, 2026-10-15; the rows whose QID is a link were read on 2026-10-30, with the class check,
+`P31`/`P279*` against every event class, run in WDQS the same day), and they are **not** added by hand: no seeds are added for them. The
 Armenian genocide and the Young Turk Revolution are the two of them that are shown, only because they are on the hand-picked list from before the rule.
+Sitelinks are Wikidata's count across all Wikimedia projects on the day read.
 
 | Event (QID) | Sitelinks | Why the rule misses it |
 |---|---|---|
@@ -320,12 +322,36 @@ Armenian genocide and the Young Turk Revolution are the two of them that are sho
 | Young Turk Revolution (Q4298662) | 46 | `P17` and `P276` Ottoman Empire; no `P625`. Shown because it is a hand-picked event. |
 | Population exchange between Greece and Turkey (Q131017) | 42 | No `P17`, `P276`, `P131` or `P625` at all. |
 | Greek genocide (Q911233) | 36 | `P17` and `P276` Ottoman Empire; no `P625`. |
+| Yemeni unification ([Q1139876](https://www.wikidata.org/wiki/Q1139876)) | 26 | **Class.** Its only `P31` is "political union" (Q1140229), which is not one of the event classes and not a subclass of one. Place (`P17` Yemen) and date (`P585` 1990-05-22) would qualify. |
+| 1988 executions of Iranian political prisoners ([Q1907554](https://www.wikidata.org/wiki/Q1907554)) | 25 | **Class.** Its only `P31` is "political repression" (Q1899269), not one of the event classes or a subclass of one. Place (`P17` and `P276` Iran) and date (`P585` 1988, year precision; `P580` 1988-06) would qualify. |
+| Anglo-Egyptian treaty of 1936 ([Q617634](https://www.wikidata.org/wiki/Q617634)) | 24 | **Place.** Class (treaty), date (`P585` 1936-08-26), English article and sitelinks qualify, but `P17` is the United Kingdom and `P276` is London (whose `P17` values are all outside the region): no tracked country. The same case as the Treaty of London (1946) below. |
 | Taif Agreement (Q321936) | 24 | No `P17`, `P276`, `P131` or `P625` at all (a "peace treaty", dated 1989 at year precision). |
+| 1941 Iraqi coup d'état ([Q641205](https://www.wikidata.org/wiki/Q641205)) | 23 | **Place.** Class (coup d'état) and date (`P585` 1941-04-01) qualify, but `P17` and `P276` are the Kingdom of Iraq (Q149805), a historical state, and there is no `P625`. See "Iraq 1920-1968" below. |
+| Ramadan Revolution ([Q2578241](https://www.wikidata.org/wiki/Q2578241)) | 22 | **Place.** Class (coup d'état) and date (`P585` 1963-02-10, `P580` 1963-02-08) qualify, but `P17` and `P276` are the First Republic of Iraq (Q3041595), a historical state, and there is no `P625`. See "Iraq 1920-1968" below. |
 | 1913 Ottoman coup d'état (Q4559693) | 17 | `P17` Ottoman Empire; no `P276` or `P625`. |
+| 1997 Turkish military memorandum ([Q3675479](https://www.wikidata.org/wiki/Q3675479)) | 14 | **Class.** Its only `P31` is "memorandum" (Q660651), not one of the event classes or a subclass of one. Place (`P17` Turkey) and date (`P585` 1997, year precision) would qualify. |
+| 1987 Mecca incident ([Q4115754](https://www.wikidata.org/wiki/Q4115754)) | 12 | **Class and place.** The item has no `P31` at all, and no `P17`, `P276` or `P131`. Its `P625` (21.4353, 39.8291) lies in Mecca, but rule 2 reads coordinates only for an item whose `P17` is a predecessor state. |
 | Treaty of London (1946) (Q541293) | 10 | Meets the class (treaty), date (1946, year precision), English-article and sitelink (exactly 10) conditions, but `P17` is the United Kingdom and `P276` is London: no tracked country. Checked 2026-10-15, when "Jordanian independence" was removed. |
 
-Each of these would be found by the rule once Wikidata records a place (`P276`) whose present-day country is tracked; for those whose `P17`
-is the Ottoman Empire, coordinates (`P625`) inside a tracked country would also do. That is an upstream edit, which this project does not make.
+Those missed for their place would be found by the rule once Wikidata records a place (`P276`) whose present-day country is tracked; for
+those whose `P17` is the Ottoman Empire, coordinates (`P625`) inside a tracked country would also do. Those missed for their class would be
+found once their `P31` is one of the event classes or a subclass of one, or if the class list itself changed, which is a change of the rule,
+not of one event. A Wikidata change is an upstream edit, which this project does not make.
+
+**Iraq 1920-1968.** Wikidata items about Iraq in these years often give as their country (`P17`), and as their place (`P276`), the state of the
+time: Mandatory Iraq (Q146720), the Kingdom of Iraq (Q149805) or the First Republic of Iraq (Q3041595). None of these counts for Iraq.
+They are not tracked country items, and the predecessor-state rule above does not reach them either: it follows one *replaced by* /
+*replaces* step to a tracked country, and on 2026-10-30 Wikidata's only such link for Iraq (Q796) was *replaces* Coalition Provisional
+Authority. The Kingdom of Iraq's only link is *replaces* Mandatory Iraq, and Mandatory Iraq's only link is *replaced by* the Kingdom of Iraq.
+The First Republic of Iraq has no such link ([Q796](https://www.wikidata.org/wiki/Q796),
+[Q149805](https://www.wikidata.org/wiki/Q149805), [Q146720](https://www.wikidata.org/wiki/Q146720),
+[Q3041595](https://www.wikidata.org/wiki/Q3041595); WDQS, 2026-10-30). Even with such a link, the strict rule would still need a `P625`
+or a present-day `P276`, and these items have neither. A WDQS count on 2026-10-30 found 5 instances of an event class whose `P17` is the
+Kingdom or the First Republic of Iraq, with 10+ sitelinks and an English article. Four of them are placed by nothing else: the 1941 coup and
+the Ramadan Revolution (rows above), the November 1963 Iraqi coup d'état ([Q449436](https://www.wikidata.org/wiki/Q449436), 13 sitelinks)
+and the 17 July Revolution of 1968 ([Q4120226](https://www.wikidata.org/wiki/Q4120226), 17), which is shown only because it is on the
+hand-picked list (as "1968 Iraqi coup d'état"). The fifth, the 14 July Revolution of 1958 (Q2988530), also has `P276` Iraq, so the ordinary
+place path reaches it; it is on the hand-picked list too.
 
 ### Not events: people, organisations and states
 
@@ -444,6 +470,7 @@ but are not shown; an event with any date flag still shows only the years in its
 | `coordinate_far_from_countries` | `review_reasons` | Real coordinates more than 1,500 km from every tagged country's reference point. |
 | `coordinate_low_precision` | `review_reasons` | A precise pin whose latitude and longitude both have at most one decimal place (about 11 km, or 111 km for whole degrees), e.g. Al-Anfal campaign 33, 43. Kept as the source gives it; the site shows it as approximate (see "Location quality"). |
 | `title_years_outside_dates` | `review_reasons` | A year the title names lies outside `date_start`..`date_end` (years only; with no `date_end`, only years before the start), e.g. "2009 Iranian presidential election protests", Wikidata 2010-02-11 to 2010-12-07. Neither the title nor the dates are changed. |
+| `title_present_no_end`, `durative_class_no_end` | `review_reasons` | No `date_end` on an event whose title says "–present", or whose Wikidata classes include one that lasts a span of time (`DURATIVE_CLASSES` in `scripts/lib/flags.js`), e.g. Yemeni civil war (2014–present). Also validator warnings. Nothing is changed. |
 | `many_countries` | `review_reasons` | More than 4 countries tagged. All are kept as Wikidata lists them. |
 | `part_of` | `review_reasons` | Wikidata `P361` says the event is part of a larger event. |
 | `possible_duplicate` | `review_reasons` | Hint that another event may be the same (shared QID, same normalised title, or similar title + date within 1 year + nearby). Nothing is dropped automatically. |
@@ -599,6 +626,8 @@ node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichmen
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
+node scripts/report-wikidata-drift.js [--report=path]   # monthly REPORT ONLY (automatic): curated events whose dates, coordinates or
+                                                        #    classes differ from their Wikidata item now; writes no data file
 node scripts/build-selection-funnel.js [--check|--offline] # -> data/selection-funnel.json (dated by its input data, not the clock;
                                                         #    --offline keeps the committed sitelink_measurement, no network)
 node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)
@@ -633,7 +662,10 @@ shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item
 a `date_end` before `date_start` that `date_flags` explains (`date_order_invalid`, or `date_end_precision_coarse` when the end's precision-wide period really reaches the start), a **precise pin outside every tagged country**: more than 5 km outside all border shapes
 (`data/boundaries.json`) that stand for the event's countries in its start year, using the map's own country-to-shape table
 (`COUNTRY_SHAPES` in `app/src/lib/eventCountries.js`; not checked when a tagged country has no shape that year, for `regional`, or for a point already
-outside the Middle East box; needs the root `npm ci`, otherwise skipped with a note),
+outside the Middle East box; needs the root `npm ci`, otherwise skipped with a note; since 2026-10-30, for the check only, a pin before 1920 tagged
+Turkey, Iraq, Syria, Lebanon, Jordan, Israel/Palestine or Saudi Arabia, which have no shape of their own then, is tested against the Ottoman Empire shape
+of its year, `PRE_1920_CHECK_SHAPES` in `scripts/lib/validate.js`: that shape spans several present-day countries, so it catches a pin outside the Empire,
+not one in the wrong province, and the map's country shading does not use it),
 `possible_duplicates` naming an id that is in neither the file nor (for the proposed file) the curated file, and, for the curated file, an event without a
 framing review or whose review is stale (its `text_sha1` is not the SHA-1 of the current extract, the same test the site uses to show "may no longer apply").
 Since 2026-10-14 also: a `wikipedia_url` that is not on English Wikipedia (rule 4); for discovered events (those with a discovery `sitelinks` count; the hand-picked
@@ -645,7 +677,11 @@ whose `resolved_qid` differs, see above; the warning then says which one is the 
 two or more of the article's own events is an **error**). Since 2026-10-24 also: a hand-picked seed event without
 `date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value; 19 left after its 2026-10-24 `--apply`), a year in the title outside `date_start`..`date_end`
 (`title_years_outside_dates`), and a precise pin rounded to at most one decimal place (`coordinate_low_precision`); both are also pipeline flags, see
-"Review flags". Warnings are for a person to look at; nothing is changed automatically.
+"Review flags". Since 2026-10-30 also, likewise pipeline flags: no `date_end` on an event whose title says it is ongoing ("–present",
+`title_present_no_end`), and no `date_end` on an event of a Wikidata class that lasts a span of time (war, civil war, proxy war, insurgency, intifada,
+military occupation, blockade, ethnic, international or border conflict, social, political or protest movement, civil resistance and a few more;
+`DURATIVE_CLASSES` in `scripts/lib/flags.js`; `durative_class_no_end`). Classes that also label one-day events (armed conflict, rebellion,
+revolution, protest) are left out of that list. Neither changes how the site places an event in time. Warnings are for a person to look at; nothing is changed automatically.
 
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
 `end_year` or `source`, a bad year range or geometry type, two shapes with the same name in the same year, or (since 2026-10-27) a ring that
@@ -686,9 +722,13 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
    renamed articles (see "Titles" below). It then runs `node scripts/refresh-sitelinks.js --apply`, which updates each event's
    `sitelinks_current` (the count behind the default list order, see "Default order"). Last, `node scripts/refresh-guidelines.js --apply` compares
    the Wikipedia guideline sections the framing review cites with the versions the reviews applied, and records a section that changed
-   (docs/framing-review.md, "Guideline versions").
+   (docs/framing-review.md, "Guideline versions"). Then `node scripts/report-wikidata-drift.js` lists, report only, the curated events
+   whose stored `date_start`/`date_end`, Wikidata-sourced `coordinates` or `wikidata_classes` differ from their Wikidata item as it is now
+   (a start that is none of the item's P585/P580 values, an end that is none of its P582 values or a P582 where none is stored, a moved or
+   removed P625, a P625 on an event without a precise pin, new or dropped P31 labels). Fields the fix ledger sets (docs/data-fixes.md) are
+   counted, not listed. Nothing in that list is changed: a fix goes through the ledger.
 2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description starts with the
-   guideline sections that changed (with their changed lines), then lists the title changes, the held title cases, and, for each changed lead, the
+   guideline sections that changed (with their changed lines) and the Wikidata drift list, then lists the title changes, the held title cases, and, for each changed lead, the
    removed and added sentences. It never merges.
 3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
    For a changed guideline, the question is whether the edit changes what the wording check flags; if so, redo that part of the review.

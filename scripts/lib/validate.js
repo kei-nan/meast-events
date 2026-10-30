@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { COUNTRIES, GROUPS, INCLUSION_MIN_SITELINKS, groupForEvent, notEventClasses } from "./event-classes.js";
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode } from "./wiki.js";
-import { leadStartDayFlag, lowPrecisionCoordinateFlag, titleYearsFlag } from "./flags.js";
+import { durativeWithoutEndFlag, leadStartDayFlag, lowPrecisionCoordinateFlag, presentWithoutEndFlag, titleYearsFlag } from "./flags.js";
 import { isRevid, isRevTimestamp } from "./revid.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
@@ -119,17 +119,43 @@ function distanceToRingsKm(turf, pt, f) {
   return best;
 }
 
+// CHECK ONLY (never used for the map's country shading or the displayed country tags): before 1920
+// the map has no shape of its own for these countries, which lay wholly or partly inside the
+// Ottoman Empire (Turkey, the Levant, Mesopotamia, the Hejaz). For the pin check a pin tagged with
+// one of them is tested against the Ottoman Empire shape of its year (data/boundaries.json draws
+// it 1886-1919). The shape also covers other present-day countries, so this catches pins that
+// lie outside the Empire altogether (abroad, swapped or mistyped coordinates), not a pin in the
+// wrong province. eventCountries.js keeps the Ottoman shape out of COUNTRY_SHAPES for that reason.
+// Kuwait, Bahrain, Qatar and the Trucial coast were not Ottoman-ruled in these years, so they are
+// not listed. Each entry is [feature name, first year, last year], as in COUNTRY_SHAPES.
+export const PRE_1920_CHECK_SHAPES = Object.fromEntries(
+  ["Turkey", "Iraq", "Syria", "Lebanon", "Jordan", "Israel/Palestine", "Saudi Arabia"].map((c) => [c, [["Ottoman Empire", 1886, 1919]]])
+);
+/** The shape names the pin check uses for a country in a year: the map's own, else the check-only pre-1920 one. */
+export function checkShapeNamesFor(country, year) {
+  const own = shapeNamesFor(country, year);
+  if (own.length) return { names: own, wide: false };
+  const extra = (Object.hasOwn(PRE_1920_CHECK_SHAPES, country) ? PRE_1920_CHECK_SHAPES[country] : [])
+    .filter(([, from, to]) => from <= year && year <= to)
+    .map(([name]) => name);
+  return { names: extra, wide: extra.length > 0 };
+}
+
 // For a precise pin: null when the point lies inside (or within PIN_TOLERANCE_KM of) a shape of
 // at least one tagged country in the event's start year, or when that cannot be checked (no
 // tagged country, or one of them, has no shape that year: e.g. "regional", Kuwait before
-// 1961). Otherwise { year, km } with the distance to the nearest of those shapes.
+// 1961). Otherwise { year, km, wide } with the distance to the nearest of those shapes; `wide`
+// when a pre-1920 check-only shape (PRE_1920_CHECK_SHAPES) was among them.
 export function pinCountryCheck(e, index) {
   const { byName, turf } = index;
   const year = Number(String(e.date_start).slice(0, 4));
   const countries = Array.isArray(e.countries) ? e.countries : [];
-  const perCountry = countries.map((c) =>
-    shapeNamesFor(c, year).flatMap((n) => (byName.get(n) ?? []).filter((s) => s.from <= year && year <= s.to))
-  );
+  let wide = false;
+  const perCountry = countries.map((c) => {
+    const r = checkShapeNamesFor(c, year);
+    if (r.wide) wide = true;
+    return r.names.flatMap((n) => (byName.get(n) ?? []).filter((s) => s.from <= year && year <= s.to));
+  });
   if (!perCountry.length || perCountry.some((s) => !s.length)) return null;
   const shapes = perCountry.flat();
   const { lat, lon } = e.coordinates;
@@ -143,7 +169,7 @@ export function pinCountryCheck(e, index) {
     if (distanceToRingsKm(turf, pt, s.f) <= PIN_TOLERANCE_KM) return null;
   }
   const km = Math.min(...shapes.map((s) => distanceToRingsKm(turf, pt, s.f)));
-  return { year, km };
+  return { year, km, wide };
 }
 
 // A real calendar day YYYY-MM-DD in MIN_YEAR..maxYear (default MAX_YEAR, the app's last year).
@@ -321,7 +347,7 @@ export function validateEvents(
         // already has its warning above (one warning per event).
         const off = pinCountryCheck(e, shapeIndex);
         if (off) {
-          warn(i, e, `precise pin (${lat}, ${lon}) is ${Math.round(off.km)} km outside the ${off.year} border shapes of every tagged country (${e.countries.join(", ")}; tolerance ${PIN_TOLERANCE_KM} km, source: ${e.coordinate_source ?? "none"}); fine if the event happened abroad`);
+          warn(i, e, `precise pin (${lat}, ${lon}) is ${Math.round(off.km)} km outside the ${off.year} border shapes of every tagged country (${e.countries.join(", ")}; tolerance ${PIN_TOLERANCE_KM} km, source: ${e.coordinate_source ?? "none"}${off.wide ? "; before 1920 checked against the Ottoman Empire shape" : ""}); fine if the event happened abroad`);
         }
       }
     }
@@ -377,6 +403,11 @@ export function validateEvents(
       const ld = leadStartDayFlag(e);
       if (ld) warn(i, e, ld);
     }
+    // No date_end on an event the title calls ongoing, or of a class that lasts a span (lib/flags.js). Flags only.
+    const pn = presentWithoutEndFlag(e);
+    if (pn) warn(i, e, pn);
+    const dn = durativeWithoutEndFlag(e);
+    if (dn) warn(i, e, dn);
     // A precise pin rounded to whole degrees or tenths (app/src/lib/coordPrecision.js): the site shows it as approximate.
     const lowPin = lowPrecisionCoordinateFlag(e);
     if (lowPin) warn(i, e, `${lowPin}; shown on the site as an approximate location`);
