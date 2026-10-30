@@ -13,7 +13,7 @@ import {
 } from "./mapLayers";
 import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";
 import { loadLabelFont } from "../lib/labelFont";
-import { readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
+import { foldIncluded, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
 import {
   BoundaryPopup,
   MapKey,
@@ -517,7 +517,7 @@ export default function MapView({
         });
         setBorderPopup(
           hits.length
-            ? { point: [e.point.x, e.point.y], lngLat: [e.lngLat.lng, e.lngLat.lat], items: uniqueBoundaries(items), hint }
+            ? { point: [e.point.x, e.point.y], lngLat: [e.lngLat.lng, e.lngLat.lat], items: foldIncluded(uniqueBoundaries(items)), hint }
             : null
         );
       });
