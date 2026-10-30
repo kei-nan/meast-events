@@ -8,10 +8,11 @@
 // tested as stored, never simplified), with the name, status, note and source
 // the border popup shows (components/mapBorders.js uniqueBoundaries), sorted by
 // name as the popup sorts them. Where shapes overlap (a "...-included" state and
-// the flagged area drawn on top of it) the year has both, as a click there
-// lists both. Nothing here writes new wording about a place.
+// the flagged area drawn on top of it) the shape on top is the entry and the
+// one under it goes with it (`under`), as a click there shows them
+// (mapBorders.js foldIncluded). Nothing here writes new wording about a place.
 
-import { uniqueBoundaries } from "../components/mapBorders.js";
+import { foldIncluded, uniqueBoundaries } from "../components/mapBorders.js";
 import { bearingDeg, haversineKm } from "./geo.js";
 
 // Even-odd ray casting over one linear ring ([lon, lat] positions, closed or
@@ -97,6 +98,21 @@ export function featuresAt(features, lon, lat) {
 const itemKey = (b) => `${b.name}\u0001${b.status ?? ""}`;
 const recordKey = (b) => `${b.note ?? ""}\u0001${b.source ?? ""}`;
 
+// The "...-included" shapes an item is drawn over in `year` (b.under, from
+// foldIncluded), kept on the item as `under`: [{name, status, start, end, note,
+// source}], one per run of years with the same shape, note and source.
+function addUnder(item, b, year) {
+  for (const u of b.under ?? []) {
+    item.under ??= [];
+    const k = `${itemKey(u)}\u0002${recordKey(u)}`;
+    const same = (r) => `${itemKey(r)}\u0002${recordKey(r)}` === k;
+    const run = item.under.find((r) => r.end === year - 1 && same(r));
+    if (run) run.end = year;
+    else if (!item.under.some((r) => r.end === year && same(r)))
+      item.under.push({ name: u.name, status: u.status, start: year, end: year, note: u.note, source: u.source });
+  }
+}
+
 /**
  * `features`: boundary features (as boundaries.json or a decoded chunk has them;
  * several copies of one feature are fine). Returns, for minYear..maxYear, the
@@ -116,10 +132,14 @@ export function historyAt(features, lon, lat, { minYear, maxYear }) {
     const active = hits.filter((f) => f.properties.start_year <= year && year <= f.properties.end_year);
     // uniqueBoundaries (the popup's own list): one entry per name and years, by name.
     const seen = new Set();
-    const shown = uniqueBoundaries(active).filter((b) => {
-      const k = `${itemKey(b)}\u0002${recordKey(b)}`;
-      return !seen.has(k) && seen.add(k);
-    });
+    // foldIncluded, as the popup: a shape drawn over an "...-included" one is
+    // the entry, the one under it goes with it (`under`).
+    const shown = foldIncluded(
+      uniqueBoundaries(active).filter((b) => {
+        const k = `${itemKey(b)}\u0002${recordKey(b)}`;
+        return !seen.has(k) && seen.add(k);
+      })
+    );
     const key = shown.map(itemKey).join("\u0003");
     if (last && last.key === key) {
       last.period.end = year;
@@ -128,16 +148,18 @@ export function historyAt(features, lon, lat, { minYear, maxYear }) {
         const rec = item.records.find((r) => r.end === year - 1 && recordKey(r) === recordKey(b));
         if (rec) rec.end = year;
         else item.records.push({ start: year, end: year, note: b.note, source: b.source });
+        addUnder(item, b, year);
       }
       continue;
     }
     const items = [];
     for (const b of shown) {
       const record = { start: year, end: year, note: b.note, source: b.source };
-      const same = items.find((i) => itemKey(i) === itemKey(b));
+      let item = items.find((i) => itemKey(i) === itemKey(b));
       // One name and status from two records in one year: both records are kept.
-      if (same) same.records.push(record);
-      else items.push({ name: b.name, status: b.status, records: [record] });
+      if (item) item.records.push(record);
+      else items.push((item = { name: b.name, status: b.status, records: [record] }));
+      addUnder(item, b, year);
     }
     const period = { start: year, end: year, items };
     periods.push(period);

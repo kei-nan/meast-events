@@ -33,10 +33,11 @@ async function lookUp(lon, lat) {
 const yearsText = (start, end) => periodLabel({ start, end }, MAX_YEAR);
 
 // One shape of a period: its name, its status in the border details' words, and
-// (behind a disclosure) each of its records' note and source, as the data has them.
+// (behind a disclosure) each of its records' note and source, as the data has them,
+// then the "...-included" shapes it is drawn over (`item.under`), each with its own.
 function Shape({ item }) {
   const status = humaniseStatus(item.status);
-  const hasNote = item.records.some((r) => r.note);
+  const hasNote = item.records.some((r) => r.note) || Boolean(item.under?.length);
   const several = item.records.length > 1;
   return (
     <div className="ph-shape">
@@ -56,6 +57,16 @@ function Shape({ item }) {
               {several && <p className="ph-record-years">{yearsText(r.start, r.end)}</p>}
               <BoundaryNote note={r.note} className="ph-note" />
               <BoundarySource source={r.source} className="ph-source" />
+            </div>
+          ))}
+          {item.under?.map((u) => (
+            <div key={`${u.name}|${u.start}`} className="ph-record ph-under">
+              <p className="ph-under-head">
+                <strong>Drawn over:</strong> {u.name} ({yearsText(u.start, u.end)}) ·{" "}
+                {humaniseStatus(u.status) ?? NO_STATUS_LABEL}
+              </p>
+              <BoundaryNote note={u.note} className="ph-note" />
+              <BoundarySource source={u.source} className="ph-source" />
             </div>
           ))}
         </details>

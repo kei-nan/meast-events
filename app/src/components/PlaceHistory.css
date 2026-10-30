@@ -149,6 +149,16 @@
   color: var(--text-secondary);
 }
 
+/* The "...-included" shape this one is drawn over (Shape `item.under`). */
+.ph-under {
+  margin-top: 10px;
+}
+
+.ph-under-head {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
 .ph-note {
   margin: 2px 0 0;
   white-space: pre-wrap;

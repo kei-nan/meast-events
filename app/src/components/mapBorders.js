@@ -80,6 +80,22 @@ export function uniqueBoundaries(featureList) {
   return out.sort((a, b) => String(a.name).localeCompare(String(b.name)));
 }
 
+/** True for an "...-included" status: the shape contains areas drawn on top as shapes of their own. */
+export const isIncludedStatus = (status) => Boolean(status) && String(status).endsWith("-included");
+
+// Where a point lies in an "...-included" shape (Israel from 1967: CShapes draws
+// no dividing lines inside it) and in a shape drawn on top of it (the West Bank,
+// Golan, Gaza), the shape on top is the entry, and the one it is drawn over goes
+// with it as `under` (with its own note and source), so a click does not read
+// as two rival answers. A point only in an "...-included" shape keeps it as its
+// entry. Items as uniqueBoundaries gives them; the order is unchanged.
+export function foldIncluded(items) {
+  const under = items.filter((b) => isIncludedStatus(b.status));
+  const over = items.filter((b) => !isIncludedStatus(b.status));
+  if (!under.length || !over.length) return items;
+  return over.map((b) => ({ ...b, under }));
+}
+
 export function yearsLabel(b) {
   const end = b.end_year >= 9999 ? "present" : b.end_year;
   return b.start_year === b.end_year ? `${b.start_year}` : `${b.start_year}–${end}`;

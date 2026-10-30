@@ -11,6 +11,22 @@ import {
   periodOf,
 } from "./placeHistory.js";
 import { parsePlace, placeLabel, placeToParam, samePlace } from "./placeParam.js";
+import { foldIncluded, isIncludedStatus } from "../components/mapBorders.js";
+
+test("foldIncluded: a shape drawn over an '...-included' one is the entry, the other goes under it", () => {
+  const israel = { name: "Israel", status: "occupied-territory-included", note: "n", source: "s" };
+  const wb = { name: "West Bank", status: "occupied-administered" };
+  const golan = { name: "Golan Heights", status: "annexed-unrecognized" };
+  assert.deepEqual(foldIncluded([israel, wb]), [{ ...wb, under: [israel] }]);
+  assert.deepEqual(foldIncluded([golan, israel, wb]), [{ ...golan, under: [israel] }, { ...wb, under: [israel] }]);
+  // Alone, or with nothing included, the list is unchanged.
+  assert.deepEqual(foldIncluded([israel]), [israel]);
+  assert.deepEqual(foldIncluded([wb, golan]), [wb, golan]);
+  assert.deepEqual(foldIncluded([]), []);
+  assert.ok(isIncludedStatus("shared-sovereignty-included"));
+  assert.ok(!isIncludedStatus("occupied-administered"));
+  assert.ok(!isIncludedStatus(null));
+});
 
 const square = (x, y, s = 1) => ({
   type: "Polygon",
@@ -127,21 +143,37 @@ const DATA = JSON.parse(readFileSync(new URL("../../../data/boundaries.json", im
 const REAL = { minYear: 1900, maxYear: 2026 };
 
 test("real data: Jerusalem's Old City (35.2345 E, 31.7767 N)", () => {
-  assert.deepEqual(names(historyAt(DATA, 35.2345, 31.7767, REAL)), [
+  const h = historyAt(DATA, 35.2345, 31.7767, REAL);
+  // From 1967 the point is also in Israel's "occupied-territory-included" shape:
+  // the West Bank shape drawn over it is the entry, Israel goes with it (under).
+  assert.deepEqual(names(h), [
     "1900-1919: Ottoman Empire",
     "1920-1947: Mandatory Palestine [mandate]",
     "1948-1949: West Bank (held by Jordan) [occupied-administered]",
     "1950-1966: West Bank (annexed by Jordan) [annexed-unrecognized]",
-    "1967-1994: Israel [occupied-territory-included] + West Bank (held by Israel) [occupied-administered]",
-    "1995-1999: Israel [occupied-territory-included] + West Bank (held by Israel, phased Oslo transfers) [occupied-administered]",
-    "2000-2026: Israel [occupied-territory-included] + West Bank Area C (held by Israel) [occupied-administered]",
+    "1967-1994: West Bank (held by Israel) [occupied-administered]",
+    "1995-1999: West Bank (held by Israel, phased Oslo transfers) [occupied-administered]",
+    "2000-2026: West Bank Area C (held by Israel) [occupied-administered]",
   ]);
+  // Israel's shape, its years and its own words are kept, under the entry (its
+  // 1967-1978 and 1979-1999 records have the same note and source: one run).
+  const israel = DATA.find((f) => f.properties.name === "Israel" && f.properties.start_year === 1967).properties;
+  assert.deepEqual(h[4].items[0].under, [
+    { name: "Israel", status: "occupied-territory-included", start: 1967, end: 1994, note: israel.note, source: israel.source },
+  ]);
+  assert.equal(h[3].items[0].under, undefined);
 });
 
 test("real data: Hebron (35.0998 E, 31.5326 N) is in Area A from 2000", () => {
-  assert.deepEqual(names(historyAt(DATA, 35.0998, 31.5326, REAL)).slice(-1), [
-    "2000-2026: Israel [occupied-territory-included] + West Bank Area A (Palestinian Authority) [autonomous-partial]",
-  ]);
+  const h = historyAt(DATA, 35.0998, 31.5326, REAL);
+  assert.deepEqual(names(h).slice(-1), ["2000-2026: West Bank Area A (Palestinian Authority) [autonomous-partial]"]);
+  assert.deepEqual(h.at(-1).items[0].under.map((u) => [u.name, u.start, u.end]), [["Israel", 2000, 2026]]);
+});
+
+test("real data: a point in Israel only (Tel Aviv, 34.7818 E, 32.0853 N) keeps Israel as its entry", () => {
+  const h = historyAt(DATA, 34.7818, 32.0853, REAL);
+  assert.deepEqual(names(h).slice(-2), ["1948-1966: Israel", "1967-2026: Israel [occupied-territory-included]"]);
+  assert.equal(h.at(-1).items[0].under, undefined);
 });
 
 test("real data: Antakya (36.1606 E, 36.2025 N), the Sanjak of Alexandretta 1922-1938", () => {
@@ -228,7 +260,15 @@ test("real data: at all 280 Wikidata border reference points (on the borders the
     for (const period of h) {
       for (const year of [period.start, period.end]) {
         const expected = [...new Set(inside.filter((f) => f.properties.start_year <= year && year <= f.properties.end_year).map((f) => f.properties.name))].sort();
-        assert.deepEqual(period.items.map((i) => i.name).sort(), expected, `${p.label} (${p.id}) ${year}`);
+        // Every shape at the point that year: the entries, and the "...-included"
+        // shapes they are drawn over (foldIncluded), nothing dropped.
+        const shown = period.items.flatMap((i) => [
+          i.name,
+          ...(i.under ?? []).filter((u) => u.start <= year && year <= u.end).map((u) => u.name),
+        ]);
+        assert.deepEqual([...new Set(shown)].sort(), expected, `${p.label} (${p.id}) ${year}`);
+        // An "...-included" shape is an entry only where nothing is drawn over it.
+        if (period.items.length > 1) assert.ok(period.items.every((i) => !isIncludedStatus(i.status)), `${p.label} ${year}`);
       }
     }
   }

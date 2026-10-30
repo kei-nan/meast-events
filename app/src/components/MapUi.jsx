@@ -296,12 +296,23 @@ export function KeyIcon({ d, dash }) {
 
 // `collapsed`: the note and source behind a "Note and source" disclosure (the
 // popup, so its "History of this place" stays in sight).
+// `b.under` (mapBorders.js foldIncluded): the "...-included" shapes this one is
+// drawn over at the clicked point, each with its own status, note and source.
 function BoundaryDetails({ b, collapsed = false }) {
   const status = humaniseStatus(b.status);
   const more = (
     <>
       <BoundaryNote note={b.note} className="mu-b-note" />
       <BoundarySource source={b.source} className="mu-b-source" />
+      {b.under?.map((u) => (
+        <div key={`${u.name}|${u.start_year}|${u.end_year}`} className="mu-b-under">
+          <p className="mu-b-under-head">
+            <strong>Drawn over:</strong> {u.name} ({yearsLabel(u)}) · {humaniseStatus(u.status) ?? NO_STATUS_LABEL}
+          </p>
+          <BoundaryNote note={u.note} className="mu-b-note" />
+          <BoundarySource source={u.source} className="mu-b-source" />
+        </div>
+      ))}
     </>
   );
   return (
