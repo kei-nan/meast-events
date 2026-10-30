@@ -52,12 +52,12 @@ import {
 } from "../lib/deferredBoundaries";
 import { MAP_EXTENT } from "../lib/mapExtent";
 import { cellsInBounds, createLandStore, wantsBackgroundDetail } from "../lib/landStore";
-import { DEFAULT_BOUNDS, DEFAULT_PADDING, SEA_COLOR } from "../lib/mapBase";
+import { SEA_COLOR, defaultBounds, openingPadding } from "../lib/mapBase";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
 import { isUnhandledEscape } from "../lib/escapeKey";
 import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
-import { keepPinInside, mapClearView, screenPoint } from "../lib/mapInsets";
+import { keepPinInside, mapClearView, screenPoint, sheetCover } from "../lib/mapInsets";
 import { eventCoords } from "../lib/geo";
 import { dragArea, handleBox, pickHandle } from "../lib/areaDrag";
 
@@ -161,7 +161,7 @@ export default function MapView({
   selectedEventId,
   hoverId,
   focus,
-  keepPinNonce = 0, // bumped when the phone sheet moves with an event open (App.jsx)
+  keepPin = null, // {nonce, center}: a new one each time the phone sheet moves with an event open (App.jsx)
   areaMode = "off",
   area = null,
   onAreaModeChange,
@@ -207,6 +207,9 @@ export default function MapView({
   const [borderPopup, setBorderPopup] = useState(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [hintOpen, setHintOpen] = useState(() => !readHintDismissed());
+  // An opened event retires the first-visit tip for this visit: it would come
+  // back over the event's place when the phone sheet is lowered ("Show map").
+  if (hintOpen && selectedEventId) setHintOpen(false);
   // Events sharing one spot, listed after a click: {point, items, total}.
   const [stackList, setStackList] = useState(null);
   const stackOpenerRef = useRef(null); // what had focus when the list opened
@@ -296,9 +299,13 @@ export default function MapView({
     const map = new MaplibreMap({
       container: containerRef.current,
       style: BASE_STYLE,
-      bounds: DEFAULT_BOUNDS,
+      // The tracked countries on a narrow (phone) map, the wider region
+      // otherwise; on phones above the lowered sheet (lib/mapBase.js openingPadding).
+      bounds: defaultBounds(containerRef.current.clientWidth),
       // MapLoading draws its stand-in in this same view (lib/mapBase.js defaultCamera).
-      fitBoundsOptions: { padding: DEFAULT_PADDING },
+      fitBoundsOptions: {
+        padding: openingPadding(containerRef.current.clientHeight, sheetCover(containerRef.current)),
+      },
       // land.json is clipped to this extent (scripts/split-data.mjs), so panning
       // further would show a sea where land was dropped.
       maxBounds: [MAP_EXTENT.slice(0, 2), MAP_EXTENT.slice(2)],
@@ -863,7 +870,11 @@ export default function MapView({
   const resetView = () => {
     const map = mapRef.current;
     if (!map) return;
-    map.fitBounds(DEFAULT_BOUNDS, { padding: DEFAULT_PADDING, duration: reducedMotion() ? 0 : 600 });
+    const el = map.getContainer();
+    map.fitBounds(defaultBounds(el.clientWidth), {
+      padding: openingPadding(el.clientHeight, sheetCover(el)),
+      duration: reducedMotion() ? 0 : 600,
+    });
   };
   const closePopup = useCallback(() => setBorderPopup(null), []);
   // Closing the list (× or Escape) removes the focused card: focus goes back to
@@ -991,15 +1002,20 @@ export default function MapView({
   // sight now, and the pin may sit under the controls or the sheet. Nudge the
   // camera just enough to keep it inside what is in sight (lib/mapInsets.js
   // keepPinInside), without changing the zoom. A pin the reader had already
-  // moved off the map is left alone.
+  // moved off the map is left alone. Lowered to its bar ("Show map"), the sheet
+  // leaves the whole map in sight: the pin goes in the middle of it.
   useEffect(() => {
-    if (!mapReady || !keepPinNonce || !selectedEventId) return;
+    if (!mapReady || !keepPin || !selectedEventId) return;
     const map = mapRef.current;
     const ev = eventsRef.current.find((e) => e.id === selectedEventId);
     const c = ev && eventCoords(ev);
     if (!c) return;
     const pin = [c.lon, c.lat];
-    const { width, height, padding } = mapClearView(map);
+    const { width, height, padding, offset } = mapClearView(map);
+    if (keepPin.center) {
+      map.easeTo({ center: pin, offset, duration: reducedMotion() ? 0 : 350 });
+      return;
+    }
     const at = map.getCenter();
     const cam = { center: [at.lng, at.lat], zoom: map.getZoom() };
     const [sx, sy] = screenPoint(pin, cam, width, height);
@@ -1008,7 +1024,7 @@ export default function MapView({
     if (center === cam.center) return;
     map.easeTo({ center, duration: reducedMotion() ? 0 : 350 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [keepPinNonce]);
+  }, [keepPin]);
 
   // Search-area layers follow the `area` prop (URL state, chip removal, edits).
   const setAreaSources = (a, showHandles = true) => {

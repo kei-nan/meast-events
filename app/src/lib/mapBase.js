@@ -21,12 +21,48 @@ export const LAND_ON_SEA = (() => {
   return `rgb(${mixed.join(",")})`;
 })();
 
-// Default view: the Middle East. Shared by the initial view and "Reset view".
+// Default view: the Middle East. Shared by the initial view and "Reset view"
+// (on maps NARROW_MAP_PX wide and up; narrower ones: NARROW_BOUNDS below).
 export const DEFAULT_BOUNDS = [
   [8, 6],
   [72, 50],
 ];
 export const DEFAULT_PADDING = 20;
+
+// On a narrow map (a phone held upright) DEFAULT_BOUNDS is fitted by its width:
+// at 390px the region is a small patch in the middle, the rest Europe, Africa
+// and the sea, and the events one big cluster. There the opening view is the
+// tracked countries themselves (lib/fallbackPoint.js FALLBACK_PLACES: Egypt's
+// western border at 25°E to Iran's eastern at ~63.3°E, Yemen's and Oman's coasts
+// near 12°N to Turkey's Black Sea coast near 42°N), with a little air.
+export const NARROW_BOUNDS = [
+  [25, 12],
+  [63.5, 42.5],
+];
+// Below this map width the opening view (and "Reset view") is NARROW_BOUNDS:
+// the line MapView's event zoom also draws between a phone and a wider map.
+export const NARROW_MAP_PX = 700;
+
+/** The opening view's bounds for a map `width` px wide. Pure. */
+export const defaultBounds = (width) => (width > 0 && width < NARROW_MAP_PX ? NARROW_BOUNDS : DEFAULT_BOUNDS);
+
+// Below this much height left above the phone sheet the opening view ignores it.
+const MIN_OPENING_PX = 80;
+
+/**
+ * The opening view's fit padding (MapLibre fitBoundsOptions.padding): on a
+ * phone, where the lowered sheet covers `sheetPx` of the bottom of a map
+ * `height` px tall, the bounds go above the sheet; else (and when that leaves
+ * too little) DEFAULT_PADDING all round. The controls along the top are left
+ * out: on a short screen (200% zoom) keeping clear of them too left the region
+ * a sliver, and the view could no longer centre it (maxBounds). Pure.
+ */
+export function openingPadding(height, sheetPx) {
+  if (!(sheetPx > 0)) return DEFAULT_PADDING;
+  const bottom = sheetPx + DEFAULT_PADDING;
+  if (height - DEFAULT_PADDING - bottom < MIN_OPENING_PX) return DEFAULT_PADDING;
+  return { top: DEFAULT_PADDING, right: DEFAULT_PADDING, bottom, left: DEFAULT_PADDING };
+}
 
 // MapLibre's tile size: at zoom z the world is 512 * 2^z pixels wide.
 const TILE_SIZE = 512;
@@ -37,22 +73,28 @@ export const mercatorY = (lat) =>
   (180 - (180 / Math.PI) * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))) / 360;
 
 /**
- * The camera MapLibre settles on for `new Map({bounds: DEFAULT_BOUNDS,
+ * The camera MapLibre settles on for `new Map({bounds: defaultBounds(width),
  * fitBoundsOptions: {padding}, maxBounds: MAP_EXTENT})` in a width x height
- * container: fit the bounds inside the padding (cameraForBounds), then zoom in
+ * container: fit the bounds inside the padding (cameraForBounds; a number, or
+ * {top, right, bottom, left}, which puts them in the middle of what the padding
+ * leaves), then zoom in
  * and shift as needed so the view stays inside maxBounds (the transform's
  * constrain step). Returns {zoom, worldSize, x0, y0}: a [lon, lat] point is
  * drawn at (mercatorX(lon) * worldSize - x0, mercatorY(lat) * worldSize - y0).
  */
-export function defaultCamera(width, height, { bounds = DEFAULT_BOUNDS, padding = DEFAULT_PADDING, extent = MAP_EXTENT } = {}) {
+export function defaultCamera(width, height, { bounds = defaultBounds(width), padding = DEFAULT_PADDING, extent = MAP_EXTENT } = {}) {
   const [[west, south], [east, north]] = bounds;
   const left = mercatorX(west);
   const right = mercatorX(east);
   const top = mercatorY(north);
   const bottom = mercatorY(south);
-  let worldSize = Math.min((width - 2 * padding) / (right - left), (height - 2 * padding) / (bottom - top));
-  let cx = (left + right) / 2;
-  let cy = (top + bottom) / 2;
+  const pad = typeof padding === "number" ? { top: padding, right: padding, bottom: padding, left: padding } : padding;
+  let worldSize = Math.min(
+    (width - pad.left - pad.right) / (right - left),
+    (height - pad.top - pad.bottom) / (bottom - top)
+  );
+  let cx = (left + right) / 2 - (pad.left - pad.right) / 2 / worldSize;
+  let cy = (top + bottom) / 2 - (pad.top - pad.bottom) / 2 / worldSize;
 
   const [minLon, minLat, maxLon, maxLat] = extent;
   const mx0 = mercatorX(minLon);

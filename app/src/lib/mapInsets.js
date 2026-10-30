@@ -9,6 +9,8 @@
 // of the map left in sight, measured from those elements themselves when the
 // move starts.
 
+import { HALF_SHARE, SHEET_STRIP_PX } from "./sheetSnap.js";
+
 // A clear area narrower or shorter than this is no use: the controls are
 // ignored then (the sheet is not: what it covers is never in sight).
 const MIN_CLEAR_PX = 40;
@@ -28,7 +30,29 @@ export function sheetCover(container) {
   const sheet = document.querySelector(".side-panel");
   if (!sheet) return 0;
   const box = container.getBoundingClientRect();
-  return Math.max(0, Math.round(box.bottom - Math.max(box.top, sheet.getBoundingClientRect().top)));
+  return Math.max(0, Math.round(box.bottom - Math.max(box.top, sheetTop(sheet))));
+}
+
+/**
+ * Where the top of the phone sheet comes to rest, in page px: at half and full
+ * its CSS height (SidePanel.css; lib/sheetSnap.js) in a map area (.app-body)
+ * `areaTop` px down and `areaHeight` px tall, else (peek, or a drag) `liveTop`,
+ * where it is now. Between half and full the sheet slides (a 0.2 s
+ * transition), and a camera move that starts as it does must aim at where it
+ * will be, not where it still is. Pure.
+ */
+export function restingSheetTop(state, areaTop, areaHeight, liveTop) {
+  if (state === "half") return areaTop + areaHeight * (1 - HALF_SHARE);
+  if (state === "full") return areaTop + Math.min(SHEET_STRIP_PX, areaHeight);
+  return liveTop;
+}
+
+// The phone sheet's resting top (restingSheetTop), read from the page.
+function sheetTop(sheet) {
+  const live = sheet.getBoundingClientRect().top;
+  const area = sheet.parentElement?.getBoundingClientRect();
+  if (!area || !isPhone()) return live;
+  return restingSheetTop(sheet.dataset.sheet, area.top, area.height, live);
 }
 
 // What lies over the map: the toolbar's, the right-hand column's and the
@@ -40,7 +64,12 @@ const OVERLAY_EACH = ".maplibregl-ctrl";
 const OVERLAY_SINGLES = [".mu-tip", ".side-panel"];
 
 function pushRect(out, el, box) {
-  const b = el.getBoundingClientRect();
+  let b = el.getBoundingClientRect();
+  // The phone sheet where it comes to rest, not where its slide has got to.
+  if (el.classList.contains("side-panel")) {
+    const top = sheetTop(el);
+    b = { left: b.left, right: b.right, top, bottom: b.bottom, width: b.width, height: b.bottom - top };
+  }
   if (b.width < 1 || b.height < 1) {
     // display: contents (the phone's .mu-borders) has no box of its own.
     for (const child of el.children) pushRect(out, child, box);

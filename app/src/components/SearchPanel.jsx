@@ -113,7 +113,7 @@ const VIEWS = [
  * @param {(id:string|null)=>void} props.onHover
  * @param {()=>void}               props.onBack   clear selection, return to results
  * @param {()=>void}               [props.onRefocus] aim the map at the open event again (phone "Find on map")
- * @param {()=>void}               [props.onSheetMove] the phone sheet moved with an event open (keep its pin in sight)
+ * @param {(sheet:string)=>void}   [props.onSheetMove] the phone sheet moved (to `sheet`) with an event open (keep its pin in sight)
  * @param {string}                 [props.sort]   order of the browse list, one of lib/browseOrder.js SORTS
  * @param {(s:string)=>void}       [props.onSortChange]
  * @param {"list"|"timeline"}      [props.view]   how results are shown: the list, or oldest first with
@@ -174,7 +174,14 @@ export default function SearchPanel({
   const lastSelectedRef = useRef(null);
   const hadSelectionRef = useRef(false);
   // Phone sheet: "peek" | "half" | "full", dragged by its bar (hooks/useSheetDrag.js).
-  const { sheet, setSheet, dragHeight, barProps } = useSheetDrag(query || selectedEvent ? "full" : "peek", panelRef);
+  // An event opens at half height, so its place stays in sight on the map above
+  // (at full only a strip shows, under the map's controls); a search opens the
+  // list at full. Tapping the lowered bar reopens it the same way.
+  const { sheet, setSheet, dragHeight, barProps } = useSheetDrag(
+    selectedEvent ? "half" : query ? "full" : "peek",
+    panelRef,
+    selectedEvent ? "half" : "full"
+  );
   const sheetOpen = sheet !== "peek";
   // Filters sit behind a disclosure so results start near the top of the panel.
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -183,13 +190,13 @@ export default function SearchPanel({
   const downloadId = useId();
   const downloadBtnRef = useRef(null);
 
-  // Selecting an event (from a row or the map) opens the sheet on mobile; a
-  // sheet the reader left at half stays at half.
+  // Selecting an event (from a row or the map) opens the sheet on mobile, at
+  // half height; a sheet the reader left at full stays at full.
   const selectedId = selectedEvent?.id ?? null;
   const [prevSelectedId, setPrevSelectedId] = useState(selectedId);
   if (selectedId !== prevSelectedId) {
     setPrevSelectedId(selectedId);
-    if (selectedId && sheet === "peek") setSheet("full");
+    if (selectedId && sheet === "peek") setSheet("half");
   }
 
   const loading = status === "loading";
@@ -276,8 +283,9 @@ export default function SearchPanel({
 
   // Mobile: the reader moved the sheet (dragged it, its bar, a key) with an
   // event open, so more or less of the map is in sight: App keeps the event's
-  // pin inside it (MapView keepPinNonce) - unless "Find on map" just aimed it,
-  // or the event itself changed (it is aimed anyway).
+  // pin inside it (MapView keepPin), and centres it when the sheet went down
+  // to its bar ("Show map") - unless "Find on map" just aimed it, or the event
+  // itself changed (it is aimed anyway).
   const sheetSeenRef = useRef({ sheet, selectedId });
   useEffect(() => {
     const prev = sheetSeenRef.current;
@@ -287,7 +295,7 @@ export default function SearchPanel({
       refocusedRef.current = false;
       return;
     }
-    if (selectedId && prev.selectedId === selectedId) onSheetMove?.();
+    if (selectedId && prev.selectedId === selectedId) onSheetMove?.(sheet);
   }, [sheet, selectedId, onSheetMove]);
 
   function clearAll() {

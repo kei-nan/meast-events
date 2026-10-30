@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { loadLand } from "../lib/dataClient";
-import { LAND_ON_SEA, defaultCamera, mercatorX, mercatorY } from "../lib/mapBase";
+import { LAND_ON_SEA, defaultCamera, mercatorX, mercatorY, openingPadding } from "../lib/mapBase";
+import { sheetCover } from "../lib/mapInsets";
 
 // Stands in for the map while MapLibre downloads and starts (~1.5 MB of
 // script, its worker included): the sea, and the land as soon as land.tbin
@@ -31,7 +32,8 @@ function draw(canvas, land) {
     return;
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const { worldSize, x0, y0 } = defaultCamera(width, height);
+  // The view MapView opens on: on phones, above the lowered sheet.
+  const { worldSize, x0, y0 } = defaultCamera(width, height, { padding: openingPadding(height, sheetCover(canvas)) });
   ctx.fillStyle = LAND_ON_SEA;
   // One path, one fill: the land is cut into pieces (cells), and separate fills would
   // leave a faint line where two pieces meet (each antialiased edge half-covers it).

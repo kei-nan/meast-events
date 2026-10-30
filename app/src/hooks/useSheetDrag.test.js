@@ -12,14 +12,14 @@ const { default: useSheetDrag, FLICK_IDLE_MS } = await import("./useSheetDrag.js
 
 // A full sheet (563px) in a 683px map area, as on a 390x844 phone: a 1px top
 // border, a 44px bar and a 44px search input (`input` 0: hidden, an event is open).
-function setup({ input = 44 } = {}) {
+function setup({ input = 44, initial = "full", openTo } = {}) {
   const sheet = {
     clientTop: 1,
     parentElement: { clientHeight: 683 },
     getBoundingClientRect: () => ({ height: 563 }),
     querySelector: (s) => ({ ".sp-sheet-toggle": { offsetHeight: 44 }, ".sp-inputwrap": { offsetHeight: input } })[s],
   };
-  const { rerender } = renderHook(() => useSheetDrag("full", { current: sheet }));
+  const { rerender } = renderHook(() => useSheetDrag(initial, { current: sheet }, openTo));
   const bar = () => rerender().barProps;
   const down = (y, t) => bar().onPointerDown({ button: 0, clientY: y, timeStamp: t, pointerId: 1, currentTarget: {} });
   const move = (y, t) => bar().onPointerMove({ clientY: y, timeStamp: t });
@@ -68,4 +68,17 @@ test("arrow keys step between the measured heights", () => {
   const s = setup();
   s.rerender().barProps.onKeyDown({ key: "ArrowDown", preventDefault() {} });
   assert.equal(s.rerender().sheet, "half");
+});
+
+test("a tap on the lowered bar opens the sheet to full, or to openTo (half, an event)", () => {
+  const s = setup({ initial: "peek" });
+  s.rerender().barProps.onClick();
+  assert.equal(s.rerender().sheet, "full");
+  s.rerender().barProps.onClick();
+  assert.equal(s.rerender().sheet, "peek");
+  const t = setup({ initial: "peek", input: 0, openTo: "half" });
+  t.rerender().barProps.onClick();
+  assert.equal(t.rerender().sheet, "half");
+  t.rerender().barProps.onClick();
+  assert.equal(t.rerender().sheet, "peek");
 });
