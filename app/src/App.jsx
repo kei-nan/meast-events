@@ -16,7 +16,7 @@ import {
   loadLand,
   prefetchFullLead,
 } from "./lib/dataClient";
-import { rawEventYears } from "./lib/eventYears";
+import { eventYearsText } from "./lib/eventYears";
 import { isFastConnection } from "./lib/landStore";
 import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
@@ -545,12 +545,8 @@ export default function App() {
   // The tab title names the open event (and is restored when it closes), as the
   // event's page has it (scripts/event-page.mjs eventPageTitle).
   const selectedTitle = selectedEventRaw?.title;
-  const selectedYears = selectedEventRaw ? rawEventYears(selectedEventRaw) : null; // as the dates give them
-  const selectedYearText = selectedYears
-    ? selectedYears[1] !== selectedYears[0]
-      ? `${selectedYears[0]}–${selectedYears[1]}`
-      : `${selectedYears[0]}`
-    : "";
+  // As the dates give them; "2014–ongoing" when a source says it is still going on (lib/eventYears.js).
+  const selectedYearText = selectedEventRaw ? eventYearsText(selectedEventRaw) : "";
   useEffect(() => {
     document.title = selectedTitle ? `${selectedTitle} (${selectedYearText}) – ${SITE_TITLE}` : SITE_TITLE;
   }, [selectedTitle, selectedYearText]);

@@ -1,7 +1,8 @@
 // Batched Wikidata entity fetch (read-only). Keeps a trimmed record per item:
 // class statements (P31), location statements (P17/P276/P131), dates (P585/P580/P582),
 // coordinates (P625), sitelinks (all projects / Wikipedia editions only), English aliases
-// (only when "aliases" is among the requested props).
+// (only when "aliases" is among the requested props), and whether the end time (P582) is given as
+// "no value" / "unknown value" instead of a date (p582_open).
 import { politeFetch, sleep, mediaWikiJson } from "./http.js";
 
 const API = "https://www.wikidata.org/w/api.php";
@@ -14,6 +15,17 @@ const times = (cl) =>
     .map((c) => c.mainsnak?.datavalue?.value)
     .filter((v) => v?.time)
     .map((v) => ({ time: v.time.replace(/^\+/, "").slice(0, 10), precision: v.precision }));
+
+// How the item states its end time (P582) when it gives no date for it: "novalue" (Wikidata's "no value")
+// or "somevalue" ("unknown value"), from its non-deprecated P582 statements in Wikidata's order; null when
+// it has an end date or no P582 statement at all; undefined when claims were not fetched.
+export function p582Open(claims) {
+  if (!claims) return undefined;
+  const st = notDeprecated(claims.P582);
+  if (st.some((c) => c.mainsnak?.snaktype === "value")) return null;
+  const open = st.find((c) => c.mainsnak?.snaktype === "novalue" || c.mainsnak?.snaktype === "somevalue");
+  return open ? open.mainsnak.snaktype : null;
+}
 
 function trim(ent) {
   const c = ent.claims ?? {};
@@ -35,6 +47,7 @@ function trim(ent) {
     p585: times(c.P585),
     p580: times(c.P580),
     p582: times(c.P582),
+    p582_open: p582Open(ent.claims),
     p625: p625 ? { lat: p625.latitude, lon: p625.longitude } : null,
     sitelinks_all: sl.length,
     // sitelinks whose URL is on a *.wikipedia.org host = Wikipedia language editions
@@ -113,4 +126,17 @@ export function setWikidataAliases(ev, aliases) {
   if (aliases.length) ev.wikidata_aliases = [...aliases];
   else delete ev.wikidata_aliases;
   return JSON.stringify(ev.wikidata_aliases ?? null) !== before;
+}
+
+// Stores how Wikidata states an item's missing end time on an event, as `date_end_open`: "wikidata_novalue"
+// (P582 "no value") or "wikidata_somevalue" (P582 "unknown value"); removes the field otherwise. Only for an
+// event with no date_end (with one, the date is what the app uses). `open` undefined (claims not fetched, or
+// an older cache entry) leaves the event unchanged. Returns true when the event changed. The app counts such
+// an event in every year from its start to the current year (docs/DATA_POLICY.md, "Ongoing events").
+export function setDateEndOpen(ev, open) {
+  if (open === undefined) return false;
+  const before = ev.date_end_open ?? null;
+  if (open && !ev.date_end) ev.date_end_open = `wikidata_${open}`;
+  else delete ev.date_end_open;
+  return (ev.date_end_open ?? null) !== before;
 }

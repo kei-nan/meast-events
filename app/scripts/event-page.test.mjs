@@ -507,3 +507,13 @@ test("fillAppShell refuses a template whose markers are missing, repeated or out
   assert.throws(() => fillAppShell(ok.replace(bc, bc + bc), meta, "C"), /exactly once/);
   assert.throws(() => fillAppShell(`${mc}${mo}${bo}${bc}`, meta, "C"), /comes before/);
 });
+
+test("an ongoing event (title says present): '– ongoing (per source)' and a note naming the source; others unchanged", () => {
+  const yemen = { id: "yemeni-civil-war-2014-present", title: "Yemeni civil war (2014–present)", date_start: "2014-09-16", date_end: null, date_precision: "day", countries: ["Yemen"], category: "war", extract: "Text." };
+  const html = page(yemen);
+  assert.match(html, /16 September 2014 – ongoing \(per source\)/);
+  assert.match(html, /shown as ongoing because its Wikipedia article title says “present”/);
+  const plain = page({ ...yemen, id: "syrian-civil-war", title: "Syrian civil war", date_start: "2011-03-15" });
+  assert.doesNotMatch(plain, /ongoing/);
+  assert.equal(eventShareTitle({ id: "w", title: "Some war", date_start: "2014-09-16", date_end_open: "wikidata_novalue" }), "Some war (2014–ongoing)");
+});

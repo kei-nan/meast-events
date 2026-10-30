@@ -15,13 +15,14 @@ import {
   timelineOrder,
 } from "../lib/timelineView.js";
 import { warmEvent } from "../lib/warmEvent.js";
+import { eventYearsText, ongoingSignal } from "../lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 
 const PAGE = 50;
 
+// "1956", "1956–1957", or "2014–ongoing" for an event a source says is still going on (lib/eventYears.js).
 function yearLabel(e) {
-  const [s, en] = eventYears(e);
-  return en !== s ? `${s}–${en}` : `${s}`;
+  return eventYearsText(e) || `${eventYears(e)[0]}`;
 }
 
 // One result row. Its accessible name is the title and the year/place line;
@@ -139,7 +140,7 @@ const TimelineRow = memo(function TimelineRow({
   // A single year is already in the margin, so the line under the bar shows
   // only a span of years; screen readers (the margin is hidden from them)
   // still hear the year as part of the row's name.
-  const yearInMargin = marginYear != null && end === start;
+  const yearInMargin = marginYear != null && end === start && !ongoingSignal(ev);
   const place = [ev.countries?.length ? timelineCountries(ev.countries) : "", ev.category ? categoryLabel(ev.category) : ""]
     .filter(Boolean)
     .join(" · ");

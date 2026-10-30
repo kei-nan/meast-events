@@ -1,16 +1,16 @@
 // Pure helpers for the map's stacked-event list, hover label and "show results"
 // fit. Kept free of MapLibre/React so they can be unit-tested with node --test.
 
+import { eventYearsText } from "./eventYears.js";
+
 // Biggest cluster whose events we list instead of zooming. Bigger clusters that
 // still can't be split (rare) list their first LIST_MAX events with a note.
 export const LIST_MAX = 60;
 
-// "1956" or "1956–1957" from an event's ISO-ish date_start/date_end.
+// "1956" or "1956–1957" from an event's ISO-ish date_start/date_end ("2014–ongoing" for an
+// event a source says is still going on, lib/eventYears.js eventYearsText).
 export function eventYearLabel(e) {
-  const s = Number(String(e?.date_start ?? "").slice(0, 4));
-  if (!Number.isFinite(s) || s === 0) return "";
-  const en = e.date_end ? Number(String(e.date_end).slice(0, 4)) : s;
-  return Number.isFinite(en) && en !== s ? `${s}–${en}` : String(s);
+  return eventYearsText(e);
 }
 
 const coordKey = (f) => {

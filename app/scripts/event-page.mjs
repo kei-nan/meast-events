@@ -19,7 +19,7 @@ import { dataFixUrl } from "../src/lib/dataFixes.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
 import { formatEventDate } from "../src/lib/eventDate.js";
 import { countryLabel } from "../src/lib/eventCountries.js";
-import { rawEventYears } from "../src/lib/eventYears.js";
+import { eventYearsText, ongoingNote, ongoingSignal } from "../src/lib/eventYears.js";
 import { markSegments } from "../src/lib/highlights.js";
 import { otherArticleNote } from "../src/lib/otherArticle.js";
 import { wikidataUrl } from "../src/lib/partOf.js";
@@ -437,7 +437,11 @@ const siteFooter = `<footer class="site-footer"><p>${escapeHtml(SITE_NAME)} is a
 
 export function eventDateText(event) {
   const flags = (event.date_flags ?? []).filter(Boolean);
-  return formatEventDate(event.date_start, event.date_end, { precision: event.date_precision ?? null, yearOnly: flags.length > 0 });
+  return formatEventDate(event.date_start, event.date_end, {
+    precision: event.date_precision ?? null,
+    yearOnly: flags.length > 0,
+    ongoing: Boolean(ongoingSignal(event)),
+  });
 }
 
 /**
@@ -460,7 +464,7 @@ export function titleHasYear(title) {
 /**
  * The link-preview title (og:title, twitter:title): "Title (1912–1913)", the tab
  * title without the site name, which og:site_name already gives, with the years
- * as the dates give them (rawEventYears). No dates: the title alone. A title that
+ * as the dates give them (eventYearsText; "2014–ongoing" for an ongoing event). No dates: the title alone. A title that
  * already names a year is left alone too: "Capture of Baghdad (1917)" is not
  * followed by "(1917)" again, nor "Political violence in Turkey (1976–1980)" by
  * the dates' different "(1968–1980)" (Wikipedia's title and Wikidata's dates can
@@ -469,8 +473,7 @@ export function titleHasYear(title) {
 export function eventShareTitle(event) {
   const title = String(event.title ?? event.id);
   if (titleHasYear(title)) return title;
-  const [s, e] = rawEventYears(event);
-  const years = event.date_start && Number.isFinite(s) ? (e !== s ? `${s}–${e}` : `${s}`) : "";
+  const years = event.date_start ? eventYearsText(event) : "";
   return `${title}${years ? ` (${years})` : ""}`;
 }
 
@@ -573,6 +576,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
   const showClasses = classes.length > 0;
   const itemUrl = wikidataUrl(event.wikidata_qid);
   const dateNote = dateOrderNote(event);
+  const ongoing = ongoingNote(event);
   const retrieved = event.extract_retrieved_at ? String(event.extract_retrieved_at).slice(0, 10) : null;
   const paragraphs = extract.split(/\n+/).filter((p) => p.trim());
 
@@ -587,6 +591,7 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
         itemUrl ? ` (all its classes: <a class="wd" href="${escapeHtml(itemUrl)}" rel="noreferrer">Wikidata item</a>)` : ""
       }</p>`,
     dateNote && `<p class="note" role="note">${escapeHtml(dateNote)}</p>`,
+    ongoing && `<p class="note" role="note">${escapeHtml(ongoing)}</p>`,
     wiki && `<p class="actions"><a class="wiki" href="${escapeHtml(wiki)}" rel="noreferrer">Read on Wikipedia</a></p>`,
     event.text_from_article && `<p class="note" role="note">${escapeHtml(otherArticleNote(event.text_from_article))}</p>`,
     renderPointer(review),
