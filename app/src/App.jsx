@@ -19,7 +19,9 @@ import {
 import { eventYearsText } from "./lib/eventYears";
 import { isFastConnection } from "./lib/landStore";
 import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
-import { eventCoords, inBbox, normalizeBounds } from "./lib/geo";
+import { eventCoords, inBbox, makeCircleArea, normalizeBounds } from "./lib/geo";
+import { roundPlace } from "./lib/placeParam.js";
+import { NEARBY_KM } from "./lib/related.js";
 import { countInBbox } from "./lib/localSearch";
 import { orderBrowseList } from "./lib/browseOrder";
 import { rankEvents } from "./lib/ranking";
@@ -135,7 +137,12 @@ export default function App() {
   const endYear = range.end;
   const [selectedEventId, setSelectedEventId] = useState(initial.eventId);
   const [hoverId, setHoverId] = useState(null);
-  const [focus, setFocus] = useState(null); // {id, lon, lat, nonce}
+  // "What was this place?" ({lon, lat}, lib/placeParam.js), shown in the panel while no event is open.
+  const [place, setPlace] = useState(initial.place);
+  // {id, lon, lat, nonce}; a place link (no event) opens with the map on its point.
+  const [focus, setFocus] = useState(() =>
+    initial.place && !initial.eventId ? { id: null, lon: initial.place.lon, lat: initial.place.lat, nonce: -1 } : null
+  );
   const focusNonceRef = useRef(0);
   const pendingFocusRef = useRef(initial.eventId); // deep link (or Back/Forward) awaiting its event
   const selectedIdRef = useRef(initial.eventId); // for handleNavigate
@@ -454,9 +461,10 @@ export default function App() {
     setAbout(parsed.about);
     setSort(parsed.sort);
     setView(parsed.view);
+    setPlace(parsed.place);
   }, []);
 
-  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort, view };
+  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort, view, place };
   const replaceNextUrl = useUrlState(urlState, handleNavigate);
 
   // Share links come from the state as it is now, not the address bar: URL
@@ -569,6 +577,37 @@ export default function App() {
     []
   );
 
+  // "What was this place?": opened from the border popup (the clicked point) or
+  // an open event (its point), which it replaces in the panel; an event opened
+  // from it shows over it, and Back returns to it. Each is a history entry
+  // (lib/urlState.js urlWriteMode).
+  const openPlace = useCallback((p) => {
+    setNotFoundId(null);
+    setHoverId(null);
+    setSelectedEventId(null);
+    setPlace(roundPlace(p));
+  }, []);
+  const closePlace = useCallback(() => setPlace(null), []);
+  const placeView = useMemo(() => {
+    if (!place) return null;
+    return {
+      place,
+      events: chronological,
+      onBack: closePlace,
+      onShowOnMap: () => setFocus({ id: null, lon: place.lon, lat: place.lat, nonce: ++focusNonceRef.current }),
+      // A period's years on the timeline (and so its borders on the map); Play stops there.
+      onChooseYears: (start, end) => {
+        setPlayState((s) => (s === "playing" ? "paused" : s));
+        setRange({ start, end });
+      },
+      // Every nearby event in the results: the same circle as an area search.
+      onListNearby: () => {
+        setArea(makeCircleArea([place.lon, place.lat], NEARBY_KM));
+        setPlace(null);
+      },
+    };
+  }, [place, chronological, closePlace]);
+
   // The tab title names the open event (and is restored when it closes), as the
   // event's page has it (scripts/event-page.mjs eventPageTitle).
   const selectedTitle = selectedEventRaw?.title;
@@ -586,14 +625,14 @@ export default function App() {
             skipTo first opens the mobile sheet if it is collapsed. */}
         <a
           className="app-skip"
-          href={selectedEventRaw ? "#event-detail-title" : "#sp-body"}
+          href={selectedEventRaw ? "#event-detail-title" : place ? "#place-history-title" : "#sp-body"}
           onClick={(e) => {
             if (!panelRef.current) return;
             e.preventDefault();
             panelRef.current.skipTo();
           }}
         >
-          {selectedEventRaw ? "Skip to panel" : "Skip to search"}
+          {selectedEventRaw || place ? "Skip to panel" : "Skip to search"}
         </a>
         <header className="app-header">
           <h1>{SITE_TITLE}</h1>
@@ -643,6 +682,8 @@ export default function App() {
                 onViewportChange={handleViewportChange}
                 onSelectEvent={handleSelectFromMap}
                 categories={categoryOptions.length ? categoryOptions : null}
+                place={selectedEventId ? null : place}
+                onPlaceHistory={openPlace}
               />
             </Suspense>
           ) : (
@@ -683,6 +724,8 @@ export default function App() {
             counts={counts}
             interim={search.interim}
             notFoundId={notFoundId}
+            placeView={placeView}
+            onOpenPlace={openPlace}
           />
         </main>
         <Timeline

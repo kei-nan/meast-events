@@ -38,6 +38,31 @@ export function EventDetailFailed({ event, onBack }) {
   );
 }
 
+/** In place of "What was this place?": Back, its heading (focused) and the notice. */
+export function PlaceHistoryFailed({ onBack }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.focus({ preventScroll: true });
+  }, []);
+  return (
+    <article className="event-detail" aria-labelledby="place-history-title">
+      <div className="event-detail-actions">
+        <button type="button" className="sp-btn" onClick={onBack}>
+          <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
+        </button>
+      </div>
+      <header className="event-detail-head">
+        <h2 id="place-history-title" ref={ref} tabIndex={-1}>
+          History of this place
+        </h2>
+      </header>
+      <p className="load-failed" role="alert">
+        This view could not be loaded. Please reload the page.
+      </p>
+    </article>
+  );
+}
+
 /** In place of the About the data dialog: says so, and closes like it (Close, Esc, a backdrop click). */
 export function AboutDataFailed({ onClose }) {
   const ref = useRef(null);

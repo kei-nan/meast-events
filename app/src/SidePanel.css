@@ -2039,6 +2039,13 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-secondary);
 }
 
+/* "This place over time": the way into "What was this place?" (PlaceHistory.jsx). */
+.event-detail-place-text {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
 /* The phone sheet jumps between its heights instead of sliding. */
 @media (max-width: 768px) and (prefers-reduced-motion: reduce) {
   .side-panel[data-sheet="half"],

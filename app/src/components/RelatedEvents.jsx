@@ -52,7 +52,9 @@ const FACE = [
   ["W", 270],
 ];
 
-function Compass({ items, hotId, onHot, onSelectEvent }) {
+// Exported for "What was this place?" (PlaceHistory.jsx), whose centre is a
+// point, not an event: `label` is then its own accessible name.
+export function Compass({ items, hotId, onHot, onSelectEvent, label }) {
   const R = 84; // the farthest dot centre
   const disc = R + DOT_R + 4;
   const c = disc + 18;
@@ -65,7 +67,10 @@ function Compass({ items, hotId, onHot, onSelectEvent }) {
       className="rel-compass"
       viewBox={`0 0 ${size} ${size}`}
       role="img"
-      aria-label={`Compass: the direction and distance of each nearby event from this one, north up, out to ${outer} km. The same events are listed below.`}
+      aria-label={
+        label?.(outer) ??
+        `Compass: the direction and distance of each nearby event from this one, north up, out to ${outer} km. The same events are listed below.`
+      }
     >
       <circle className="rel-face" cx={c} cy={c} r={disc} />
       {FACE.map(([label, deg]) => {

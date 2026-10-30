@@ -396,6 +396,67 @@
   color: #4a4030;
   overflow-wrap: anywhere;
 }
+/* A note's sentences and a source's items (BoundaryText.jsx). */
+.mu-b-note-list,
+.mu-b-source-list {
+  margin: 4px 0;
+  padding-left: 18px;
+  white-space: normal;
+}
+.mu-b-note-list li + li,
+.mu-b-source-list li + li {
+  margin-top: 3px;
+}
+.mu-b-source a,
+.mu-b-more summary {
+  color: #1f5a8a;
+}
+/* The popup's note and source, behind a disclosure (BoundaryDetails collapsed),
+   so its "History of this place" stays in sight. */
+.mu-b-more {
+  margin: 2px 0 0;
+}
+.mu-b-more summary {
+  cursor: pointer;
+  width: fit-content;
+}
+.mu-b-more summary:focus-visible,
+.mu-b-source a:focus-visible {
+  outline: 3px solid #1f5a8a;
+  outline-offset: 2px;
+}
+.mu-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* The point "What was this place?" describes (usePlaceMarker.js): a diamond,
+   as the Nearby compass marks its centre. Never a ring-and-cross shape. */
+.mu-place-marker {
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+.mu-place-marker-shape {
+  display: block;
+  width: 13px;
+  height: 13px;
+  margin: 2px;
+  box-sizing: border-box;
+  background: #c99a45;
+  border: 2px solid #2b2418;
+  box-shadow: 0 0 0 2px rgba(255, 250, 238, 0.85);
+  transform: rotate(45deg);
+}
+/* "History of this place" (PlaceHistory.jsx), under the shapes it goes beyond. */
+.mu-b-history {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid #c9bfa8;
+}
 
 /* The Map key's button and panel are items of the right-hand column itself, so
    the opened panel goes under the "Borders as of" years (it does not push

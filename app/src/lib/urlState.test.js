@@ -34,6 +34,7 @@ test("defaults serialize to empty and parse back to defaults", () => {
     about: false,
     sort: "coverage",
     view: "list",
+    place: null,
   });
 });
 
@@ -205,6 +206,22 @@ test("urlWriteMode: pushes event changes, debounces the rest, replaces on reques
   assert.equal(urlWriteMode("/event/bogus?q=x", "/?q=x", { replace: true }), "replace");
   // The flag only matters for event changes.
   assert.equal(urlWriteMode("/?q=x", "/?q=y", { replace: true }), "debounce");
+  // "What was this place?" opened, moved to another point, closed: pushes; the years under it: debounced.
+  assert.equal(urlWriteMode("/", "/?place=35.2345,31.7767"), "push");
+  assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/?place=36.16,36.2"), "push");
+  assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/"), "push");
+  assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/?y=1920-1947&place=35.2345,31.7767"), "debounce");
+  assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/", { backUrl: "/?q=x" }), "back");
+});
+
+test("place=lon,lat round trips at 5 decimals; junk is dropped", () => {
+  assert.deepEqual(parseUrlState("?place=35.2345,31.7767").place, { lon: 35.2345, lat: 31.7767 });
+  assert.equal(parseUrlState("?place=35.2345").place, null);
+  assert.equal(parseUrlState("?place=190,31").place, null);
+  assert.equal(serializeUrlState({ ...base, place: { lon: 35.234567, lat: 31.7767 } }), "?place=35.23457,31.7767");
+  assert.equal(serializeUrlState({ ...base, place: null }), "");
+  // Carried into the current entry before a push, like the open event.
+  assert.equal(entryBeforePush("/?place=35.2,31.7", { ...base, place: null, startYear: 1920, endYear: 1947 }), "/?y=1920-1947&place=35.2,31.7");
 });
 
 test("urlWriteMode: closing in the app goes back to the entry it was opened from", () => {

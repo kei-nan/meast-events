@@ -28,6 +28,7 @@ import MapLoading from "./MapLoading";
 import { diffById } from "../lib/sourceDiff";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "./useMapHoverLabel";
+import usePlaceMarker from "./usePlaceMarker";
 import { LIST_MAX, allSameCoordinates, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
 import useCountryHighlight from "./countryHighlight";
 import useDebouncedValue from "../hooks/useDebouncedValue";
@@ -173,6 +174,8 @@ export default function MapView({
   eventsLoading = false,
   yearPending = false, // true while the year to show is not known yet: no borders are fetched (App.jsx)
   categories = null, // category ids that have events: the Map key lists only these (null = all)
+  place = null, // {lon, lat} "What was this place?" describes: marked on the map (usePlaceMarker.js)
+  onPlaceHistory, // ({lon, lat}): the border popup's "History of this place"
 }) {
   const year = borderYear ?? timelineYear;
   const containerRef = useRef(null);
@@ -512,7 +515,11 @@ export default function MapView({
           hint = placeholder.properties.note;
           return placeholderMembers(placeholder, chunk);
         });
-        setBorderPopup(hits.length ? { point: [e.point.x, e.point.y], items: uniqueBoundaries(items), hint } : null);
+        setBorderPopup(
+          hits.length
+            ? { point: [e.point.x, e.point.y], lngLat: [e.lngLat.lng, e.lngLat.lat], items: uniqueBoundaries(items), hint }
+            : null
+        );
       });
 
       setMapReady(true);
@@ -819,6 +826,8 @@ export default function MapView({
     map.on("movestart", onMoveStart);
     return () => map.off("movestart", onMoveStart);
   }, [mapReady]);
+
+  usePlaceMarker({ mapRef, mapReady, place });
 
   useMapHoverLabel({
     mapRef,
@@ -1305,7 +1314,21 @@ export default function MapView({
         }}
       />
       {hintOpen && <MapTip onDismiss={dismissHint} />}
-      {borderPopup && <BoundaryPopup popup={borderPopup} onClose={closePopup} width={size.w} height={size.h} />}
+      {borderPopup && (
+        <BoundaryPopup
+          popup={borderPopup}
+          onClose={closePopup}
+          width={size.w}
+          height={size.h}
+          onPlaceHistory={
+            onPlaceHistory &&
+            ((p) => {
+              setBorderPopup(null);
+              onPlaceHistory(p);
+            })
+          }
+        />
+      )}
       {stackList && (
         <ClusterList list={stackList} onSelect={selectFromStack} onClose={closeStack} width={size.w} height={size.h} />
       )}

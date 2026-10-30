@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
-import { humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
+import { NO_STATUS_LABEL, humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import { categoryLabel } from "../lib/categoryLabels";
 import { isUnhandledEscape } from "../lib/escapeKey";
+import { BoundaryNote, BoundarySource } from "./BoundaryText.jsx";
 import { sheetCover } from "../lib/mapInsets";
 import "./MapUi.css";
 
@@ -293,25 +294,40 @@ export function KeyIcon({ d, dash }) {
 
 // ---- a single boundary's details (used by the popup and the Borders list) ----
 
-function BoundaryDetails({ b }) {
+// `collapsed`: the note and source behind a "Note and source" disclosure (the
+// popup, so its "History of this place" stays in sight).
+function BoundaryDetails({ b, collapsed = false }) {
   const status = humaniseStatus(b.status);
+  const more = (
+    <>
+      <BoundaryNote note={b.note} className="mu-b-note" />
+      <BoundarySource source={b.source} className="mu-b-source" />
+    </>
+  );
   return (
     <>
       <p className="mu-b-status">
         <span className={`mu-swatch-line ${isDashedStatus(b.status) ? "is-flagged" : "is-solid"}`} aria-hidden="true" />
-        {status ?? "Source-dated border (no status flag)"}
+        {status ?? NO_STATUS_LABEL}
       </p>
-      {b.note && <p className="mu-b-note">{b.note}</p>}
-      {b.source && (
-        <p className="mu-b-source">
-          <strong>Source:</strong> {b.source}
-        </p>
+      {collapsed && (b.note || b.source) ? (
+        <details className="mu-b-more">
+          <summary>
+            {b.note ? "Note and source" : "Source"}
+            <span className="mu-sr"> for {b.name}</span>
+          </summary>
+          {more}
+        </details>
+      ) : (
+        more
       )}
     </>
   );
 }
 
-export function BoundaryPopup({ popup, onClose, width, height }) {
+// `onPlaceHistory({lon, lat})` (optional): "History of this place" for the
+// clicked point (popup.lngLat), every year's borders there (PlaceHistory.jsx).
+export function BoundaryPopup({ popup, onClose, width, height, onPlaceHistory }) {
   const ref = useRef(null);
   useEffect(() => {
     const onKey = (e) => {
@@ -346,9 +362,20 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
         <section key={`${b.name}|${b.start_year}|${b.end_year}`} className="mu-b-item">
           <h3 className="mu-b-name">{b.name}</h3>
           <p className="mu-b-years">{yearsLabel(b)}</p>
-          <BoundaryDetails b={b} />
+          <BoundaryDetails b={b} collapsed />
         </section>
       ))}
+      {onPlaceHistory && popup.lngLat && (
+        <p className="mu-b-history">
+          <button
+            type="button"
+            className="mu-btn mu-btn-small"
+            onClick={() => onPlaceHistory({ lon: popup.lngLat[0], lat: popup.lngLat[1] })}
+          >
+            History of this place
+          </button>
+        </p>
+      )}
     </div>
   );
 }
