@@ -427,7 +427,7 @@
     "id": "fall-of-baghdad-1917",
     "title": "Capture of Baghdad (1917)",
     "date_start": "1917-03-11",
-    "date_end": null,
+    "date_end": "1917-03-11",
     "countries": [
       "Iraq"
     ],
@@ -578,8 +578,8 @@
   {
     "id": "iraqi-revolt-against-the-british",
     "title": "Iraqi Revolt",
-    "date_start": "1920-05-30",
-    "date_end": "1920-10-17",
+    "date_start": "1920-01-01",
+    "date_end": "1920-10-01",
     "countries": [
       "Iraq"
     ],
@@ -608,7 +608,8 @@
     "sitelinks_current": 23,
     "wikidata_aliases": [
       "Iraqi revolt against the British"
-    ]
+    ],
+    "date_precision": "year"
   },
   {
     "id": "treaty-of-s-vres",
@@ -864,8 +865,8 @@
   {
     "id": "great-syrian-revolt",
     "title": "Great Syrian Revolt",
-    "date_start": "1925-07-18",
-    "date_end": "1927-04-01",
+    "date_start": "1925-07-19",
+    "date_end": "1927-06-01",
     "countries": [
       "Syria"
     ],
@@ -898,7 +899,8 @@
       "Great Revolt of 1925–1927",
       "Syrian Revolution of 1925–1927",
       "1925–1927 Syrian Revolution"
-    ]
+    ],
+    "date_precision": "day"
   },
   {
     "id": "1929-palestine-riots",
@@ -948,8 +950,8 @@
   {
     "id": "unification-of-saudi-arabia",
     "title": "Formation of Saudi Arabia",
-    "date_start": "1932-09-23",
-    "date_end": null,
+    "date_start": "1902-01-01",
+    "date_end": "1932-01-01",
     "countries": [
       "Saudi Arabia"
     ],
@@ -974,12 +976,13 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "date_precision": "year"
   },
   {
     "id": "anglo-iraqi-treaty-1930",
     "title": "Anglo-Iraqi Treaty of 1930",
-    "date_start": "1932-10-03",
+    "date_start": "1930-06-30",
     "date_end": null,
     "countries": [
       "Iraq"
@@ -1003,18 +1006,16 @@
     ],
     "category_group": "treaty",
     "review_reasons": [],
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 1932 (1932-10-03) is not within 1 year of any year in the Wikipedia lead [1930, 1922, 1927]"
-    ],
-    "needs_review": true,
+    "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "date_precision": "day"
   },
   {
     "id": "1936-39-arab-revolt-in-palestine",
     "title": "1936–1939 Arab revolt in Palestine",
     "date_start": "1936-04-19",
-    "date_end": "1939-05-17",
+    "date_end": "1939-08-26",
     "countries": [
       "Israel/Palestine"
     ],
@@ -1059,7 +1060,7 @@
   {
     "id": "peel-commission",
     "title": "Peel Commission",
-    "date_start": "1936-11-01",
+    "date_start": "1936-08-01",
     "date_end": "1937-07-07",
     "countries": [
       "Israel/Palestine"
@@ -1088,12 +1089,13 @@
     "sitelinks_current": 24,
     "wikidata_aliases": [
       "Palestine Royal Commission"
-    ]
+    ],
+    "date_precision": "month"
   },
   {
     "id": "white-paper-of-1939",
     "title": "White Paper of 1939",
-    "date_start": "1939-05-17",
+    "date_start": "1939-01-01",
     "date_end": null,
     "countries": [
       "Israel/Palestine"
@@ -1122,7 +1124,8 @@
     "sitelinks_current": 23,
     "wikidata_aliases": [
       "McDonald White Paper"
-    ]
+    ],
+    "date_precision": "year"
   },
   {
     "id": "anglo-iraqi-war",
@@ -1388,7 +1391,7 @@
   {
     "id": "nakba",
     "title": "Nakba",
-    "date_start": "1948-05-15",
+    "date_start": "1948-01-01",
     "date_end": "1949-01-01",
     "countries": [
       "Israel/Palestine"
@@ -1435,12 +1438,13 @@
       "Al Naqba",
       "An-Nakba",
       "An Nakba"
-    ]
+    ],
+    "date_precision": "year"
   },
   {
     "id": "1949-armistice-agreements",
     "title": "1949 Armistice Agreements",
-    "date_start": "1949-02-24",
+    "date_start": "1949-01-01",
     "date_end": "1949-07-20",
     "countries": [
       "Israel/Palestine",
@@ -1472,7 +1476,8 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 21
+    "sitelinks_current": 21,
+    "date_precision": "year"
   },
   {
     "id": "jewish-exodus-from-the-muslim-world",
@@ -1737,7 +1742,7 @@
     "id": "north-yemen-civil-war",
     "title": "North Yemen civil war",
     "date_start": "1962-09-26",
-    "date_end": "1970-05-01",
+    "date_end": "1970-12-01",
     "countries": [
       "Yemen"
     ],
@@ -1787,7 +1792,7 @@
     "id": "1966-syrian-coup-d-tat",
     "title": "1966 Syrian coup d'état",
     "date_start": "1966-02-23",
-    "date_end": null,
+    "date_end": "1966-02-23",
     "countries": [
       "Syria"
     ],
@@ -2176,8 +2181,8 @@
   {
     "id": "1973-oil-crisis",
     "title": "1973 oil crisis",
-    "date_start": "1973-10-17",
-    "date_end": "1974-03-18",
+    "date_start": "1973-01-01",
+    "date_end": "1974-03-17",
     "countries": [
       "Saudi Arabia",
       "regional"
@@ -2204,7 +2209,8 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 60
+    "sitelinks_current": 60,
+    "date_precision": "year"
   },
   {
     "id": "lebanese-civil-war",
@@ -2739,8 +2745,8 @@
   {
     "id": "al-anfal-campaign",
     "title": "Al-Anfal campaign",
-    "date_start": "1986-02-23",
-    "date_end": "1989-09-06",
+    "date_start": "1986-01-01",
+    "date_end": "1989-01-01",
     "countries": [
       "Iraq"
     ],
@@ -2768,7 +2774,8 @@
       "title_differs_from_article: record title \"Al-Anfal campaign\" differs from the Wikipedia article title \"Anfal campaign\" and does not appear in its lead"
     ],
     "date_flags": [
-      "date_start_year_not_in_lead: start year 1986 (1986-02-23) is not within 1 year of any year in the Wikipedia lead [1988, 1993, 1991, 2007]"
+      "date_source_adjusted: Wikidata P585 1988-09-00 lies strictly between the item's start time (P580 1986-00-00) and end time (P582 1989-00-00); used P580 start time 1986-00-00",
+      "date_start_year_not_in_lead: start year 1986 (1986-01-01) is not within 1 year of any year in the Wikipedia lead [1988, 1993, 1991, 2007]"
     ],
     "needs_review": true,
     "location_quality": "precise",
@@ -2777,7 +2784,8 @@
       "Kurdish genocide",
       "Al-Anfal campaign",
       "Anfal genocide"
-    ]
+    ],
+    "date_precision": "year"
   },
   {
     "id": "gulf-war",
@@ -3505,7 +3513,7 @@
     "id": "arab-spring",
     "title": "Arab Spring",
     "date_start": "2010-12-18",
-    "date_end": "2012-01-01",
+    "date_end": "2012-12-01",
     "countries": [
       "regional"
     ],
@@ -3595,7 +3603,7 @@
     "id": "syrian-civil-war",
     "title": "Syrian civil war",
     "date_start": "2011-03-15",
-    "date_end": null,
+    "date_end": "2024-12-08",
     "countries": [
       "Syria"
     ],
@@ -3698,8 +3706,8 @@
   {
     "id": "egyptian-crisis-2011-2014",
     "title": "Egyptian Crisis (2011–2014)",
-    "date_start": "2012-06-30",
-    "date_end": "2014-06-08",
+    "date_start": "2011-01-25",
+    "date_end": "2014-05-01",
     "countries": [
       "Egypt"
     ],
@@ -3724,7 +3732,8 @@
     "review_reasons": [],
     "needs_review": false,
     "location_quality": "approximate",
-    "sitelinks_current": 10
+    "sitelinks_current": 10,
+    "date_precision": "day"
   },
   {
     "id": "yemeni-civil-war-2014-present",
@@ -4341,7 +4350,7 @@
     "id": "mahsa-amini-protests",
     "title": "Mahsa Amini protests",
     "date_start": "2022-09-16",
-    "date_end": "2023-01-01",
+    "date_end": "2023-09-01",
     "countries": [
       "Iran"
     ],

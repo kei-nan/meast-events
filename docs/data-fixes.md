@@ -478,3 +478,80 @@ put them outside the tracked set; the validator now rejects any event without a 
   `wikipedia_revid` 1379657240 still holds: that revision's parsed lead, normalised the same way, equals the new extract (checked live 2026-10-29).
   Its framing review's fingerprint (`text_sha1`) was updated to the new text (3cdaae19260a -> 6753ab5b901f): no word changed, and neither review
   finding is on the first sentence.
+
+## Wikidata date refresh of 2026-10-30: 24 drifted dates set to Wikidata's value (owner-approved)
+
+- Source: `node scripts/report-wikidata-drift.js` (live Wikidata, 2026-10-30) listed 55 differences in 39 events (21 `date_start`, 31 `date_end`,
+  1 coordinates, 2 classes) plus 15 the ledger explains. The owner approved setting drifted dates to Wikidata's value. Each item's date statements
+  were re-read with their ranks (`wbgetentities`, `props=claims`) and the date derived **as the pipeline derives it for a new event**: preferred
+  statements if the item has any, else normal ones, deprecated ignored (as `wdt:`); start = the earliest P585, else the earliest P580, then
+  `reconcileStartDate` (F2/F15); end = the latest P582; a coarse value stored as the 1st ("1920-00-00" -> 1920-01-01) with its precision in
+  `date_precision` (`keptDatePrecision`). Date flags, the `date_precision_coarse` / `month_precision_day_in_lead` / `lead_start_day_differs` notes
+  and `needs_review` were recomputed on the new dates as `scripts/lib/v21.js` `finalizeEvent` does. No ledger entry was added: the values are
+  Wikidata's own, so a later change on Wikidata is listed by the drift report again (a ledger field would hide it as "explained").
+- Not changed: any field the fix ledger sets (`scripts/lib/fixes.js`); a difference where Wikidata has **no** value (a stored date is not removed
+  because Wikidata has none); a hand-picked seed date that the English article's lead or infobox gives while Wikidata differs; an item whose
+  values are incoherent; coordinates and classes (report only). Titles and extracts are untouched, and so are the end dates of the six
+  "–present" events (none has a Wikidata end). `data/seed-events.json` (the original hand-typed list) is not edited, as for F13.
+- Every applied value was compared with the item's statement and with its English article: the lead (the stored extract) and the infobox at the
+  revision named (read 2026-10-30).
+
+| Event (QID) | Field | Old -> new | Wikidata | English Wikipedia |
+|---|---|---|---|---|
+| `fall-of-baghdad-1917` (Q2665637) | date_end | none -> 1917-03-11 | P582 1917-03-11 (day) | lead "(11 March 1917)"; infobox "8–11 March 1917" (rev 1374873756) |
+| `iraqi-revolt-against-the-british` (Q616851) | date_start | 1920-05-30 -> 1920-01-01, year | P585 1920 (year), taken before P580 1920-05 | infobox "May–October 1920" (rev 1381194751) |
+| | date_end | 1920-10-17 -> 1920-10-01 | P582 1920-10 (month) | lead "by the end of October 1920" |
+| `great-syrian-revolt` (Q1968718) | date_start | 1925-07-18 -> 1925-07-19, day | P580 1925-07-19 | lead "1925 to 1927"; infobox "1925–1927" (rev 1379976254) |
+| | date_end | 1927-04-01 -> 1927-06-01 | P582 1927-06 (month) | |
+| `unification-of-saudi-arabia` (Q251600) | date_start | 1932-09-23 -> 1902-01-01, year | P585 = P580 1902 (year) | lead "Unification began in 1902 and culminated in 1932"; infobox "First phase: 13 January 1902 – 23 September 1932" (rev 1382706872) |
+| | date_end | none -> 1932-01-01 | P582 1932 (year) | |
+| `anglo-iraqi-treaty-1930` (Q541372) | date_start | 1932-10-03 -> 1930-06-30, day | P585 1930-06-30 | lead names 1930, no day, no infobox (rev 1369404529); its `date_start_year_not_in_lead` flag and `title_years_outside_dates` warning are gone |
+| `1936-39-arab-revolt-in-palestine` (Q46057) | date_end | 1939-05-17 -> 1939-08-26 | P582 1939-08-26 (day) | infobox "19 April 1936 – 26 August 1939" (rev 1382040157) |
+| `peel-commission` (Q655894) | date_start | 1936-11-01 -> 1936-08-01, month | P580 1936-08 (month) | lead "appointed in 1936" (rev 1375537897) |
+| `white-paper-of-1939` (Q1501775) | date_start | 1939-05-17 -> 1939-01-01, year | P585 1939 (year) | lead "formal approval ... on 23 May 1939", neither the stored day nor a Wikidata value (rev 1357789658) |
+| `nakba` (Q3266633) | date_start | 1948-05-15 -> 1948-01-01, year | P585 1948 (year) | lead "the foundational events of the Nakba in 1948" (rev 1381546706) |
+| `1949-armistice-agreements` (Q999143) | date_start | 1949-02-24 -> 1949-01-01, year | P585 1949 (year) | lead names no date, no infobox (rev 1373406233) |
+| `north-yemen-civil-war` (Q521199) | date_end | 1970-05-01 -> 1970-12-01 | P582 1970-12-01 (day) | infobox "26 September 1962 – 1 December 1970" (rev 1378725652) |
+| `1966-syrian-coup-d-tat` (Q3560385) | date_end | none -> 1966-02-23 | P582 1966-02-23 (day) | lead "(21–23 February)"; infobox "21–23 February 1966" (rev 1373445341) |
+| `1973-oil-crisis` (Q316817) | date_start | 1973-10-17 -> 1973-01-01, year | P585 1973 (year), taken before P580 1973-10-16 | lead "In October 1973", no infobox (rev 1378160425) |
+| | date_end | 1974-03-18 -> 1974-03-17 | P582 1974-03-17 (day) | lead "In March 1974" |
+| `al-anfal-campaign` (Q529723) | date_start | 1986-02-23 -> 1986-01-01, year | P580 1986 (year): P585 1988-09 lies between P580 and P582, so `reconcileStartDate` takes P580 (`date_source_adjusted` added) | lead and infobox "February–September 1988" (rev 1377434227): the `date_start_year_not_in_lead` flag stays |
+| | date_end | 1989-09-06 -> 1989-01-01 | P582 1989 (year) | |
+| `arab-spring` (Q33761) | date_end | 2012-01-01 -> 2012-12-01 | P582 2012-12 (month) | infobox "17 December 2010 – December 2012" (rev 1382315239) |
+| `syrian-civil-war` (Q178810) | date_end | none -> 2024-12-08 | P582 2024-12-08 (day, normal rank) | lead "culminated in the fall of the Assad regime in December 2024"; infobox end date 2024-12-08 (rev 1382725076) |
+| `egyptian-crisis-2011-2014` (Q577539) | date_start | 2012-06-30 -> 2011-01-25, day | P580 2011-01-25 | lead "began with the 2011 Egyptian revolution" (rev 1382699726); its `title_years_outside_dates` warning is gone |
+| | date_end | 2014-06-08 -> 2014-05-01 | P582 2014-05 (month) | lead "ended with the presidency of Abdel Fattah el-Sisi in 2014" |
+| `mahsa-amini-protests` (Q114065797) | date_end | 2023-01-01 -> 2023-09-01 | P582 2023-09 (month) | infobox "16 September 2022 – 2023" (rev 1376655382) |
+
+- What the site shows: an end date appears as its year only, and an end on the start day not at all, so of the end changes only Formation of
+  Saudi Arabia (now 1902–1932) and the Syrian civil war (now 2011–2024; it was in its start year only) look different. Start dates now show at
+  Wikidata's precision: Great Syrian Revolt, Anglo-Iraqi Treaty and Egyptian Crisis to the day, Peel Commission to the month, the seven
+  year-precision ones as the year (as before: without `date_precision` a seed date already showed as the year only). Eleven seed events gained a
+  `date_precision` (seeds without one: 19 -> 8). `validate-events.js` warnings on the curated file: 178 -> 164, none new. Events without an end
+  date: 501 -> 497. `data/selection-funnel.json` (by decade) and `data/missing-coordinates-report.md` (dates column) were regenerated.
+
+### Differences left as they are (31)
+
+| Event (QID) | Field | Stored | Wikidata | Why not applied |
+|---|---|---|---|---|
+| `german-ottoman-alliance` (Q261982) | date_start | 1914-08-02 | P585 1914-07-20 | not drift: the value is in the **Julian** calendar (calendarmodel Q1985786), i.e. 2 August 1914 Gregorian, the stored date and the lead's ("August 2, 1914"). The report compares the raw value |
+| `armistice-of-erzincan` (Q28048694) | date_start | 1917-12-18 | P585 1917-12-05 | not drift: Julian, = 18 December 1917 Gregorian; lead "18 December 1917 (5 December O.S.)" |
+| `mcmahon-hussein-correspondence`, `national-pact`, `khartoum-resolution`, `iranian-green-movement` | date_start | | none | Wikidata has no P585/P580 |
+| `mcmahon-hussein-correspondence`, `1929-palestine-riots`, `peel-commission`, `nakba`, `1949-armistice-agreements`, `khartoum-resolution`, `israeli-disengagement-from-gaza`, `iranian-green-movement`, `fall-of-the-assad-regime` | date_end | | none | Wikidata has no P582: a stored end is not removed (the riots' 29 August 1929 is the infobox's, Peel's 7 July 1937 and the Fall of the Assad regime's 8 December 2024 are the lead's) |
+| `2024-israel-hezbollah-conflict` (Q122974556) | date_end | 2024-11-27 | none | no P582, and a "–present" title: not touched |
+| `fall-of-baghdad-1917` (Q2665637) | date_start | 1917-03-11 | P585 1917 (year); P580 1917-03-08 | the lead gives the stored date ("(11 March 1917)") |
+| `israeli-disengagement-from-gaza` (Q196122) | date_start | 2005-08-15 | P585 2005-08 (month) | the lead gives the stored date ("August 15, 2005") |
+| `iranian-revolution` (Q126065) | date_start, date_end | 1978-01-07, 1979-02-11 | P580 1978-01 (month), P585 1970 (decade); P582 1979-02 (month) | the infobox gives both stored dates, "7 January 1978 – 11 February 1979" (rev 1382707136) |
+| `balkan-wars` (Q165725) | date_end | 1913-08-10 | P582 1913-07-18 | the infobox gives the stored date, "8 October 1912 – 10 August 1913" (rev 1382825048) |
+| `arab-revolt` (Q239060) | date_end | 1918-10-25 | P582 1918-10 (month) | the infobox gives the stored date, "10 June 1916 – 25 October 1918" (rev 1380894633, cited by F14) |
+| `1948-palestine-war` (Q49097) | date_end | 1949-03-10 | P582 1949-07-20 | the lead gives the stored date ("30 November 1947 – 10 March 1949") |
+| `yom-kippur-war` (Q49100) | date_end | 1973-10-25 | P582 1973-10-26 | the lead gives the stored date ("6–25 October 1973") |
+| `armenian-genocide` (Q80034) | date_end | 1917-01-01 | P582 1923 (year) | the article gives the stored year: infobox "1915–1917" (rev 1382213148), lead "State-sponsored killings mostly ceased by early 1917"; 1923 is the lead's end of the prosecutions |
+| `1982-lebanon-war` (Q49103) | date_end | 1982-09-01 | P582 1985-05-17 | Wikidata contradicts the article: lead "ended its operation on 29 September 1982", infobox "6 June – 29 September 1982" (rev 1381378524); the shown year, 1982, is the article's |
+| `jewish-exodus-from-the-muslim-world` (Q276172) | date_start, date_end | 1948-01-01, 1972-01-01 | P585 2000 (century), P580 1930 (decade); P582 1970 (decade) | incoherent: the pipeline's start would be P585 "2000" at century precision (the 20th century), after the end (a reversed range); the lead says "from 1948 to the early 1970s" |
+| `operation-tariq-al-quds` (Q1382298) | coordinates | none | P625 31.7315, 48.0418 | coordinates are out of scope here (report only) |
+| `ottoman-entry-into-world-war-i` (Q1328496), `operation-aspides` (Q124618589) | classes | | new P31 | classes are out of scope here (report only) |
+
+- Monthly refresh: the drift report stays **report only**. A listed date difference is applied by hand, by the rule above, in a reviewed pull
+  request with an entry here; nothing applies it automatically.
+- Known false positive of the report: a Wikidata date in the Julian calendar (the two above) is compared as written, not converted.
