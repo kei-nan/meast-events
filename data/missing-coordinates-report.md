@@ -49,8 +49,8 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 30 | Italo-Turkish War | 1911-09-29 | 62 | pin at Turkey capital (approximate) | [article](https://en.wikipedia.org/wiki/Italo-Turkish_War) | [Q203824](https://www.wikidata.org/wiki/Q203824) |
 | 31 | 2014 Gaza War | 2014-01-01 | 61 | no location | [article](https://en.wikipedia.org/wiki/2014_Gaza_War) | [Q17324420](https://www.wikidata.org/wiki/Q17324420) |
 | 32 | Yemeni civil war (2014–present) | 2014-09-16 | 61 | pin at Yemen capital (approximate) | [article](https://en.wikipedia.org/wiki/Yemeni_civil_war_(2014%E2%80%93present)) | [Q19686631](https://www.wikidata.org/wiki/Q19686631) |
-| 33 | 1973 oil crisis | 1973-10-17 | 60 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/1973_oil_crisis) | [Q316817](https://www.wikidata.org/wiki/Q316817) |
-| 34 | Nakba | 1948-05-15 | 57 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Nakba) | [Q3266633](https://www.wikidata.org/wiki/Q3266633) |
+| 33 | 1973 oil crisis | 1973-01-01 | 60 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/1973_oil_crisis) | [Q316817](https://www.wikidata.org/wiki/Q316817) |
+| 34 | Nakba | 1948-01-01 | 57 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Nakba) | [Q3266633](https://www.wikidata.org/wiki/Q3266633) |
 | 35 | Arab Revolt | 1916-06-10 | 56 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/Arab_Revolt) | [Q239060](https://www.wikidata.org/wiki/Q239060) |
 | 36 | 1982 Lebanon War | 1982-06-06 | 55 | pin at Lebanon capital (approximate) | [article](https://en.wikipedia.org/wiki/1982_Lebanon_War) | [Q49103](https://www.wikidata.org/wiki/Q49103) |
 | 37 | Greco-Turkish War (1919–1922) | 1919-05-15 | 55 | no location | [article](https://en.wikipedia.org/wiki/Greco-Turkish_War_(1919%E2%80%931922)) | [Q87138](https://www.wikidata.org/wiki/Q87138) |
@@ -136,7 +136,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 117 | April 2019 Israeli legislative election | 2019-04-09 | 27 | no location | [article](https://en.wikipedia.org/wiki/April_2019_Israeli_legislative_election) | [Q24909108](https://www.wikidata.org/wiki/Q24909108) |
 | 118 | 2022 Israeli legislative election | 2022-11-01 | 27 | no location | [article](https://en.wikipedia.org/wiki/2022_Israeli_legislative_election) | [Q106181016](https://www.wikidata.org/wiki/Q106181016) |
 | 119 | 1998 bombing of Iraq | 1998-01-01 | 26 | no location | [article](https://en.wikipedia.org/wiki/1998_bombing_of_Iraq) | [Q1327861](https://www.wikidata.org/wiki/Q1327861) |
-| 120 | Great Syrian Revolt | 1925-07-18 | 26 | pin at Syria capital (approximate) | [article](https://en.wikipedia.org/wiki/Great_Syrian_Revolt) | [Q1968718](https://www.wikidata.org/wiki/Q1968718) |
+| 120 | Great Syrian Revolt | 1925-07-19 | 26 | pin at Syria capital (approximate) | [article](https://en.wikipedia.org/wiki/Great_Syrian_Revolt) | [Q1968718](https://www.wikidata.org/wiki/Q1968718) |
 | 121 | 1963 Syrian coup d'état | 1963-03-08 | 26 | no location | [article](https://en.wikipedia.org/wiki/1963_Syrian_coup_d'%C3%A9tat) | [Q2475925](https://www.wikidata.org/wiki/Q2475925) |
 | 122 | Operation Inherent Resolve | 2014-06-15 | 26 | no location | [article](https://en.wikipedia.org/wiki/Operation_Inherent_Resolve) | [Q18357664](https://www.wikidata.org/wiki/Q18357664) |
 | 123 | Black Sea Grain Initiative | 2022-07-22 | 26 | no location | [article](https://en.wikipedia.org/wiki/Black_Sea_Grain_Initiative) | [Q113295397](https://www.wikidata.org/wiki/Q113295397) |
@@ -153,17 +153,17 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 134 | Kurdish–Turkish conflict | 1921-03-06 | 25 | no location | [article](https://en.wikipedia.org/wiki/Kurdish%E2%80%93Turkish_conflict) | [Q6445763](https://www.wikidata.org/wiki/Q6445763) |
 | 135 | Yazidi genocide | 2014-08-01 | 25 | no location | [article](https://en.wikipedia.org/wiki/Yazidi_genocide) | [Q21190910](https://www.wikidata.org/wiki/Q21190910) |
 | 136 | 2019–2020 Iranian protests | 2019-11-15 | 25 | no location | [article](https://en.wikipedia.org/wiki/2019%E2%80%932020_Iranian_protests) | [Q75161062](https://www.wikidata.org/wiki/Q75161062) |
-| 137 | Peel Commission | 1936-11-01 | 24 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Peel_Commission) | [Q655894](https://www.wikidata.org/wiki/Q655894) |
+| 137 | Peel Commission | 1936-08-01 | 24 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Peel_Commission) | [Q655894](https://www.wikidata.org/wiki/Q655894) |
 | 138 | Balkan Pact (1953) | 1953-02-28 | 24 | no location | [article](https://en.wikipedia.org/wiki/Balkan_Pact_(1953)) | [Q805061](https://www.wikidata.org/wiki/Q805061) |
 | 139 | Treaty of Ankara (1921) | 1921-10-20 | 24 | no location | [article](https://en.wikipedia.org/wiki/Treaty_of_Ankara_(1921)) | [Q2358950](https://www.wikidata.org/wiki/Q2358950) |
 | 140 | 2018 Turkish presidential election | 2018-06-24 | 24 | no location | [article](https://en.wikipedia.org/wiki/2018_Turkish_presidential_election) | [Q51955238](https://www.wikidata.org/wiki/Q51955238) |
 | 141 | 2020 Israeli legislative election | 2020-03-02 | 24 | no location | [article](https://en.wikipedia.org/wiki/2020_Israeli_legislative_election) | [Q77929387](https://www.wikidata.org/wiki/Q77929387) |
 | 142 | Gaza war hostage crisis | 2023-10-01 | 24 | no location | [article](https://en.wikipedia.org/wiki/Gaza_war_hostage_crisis) | [Q123005094](https://www.wikidata.org/wiki/Q123005094) |
 | 143 | Treaty of Constantinople (1913) | 1913-09-29 | 23 | no location | [article](https://en.wikipedia.org/wiki/Treaty_of_Constantinople_(1913)) | [Q269606](https://www.wikidata.org/wiki/Q269606) |
-| 144 | Iraqi Revolt | 1920-05-30 | 23 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Iraqi_Revolt) | [Q616851](https://www.wikidata.org/wiki/Q616851) |
+| 144 | Iraqi Revolt | 1920-01-01 | 23 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Iraqi_Revolt) | [Q616851](https://www.wikidata.org/wiki/Q616851) |
 | 145 | Execution of Saddam Hussein | 2006-12-30 | 23 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Execution_of_Saddam_Hussein) | [Q1193136](https://www.wikidata.org/wiki/Q1193136) |
 | 146 | Franco-Turkish War | 1918-12-01 | 23 | no location | [article](https://en.wikipedia.org/wiki/Franco-Turkish_War) | [Q1450532](https://www.wikidata.org/wiki/Q1450532) |
-| 147 | White Paper of 1939 | 1939-05-17 | 23 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/White_Paper_of_1939) | [Q1501775](https://www.wikidata.org/wiki/Q1501775) |
+| 147 | White Paper of 1939 | 1939-01-01 | 23 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/White_Paper_of_1939) | [Q1501775](https://www.wikidata.org/wiki/Q1501775) |
 | 148 | Yemeni civil war (1994) | 1994-05-04 | 23 | no location | [article](https://en.wikipedia.org/wiki/Yemeni_civil_war_(1994)) | [Q2461485](https://www.wikidata.org/wiki/Q2461485) |
 | 149 | South Lebanon conflict (1985–2000) | 1985-02-16 | 23 | pin at Lebanon capital (approximate) | [article](https://en.wikipedia.org/wiki/South_Lebanon_conflict_(1985%E2%80%932000)) | [Q2479435](https://www.wikidata.org/wiki/Q2479435) |
 | 150 | 2014 Egyptian presidential election | 2014-05-28 | 23 | no location | [article](https://en.wikipedia.org/wiki/2014_Egyptian_presidential_election) | [Q14303464](https://www.wikidata.org/wiki/Q14303464) |
@@ -172,7 +172,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 153 | Middle Eastern crisis (2023–present) | 2023-10-07 | 23 | no location | [article](https://en.wikipedia.org/wiki/Middle_Eastern_crisis_(2023%E2%80%93present)) | [Q124373310](https://www.wikidata.org/wiki/Q124373310) |
 | 154 | September 2024 Israeli attacks against Lebanon | 2024-09-23 | 23 | no location | [article](https://en.wikipedia.org/wiki/September_2024_Israeli_attacks_against_Lebanon) | [Q130354504](https://www.wikidata.org/wiki/Q130354504) |
 | 155 | Operation Magic Carpet (Yemen) | 1949-06-01 | 22 | no location | [article](https://en.wikipedia.org/wiki/Operation_Magic_Carpet_(Yemen)) | [Q113016](https://www.wikidata.org/wiki/Q113016) |
-| 156 | Formation of Saudi Arabia | 1932-09-23 | 22 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/Formation_of_Saudi_Arabia) | [Q251600](https://www.wikidata.org/wiki/Q251600) |
+| 156 | Formation of Saudi Arabia | 1902-01-01 | 22 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/Formation_of_Saudi_Arabia) | [Q251600](https://www.wikidata.org/wiki/Q251600) |
 | 157 | Treaty of Saadabad | 1937-07-08 | 22 | no location | [article](https://en.wikipedia.org/wiki/Treaty_of_Saadabad) | [Q537143](https://www.wikidata.org/wiki/Q537143) |
 | 158 | 2013 Iranian presidential election | 2013-06-14 | 22 | no location | [article](https://en.wikipedia.org/wiki/2013_Iranian_presidential_election) | [Q626198](https://www.wikidata.org/wiki/Q626198) |
 | 159 | National Pact | 1943-11-22 | 22 | pin at Lebanon capital (approximate) | [article](https://en.wikipedia.org/wiki/National_Pact) | [Q748819](https://www.wikidata.org/wiki/Q748819) |
@@ -183,7 +183,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 164 | Operation Focus | 1967-06-05 | 21 | no location | [article](https://en.wikipedia.org/wiki/Operation_Focus) | [Q63863](https://www.wikidata.org/wiki/Q63863) |
 | 165 | 1991 Iraqi uprisings | 1991-01-01 | 21 | no location | [article](https://en.wikipedia.org/wiki/1991_Iraqi_uprisings) | [Q760002](https://www.wikidata.org/wiki/Q760002) |
 | 166 | 2006 Palestinian legislative election | 2006-01-25 | 21 | no location | [article](https://en.wikipedia.org/wiki/2006_Palestinian_legislative_election) | [Q977390](https://www.wikidata.org/wiki/Q977390) |
-| 167 | 1949 Armistice Agreements | 1949-02-24 | 21 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/1949_Armistice_Agreements) | [Q999143](https://www.wikidata.org/wiki/Q999143) |
+| 167 | 1949 Armistice Agreements | 1949-01-01 | 21 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/1949_Armistice_Agreements) | [Q999143](https://www.wikidata.org/wiki/Q999143) |
 | 168 | 1948 Palestinian expulsion and flight | 1948-01-01 | 21 | no location | [article](https://en.wikipedia.org/wiki/1948_Palestinian_expulsion_and_flight) | [Q13220089](https://www.wikidata.org/wiki/Q13220089) |
 | 169 | 2017 Iranian presidential election | 2017-05-19 | 21 | no location | [article](https://en.wikipedia.org/wiki/2017_Iranian_presidential_election) | [Q16052966](https://www.wikidata.org/wiki/Q16052966) |
 | 170 | 2022 Gaza–Israel clashes | 2022-08-01 | 21 | no location | [article](https://en.wikipedia.org/wiki/2022_Gaza%E2%80%93Israel_clashes) | [Q113453221](https://www.wikidata.org/wiki/Q113453221) |
@@ -371,7 +371,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 352 | 2025 Gaza Strip aid distribution killings | 2025-05-27 | 12 | no location | [article](https://en.wikipedia.org/wiki/2025_Gaza_Strip_aid_distribution_killings) | [Q134642893](https://www.wikidata.org/wiki/Q134642893) |
 | 353 | Prelude to the 2026 Iran war | 2026-01-13 | 12 | no location | [article](https://en.wikipedia.org/wiki/Prelude_to_the_2026_Iran_war) | [Q138300045](https://www.wikidata.org/wiki/Q138300045) |
 | 354 | Syrian occupation of Lebanon | 1976-05-31 | 11 | no location | [article](https://en.wikipedia.org/wiki/Syrian_occupation_of_Lebanon) | [Q64876](https://www.wikidata.org/wiki/Q64876) |
-| 355 | Anglo-Iraqi Treaty of 1930 | 1932-10-03 | 11 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Anglo-Iraqi_Treaty_of_1930) | [Q541372](https://www.wikidata.org/wiki/Q541372) |
+| 355 | Anglo-Iraqi Treaty of 1930 | 1930-06-30 | 11 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Anglo-Iraqi_Treaty_of_1930) | [Q541372](https://www.wikidata.org/wiki/Q541372) |
 | 356 | 1964 Hama riot | 1964-04-01 | 11 | no location | [article](https://en.wikipedia.org/wiki/1964_Hama_riot) | [Q617883](https://www.wikidata.org/wiki/Q617883) |
 | 357 | March 1949 Syrian coup d'état | 1949-03-29 | 11 | no location | [article](https://en.wikipedia.org/wiki/March_1949_Syrian_coup_d'%C3%A9tat) | [Q643510](https://www.wikidata.org/wiki/Q643510) |
 | 358 | Operation Uvda | 1949-03-05 | 11 | no location | [article](https://en.wikipedia.org/wiki/Operation_Uvda) | [Q931576](https://www.wikidata.org/wiki/Q931576) |
@@ -417,7 +417,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 398 | Southern Syria offensive (2024) | 2024-11-29 | 11 | no location | [article](https://en.wikipedia.org/wiki/Southern_Syria_offensive_(2024)) | [Q131366416](https://www.wikidata.org/wiki/Q131366416) |
 | 399 | Second Battle of al-Faw | 1988-04-17 | 10 | no location | [article](https://en.wikipedia.org/wiki/Second_Battle_of_al-Faw) | [Q82995](https://www.wikidata.org/wiki/Q82995) |
 | 400 | Kuwaiti protests (2011–2012) | 2011-01-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/Kuwaiti_protests_(2011%E2%80%932012)) | [Q428733](https://www.wikidata.org/wiki/Q428733) |
-| 401 | Egyptian Crisis (2011–2014) | 2012-06-30 | 10 | pin at Egypt capital (approximate) | [article](https://en.wikipedia.org/wiki/Egyptian_Crisis_(2011%E2%80%932014)) | [Q577539](https://www.wikidata.org/wiki/Q577539) |
+| 401 | Egyptian Crisis (2011–2014) | 2011-01-25 | 10 | pin at Egypt capital (approximate) | [article](https://en.wikipedia.org/wiki/Egyptian_Crisis_(2011%E2%80%932014)) | [Q577539](https://www.wikidata.org/wiki/Q577539) |
 | 402 | 2015 Egyptian parliamentary election | 2015-10-17 | 10 | no location | [article](https://en.wikipedia.org/wiki/2015_Egyptian_parliamentary_election) | [Q627548](https://www.wikidata.org/wiki/Q627548) |
 | 403 | 2001 Iranian presidential election | 2001-06-08 | 10 | no location | [article](https://en.wikipedia.org/wiki/2001_Iranian_presidential_election) | [Q660173](https://www.wikidata.org/wiki/Q660173) |
 | 404 | 2004 Ashura massacre | 2004-03-02 | 10 | no location | [article](https://en.wikipedia.org/wiki/2004_Ashura_massacre) | [Q722990](https://www.wikidata.org/wiki/Q722990) |

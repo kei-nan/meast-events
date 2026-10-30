@@ -11,6 +11,8 @@ rather than a second layer of ours. Concretely:
   other countries than Wikidata's, and 30 seed start dates were none of the item's Wikidata P585/P580 values, 11 of them
   checked against the article, `docs/data-fixes.md` F14). They are kept as they are; each such event says so on the site
   ("Hand-picked event: ... its dates and countries were typed by hand for that list, so they can differ from Wikidata's").
+  Since the owner-approved Wikidata date refresh of 2026-10-30 (`docs/data-fixes.md`), a seed date that differs from Wikidata is set to Wikidata's
+  value unless the article's lead or infobox gives the stored date (24 dates of 19 seed events changed; the rest are listed there with the reason).
 - Automated checks only **flag** (a note in `review_reasons` or `date_flags`); they never overwrite, "correct" or
   silently drop an event on judgement of its content. The exceptions are the few individually verified fixes listed
   with evidence in `docs/data-fixes.md`.
@@ -388,7 +390,7 @@ The counts are refreshed monthly with the extracts (`scripts/refresh-sitelinks.j
 
 ## Ongoing events
 
-An event with no end date (`date_end` empty: 501 of 815 events on 2026-10-30) counts on the timeline in its **start year only**: a missing end
+An event with no end date (`date_end` empty: 497 of 815 events on 2026-10-30, after that day's Wikidata date refresh) counts on the timeline in its **start year only**: a missing end
 is not read as "still going on". The one exception is an event **a source says is still going on**:
 
 1. its English Wikipedia article title says "present" as the end of a span ("Yemeni civil war (2014–present)"; the `title` field matched against
@@ -412,8 +414,8 @@ ongoing by hand.
 On 2026-10-30 six events matched, all by their title: Yemeni civil war (2014–present), Iraqi insurgency (2017–present), Israeli blockade of the
 Gaza Strip (2023–present), Attacks on Jabalia refugee camp (2023–present), Middle Eastern crisis (2023–present) and Israeli invasion of Syria
 (2024–present). None matched through Wikidata: of the 815 items, the only P582 without a date was a deprecated "unknown value" on Q137612545
-(2025–2026 Iranian protests), which is ignored as every deprecated statement is. Events with no end date and neither signal, such as the
-Syrian civil war (stored end empty; title without "present"), still count in their start year only.
+(2025–2026 Iranian protests), which is ignored as every deprecated statement is. Events with no end date and neither signal still count in their start year only
+(the Syrian civil war, the example here before, now has Wikidata's end 2024-12-08, set by the Wikidata date refresh of 2026-10-30).
 
 ## Event classes
 
@@ -659,6 +661,7 @@ node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_curr
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
 node scripts/report-wikidata-drift.js [--report=path]   # monthly REPORT ONLY (automatic): curated events whose dates, coordinates or
                                                         #    classes differ from their Wikidata item now; writes no data file
+                                                        #    (a listed date is applied by hand in a reviewed PR, docs/data-fixes.md)
 node scripts/build-selection-funnel.js [--check|--offline] # -> data/selection-funnel.json (dated by its input data, not the clock;
                                                         #    --offline keeps the committed sitelink_measurement, no network)
 node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)
@@ -706,7 +709,7 @@ P580 "+2000" at century precision, i.e. the 20th century, stored as 2000-01-01);
 `wikipedia_url` or an identical extract, naming the other event (since 2026-10-24 also when all but one of them are events without an article of their own,
 whose `resolved_qid` differs, see above; the warning then says which one is the article's own event; since 2026-10-29 a shared `wikipedia_url` with
 two or more of the article's own events is an **error**). Since 2026-10-24 also: a hand-picked seed event without
-`date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value; 19 left after its 2026-10-24 `--apply`), a year in the title outside `date_start`..`date_end`
+`date_precision` (its date shows as the year only; `scripts/enrich-seed.js` proposes the Wikidata value; 19 left after its 2026-10-24 `--apply`, 8 after the Wikidata date refresh of 2026-10-30), a year in the title outside `date_start`..`date_end`
 (`title_years_outside_dates`), and a precise pin rounded to at most one decimal place (`coordinate_low_precision`); both are also pipeline flags, see
 "Review flags". Since 2026-10-30 also, likewise pipeline flags: no `date_end` on an event whose title says it is ongoing ("–present",
 `title_present_no_end`), and no `date_end` on an event of a Wikidata class that lasts a span of time (war, civil war, proxy war, insurgency, intifada,
