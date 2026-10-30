@@ -38,7 +38,8 @@
 // versioned folder like the events', named in src/lib/dataVersion.js and in
 // boundaries/meta.json; see splitBoundaries): the map needs only the year shown.
 // MIN_YEAR/MAX_YEAR (src/lib/years.js, shared with the app) bound which decade
-// chunks are ever requested.
+// chunks are ever requested. The same folder has history.tbin, every boundary
+// feature once, for "What was this place?" (src/lib/placeHistory.js).
 //
 // GEOMETRY files (boundaries and land) are written in the binary topology format of
 // src/lib/geoCodec.js (.tbin), not JSON: about half the bytes for the same vertices.
@@ -353,8 +354,23 @@ async function splitBoundaries() {
       };
       return { decade, fc, encoded: encodeGeoChecked(`boundaries/${decade}.tbin`, fc) };
     });
+  // history.tbin: every boundary feature ONCE (no placeholder), for "What was this
+  // place?" (src/lib/placeHistory.js), which tests one point against every year's
+  // borders. The decade chunks repeat a long-lived geometry in each decade it
+  // spans: all 13 were 406 KB brotli against 63 KB for this file (October 2026).
+  // Full geometry, as in the chunks; the deferred members point to the same shared
+  // file (with their bbox), loaded only for a point inside that bbox.
+  const historyFc = {
+    type: "FeatureCollection",
+    features: raw.features.map((f) => {
+      if (!sharedRefs.has(f)) return f;
+      return { type: "Feature", properties: f.properties, geometry: null, geometry_ref: sharedRefs.get(f), bbox: deferred.members.get(f).bbox };
+    }),
+  };
+  const history = encodeGeoChecked("boundaries/history.tbin", historyFc);
   const versionHash = createHash("sha256");
   for (const { decade, encoded } of chunks) versionHash.update(`${decade}\0`).update(encoded.bytes).update("\0");
+  versionHash.update("history\0").update(history.bytes).update("\0");
   const version = versionHash.digest("hex").slice(0, 12);
   const dir = `v.${version}`;
 
@@ -362,7 +378,8 @@ async function splitBoundaries() {
   for (const { decade, fc, encoded } of chunks) {
     totalBytes += (await writeGeo(path.join(OUT_DIR, "boundaries", dir, `${decade}.tbin`), fc, encoded)).length;
   }
-  totalBytes += sharedBytes;
+  const historyBytes = (await writeGeo(path.join(OUT_DIR, "boundaries", dir, "history.tbin"), historyFc, history)).length;
+  totalBytes += historyBytes + sharedBytes;
 
   await writeJSON(path.join(OUT_DIR, "boundaries", "meta.json"), {
     decadeSize: DECADE_SIZE,
@@ -374,7 +391,8 @@ async function splitBoundaries() {
   });
 
   console.log(
-    `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks (boundaries/${dir}/) + ${groups.size} deferred group file(s) ` +
+    `boundaries: ${raw.features.length} features -> ${byDecade.size} decade chunks (boundaries/${dir}/) + history.tbin ` +
+      `(${(historyBytes / 1024).toFixed(0)}KB) + ${groups.size} deferred group file(s) ` +
       `(${sharedRefs.size} geometries), ` +
       `${(totalBytes / 1024).toFixed(0)}KB total (source was ${(
         (await readFile(BOUNDARIES_FILE)).length / 1024

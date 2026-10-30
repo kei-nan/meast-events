@@ -105,6 +105,7 @@ function fixture() {
   write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const BOUNDARIES_VERSION="${BVERSION}";const SEARCH_DIR="${SEARCH_DIR}";`);
   write("data/boundaries/meta.json", { decades: [1950], version: BVERSION, dir: BDIR });
   write(`data/boundaries/${BDIR}/1950.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#1" }, { type: "Feature", properties: {}, geometry: polygon }])));
+  write(`data/boundaries/${BDIR}/history.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#0" }, { type: "Feature", properties: {}, geometry: polygon }])));
   write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([0, 1].map(() => ({ type: "Feature", properties: {}, geometry: polygon })))));
   write("data/land.tbin", tbin(fc([], { cells: ["n30e030"] })));
   write("data/land-far.tbin", tbin(fc()));
@@ -198,6 +199,13 @@ test("boundaries and land: a missing or undecodable geometry file, shared geomet
   await assertProblem((f) => f.write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([{ type: "Feature", properties: {}, geometry: polygon }]))), /aaaaaaaaaaaa\.tbin has no geometry 1/);
   await assertProblem((f) => f.remove(`data/boundaries/${BDIR}/1950.tbin`), /data\/boundaries\/v\.fedcba987654\/1950\.tbin is missing/);
   await assertProblem((f) => f.write(`data/boundaries/${BDIR}/1950.tbin`, fc()), /1950\.tbin does not decode: geoCodec: not a \.tbin file/);
+  // history.tbin ("What was this place?"): there, a FeatureCollection, its shared geometries there too.
+  await assertProblem((f) => f.remove(`data/boundaries/${BDIR}/history.tbin`), /v\.fedcba987654\/history\.tbin is missing/);
+  await assertProblem((f) => f.write(`data/boundaries/${BDIR}/history.tbin`, tbin(polygon)), /history\.tbin is not a FeatureCollection/);
+  await assertProblem(
+    (f) => f.write(`data/boundaries/${BDIR}/history.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "bbbbbbbbbbbb#0" }]))),
+    /history\.tbin points to missing shared geometry bbbbbbbbbbbb#0/
+  );
   await assertProblem((f) => f.remove("data/land-far.tbin"), /data\/land-far\.tbin is missing/);
   await assertProblem((f) => f.write("data/land-far.tbin", tbin(polygon)), /land-far\.tbin is not a FeatureCollection/);
   await assertProblem((f) => f.remove("data/land-cells/n30e030.tbin"), /land-cells\/n30e030\.tbin is missing/);

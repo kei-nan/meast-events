@@ -396,6 +396,30 @@
   color: #4a4030;
   overflow-wrap: anywhere;
 }
+/* The point "What was this place?" describes (usePlaceMarker.js): a diamond,
+   as the Nearby compass marks its centre. Never a ring-and-cross shape. */
+.mu-place-marker {
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+.mu-place-marker-shape {
+  display: block;
+  width: 13px;
+  height: 13px;
+  margin: 2px;
+  box-sizing: border-box;
+  background: #c99a45;
+  border: 2px solid #2b2418;
+  box-shadow: 0 0 0 2px rgba(255, 250, 238, 0.85);
+  transform: rotate(45deg);
+}
+/* "History of this place" (PlaceHistory.jsx), under the shapes it goes beyond. */
+.mu-b-history {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid #c9bfa8;
+}
 
 /* The Map key's button and panel are items of the right-hand column itself, so
    the opened panel goes under the "Borders as of" years (it does not push

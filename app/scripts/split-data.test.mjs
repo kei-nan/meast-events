@@ -251,7 +251,10 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     assert.match(bmeta.version, /^[0-9a-f]{12}$/);
     assert.equal(bmeta.dir, `v.${bmeta.version}`);
     assert.deepEqual(fs.readdirSync(path.join(r.out, "boundaries")).sort(), [bmeta.dir, "meta.json", "shared"].sort());
-    assert.deepEqual(fs.readdirSync(path.join(r.out, "boundaries", bmeta.dir)).sort(), bmeta.decades.map((d) => `${d}.tbin`).sort());
+    assert.deepEqual(
+      fs.readdirSync(path.join(r.out, "boundaries", bmeta.dir)).sort(),
+      [...bmeta.decades.map((d) => `${d}.tbin`), "history.tbin"].sort()
+    );
     // Land cells: a file for exactly the cells listed, and none listed whose 1:10m land
     // is just its light pieces (src/data/land.json and land-cells/, the real ones).
     const land = decodeGeo(fs.readFileSync(path.join(r.out, "land.tbin")));
@@ -273,6 +276,16 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     assert.ok(members.every((f) => f.geometry === null && f.minzoom === DEFERRED_GROUPS[0].minzoom && f.bbox.length === 4));
     const shared = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", "shared", `${hash}.tbin`)));
     assert.deepEqual(shared.features.map((f) => f.geometry), members.map(() => square(35, 31)));
+    // history.tbin: every source feature once, in order, no placeholder; the deferred
+    // members point to the same shared geometries (with their bbox), the rest carry theirs.
+    const history = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", bmeta.dir, "history.tbin")));
+    const source = deferredFixture();
+    assert.deepEqual(history.features.map((f) => f.properties.name), source.map((f) => f.properties.name));
+    assert.ok(history.features.every((f) => !f.properties.placeholder_for));
+    const lazy = history.features.filter((f) => f.geometry_ref);
+    assert.deepEqual(lazy.map((f) => f.geometry_ref), members.map((f) => f.geometry_ref));
+    assert.ok(lazy.every((f) => f.geometry === null && f.bbox.length === 4 && f.minzoom === undefined));
+    assert.deepEqual(history.features.filter((f) => !f.geometry_ref).map((f) => f.geometry), source.filter((f) => !DEFERRED_GROUPS[0].members.includes(f.properties.name)).map((f) => f.geometry));
   } finally {
     r.cleanup();
   }

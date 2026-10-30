@@ -308,6 +308,27 @@ test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shar
   assert.equal(count(calls, chunk(BV1, 1990)), 2);
 });
 
+test("loadBoundaryHistory: one shared request, deferred members left pending, a failure evicted", async () => {
+  const { loadBoundaryHistory } = await freshClient();
+  const geom = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] };
+  let ok = false;
+  const calls = stubFetch({
+    [chunk(BV1, "history")]: () =>
+      ok
+        ? tbin(fc({ properties: { name: "A" }, geometry: geom }, { properties: { name: "B" }, geometry: null, geometry_ref: "h2#0", bbox: [0, 0, 1, 1] }))
+        : json({}, 503),
+  });
+  await assert.rejects(loadBoundaryHistory(), (e) => e.outage === true);
+  ok = true;
+  const [a, b] = await Promise.all([loadBoundaryHistory(), loadBoundaryHistory()]);
+  assert.equal(a, b);
+  assert.deepEqual(a.features[0].geometry, geom);
+  assert.equal(a.features[1].geometry, null);
+  assert.equal(a.features[1].geometry_ref, "h2#0");
+  assert.equal(count(calls, chunk(BV1, "history")), 2);
+  assert.equal(count(calls, "/data/boundaries/shared/h2.tbin"), 0);
+});
+
 test("loadBoundaryDecade: a file without features is evicted and refetched", async () => {
   const { loadBoundaryDecade } = await freshClient();
   let good = false;

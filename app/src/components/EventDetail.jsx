@@ -13,6 +13,7 @@ import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
 import { countryLabel, countryShading, eventBorderYear } from "../lib/eventCountries.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
+import { eventCoords } from "../lib/geo.js";
 import { categorySourceParts, categorySummary } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
@@ -187,11 +188,12 @@ function LoadingNote() {
  * its button is shown on narrow screens only (SidePanel.css).
  * `onSelectEvent(id)` opens another event (the "Part of", "Includes" and related links).
  * `borderYear` is the year whose borders the map draws (for the shading note).
+ * `onPlaceHistory({lon, lat})` (optional) opens "What was this place?" for the event's point.
  * Memoized (default export): App re-renders on every Play step, map move and
  * hover, and this view re-splits and marks its whole lead each render; keep
  * its props stable (SearchPanel's onShowOnMap is a useCallback).
  */
-function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent }) {
+function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent, onPlaceHistory }) {
   const headingRef = useRef(null);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
@@ -432,6 +434,19 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
       {/* Only with the full record: until it arrives, an empty tab's reason could be wrong. */}
       {!event.leadStatus && (
         <RelatedEvents event={event} tab={relatedTab} onTab={setRelatedTab} onSelectEvent={onSelectEvent} />
+      )}
+      {/* "What was this place?" for the event's own point: precise locations only,
+          as for Nearby (an approximate marker is not where the event happened). */}
+      {onPlaceHistory && quality === "precise" && eventCoords(event) && (
+        <section className="event-detail-section event-detail-place" aria-labelledby="event-detail-place-title">
+          <h3 id="event-detail-place-title">This place over time</h3>
+          <p className="event-detail-place-text">
+            The map&apos;s border shapes at this event&apos;s location in each year from {MIN_YEAR}, and the events near it.
+          </p>
+          <button type="button" className="sp-btn" onClick={() => onPlaceHistory(eventCoords(event))}>
+            History of this place
+          </button>
+        </section>
       )}
       <CitationPrint event={event} />
       <section className="event-detail-section event-detail-about" aria-labelledby="event-detail-about-title">

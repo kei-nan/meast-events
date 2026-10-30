@@ -13,7 +13,8 @@
 //   about=1 (the "About the data" dialog is open),
 //   sort=coverage-asc|date|date-desc (browse list order, lib/browseOrder.js; the
 //   default, most covered first, is omitted),
-//   view=timeline (the results panel's Timeline view; the default list is omitted)
+//   view=timeline (the results panel's Timeline view; the default list is omitted),
+//   place=lon,lat ("What was this place?" is open for that point, lib/placeParam.js)
 //
 // Older links put the event in the query, /?e=<id>: still read (the path wins
 // if both are given), and rewritten to /event/<id> by the next URL write.
@@ -22,6 +23,7 @@ import { SORTS } from "./browseOrder.js";
 import { CATEGORY_LABELS } from "./categoryLabels.js";
 import { COUNTRY_SHAPES } from "./eventCountries.js";
 import { MAX_RADIUS_KM, makeCircleArea, makeRectArea } from "./geo.js";
+import { parsePlace, placeToParam } from "./placeParam.js";
 import { MAX_YEAR, MIN_YEAR } from "./years.js";
 
 export const YEAR_MIN = MIN_YEAR;
@@ -129,7 +131,7 @@ export function areaToParam(area) {
   return null;
 }
 
-// -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort, view}
+// -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort, view, place}
 export function parseUrlState(search, pathname = "/") {
   const p = new URLSearchParams(search);
   let q = p.get("q") ?? "";
@@ -159,12 +161,13 @@ export function parseUrlState(search, pathname = "/") {
     about: p.get("about") === "1",
     sort: SORTS.includes(p.get("sort")) ? p.get("sort") : "coverage",
     view: p.get("view") === "timeline" ? "timeline" : "list",
+    place: parsePlace(p.get("place")),
   };
 }
 
 const enc = (v) => encodeURIComponent(v).replace(/%2C/g, ",").replace(/%3A/g, ":");
 
-// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view}
+// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view, place}
 // -> the query string: "" or "?a=b&..." (defaults omitted so the bare URL stays
 // clean). The event is not in it: it is the path (stateUrl).
 export function serializeUrlState(state) {
@@ -188,6 +191,8 @@ export function serializeUrlState(state) {
   if (state.about) parts.push("about=1");
   if (SORTS.includes(state.sort) && state.sort !== "coverage") parts.push(`sort=${state.sort}`);
   if (state.view === "timeline") parts.push("view=timeline");
+  const place = placeToParam(state.place);
+  if (place) parts.push(`place=${place}`);
   return parts.length ? `?${parts.join("&")}` : "";
 }
 
@@ -216,16 +221,16 @@ export function parseUrl(url) {
 // Closing an event or About is then an undo: useUrlState goes back to that
 // entry (and gives it the current view) instead of pushing a copy of it, so the
 // browser's Back does not re-open what was just closed.
+// Opening or closing "What was this place?" (or moving it to another point) is
+// a push too, like an event: the browser's Back closes it.
+const samePush = (a, b) => a.eventId === b.eventId && a.about === b.about && placeToParam(a.place) === placeToParam(b.place);
 export function urlWriteMode(prevUrl, nextUrl, { replace = false, backUrl = null } = {}) {
   if (nextUrl === prevUrl) return null;
   const prev = parseUrl(prevUrl);
   const next = parseUrl(nextUrl);
-  if (prev.eventId === next.eventId && prev.about === next.about) return "debounce";
+  if (samePush(prev, next)) return "debounce";
   if (replace) return "replace";
-  if (typeof backUrl === "string") {
-    const back = parseUrl(backUrl);
-    if (back.eventId === next.eventId && back.about === next.about) return "back";
-  }
+  if (typeof backUrl === "string" && samePush(parseUrl(backUrl), next)) return "back";
   return "push";
 }
 
@@ -246,7 +251,7 @@ export function areaRoundTrips(area) {
 // `prevUrl` is the current entry's URL, `state` the new state (as for stateUrl).
 export function entryBeforePush(prevUrl, state) {
   const prev = parseUrl(prevUrl);
-  const carried = stateUrl({ ...state, eventId: prev.eventId, about: prev.about });
+  const carried = stateUrl({ ...state, eventId: prev.eventId, about: prev.about, place: prev.place });
   return carried === prevUrl ? null : carried;
 }
 

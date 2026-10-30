@@ -1,0 +1,172 @@
+/* "What was this place?" (PlaceHistory.jsx), in the side panel like an open
+   event: it uses the event view's frame (.event-detail, its action row and
+   sections, SidePanel.css) and the Nearby compass (.rel-*); these are its own
+   parts. */
+
+.ph-kicker {
+  margin: 6px 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.ph-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ph-loading {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* The periods: a vertical line through the years, one entry per period. */
+.ph-periods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ph-period {
+  position: relative;
+  padding: 0 0 12px 16px;
+  border-left: 2px solid var(--border);
+}
+
+.ph-period::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 12px;
+  width: 10px;
+  height: 10px;
+  background: var(--bg-1);
+  border: 2px solid var(--text-tertiary);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.ph-period.is-on-map::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.ph-period-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-bottom: 4px;
+}
+
+.ph-years {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* Not clickable: a small outline tag (docs/design-contract.md "Controls"). */
+.ph-tag {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-field);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.ph-shape + .ph-shape {
+  margin-top: 8px;
+}
+
+.ph-name {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.ph-status {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* The map's two line styles (mapBorders.js BORDER_STYLE): solid for a
+   source-dated border, dashed for a status flag; lighter for the dark panel. */
+.ph-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.ph-swatch.is-solid {
+  border-top: 2px solid var(--text-tertiary);
+}
+
+.ph-swatch.is-flagged {
+  border-top: 3px dashed var(--accent);
+}
+
+.ph-blank {
+  margin: 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.ph-more {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+}
+
+.ph-more summary {
+  cursor: pointer;
+  color: var(--link);
+  width: fit-content;
+}
+
+.ph-more summary:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.ph-record {
+  margin: 6px 0 0;
+  padding-left: 9px;
+  border-left: 2px solid var(--border);
+}
+
+.ph-record-years {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ph-note {
+  margin: 2px 0 0;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+}
+
+.ph-source {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.ph-foot {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.ph-all {
+  margin: 10px 0 0;
+}

@@ -132,23 +132,39 @@ function loadSharedGeometry(ref) {
 // lib/deferredBoundaries.js), which stay pending until the map asks for them
 // with loadDeferredGeometry.
 // Concurrent/repeat callers share one load per decade.
-const boundaryDecades = new Map(); // decade -> Promise<FeatureCollection>
+const boundaryDecades = new Map(); // decade | "history" -> Promise<FeatureCollection>
 let boundariesVersion = BOUNDARIES_VERSION;
+// boundaries/v.<version>/<name>.tbin, with the meta.json fallback described above.
+function loadBoundaryFile(name) {
+  const check = (fc) => {
+    if (!Array.isArray(fc?.features)) throw new Error("boundaries file has no features");
+  };
+  const chunk = (version) => fetchGeoCached(`boundaries/v.${version}/${name}`, { check });
+  const tried = boundariesVersion;
+  return chunk(tried).catch(async (err) => {
+    if (err.outage !== false) throw err;
+    const meta = await fetchJSON(dataUrl("boundaries/meta.json"), { cache: "no-cache" });
+    if (!meta?.version || meta.version === tried) throw err;
+    boundariesVersion = meta.version;
+    return chunk(meta.version);
+  });
+}
+
+// Every boundary feature once (history.tbin, split-data.mjs), for "What was this
+// place?" (lib/placeHistory.js). Deferred members stay pending (`geometry_ref`
+// and `bbox`): loadDeferredGeometry brings one in when a point is inside its bbox.
+export function loadBoundaryHistory() {
+  if (!boundaryDecades.has("history")) {
+    const promise = loadBoundaryFile("history");
+    promise.catch(() => boundaryDecades.delete("history"));
+    boundaryDecades.set("history", promise);
+  }
+  return boundaryDecades.get("history");
+}
+
 export function loadBoundaryDecade(decade) {
   if (!boundaryDecades.has(decade)) {
-    const check = (fc) => {
-      if (!Array.isArray(fc?.features)) throw new Error("boundaries file has no features");
-    };
-    const chunk = (version) => fetchGeoCached(`boundaries/v.${version}/${decade}`, { check });
-    const tried = boundariesVersion;
-    const promise = chunk(tried)
-      .catch(async (err) => {
-        if (err.outage !== false) throw err;
-        const meta = await fetchJSON(dataUrl("boundaries/meta.json"), { cache: "no-cache" });
-        if (!meta?.version || meta.version === tried) throw err;
-        boundariesVersion = meta.version;
-        return chunk(meta.version);
-      })
+    const promise = loadBoundaryFile(decade)
       .then(async (fc) => {
         const features = await Promise.all(
           fc.features.map(async (f) => {

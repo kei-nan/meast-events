@@ -10,8 +10,9 @@
 //     every event's full record is in the bucket its id hashes to;
 //   - every geometry file (.tbin) the app is pointed to exists and decodes: each
 //     decade's boundaries (in the versioned folder boundaries/v.<BOUNDARIES_VERSION>/,
-//     which boundaries/meta.json and the built JavaScript name too, and no other)
-//     and the shared geometries they name, the land and its cells;
+//     which boundaries/meta.json and the built JavaScript name too, and no other),
+//     history.tbin beside them ("What was this place?") and the shared geometries
+//     they name, the land and its cells;
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - every event has its page, and each is the app: the same /assets/ as index.html;
 //   - the search index (Pagefind) was built into the versioned folder
@@ -183,8 +184,10 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
       fail(`no dist/assets/*.js contains BOUNDARIES_VERSION ${BOUNDARIES_VERSION} (the bundle was built against another dataVersion.js)`);
     }
   }
-  for (const d of bmeta.decades) {
-    for (const f of readGeo(`data/boundaries/${bdir}/${d}.tbin`)?.features ?? []) {
+  for (const d of [...bmeta.decades, "history"]) {
+    const geo = readGeo(`data/boundaries/${bdir}/${d}.tbin`);
+    if (geo && !Array.isArray(geo.features)) fail(`data/boundaries/${bdir}/${d}.tbin is not a FeatureCollection`);
+    for (const f of geo?.features ?? []) {
       if (!f.geometry_ref) continue;
       const [file, index = "0"] = f.geometry_ref.split("#");
       const rel = `data/boundaries/shared/${file}.tbin`;

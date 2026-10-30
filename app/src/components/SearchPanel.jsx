@@ -7,9 +7,9 @@ import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
 import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
 import { CATEGORY_COLORS } from "./mapLayers";
-import { EventDetailFailed } from "./LoadFailed.jsx";
+import { EventDetailFailed, PlaceHistoryFailed } from "./LoadFailed.jsx";
 import { importOr } from "../lib/importOr.js";
-import { loadEventDetail, loadExportResults } from "../lib/lazyChunks.js";
+import { loadEventDetail, loadExportResults, loadPlaceHistory } from "../lib/lazyChunks.js";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { effectiveQuery } from "../lib/ranking.js";
@@ -39,6 +39,8 @@ const SORT_OPTIONS = [
 // The open event's view is its own chunk (with its related events and citation),
 // so the first view does not wait for it; an event link starts it early (App.jsx).
 const EventDetail = lazy(() => importOr(loadEventDetail, EventDetailFailed));
+// "What was this place?", loaded when a place is first opened.
+const PlaceHistory = lazy(() => importOr(loadPlaceHistory, PlaceHistoryFailed));
 
 // Until that chunk is in (one round trip, usually alongside the event's full
 // record): the action row's Back and the event's title, styled as the real view
@@ -122,6 +124,10 @@ const VIEWS = [
  * @param {(v:"list"|"timeline")=>void} [props.onViewChange]
  * @param {string|null} [props.notFoundId]  the id of an event link that leads to no event (App): said at the top
  *                                          of the panel, with "Search instead", until the next search or selection
+ * @param {object|null} [props.placeView] "What was this place?" while open (shown when no event is):
+ *                                          {place, events, onBack, onShowOnMap, onChooseYears, onListNearby}
+ *                                          (components/PlaceHistory.jsx; its events open with onSelect)
+ * @param {(p:{lon:number,lat:number})=>void} [props.onOpenPlace] opens it for a point (the open event's)
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -159,6 +165,8 @@ export default function SearchPanel({
   view = "list",
   onViewChange,
   notFoundId = null,
+  placeView = null,
+  onOpenPlace, // ({lon, lat}): an open event's "History of this place"
   ref,
 }) {
   const inputId = useId();
@@ -178,13 +186,14 @@ export default function SearchPanel({
   const lastSelectedRef = useRef(null);
   const hadSelectionRef = useRef(false);
   // Phone sheet: "peek" | "half" | "full", dragged by its bar (hooks/useSheetDrag.js).
-  // An event opens at half height, so its place stays in sight on the map above
-  // (at full only a strip shows, under the map's controls); a search opens the
-  // list at full. Tapping the lowered bar reopens it the same way.
+  // An event (or "What was this place?") opens at half height, so its place stays
+  // in sight on the map above (at full only a strip shows, under the map's
+  // controls); a search opens the list at full. Tapping the lowered bar reopens
+  // it the same way.
   const { sheet, setSheet, dragHeight, barProps } = useSheetDrag(
-    selectedEvent ? "half" : query ? "full" : "peek",
+    selectedEvent || placeView ? "half" : query ? "full" : "peek",
     panelRef,
-    selectedEvent ? "half" : "full"
+    selectedEvent || placeView ? "half" : "full"
   );
   const sheetOpen = sheet !== "peek";
   // Filters sit behind a disclosure so results start near the top of the panel.
@@ -207,6 +216,14 @@ export default function SearchPanel({
   if (notFoundId !== prevNotFoundId) {
     setPrevNotFoundId(notFoundId);
     if (notFoundId && sheet === "peek") setSheet("full");
+  }
+  // "What was this place?" opens the same way as an event; it shows while no event is open.
+  const placeKey = placeView ? `${placeView.place.lon},${placeView.place.lat}` : null;
+  const placeShown = Boolean(placeView) && !selectedEvent;
+  const [prevPlaceKey, setPrevPlaceKey] = useState(placeKey);
+  if (placeKey !== prevPlaceKey) {
+    setPrevPlaceKey(placeKey);
+    if (placeKey && sheet === "peek") setSheet("half");
   }
 
   const loading = status === "loading";
@@ -235,6 +252,21 @@ export default function SearchPanel({
     if (!el || prev === selectedId) return;
     el.scrollTop = selectedId ? 0 : listScrollRef.current;
   }, [selectedId]);
+  // A place opened (or moved) starts at its top too; closed, the list is back where it was.
+  const placeScrolledRef = useRef(placeKey);
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    const prev = placeScrolledRef.current;
+    placeScrolledRef.current = placeKey;
+    if (!el || prev === placeKey || selectedId) return;
+    el.scrollTop = placeKey ? 0 : listScrollRef.current;
+    // Closed with no event open: focus goes to the status line (or the lowered sheet's bar), as after Back from an event.
+    if (!placeKey && prev) {
+      const toggle = toggleRef.current;
+      if (toggle?.getClientRects().length && toggle.getAttribute("aria-expanded") === "false") toggle.focus();
+      else statusRef.current?.focus();
+    }
+  }, [placeKey, selectedId]);
 
   // Back restores focus to the originating row, or, if that row is gone or not
   // rendered (rows render 50 at a time), to the status line above the list
@@ -269,11 +301,15 @@ export default function SearchPanel({
     () => ({
       skipTo() {
         if (!sheetOpen) flushSync(() => setSheet("full"));
-        const target = selectedId ? document.getElementById("event-detail-title") : inputRef.current;
+        const target = selectedId
+          ? document.getElementById("event-detail-title")
+          : placeShown
+            ? document.getElementById("place-history-title")
+            : inputRef.current;
         target?.focus();
       },
     }),
-    [selectedId, sheetOpen, setSheet]
+    [selectedId, placeShown, sheetOpen, setSheet]
   );
 
   // Mobile: collapse the sheet to its peek bar so the map shows, and aim the
@@ -290,6 +326,13 @@ export default function SearchPanel({
     onRefocus?.();
     toggleRef.current?.focus();
   }, [setSheet, onRefocus]);
+  // The same for "What was this place?": the sheet lowered, the map aimed at the point.
+  const onShowPlace = placeView?.onShowOnMap;
+  const showPlaceOnMap = useCallback(() => {
+    setSheet("peek");
+    onShowPlace?.();
+    if (toggleRef.current?.getClientRects().length) toggleRef.current.focus();
+  }, [setSheet, onShowPlace]);
 
   // Mobile: the reader moved the sheet (dragged it, its bar, a key) with an
   // event open, so more or less of the map is in sight: App keeps the event's
@@ -523,6 +566,8 @@ export default function SearchPanel({
             {selectedEvent.title}
             <span className="sp-sr"> (show event)</span>
           </span>
+        ) : placeShown ? (
+          "Show history of this place"
         ) : (
           "Show results"
         )}
@@ -533,7 +578,7 @@ export default function SearchPanel({
         ref={scrollRef}
         onScroll={(e) => {
           // Only the list's own scrolling; opening an event changes the content under it.
-          if (!selectedId) listScrollRef.current = e.currentTarget.scrollTop;
+          if (!selectedId && !placeShown) listScrollRef.current = e.currentTarget.scrollTop;
         }}
       >
         {selectedEvent && (
@@ -553,12 +598,38 @@ export default function SearchPanel({
                 onBack={onBack}
                 onShowOnMap={showOnMap}
                 onSelectEvent={onSelect}
+                onPlaceHistory={onOpenPlace}
               />
             </Suspense>
           </div>
         )}
 
-        <div id="sp-body" className="sp-search" hidden={!!selectedEvent}>
+        {placeShown && (
+          <div
+            onKeyDown={(e) => {
+              if (e.key !== "Escape" || e.defaultPrevented) return;
+              e.preventDefault();
+              if (areaMode !== "off") onAreaModeChange?.("off");
+              else placeView.onBack();
+            }}
+          >
+            <Suspense fallback={<p className="sp-status">Loading…</p>}>
+              <PlaceHistory
+                place={placeView.place}
+                events={placeView.events}
+                eventsLoading={eventsLoading}
+                mapYear={mapBorderYear}
+                onBack={placeView.onBack}
+                onShowOnMap={showPlaceOnMap}
+                onChooseYears={placeView.onChooseYears}
+                onSelectEvent={onSelect}
+                onListNearby={placeView.onListNearby}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        <div id="sp-body" className="sp-search" hidden={!!selectedEvent || placeShown}>
           {/* A link to no event (App's notFoundId), in the panel where the event would have opened. Always in the
               page, so screen readers announce it when it appears. */}
           <div role="status">

@@ -21,6 +21,9 @@ export const BOUNDARY_STATUS_LABELS = {
   "partitioned-ceasefire": "Partitioned along a ceasefire line",
 };
 
+// What the border details say for a shape with no status flag.
+export const NO_STATUS_LABEL = "Source-dated border (no status flag)";
+
 export function humaniseStatus(status) {
   if (!status) return null;
   if (BOUNDARY_STATUS_LABELS[status]) return BOUNDARY_STATUS_LABELS[status];
