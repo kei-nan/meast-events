@@ -13,6 +13,7 @@ import { loadEventDetail, loadExportResults } from "../lib/lazyChunks.js";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { effectiveQuery } from "../lib/ranking.js";
+import { eventIdQuery } from "../lib/urlState.js";
 import { timelineOrder } from "../lib/timelineView.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
@@ -119,6 +120,8 @@ const VIEWS = [
  * @param {"list"|"timeline"}      [props.view]   how results are shown: the list, or oldest first with
  *                                          a bar per event on a year axis (ResultsList layout)
  * @param {(v:"list"|"timeline")=>void} [props.onViewChange]
+ * @param {string|null} [props.notFoundId]  the id of an event link that leads to no event (App): said at the top
+ *                                          of the panel, with "Search instead", until the next search or selection
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -155,6 +158,7 @@ export default function SearchPanel({
   onSortChange,
   view = "list",
   onViewChange,
+  notFoundId = null,
   ref,
 }) {
   const inputId = useId();
@@ -197,6 +201,12 @@ export default function SearchPanel({
   if (selectedId !== prevSelectedId) {
     setPrevSelectedId(selectedId);
     if (selectedId && sheet === "peek") setSheet("half");
+  }
+  // So does a link to no event, whose notice is at the top of the panel.
+  const [prevNotFoundId, setPrevNotFoundId] = useState(notFoundId);
+  if (notFoundId !== prevNotFoundId) {
+    setPrevNotFoundId(notFoundId);
+    if (notFoundId && sheet === "peek") setSheet("full");
   }
 
   const loading = status === "loading";
@@ -549,6 +559,29 @@ export default function SearchPanel({
         )}
 
         <div id="sp-body" className="sp-search" hidden={!!selectedEvent}>
+          {/* A link to no event (App's notFoundId), in the panel where the event would have opened. Always in the
+              page, so screen readers announce it when it appears. */}
+          <div role="status">
+            {notFoundId && (
+              <div className="sp-notfound">
+                <p className="sp-notfound-title">No event found for this link.</p>
+                <p className="sp-muted">
+                  The link asked for <code className="sp-notfound-id">{notFoundId}</code>, which is not an event in
+                  this atlas.
+                </p>
+                <button
+                  type="button"
+                  className="sp-btn"
+                  onClick={() => {
+                    onQueryChange(eventIdQuery(notFoundId));
+                    inputRef.current?.focus();
+                  }}
+                >
+                  Search instead
+                </button>
+              </div>
+            )}
+          </div>
           <div className="sp-searchbox" role="search">
             <label htmlFor={inputId} className="sp-label">
               Search events
@@ -748,7 +781,7 @@ export default function SearchPanel({
               {activeChips.map((chip) => (
                 <span key={chip.key} className="sp-chip sp-chip--active">
                   {chip.color && (
-                    <span className="sp-dot" aria-hidden="true" style={{ background: chip.color }} />
+                    <span className="sp-dot" aria-hidden="true" style={{ "--dot": chip.color }} />
                   )}
                   <span title={chip.title}>{chip.label}</span>
                   <button
@@ -825,9 +858,15 @@ export default function SearchPanel({
                   The atlas covers only a partial selection of events, so a missing result says
                   nothing about whether something happened.
                 </p>
+                {textQuery && (
+                  <p className="sp-muted">
+                    Search looks in English text: Wikipedia&apos;s titles and article leads, and Wikidata&apos;s English
+                    aliases.
+                  </p>
+                )}
                 {(searching || inView) && (
                   <button type="button" className="sp-btn" onClick={clearAll}>
-                    Clear filters
+                    {query && activeCount > 0 ? "Clear search and filters" : query ? "Clear search" : "Clear filters"}
                   </button>
                 )}
               </div>

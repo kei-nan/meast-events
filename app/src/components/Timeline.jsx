@@ -28,8 +28,8 @@ const PRESETS = [
 const frac = (y) => (y - MIN_YEAR) / (MAX_YEAR - MIN_YEAR);
 
 // Ids stay "accumulate"/"slide" (lib/playback.js); the labels say what Play does
-// in plain words, and the help is visible to screen readers too, not only as a
-// tooltip that phones never show.
+// in plain words. The help is each button's description for screen readers, its
+// tooltip, and, behind the ⓘ beside them, a line in sight (phones show no tooltips).
 const PLAY_MODES = [
   { id: "accumulate", label: "Grow", help: "Play keeps the start year and advances the end year." },
   { id: "slide", label: "Move", help: "Play moves the whole period forward, keeping its length." },
@@ -65,6 +65,7 @@ function Timeline({
   const [playMode, setPlayMode] = useState("accumulate");
   const [active, setActive] = useState(null); // "start" | "end" while dragged/focused
   const [editing, setEditing] = useState(false);
+  const [modeHelpOpen, setModeHelpOpen] = useState(false);
   const latest = useRef({ startYear, endYear, onChangeRange });
   useEffect(() => {
     latest.current = { startYear, endYear, onChangeRange };
@@ -262,6 +263,24 @@ function Timeline({
                 {m.help}
               </span>
             ))}
+            {/* The help in sight, for touch screens (no tooltips) and anyone
+                else: a line under the controls while it is open. */}
+            <button
+              type="button"
+              className="timeline-mode-info"
+              aria-expanded={modeHelpOpen}
+              aria-controls="timeline-mode-help"
+              aria-label="What Grow and Move do"
+              title="What Grow and Move do"
+              onClick={() => setModeHelpOpen((v) => !v)}
+              onKeyDown={(e) => {
+                if (e.key !== "Escape" || !modeHelpOpen) return;
+                e.preventDefault();
+                setModeHelpOpen(false);
+              }}
+            >
+              <span aria-hidden="true">ⓘ</span>
+            </button>
           </div>
           <button
             type="button"
@@ -305,6 +324,13 @@ function Timeline({
         ) : (
           <Presets startYear={startYear} endYear={endYear} onPick={applyPreset} />
         )}
+        <p id="timeline-mode-help" className="timeline-mode-help" hidden={!modeHelpOpen}>
+          {PLAY_MODES.map((m) => (
+            <span key={m.id}>
+              <strong>{m.label}:</strong> {m.help}{" "}
+            </span>
+          ))}
+        </p>
       </div>
       <div className="timeline-strip">
         <span className="timeline-bound">{MIN_YEAR}</span>

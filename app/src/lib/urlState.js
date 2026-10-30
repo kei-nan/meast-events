@@ -38,6 +38,15 @@ export function isValidEventId(id) {
   return typeof id === "string" && ID_RE.test(id);
 }
 
+/**
+ * Search words for an event link that leads nowhere (App's "Search instead"): the id's words, its separators as
+ * spaces ("june-2025-strikes" -> "june 2025 strikes"), as long as the search box takes; "" for no id.
+ */
+export function eventIdQuery(id) {
+  if (typeof id !== "string") return "";
+  return id.replace(/[-_.~:]+/g, " ").trim().slice(0, MAX_Q_LENGTH).trim();
+}
+
 /** The event's URL path; scripts/build-event-pages.mjs writes its page there. */
 export const eventPath = (id) => `/event/${encodeURIComponent(id)}`;
 

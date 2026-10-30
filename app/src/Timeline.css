@@ -124,9 +124,58 @@
   border-radius: 6px 0 0 6px;
 }
 
-.timeline-mode-btn:last-of-type {
+/* Move (the ⓘ after it is a button too, so not :last-of-type). */
+.timeline-mode-btn + .timeline-mode-btn {
   margin-left: -1px;
   border-radius: 0 6px 6px 0;
+}
+
+/* ⓘ: opens the line saying what Grow and Move do (.timeline-mode-help). */
+.timeline-mode-info {
+  flex: none;
+  min-width: 28px;
+  min-height: var(--tl-btn);
+  margin-left: 2px;
+  padding: 0 4px;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.timeline-mode-info:hover,
+.timeline-mode-info[aria-expanded="true"] {
+  color: var(--text-primary);
+  border-color: var(--border);
+  background: var(--bg-2);
+}
+
+.timeline-mode-info:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* A line of its own under the controls, only while the ⓘ has it open. */
+.timeline-mode-help {
+  flex-basis: 100%;
+  order: 10;
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.timeline-mode-help[hidden] {
+  display: none;
+}
+
+.timeline-mode-help strong {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .timeline-mode-btn[aria-pressed="true"] {
@@ -498,10 +547,11 @@
   }
 }
 
-/* Mobile: Play, play mode, the years and the presets (scrolling sideways) on
-   one row, the strip on the next, so the timeline stays short. A 360px phone
-   leaves the presets ~76px (a preset and a half, scrolling); below about 350px
-   they wrap to a row of their own rather than shrink to a sliver. */
+/* Mobile: Play, play mode (and its ⓘ), the years and the presets (scrolling
+   sideways) on one row, the strip on the next, so the timeline stays short. A
+   360px phone leaves the presets ~52px (a preset, scrolling; 82px at 390px);
+   below about 355px they wrap to a row of their own rather than shrink to a
+   sliver. */
 @media (max-width: 768px) {
   .timeline {
     --tl-thumb: 44px;
@@ -521,7 +571,7 @@
 
   .timeline-presets {
     --tl-fade: 22px;
-    flex: 1 1 66px;
+    flex: 1 1 50px;
     padding: 2px 0;
   }
 
@@ -541,6 +591,14 @@
   .timeline-mode-btn {
     min-width: 44px;
     padding: 0 7px;
+  }
+
+  /* 24px wide (the WCAG 2.2 minimum; 44px tall), so a 360px phone keeps the
+     presets on this row. */
+  .timeline-mode-info {
+    min-width: 24px;
+    margin-left: 0;
+    padding: 0;
   }
 
   .timeline-year {
@@ -626,7 +684,7 @@
     padding-bottom: 2px;
   }
 
-  .app:has(.side-panel[data-sheet="full"]) .timeline:not(:has(.timeline-edit)) :is(.timeline-mode, .timeline-presets, .timeline-bound) {
+  .app:has(.side-panel[data-sheet="full"]) .timeline:not(:has(.timeline-edit)) :is(.timeline-mode, .timeline-mode-help, .timeline-presets, .timeline-bound) {
     display: none;
   }
 
@@ -649,7 +707,7 @@
     padding-bottom: 2px;
   }
 
-  .timeline:not(:has(.timeline-edit)) :is(.timeline-mode, .timeline-presets, .timeline-bound) {
+  .timeline:not(:has(.timeline-edit)) :is(.timeline-mode, .timeline-mode-help, .timeline-presets, .timeline-bound) {
     display: none;
   }
 

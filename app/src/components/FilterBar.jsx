@@ -42,19 +42,22 @@ export default function FilterBar({
               <span
                 className="sp-dot"
                 aria-hidden="true"
-                style={{ background: COLORS[c] ?? "#6b6151" }}
+                style={{ "--dot": COLORS[c] ?? "#6b6151" }}
               />
               {categoryLabel(c)}
             </button>
           ))}
         </div>
       </fieldset>
-      <div className="sp-filter-row">
-        {countryOptions?.length > 0 && (
+      {/* The note says what a country tag is (docs/DATA_POLICY.md, `countries`): an event struck in one country is
+          tagged with that country only, whoever acted. */}
+      {countryOptions?.length > 0 && (
+        <div className="sp-country">
           <label className="sp-select">
             <span>Country</span>
             <select
               value={countries[0] ?? ""}
+              aria-describedby="sp-country-note"
               onChange={(e) =>
                 onFiltersChange({
                   ...filters,
@@ -70,8 +73,14 @@ export default function FilterBar({
               ))}
             </select>
           </label>
-        )}
-        {showScope && (
+          <p id="sp-country-note" className="sp-filter-note">
+            Countries are where Wikidata places an event (its country or location; typed by hand for hand-picked
+            events), not who took part.
+          </p>
+        </div>
+      )}
+      {showScope && (
+        <div className="sp-filter-row">
           <div className="sp-seg" role="group" aria-label="Search scope">
             <button
               type="button"
@@ -90,8 +99,8 @@ export default function FilterBar({
               Only selected years
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

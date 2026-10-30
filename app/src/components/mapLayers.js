@@ -14,19 +14,26 @@ export const CATEGORY_COLORS = {
   treaty: "#5e9377", // verdigris green
   political: "#304876", // muted indigo
   uprising: "#c99a45", // antique gold
-  // Chosen 2026-10-06 by search: the muted mid-lightness ink farthest (CIEDE2000)
-  // from the others in normal vision, deuteranopia and protanopia (worst 14.6,
-  // above the rest of the palette's own worst pair, 13.1).
-  protest: "#4b69c3", // cobalt
+  // Not a second blue beside political (it was cobalt #4b69c3; review 2026-10).
+  // Chosen 2026-10-30 by search over muted, non-blue mid-lightness inks: the
+  // farthest (CIEDE2000, the minimum over normal vision, deuteranopia and
+  // protanopia) from the others: 11.9 from diplomatic, 13.1 from migration.
+  // WCAG contrast 3.3 / 3.0 on land / sea, 3.5 on the dark panel.
+  protest: "#9a5cb4", // amethyst
   migration: "#a585ac", // dusty lilac
   diplomatic: "#36747d", // muted teal
   economic: "#8b7938", // olive mustard
   terrorism: "#783e4d", // oxblood
+  // The darkest ink, 10.8:1 on land; on the dark panel its swatch (SidePanel.css .sp-dot) sits on a small tile in
+  // the map's land colour, with the map's dark dot edge, so it reads as a filled dot, not a hollow ring.
   atrocity: "#2b251c", // lamp black
-  // Two neutral greys told apart by hue (cool slate, warm grey). WCAG contrast against land #d5dbd7 / sea #b9d5e3:
-  // mixed 4.58 / 4.19, unclassified 4.33 / 3.96.
+  // Two neutral greys told apart by lightness (dark slate, light stone): told apart by hue alone (the old warm grey
+  // #6b6151) they read as one grey (review 2026-10). Light stone is the light grey farthest (CIEDE2000, as above) from
+  // the others while still 10.0 from verdigris; its edge (STROKE_DOT) sets it off the land, as for antique gold.
+  // WCAG contrast against land #d5dbd7 / sea #b9d5e3 / the dark panel #262019: mixed 4.58 / 4.19 / 2.50,
+  // unclassified 1.70 / 1.56 / 6.73.
   mixed: "#5a5f66", // slate grey: listed classes from more than one group
-  unclassified: "#6b6151", // warm grey: no listed Wikidata class
+  unclassified: "#aca79d", // light stone grey: no listed Wikidata class
 };
 const FALLBACK_COLOR = "#6b6151";
 
