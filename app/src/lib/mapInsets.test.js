@@ -1,6 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { PIN_MARGIN_PX, clearPadding, growPadding, keepPinInside, paddingOffset, screenPoint } from "./mapInsets.js";
+import {
+  PIN_MARGIN_PX,
+  clearPadding,
+  growPadding,
+  keepPinInside,
+  paddingOffset,
+  restingSheetTop,
+  screenPoint,
+} from "./mapInsets.js";
 import { SHEET_STRIP_PX } from "./sheetSnap.js";
 
 const rect = (left, top, right, bottom) => ({ left, top, right, bottom });
@@ -130,4 +138,33 @@ test("keepPinInside keeps a pin off the edge of a wide clear part (a fifth of it
   const [x, y] = screenPoint([20, 31.8], { ...cam, center }, w, h);
   assert.ok(Math.abs(x - 2 * PIN_MARGIN_PX) < 1e-3, `x ${x}`);
   assert.ok(Math.abs(y - h / 2) < 1e-3, `y ${y}`);
+});
+
+test("restingSheetTop: half and full from the map area, peek and a drag where the sheet is", () => {
+  // A 390x844 phone: the map area 45..773 (728 px).
+  assert.equal(restingSheetTop("half", 45, 728, 700), 45 + 364);
+  assert.equal(restingSheetTop("full", 45, 728, 409), 45 + SHEET_STRIP_PX);
+  assert.equal(restingSheetTop("peek", 45, 728, 674), 674);
+  assert.equal(restingSheetTop("drag", 45, 728, 512), 512);
+  // A map area shorter than the strip: full covers nothing of it.
+  assert.equal(restingSheetTop("full", 0, 80, 40), 80);
+});
+
+test("an event at half height is centred in the map above the sheet, below the controls", () => {
+  // 390x728 map; toolbar and Borders row along the top (to 54), the keys'
+  // column at the right (64..248), the sheet at half from 364.
+  const rects = [
+    { left: 10, top: 10, right: 62, bottom: 54 },
+    { left: 95, top: 10, right: 380, bottom: 60 },
+    { left: 328, top: 64, right: 380, bottom: 248 },
+    { left: 0, top: restingSheetTop("half", 0, 728, 0), right: 390, bottom: 728 },
+  ];
+  const p = clearPadding(390, 728, rects);
+  assert.equal(p.bottom, 728 - 364);
+  assert.ok(p.top >= 54);
+  const [, dy] = paddingOffset(390, 728, p);
+  assert.ok(dy < 0, "aimed above the middle of the map");
+  const y = 728 / 2 + dy; // where the event lands
+  assert.ok(y > p.top && y < 364, `inside the map in sight: ${y}`);
+  assert.equal(Math.round(y), Math.round((p.top + 364) / 2));
 });

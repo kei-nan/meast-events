@@ -24,7 +24,7 @@ function peekHeight(el) {
  * The phone results sheet's position: "peek" (the bar and search box), "half"
  * or "full" (lib/sheetSnap.js), and its bar as a handle. Drag the bar to any
  * height and let go: it rests at the nearest height, or a flick carries it to
- * the next one. A tap toggles peek and open; Arrow Up / Down step one height.
+ * the next one. A tap toggles peek and open (`openTo`); Arrow Up / Down step one height.
  * Only the bar drags, so scrolling the list or an article never moves the sheet.
  *
  * Returns {sheet, setSheet, dragHeight (px while dragging, else null), barProps
@@ -32,8 +32,9 @@ function peekHeight(el) {
  *
  * @param {"peek"|"half"|"full"} initial
  * @param {import("react").RefObject<HTMLElement>} sheetRef  the sheet (inside the map area, .app-body)
+ * @param {"half"|"full"} [openTo]  where a tap on the lowered bar opens it
  */
-export default function useSheetDrag(initial, sheetRef) {
+export default function useSheetDrag(initial, sheetRef, openTo = "full") {
   const [sheet, setSheet] = useState(initial);
   const [dragHeight, setDragHeight] = useState(null);
   const dragRef = useRef(null); // {y, h, last, lastT, v, moved}
@@ -90,7 +91,7 @@ export default function useSheetDrag(initial, sheetRef) {
       swallowClickRef.current = false;
       return;
     }
-    setSheet(sheet === "peek" ? "full" : "peek");
+    setSheet(sheet === "peek" ? openTo : "peek");
   }
 
   function onKeyDown(e) {

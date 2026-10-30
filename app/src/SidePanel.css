@@ -1557,6 +1557,17 @@ button.sp-chip[aria-pressed="true"] {
     }
   }
 
+  /* A very short screen (400% zoom, 320x256: ~136px of map): the lowered
+     sheet is its bar alone, as with an event open, so the map's controls
+     (44px keys 10px from the top) stay in sight above it (WCAG 2.4.11). The
+     bar opens the sheet at the search box; useSheetDrag measures the peek
+     height from what shows. */
+  @media (max-height: 320px) {
+    .side-panel[data-sheet="peek"] .sp-searchbox {
+      display: none;
+    }
+  }
+
   /* Half of the map area (lib/sheetSnap.js HALF_SHARE). While its bar is
      dragged (data-sheet="drag") the height is set inline and follows the
      finger; between resting heights it slides. */

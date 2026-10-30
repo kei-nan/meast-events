@@ -506,14 +506,22 @@ export default function App() {
     setSelectedEventId(null);
   }, []);
 
-  // Map click: select only. List click: select AND fly the map there. An event
-  // opened while Play runs gets the range end's borders, as pressing Play with it
-  // open does (handlePlayState), so playback keeps visibly moving the map.
+  // MapView keeps the open event's pin in sight of what covers the map (on
+  // phones the sheet, at half height for an opened event): a new {nonce, center}
+  // nudges it inside (center: false) or puts it in the middle (center: true).
+  const [keepPin, setKeepPin] = useState(null);
+
+  // Map click: select only (the map keeps its zoom; the pin is only nudged out
+  // from under the phone sheet that opens over it). List click: select AND fly
+  // the map there. An event opened while Play runs gets the range end's
+  // borders, as pressing Play with it open does (handlePlayState), so playback
+  // keeps visibly moving the map.
   const handleSelectFromMap = useCallback(
     (id) => {
       setNotFound(false);
       setHoverId(null);
       setSelectedEventId(id);
+      setKeepPin((k) => ({ nonce: (k?.nonce ?? 0) + 1, center: false }));
       if (playState === "playing") setTimelineBordersFor(id);
     },
     [playState]
@@ -538,9 +546,12 @@ export default function App() {
     const f = ev && focusFor(ev, focusNonceRef);
     if (f) setFocus(f);
   }, [storeRef, selectedEventId]);
-  // The phone sheet moved with an event open: MapView keeps its pin in sight.
-  const [keepPinNonce, setKeepPinNonce] = useState(0);
-  const handleSheetMove = useCallback(() => setKeepPinNonce((n) => n + 1), []);
+  // The phone sheet moved with an event open: MapView keeps its pin in sight,
+  // and centres it in the map when the sheet went down to its bar ("Show map").
+  const handleSheetMove = useCallback(
+    (sheet) => setKeepPin((k) => ({ nonce: (k?.nonce ?? 0) + 1, center: sheet === "peek" })),
+    []
+  );
 
   // The tab title names the open event (and is restored when it closes), as the
   // event's page has it (scripts/event-page.mjs eventPageTitle).
@@ -613,7 +624,7 @@ export default function App() {
                 selectedEventId={selectedEventId}
                 hoverId={hoverId}
                 focus={focus}
-                keepPinNonce={keepPinNonce}
+                keepPin={keepPin}
                 areaMode={areaMode}
                 area={area}
                 onAreaModeChange={setAreaMode}
