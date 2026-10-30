@@ -161,6 +161,28 @@
   overflow-wrap: anywhere;
 }
 
+/* A note's sentences and a source's items (BoundaryText.jsx). */
+.ph-note-list,
+.ph-source-list {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  white-space: normal;
+}
+
+.ph-note-list li + li,
+.ph-source-list li + li {
+  margin-top: 3px;
+}
+
+.ph-source a {
+  color: var(--link);
+}
+
+.ph-source a:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
 .ph-foot {
   margin: 4px 0 0;
   font-size: 0.8rem;

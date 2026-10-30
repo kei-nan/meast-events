@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import EventLink from "./EventLink.jsx";
 import ShareButton from "./ShareButton.jsx";
 import { Compass } from "./RelatedEvents.jsx";
+import { BoundaryNote, BoundarySource } from "./BoundaryText.jsx";
 import { NO_STATUS_LABEL, humaniseStatus, isDashedStatus } from "./mapBorders.js";
 import { loadBoundaryHistory, loadDeferredGeometry } from "../lib/dataClient.js";
 import { eventsNear, historyAt, pendingRefsAt, periodLabel } from "../lib/placeHistory.js";
@@ -53,12 +54,8 @@ function Shape({ item }) {
           {item.records.map((r) => (
             <div key={r.start} className="ph-record">
               {several && <p className="ph-record-years">{yearsText(r.start, r.end)}</p>}
-              {r.note && <p className="ph-note">{r.note}</p>}
-              {r.source && (
-                <p className="ph-source">
-                  <strong>Source:</strong> {r.source}
-                </p>
-              )}
+              <BoundaryNote note={r.note} className="ph-note" />
+              <BoundarySource source={r.source} className="ph-source" />
             </div>
           ))}
         </details>
