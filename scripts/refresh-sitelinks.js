@@ -16,9 +16,13 @@
 //
 // The aliases are Wikidata's English "also known as" values, stored as-is in Wikidata's order; an item
 // with none has no `wikidata_aliases` field.
+//
+// It also stores `date_end_open` for an event with no date_end whose item gives its end time (P582) as
+// "no value" or "unknown value" (lib/wd-entities.js setDateEndOpen); the app counts such an event in every
+// year from its start to the current year (docs/DATA_POLICY.md, "Ongoing events"). Refreshed in both modes.
 import { readFile } from "node:fs/promises";
 import { writeFileAtomic } from "./lib/files.js";
-import { fetchEntities, setWikidataAliases } from "./lib/wd-entities.js";
+import { fetchEntities, setDateEndOpen, setWikidataAliases } from "./lib/wd-entities.js";
 
 const APPLY = process.argv.includes("--apply");
 const ALIASES_ONLY = process.argv.includes("--aliases-only");
@@ -27,11 +31,12 @@ const events = JSON.parse(await readFile(curatedUrl, "utf-8"));
 
 const entities = await fetchEntities(
   events.map((e) => e.wikidata_qid),
-  { props: "sitelinks|aliases", log: (m) => console.log(m) }
+  { props: "sitelinks|aliases|claims", log: (m) => console.log(m) }
 );
 
 let changed = 0;
 let aliasesChanged = 0;
+let openChanged = 0;
 const missing = [];
 for (const e of events) {
   const rec = entities.get(e.wikidata_qid);
@@ -49,13 +54,20 @@ for (const e of events) {
     console.log(`${e.id}: aliases ${JSON.stringify(before ?? [])} -> ${JSON.stringify(e.wikidata_aliases ?? [])}`);
     aliasesChanged++;
   }
+  const openBefore = e.date_end_open;
+  if (setDateEndOpen(e, rec.p582_open)) {
+    console.log(`${e.id}: date_end_open ${openBefore ?? "-"} -> ${e.date_end_open ?? "-"}`);
+    openChanged++;
+  }
 }
 
 const withAliases = events.filter((e) => e.wikidata_aliases).length;
 const aliasCount = events.reduce((n, e) => n + (e.wikidata_aliases?.length ?? 0), 0);
 console.log(
   `\n${ALIASES_ONLY ? "Sitelink counts not refreshed (--aliases-only)." : `${changed} of ${events.length} counts changed.`}` +
-    `\n${aliasesChanged} events' aliases changed; ${withAliases} events have aliases (${aliasCount} in total).`
+    `\n${aliasesChanged} events' aliases changed; ${withAliases} events have aliases (${aliasCount} in total).` +
+    `
+${openChanged} events' date_end_open changed; ${events.filter((e) => e.date_end_open).length} events have one.`
 );
 if (missing.length) console.log(`Not fetched (previous count and aliases kept): ${missing.join(", ")}`);
 if (APPLY) {

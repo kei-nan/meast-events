@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { fetchLeads } from "./lead.js";
 import { fetchLabels, fetchCategories } from "./wiki.js";
-import { fetchEntities, fetchLabelsCached, setWikidataAliases } from "./wd-entities.js";
+import { fetchEntities, fetchLabelsCached, p582Open, setDateEndOpen, setWikidataAliases } from "./wd-entities.js";
 import { fetchRevisions } from "./rev-lead.js";
 import { mediaWikiJson } from "./http.js";
 
@@ -186,4 +186,31 @@ test("setWikidataAliases: sets, replaces or removes the field; undefined (not fe
   assert.deepEqual(ev.wikidata_aliases, ["July War"]);
   assert.equal(setWikidataAliases(ev, []), true);
   assert.equal("wikidata_aliases" in ev, false);
+});
+
+test("p582Open: an end time stated as no value / unknown value, never when a date is given; deprecated ignored", () => {
+  const st = (snaktype, rank = "normal") => ({ rank, mainsnak: { snaktype, ...(snaktype === "value" ? { datavalue: { value: { time: "+2024-12-08T00:00:00Z" } } } : {}) } });
+  assert.equal(p582Open(undefined), undefined); // claims not fetched
+  assert.equal(p582Open({}), null);
+  assert.equal(p582Open({ P582: [st("novalue")] }), "novalue");
+  assert.equal(p582Open({ P582: [st("somevalue")] }), "somevalue");
+  assert.equal(p582Open({ P582: [st("somevalue"), st("value")] }), null);
+  // As Q137612545 (2025-2026 Iranian protests) had it, checked 2026-10-30: one deprecated "unknown value".
+  assert.equal(p582Open({ P582: [st("somevalue", "deprecated")] }), null);
+});
+
+test("setDateEndOpen: only without date_end; undefined (not fetched) leaves the event unchanged", () => {
+  const ev = { id: "a", date_end: null };
+  assert.equal(setDateEndOpen(ev, "novalue"), true);
+  assert.equal(ev.date_end_open, "wikidata_novalue");
+  assert.equal(setDateEndOpen(ev, "novalue"), false);
+  assert.equal(setDateEndOpen(ev, undefined), false);
+  assert.equal(ev.date_end_open, "wikidata_novalue");
+  assert.equal(setDateEndOpen(ev, "somevalue"), true);
+  assert.equal(ev.date_end_open, "wikidata_somevalue");
+  assert.equal(setDateEndOpen(ev, null), true);
+  assert.equal("date_end_open" in ev, false);
+  const ended = { id: "b", date_end: "2020-01-01" };
+  assert.equal(setDateEndOpen(ended, "novalue"), false);
+  assert.equal("date_end_open" in ended, false);
 });

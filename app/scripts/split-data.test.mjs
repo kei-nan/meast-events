@@ -335,3 +335,10 @@ test("CLI: fails when a deferred boundary group no longer matches the data", () 
     r.cleanup();
   }
 });
+
+test("publicEvent: date_end_open only on an event without date_end that has one", () => {
+  const base = { id: "a", title: "A", date_start: "2014-01-01", countries: [], category: "war", extract: "" };
+  assert.equal(publicEvent({ ...base, date_end_open: "wikidata_novalue" }).date_end_open, "wikidata_novalue");
+  assert.equal("date_end_open" in publicEvent(base), false);
+  assert.equal("date_end_open" in publicEvent({ ...base, date_end: "2015-01-01", date_end_open: "wikidata_novalue" }), false);
+});

@@ -41,6 +41,7 @@ rather than a second layer of ours. Concretely:
 | `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
 | `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
 | `wikidata_aliases` | The item's English Wikidata aliases ("also known as"), kept as-is in Wikidata's order; absent when it has none. Refreshed monthly with the sitelink counts. Used by the search only: a result found through an alias rather than its title names the alias the reader typed ("matched: July War"). They are not listed on the event panel, because some are one side's name for the event; the displayed title stays Wikipedia's | Wikidata |
+| `date_end_open` | Only on an event with no `date_end` whose Wikidata item gives its end time (P582) as "no value" (`wikidata_novalue`) or "unknown value" (`wikidata_somevalue`) instead of a date; deprecated statements are ignored. Refreshed monthly with the sitelink counts. Read by the app as "ongoing" (see "Ongoing events") | Wikidata |
 
 ### Extract
 
@@ -384,6 +385,35 @@ pressing the active one reverses it (least covered first, or newest first). The 
 The order inherits the caveats of the inclusion rule above: sitelinks measure how many Wikimedia communities wrote about an item, not importance,
 and favour international, modern and widely covered events. It is a published rule applied to every event alike, not a per-event choice.
 The counts are refreshed monthly with the extracts (`scripts/refresh-sitelinks.js`, see "Refreshing extracts").
+
+## Ongoing events
+
+An event with no end date (`date_end` empty: 501 of 815 events on 2026-10-30) counts on the timeline in its **start year only**: a missing end
+is not read as "still going on". The one exception is an event **a source says is still going on**:
+
+1. its English Wikipedia article title says "present" as the end of a span ("Yemeni civil war (2014–present)"; the `title` field matched against
+   `–present`, `-present` or `—present`), or
+2. its Wikidata item gives its end time (P582) as "no value" or "unknown value" instead of a date (`date_end_open`, stored by
+   `scripts/refresh-sitelinks.js` and the enrichment, `scripts/lib/wd-entities.js`).
+
+Such an event counts in **every year from its start to the current year** (the timeline's last year, `MAX_YEAR` in `app/src/lib/years.js`: the
+visitor's UTC year, capped by the build; never before its start): the year filter, the results list's Timeline bars, playback and the map include
+it in each of those years (`app/src/lib/eventYears.js` `ongoingSignal`, `eventSpanYears`). An event with an end date keeps it, even when its title
+says "present" (Hezbollah–Israel conflict (2023–present): end 2024-11-27, as Wikidata gives it). Records whose end is before their start are
+unchanged (iraqi-invasion-of-kuwait still counts in 1990 and 2009 only). The timeline's density chart and the "N events starting that year"
+counts stay by start year.
+
+Dates and titles are not changed. Where the site shows the dates (event panel, list rows, event pages, the CSV/JSON download's `notes`) such
+an event reads "16 September 2014 – ongoing (per source)" ("2014–ongoing" in lists), and the panel and the event page add a note naming the
+source ("shown as ongoing because its Wikipedia article title says “present”" or "... because Wikidata gives its end time as “no value”").
+Event pages are built once, so they say "ongoing" without a year. The rule is mechanical and applies to every event alike; no event is marked
+ongoing by hand.
+
+On 2026-10-30 six events matched, all by their title: Yemeni civil war (2014–present), Iraqi insurgency (2017–present), Israeli blockade of the
+Gaza Strip (2023–present), Attacks on Jabalia refugee camp (2023–present), Middle Eastern crisis (2023–present) and Israeli invasion of Syria
+(2024–present). None matched through Wikidata: of the 815 items, the only P582 without a date was a deprecated "unknown value" on Q137612545
+(2025–2026 Iranian protests), which is ignored as every deprecated statement is. Events with no end date and neither signal, such as the
+Syrian civil war (stored end empty; title without "present"), still count in their start year only.
 
 ## Event classes
 

@@ -172,6 +172,9 @@ export function publicEvent(e) {
     title: e.title,
     date_start: e.date_start,
     date_end: e.date_end,
+    // Wikidata gives the end time as "no value" / "unknown value" (data date_end_open), only on events with no
+    // date_end that have one: the filter, timeline and labels read such an event as ongoing (src/lib/eventYears.js).
+    ...(e.date_end_open && !e.date_end ? { date_end_open: e.date_end_open } : {}),
     countries: e.countries,
     category: e.category_group || e.category,
     snippet: makeSnippet(e.extract),

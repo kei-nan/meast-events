@@ -264,3 +264,15 @@ test("exportFileRange: a whole-timeline search is named 'all', not the timeline'
   // Browsing (no search) lists only the selected years, whatever the scope.
   assert.equal(name(false, "all"), "middleeast-events-1967-120.csv");
 });
+
+test("notes: an ongoing event (a source says so) names that source; date_end stays as given (null)", () => {
+  const yemen = { id: "y", title: "Yemeni civil war (2014–present)", date_start: "2014-09-16", date_end: null, location_quality: "precise", coordinates: { lat: 15.35, lon: 44.2 } };
+  assert.deepEqual(rowNotes(yemen), ["No end date; ongoing per source (Wikipedia title says present)"]);
+  assert.equal(exportRow(yemen).date_end, null);
+  assert.deepEqual(rowNotes({ ...yemen, title: "Yemeni civil war", date_end_open: "wikidata_somevalue" }), [
+    "No end date; ongoing per source (Wikidata end time: unknown value)",
+  ]);
+  assert.deepEqual(rowNotes({ ...yemen, title: "Yemeni civil war" }), []);
+  // Inside the selected years even when they are later than its start.
+  assert.deepEqual(rowNotes(yemen, { range: [2018, 2020] }), ["No end date; ongoing per source (Wikipedia title says present)"]);
+});

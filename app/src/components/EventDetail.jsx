@@ -16,6 +16,7 @@ import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import { categorySourceParts, categorySummary } from "../lib/categoryLabels.js";
 import { formatEventDate } from "../lib/eventDate.js";
 import { dateOrderNote } from "../lib/dateOrderNote.js";
+import { ongoingNote, ongoingSignal } from "../lib/eventYears.js";
 import { wikidataUrl } from "../lib/partOf.js";
 import { shownClasses } from "../lib/eventClasses.js";
 import { fallbackLocationNote } from "../lib/fallbackPoint.js";
@@ -245,9 +246,12 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
   const dateText = formatEventDate(event.date_start, event.date_end, {
     precision: event.date_precision,
     yearOnly: flags.length > 0,
+    ongoing: Boolean(ongoingSignal(event)),
   });
   // Only an end before the start gets a note; the other date flags are not shown.
   const dateNote = dateOrderNote(event);
+  // An event read as ongoing says which source says so (lib/eventYears.js).
+  const ongoing = ongoingNote(event);
   const review = event.framing_review;
   // Each paragraph as plain and highlighted pieces, with its right-to-left runs
   // (lib/bidi.js). Paragraphs past the first LEAD_PARAGRAPHS are hidden or
@@ -367,6 +371,11 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
       {dateNote && (
         <p className="event-detail-note" role="note">
           {dateNote}
+        </p>
+      )}
+      {ongoing && (
+        <p className="event-detail-note" role="note">
+          {ongoing}
         </p>
       )}
       {event.text_from_article && (

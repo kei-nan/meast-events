@@ -15,7 +15,16 @@
 //    so they draw in any later year); a new decade needs one (next: 2030).
 // Outside a Vite bundle (the build itself, node --test) __DATA_MAX_YEAR__ is not
 // defined and the clock's year is used: that is the build's year.
-import { DECADE_SIZE, decadeFloor } from "./eventYears.js";
+//
+// The border decades are defined here (lib/eventYears.js re-exports them), so
+// eventYears.js can read MAX_YEAR (ongoing events) without an import cycle.
+
+export const DECADE_SIZE = 10;
+
+/** The first year of the decade `year` falls in (the boundary chunk it lives in). */
+export function decadeFloor(year) {
+  return Math.floor(year / DECADE_SIZE) * DECADE_SIZE;
+}
 
 export const MIN_YEAR = 1900;
 

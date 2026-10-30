@@ -8,10 +8,11 @@
 // when only its end year is on the axis (the selected years match it there,
 // lib/eventYears.js eventOverlapsRange), it is a point at the end year instead.
 // An event without an end date is a point at its start year: a missing end is
-// not read as "still going on".
+// not read as "still going on", unless a source says so (lib/eventYears.js
+// ongoingSignal): then its bar runs from its start to the current year.
 
 import { startedBefore } from "./browseOrder.js";
-import { rawEventYears } from "./eventYears.js";
+import { eventSpanYears, rawEventYears } from "./eventYears.js";
 
 /** The event's start date as a sortable string ("" when it has none). */
 function startKey(e) {
@@ -67,7 +68,7 @@ export function timelineAxis(events, range, { fit = false, minYear = -Infinity, 
   let lo = Infinity;
   let hi = -Infinity;
   for (const e of events) {
-    const [s, en] = rawEventYears(e);
+    const [s, en] = eventSpanYears(e);
     if (!Number.isFinite(s) || s <= 0) continue;
     const end = en >= s ? en : s; // a reversed record counts at its start only
     lo = Math.min(lo, s);
@@ -87,7 +88,7 @@ const pct = (n) => Math.round(n * 10000) / 100;
  * one year only. null when the event has no start year or lies off the axis.
  */
 export function barGeometry(e, [a0, a1]) {
-  const [s, en] = rawEventYears(e);
+  const [s, en] = eventSpanYears(e);
   if (!Number.isFinite(s) || s <= 0) return null;
   const reversed = en < s;
   if (reversed) {

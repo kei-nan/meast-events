@@ -10,6 +10,7 @@ import {
   timelineAxis,
   timelineOrder,
 } from "./timelineView.js";
+import { MAX_YEAR } from "./years.js";
 
 const ev = (id, date_start, date_end) => ({ id, title: id, date_start, date_end });
 
@@ -169,4 +170,17 @@ test("ticks: round years, not crowding the labelled ends", () => {
   );
   assert.deepEqual(axisTicks([1967, 1967]), []);
   for (const t of axisTicks([1973, 1991])) assert.ok(t.at >= 12 && t.at <= 88);
+});
+
+test("bar and fit axis: an ongoing event (title says present) runs to the current year; no signal stays a point", () => {
+  const yemen = { id: "y", title: "Yemeni civil war (2014–present)", date_start: "2014-09-16", date_end: null };
+  const syria = { id: "s", title: "Syrian civil war", date_start: "2011-03-15", date_end: null };
+  const bar = barGeometry(yemen, [2018, 2020]);
+  assert.equal(bar.before, true);
+  assert.equal(bar.after, MAX_YEAR > 2020);
+  assert.equal(bar.width, 100);
+  assert.equal(bar.point, false);
+  assert.equal(barGeometry(syria, [2018, 2020]), null);
+  assert.deepEqual(timelineAxis([yemen], [1900, MAX_YEAR], { fit: true }), [2014, MAX_YEAR]);
+  assert.deepEqual(timelineAxis([syria], [1900, MAX_YEAR], { fit: true }), [2011, 2011]);
 });

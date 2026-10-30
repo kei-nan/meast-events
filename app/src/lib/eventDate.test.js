@@ -35,3 +35,11 @@ test("yearOnly, or an end before the start, shows only the years in the order gi
   assert.equal(formatEventDate("2009-08-02", "1990-08-04", { precision: "day", yearOnly: true }), "2009–1990");
   assert.equal(formatEventDate("2009-08-02", "1990-08-04", { precision: "day" }), "2009–1990");
 });
+
+test("ongoing (a source says it is still going on): '– ongoing (per source)' after the start, only without an end", () => {
+  assert.equal(formatEventDate("2014-09-16", null, { precision: "day", ongoing: true }), "16 September 2014 – ongoing (per source)");
+  assert.equal(formatEventDate("2014-09-16", null, { precision: "month", ongoing: true }), "September 2014 – ongoing (per source)");
+  assert.equal(formatEventDate("2014-09-16", null, { precision: "day", yearOnly: true, ongoing: true }), "2014–ongoing (per source)");
+  assert.equal(formatEventDate("2023-10-08", "2024-11-27", { precision: "day", ongoing: true }), "8 October 2023 – 2024");
+  assert.equal(formatEventDate("2011-03-15", null, { precision: "day" }), "15 March 2011");
+});

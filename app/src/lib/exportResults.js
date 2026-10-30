@@ -30,7 +30,7 @@
 
 import { categoryLabel } from "./categoryLabels.js";
 import { countryLabel } from "./eventCountries.js";
-import { rawEventYears, eventOverlapsRange, yearsReversed } from "./eventYears.js";
+import { rawEventYears, eventOverlapsRange, ongoingSignal, yearsReversed } from "./eventYears.js";
 import { startedBefore } from "./browseOrder.js";
 import { eventPath, shareLink } from "./urlState.js";
 import { downloadBlob } from "./downloadFile.js";
@@ -58,6 +58,13 @@ export const CSV_COLUMNS = [
   ["license", "license"],
 ];
 
+// Which source an ongoing event's reading comes from (lib/eventYears.js ongoingSignal).
+const ONGOING_SOURCE = {
+  title: "Wikipedia title says present",
+  wikidata_novalue: "Wikidata end time: no value",
+  wikidata_somevalue: "Wikidata end time: unknown value",
+};
+
 const finite = (n) => typeof n === "number" && Number.isFinite(n);
 
 /**
@@ -70,6 +77,8 @@ export function rowNotes(e, { range = null, browse = false } = {}) {
   if (range && !eventOverlapsRange(e, range[0], range[1])) notes.push("Outside selected years");
   if (browse && range && startedBefore(e, range[0])) notes.push(`Ongoing since ${rawEventYears(e)[0]}`);
   if (yearsReversed(e)) notes.push("End date before start");
+  const ongoing = ongoingSignal(e);
+  if (ongoing) notes.push(`No end date; ongoing per source (${ONGOING_SOURCE[ongoing]})`);
   if (e.location_quality === "none") notes.push("No map location");
   if (e.location_quality === "approximate") {
     notes.push(

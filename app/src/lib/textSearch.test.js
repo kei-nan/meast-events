@@ -174,9 +174,13 @@ test("an old folder's load failing late does not reset the new folder's", async 
     release();
     await oldIdsSettled;
     assert.deepEqual(await searchEventIds("q"), ["e1"]);
-    // Still the retry's one meta.json read, engine and id map.
+    // Still the retry's one meta.json read, engine and id map. Counted for this
+    // test's folder only: the previous test's v.old engine load is not awaited
+    // and may settle now, calling options() on this test's fake (seen on CI).
     assert.equal(calls.meta, 1);
-    assert.equal(pf.calls.options.length, 1);
+    const bases = pf.calls.options.map((o) => o.basePath);
+    assert.equal(bases.filter((b) => b === "/pagefind/v.test/").length, 1);
+    assert.ok(bases.every((b) => b === "/pagefind/v.test/" || b === "/pagefind/v.old/"));
     assert.deepEqual(calls, ["/pagefind/v.test/ids.json"]);
   } finally {
     delete globalThis.__SEARCH_DIR__;
