@@ -149,6 +149,8 @@ async function withRetry(fn, onFirstFail) {
   }
 }
 
+const MAP_DESCRIPTION_ID = "map-description";
+
 export default function MapView({
   events,
   year: timelineYear,
@@ -170,6 +172,7 @@ export default function MapView({
   onSelectEvent,
   eventsLoading = false,
   yearPending = false, // true while the year to show is not known yet: no borders are fetched (App.jsx)
+  categories = null, // category ids that have events: the Map key lists only these (null = all)
 }) {
   const year = borderYear ?? timelineYear;
   const containerRef = useRef(null);
@@ -304,6 +307,9 @@ export default function MapView({
       maxBounds: [MAP_EXTENT.slice(0, 2), MAP_EXTENT.slice(2)],
     });
     mapRef.current = map;
+    // MapLibre's canvas is a region named "Map" with nothing inside for a screen reader: it points at a hidden line
+    // (MAP_DESCRIPTION_ID, rendered below) saying where the events are listed and which keys move the map.
+    map.getCanvas().setAttribute("aria-describedby", MAP_DESCRIPTION_ID);
     if (import.meta.env.DEV) window.__map = map; // debug helper, dev-only
     // Set on unmount; the async load handler checks it after each await.
     let cancelled = false;
@@ -1244,6 +1250,7 @@ export default function MapView({
           updating={!decadeCached}
           eventYearShown={borderYear != null}
           items={yearBorders}
+          categories={categories}
           yearBeside={eventYear != null && eventYear !== timelineYear}
         />
         {eventYear != null && eventYear !== timelineYear && (
@@ -1287,6 +1294,11 @@ export default function MapView({
         <ClusterList list={stackList} onSelect={selectFromStack} onClose={closeStack} width={size.w} height={size.h} />
       )}
       <div ref={hoverLabelRef} className="mu-tooltip" aria-hidden="true" hidden />
+      {/* The keys are MapLibre's keyboard handler (arrows pan, + and - zoom, with the map focused) and MapNav. */}
+      <p id={MAP_DESCRIPTION_ID} className="mu-visually-hidden">
+        The panel lists the events the map shows: those of the selected years, or the matches of a search. With the map
+        focused, the arrow keys move the map and the plus and minus keys zoom; the zoom and Move map buttons do the same.
+      </p>
     </div>
   );
 }

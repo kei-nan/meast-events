@@ -160,7 +160,8 @@ function ShowMatchesButton({ count, total, compact, onClick }) {
 // (`eventLabel` "event", or "event start" for a multi-year event) or the end of
 // the selected years. Both years are always printed, so the map never leaves
 // in doubt which year its borders are from. Phones keep only the two years in
-// sight beside the Borders chip; the accessible names keep the words.
+// sight beside the Borders chip, whose line then ends "Borders as of" (MapKey);
+// the accessible names keep the words.
 export function BorderYearChoice({ eventYear, eventLabel, rangeYear, eventShown, compact, onChoose }) {
   const options = [
     { key: "event", year: eventYear, label: eventLabel, pressed: eventShown },
@@ -364,7 +365,7 @@ export function BoundaryPopup({ popup, onClose, width, height }) {
 // year (pressed), so the button says just "Borders" (a phone fits the two in
 // one row); its accessible name and the Borders tab still give the year.
 const KEY_TABS = ["legend", "borders"];
-export function MapKey({ year, shownYear, updating, eventYearShown, items, yearBeside = false }) {
+export function MapKey({ year, shownYear, updating, eventYearShown, items, categories = null, yearBeside = false }) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("legend"); // kept while the page is open
   const panelRef = useRef(null);
@@ -432,8 +433,16 @@ export function MapKey({ year, shownYear, updating, eventYearShown, items, yearB
         onClick={() => setOpen((v) => !v)}
       >
         <span className="mu-borders-main">
-          Map key <span className="mu-borders-sep">·</span> Borders{yearText}
+          Map key{" "}
+          <span className="mu-borders-sep" aria-hidden="true">
+            ·
+          </span>{" "}
+          Borders{yearText}
+          {/* Phones drop the "Borders as of" caption of the years beside the
+              button (MapUi.css), so the button's own line ends with it. */}
+          {yearBeside && !updating && <span className="mu-borders-asof"> as of</span>}
         </span>
+        <span className="mu-borders-short">Key</span>
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
       </button>
       {open && (
@@ -444,7 +453,7 @@ export function MapKey({ year, shownYear, updating, eventYearShown, items, yearB
           </div>
           {tab === "legend" ? (
             <div role="tabpanel" id="mu-key-panel-legend" aria-labelledby="mu-key-tab-legend" className="mu-legend">
-              <LegendContent />
+              <LegendContent categories={categories} />
             </div>
           ) : (
             <div role="tabpanel" id="mu-key-panel-borders" aria-labelledby="mu-key-tab-borders">
@@ -480,11 +489,14 @@ export function MapKey({ year, shownYear, updating, eventYearShown, items, yearB
 
 // Alphabetical by label, like the search panel's category list (deliberate:
 // no category is put first). Labels are the shared ones (lib/categoryLabels.js).
+// Only the groups that have events (`categories`, App's filter chips), so the
+// key names no colour the map never draws (Economic has no event).
 const LEGEND_CATEGORIES = Object.entries(CATEGORY_COLORS)
   .map(([k, color]) => ({ k, color, label: categoryLabel(k) }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
-function LegendContent() {
+function LegendContent({ categories }) {
+  const shown = categories ? LEGEND_CATEGORIES.filter(({ k }) => categories.includes(k)) : LEGEND_CATEGORIES;
   return (
     <>
       <h3>Borders</h3>
@@ -501,7 +513,7 @@ function LegendContent() {
       </ul>
       <h3>Events (category is our grouping)</h3>
       <ul className="mu-cats">
-        {LEGEND_CATEGORIES.map(({ k, color, label }) => (
+        {shown.map(({ k, color, label }) => (
           <li key={k}>
             <span className="mu-dot" style={{ background: color }} aria-hidden="true" />
             {label}

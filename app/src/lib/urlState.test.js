@@ -6,6 +6,7 @@ import {
   canonicalPath,
   entryBeforePush,
   eventIdFromPath,
+  eventIdQuery,
   eventPath,
   parseArea,
   parseUrl,
@@ -260,4 +261,17 @@ test("shareLink: the view as it is now (not as the debounced URL last had it)", 
   assert.equal(shareLink("https://x.test", { ...base, q: "suez", startYear: 1956, endYear: 1957 }), "https://x.test/?q=suez&y=1956-1957");
   // An invalid id is not shared.
   assert.equal(shareLink("https://x.test", { ...base, eventId: "a b" }), "https://x.test/");
+});
+
+test("eventIdQuery: an unknown event link's id as search words", () => {
+  assert.equal(eventIdQuery("june-2025-israeli-strikes-on-iran"), "june 2025 israeli strikes on iran");
+  assert.equal(eventIdQuery("nope"), "nope");
+  assert.equal(eventIdQuery("Q123_a.b~c:d--e"), "Q123 a b c d e");
+  assert.equal(eventIdQuery("-x-"), "x");
+  assert.equal(eventIdQuery(null), "");
+  assert.equal(eventIdQuery(undefined), "");
+  // No longer than the search box takes (MAX_Q_LENGTH), and no trailing space from the cut.
+  const long = eventIdQuery(`${"a".repeat(99)}-b`);
+  assert.equal(long, "a".repeat(99));
+  assert.ok(eventIdQuery("ab-".repeat(60)).length <= 100);
 });

@@ -134,10 +134,17 @@ export default function App() {
     selectedIdRef.current = selectedEventId;
   }, [selectedEventId]);
   const panelRef = useRef(null); // SearchPanel's skipTo (skip link)
-  const [notFound, setNotFound] = useState(false);
+  // The id of an event link that leads to no event: the panel says so (SearchPanel) until the next search or
+  // selection.
+  const [notFoundId, setNotFoundId] = useState(null);
   const [playState, setPlayState] = useState("stopped"); // timeline Play, see Timeline (SearchPanel holds its announcements)
 
-  const [query, setQuery] = useState(initial.q);
+  const [query, setQueryState] = useState(initial.q);
+  // A search (typed, cleared, or "Search instead") retires the "no such event" notice.
+  const setQuery = useCallback((q) => {
+    setNotFoundId(null);
+    setQueryState(q);
+  }, []);
   const [categories, setCategories] = useState(initial.categories);
   const [countries, setCountries] = useState(initial.countries);
   const [scope, setScope] = useState(initial.scope); // "all" | "range"
@@ -424,7 +431,7 @@ export default function App() {
   const handleNavigate = useCallback((parsed) => {
     setPlayState((p) => (p === "playing" ? "paused" : p));
     setAreaMode("off");
-    setQuery(parsed.q);
+    setQueryState(parsed.q);
     setCategories(parsed.categories);
     setCountries(parsed.countries);
     setScope(parsed.scope);
@@ -432,7 +439,7 @@ export default function App() {
     setRange({ start: parsed.years?.[0] ?? MIN_YEAR, end: parsed.years?.[1] ?? MAX_YEAR });
     // Focus only an event this entry opens, not one that stays open.
     if (parsed.eventId !== selectedIdRef.current) pendingFocusRef.current = parsed.eventId;
-    setNotFound(false);
+    setNotFoundId(null);
     setSelectedEventId(parsed.eventId);
     setAboutSection(null);
     setAbout(parsed.about);
@@ -482,7 +489,7 @@ export default function App() {
       pendingFocusRef.current = null;
       replaceNextUrl();
       setSelectedEventId(null);
-      setNotFound(true);
+      setNotFoundId(selectedEventId);
     };
     const ev = storeRef.current.get(selectedEventId);
     if (ev && pendingFocusRef.current === selectedEventId) {
@@ -511,7 +518,7 @@ export default function App() {
   // open does (handlePlayState), so playback keeps visibly moving the map.
   const handleSelectFromMap = useCallback(
     (id) => {
-      setNotFound(false);
+      setNotFoundId(null);
       setHoverId(null);
       setSelectedEventId(id);
       if (playState === "playing") setTimelineBordersFor(id);
@@ -520,7 +527,7 @@ export default function App() {
   );
   const handleSelectFromList = useCallback(
     (id) => {
-      setNotFound(false);
+      setNotFoundId(null);
       setHoverId(null);
       setSelectedEventId(id);
       if (playState === "playing") setTimelineBordersFor(id);
@@ -589,7 +596,6 @@ export default function App() {
             {degraded && search.textSearch && search.source !== "static" && (
               <span className="app-notice">Full-text search is unavailable - matching titles and summaries only</span>
             )}
-            {notFound && <span className="app-notice">That event could not be found.</span>}
           </div>
           {/* The URL holds the view (years, filters, area), so this shares it as seen. While
               an event is open its own Share (EventDetail) takes over, so there is only ever one. */}
@@ -620,6 +626,7 @@ export default function App() {
                 onAreaChange={setArea}
                 onViewportChange={handleViewportChange}
                 onSelectEvent={handleSelectFromMap}
+                categories={categoryOptions.length ? categoryOptions : null}
               />
             </Suspense>
           ) : (
@@ -659,6 +666,7 @@ export default function App() {
             onViewChange={setView}
             counts={counts}
             interim={search.interim}
+            notFoundId={notFoundId}
           />
         </main>
         <Timeline

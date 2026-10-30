@@ -86,7 +86,7 @@ html, body, #root {
 
 .app-footer {
   flex: none;
-  padding: 3px 22px 4px;
+  padding: 1px 22px 2px;
   font-size: 0.78rem;
   line-height: 1.4;
   color: var(--text-secondary);
@@ -94,7 +94,9 @@ html, body, #root {
   border-top: 1px solid var(--border-soft);
 }
 
+/* At least 24px tall (WCAG 2.5.8 target size); the footer's own padding is that much smaller. */
 .app-footer-link {
+  min-height: 24px;
   background: none;
   border: 0;
   padding: 2px 0;
@@ -181,19 +183,21 @@ html, body, #root {
   }
 }
 
-/* Hidden until focused, so keyboard users can skip the map controls. */
+/* Hidden until focused, so keyboard users can skip the map controls. Moved up by its own height (and its 8px gap),
+   not a fixed -40px, which left it peeking in at larger text sizes (200% text: 53px tall). */
 .app-skip {
   position: absolute;
   left: 8px;
-  top: -40px;
+  top: 8px;
   z-index: 1000;
   padding: 6px 12px;
   background: var(--bg-2);
   color: var(--text-primary);
   border: 1px solid var(--accent);
   border-radius: 4px;
+  transform: translateY(calc(-100% - 16px));
 }
 
 .app-skip:focus {
-  top: 8px;
+  transform: none;
 }

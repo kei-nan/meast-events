@@ -311,13 +311,19 @@
   background: rgba(47, 111, 159, 0.16);
   box-sizing: border-box;
 }
+/* An event dot as the map draws it (mapLayers.js POINT_PAINT): the ink in the
+   dark edge, which also keeps the light inks (unclassified, uprising) apart
+   from the cream panel. A cluster keeps the map's light edge. */
 .mu-dot {
   flex: none;
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  border: 2px solid rgba(236, 226, 201, 0.85);
+  border: 2px solid #3b3226;
   box-sizing: border-box;
+}
+.mu-dot.is-cluster {
+  border-color: rgba(236, 226, 201, 0.85);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 .mu-dot.is-ring {
@@ -410,9 +416,16 @@
   overflow-y: auto;
   padding: 0 10px 8px;
 }
+/* Decorative (aria-hidden), but in the text's own contrast: 5.4:1 on the
+   button, 4.7:1 on its hover colour. */
 .mu-borders-sep {
   font-weight: 400;
-  color: #8a7a5f;
+  color: #6f6148;
+}
+/* " as of" after "Borders": phones only, where the years beside the button
+   lose their "Borders as of" caption. */
+.mu-borders-asof {
+  display: none;
 }
 .mu-borders-btn[aria-expanded="true"] .mu-borders-sep {
   color: #d6ccb6;
@@ -675,6 +688,11 @@
     width: 44px;
     height: 44px;
   }
+  /* The attribution's links (14px tall): 24px to a finger, the line unmoved
+     (vertical padding on an inline box). */
+  .maplibregl-ctrl-attrib a {
+    padding-block: 5px;
+  }
 }
 
 /* Mobile: the results sheet covers the lower ~45% of the map, so everything
@@ -699,6 +717,25 @@
   }
   .mu-tool-icon {
     font-size: 18px;
+  }
+  /* The open Draw menu keeps its words (touch screens show no tooltips, and
+     three bare shapes said nothing): one choice per row, icon and label. */
+  .mu-draw-menu {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mu-draw-menu .mu-tool {
+    justify-content: flex-start;
+    gap: 8px;
+    padding-left: 10px;
+    padding-right: 12px;
+  }
+  .mu-draw-menu .mu-tool .mu-tool-label {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
   }
   /* With an event open the Borders chip and the [1917][2026] choice sit side by side in
      one row (stacked they covered the map where the event was zoomed to);
@@ -746,6 +783,9 @@
   .mu-borders-main,
   .mu-borders-sub {
     white-space: nowrap;
+  }
+  .mu-borders-asof {
+    display: inline;
   }
   /* Phones: just the two joined years beside the Borders chip, no box or
      caption (the chip says "Borders 1917" right next to them). */
@@ -859,6 +899,20 @@
   .mu-ctrl-right > .mu-notices,
   .mu-ctrl-right .mu-borders-panel {
     margin-right: 0;
+  }
+}
+/* A 320px phone held sideways (or zoomed): ~60px between Draw area and that
+   row, and the results sheet's bar right under them, so the chip says just
+   "Key" (it ran over Draw area); its name and the Borders tab give the year. */
+.mu-borders-short {
+  display: none;
+}
+@media (max-height: 500px) and (max-width: 439px) {
+  .mu-borders-btn .mu-borders-main {
+    display: none;
+  }
+  .mu-borders-btn .mu-borders-short {
+    display: inline;
   }
 }
 

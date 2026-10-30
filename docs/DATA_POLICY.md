@@ -121,8 +121,9 @@ event (`groupForEvent` in `scripts/lib/event-classes.js`):
 hand-picked and discovered events alike, so the rule can be re-applied to the stored data; `scripts/validate-events.js` fails an event whose category is
 not what the rule gives. The event's header names the classes behind its group ("Terrorism, from Wikidata's class "suicide attack"";
 "Mixed — Wikidata's classes point to more than one group: protest (Protest), revolution (Uprising), war (War)";
-"Unclassified: none of its Wikidata classes is on our list"), generated the same way for every event. On the map, mixed is a slate grey
-and unclassified a warm grey (contrast against land/sea 4.58/4.19 and 4.33/3.96).
+"Unclassified: none of its Wikidata classes is on our list"), generated the same way for every event. On the map, mixed is a dark slate grey
+and unclassified a light stone grey, told apart by lightness (contrast against land/sea 4.58/4.19 and 1.70/1.56; the dark edge every dot has sets the
+light one off the land). Until 2026-10-30 unclassified was a warm grey of mixed's lightness, which read as the same grey.
 
 **2026-10-25: "mixed" replaced the table order.** The rule's first version (same day) took the group of the listed class that came first in the
 table, so the table's order decided, for example, that an "assassination" also typed "military operation" was war. An event whose listed classes span

@@ -280,6 +280,31 @@
   background: rgba(201, 154, 69, 0.1);
 }
 
+/* A link to no event (SearchPanel notFoundId): a notice at the top of the panel, in the banner's look. */
+.sp-notfound {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: rgba(201, 154, 69, 0.1);
+}
+
+.sp-notfound p {
+  margin: 0 0 8px;
+}
+
+.sp-notfound-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sp-notfound-id {
+  font-size: 0.95em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
 /* ---------- Filters disclosure ---------- */
 
 /* The second line under the search box: Filters, List | Timeline and Sort.
@@ -381,6 +406,18 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+/* The Country select, and under it what a country tag means; the scope row (while searching) below both. */
+.sp-country + .sp-filter-row {
+  margin-top: 10px;
+}
+
+.sp-filter-note {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
 }
 
 .sp-check {
@@ -520,13 +557,16 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-primary);
 }
 
+/* A category swatch as the map draws the dot: the ink (--dot) with the map's dark edge, on a small tile of the map's
+   land colour. On the bare dark panel the near-black atrocity ink read as a hollow ring (the map's sign for an
+   approximate location), with a hairline or a light rim alike; on the tile every ink reads as a filled dot. A square
+   tile, not a circle, so the light around a dark dot is not a second ring. */
 .sp-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
   flex-shrink: 0;
-  /* light hairline ring: keeps near-black category colours (atrocity) visible on the dark panel */
-  box-shadow: 0 0 0 1px rgba(236, 226, 201, 0.5);
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: radial-gradient(circle closest-side, var(--dot) 0 50%, #3b3226 53% 63%, #d5dbd7 67%);
 }
 
 .sp-select {
@@ -1441,6 +1481,16 @@ button.sp-chip[aria-pressed="true"] {
     content: "";
     position: absolute;
     inset: -12px -4px;
+  }
+}
+
+/* Small inline links (the review's "How we review" and "Disagree", the "Part of" links): on touch screens and phones
+   at least 24px tall to a finger (WCAG 2.5.8). Vertical padding on an inline box widens what a tap hits without
+   moving the line. */
+@media (pointer: coarse), (max-width: 768px) {
+  .framing-review-meta a,
+  .event-detail-partof a {
+    padding-block: 5px;
   }
 }
 
