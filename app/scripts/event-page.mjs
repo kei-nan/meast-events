@@ -141,7 +141,7 @@ function renderParagraph(paragraph, highlights) {
       if (!s.flagged) return text;
       const cls = ["framing-mark", ...s.kinds.map((k) => `framing-mark--${k}`)].join(" ");
       const by = s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ");
-      return `<mark class="${cls}" title="Flagged by the ${escapeHtml(by || "framing review")}. See the review below.">${text}</mark>`;
+      return `<mark class="${escapeHtml(cls)}" title="Flagged by the ${escapeHtml(by || "framing review")}. See the review below.">${text}</mark>`;
     })
     .join("");
   return `<p>${html}</p>`;

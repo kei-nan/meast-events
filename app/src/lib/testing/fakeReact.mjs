@@ -1,5 +1,5 @@
 // Test-only stand-in for the few React hooks a map hook uses (useRef, useMemo,
-// useEffect, useState), so a hook can be driven under `node --test` with no DOM and no
+// useCallback, useEffect, useState), so a hook can be driven under `node --test` with no DOM and no
 // renderer. Aliased in for "react" by viteNodeHooks.mjs (`data.aliases`).
 //
 // Semantics kept from React: hook slots by call order; useMemo/useEffect re-run
@@ -45,6 +45,15 @@ export function useMemo(fn, deps) {
   return s.value;
 }
 
+export function useCallback(fn, deps) {
+  const s = slot(() => ({ deps: null, fn }));
+  if (changed(s.deps, deps)) {
+    s.fn = fn;
+    s.deps = deps;
+  }
+  return s.fn;
+}
+
 export function useEffect(fn, deps) {
   const s = slot(() => ({ deps: null, cleanup: null }));
   if (!changed(s.deps, deps)) return;
@@ -76,4 +85,4 @@ export function renderHook(hook, props) {
   return { rerender: render };
 }
 
-export default { useRef, useMemo, useEffect, useState };
+export default { useRef, useMemo, useCallback, useEffect, useState };

@@ -44,25 +44,28 @@ export default function useUrlState(state, onNavigate) {
     stateRef.current = state;
   });
 
-  useEffect(() => {
+  // Writes `next` over the current entry (urlWriteMode); returns the pending
+  // debounced write's cancel, if any. Shared by the effect below and by the
+  // popstate of our own history.back().
+  const sync = (next) => {
     const entry = window.history.state;
     const backUrl = entry?.doc === DOC ? entry.back : null;
-    const mode = urlWriteMode(lastRef.current, url, { replace: replaceNextRef.current, backUrl });
-    if (!mode) return;
+    const mode = urlWriteMode(lastRef.current, next, { replace: replaceNextRef.current, backUrl });
+    if (!mode) return undefined;
     // A replace keeps the entry's own history.state (its `back`).
-    const write = (method, next = url) => {
+    const write = (method, to = next) => {
       const data = method === "pushState" ? { doc: DOC, back: lastRef.current } : window.history.state;
-      window.history[method](data, "", `${next}${window.location.hash}`);
-      lastRef.current = next;
+      window.history[method](data, "", `${to}${window.location.hash}`);
+      lastRef.current = to;
     };
     if (mode === "back") {
       // The popstate it fires is ours: that entry then gets the view as it is
-      // now (years or filters changed while the event was open are kept).
+      // by then (years or filters changed while the event was open are kept).
       replaceNextRef.current = false;
       goingBackRef.current = true;
-      lastRef.current = url;
+      lastRef.current = next;
       window.history.back();
-      return;
+      return undefined;
     }
     if (mode !== "debounce") {
       replaceNextRef.current = false;
@@ -73,22 +76,44 @@ export default function useUrlState(state, onNavigate) {
         if (carried != null) write("replaceState", carried);
       }
       write(mode === "push" ? "pushState" : "replaceState");
-      return;
+      return undefined;
     }
     const timer = setTimeout(() => write("replaceState"), REPLACE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
+  };
+  const syncRef = useRef(sync);
+  useEffect(() => {
+    syncRef.current = sync;
+  });
+
+  useEffect(() => {
+    // history.back() is asynchronous: until its popstate arrives, the current
+    // entry is still the one being left, so a write now (a push or replace)
+    // would land on the wrong entry or race the traversal. The popstate
+    // handler writes the latest state instead.
+    if (goingBackRef.current) return undefined;
+    return syncRef.current(url);
   }, [url]);
 
   useEffect(() => {
     const onPop = () => {
-      replaceNextRef.current = false;
       if (goingBackRef.current) {
+        // Our own history.back(): the entry reached gets the view as it is now,
+        // at once. If the state moved on meanwhile (another event opened or
+        // closed), that change is written from here like any other.
         goingBackRef.current = false;
+        lastRef.current = currentUrl();
         const next = stateUrl(stateRef.current);
-        window.history.replaceState(window.history.state, "", `${next}${window.location.hash}`);
-        lastRef.current = next;
+        if (urlWriteMode(lastRef.current, next) === "debounce") {
+          window.history.replaceState(window.history.state, "", `${next}${window.location.hash}`);
+          lastRef.current = next;
+        } else {
+          syncRef.current(next);
+        }
+        replaceNextRef.current = false;
         return;
       }
+      replaceNextRef.current = false;
       lastRef.current = currentUrl();
       navigateRef.current(parseUrl(lastRef.current));
     };

@@ -41,3 +41,5 @@ data/raw/
 # Local scratch: throw-away wrangler configs / Playwright scripts / dev-server logs
 .scratch/
 *.log
+# PID files from local dev/preview servers (e.g. serve-before.pid)
+*.pid

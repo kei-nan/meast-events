@@ -105,10 +105,14 @@ export default function useEventSearch({
 
   // Latest full-text answer: {q, status: 'ready'|'failed', ids}
   const [full, setFull] = useState({ q: null });
+  // The latest values, for the effect below without re-running it on each
+  // change (synced first: effects run in order; not written during render).
   const degradedRef = useRef(degraded);
-  degradedRef.current = degraded;
   const fullRef = useRef(full);
-  fullRef.current = full;
+  useEffect(() => {
+    degradedRef.current = degraded;
+    fullRef.current = full;
+  });
   const handledProbeRef = useRef(probeTick);
 
   // Re-run when `degraded` clears too: a probe that loaded the index but went
