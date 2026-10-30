@@ -24,8 +24,8 @@ export const CATEGORY_COLORS = {
   diplomatic: "#36747d", // muted teal
   economic: "#8b7938", // olive mustard
   terrorism: "#783e4d", // oxblood
-  // The darkest ink, 10.8:1 on land; on the dark panel its swatch (SidePanel.css .sp-dot) has a light rim so it
-  // reads as a filled dot, not a hollow ring.
+  // The darkest ink, 10.8:1 on land; on the dark panel its swatch (SidePanel.css .sp-dot) sits on a small tile in
+  // the map's land colour, with the map's dark dot edge, so it reads as a filled dot, not a hollow ring.
   atrocity: "#2b251c", // lamp black
   // Two neutral greys told apart by lightness (dark slate, light stone): told apart by hue alone (the old warm grey
   // #6b6151) they read as one grey (review 2026-10). Light stone is the light grey farthest (CIEDE2000, as above) from
