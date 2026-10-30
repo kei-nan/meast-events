@@ -11,6 +11,9 @@ name: Refresh Wikipedia summaries
 # The same run checks the Wikipedia guideline sections the framing review's
 # wording check cites; a section edited since the reviews is recorded in
 # data/framing-review.json and its diff shown at the top of the PR description.
+# It also lists, report only, curated events whose stored dates, coordinates or
+# Wikidata classes no longer match their Wikidata item (scripts/report-wikidata-
+# drift.js); nothing in that list is changed.
 #
 # Two jobs, so code from npm never runs where a write token exists:
 # - "refresh" runs the repo's scripts, `npm ci` (whose install scripts run
@@ -54,6 +57,7 @@ jobs:
       changed: ${{ steps.diff.outputs.changed }}
       report-url: ${{ steps.report.outputs.artifact-url }}
       guidelines-outcome: ${{ steps.guidelines.outcome }}
+      drift-outcome: ${{ steps.drift.outcome }}
     steps:
       # Read-only token, and not left in .git/config either.
       - name: Check out repository
@@ -89,6 +93,14 @@ jobs:
         id: guidelines
         continue-on-error: true
         run: node scripts/refresh-guidelines.js --apply --report="$RUNNER_TEMP/guidelines-report.md"
+
+      # REPORT ONLY: curated events whose stored start/end dates, coordinates or
+      # classes differ from their Wikidata item now. Writes no data file. Like the
+      # guideline check, a failure must not hold back the summaries.
+      - name: Report Wikidata drift
+        id: drift
+        continue-on-error: true
+        run: node scripts/report-wikidata-drift.js --report="$RUNNER_TEMP/drift-report.md"
 
       - name: Check for changes
         id: diff
@@ -163,6 +175,7 @@ jobs:
           path: |
             ${{ runner.temp }}/refresh-report.md
             ${{ runner.temp }}/guidelines-report.md
+            ${{ runner.temp }}/drift-report.md
           if-no-files-found: error
           retention-days: 90
 
@@ -238,6 +251,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPORT_URL: ${{ needs.refresh.outputs.report-url }}
           GUIDELINES_OUTCOME: ${{ needs.refresh.outputs.guidelines-outcome }}
+          DRIFT_OUTCOME: ${{ needs.refresh.outputs.drift-outcome }}
         run: |
           reports="$RUNNER_TEMP/reports"
           day="$(date -u +%Y-%m-%d)"
@@ -258,6 +272,8 @@ jobs:
             git -c core.hooksPath=/dev/null push origin "$branch"
           guidelines_bytes=0
           if [ "$GUIDELINES_OUTCOME" = "success" ]; then guidelines_bytes=$(wc -c < "$reports/guidelines-report.md"); fi
+          drift_bytes=0
+          if [ "$DRIFT_OUTCOME" = "success" ] && [ -f "$reports/drift-report.md" ]; then drift_bytes=$(wc -c < "$reports/drift-report.md"); fi
           {
             echo "Monthly refresh of the English Wikipedia summaries and titles (${day}), and a check of the Wikipedia guidelines the framing review cites."
             echo
@@ -278,8 +294,22 @@ jobs:
               echo "**The guideline check did not run to the end** (see the workflow log); this PR does not say whether the cited guidelines changed."
             fi
             echo
-            # The rest of the 60,000 bytes, without splitting a multi-byte UTF-8 character.
-            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$reports/refresh-report.md" "$guidelines_bytes"
+            # The Wikidata drift list (report only; this PR does not change what it lists), whole too.
+            if [ "$drift_bytes" -gt 20000 ]; then
+              echo "## Wikidata drift (report only)"
+              echo
+              echo "The drift list is longer than 20,000 bytes: see drift-report.md in the full report linked above."
+              drift_bytes=200
+            elif [ "$drift_bytes" -gt 0 ]; then
+              cat "$reports/drift-report.md"
+            else
+              echo "## Wikidata drift (report only)"
+              echo
+              echo "**The drift check did not run to the end** (see the workflow log)."
+            fi
+            echo
+            # The rest of the 60,000 bytes (after the guideline and drift sections), without splitting a multi-byte UTF-8 character.
+            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$reports/refresh-report.md" "$((guidelines_bytes + drift_bytes))"
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base main --head "$branch" \
             --title "Refresh Wikipedia summaries, titles and guideline versions (${day})" \

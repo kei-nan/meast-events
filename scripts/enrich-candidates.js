@@ -62,6 +62,10 @@ import {
   TITLE_YEARS_FLAG,
   lowPrecisionCoordinateFlag,
   LOW_PRECISION_FLAG,
+  presentWithoutEndFlag,
+  PRESENT_NO_END_FLAG,
+  durativeWithoutEndFlag,
+  DURATIVE_NO_END_FLAG,
 } from "./lib/flags.js";
 import { keptDatePrecision } from "./lib/fixes.js";
 import { renderMissingReport } from "./lib/missing-report.js";
@@ -420,6 +424,8 @@ ${m}      `),
     // On the kept dates and location (after the fix ledger); flags only, nothing is changed.
     setReason(r.review_reasons, TITLE_YEARS_FLAG, titleYearsFlag(r));
     setReason(r.review_reasons, LOW_PRECISION_FLAG, lowPrecisionCoordinateFlag(r));
+    setReason(r.review_reasons, PRESENT_NO_END_FLAG, presentWithoutEndFlag(r));
+    setReason(r.review_reasons, DURATIVE_NO_END_FLAG, durativeWithoutEndFlag(r));
     r._review = r.review_reasons;
   }
 

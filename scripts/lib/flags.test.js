@@ -13,7 +13,28 @@ import {
   TITLE_YEARS_FLAG,
   lowPrecisionCoordinateFlag,
   LOW_PRECISION_FLAG,
+  presentWithoutEndFlag,
+  PRESENT_NO_END_FLAG,
+  durativeWithoutEndFlag,
+  DURATIVE_NO_END_FLAG,
 } from "./flags.js";
+
+test("presentWithoutEndFlag: 'present' in the title and no date_end", () => {
+  assert.match(presentWithoutEndFlag({ title: "Iraqi insurgency (2017–present)", date_end: null }), new RegExp(`^${PRESENT_NO_END_FLAG}: `));
+  assert.ok(presentWithoutEndFlag({ title: "Middle Eastern crisis 2023-present", date_end: undefined }));
+  assert.equal(presentWithoutEndFlag({ title: "Iraqi insurgency (2017–present)", date_end: "2024-01-01" }), null);
+  // "present" not as a range end: not flagged.
+  assert.equal(presentWithoutEndFlag({ title: "Present-day Iraq protests", date_end: null }), null);
+  assert.equal(presentWithoutEndFlag({ title: undefined, date_end: null }), null);
+});
+
+test("durativeWithoutEndFlag: a durative Wikidata class and no date_end", () => {
+  const f = durativeWithoutEndFlag({ wikidata_classes: ["military occupation", "battle"], date_end: null });
+  assert.match(f, new RegExp(`^${DURATIVE_NO_END_FLAG}: Wikidata class military occupation describes a span of time`));
+  assert.equal(durativeWithoutEndFlag({ wikidata_classes: ["war"], date_end: "1967-06-10" }), null);
+  assert.equal(durativeWithoutEndFlag({ wikidata_classes: ["battle", "armed conflict", "rebellion", "protest"], date_end: null }), null);
+  assert.equal(durativeWithoutEndFlag({ wikidata_classes: undefined, date_end: null }), null);
+});
 
 test("titleYears: single years, ranges, two-digit ends and 'present'", () => {
   assert.deepEqual(titleYears("2009 Iranian presidential election protests"), [2009]);

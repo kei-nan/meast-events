@@ -111,6 +111,60 @@ export function titleYearsFlag({ title, date_start, date_end }) {
   );
 }
 
+// ---------- an ongoing or lasting event with no end date (flag only) ----------
+// The title says the event is still going on ("(2014–present)", "2023-present") but there is no date_end. An open
+// end is what Wikidata gives for an ongoing event; it is flagged so a reader of the data knows the stored span is the
+// start only. FLAG ONLY: the title and dates are never changed.
+export const PRESENT_NO_END_FLAG = "title_present_no_end";
+const PRESENT_RE = /[–—-]\s*present\b/i;
+export function presentWithoutEndFlag({ title, date_end }) {
+  if (date_end != null || !PRESENT_RE.test(String(title ?? ""))) return null;
+  return (
+    `${PRESENT_NO_END_FLAG}: the title says the event is ongoing ("present") and there is no date_end; ` +
+    `title and dates are kept as the sources give them`
+  );
+}
+
+// Wikidata classes (the labels stored in wikidata_classes) of events that by their nature last a span of time: a
+// war, an insurgency, an occupation, a movement. Narrow on purpose: "armed conflict", "rebellion", "revolution" and
+// "protest" also label single-day clashes, coups and demonstrations, so they are left out.
+export const DURATIVE_CLASSES = new Set([
+  "war",
+  "civil war",
+  "world war",
+  "proxy war",
+  "cold war",
+  "war of independence",
+  "war of national liberation",
+  "series of wars",
+  "attrition warfare",
+  "low-intensity conflict",
+  "insurgency",
+  "intifada",
+  "military occupation",
+  "ethnic conflict",
+  "international conflict",
+  "border conflict",
+  "blockade",
+  "protest movement",
+  "social movement",
+  "political movement",
+  "civil resistance",
+]);
+
+// An event of a durative class (above) with no date_end: the data holds only when it began. Not an error (it may be
+// ongoing, or Wikidata may lack the end); flagged so the open end is seen. FLAG ONLY: nothing is changed.
+export const DURATIVE_NO_END_FLAG = "durative_class_no_end";
+export function durativeWithoutEndFlag({ wikidata_classes, date_end }) {
+  if (date_end != null || !Array.isArray(wikidata_classes)) return null;
+  const hits = wikidata_classes.filter((c) => DURATIVE_CLASSES.has(c));
+  if (!hits.length) return null;
+  return (
+    `${DURATIVE_NO_END_FLAG}: Wikidata class ${hits.join(", ")} describes a span of time, but there is no date_end ` +
+    `(ongoing, or the end is not in Wikidata); dates are kept as the sources give them`
+  );
+}
+
 // ---------- month-precision date vs an exact day in the lead (flag only) ----------
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const M = MONTH_NAMES.join("|");

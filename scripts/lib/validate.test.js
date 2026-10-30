@@ -11,7 +11,9 @@ import {
   MAX_YEAR,
   MAX_END_YEAR,
   eventIdProblem,
+  checkShapeNamesFor,
 } from "./validate.js";
+import { shapeNamesFor } from "../../app/src/lib/eventCountries.js";
 import { isValidEventId } from "../../app/src/lib/urlState.js";
 import { MIN_YEAR as APP_MIN_YEAR, MAX_YEAR as APP_MAX_YEAR } from "../../app/src/lib/years.js";
 import { CATEGORY_LABELS, CLASS_GROUPS } from "../../app/src/lib/categoryLabels.js";
@@ -219,13 +221,13 @@ test("checkFramingCoverage: missing, stale and orphaned reviews are reported", (
 });
 
 test("validateEvents: a start date after the data was retrieved is a warning, not an error", () => {
-  const scheduled = event({ date_start: "2026-10-27", date_end: null, extract_retrieved_at: "2026-10-06T20:35:50Z" });
+  const scheduled = event({ date_start: "2026-10-27", date_end: null, wikidata_classes: ["battle"], extract_retrieved_at: "2026-10-06T20:35:50Z" });
   const r = validateEvents([scheduled]);
   assert.deepEqual(r.errors, []);
   assert.equal(r.warnings.length, 1);
   assert.match(r.warnings[0], /date_start \(2026-10-27\) is after the day its data was retrieved \(2026-10-06\)/);
   // Same day, or earlier: nothing.
-  assert.deepEqual(validateEvents([event({ date_start: "2026-10-06", date_end: null, extract_retrieved_at: "2026-10-06" })]).warnings, []);
+  assert.deepEqual(validateEvents([event({ date_start: "2026-10-06", date_end: null, wikidata_classes: ["battle"], extract_retrieved_at: "2026-10-06" })]).warnings, []);
   // No fetch date: compared with opts.today instead.
   const undated = { ...scheduled, extract_retrieved_at: undefined };
   assert.ok(validateEvents([undated], { lenient: true, today: "2026-10-01" }).warnings.some((w) => /was validated \(2026-10-01\)/.test(w)));
@@ -272,7 +274,7 @@ test("validateEvents: a precise pin outside every tagged country's shape is one 
   const pinOnly = (r) => ({ ...r, warnings: r.warnings.filter((w) => !/coordinate_low_precision/.test(w)) });
   const validate = (events, o) => pinOnly(validateEvents(events, o));
   const opts = { boundaries, turf };
-  const at = (lat, lon, over = {}) => event({ date_start: "1990-01-01", date_end: null, coordinates: { lat, lon }, ...over });
+  const at = (lat, lon, over = {}) => event({ date_start: "1990-01-01", date_end: null, wikidata_classes: ["battle"], coordinates: { lat, lon }, ...over });
   // Inside, and just outside the edge (within the 5 km tolerance): fine.
   assert.deepEqual(validate([at(30, 30)], opts).warnings, []);
   assert.deepEqual(validate([at(25, 35.04)], opts).warnings, []); // ~4 km east of the edge
@@ -293,6 +295,58 @@ test("validateEvents: a precise pin outside every tagged country's shape is one 
   assert.equal(validate([at(38.9, -77.03)], opts).warnings.length, 1);
   // Without boundaries/turf the check is off.
   assert.deepEqual(validate([at(32, 30)]).warnings, []);
+});
+
+test("validateEvents: before 1920 a pin tagged with an Ottoman-ruled country is checked against the Ottoman shape", needsTurf, () => {
+  const boundaries = {
+    type: "FeatureCollection",
+    features: [
+      box("Ottoman Empire", 1915, 1917, [26, 29, 48, 42]),
+      box("Ottoman Empire", 1920, 1921, [26, 36, 44.8, 42]),
+      box("Turkey", 1924, 9999, [26, 36, 44.8, 42]),
+    ],
+  };
+  const opts = { boundaries, turf };
+  const pinOnly = (events) => validateEvents(events, opts).warnings.filter((w) => !/coordinate_low_precision/.test(w));
+  const at = (lat, lon, over = {}) =>
+    event({ date_start: "1915-04-25", date_end: null, wikidata_classes: ["battle"], countries: ["Turkey"], coordinates: { lat, lon }, ...over });
+  // Inside the 1915 Ottoman shape: fine, for Turkey and for Iraq (Kut, 32.5N 45.8E).
+  assert.deepEqual(pinOnly([at(40, 30)]), []);
+  assert.deepEqual(pinOnly([at(32.5, 45.8, { countries: ["Iraq"] })]), []);
+  // Outside it (Kars in the Russian Empire's shape-less area, here east of the box): one warning naming the shape.
+  const off = pinOnly([at(40.6, 49)]);
+  assert.equal(off.length, 1);
+  assert.match(off[0], /is \d+ km outside the 1915 border shapes of every tagged country \(Turkey; .*before 1920 checked against the Ottoman Empire shape\)/);
+  // Countries not Ottoman-ruled then (Kuwait), and years with no Ottoman shape in the data (1918 here), stay unchecked.
+  assert.deepEqual(pinOnly([at(40.6, 49, { countries: ["Kuwait"] })]), []);
+  assert.deepEqual(pinOnly([at(40.6, 49, { date_start: "1918-01-01" })]), []);
+  // From 1920 the map's own table applies (the 1920 Ottoman shape is Turkey's): no "before 1920" note.
+  const later = pinOnly([at(40.6, 49, { date_start: "1920-06-01" })]);
+  assert.equal(later.length, 1);
+  assert.doesNotMatch(later[0], /before 1920/);
+});
+
+test("checkShapeNamesFor: the map's own shapes first; the Ottoman shape only before 1920 and only for the check", () => {
+  assert.deepEqual(checkShapeNamesFor("Turkey", 1930), { names: ["Turkey"], wide: false });
+  assert.deepEqual(checkShapeNamesFor("Iraq", 1916), { names: ["Ottoman Empire"], wide: true });
+  assert.deepEqual(checkShapeNamesFor("Egypt", 1916), { names: ["Egypt"], wide: false });
+  assert.deepEqual(checkShapeNamesFor("Kuwait", 1916), { names: [], wide: false });
+  assert.deepEqual(checkShapeNamesFor("Iraq", 1885), { names: [], wide: false });
+  // The app's display table is unchanged: no Ottoman shape for Iraq in 1916.
+  assert.deepEqual(shapeNamesFor("Iraq", 1916), []);
+});
+
+test("validateEvents: no date_end on a title saying 'present' or on a durative class is a warning", () => {
+  const w = (over) => validateEvents([event({ wikipedia_url: "https://en.wikipedia.org/wiki/T", ...over })]).warnings;
+  // As in the data: yemeni-civil-war-2014-present (classes civil war, war; no end).
+  const yemen = w({ title: "Yemeni civil war (2014–present)", date_start: "2014-09-16", date_end: null, wikidata_classes: ["civil war", "war"] });
+  assert.equal(yemen.length, 2, yemen.join("\n"));
+  assert.match(yemen[0], /title_present_no_end: the title says the event is ongoing/);
+  assert.match(yemen[1], /durative_class_no_end: Wikidata class civil war, war describes a span of time/);
+  // With an end date: neither (2024-israel-hezbollah-conflict ends 2024-11-27).
+  assert.deepEqual(w({ title: "Hezbollah–Israel conflict (2023–present)", date_start: "2023-10-08", date_end: "2024-11-27" }), []);
+  // A class that also labels single-day events (battle, armed conflict, protest): not flagged.
+  assert.deepEqual(w({ date_end: null, wikidata_classes: ["battle", "armed conflict", "protest"] }), []);
 });
 
 test("findClashes: id and QID clashes with the base set, each reason listed", () => {
@@ -368,8 +422,8 @@ test("validateEvents: years in the title outside the dates are a warning; the da
   // "present": 2024-israel-hezbollah-conflict (2024-09-23 to 2024-11-27).
   assert.match(w({ title: "Hezbollah–Israel conflict (2023–present)", date_start: "2024-09-23", date_end: "2024-11-27" }).join(), /names 2023,/);
   // No end date: only years before the start are outside (2015-2018-iraqi-protests, start 2018-09-07).
-  assert.match(w({ title: "2015–2018 Iraqi protests", date_start: "2018-09-07", date_end: null }).join(), /names 2015, outside the stored dates \(2018-09-07, no end date\)/);
-  assert.deepEqual(w({ title: "2018–2019 Gaza border protests", date_start: "2018-03-30", date_end: null }), []);
+  assert.match(w({ title: "2015–2018 Iraqi protests", date_start: "2018-09-07", date_end: null, wikidata_classes: ["battle"] }).join(), /names 2015, outside the stored dates \(2018-09-07, no end date\)/);
+  assert.deepEqual(w({ title: "2018–2019 Gaza border protests", date_start: "2018-03-30", date_end: null, wikidata_classes: ["battle"] }), []);
   // Inside the dates, a two-digit range end, reversed dates (lower to higher year): nothing.
   assert.deepEqual(w({ title: "Six-Day War of 1967", date_start: "1967-06-05", date_end: "1967-06-10" }), []);
   assert.deepEqual(w({ title: "Battle of Ras al-Ayn (2012–13)", date_start: "2012-11-08", date_end: "2013-07-17" }), []);
@@ -393,10 +447,10 @@ test("validateEvents: a precise pin with at most one decimal place is a warning 
 });
 
 test("validateEvents: a decade/century start without an end, and >= 8 countries, are warnings", () => {
-  const century = found({ date_start: "2000-01-01", date_end: null, date_precision: "century" });
+  const century = found({ date_start: "2000-01-01", date_end: null, wikidata_classes: ["battle"], date_precision: "century" });
   assert.match(validateEvents([century]).warnings.join(), /only century precision and there is no date_end: .*century ending 2000/);
   assert.deepEqual(validateEvents([found({ date_start: "1940-01-01", date_end: "1949-05-01", date_precision: "decade" })]).warnings, []);
-  assert.deepEqual(validateEvents([found({ date_start: "1948-01-01", date_end: null, date_precision: "year" })]).warnings, []);
+  assert.deepEqual(validateEvents([found({ date_start: "1948-01-01", date_end: null, wikidata_classes: ["battle"], date_precision: "year" })]).warnings, []);
   const many = ["Turkey", "Iran", "Iraq", "Syria", "Lebanon", "Jordan", "Egypt", "Yemen"];
   assert.match(validateEvents([found({ countries: many })]).warnings.join(), /tagged with 8 countries/);
   assert.deepEqual(validateEvents([found({ countries: many.slice(0, 7) })]).warnings, []);
