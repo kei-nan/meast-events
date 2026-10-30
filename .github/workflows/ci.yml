@@ -49,12 +49,15 @@ jobs:
         run: npm ci
 
       # oxlint (app/.oxlintrc.json: react, jsx-a11y and import plugins); warnings fail.
+      # Its prelint script first writes the generated src/lib/dataVersion.js
+      # (scripts/split-data.mjs, as predev/prebuild do), so import/named checks
+      # the imports from it against the current data, not a missing or stale copy.
       - name: Lint
         working-directory: app
         run: npm run lint
 
       # Unit tests for the frontend (src/lib, src/components, scripts): node's
-      # built-in test runner. They run before the build creates the generated
+      # built-in test runner. They do not read the generated
       # src/lib/dataVersion.js: tests that need it stub it (and Vite's
       # import.meta.env) with src/lib/testing/viteNodeHooks.mjs.
       - name: Unit tests (app/src and app/scripts)

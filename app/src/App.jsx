@@ -39,6 +39,15 @@ const MapViewFailed = () => (
     The map could not be loaded. Please reload the page.
   </div>
 );
+// The map chunk is requested as soon as this module runs, not when React first
+// renders <MapView>: the lazy() import below then reuses the same download.
+// Measured (2026-10, slow 4G 1.6 Mbps/150 ms, 4x CPU, phone, cache off, median
+// of 9): requested at 1.39 s instead of 1.65 s, the map uncovered ~35-55 ms
+// sooner, first paint unchanged. A <link rel=modulepreload> in index.html would
+// start it at 0.2 s, but it shares the bandwidth with index.js: first paint
+// 1.58 -> 2.06 s and the result list 1.63 -> 2.06 s, for the map ~0.3 s sooner.
+// A failure here is ignored: importOr reports and retries it.
+import("./components/MapView").catch(() => {});
 const MapView = lazy(() => importOr(() => import("./components/MapView"), MapViewFailed));
 // Sea, then the land as soon as land.json is in (components/MapLoading.jsx).
 const MAP_PLACEHOLDER = <MapLoading />;

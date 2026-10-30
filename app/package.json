@@ -13,6 +13,7 @@
     "dev": "vite",
     "build": "vite build",
     "postbuild": "node scripts/build-event-pages.mjs && node scripts/expand-headers.mjs && node scripts/check-dist.mjs",
+    "prelint": "node scripts/split-data.mjs",
     "lint": "oxlint --deny-warnings",
     "test": "node --test \"src/lib/*.test.js\" \"src/components/*.test.js\" \"src/hooks/*.test.js\" \"scripts/*.test.mjs\"",
     "preview": "vite preview",
