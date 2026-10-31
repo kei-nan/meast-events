@@ -35,6 +35,7 @@ rather than a second layer of ours. Concretely:
 | `wikipedia_revid`, `wikipedia_revid_timestamp` | Only where known: the id of the English Wikipedia revision whose lead is exactly `extract`, and when it was saved (see "Revision") | Wikipedia |
 | `wikidata_classes` | ALL class labels of the Wikidata item, see below | Wikidata |
 | `date_start`, `date_end` | Wikidata dates (P585 point in time, else P580 start; P582 end) | Wikidata |
+| `date_precision`, `date_end_precision` | Wikidata's precision ("day", "month", "year", "decade", ...) of the statement whose value is the stored `date_start` (P585/P580) or `date_end` (P582); `null` when no statement of the item has the stored date. The event panel shows each date to its precision and no further ("29 October – 7 November 1956"); without `date_end_precision` the end shows as a year only ("29 October 1956 (ended 1956)"). `date_end_precision` is only on events with a `date_end` (backfilled 2026-10-31 by `scripts/backfill-end-precision.js`: 269 day, 14 month, 13 year, 22 null of 318) | Wikidata |
 | `countries` | Wikidata's country (P17, or P17 of the P276/P131 place), mapped to the 15 tracked names | Wikidata |
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
@@ -656,12 +657,16 @@ node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichmen
                                                         #    only where the stored date is a Wikidata P585/P580 value or a
                                                         #    verified F13/F14 entry (docs/data-fixes.md) settles it
                                                         #    (run 2026-10-24: 83 of 102 applied, 19 left as they are)
+node scripts/backfill-end-precision.js [--apply]        # date_end_precision for curated events with a date_end that lack it
+                                                        #    (the P582 statement whose value is the stored date_end; null if none)
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
 node scripts/report-wikidata-drift.js [--report=path]   # monthly REPORT ONLY (automatic): curated events whose dates, coordinates or
                                                         #    classes differ from their Wikidata item now; writes no data file
                                                         #    (a listed date is applied by hand in a reviewed PR, docs/data-fixes.md)
+                                                        #    (a changed date_end: delete its date_end_precision and rerun
+                                                        #    backfill-end-precision.js, which derives it for the new date)
 node scripts/build-selection-funnel.js [--check|--offline] # -> data/selection-funnel.json (dated by its input data, not the clock;
                                                         #    --offline keeps the committed sitelink_measurement, no network)
 node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)

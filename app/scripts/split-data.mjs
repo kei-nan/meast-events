@@ -523,8 +523,10 @@ async function splitEvents(boundariesVersion) {
         ? { wikipedia_revid: e.wikipedia_revid, wikipedia_revid_timestamp: e.wikipedia_revid_timestamp }
         : {}),
       ...detailFields(e, fixAnchors),
-      // Wikidata's precision of date_start ("day", "month", "year", "decade").
+      // Wikidata's precision of date_start ("day", "month", "year", "decade"),
+      // and of date_end where recorded (its P582 statement's).
       date_precision: e.date_precision ?? null,
+      ...(e.date_end_precision ? { date_end_precision: e.date_end_precision } : {}),
       framing_review: framing,
     };
     // Only on events that have them, so the buckets stay small.

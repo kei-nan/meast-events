@@ -439,6 +439,7 @@ export function eventDateText(event) {
   const flags = (event.date_flags ?? []).filter(Boolean);
   return formatEventDate(event.date_start, event.date_end, {
     precision: event.date_precision ?? null,
+    endPrecision: event.date_end_precision ?? null,
     yearOnly: flags.length > 0,
     ongoing: Boolean(ongoingSignal(event)),
   });
@@ -509,10 +510,10 @@ export function eventJsonLd(event) {
   const reversed = Boolean(event.date_start && event.date_end && String(event.date_end) < String(event.date_start));
   // Flagged (unverified) or reversed dates: years only, as the page shows them.
   const startDate = isoDate(event.date_start, flagged || reversed ? "year" : (event.date_precision ?? null));
-  // No precision is recorded for an end date: the year only. A reversed range is
-  // not valid structured data, so it gets no endDate; the page shows both dates
-  // and a note.
-  const endDate = event.date_end && !reversed ? isoDate(event.date_end, "year") : null;
+  // The end at its own recorded precision (date_end_precision), else the year
+  // only. A reversed range is not valid structured data, so it gets no endDate;
+  // the page shows both dates and a note.
+  const endDate = event.date_end && !reversed ? isoDate(event.date_end, flagged ? "year" : (event.date_end_precision ?? "year")) : null;
   const c = event.coordinates;
   const precise = event.location_quality === "precise" && Number.isFinite(c?.lat) && Number.isFinite(c?.lon);
   const description = metaDescription(event.extract);
@@ -555,7 +556,7 @@ export function jsonLdScript(data) {
 /**
  * One event's page: the app shell `template` (dist/index.html) filled with the
  * event (fillAppShell). `event` is the lite record (split-data.mjs publicEvent)
- * merged with its full-lead record (extract, extract_retrieved_at, date_precision,
+ * merged with its full-lead record (extract, extract_retrieved_at, date_precision, date_end_precision,
  * framing_review, part_of, includes, related). Every field may be missing except id and title.
  * `neighbours` ({prev, next}, lite records) are the events before and after it in
  * the dataset's order; `preload` is its full-record bucket's path (fillAppShell).

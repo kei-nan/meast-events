@@ -67,7 +67,7 @@ import {
   durativeWithoutEndFlag,
   DURATIVE_NO_END_FLAG,
 } from "./lib/flags.js";
-import { keptDatePrecision } from "./lib/fixes.js";
+import { keptDatePrecision, keptEndPrecision } from "./lib/fixes.js";
 import { renderMissingReport } from "./lib/missing-report.js";
 import { refreshOrderFlags } from "./lib/order-flags.js";
 import { slugify } from "./lib/slug.js";
@@ -416,6 +416,10 @@ ${m}      `),
     const kept = keptDatePrecision(ctx.entities.get(r.wikidata_qid), r.date_start);
     if (kept) r.date_precision = kept.name;
     else if (!src || r.date_start !== src.date_start) r.date_precision = null;
+    // The kept date_end's precision likewise: its P582 statement's (lib/fixes.js keptEndPrecision), null when no P582
+    // has that value; no end, no field. The event panel shows the end to it ("29 October – 7 November 1956").
+    if (r.date_end) r.date_end_precision = keptEndPrecision(ctx.entities.get(r.wikidata_qid), r.date_end)?.name ?? null;
+    else delete r.date_end_precision;
     const code = PRECISION_CODE[r.date_precision];
     setReason(r.review_reasons, "date_precision_coarse",
       code != null && code < 9 ? `date_precision_coarse: Wikidata records the date only to ${r.date_precision} precision` : null);

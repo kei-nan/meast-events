@@ -395,6 +395,15 @@ export function validateEvents(
     } else if (e.date_precision != null && precisionCode(e.date_precision) === null) {
       warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
     }
+    // date_end_precision (optional): the Wikidata precision of the kept date_end's P582 statement (lib/fixes.js
+    // keptEndPrecision; scripts/backfill-end-precision.js), null when no P582 has that value. Without it the end
+    // shows as a year only.
+    if ("date_end_precision" in e) {
+      if (!e.date_end) warn(i, e, "date_end_precision without a date_end");
+      else if (e.date_end_precision !== null && precisionCode(e.date_end_precision) === null) {
+        warn(i, e, `date_end_precision ${JSON.stringify(e.date_end_precision)} is not a Wikidata precision name`);
+      }
+    }
     // Years only: the title is Wikipedia's, the dates Wikidata's; neither is changed (lib/flags.js titleYearsFlag).
     if (typeof e.title === "string" && isRealDate(e.date_start)) {
       const ty = titleYearsFlag(e);

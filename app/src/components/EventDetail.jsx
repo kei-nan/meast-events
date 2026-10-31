@@ -243,10 +243,11 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
   const showClasses = classes.length > 0;
   const itemUrl = wikidataUrl(event.wikidata_qid);
   const flags = (event.date_flags ?? []).filter(Boolean);
-  // Unverified dates show only their years. date_precision comes with the full lead,
-  // so the year alone shows until it arrives.
+  // Unverified dates show only their years. date_precision and date_end_precision
+  // come with the full lead, so the year alone shows until they arrive.
   const dateText = formatEventDate(event.date_start, event.date_end, {
     precision: event.date_precision,
+    endPrecision: event.date_end_precision,
     yearOnly: flags.length > 0,
     ongoing: Boolean(ongoingSignal(event)),
   });
