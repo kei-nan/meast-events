@@ -513,6 +513,20 @@ export default function AboutData({ section = null, onClose }) {
           </a>{" "}
           says which and why). The lake outlines are Natural Earth&apos;s.
         </p>
+        <p>
+          Cities appear as you zoom in: Natural Earth&apos;s places in the 16 countries with a population of 300,000 or more
+          (Natural Earth&apos;s metropolitan figure), at its point. They are today&apos;s cities, named in every year, however small
+          they were then; a city that merged into another (Jaffa into Tel Aviv-Yafo) has no name of its own. No capital is
+          marked. Each name is the title of the city&apos;s English Wikipedia article, as an event&apos;s is. Before a change of
+          name, the map shows the former name (Constantinople until 1930, Rezaiyeh for Urmia in 1925&ndash;1979) where an
+          English Wikipedia article gives the former name and the year; where it gives only the decade, the city is unnamed in
+          those years. The{" "}
+          <a href={`${REPO}/blob/main/scripts/build-cities.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            list
+          </a>{" "}
+          quotes the sentences, and names the changes left out because no article dates them (Aintab for Gaziantep, Soltan
+          Abad for Arak).
+        </p>
 
         {/* The footer's "Sources & licences" opens the dialog here: these are
             the site's required credits, so none of them may be dropped. */}
