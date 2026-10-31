@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@turf/turf": "^7.4.0",
-    "oxlint": "1.88.0",
+    "oxlint": "1.89.0",
     "shapefile": "^0.6.6"
   }
 }
