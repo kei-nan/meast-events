@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 import { loadLand } from "../lib/dataClient";
-import { LAND_ON_SEA, defaultCamera, mercatorX, mercatorY, openingPadding } from "../lib/mapBase";
+import { LAND_ON_SEA, SEA_COLOR, defaultCamera, mercatorX, mercatorY, openingPadding } from "../lib/mapBase";
+import WATER from "../data/water.json";
 import { sheetCover } from "../lib/mapInsets";
 
 // Stands in for the map while MapLibre downloads and starts (~1.5 MB of
@@ -34,11 +35,20 @@ function draw(canvas, land) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   // The view MapView opens on: on phones, above the lowered sheet.
   const { worldSize, x0, y0 } = defaultCamera(width, height, { padding: openingPadding(height, sheetCover(canvas)) });
-  ctx.fillStyle = LAND_ON_SEA;
   // One path, one fill: the land is cut into pieces (cells), and separate fills would
   // leave a faint line where two pieces meet (each antialiased edge half-covers it).
+  ctx.fillStyle = LAND_ON_SEA;
+  fillPolygons(ctx, land.features, worldSize, x0, y0);
+  // The lakes over it, as the map draws them (mapInstallLayers.js "lake-fill").
+  ctx.fillStyle = SEA_COLOR;
+  fillPolygons(ctx, LAKES, worldSize, x0, y0);
+}
+
+const LAKES = WATER.features.filter((f) => f.properties.kind === "lake");
+
+function fillPolygons(ctx, features, worldSize, x0, y0) {
   ctx.beginPath();
-  for (const feature of land.features) {
+  for (const feature of features) {
     const { type, coordinates } = feature.geometry ?? {};
     const polygons = type === "Polygon" ? [coordinates] : type === "MultiPolygon" ? coordinates : [];
     for (const rings of polygons) {
@@ -53,7 +63,7 @@ function draw(canvas, land) {
       }
     }
   }
-  ctx.fill("evenodd"); // holes (lakes) stay sea; pieces never overlap
+  ctx.fill("evenodd"); // holes stay unfilled; pieces never overlap
 }
 
 /**

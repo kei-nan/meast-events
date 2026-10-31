@@ -13,7 +13,8 @@ import {
   POINT_PAINT,
 } from "./mapLayers";
 import { BORDER_STYLE, DASHED_EXPR } from "./mapBorders";
-import { LAND_ON_SEA } from "../lib/mapBase";
+import { LAND_ON_SEA, SEA_COLOR } from "../lib/mapBase";
+import WATER from "../data/water.json";
 import { LABEL_FONT_FAMILY } from "../lib/labelFont";
 
 // Labels are drawn in the browser from the site's Inter at weight 600
@@ -65,6 +66,18 @@ export function installLayers(map, { land, boundaries, labels, events }) {
     }
   );
 
+  // The two lakes Natural Earth's land covers (the Dead Sea and the Sea of Galilee),
+  // physical geography like the land (scripts/build-water.js): the sea's colour over
+  // the land. MapLoading draws them the same way. Their names: "water-label-*" below.
+  map.addSource("water", { type: "geojson", data: WATER });
+  map.addLayer({
+    id: "lake-fill",
+    type: "fill",
+    source: "water",
+    filter: ["==", ["get", "kind"], "lake"],
+    paint: { "fill-color": SEA_COLOR, "fill-opacity": 1 },
+  });
+
   map.addSource("boundaries", {
     type: "geojson",
     data: boundaries,
@@ -97,6 +110,31 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       ],
     },
   });
+
+  // Water names (scripts/build-water.js): over the border lines, under the search
+  // area and the event markers. Every other label (states, cluster counts) sits higher,
+  // so it is placed first (symbols are placed top layer down) and a water name that
+  // would overlap it is not drawn. One layer per `minzoom`: seas, gulfs, straits.
+  const tiers = [...new Set(WATER.features.map((f) => f.properties.minzoom).filter((z) => z != null))].sort((a, b) => a - b);
+  for (const minzoom of tiers) {
+    map.addLayer({
+      id: `water-label-${minzoom}`,
+      type: "symbol",
+      source: "water",
+      minzoom,
+      filter: ["all", ["!=", ["get", "kind"], "lake"], ["==", ["get", "minzoom"], minzoom]],
+      layout: {
+        "text-field": ["get", "name"],
+        "text-font": LABEL_FONT,
+        "text-size": ["interpolate", ["linear"], ["zoom"], 2, 10, 5, 12, 8, 14],
+        "text-letter-spacing": 0.12,
+        "text-max-width": 6,
+        "text-padding": 2,
+      },
+      // #2e5a72 on the sea (lib/mapBase.js SEA_COLOR): 4.85:1, WCAG AA for text.
+      paint: { "text-color": "#2e5a72", "text-halo-color": "rgba(214,232,241,0.8)", "text-halo-width": 1 },
+    });
+  }
 
   map.addSource("boundary-labels", {
     type: "geojson",
