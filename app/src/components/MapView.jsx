@@ -11,7 +11,7 @@ import {
   makeRectArea,
   pointFeature,
 } from "./mapLayers";
-import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";
+import { CLUSTER_MAX_ZOOM, installLayers, setCityYear } from "./mapInstallLayers";
 import { loadLabelFont } from "../lib/labelFont";
 import { foldIncluded, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
 import {
@@ -373,6 +373,7 @@ export default function MapView({
         // Already filtered to the year, so the labels' own filter keeps them all.
         labels: boundaryLabelsForYear(yearRef.current, boundaries.features),
         events: eventsToGeoJSON(eventsRef.current, matchIdsRef.current),
+        year: yearRef.current,
       });
       sourceSigsRef.current = new Map(
         eventsRef.current.filter((e) => e.coordinates).map((e) => [e.id, eventSignature(e, matchIdsRef.current)])
@@ -750,6 +751,8 @@ export default function MapView({
       // Already filtered to the year, so the labels' own filter keeps them all.
       mapRef.current.getSource("boundary-labels")?.setData(boundaryLabelsForYear(year, active.features));
     }
+    // City names change with the borders, so the two always show the same year.
+    setCityYear(mapRef.current, year);
     setDisplayedYear(year);
   }, [year, boundaryVersion, mapReady]);
 
