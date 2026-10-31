@@ -858,6 +858,12 @@
   .mu-borders-asof {
     display: inline;
   }
+  /* With an event's years beside it the chip reads just "Borders as of"
+     (~75px narrower), so the row covers less of the map round the event; it
+     still opens the Map key, and says so when no event is open. */
+  .mu-borders-btn[data-beside] .mu-borders-keyword {
+    display: none;
+  }
   /* Phones: just the two joined years beside the Borders chip, no box or
      caption (the chip says "Borders 1917" right next to them). */
   .mu-year-choice {

@@ -252,6 +252,11 @@
   flex: none;
 }
 
+/* Phones only (below). */
+.timeline-presets-more {
+  display: none;
+}
+
 /* Inside the button: the scrolling row (and its edge fades) would clip a ring
    drawn outside it, on phones at both ends. */
 .timeline-preset:focus-visible {
@@ -581,6 +586,36 @@
 
   .timeline-preset {
     min-width: 44px;
+  }
+
+  /* The row often holds exactly one preset here, so the fade fell on an
+     empty gap and nothing said the row goes on. Instead: a "›" held at the
+     right edge (sticky) over whatever is clipped, while there is more. */
+  .timeline-presets[data-fade-right] {
+    mask-image: none;
+  }
+  .timeline-presets[data-fade-left],
+  .timeline-presets[data-fade-left][data-fade-right] {
+    mask-image: linear-gradient(to right, transparent, #000 var(--tl-fade));
+  }
+  /* A focused preset (scrollIntoView) clear of the mark. */
+  .timeline-presets {
+    scroll-padding-inline-end: 18px;
+  }
+  .timeline-presets[data-fade-right] .timeline-presets-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    right: 0;
+    flex: none;
+    width: 18px;
+    margin-left: -23px; /* over the clipped edge, not after it (-18px - the 5px gap) */
+    background: var(--bg-1);
+    box-shadow: -6px 0 6px var(--bg-1);
+    color: var(--accent);
+    font: 600 20px/1 system-ui, sans-serif;
+    pointer-events: none;
   }
 
   .timeline-play {

@@ -464,6 +464,7 @@ export function MapKey({ year, shownYear, updating, eventYearShown, items, categ
         ref={buttonRef}
         type="button"
         className="mu-btn mu-borders-btn"
+        data-beside={yearBeside || undefined}
         aria-expanded={open}
         aria-controls="mu-borders-panel"
         aria-label={`Map key${shownYear != null ? `: borders ${shownYear}${n ? `, ${n} drawn` : ""}` : ""}${sub ? `, ${sub}` : ""}`}
@@ -471,10 +472,14 @@ export function MapKey({ year, shownYear, updating, eventYearShown, items, categ
         onClick={() => setOpen((v) => !v)}
       >
         <span className="mu-borders-main">
-          Map key{" "}
-          <span className="mu-borders-sep" aria-hidden="true">
-            ·
-          </span>{" "}
+          {/* Phones with the years beside drop "Map key ·" (MapUi.css): the
+              row covered the map under it. The name keeps the words. */}
+          <span className="mu-borders-keyword">
+            Map key{" "}
+            <span className="mu-borders-sep" aria-hidden="true">
+              ·
+            </span>{" "}
+          </span>
           Borders{yearText}
           {/* Phones drop the "Borders as of" caption of the years beside the
               button (MapUi.css), so the button's own line ends with it. */}

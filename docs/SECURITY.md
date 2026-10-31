@@ -265,8 +265,6 @@ The site has no accounts, no user data and no server code (above), so the
 interesting cases are things like script injection on the site, a way to get
 unreviewed content deployed, or a weakness in the CI workflows.
 
-Owner, once: private reporting must be switched on, or the button does not
-appear (it was off when checked on 2026-10-18). GitHub's
-[docs](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configuring-private-vulnerability-reporting-for-a-repository):
-repository **Settings -> Advanced Security** (sidebar section "Security and
-quality") -> **Private vulnerability reporting** -> **Enable**.
+Private reporting is switched on (checked 2026-10-31). If the button is ever
+missing, it was switched off: repository **Settings -> Advanced Security** ->
+**Private vulnerability reporting** -> **Enable**.

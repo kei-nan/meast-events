@@ -377,10 +377,7 @@ dashboard. None is needed for the site to work.
 4. **Finish [Retiring the old API](#retiring-the-old-api-manual-one-time):** delete the
    `meast-api` Worker and the Redis Cloud database (and subscription), then delete the local
    `server/.env` and `worker/.dev.vars` files (they hold the old Redis password).
-5. **Turn on GitHub private vulnerability reporting** (it was off on 2026-10-18), so the
-   "Report a vulnerability" route in [docs/SECURITY.md](docs/SECURITY.md#5-reporting-a-vulnerability)
-   works: **Settings → Advanced Security → Private vulnerability reporting → Enable**.
-6. **Stop Cloudflare injecting its "JavaScript detections" script.** Every page on the live
+5. **Stop Cloudflare injecting its "JavaScript detections" script.** Every page on the live
    site logs a CSP error ("Refused to execute inline script ...") for an inline script
    Cloudflare adds under `/cdn-cgi/challenge-platform/`. The CSP blocks it on purpose: its
    content changes per response, so only `'unsafe-inline'` would allow it

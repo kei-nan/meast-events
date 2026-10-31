@@ -476,6 +476,11 @@ function Presets({ startYear, endYear, onPick }) {
           {p.label}
         </button>
       ))}
+      {/* Phones: a "more this way" mark on the clipped right edge (Timeline.css),
+          where the fade alone fell on an empty gap. Decorative. */}
+      <span className="timeline-presets-more" aria-hidden="true">
+        ›
+      </span>
     </div>
   );
 }
