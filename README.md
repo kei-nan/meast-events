@@ -4,6 +4,13 @@ An interactive map and timeline of the Middle East, 1900 to the present:
 events from Wikipedia and historically dated borders, with the source and
 status of every border shown honestly.
 
+[![The site's map from 1902 to 2026, two years per frame: the borders of each period and the events in it](docs/media/borders-1902-2026.gif)](https://middleeast.events)
+
+*The live site's map, 1902–2026, two years per frame. Borders derive from
+CShapes 2.0 (CC BY-NC-SA 4.0) and, for the West Bank Areas A/B/C, UN OCHA
+(non-commercial, with credit); see [data/LICENSE](data/LICENSE) and
+[NOTICE](NOTICE).*
+
 Structure: `app/` (React + MapLibre frontend, a fully static site with
 in-browser full-text search), `scripts/` and `data/` (ingestion and the cited
 border-corrections pipeline). See DEPLOYMENT.md.
