@@ -501,6 +501,18 @@ export default function AboutData({ section = null, onClose }) {
           </a>{" "}
           lists these cases and the rule.
         </p>
+        <p>
+          The names of seas, gulfs and straits, and the two lakes drawn (the Dead Sea and the Sea of Galilee), are physical
+          geography and the same in every year. Which water is named is our choice. Each name is the title of its English
+          Wikipedia article, as an event&apos;s is, so where water has more than one name the map shows that one: the Persian
+          Gulf is also called the Arabian Gulf, the Gulf of Aqaba the Gulf of Eilat, and the Sea of Galilee Lake Kinneret or
+          Lake Tiberias. Where each name sits is Wikidata&apos;s coordinate for it, or a point of ours where that one is off the
+          map or crowded (the{" "}
+          <a href={`${REPO}/blob/main/scripts/build-water.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
+            list
+          </a>{" "}
+          says which and why). The lake outlines are Natural Earth&apos;s.
+        </p>
 
         {/* The footer's "Sources & licences" opens the dialog here: these are
             the site's required credits, so none of them may be dropped. */}
