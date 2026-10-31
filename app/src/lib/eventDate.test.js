@@ -43,3 +43,23 @@ test("ongoing (a source says it is still going on): '– ongoing (per source)' a
   assert.equal(formatEventDate("2023-10-08", "2024-11-27", { precision: "day", ongoing: true }), "8 October 2023 – 2024");
   assert.equal(formatEventDate("2011-03-15", null, { precision: "day" }), "15 March 2011");
 });
+
+test("with the end's own precision the end shows to it, a shared year (and month) said once", () => {
+  const day = { precision: "day", endPrecision: "day" };
+  assert.equal(formatEventDate("1956-10-29", "1956-11-07", day), "29 October – 7 November 1956");
+  assert.equal(formatEventDate("1967-06-05", "1967-06-10", day), "5–10 June 1967");
+  assert.equal(formatEventDate("2003-03-20", "2011-12-18", day), "20 March 2003 – 18 December 2011");
+  assert.equal(formatEventDate("1915-07-01", "1915-09-01", { precision: "month", endPrecision: "month" }), "July – September 1915");
+  assert.equal(formatEventDate("1915-07-01", "1915-07-01", { precision: "month", endPrecision: "month" }), "July 1915");
+  assert.equal(formatEventDate("1915-07-01", "1915-07-31", { precision: "month", endPrecision: "month" }), "July 1915");
+  assert.equal(formatEventDate("1967-06-05", "1967-06-01", { precision: "day", endPrecision: "month" }), "1967");
+  assert.equal(formatEventDate("1967-06-05", "1967-08-01", { precision: "day", endPrecision: "month" }), "5 June – August 1967");
+  assert.equal(formatEventDate("1915-07-01", "1916-08-01", { precision: "month", endPrecision: "month" }), "July 1915 – August 1916");
+});
+
+test("a year-precision or unknown end, or a year-only start, keeps the year-only end", () => {
+  assert.equal(formatEventDate("1956-10-29", "1956-11-07", { precision: "day", endPrecision: "year" }), "29 October 1956 (ended 1956)");
+  assert.equal(formatEventDate("1956-10-29", "1956-11-07", { precision: "day", endPrecision: null }), "29 October 1956 (ended 1956)");
+  assert.equal(formatEventDate("1915-01-01", "1917-03-04", { precision: "year", endPrecision: "day" }), "1915–1917");
+  assert.equal(formatEventDate("1956-10-29", "1956-11-07", { precision: "day", endPrecision: "day", yearOnly: true }), "1956");
+});

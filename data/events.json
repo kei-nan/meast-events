@@ -81,6 +81,7 @@
       "Turco-Italian War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q179848",
@@ -123,6 +124,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 80,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [],
     "resolved_qid": "Q165725",
     "wikidata_description": "two consecutive wars in 1912 and 1913"
@@ -203,6 +205,7 @@
       "Great Crime"
     ],
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [],
     "resolved_qid": "Q80034",
     "wikidata_description": "systematic destruction of the Armenian people and identity in the Ottoman Empire during World War I implemented by the Ottoman authorities through mass murder"
@@ -250,6 +253,7 @@
       "Dardanelles campaign"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -264,6 +268,7 @@
     "title": "McMahon–Hussein correspondence",
     "date_start": "1915-07-14",
     "date_end": "1916-03-10",
+    "date_end_precision": null,
     "countries": [
       "regional"
     ],
@@ -375,6 +380,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 56,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q1765465",
@@ -428,6 +434,7 @@
     "title": "Capture of Baghdad (1917)",
     "date_start": "1917-03-11",
     "date_end": "1917-03-11",
+    "date_end_precision": "day",
     "countries": [
       "Iraq"
     ],
@@ -491,6 +498,7 @@
     "location_quality": "precise",
     "sitelinks_current": 25,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -571,6 +579,7 @@
     "location_quality": "precise",
     "sitelinks_current": 35,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q1365425",
     "wikidata_description": "allocation of League of Nations mandates"
@@ -609,7 +618,8 @@
     "wikidata_aliases": [
       "Iraqi revolt against the British"
     ],
-    "date_precision": "year"
+    "date_precision": "year",
+    "date_end_precision": "month"
   },
   {
     "id": "treaty-of-s-vres",
@@ -686,6 +696,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 27,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q154611",
@@ -732,6 +743,7 @@
       "Turkish War of Liberation"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q234738",
     "wikidata_description": "war fought between the Turkish National Movement and the Entente and their proxies"
@@ -900,7 +912,8 @@
       "Syrian Revolution of 1925–1927",
       "1925–1927 Syrian Revolution"
     ],
-    "date_precision": "day"
+    "date_precision": "day",
+    "date_end_precision": "month"
   },
   {
     "id": "1929-palestine-riots",
@@ -938,6 +951,7 @@
     "location_quality": "precise",
     "sitelinks_current": 25,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q2992527",
@@ -977,7 +991,8 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 22,
-    "date_precision": "year"
+    "date_precision": "year",
+    "date_end_precision": "year"
   },
   {
     "id": "anglo-iraqi-treaty-1930",
@@ -1048,6 +1063,7 @@
       "1936–39 Arab revolt in Palestine"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2992527",
@@ -1090,7 +1106,8 @@
     "wikidata_aliases": [
       "Palestine Royal Commission"
     ],
-    "date_precision": "month"
+    "date_precision": "month",
+    "date_end_precision": null
   },
   {
     "id": "white-paper-of-1939",
@@ -1164,6 +1181,7 @@
       "May War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q696817",
@@ -1207,6 +1225,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 33,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q696817",
@@ -1330,6 +1349,7 @@
       "1947–1949 Palestine war"
     ],
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [],
     "resolved_qid": "Q49097",
     "wikidata_description": "first war of the Arab–Israeli conflict"
@@ -1439,7 +1459,8 @@
       "An-Nakba",
       "An Nakba"
     ],
-    "date_precision": "year"
+    "date_precision": "year",
+    "date_end_precision": null
   },
   {
     "id": "1949-armistice-agreements",
@@ -1477,13 +1498,15 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 21,
-    "date_precision": "year"
+    "date_precision": "year",
+    "date_end_precision": null
   },
   {
     "id": "jewish-exodus-from-the-muslim-world",
     "title": "Jewish exodus from the Muslim world",
     "date_start": "1948-01-01",
     "date_end": "1972-01-01",
+    "date_end_precision": null,
     "countries": [
       "Iraq",
       "Yemen",
@@ -1613,6 +1636,7 @@
       "TP-AJAX Project"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q304454",
@@ -1680,6 +1704,7 @@
       "Suez War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -1779,6 +1804,7 @@
       "Egyptian war in Yemen"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4783165",
@@ -1821,6 +1847,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 19,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4783165",
@@ -1878,6 +1905,7 @@
       "6 Day War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -1892,6 +1920,7 @@
     "title": "Khartoum Resolution",
     "date_start": "1967-08-29",
     "date_end": "1967-09-01",
+    "date_end_precision": null,
     "countries": [
       "regional"
     ],
@@ -1962,6 +1991,7 @@
       "opotřebovací válka (1967-1970)"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -2109,6 +2139,7 @@
       "Jordanian Civil War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -2169,6 +2200,7 @@
       "Tishreen Liberation war"
     ],
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q3491398",
@@ -2210,7 +2242,8 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 60,
-    "date_precision": "year"
+    "date_precision": "year",
+    "date_end_precision": "day"
   },
   {
     "id": "lebanese-civil-war",
@@ -2256,6 +2289,7 @@
       "الحرب الأهلية اللبنانية"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4783165",
@@ -2326,6 +2360,7 @@
     "title": "Iranian Revolution",
     "date_start": "1978-01-07",
     "date_end": "1979-02-11",
+    "date_end_precision": null,
     "countries": [
       "Iran"
     ],
@@ -2439,6 +2474,7 @@
     "location_quality": "precise",
     "sitelinks_current": 37,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q829839",
     "wikidata_description": "islamists' terrorist action, 1979"
@@ -2478,6 +2514,7 @@
     "location_quality": "precise",
     "sitelinks_current": 48,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q5163326",
@@ -2527,6 +2564,7 @@
       "Iraq-Iran War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q9001214",
@@ -2579,6 +2617,7 @@
       "Operation Peace in Galilee"
     ],
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q208484",
@@ -2633,6 +2672,7 @@
       "Sabra et Chatila"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q208484",
@@ -2729,6 +2769,7 @@
       "1st Intifada"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q151622",
@@ -2785,7 +2826,8 @@
       "Al-Anfal campaign",
       "Anfal genocide"
     ],
-    "date_precision": "year"
+    "date_precision": "year",
+    "date_end_precision": "year"
   },
   {
     "id": "gulf-war",
@@ -2830,6 +2872,7 @@
       "Video Game War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q37643",
     "wikidata_description": "1990–1991 conflict between Iraq and a 42-country coalition"
@@ -2865,6 +2908,7 @@
     "location_quality": "precise",
     "sitelinks_current": 29,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q1343802",
     "wikidata_description": "Israeli-Palestinian peace conference"
@@ -3043,6 +3087,7 @@
       "Al-Aqsa Intifada"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q151622",
@@ -3097,6 +3142,7 @@
       "Security Zone Conflict in Lebanon"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q3241199",
@@ -3154,6 +3200,7 @@
       "invasion of Iraq"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -3247,6 +3294,7 @@
       "Rabi' el Arz"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q184310",
     "wikidata_description": "2005 anti-Syrian protest movement in Lebanon"
@@ -3256,6 +3304,7 @@
     "title": "Israeli disengagement from the Gaza Strip",
     "date_start": "2005-08-15",
     "date_end": "2005-09-12",
+    "date_end_precision": null,
     "countries": [
       "Israel/Palestine"
     ],
@@ -3367,6 +3416,7 @@
       "Lebanon War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q3241199",
@@ -3419,6 +3469,7 @@
     "location_quality": "precise",
     "sitelinks_current": 26,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1397949",
@@ -3466,6 +3517,7 @@
       "Operation Cast Lead"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q553184",
@@ -3480,6 +3532,7 @@
     "title": "Iranian Green Movement",
     "date_start": "2009-06-13",
     "date_end": "2010-02-11",
+    "date_end_precision": null,
     "countries": [
       "Iran"
     ],
@@ -3546,6 +3599,7 @@
       "Arab Spring revolt"
     ],
     "date_precision": "day",
+    "date_end_precision": "month",
     "part_of": [],
     "resolved_qid": "Q33761",
     "wikidata_description": "protests and revolutions in the Arab world in the 2010s"
@@ -3590,6 +3644,7 @@
       "Egyptian Revolution of Dignity"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q33761",
@@ -3646,6 +3701,7 @@
       "Syrian Unrest"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q33761",
@@ -3694,6 +3750,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 40,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q33761",
@@ -3733,7 +3790,8 @@
     "needs_review": false,
     "location_quality": "approximate",
     "sitelinks_current": 10,
-    "date_precision": "day"
+    "date_precision": "day",
+    "date_end_precision": "month"
   },
   {
     "id": "yemeni-civil-war-2014-present",
@@ -3908,6 +3966,7 @@
     "location_quality": "precise",
     "sitelinks_current": 32,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -3955,6 +4014,7 @@
       "Operation \"We Are Coming, Nineveh\""
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17984356",
@@ -4007,6 +4067,7 @@
       "Qatari diplomatic crisis"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "resolved_qid": "Q30130610",
     "wikidata_description": "diplomatic crisis between several Arab League countries and Qatar"
@@ -4337,6 +4398,7 @@
       "Operation Guardian of the Walls"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q151622",
@@ -4380,6 +4442,7 @@
     "location_quality": "approximate",
     "sitelinks_current": 53,
     "date_precision": "day",
+    "date_end_precision": "month",
     "part_of": [],
     "resolved_qid": "Q114065797",
     "wikidata_description": "Iranian protest movement in 2022–2023"
@@ -4488,6 +4551,7 @@
       "Fall of the Assad administration"
     ],
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [],
     "resolved_qid": "Q131404510",
     "wikidata_description": "End of Assadist rule in Syria"
@@ -4539,6 +4603,7 @@
       "Third Lebanon War"
     ],
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q124373310",
@@ -4597,6 +4662,7 @@
       "Israel–Iran War"
     ],
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q124373310",
@@ -4637,6 +4703,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -4711,6 +4778,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q203824",
@@ -4800,6 +4868,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q177918",
@@ -4847,6 +4916,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q177918",
@@ -4891,6 +4961,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q177918",
@@ -5067,6 +5138,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q18937",
@@ -5114,6 +5186,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q18937",
@@ -5158,6 +5231,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -5202,6 +5276,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q523154",
@@ -5290,6 +5365,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q523154",
@@ -5336,6 +5412,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q523154",
@@ -5380,6 +5457,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -5426,6 +5504,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q80034",
@@ -5476,6 +5555,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q361",
@@ -5521,6 +5601,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q80034",
@@ -5568,6 +5649,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q18937",
@@ -5612,6 +5694,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q18937",
@@ -5659,6 +5742,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -5748,6 +5832,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -5792,6 +5877,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q239060",
@@ -5836,6 +5922,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -5880,6 +5967,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -5968,6 +6056,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q18937",
@@ -6103,6 +6192,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -6191,6 +6281,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -6236,6 +6327,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q727536",
@@ -6373,6 +6465,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q727536",
@@ -6505,6 +6598,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1450532",
@@ -6714,6 +6808,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q130459577",
@@ -6758,6 +6853,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q218678",
@@ -6802,6 +6898,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q625798",
@@ -6847,6 +6944,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q625798",
@@ -6936,6 +7034,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q218678",
@@ -7069,6 +7168,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q625798",
@@ -7125,6 +7225,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q625798",
@@ -7169,6 +7270,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q625798",
@@ -7357,6 +7459,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2379101",
@@ -7445,6 +7548,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2379101",
@@ -7529,6 +7633,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -7573,6 +7678,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -7936,6 +8042,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4783165",
@@ -8321,6 +8428,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q27851",
@@ -8369,6 +8477,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49100",
@@ -8414,6 +8523,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49100",
@@ -8862,6 +8972,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q589673",
@@ -8910,6 +9021,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -8958,6 +9070,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -9002,6 +9115,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -9147,6 +9261,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2592077",
@@ -9195,6 +9310,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -9239,6 +9355,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49103",
@@ -9449,6 +9566,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q202812",
@@ -9542,6 +9660,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -9729,6 +9848,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q37643",
@@ -9818,6 +9938,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q37643",
@@ -10063,6 +10184,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
@@ -10185,6 +10307,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2276724",
@@ -10235,6 +10358,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -10279,6 +10403,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -10329,6 +10454,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -10381,6 +10507,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -10425,6 +10552,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -10469,6 +10597,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -10513,6 +10642,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -10557,6 +10687,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -10639,6 +10770,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -10730,6 +10862,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q6722016",
@@ -10779,6 +10912,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -10823,6 +10957,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -10906,6 +11041,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q6722016",
@@ -11361,6 +11497,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -11631,6 +11768,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q14746872",
@@ -11675,6 +11813,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -11761,6 +11900,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -11805,6 +11945,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q14746872",
@@ -11849,6 +11990,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -12025,6 +12167,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17015462",
@@ -12070,6 +12213,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q553184",
@@ -12163,6 +12307,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -12379,6 +12524,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q15553019",
@@ -12423,6 +12569,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17984356",
@@ -12544,6 +12691,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -12638,6 +12786,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17984356",
@@ -12688,6 +12837,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -12921,6 +13071,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -13298,6 +13449,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -13749,6 +13901,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -13797,6 +13950,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -13841,6 +13995,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -14310,6 +14465,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q42161041",
@@ -14482,6 +14638,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q39899474",
@@ -14527,6 +14684,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q18208094",
@@ -14927,6 +15085,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q151622",
@@ -14984,6 +15143,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q122962941",
@@ -15645,6 +15805,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q123290408",
@@ -15709,6 +15870,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q131342170",
@@ -16486,6 +16648,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q131342170",
@@ -16870,6 +17033,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [
       {
         "qid": "Q251600",
@@ -16915,6 +17079,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
@@ -16986,6 +17151,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -17104,6 +17270,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
@@ -17197,6 +17364,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q164983",
@@ -17278,6 +17446,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -17349,6 +17518,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q239060",
@@ -17506,6 +17676,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -17543,6 +17714,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -17582,6 +17754,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q234738",
@@ -17674,6 +17847,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q234738",
@@ -17723,6 +17897,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -17758,6 +17933,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [
       {
         "qid": "Q87138",
@@ -17963,6 +18139,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q87138",
@@ -18011,6 +18188,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q87138",
@@ -18122,6 +18300,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q6102087",
@@ -18247,6 +18426,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q6445763",
@@ -18325,6 +18505,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q6445763",
@@ -18369,6 +18550,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q251600",
@@ -18480,6 +18662,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q12809191",
@@ -18583,6 +18766,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
@@ -18631,6 +18815,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49097",
@@ -18725,6 +18910,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -18773,6 +18959,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2379101",
@@ -18817,6 +19004,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49097",
@@ -18867,6 +19055,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -18913,6 +19102,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -18959,6 +19149,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -19000,6 +19191,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49092",
@@ -19041,6 +19233,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8683",
@@ -19082,6 +19275,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q276172",
@@ -19238,6 +19432,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4783165",
@@ -19323,6 +19518,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -19398,6 +19594,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4783165",
@@ -19486,6 +19683,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8683",
@@ -19534,6 +19732,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [
       {
         "qid": "Q151622",
@@ -19745,6 +19944,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -19779,6 +19979,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49100",
@@ -20042,6 +20243,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q137885050",
@@ -20371,6 +20573,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -20611,6 +20814,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -20654,6 +20858,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -20703,6 +20908,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q82664",
@@ -20844,6 +21050,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -21048,6 +21255,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q899657",
@@ -21089,6 +21297,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q899657",
@@ -21130,6 +21339,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8669",
@@ -21172,6 +21382,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q6068230",
@@ -21214,6 +21425,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q5347390",
@@ -21345,6 +21557,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q899657",
@@ -21390,6 +21603,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49106",
@@ -21435,6 +21649,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q47015896",
@@ -21497,6 +21712,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q18357664",
@@ -21544,6 +21760,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q107802",
@@ -21656,6 +21873,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -21698,6 +21916,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -21869,6 +22088,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q37643",
@@ -21998,6 +22218,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q33761",
@@ -22094,6 +22315,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -22155,6 +22377,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "year",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
@@ -22192,6 +22415,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q553184",
@@ -22353,6 +22577,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17984356",
@@ -22394,6 +22619,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q553184",
@@ -22440,6 +22666,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17512479",
@@ -22490,6 +22717,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -22530,6 +22758,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q17984356",
@@ -22607,6 +22836,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -22691,6 +22921,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q15946570",
@@ -22739,6 +22970,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17507684",
@@ -22831,6 +23063,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q178810",
@@ -22876,6 +23109,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": null,
     "part_of": [
       {
         "qid": "Q2165215",
@@ -22973,6 +23207,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1842866",
@@ -23191,6 +23426,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -23228,6 +23464,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q75161062",
@@ -23272,6 +23509,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -23317,6 +23555,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -23396,6 +23635,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -23517,6 +23757,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q553184",
@@ -23660,6 +23901,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q553184",
@@ -23714,6 +23956,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q122976243",
@@ -23764,6 +24007,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q123392381",
@@ -24005,6 +24249,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q123025873",
@@ -24207,6 +24452,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q123285238",
@@ -24361,6 +24607,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q122974556",
@@ -24514,6 +24761,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q122974556",
@@ -24620,6 +24868,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q122962941",
@@ -24826,6 +25075,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q122962941",
@@ -24957,6 +25207,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q136243381",
@@ -25393,6 +25644,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q4397975",
@@ -25439,6 +25691,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -25501,6 +25754,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -25547,6 +25801,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -25590,6 +25845,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -25639,6 +25895,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -25683,6 +25940,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q1765465",
@@ -25733,6 +25991,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q361",
@@ -25778,6 +26037,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -25820,6 +26080,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2992527",
@@ -25864,6 +26125,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "month",
     "part_of": [
       {
         "qid": "Q234738",
@@ -25960,6 +26222,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -26012,6 +26275,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q362",
@@ -26059,6 +26323,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q218678",
@@ -26109,6 +26374,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q625798",
@@ -26205,6 +26471,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q177716",
@@ -26286,6 +26553,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q696817",
@@ -26335,6 +26603,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -26374,6 +26643,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q5249554",
@@ -26416,6 +26686,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8683",
@@ -26984,6 +27255,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -27271,6 +27543,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q8683",
@@ -27482,6 +27755,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q85804678",
@@ -27564,6 +27838,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q3241199",
@@ -27683,6 +27958,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "year",
     "part_of": [
       {
         "qid": "Q8683",
@@ -27998,6 +28274,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q82664",
@@ -28085,6 +28362,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q3241199",
@@ -28254,6 +28532,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q37643",
@@ -28564,6 +28843,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -28818,6 +29098,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "year",
     "part_of": [
       {
         "qid": "Q49106",
@@ -28974,6 +29255,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q545449",
@@ -29141,6 +29423,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -29386,6 +29669,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q49106",
@@ -29896,6 +30180,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [
       {
@@ -30051,6 +30336,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "year",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -30123,6 +30409,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q33761",
@@ -30213,6 +30500,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -30248,6 +30536,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -30402,6 +30691,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -30439,6 +30729,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q33761",
@@ -30835,6 +31126,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q2165215",
@@ -31071,6 +31363,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q17984356",
@@ -31249,6 +31542,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "year",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -31286,6 +31580,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q5468411",
@@ -31338,6 +31633,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -31382,6 +31678,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -31473,6 +31770,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -32194,6 +32492,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -32292,6 +32591,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -33253,6 +33553,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q65084224",
@@ -33621,6 +33922,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [
@@ -33872,6 +34174,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -34028,6 +34331,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q47015896",
@@ -34159,6 +34463,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -34249,6 +34554,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -34821,6 +35127,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q124373310",
@@ -34868,6 +35175,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -35120,6 +35428,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q61126993",
@@ -35445,6 +35754,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -35494,6 +35804,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q178810",
@@ -35536,6 +35847,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q131342170",
@@ -35581,6 +35893,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q131364168",
@@ -35964,6 +36277,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q632663",
@@ -36009,6 +36323,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q136541125",
@@ -36349,6 +36664,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
     "review_reasons": [],
@@ -36475,6 +36791,7 @@
     "location_quality": "precise",
     "needs_manual_coordinates": false,
     "date_precision": "day",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q65920364",
@@ -36533,6 +36850,7 @@
     "location_quality": "none",
     "needs_manual_coordinates": true,
     "date_precision": "month",
+    "date_end_precision": "day",
     "part_of": [
       {
         "qid": "Q106775117",
