@@ -112,8 +112,9 @@ function resolveProperties(cntry_name, intervalStartYear) {
     name = phase.name;
     status = phase.status ?? null;
     note = split.note;
+    if (phase.geometry && !phase.geometry_source) throw new Error(`${phase.name}: a split phase with geometry needs a geometry_source`);
     source = phase.geometry
-      ? `Geometry corrected per ${split.source} (see data/corrections-geometry.json); ${CSHAPES_CITATION} for the rest`
+      ? `Geometry corrected per ${split.source} (see data/corrections-geometry.json): ${phase.geometry_source}; ${CSHAPES_CITATION} for the rest`
       : `${CSHAPES_CITATION} geometry, renamed per ${split.source}`;
     geometryKey = phase.geometry ?? null;
   }
@@ -567,7 +568,7 @@ function applyFits(features, land) {
           if (overlay && turf.booleanIntersects(piece, turf.buffer(overlay, fit.maxGapKm))) {
             const others = out.filter((f) => f !== n && f !== overlay && activeIn(f, s) && f.properties.name !== spec.name);
             piece.geometry = fittedGeometry(piece, overlay, others, spec.mode, fit.maxGapKm, land, spec);
-            piece.properties.source = `${piece.properties.source}; edge fitted to the ${fit.overlay} shape (${fit.note})`;
+            piece.properties.source = `${piece.properties.source}; edge fitted to the ${fit.overlay} shape (${fit.note})${spec.mode === "snap" ? ", any unclaimed land between the two lines filled from the map's land mask (Natural Earth 1:10m, public domain)" : ""}`;
           }
           next.push(piece);
         });
@@ -685,7 +686,7 @@ function applyCoastalGaps(features, land) {
           geom = turf.union(fc(nodedShape.length === 1 ? turf.polygon(nodedShape[0]) : turf.multiPolygon(nodedShape), turf.polygon(nodedQ)));
         }
         piece.geometry = dissolveParts(turf.getGeom(geom), `${f.properties.name} ${s}-${e}`);
-        piece.properties.source = `${piece.properties.source}; coastal strip of the map's land mask between this shape and the sea added (no source draws that coast)`;
+        piece.properties.source = `${piece.properties.source}; coastal strip of the map's land mask (Natural Earth 1:10m, public domain) between this shape and the sea added (no border source draws that coast)`;
         for (const q of pieces) console.log(`  coastal gap ${s}-${e}: ${(turf.area(q) / 1e6).toFixed(3)} km2 at ${turf.centroid(q).geometry.coordinates.map((v) => v.toFixed(4)).join(",")} -> ${f.properties.name}`);
       }
       out.push(piece);

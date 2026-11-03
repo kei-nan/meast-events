@@ -31,10 +31,18 @@ export const OVERLAP_MIN_KM2 = 0.5;
 // it is computed from CShapes records; scripts/ingest-boundaries.js) must say where its
 // outline comes from: a source item, as the app lists them (app/src/lib/boundaryText.js),
 // naming its outline or geometry. One computed from CShapes must also credit CShapes.
+// A CShapes shape with a corrected edge ("Geometry corrected per ...") must name the source
+// of that edge, and land added from the map's land mask must name Natural Earth.
 const NOT_CSHAPES_PREFIXES = ["Not in CShapes", "Not a CShapes record"];
 const GEOMETRY_ITEM = /\b(outlines?|geometry)\b/i;
+const NON_CSHAPES_SOURCE = /Natural Earth|OCHA|GeoNames|digitized/;
 export function geometrySourceError(source) {
-  const [first, ...rest] = sourceItems(source);
+  const items = sourceItems(source);
+  const corrected = items.find((item) => item.startsWith("Geometry corrected per"));
+  if (corrected && !NON_CSHAPES_SOURCE.test(corrected)) return "a corrected geometry names no source for the corrected edge";
+  const landMask = items.find((item) => /land mask/.test(item) && !/Natural Earth/.test(item));
+  if (landMask) return `"${landMask.slice(0, 60)}..." uses the land mask but does not name Natural Earth`;
+  const [first, ...rest] = items;
   if (!NOT_CSHAPES_PREFIXES.includes(first)) return null;
   if (!rest.some((item) => GEOMETRY_ITEM.test(item))) return `source says "${first}" but names no geometry source (an item on its outline or geometry)`;
   if (first === "Not a CShapes record" && !/CShapes 2\.0/.test(rest.join("; "))) return `source says "${first}" (computed from CShapes) but does not credit CShapes 2.0`;

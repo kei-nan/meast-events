@@ -143,7 +143,15 @@ export const CORRECTIONS = [
       // Hatay below for the 1923-1939 period. geometry: "turkeyPre1939" is Turkey's
       // CShapes shape with Hatay subtracted (computed via polygon difference against
       // modern Hatay Province as an approximation of the historical Sanjak boundary).
-      { until: 1939, name: "Turkey", geometry: "turkeyPre1939" },
+      // `geometry_source` (required with `geometry`) says where the corrected edge comes from.
+      {
+        until: 1939,
+        name: "Turkey",
+        geometry: "turkeyPre1939",
+        geometry_source:
+          "its border with the Sanjak of Alexandretta is Turkey's modern Hatay Province from Natural " +
+          "Earth 1:10m states and provinces (public domain), cut out of the CShapes 1923 Turkey record",
+      },
     ],
     note:
       "The Ottoman Empire was formally abolished and the Republic of Turkey proclaimed " +
@@ -900,8 +908,9 @@ export const CORRECTIONS = [
     ],
     maxGapKm: 3,
     note:
-      "Gaza's land border follows the Gaza Strip shape (Natural Earth); Egypt's and (1948-1966) " +
-      "Israel's CShapes lines are fitted to it.",
+      "The Gaza Strip shape is Natural Earth's outline (public domain) with its land border cut to " +
+      "CShapes' Egypt and 1949-1967 Israel lines; Egypt's and (1948-1966) Israel's CShapes lines are " +
+      "fitted to it, and from 1967 Israel's shape is widened to wrap it.",
   },
   {
     type: "fit",
@@ -952,7 +961,10 @@ export const CORRECTIONS = [
       { name: "Saudi Arabia", mode: "snap", trim: true, notOnCShapes: "Kuwait" },
     ],
     maxGapKm: 5,
-    note: "the zone was shared territory until its partition took effect in December 1969",
+    note:
+      "the zone was shared territory until its partition took effect in December 1969. Its " +
+      `outline was digitized by this project from its delimitation documents and ${GEONAMES_CREDIT} ` +
+      "(see the zone's own source)",
   },
   {
     type: "fit",
@@ -964,7 +976,9 @@ export const CORRECTIONS = [
       { name: "Iraq", mode: "trim" },
     ],
     maxGapKm: 3,
-    note: "the zone was shared territory until the 1981 partition treaty",
+    note:
+      "the zone was shared territory until the 1981 partition treaty. Its outline was digitized " +
+      `by this project from its delimitation documents and ${GEONAMES_CREDIT} (see the zone's own source)`,
   },
   {
     type: "add",
