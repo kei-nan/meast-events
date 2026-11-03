@@ -1,0 +1,159 @@
+{
+  "pagefind": "1.5.2",
+  "intro": [
+    "Pagefind's search runtime (dist/pagefind/v.*/wasm.en.pagefind and wasm.unknown.pagefind) is WebAssembly compiled",
+    "from Pagefind's pagefind_web crate (MIT, Pagefind's own licence, above) and the Rust crates below. Pagefind",
+    "publishes no third-party notices for it; these were collected for Pagefind 1.5.2 from pagefind_web/Cargo.lock",
+    "at tag v1.5.2 (commit bf17396721be637cc67c8ed7ead1dc7b8ac43d96):",
+    "https://github.com/Pagefind/pagefind/blob/bf17396721be637cc67c8ed7ead1dc7b8ac43d96/pagefind_web/Cargo.lock",
+    "Unless its entry says otherwise, each crate's text was taken from its repository at the commit its crates.io package names",
+    "(.cargo_vcs_info.json) and is identical to the file in that package (sha256 as in Cargo.lock).",
+    "Where a crate is offered under MIT OR Apache-2.0, it is used here under MIT. Crates listed \"in case any of it",
+    "is linked\" are dependencies whose code may be removed entirely by the optimiser; their notices are kept anyway."
+  ],
+  "crates": [
+    {
+      "name": "wasm-bindgen",
+      "version": "0.2.117",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "files": [
+        { "file": "wasm-bindgen-0.2.117.LICENSE-MIT.txt", "source": "https://github.com/wasm-bindgen/wasm-bindgen/blob/fb403cfef5041fbe320eb8423003bda49ca33125/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "wasm-bindgen-shared",
+      "version": "0.2.117",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "A dependency of wasm-bindgen. Its LICENSE-MIT is a link to the repository's, given here.",
+      "files": [
+        { "file": "wasm-bindgen-shared-0.2.117.LICENSE-MIT.txt", "source": "https://github.com/wasm-bindgen/wasm-bindgen/blob/fb403cfef5041fbe320eb8423003bda49ca33125/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.24",
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "usedUnder": "MIT AND Unicode-3.0",
+      "note": "A dependency of wasm-bindgen-shared; listed in case any of it is linked. Its LICENSE-MIT has no copyright line.",
+      "files": [
+        { "file": "unicode-ident-1.0.24.LICENSE-MIT.txt", "source": "https://github.com/dtolnay/unicode-ident/blob/5b54a632702b5744a1c40ea01c127c0ac0498172/LICENSE-MIT" },
+        { "file": "unicode-ident-1.0.24.LICENSE-UNICODE.txt", "source": "https://github.com/dtolnay/unicode-ident/blob/5b54a632702b5744a1c40ea01c127c0ac0498172/LICENSE-UNICODE" }
+      ]
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.4",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "A dependency of wasm-bindgen.",
+      "files": [
+        { "file": "cfg-if-1.0.4.LICENSE-MIT.txt", "source": "https://github.com/rust-lang/cfg-if/blob/3510ca6abea34cbbc702509a4e50ea9709925eda/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "A dependency of wasm-bindgen. Its LICENSE-MIT has no copyright line; the crate's Cargo.toml names Aleksey Kladov as author.",
+      "files": [
+        { "file": "once_cell-1.21.4.LICENSE-MIT.txt", "source": "https://github.com/matklad/once_cell/blob/80fe900b21f6d76c1a2ed74d3343e8a3a88c46d0/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "bit-set",
+      "version": "0.10.0",
+      "license": "Apache-2.0 OR MIT",
+      "usedUnder": "MIT",
+      "files": [
+        { "file": "bit-set-0.10.0.LICENSE-MIT.txt", "source": "https://github.com/contain-rs/bit-set/blob/2a569e1a5bffaee2c2974bcf070ef4e8ee85550b/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "bit-vec",
+      "version": "0.9.1",
+      "license": "Apache-2.0 OR MIT",
+      "usedUnder": "MIT",
+      "note": "A dependency of bit-set.",
+      "files": [
+        { "file": "bit-vec-0.9.1.LICENSE-MIT.txt", "source": "https://github.com/contain-rs/bit-vec/blob/2fb0305422ff7fd915a107b91209abbff9fce50f/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "serde",
+      "version": "1.0.228",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "Cargo.lock lists it as a dependency of bit-vec (an optional one); listed in case any of it is linked. Its LICENSE-MIT has no copyright line.",
+      "files": [
+        { "file": "serde-1.0.228.LICENSE-MIT.txt", "source": "https://github.com/serde-rs/serde/blob/a866b336f14aa57a07f0d0be9f8762746e64ecb4/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.228",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "A dependency of serde; listed for the same reason. Its LICENSE-MIT has no copyright line.",
+      "files": [
+        { "file": "serde_core-1.0.228.LICENSE-MIT.txt", "source": "https://github.com/serde-rs/serde/blob/a866b336f14aa57a07f0d0be9f8762746e64ecb4/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "pagefind_stem",
+      "version": "1.0.0",
+      "license": "MIT",
+      "note": "Ships no licence file. Its notices are the header of its src/lib.rs, reproduced below: the rust-stemmers API (MIT) and the Snowball stemmers (BSD-3-Clause), whose second clause asks for this notice with a binary redistribution.",
+      "files": [
+        { "file": "pagefind_stem-1.0.0.lib-rs-notice.txt", "source": "https://github.com/Pagefind/pagefind/blob/bf17396721be637cc67c8ed7ead1dc7b8ac43d96/pagefind_stem/src/lib.rs (lines 7-63, comment markers removed; identical in https://static.crates.io/crates/pagefind_stem/pagefind_stem-1.0.0.crate)" }
+      ]
+    },
+    {
+      "name": "minicbor",
+      "version": "2.2.1",
+      "license": "BlueOak-1.0.0",
+      "files": [
+        { "file": "minicbor-2.2.1.LICENSE.md.txt", "source": "https://github.com/twittner/minicbor/blob/b22bf310922e79da6ecac1ec0f0a3a4419962222/LICENSE.md" }
+      ]
+    },
+    {
+      "name": "write-json",
+      "version": "0.1.4",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "Its LICENSE-MIT has no copyright line; the crate's Cargo.toml names Aleksey Kladov as author.",
+      "files": [
+        { "file": "write-json-0.1.4.LICENSE-MIT.txt", "source": "https://github.com/matklad/write-json/blob/21160349b6e511bee31fe570a905aef667ea1390/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "pagefind_microjson",
+      "version": "0.1.4",
+      "license": "GPL-3.0-only",
+      "note": "Declared GPL-3.0-only in its Cargo.toml; the notice in its src/lib.rs says version 3 \"or (at your option) any later version\". Both notices are reproduced as published. The crate's LICENCE file is the GPL-3.0 text up to \"END OF TERMS AND CONDITIONS\" (identical in https://github.com/rspencer01/microjson/blob/0a19858180bf7688e689bf982ea444c30d981594/LICENCE); the full text from gnu.org follows.",
+      "correspondingSource": [
+        "https://static.crates.io/crates/pagefind_microjson/pagefind_microjson-0.1.4.crate (sha256 8f97aa64cde14e78d6274c473f36cec98d401f0b583282055e953d2df907e210, as in Pagefind's Cargo.lock), built from commit 51e27c165e26c7125666403b796fb5d8564a8be5 (the package's .cargo_vcs_info.json), a commit not in the public repository https://github.com/rspencer01/microjson; the crate file above is the exact source.",
+        "Pagefind's build of it: https://github.com/Pagefind/pagefind/tree/bf17396721be637cc67c8ed7ead1dc7b8ac43d96/pagefind_web (tag v1.5.2)."
+      ],
+      "files": [
+        { "file": "pagefind_microjson-0.1.4.lib-rs-notice.txt", "source": "https://static.crates.io/crates/pagefind_microjson/pagefind_microjson-0.1.4.crate, src/lib.rs lines 1-15" },
+        { "file": "GPL-3.0.txt", "source": "https://www.gnu.org/licenses/gpl-3.0.txt" }
+      ]
+    }
+  ],
+  "notCompiledIn": {
+    "note": "Also in pagefind_web/Cargo.lock, but proc-macros, a build script dependency and what only they use, which run while compiling and are not part of the WebAssembly:",
+    "crates": [
+      "wasm-bindgen-macro 0.2.117",
+      "wasm-bindgen-macro-support 0.2.117",
+      "bumpalo 3.20.2",
+      "rustversion 1.0.22",
+      "serde_derive 1.0.228",
+      "proc-macro2 1.0.106",
+      "quote 1.0.45",
+      "syn 2.0.117"
+    ]
+  }
+}

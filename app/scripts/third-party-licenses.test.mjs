@@ -1,9 +1,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { bundledPackagesOf, OVERRIDES_DIR, packageNotice, packageOf } from "./third-party-licenses.mjs";
+import { fileURLToPath } from "node:url";
+import {
+  bundledPackagesOf,
+  OVERRIDES_DIR,
+  PAGEFIND_WASM_DIR,
+  packageNotice,
+  packageOf,
+  pagefindWasmNotices,
+} from "./third-party-licenses.mjs";
 
 test("packageOf: the package a bundled module belongs to", () => {
   assert.deepEqual(packageOf("/a/app/node_modules/maplibre-gl/dist/maplibre-gl.js"), {
@@ -99,6 +107,63 @@ test("packageNotice: the vendored murmurhash-js text names its source and its co
   assert.match(text, /https:\/\/github\.com\/mikolalysenko\/murmurhash-js\/blob\/[0-9a-f]{40}\/README\.md/);
   assert.match(text, /Copyright \(c\) 2011 Gary Court/);
   assert.match(text, /Permission is hereby granted, free of charge/);
+});
+
+// A node_modules/pagefind with just a package.json of the given version.
+function fakePagefind(version) {
+  const root = mkdtempSync(join(tmpdir(), "tpl-pf-"));
+  writeFileSync(join(root, "package.json"), JSON.stringify({ name: "pagefind", version }));
+  return root;
+}
+const wasmManifest = JSON.parse(readFileSync(join(PAGEFIND_WASM_DIR, "manifest.json"), "utf8"));
+
+test("pagefindWasmNotices: another Pagefind version fails the build, so an upgrade forces a re-check", () => {
+  const root = fakePagefind("9.9.9");
+  try {
+    assert.throws(() => pagefindWasmNotices(root), /Pagefind 9\.9\.9 is installed, but the notices .* are for Pagefind 1\.5\.2/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("pagefindWasmNotices: the installed Pagefind is the version the notices were collected for", (t) => {
+  const installed = fileURLToPath(new URL("../node_modules/pagefind/package.json", import.meta.url));
+  if (!existsSync(installed)) return t.skip("node_modules not installed");
+  assert.equal(JSON.parse(readFileSync(installed, "utf8")).version, wasmManifest.pagefind);
+});
+
+test("pagefindWasmNotices: every crate with its version, licence, sources and texts; GPL with its corresponding source", () => {
+  const root = fakePagefind(wasmManifest.pagefind);
+  try {
+    const text = pagefindWasmNotices(root);
+    assert.ok(text.includes("Rust crates compiled into Pagefind's search (wasm)"));
+    for (const name of ["wasm-bindgen", "bit-set", "pagefind_stem", "minicbor", "pagefind_microjson", "write-json"]) {
+      assert.ok(wasmManifest.crates.some((c) => c.name === name), name);
+    }
+    for (const c of wasmManifest.crates) {
+      assert.match(c.version, /^\d+\.\d+\.\d+$/, c.name);
+      assert.ok(text.includes(`--- ${c.name} ${c.version} - ${c.license}`), c.name);
+      for (const f of c.files) {
+        assert.ok(text.includes(`Source: ${f.source}`), f.file);
+        assert.ok(text.includes(readFileSync(join(PAGEFIND_WASM_DIR, f.file), "utf8").replace(/\r\n/g, "\n").trim()), f.file);
+        // a repository source names a commit, not a branch
+        if (f.source.startsWith("https://github.com/")) assert.match(f.source, /\/blob\/[0-9a-f]{40}\//, f.source);
+      }
+    }
+    const gpl = wasmManifest.crates.filter((c) => /GPL/.test(c.license));
+    assert.deepEqual(gpl.map((c) => c.name), ["pagefind_microjson"]);
+    for (const c of gpl) {
+      assert.ok(c.files.some((f) => f.file === "GPL-3.0.txt"));
+      assert.ok(c.correspondingSource?.some((s) => s.startsWith(`https://static.crates.io/crates/${c.name}/${c.name}-${c.version}.crate`)));
+    }
+    assert.ok(text.includes("Corresponding source: https://static.crates.io/crates/pagefind_microjson/pagefind_microjson-0.1.4.crate"));
+    assert.ok(text.includes("END OF TERMS AND CONDITIONS"));
+    // every vendored file is used
+    const used = new Set(["manifest.json", ...wasmManifest.crates.flatMap((c) => c.files.map((f) => f.file))]);
+    assert.deepEqual(readdirSync(PAGEFIND_WASM_DIR).filter((f) => !used.has(f)), []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("bundledPackagesOf: the packages a prebuilt file inlines, from the source map beside it", () => {

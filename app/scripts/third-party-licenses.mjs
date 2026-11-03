@@ -88,6 +88,34 @@ export function packageNotice(dir, overridesDir = OVERRIDES_DIR) {
   return { name: pkg.name, text: `${"=".repeat(78)}\n${head}\n${"=".repeat(78)}\n\n${text}\n` };
 }
 
+// The Rust crates compiled into Pagefind's WebAssembly (dist/pagefind/v.*/wasm.*.pagefind): Pagefind ships no
+// notices for them, so they are vendored in scripts/licenses/pagefind-wasm/ (manifest.json: each crate's version
+// from pagefind_web/Cargo.lock, its declared licence, and the source of every text), collected for one Pagefind
+// version. Throws when the installed Pagefind is another version: an upgrade can change the crates, so the
+// notices must be collected again (and manifest.json's "pagefind" updated) before the build passes.
+export const PAGEFIND_WASM_DIR = join(OVERRIDES_DIR, "pagefind-wasm");
+export function pagefindWasmNotices(pagefindDir, dir = PAGEFIND_WASM_DIR) {
+  const manifest = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8"));
+  const { version } = JSON.parse(readFileSync(join(pagefindDir, "package.json"), "utf8"));
+  if (version !== manifest.pagefind) {
+    throw new Error(
+      `third-party-licenses: Pagefind ${version} is installed, but the notices in ${dir} are for Pagefind ` +
+        `${manifest.pagefind}; collect them again from its pagefind_web/Cargo.lock and update manifest.json`
+    );
+  }
+  const bar = "=".repeat(78);
+  const parts = [`${bar}\nRust crates compiled into Pagefind's search (wasm)\n${bar}\n\n${manifest.intro.join("\n")}`];
+  for (const c of manifest.crates) {
+    const lines = [`--- ${c.name} ${c.version} - ${c.license}${c.usedUnder ? ` (used under ${c.usedUnder})` : ""} ---`];
+    if (c.note) lines.push("", c.note);
+    for (const s of c.correspondingSource ?? []) lines.push("", `Corresponding source: ${s}`);
+    for (const f of c.files) lines.push("", `Source: ${f.source}`, "", readText(join(dir, f.file)));
+    parts.push(lines.join("\n"));
+  }
+  if (manifest.notCompiledIn) parts.push(`${manifest.notCompiledIn.note}\n${manifest.notCompiledIn.crates.join(", ")}.`);
+  return `${parts.join("\n\n")}\n`;
+}
+
 export default function thirdPartyLicenses() {
   let root = process.cwd();
   return {
@@ -122,7 +150,14 @@ export default function thirdPartyLicenses() {
         "data and other credits: https://github.com/kei-nan/meast-events/blob/main/NOTICE\n\n" +
         "Below: the packages whose code or fonts are in the built site, with their licence notices,\n" +
         "generated at build time by app/scripts/third-party-licenses.mjs.\n\n";
-      this.emitFile({ type: "asset", fileName: FILE_NAME, source: intro + notices.map((n) => n.text).join("\n") });
+      let wasm;
+      try {
+        wasm = pagefindWasmNotices(join(root, "node_modules", "pagefind"));
+      } catch (err) {
+        this.error(err.message);
+      }
+      const source = intro + notices.map((n) => n.text).join("\n") + "\n" + wasm;
+      this.emitFile({ type: "asset", fileName: FILE_NAME, source });
     },
   };
 }
