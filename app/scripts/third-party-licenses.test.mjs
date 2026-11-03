@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { bundledPackagesOf, packageNotice, packageOf } from "./third-party-licenses.mjs";
+import { bundledPackagesOf, OVERRIDES_DIR, packageNotice, packageOf } from "./third-party-licenses.mjs";
 
 test("packageOf: the package a bundled module belongs to", () => {
   assert.deepEqual(packageOf("/a/app/node_modules/maplibre-gl/dist/maplibre-gl.js"), {
@@ -63,6 +63,42 @@ test("packageNotice: a package without a licence file says so", () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test("packageNotice: a licence directory gives every file in it, by name (Pagefind's LICENSE/)", () => {
+  const { root, dir } = fakePackage({
+    "package.json": JSON.stringify({ name: "maplibre-gl", version: "1.0.0", license: "MIT" }),
+    LICENSE: null,
+  });
+  writeFileSync(join(dir, "LICENSE", "LICENSE-other"), "Copyright (c) Other\r\n");
+  writeFileSync(join(dir, "LICENSE", "LICENSE"), "Copyright (c) Pagefind\n");
+  try {
+    const { text } = packageNotice(dir);
+    assert.ok(text.endsWith("--- LICENSE/LICENSE ---\n\nCopyright (c) Pagefind\n\n--- LICENSE/LICENSE-other ---\n\nCopyright (c) Other\n"));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("packageNotice: a package that ships no licence takes the vendored override", () => {
+  const { root, dir } = fakePackage({ "package.json": JSON.stringify({ name: "maplibre-gl", version: "1.0.0", license: "MIT" }) });
+  const overrides = join(root, "overrides");
+  mkdirSync(overrides);
+  writeFileSync(join(overrides, "maplibre-gl.txt"), "(Taken from https://example.org/README.md)\r\n\r\nCopyright (c) 2011 Someone\r\n");
+  try {
+    const { text } = packageNotice(dir, overrides);
+    assert.ok(text.endsWith("(Taken from https://example.org/README.md)\n\nCopyright (c) 2011 Someone\n"));
+    assert.ok(!text.includes("ships no licence file"));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("packageNotice: the vendored murmurhash-js text names its source and its copyright", () => {
+  const text = readFileSync(join(OVERRIDES_DIR, "murmurhash-js.txt"), "utf8");
+  assert.match(text, /https:\/\/github\.com\/mikolalysenko\/murmurhash-js\/blob\/[0-9a-f]{40}\/README\.md/);
+  assert.match(text, /Copyright \(c\) 2011 Gary Court/);
+  assert.match(text, /Permission is hereby granted, free of charge/);
 });
 
 test("bundledPackagesOf: the packages a prebuilt file inlines, from the source map beside it", () => {

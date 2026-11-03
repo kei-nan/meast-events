@@ -25,8 +25,9 @@
 // src/lib/labelFont.js) get Inter's faces once more under the family
 // LABEL_FONT_FAMILY, with the same files and their unicode-range cut down to the
 // label characters: all of Basic Latin (cluster counts, the search-area radius)
-// and every boundary `name` in public/data/boundaries/. A label character no Inter
-// face covers fails the run (it would be drawn in a system font).
+// and every boundary `name` in public/data/boundaries/ and water `name` in
+// src/data/water.json. A label character no Inter face covers fails the run (it
+// would be drawn in a system font).
 //
 // Inter stays a variable font (harfbuzz keeps the wght axis); Spectral is the single
 // 600 weight. font-display, font-weight and the unicode-range of each face are
@@ -124,6 +125,21 @@ for (const f of decadeFiles) {
   for (const { properties } of decodeGeo(readFileSync(path.join(boundariesDir, f))).features) {
     for (const ch of properties?.name ?? "") labelChars.add(ch.codePointAt(0));
   }
+}
+// The water names (src/data/water.json, written by scripts/build-water.js and bundled
+// into the app, so not under public/data/). A missing file or one without a name
+// fails the run: the water labels would go unchecked.
+const waterFile = path.join(APP, "src", "data", "water.json");
+const waterNames = JSON.parse(readFileSync(waterFile, "utf8"))
+  .features.map((f) => f.properties?.name)
+  .filter((n) => typeof n === "string" && n);
+if (!waterNames.length) {
+  console.error(`subset-fonts: no water name in ${waterFile}; run scripts/build-water.js`);
+  process.exit(1);
+}
+for (const name of waterNames) {
+  addText(name);
+  for (const ch of name) labelChars.add(ch.codePointAt(0));
 }
 
 const decodeSource = (s) =>
