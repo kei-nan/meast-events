@@ -659,6 +659,8 @@ node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichmen
                                                         #    (run 2026-10-24: 83 of 102 applied, 19 left as they are)
 node scripts/backfill-end-precision.js [--apply]        # date_end_precision for curated events with a date_end that lack it
                                                         #    (the P582 statement whose value is the stored date_end; null if none)
+node scripts/backfill-revids.js [--historical] [--apply] # wikipedia_revid and wikipedia_revid_timestamp for events without them,
+                                                        #    only where a lead equals the stored extract exactly (see "Revision")
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
@@ -673,6 +675,12 @@ node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coo
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
+node scripts/fetch-border-references.js                 # -> data/border-reference-points.json: Wikidata border checkpoints, border
+                                                        #    crossings and tripoints with coordinates in the map's countries, the
+                                                        #    independent points scripts/verify-borders.js checks the borders against
+node scripts/build-water.js [--raw-dir=DIR]             # -> app/src/data/water.json: names of seas, gulfs and straits (English
+                                                        #    Wikipedia title and P625 of each Wikidata item) and the Dead Sea and
+                                                        #    Sea of Galilee outlines (Natural Earth 1:10m lakes, data/raw/ne10-lakes.geojson)
 npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings, simplified/coarsened shapes (runs in CI; needs root npm ci)
 node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --apply writes data/events.json. Every run also
                                                         #    applies the "Not events" rule and carries re-derived date-order
@@ -685,8 +693,10 @@ older than that (units s, m, h, d; `scripts/lib/cache.js`). A Wikipedia/Wikidata
 fails the request like an HTTP error and is never cached (`mediaWikiJson` in `scripts/lib/http.js`). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
 is then retried like a dropped connection.
 
-Pipeline output never touches `data/events.json`. Only an explicit `merge-proposed.js --apply` run by a person does, plus `refresh-extracts.js --apply`
-(deliberate, and run monthly through a pull request). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
+Pipeline output never touches `data/events.json`. Only these scripts write it, each only with `--apply`: `merge-proposed.js --apply` run by a person;
+`refresh-extracts.js --apply` and `refresh-sitelinks.js --apply` (deliberate, and run monthly by `.github/workflows/refresh-data.yml` through a pull request);
+and the backfills run by a person, `enrich-seed.js --apply` (the hand-picked seed events), `backfill-end-precision.js --apply` and `backfill-revids.js --apply`
+(one-off, re-runnable). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
 There is no second, committed copy of the events any more: `app/public/data/` is generated from `data/` by `app/scripts/split-data.mjs` on every dev start and
 build, and is gitignored.
 

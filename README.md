@@ -28,7 +28,7 @@ pipeline), which the site build never installs.
 | Task | Command |
 |---|---|
 | Run the site locally | `cd app && npm run dev` (first regenerates `app/public/data/`, the search index and `app/src/lib/dataVersion.js` from `data/`) |
-| Unit tests | `npm test` (scripts/lib) and `npm test --prefix app` (app/src/lib, app/src/components and app/scripts) |
+| Unit tests | `npm test` (scripts/lib) and `npm test --prefix app` (app/src/lib, app/src/components, app/src/hooks and app/scripts) |
 | Lint | `npm run lint` (scripts/) and `npm run lint --prefix app`; warnings fail both |
 | Production build | `cd app && npm run build` (its postbuild step writes the event pages and runs `scripts/check-dist.mjs`) |
 | Smoke test of the build | `cd app && npm run smoke` (after a build: serves `dist/` with `wrangler dev`, which applies `_headers`, and checks the map, search, event panel, About dialog and an `/event/<id>` page in an installed Chrome or Edge; `SMOKE_BROWSER=msedge` or `chrome`) |
