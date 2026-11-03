@@ -210,7 +210,7 @@ did: seven bombings Wikidata types only as "suicide attack" (the Dolphinarium, S
 attack" are terrorism - the same mechanism as the 2026-09-28 finding above. The owner chose terrorism (2026-10-07), so that the group no longer
 depends on whether a Wikidata editor added "terrorist attack" next to "suicide attack". It moved one event already shown, the 2011 southern Israel cross-border attacks, from war to terrorism.
 "Terrorism" remains our group name, not a Wikidata label: the UI lists the item's Wikidata classes next to it, and since 2026-10-25 the event header,
-the legend and the filters attribute it ("Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, hijacking)"; "Terrorism, from Wikidata's
+the legend and the filters attribute it ("Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, aircraft hijacking)"; "Terrorism, from Wikidata's
 class "suicide attack"") as the framing review's MOS:LABEL check asks of the word "terrorist". The group still follows the method classes listed above
 (suicide attack, hostage taking, aircraft hijacking) as well as "terrorist attack"; an airstrike or bombardment is war unless Wikidata also types it with
 an atrocity or terrorism class. "Protest" is a new group (protest, demonstration, riot); before, the only

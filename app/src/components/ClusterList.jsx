@@ -4,7 +4,7 @@ import { isUnhandledEscape } from "../lib/escapeKey";
 import { sheetCover } from "../lib/mapInsets";
 import { warmEvent } from "../lib/warmEvent";
 
-// Events that share one spot on the map (capital-pinned "approximate" events,
+// Events that share one spot on the map (events at a country's reference point,
 // or a cluster no zoom level can split): listed in a card at the click point.
 // Same placement rules as BoundaryPopup: clamped to the map, clear of the
 // phone results sheet, Escape closes (MapView then puts focus back). Pointing
@@ -52,7 +52,7 @@ export default function ClusterList({ list, onSelect, onClose, width, height }) 
         {total} events {oneSpot ? "at this spot" : "here"}
       </h3>
       {allApprox && (
-        <p className="mu-stack-note">Approximate locations: pinned to a capital or region, not the exact site.</p>
+        <p className="mu-stack-note">Approximate locations: a reference point for the country, or coordinates the source rounds to the area; not the exact site.</p>
       )}
       {total > items.length && <p className="mu-stack-note">Showing the first {items.length}.</p>}
       <ul className="mu-stack-list">
