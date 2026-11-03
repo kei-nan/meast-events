@@ -45,6 +45,20 @@ test("checkProperties: a missing status key is a warning, missing name/years/sou
   assert.ok(bad.errors.some((e) => /missing "source"/.test(e)));
 });
 
+test("checkProperties: a shape not from a CShapes record must name its geometry source", () => {
+  const ok = [
+    "Not in CShapes; https://en.wikipedia.org/wiki/X; Outline from Natural Earth 1:10m countries (public domain)",
+    "Not in CShapes; https://en.wikipedia.org/wiki/X; Island outlines from Natural Earth 10m minor islands (public domain)",
+    "Not a CShapes record; https://en.wikipedia.org/wiki/X; Outline derived from CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0): a difference",
+    "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)",
+  ];
+  assert.deepEqual(checkProperties(ok.map((source) => feature({ source }))).errors, []);
+  const noGeometry = checkProperties([feature({ source: "Not in CShapes; https://en.wikipedia.org/wiki/X" })]);
+  assert.match(noGeometry.errors[0], /names no geometry source/);
+  const noCredit = checkProperties([feature({ source: "Not a CShapes record; https://en.wikipedia.org/wiki/X; Outline from Natural Earth" })]);
+  assert.match(noCredit.errors[0], /does not credit CShapes 2\.0/);
+});
+
 test("checkProperties: unknown status values and bad geometry", () => {
   const r = checkProperties([feature({ status: "made-up" }), feature({ status: "mandate" }), { ...feature(), geometry: { type: "Point", coordinates: [1, 2] } }]);
   assert.equal(r.warnings.length, 1);

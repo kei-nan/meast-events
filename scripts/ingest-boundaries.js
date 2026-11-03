@@ -12,7 +12,7 @@
 // properties, so the generated file is self-documenting about what came from where.
 import { readFileSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
-import { CORRECTIONS } from "./boundary-corrections.js";
+import { CORRECTIONS, CSHAPES_CITATION } from "./boundary-corrections.js";
 import * as turf from "@turf/turf";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
 import { dropRepeatedPositionsInGeometry } from "./lib/ring-positions.js";
@@ -26,8 +26,6 @@ import { resolve } from "node:path";
 const argVal = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=").slice(1).join("=");
 const RAW_DIR = argVal("raw-dir") ? pathToFileURL(resolve(argVal("raw-dir")) + "/") : new URL("../data/raw/", import.meta.url);
 const OUT = argVal("out") ? pathToFileURL(resolve(argVal("out"))) : new URL("../data/boundaries.json", import.meta.url);
-
-const CSHAPES_CITATION = "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)";
 
 const REGION_ENTITIES = [
   "Turkey (Ottoman Empire)",
@@ -211,8 +209,10 @@ async function main() {
     ne10 ??= JSON.parse(readFileSync(new URL("ne10-countries.geojson", RAW_DIR), "utf-8"));
     return area ? ne10.features.filter((f) => turf.booleanIntersects(f, area)).map((f) => asFeature(f.geometry)) : [];
   };
+  const reshapedByCshapes = new Set();
   for (const r of CORRECTIONS.filter((c) => c.type === "reshape")) {
     if (!correctionsGeometry[r.geometry]) throw new Error(`reshape: no geometry "${r.geometry}"`);
+    reshapedByCshapes.add(r.geometry);
     let shape = asFeature(correctionsGeometry[r.geometry]);
     const outlines = r.borders.map((b) => asFeature(cshapesIn(b.cshapes, b.year)));
     r.borders.forEach((b, i) => {
@@ -252,6 +252,17 @@ async function main() {
     const fromCshapes = c.geometry.startsWith("cshapes:");
     const geometry = fromCshapes ? cshapesRecord(c.geometry.slice("cshapes:".length)) : correctionsGeometry[c.geometry];
     if (!geometry) throw new Error(`no geometry "${c.geometry}" for ${c.name}`);
+    // A shape not taken from a CShapes record says where its outline comes from; one
+    // computed from CShapes records (or cut to a CShapes line by a reshape) credits CShapes.
+    if (!fromCshapes) {
+      if (!c.geometry_source) throw new Error(`${c.name}: an "add" not from a CShapes record needs a geometry_source`);
+      if (reshapedByCshapes.has(c.geometry) && !c.cshapes_derived) {
+        throw new Error(`${c.name}: geometry "${c.geometry}" is cut to a CShapes line by a reshape, so set cshapes_derived`);
+      }
+      if (c.cshapes_derived && !c.geometry_source.includes(CSHAPES_CITATION)) {
+        throw new Error(`${c.name}: cshapes_derived, so its geometry_source must credit ${CSHAPES_CITATION}`);
+      }
+    }
     features.push({
       type: "Feature",
       properties: {
@@ -261,7 +272,7 @@ async function main() {
         status: c.status ?? null,
         source: fromCshapes
           ? `${CSHAPES_CITATION} geometry (its "${c.geometry.slice("cshapes:".length)}" record); ${c.source}`
-          : `Not in CShapes; ${c.source}${c.geometry_source ? `; ${c.geometry_source}` : ""}`,
+          : `${c.cshapes_derived ? "Not a CShapes record" : "Not in CShapes"}; ${c.source}; ${c.geometry_source}`,
         note: c.note ?? null,
       },
       geometry,

@@ -7,6 +7,7 @@
 // caller passes in, so the property/continuity checks and their tests also run where only
 // Node is installed (CI's unit-test step and the refresh workflow run before `npm ci`).
 import { BOUNDARY_STATUS_LABELS } from "../../app/src/components/mapBorders.js";
+import { sourceItems } from "../../app/src/lib/boundaryText.js";
 
 // Every feature carries these keys (null allowed for status). name/years/source missing is
 // an error; a missing status or note KEY is a warning (the value null is fine).
@@ -26,6 +27,20 @@ export const INTENTIONAL_OVERLAY_STATUSES = ["occupied-territory-included", "sha
 // the slivers this leaves are at most ~0.13 km2. Overlaps below this size are counted, not listed.
 export const OVERLAP_MIN_KM2 = 0.5;
 
+// A shape not taken from a CShapes record ("Not in CShapes", or "Not a CShapes record" when
+// it is computed from CShapes records; scripts/ingest-boundaries.js) must say where its
+// outline comes from: a source item, as the app lists them (app/src/lib/boundaryText.js),
+// naming its outline or geometry. One computed from CShapes must also credit CShapes.
+const NOT_CSHAPES_PREFIXES = ["Not in CShapes", "Not a CShapes record"];
+const GEOMETRY_ITEM = /\b(outlines?|geometry)\b/i;
+export function geometrySourceError(source) {
+  const [first, ...rest] = sourceItems(source);
+  if (!NOT_CSHAPES_PREFIXES.includes(first)) return null;
+  if (!rest.some((item) => GEOMETRY_ITEM.test(item))) return `source says "${first}" but names no geometry source (an item on its outline or geometry)`;
+  if (first === "Not a CShapes record" && !/CShapes 2\.0/.test(rest.join("; "))) return `source says "${first}" (computed from CShapes) but does not credit CShapes 2.0`;
+  return null;
+}
+
 const yearLabel = (y) => (y === OPEN_END_YEAR ? "present" : String(y));
 const span = (a, b) => (a === b ? yearLabel(a) : `${yearLabel(a)}-${yearLabel(b)}`);
 const label = (p) => `${p?.name ?? "(no name)"} ${span(p?.start_year, p?.end_year)}`;
@@ -42,6 +57,10 @@ export function checkProperties(features) {
     if (!Number.isInteger(p.start_year) || !Number.isInteger(p.end_year)) errors.push(`${where}: start_year/end_year must be integers`);
     else if (p.start_year > p.end_year) errors.push(`${where}: start_year after end_year`);
     if ("source" in p && (typeof p.source !== "string" || !p.source.trim())) errors.push(`${where}: source must be a non-empty string`);
+    else if ("source" in p) {
+      const e = geometrySourceError(p.source);
+      if (e) errors.push(`${where}: ${e}`);
+    }
     for (const k of EXPECTED_KEYS) {
       if (!(k in p)) warnings.push(`${where}: no "${k}" key (other features use ${k}: null when there is none)`);
     }
