@@ -180,7 +180,7 @@ nothing. Its jobs (the names GitHub shows as status checks):
   (`npm test`), checks that `.nvmrc` and `app/.nvmrc` agree, runs `npm run build`, i.e. the
   same build Cloudflare runs, with all the checks above, and then smoke-tests the built site
   (`npm run smoke`, `scripts/smoke.mjs`: it serves `dist/` under its production headers with
-  `wrangler dev` and checks in Chrome that the map draws, search answers, an event and the
+  `wrangler dev` and checks in an installed Chrome or Edge that the map draws, search answers, an event and the
   About dialog open, `/event/<id>` loads, and nothing logs an error or a CSP violation;
   Cloudflare does not run it).
 - **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
