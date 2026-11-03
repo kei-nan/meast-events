@@ -265,13 +265,14 @@ function ResultsList({
   const [active, setActive] = useState(0);
   const timeline = layout === "timeline";
   const rangeStart = browse && range ? range[0] : null;
-  const ordered = useMemo(
-    () => (timeline ? timelineOrder(results, rangeStart) : results),
-    [timeline, results, rangeStart]
-  );
   const axis = useMemo(
     () => (timeline ? timelineAxis(results, range, { fit: fitAxis, minYear: MIN_YEAR, maxYear: MAX_YEAR }) : null),
     [timeline, results, range, fitAxis]
+  );
+  // Each row placed (order, decade) at the year its bar sits on the axis.
+  const ordered = useMemo(
+    () => (timeline ? timelineOrder(results, rangeStart, axis) : results),
+    [timeline, results, rangeStart, axis]
   );
   const band = axis && fitAxis ? rangeBand(range, axis) : null;
   const visible = ordered.slice(0, shown);
@@ -327,7 +328,7 @@ function ResultsList({
   // heading; in the list only that "ongoing" group has a heading. Rows keep
   // their index in `visible` (roving tab stop, "Show more" focus).
   const ongoingOf = (e) => Boolean(browse && range && startedBefore(e, range[0]));
-  const groupOf = timeline ? (e) => (ongoingOf(e) ? "ongoing" : startDecade(e)) : (e) => (ongoingOf(e) ? "ongoing" : "");
+  const groupOf = timeline ? (e) => (ongoingOf(e) ? "ongoing" : startDecade(e, axis)) : (e) => (ongoingOf(e) ? "ongoing" : "");
   const groups = [];
   visible.forEach((ev, idx) => {
     const g = groupOf(ev);

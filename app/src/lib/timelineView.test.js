@@ -184,3 +184,27 @@ test("bar and fit axis: an ongoing event (title says present) runs to the curren
   assert.deepEqual(timelineAxis([yemen], [1900, MAX_YEAR], { fit: true }), [2014, MAX_YEAR]);
   assert.deepEqual(timelineAxis([syria], [1900, MAX_YEAR], { fit: true }), [2011, 2011]);
 });
+
+test("Timeline: a reversed record sits at the year its bar is drawn at (real record)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { eventOverlapsRange } = await import("./eventYears.js");
+  const events = JSON.parse(readFileSync(new URL("../../../data/events.json", import.meta.url), "utf8"));
+  const kuwait = events.find((e) => e.id === "iraqi-invasion-of-kuwait"); // start 2009-08-02, end 1990-08-04
+  const axis = [1990, 1991];
+  assert.equal(barGeometry(kuwait, axis).left, 0, "its bar at 1990, the end year");
+  assert.equal(startDecade(kuwait, axis), 1990, "under 1990s, not 2000s");
+  assert.equal(startDecade(kuwait), 2000, "without an axis: its start, as given");
+  assert.equal(startDecade(kuwait, [2005, 2010]), 2000);
+  assert.equal(startDecade(kuwait, [1985, 2010]), 2000, "both years on the axis: its start, like its bar");
+
+  const inRange = events.filter((e) => eventOverlapsRange(e, 1990, 1991));
+  const order = timelineOrder(inRange, 1990, axis);
+  const i = order.indexOf(kuwait);
+  const decades = order.map((e) => startDecade(e, axis));
+  assert.equal(decades[i], 1990);
+  // Oldest first by the year each row is placed at: Kuwait among the 4 August 1990 neighbours.
+  const prev = order[i - 1];
+  const next = order[i + 1];
+  if (prev) assert.ok((prev.date_start ?? "") <= "1990-08-04");
+  if (next) assert.ok((next.date_start ?? "") >= "1990-08-04");
+});

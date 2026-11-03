@@ -11,18 +11,18 @@
 // not read as "still going on", unless a source says so (lib/eventYears.js
 // ongoingSignal): then its bar runs from its start to the current year.
 
-import { startedBefore } from "./browseOrder.js";
-import { eventSpanYears, rawEventYears } from "./eventYears.js";
+import { listedDate, listedYear, startedBefore } from "./browseOrder.js";
+import { eventSpanYears } from "./eventYears.js";
 
-/** The event's start date as a sortable string ("" when it has none). */
-function startKey(e) {
-  return typeof e?.date_start === "string" ? e.date_start : "";
-}
-
-/** Events oldest first by start date (as given); undated last; stable. */
-export function chronological(events) {
+/**
+ * Events oldest first by start date (as given); undated last; stable. With
+ * `axis` (the years the bars are drawn on, [first, last]), a reversed record
+ * whose bar sits at its end year (barGeometry: its start is off the axis) goes
+ * by its end date there (lib/browseOrder.js listedAtEnd).
+ */
+export function chronological(events, axis = null) {
   return events
-    .map((e, i) => ({ e, i, k: startKey(e) }))
+    .map((e, i) => ({ e, i, k: listedDate(e, axis) }))
     .sort((a, b) => {
       if (!a.k !== !b.k) return a.k ? -1 : 1;
       if (a.k !== b.k) return a.k < b.k ? -1 : 1;
@@ -36,9 +36,11 @@ export function chronological(events) {
  * that START in the selected years first, then those ongoing from before them,
  * each part oldest first - the List view's split (lib/browseOrder.js). Without
  * it: all oldest first. Undated events stay in the first part, as in the List.
+ * `axis`: the bars' years (timelineAxis), for where a reversed record is placed
+ * (chronological).
  */
-export function timelineOrder(events, rangeStart = null) {
-  const sorted = chronological(events);
+export function timelineOrder(events, rangeStart = null, axis = null) {
+  const sorted = chronological(events, axis);
   if (!Number.isFinite(rangeStart)) return sorted;
   const starting = [];
   const ongoing = [];
@@ -46,9 +48,14 @@ export function timelineOrder(events, rangeStart = null) {
   return starting.concat(ongoing);
 }
 
-/** The first year of the decade the event starts in, or null when it has no start year. */
-export function startDecade(e) {
-  const [s] = rawEventYears(e);
+/**
+ * The first year of the decade the event starts in, or null when it has no
+ * start year. With `axis`: the decade of the year its bar sits at, which for a
+ * reversed record whose start is off the axis is its end year (listedAtEnd):
+ * iraqi-invasion-of-kuwait (2009 / 1990) in 1990-1991 is in the 1990s.
+ */
+export function startDecade(e, axis = null) {
+  const s = listedYear(e, axis);
   return Number.isFinite(s) && s > 0 ? Math.floor(s / 10) * 10 : null;
 }
 

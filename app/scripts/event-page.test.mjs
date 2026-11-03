@@ -244,6 +244,7 @@ test("only an end before the start gets a date note, in plain language", () => {
     date_start: "2002-03-27",
     date_end: "2002-01-01",
     date_precision: "day",
+    date_end_precision: "day",
     date_flags: ["date_order_invalid: x", "wikipedia_dates_note: y"],
     wikipedia_lead_dates: ["2002-03-27"],
   });
