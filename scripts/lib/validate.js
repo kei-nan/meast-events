@@ -199,8 +199,8 @@ export function isRealDate(s, maxYear = MAX_YEAR) {
   return d <= dim;
 }
 
-// opts.lenient: curated data.events.json may hold events that still
-// need manual coordinates (reported as warnings, not errors). The proposed file may not.
+// opts.lenient: events that still need manual coordinates or a QID are reported as warnings, not errors. No script
+// uses it since 2026-11-03: data/events.json passes strictly, and validate-events.js / merge-proposed.js validate strictly.
 //
 // KNOWN_DUPLICATE_QIDS: pre-existing duplicates in curated data awaiting the user's
 // decision (we never edit curated data automatically). Downgraded to warnings in lenient

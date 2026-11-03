@@ -336,6 +336,7 @@ async function main() {
   for (const r of results) {
     // An item already in the curated file keeps the id it has there, whatever its title slugifies to now
     // (lib/slug.js may spell a title differently than when that id was made, e.g. "dawson-s-field-hijackings").
+    // Unreachable since 2026-11-03 (curated QIDs are no longer in the batch: withoutCurated above); kept as a safeguard.
     const existing = curatedByQid.get(r.wikidata_qid);
     if (existing) r.id = existing.id;
     else if (takenIds.has(r.id) && takenIds.get(r.id) !== r.wikidata_qid) r.id = `${r.id}-${r.wikidata_qid.toLowerCase()}`;
@@ -411,6 +412,7 @@ ${m}      `),
     delete r.date_flags;
     // Events already merged into the curated file keep the dates as merged (no source reconciliation here): their
     // stored dates, and the date_source_adjusted note that explains a reconciled start, come from the curated record.
+    // Unreachable since 2026-11-03 (curated QIDs are no longer in the batch: withoutCurated above); kept as a safeguard.
     const merged = curatedByQid.get(r.wikidata_qid);
     if (merged) {
       r.date_start = merged.date_start;

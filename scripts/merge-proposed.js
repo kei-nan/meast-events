@@ -17,7 +17,9 @@
 //   - Re-derived date-order flags (lib/order-flags.js): a curated event that is also in the proposed file (same id and
 //     QID, same dates and extract) takes the proposed record's date_order_invalid / date_end_precision_coarse /
 //     wikipedia_dates_note flags and wikipedia_lead_dates, so a pipeline fix to those flags reaches the curated record.
-//     Nothing else of the curated record changes.
+//     Nothing else of the curated record changes. Since 2026-11-03 curated events are not re-proposed
+//     (enrich-candidates.js, lib/enrich-run.js withoutCurated), so this finds nothing to copy unless a proposed file
+//     written before then is merged; kept for that case.
 import { readFile } from "node:fs/promises";
 import { readJsonIfExists, writeFileAtomic } from "./lib/files.js";
 import { pathToFileURL } from "node:url";

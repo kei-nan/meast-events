@@ -6,13 +6,16 @@ import { existsSync } from "node:fs";
 import { validateEvents, checkFramingCoverage } from "./lib/validate.js";
 
 const root = new URL("../", import.meta.url);
+// Both files are validated strictly (since 2026-11-03 the curated file passes without the "lenient" mode, which turned a
+// missing wikidata_qid or null coordinates with a location_quality other than "none" into warnings). `curated` only
+// decides the cross-file parts: the framing-review coverage (curated) and the curated ids hints may point at (proposed).
 const defaults = [
-  { path: "data/events.json", lenient: true, required: true },
-  { path: "data/events.proposed.json", lenient: false, required: false },
+  { path: "data/events.json", curated: true, required: true },
+  { path: "data/events.proposed.json", curated: false, required: false },
 ];
 const cliFiles = process.argv.slice(2);
 const targets = cliFiles.length
-  ? cliFiles.map((p) => ({ path: p, lenient: !/proposed/.test(p), required: true }))
+  ? cliFiles.map((p) => ({ path: p, curated: !/proposed/.test(p), required: true }))
   : defaults;
 
 // Pin-in-country check (warnings): needs data/boundaries.json and @turf/turf, a repo-root
@@ -45,10 +48,10 @@ for (const t of targets) {
   // The proposed file's possible_duplicates hints may point at curated events.
   const curatedUrl = new URL("data/events.json", root);
   const otherIds =
-    !t.lenient && existsSync(curatedUrl)
+    !t.curated && existsSync(curatedUrl)
       ? new Set(JSON.parse(await readFile(curatedUrl, "utf-8")).map((e) => e?.id))
       : new Set();
-  const { errors, warnings } = validateEvents(events, { name: t.path, lenient: t.lenient, otherIds, boundaries, turf });
+  const { errors, warnings } = validateEvents(events, { name: t.path, otherIds, boundaries, turf });
   for (const w of warnings) console.warn(`warn ${w}`);
   if (errors.length) {
     failed = true;
@@ -60,7 +63,7 @@ for (const t of targets) {
   }
   // The curated file must have a current framing review per event (warnings only: a refreshed
   // summary stays "stale" until it is re-reviewed).
-  if (t.lenient && /(^|[\\/])events\.json$/.test(t.path) && Array.isArray(events)) {
+  if (t.curated && /(^|[\\/])events\.json$/.test(t.path) && Array.isArray(events)) {
     const reviewUrl = new URL("data/framing-review.json", root);
     if (!existsSync(reviewUrl)) {
       console.warn("warn data/framing-review.json missing: no framing reviews");
