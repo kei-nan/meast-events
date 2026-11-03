@@ -238,9 +238,11 @@ export function installLayers(map, { land, boundaries, labels, events }) {
       // a degree of latitude here is ~1.6 * 2^zoom px (512 px tiles, Mercator
       // at ~28N), so the room needed about halves with each zoom level. Each
       // step is the need at the low end of its band, for a small state's text
-      // size. At the opening desktop zoom (~3.6) Israel (1.8), Jordan (2.1) and
-      // up may move, not the UAE (1.3), Kuwait, Lebanon, Qatar, the West Bank
-      // areas or the neutral zones; on a phone (~2.6) only Egypt and larger.
+      // size. At the opening desktop zoom (~3.6) Jordan (2.1) and up may move,
+      // not Israel (1.35 in 1948-66 and from 1979: its name sits in the Negev,
+      // off the West Bank and Gaza, and may move from zoom 4), the UAE (1.3),
+      // Kuwait, Lebanon, Qatar, the West Bank areas or the neutral zones; on a
+      // phone (~2.6) only Egypt and larger.
       "text-variable-anchor-offset": [
         "step",
         ["zoom"],
