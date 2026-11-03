@@ -74,6 +74,44 @@ test("validateEvents: an event needs a tracked country", () => {
   assert.match(validateEvents([event({ countries: ["France"] })]).errors[0], /no tracked country/);
 });
 
+test("validateEvents: every country tag must be tracked (one known tag does not excuse a typo)", () => {
+  const r = validateEvents([event({ countries: ["Iraq", "Isreal"] })]);
+  assert.equal(r.errors.length, 1, r.errors.join("\n"));
+  assert.match(r.errors[0], /unknown country "Isreal"/);
+  assert.deepEqual(validateEvents([event({ countries: ["Iraq", "regional"] })]).errors, []);
+  // Not a prototype key either.
+  assert.match(validateEvents([event({ countries: ["Iraq", "toString"] })]).errors[0], /unknown country "toString"/);
+});
+
+test("validateEvents: wikipedia_url is required and must be the English article (inclusion rule 4)", () => {
+  const missing = event();
+  delete missing.wikipedia_url;
+  assert.match(validateEvents([missing]).errors.join(), /wikipedia_url missing/);
+  assert.match(validateEvents([event({ wikipedia_url: null })]).errors.join(), /wikipedia_url missing/);
+  const fr = validateEvents([event({ wikipedia_url: "https://fr.wikipedia.org/wiki/Guerre_des_Six_Jours" })]);
+  assert.match(fr.errors.join(), /not an English Wikipedia article/);
+  assert.match(validateEvents([event({ wikipedia_url: "https://example.org/wiki/X" })]).errors.join(), /not a Wikipedia article URL/);
+});
+
+test("validateEvents: location_quality is required", () => {
+  const e = event();
+  delete e.location_quality;
+  assert.match(validateEvents([e]).errors.join(), /location_quality missing/);
+  assert.match(validateEvents([e], { lenient: true }).errors.join(), /location_quality missing/);
+});
+
+test("validateEvents: date_precision / date_end_precision must fit the stored date's shape", () => {
+  const ok = (over) => assert.deepEqual(validateEvents([event(over)]).errors, [], JSON.stringify(over));
+  const bad = (over, re) => assert.match(validateEvents([event(over)]).errors.join(), re, JSON.stringify(over));
+  ok({ date_start: "1967-06-01", date_precision: "month" });
+  ok({ date_start: "1967-01-01", date_end: null, date_precision: "year", wikidata_classes: ["battle"] });
+  ok({ date_start: "1967-06-05", date_precision: null });
+  bad({ date_start: "1967-06-05", date_precision: "month" }, /date_start 1967-06-05 does not fit date_precision "month"/);
+  bad({ date_start: "1967-06-01", date_precision: "year" }, /does not fit date_precision "year": a year-precision date is stored as 1 January/);
+  bad({ date_end: "1967-06-10", date_end_precision: "month" }, /date_end 1967-06-10 does not fit date_end_precision "month"/);
+  ok({ date_end: "1967-06-01", date_start: "1967-05-01", date_precision: "month", date_end_precision: "month" });
+});
+
 test("isRealDate: years from the app's first to its last timeline year", () => {
   // The same bounds as the app's timeline (outside a Vite bundle its last year is the UTC year).
   assert.equal(MIN_YEAR, APP_MIN_YEAR);
@@ -378,7 +416,6 @@ test("validateEvents: inclusion-rule warnings for discovered events; hand-picked
   const r = validateEvents([
     found({ id: "low", wikidata_qid: "Q1", sitelinks: 9, wikipedia_url: "https://en.wikipedia.org/wiki/Low", extract: "L ".repeat(90) }),
     found({ id: "fell", wikidata_qid: "Q2", sitelinks_current: 8, wikipedia_url: "https://en.wikipedia.org/wiki/Fell", extract: "F ".repeat(90) }),
-    found({ id: "fr", wikidata_qid: "Q3", wikipedia_url: "https://fr.wikipedia.org/wiki/Guerre_des_Six_Jours", extract: "G ".repeat(90) }),
     found({ id: "noprec", wikidata_qid: "Q4", date_precision: undefined, wikipedia_url: "https://en.wikipedia.org/wiki/N", extract: "N ".repeat(90) }),
     found({ id: "badprec", wikidata_qid: "Q5", date_precision: "fortnight", wikipedia_url: "https://en.wikipedia.org/wiki/P", extract: "P ".repeat(90) }),
     // seed event: no sitelinks key, low current count - none of the above applies
@@ -391,11 +428,10 @@ test("validateEvents: inclusion-rule warnings for discovered events; hand-picked
   const w = (id) => r.warnings.filter((x) => x.includes(` ${id}: `));
   assert.match(w("low").join(), /sitelinks at discovery \(9\) below the inclusion threshold of 10/);
   assert.match(w("fell").join(), /sitelinks_current \(8\) has fallen below/);
-  assert.match(w("fr").join(), /not an English Wikipedia article/);
   assert.match(w("noprec").join(), /date_precision missing/);
   assert.match(w("badprec").join(), /"fortnight" is not a Wikidata precision name/);
   assert.deepEqual(w("seed"), []);
-  assert.equal(r.warnings.length, 5, r.warnings.join("\n"));
+  assert.equal(r.warnings.length, 4, r.warnings.join("\n"));
   // null precision (a ledger date that is no Wikidata value) is allowed
   assert.deepEqual(validateEvents([found({ date_precision: null })]).warnings, []);
 });

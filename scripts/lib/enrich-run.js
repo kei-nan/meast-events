@@ -5,6 +5,7 @@
 //     (--out-suffix).
 //   - reuseRecord (--reuse): only a clean record of the same article is reused, and the fields the candidate file gives
 //     (countries, sitelinks, classes, description) are taken from the CURRENT candidate, not the stale copy.
+//   - withoutCurated: curated events (data/events.json, by QID) are never re-proposed.
 //   - fetchErrors: records whose fetch failed (network/API error). They must never be reused or written as if the
 //     event were excluded on its merits.
 import { EVENT_CLASSES } from "./event-classes.js";
@@ -73,6 +74,17 @@ export function reuseRecord(cached, candidate, reusableVersions) {
   setReason(r._review, MANY_COUNTRIES_FLAG, manyCountriesFlag(r.countries));
   setReason(r._review, FAR_FLAG, coordinateFlag(r.coordinates, r.countries));
   return r;
+}
+
+/**
+ * Records (candidates, proposed or enriched events) whose wikidata_qid is NOT in the curated file. Curated events are
+ * not re-proposed (docs/DATA_POLICY.md). Checked against data/events.json itself, never against a candidate's stored
+ * `already_curated` flag: discover-events.js --predecessors-only leaves existing candidate rows untouched, so that flag
+ * goes stale as soon as events are merged (on 2026-11-03, 254 of the 255 proposed records were curated already).
+ */
+export function withoutCurated(records, curated) {
+  const qids = new Set((curated ?? []).map((e) => e?.wikidata_qid).filter(Boolean));
+  return (records ?? []).filter((r) => !qids.has(r?.wikidata_qid));
 }
 
 /** The records whose fetch failed. */

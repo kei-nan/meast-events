@@ -45,7 +45,14 @@ export function titleFromWikipediaUrl(url) {
 // for the rest; without following it, the later pages of a batch would come back with no
 // extract at all. Each continued response repeats `normalized`/`redirects`; the page records
 // are merged by title (a field from a later part fills one that is still missing).
-export async function queryAllParts(titles, { maxParts = 50 } = {}) {
+//
+// Revision check: `lastrevid` (and the revision timestamp) come with the first part, but a page's extract may only
+// come in a later one. Were the article edited in between, the stored revid would not be the revision of the stored
+// text. So for every page whose extract came in a later part than its lastrevid (or whose lastrevid changed between
+// parts), the latest revision is asked for again once all parts are in (latestRevids). Revision ids only grow, so
+// the same lastrevid before and after means the page did not change while its lead was fetched. A page that did
+// change is fetched again (up to `retries` times); if it keeps changing the fetch throws (nothing is cached).
+export async function queryAllParts(titles, { maxParts = 50, retries = 2 } = {}) {
   const base = {
     action: "query",
     // revisions (latest only, ids|timestamp): the date of the revision the lead comes from (lib/revid.js)
@@ -64,6 +71,9 @@ export async function queryAllParts(titles, { maxParts = 50 } = {}) {
   const normalized = new Map();
   const redirects = new Map();
   const pages = new Map();
+  const revPart = new Map(); // title -> the part its lastrevid came in
+  const extractPart = new Map(); // title -> the part its extract came in
+  const changed = new Set(); // titles whose lastrevid differed between two parts
   let cont = null;
   for (let part = 0; part < maxParts; part++) {
     const res = await politeFetch(`${API}?${new URLSearchParams({ ...base, ...cont })}`);
@@ -74,13 +84,42 @@ export async function queryAllParts(titles, { maxParts = 50 } = {}) {
     for (const r of q.redirects ?? []) redirects.set(r.from, r);
     for (const p of q.pages ?? []) {
       const prev = pages.get(p.title);
+      if (p.lastrevid !== undefined) {
+        if (!revPart.has(p.title)) revPart.set(p.title, part);
+        else if (prev && prev.lastrevid !== p.lastrevid) changed.add(p.title);
+      }
+      if (p.extract !== undefined && !extractPart.has(p.title)) extractPart.set(p.title, part);
       if (!prev) pages.set(p.title, { ...p });
       else for (const [k, v] of Object.entries(p)) if (prev[k] === undefined) prev[k] = v;
     }
-    if (!data.continue) return { normalized: [...normalized.values()], redirects: [...redirects.values()], pages: [...pages.values()] };
+    if (!data.continue) {
+      const split = [...pages.keys()].filter(
+        (t) => !changed.has(t) && extractPart.has(t) && revPart.has(t) && extractPart.get(t) !== revPart.get(t)
+      );
+      const current = split.length ? await latestRevids(split) : new Map();
+      const stale = [...changed, ...split.filter((t) => current.get(t) !== pages.get(t).lastrevid)];
+      if (stale.length) {
+        if (retries <= 0) {
+          throw new Error(
+            `lead fetch: ${stale.join(", ")} changed while the lead was being fetched (the revision id no longer matches the text); re-run`
+          );
+        }
+        // Fetched again by canonical title: the redirects/normalisation already recorded above still apply.
+        const again = await queryAllParts(stale, { maxParts, retries: retries - 1 });
+        for (const p of again.pages) pages.set(p.title, p);
+      }
+      return { normalized: [...normalized.values()], redirects: [...redirects.values()], pages: [...pages.values()] };
+    }
     cont = data.continue;
   }
   throw new Error(`lead fetch: still continuing after ${maxParts} parts (${titles.length} titles)`);
+}
+
+// The current lastrevid of each (canonical) title: Map(title -> lastrevid). At most LEAD_BATCH titles (one batch).
+async function latestRevids(titles) {
+  const params = { action: "query", prop: "info", format: "json", formatversion: "2", titles: titles.join("|") };
+  const data = await mediaWikiJson(await politeFetch(`${API}?${new URLSearchParams(params)}`), "lead revision check");
+  return new Map((data.query?.pages ?? []).map((p) => [p.title, p.lastrevid]));
 }
 
 /** The timestamp of a page record's latest revision, only when it is the revision `lastrevid` names. */
@@ -93,12 +132,17 @@ export function revisionTimestamp(page) {
 // title, so an interrupted run resumes. Returns Map(requestedTitle -> record|null).
 // record: { title (canonical, after redirects), extract, wikibase_item, pageid, lastrevid,
 //           url, redirected_from|null, redirect_fragment|null (redirect to a section), retrieved_at }
+// A missing or invalid page (null) is NOT cached, and a null already in a cache written by an earlier version is
+// treated as not cached: a page missing once (deleted, moved, a transient API answer) would otherwise read as missing
+// on every later run, and the pipeline would keep falling back to the REST summary's extract (lib/v21.js) for good.
+// Asking again costs one batch request for the few such titles.
 export async function fetchLeads(titles, { cache = null, delayMs = 400, log = () => {} } = {}) {
   const wanted = [...new Set(titles.filter(Boolean))];
   const result = new Map();
   const todo = [];
   for (const t of wanted) {
-    if (cache?.has(t)) result.set(t, cache.get(t));
+    const hit = cache?.has(t) ? cache.get(t) : null;
+    if (hit) result.set(t, hit);
     else todo.push(t);
   }
   for (let i = 0; i < todo.length; i += LEAD_BATCH) {
@@ -129,7 +173,7 @@ export async function fetchLeads(titles, { cache = null, delayMs = 400, log = ()
         };
       }
       result.set(t, rec);
-      cache?.set(t, rec);
+      if (rec) cache?.set(t, rec);
     }
     cache?.flush();
     log(`leads ${Math.min(i + LEAD_BATCH, todo.length)}/${todo.length}`);

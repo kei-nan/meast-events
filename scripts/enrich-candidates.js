@@ -32,7 +32,8 @@
 // FAILURES: a candidate whose fetch fails (network or API error) is not an exclusion. If any fetch failed, or the
 // proposed set fails validation, the run exits non-zero and writes none of the real output files (with --out-suffix
 // the suffixed files are still written, for inspection). Re-run; nothing is cached from a failed fetch.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { existsSync } from "node:fs";
 import { sleep } from "./lib/http.js";
 import { compareQids } from "./lib/wdqs.js";
@@ -77,6 +78,7 @@ import { validateEvents, borrowedSource, BORROWED_SOURCE } from "./lib/validate.
 import {
   boundedRunError,
   candidateFields,
+  withoutCurated,
   fetchErrors,
   manyCountriesFlag,
   reuseRecord,
@@ -220,7 +222,7 @@ async function loadJson(name, fallback = []) {
 // network; stored sitelink counts), applied to the curated file and the proposed set just written.
 async function writeMissingReport({ curated, proposed }) {
   const { md, curated: nc, proposed: np } = renderMissingReport({ curated, proposed });
-  await writeFile(path(outName("missing-coordinates-report", "md")), md);
+  await writeFileAtomic(path(outName("missing-coordinates-report", "md")), md);
   return { curated: nc, candidates: np };
 }
 
@@ -229,8 +231,14 @@ async function writeMissingReport({ curated, proposed }) {
 // wikipedia_lead_dates), which take this run's values when the dates and text are the same (lib/order-flags.js);
 // only candidates new to the files are added (proposed: at their place in the date order; enriched: at the end). A full run re-derives every record, which also re-derives what was applied at merge time (data fixes,
 // redirect notes), so a bounded addition uses this.
-async function keepExisting({ proposed, persist }) {
-  const oldProposed = await loadJson(outName("events.proposed", "json"));
+async function keepExisting({ proposed, persist, curated }) {
+  // A kept proposed record that has since been merged into the curated file is dropped (curated events are not
+  // re-proposed); data/enriched-candidates.json keeps it, as the record of what was enriched.
+  const storedProposed = await loadJson(outName("events.proposed", "json"));
+  const oldProposed = withoutCurated(storedProposed, curated);
+  if (oldProposed.length < storedProposed.length) {
+    console.log(`--keep-existing: dropped ${storedProposed.length - oldProposed.length} proposed records already in data/events.json`);
+  }
   const oldEnriched = await loadJson(outName("enriched-candidates", "json"));
   const inProposed = new Set(oldProposed.map((e) => e.wikidata_qid));
   const inEnriched = new Set(oldEnriched.map((e) => e.wikidata_qid));
@@ -262,8 +270,12 @@ async function main() {
   const bounded = boundedRunError({ limit: LIMIT, classes: ONLY_CLASSES, keepExisting: KEEP_EXISTING, outSuffix: SUFFIX });
   if (bounded) refuse(bounded);
   const allCandidates = await loadJson("event-candidates.json");
-  let batch = allCandidates.filter(
-    (c) => c.has_en_wikipedia && c.sitelinks >= INCLUSION_MIN_SITELINKS && !c.already_curated
+  // "Not already curated" is checked against data/events.json itself (lib/enrich-run.js withoutCurated), not the
+  // candidate's stored already_curated flag, which goes stale once events are merged.
+  const curated = await loadJson("events.json");
+  let batch = withoutCurated(
+    allCandidates.filter((c) => c.has_en_wikipedia && c.sitelinks >= INCLUSION_MIN_SITELINKS),
+    curated
   );
   if (ONLY_CLASSES) batch = batch.filter((c) => (c.wikidata_classes ?? []).some((l) => ONLY_CLASSES.includes(l)));
   if (LIMIT) batch = batch.slice(0, LIMIT);
@@ -317,7 +329,6 @@ async function main() {
   }
 
   // ---- unique ids (never rename silently: suffix with the QID on a clash) ----
-  const curated = await loadJson("events.json");
   // An id already held by the SAME Wikidata item (already merged into the curated file) is kept as is (ids are
   // stable); only a clash with a different item is disambiguated with the QID.
   const takenIds = new Map(curated.map((e) => [e.id, e.wikidata_qid]));
@@ -470,7 +481,7 @@ ${m}      `),
     })
     .sort((a, b) => a.date_start.localeCompare(b.date_start) || compareQids(a.wikidata_qid, b.wikidata_qid));
 
-  if (KEEP_EXISTING) ({ proposed, persist } = await keepExisting({ proposed, persist }));
+  if (KEEP_EXISTING) ({ proposed, persist } = await keepExisting({ proposed, persist, curated }));
 
   const { errors } = validateEvents(proposed, { name: "events.proposed" });
   if (errors.length) {
@@ -480,8 +491,8 @@ ${m}      `),
     );
   }
 
-  await writeFile(path(outName("enriched-candidates", "json")), JSON.stringify(persist, null, 2));
-  await writeFile(path(outName("events.proposed", "json")), JSON.stringify(proposed, null, 2) + "\n");
+  await writeFileAtomic(path(outName("enriched-candidates", "json")), JSON.stringify(persist, null, 2));
+  await writeFileAtomic(path(outName("events.proposed", "json")), JSON.stringify(proposed, null, 2) + "\n");
 
   let report = null;
   if (!flag("no-report")) {

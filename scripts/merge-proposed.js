@@ -71,7 +71,9 @@ if (SKIP_DUP) incoming = incoming.filter((e) => !e.possible_duplicates?.length);
 
 // Also guard QID clashes within the incoming set against curated after id filtering.
 const merged = [...curated, ...incoming];
-const mv = validateEvents(merged, { name: "merged", lenient: true });
+// Strict, like the proposed file: what is written to data/events.json must pass every rule, not the curated-mode
+// leniency (missing wikidata_qid, null coordinates with a location_quality other than "none" as warnings).
+const mv = validateEvents(merged, { name: "merged" });
 if (mv.errors.length) {
   console.error(`Merged result would be invalid (${mv.errors.length} violation(s)); refusing:`);
   for (const e of mv.errors.slice(0, 20)) console.error("  " + e);

@@ -34,6 +34,11 @@ test("fetchLeads: follows the API's continue until every page has its extract", 
   });
   await withFetch(
     (url) => {
+      // Beta's and Gamma's extracts come in later parts than their lastrevid: their revision is checked once more.
+      if (url.searchParams.get("prop") === "info") {
+        assert.equal(url.searchParams.get("titles"), "Beta|Gamma");
+        return json({ query: { pages: [page("Beta"), page("Gamma")] } });
+      }
       const cont = url.searchParams.get("excontinue");
       assert.equal(url.searchParams.get("titles"), "Alpha|Beta war|Gamma");
       if (cont == null) {
@@ -56,13 +61,113 @@ test("fetchLeads: follows the API's continue until every page has its extract", 
     },
     async (calls) => {
       const leads = await fetchLeads(["Alpha", "Beta war", "Gamma"], { delayMs: 0 });
-      assert.equal(calls.length, 3);
+      assert.equal(calls.length, 4); // three parts + one revision check
       assert.equal(leads.get("Alpha").extract, "Alpha lead.");
       assert.equal(leads.get("Beta war").extract, "Beta lead.\n\nMore.");
       assert.equal(leads.get("Beta war").title, "Beta");
       assert.equal(leads.get("Beta war").redirected_from, "Beta war");
       assert.equal(leads.get("Gamma").extract, "Gamma lead.");
       assert.equal(leads.get("Gamma").wikibase_item, "Q5");
+    }
+  );
+});
+
+// Real continued parts do not repeat lastrevid/revisions (the `continue` value lists info|revisions as done), so the
+// revid comes from part 1 and the extract from part 2.
+const leadPage = (title, { extract, revid } = {}) => ({
+  pageid: 7,
+  title,
+  ...(extract !== undefined ? { extract } : {}),
+  ...(revid !== undefined ? { lastrevid: revid, revisions: [{ revid, timestamp: `2026-11-0${revid % 9 || 1}T00:00:00Z` }] } : {}),
+  canonicalurl: `https://en.wikipedia.org/wiki/${title}`,
+});
+
+test("fetchLeads: an article edited between the revid part and the extract part is fetched again", async () => {
+  // Revision 100 when part 1 is served, 101 (new text) from then on.
+  let rev = 100;
+  await withFetch(
+    (url) => {
+      if (url.searchParams.get("prop") === "info") return json({ query: { pages: [{ title: "Alpha", lastrevid: rev }] } });
+      const cont = url.searchParams.get("excontinue");
+      if (cont == null) {
+        const r = rev;
+        rev = 101; // edited right after part 1 was served
+        // A single title on the retry: the extract fits in the first part, with its own revid.
+        if (url.searchParams.get("titles") === "Alpha" && r === 101) {
+          return json({ batchcomplete: true, query: { pages: [leadPage("Alpha", { revid: 101, extract: "New text." })] } });
+        }
+        return json({
+          continue: { excontinue: "1", continue: "||info|revisions" },
+          query: { pages: [leadPage("Alpha", { revid: r }), leadPage("Other", { revid: 5, extract: "Other text." })] },
+        });
+      }
+      return json({ batchcomplete: true, query: { pages: [leadPage("Alpha", { extract: "New text." }), leadPage("Other")] } });
+    },
+    async (calls) => {
+      const leads = await fetchLeads(["Alpha", "Other"], { delayMs: 0 });
+      // parts 1-2, the revision check (101 != 100), the retry
+      assert.equal(calls.length, 4, calls.join("\n"));
+      assert.equal(leads.get("Alpha").extract, "New text.");
+      assert.equal(leads.get("Alpha").lastrevid, 101);
+      assert.equal(leads.get("Alpha").lastrev_timestamp, "2026-11-02T00:00:00Z");
+      assert.equal(leads.get("Other").lastrevid, 5);
+    }
+  );
+});
+
+test("fetchLeads: an unchanged revid after the extract part needs no retry", async () => {
+  await withFetch(
+    (url) => {
+      if (url.searchParams.get("prop") === "info") return json({ query: { pages: [{ title: "Alpha", lastrevid: 100 }] } });
+      if (url.searchParams.get("excontinue") == null) {
+        return json({ continue: { excontinue: "1", continue: "||info|revisions" }, query: { pages: [leadPage("Alpha", { revid: 100 })] } });
+      }
+      return json({ batchcomplete: true, query: { pages: [leadPage("Alpha", { extract: "Text." })] } });
+    },
+    async (calls) => {
+      const leads = await fetchLeads(["Alpha"], { delayMs: 0 });
+      assert.equal(calls.length, 3);
+      assert.equal(leads.get("Alpha").lastrevid, 100);
+      assert.equal(leads.get("Alpha").extract, "Text.");
+    }
+  );
+});
+
+test("fetchLeads: an article that keeps changing throws and nothing is cached", async () => {
+  const cache = memoryCache();
+  let rev = 100;
+  await withFetch(
+    (url) => {
+      rev++;
+      if (url.searchParams.get("prop") === "info") return json({ query: { pages: [{ title: "Alpha", lastrevid: rev }] } });
+      if (url.searchParams.get("excontinue") == null) {
+        return json({ continue: { excontinue: "1", continue: "||info|revisions" }, query: { pages: [leadPage("Alpha", { revid: rev })] } });
+      }
+      return json({ batchcomplete: true, query: { pages: [leadPage("Alpha", { extract: `Text ${rev}.` })] } });
+    },
+    async () => assert.rejects(fetchLeads(["Alpha"], { cache, delayMs: 0 }), /Alpha changed while the lead was being fetched/)
+  );
+  assert.equal(cache.data.size, 0);
+});
+
+test("fetchLeads: a missing page is not cached, and a cached null is asked again", async () => {
+  const cache = memoryCache();
+  cache.set("Stale", null); // written by an earlier version
+  await withFetch(
+    (url) => {
+      const titles = url.searchParams.get("titles").split("|");
+      return json({
+        query: { pages: titles.map((t) => (t === "Nope" ? { title: t, missing: true } : leadPage(t, { revid: 3, extract: `${t} text.` }))) },
+      });
+    },
+    async (calls) => {
+      const leads = await fetchLeads(["Nope", "Stale"], { cache, delayMs: 0 });
+      assert.equal(calls.length, 1);
+      assert.equal(new URL(calls[0]).searchParams.get("titles"), "Nope|Stale");
+      assert.equal(leads.get("Nope"), null);
+      assert.equal(leads.get("Stale").extract, "Stale text.");
+      assert.equal(cache.data.has("Nope"), false);
+      assert.equal(cache.get("Stale").lastrevid, 3);
     }
   );
 });
