@@ -19,8 +19,12 @@ import {
   eventShareTitle,
   jsonLdScript,
   safeUrl,
+  SITE,
+  SITE_NAME,
   titleHasYear,
 } from "./event-page.mjs";
+import { SITE as citationSite, SITE_NAME as citationSiteName } from "../src/lib/citation.js";
+import { safeUrl as appSafeUrl } from "../src/lib/safeUrl.js";
 
 // The app's own index.html (its source; the build fills in the built one, which
 // differs only in the script and style tags Vite writes).
@@ -68,6 +72,14 @@ test("safeUrl only lets http(s) through", () => {
   assert.equal(safeUrl("https://en.wikipedia.org/wiki/X"), "https://en.wikipedia.org/wiki/X");
   assert.equal(safeUrl("javascript:alert(1)"), null);
   assert.equal(safeUrl(undefined), null);
+  // the app's own check, so the event pages link exactly what the app links
+  assert.equal(safeUrl, appSafeUrl);
+  for (const bad of ["https://", "http://a b", " https://x.org", "https:x.org"]) assert.equal(safeUrl(bad), null, bad);
+});
+
+test("the site's address and name are the app's (citation.js)", () => {
+  assert.equal(SITE, citationSite);
+  assert.equal(SITE_NAME, citationSiteName);
 });
 
 test("metaDescription keeps a short first paragraph whole and cuts a long one at a word", () => {

@@ -13,7 +13,7 @@
 // (src/lib/urlState.js) and opens it on the map.
 import { rtlRuns, splitBidi } from "../src/lib/bidi.js";
 import { categorySourceParts, categorySummary } from "../src/lib/categoryLabels.js";
-import { citationNotes, citeEvent } from "../src/lib/citation.js";
+import { citationNotes, citeEvent, SITE, SITE_NAME } from "../src/lib/citation.js";
 import { roundedLocationNote } from "../src/lib/coordPrecision.js";
 import { dataFixUrl } from "../src/lib/dataFixes.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
@@ -29,12 +29,13 @@ import { HAND_PICKED_NOTE } from "../src/lib/handPicked.js";
 import { NEARBY_KM, RELATED_SHOWN } from "../src/lib/related.js";
 import { compassPoint, formatKm } from "../src/lib/relatedViz.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
+import { safeUrl } from "../src/lib/safeUrl.js";
 import { eventPath, isValidEventId } from "../src/lib/urlState.js";
 
-export { eventPath };
+// The app's own definitions, so the event pages and the app agree: the site's address and name (citation.js),
+// and which links from the data are rendered as links (http(s) only, never javascript: etc.; safeUrl.js).
+export { eventPath, safeUrl, SITE, SITE_NAME };
 
-export const SITE = "https://middleeast.events";
-export const SITE_NAME = "Middle East, 1900–present";
 const REPO = "https://github.com/kei-nan/meast-events";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 const CC_BY_SA = "https://creativecommons.org/licenses/by-sa/4.0/";
@@ -59,11 +60,6 @@ export function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-// Only http(s) links from the data are rendered as links (never javascript: etc.).
-export function safeUrl(url) {
-  return typeof url === "string" && /^https?:\/\//i.test(url) ? url : null;
 }
 
 
