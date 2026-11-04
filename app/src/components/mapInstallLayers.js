@@ -15,6 +15,7 @@ import {
 import { BORDER_STYLE, DASHED_EXPR } from "./mapBorders";
 import { LAND_ON_SEA, SEA_COLOR } from "../lib/mapBase";
 import WATER from "../data/water.json";
+import CITIES from "../data/cities.json";
 import { LABEL_FONT_FAMILY } from "../lib/labelFont";
 
 // Labels are drawn in the browser from the site's Inter at weight 600
@@ -33,6 +34,25 @@ const labelMoveIf = (room) => [
 // Points stop clustering above this zoom; identical points then draw as one dot.
 export const CLUSTER_MAX_ZOOM = 12;
 
+// City names (scripts/build-cities.js): one layer per `minzoom`, each showing the name
+// a city had in the year shown. A name's `from` is the first year it is shown, `to` the
+// first year it is not; a missing one is open.
+const CITY_TIERS = [...new Set(CITIES.features.map((f) => f.properties.minzoom))].sort((a, b) => a - b);
+const cityLayerId = (minzoom) => `city-label-${minzoom}`;
+const cityFilter = (minzoom, year) => [
+  "all",
+  ["==", ["get", "minzoom"], minzoom],
+  ["<=", ["coalesce", ["get", "from"], 0], year],
+  [">", ["coalesce", ["get", "to"], 9999], year],
+];
+
+/** Shows each city's name for `year` (MapLibre skips a filter equal to the current one). */
+export function setCityYear(map, year) {
+  for (const minzoom of CITY_TIERS) {
+    if (map.getLayer(cityLayerId(minzoom))) map.setFilter(cityLayerId(minzoom), cityFilter(minzoom, year));
+  }
+}
+
 /**
  * Adds every source and layer, bottom to top.
  * @param map         the MapLibre map (style loaded)
@@ -40,8 +60,9 @@ export const CLUSTER_MAX_ZOOM = 12;
  * @param boundaries  initial boundaries FeatureCollection (active for the year)
  * @param labels      initial boundary-labels FeatureCollection
  * @param events      initial events FeatureCollection
+ * @param year        the year shown (city names)
  */
-export function installLayers(map, { land, boundaries, labels, events }) {
+export function installLayers(map, { land, boundaries, labels, events, year }) {
   // Physical land/water silhouette for world context (Mediterranean, Black Sea, Red
   // Sea, Persian Gulf, Europe, Africa, etc). Sourced from Natural Earth land
   // polygons - pure physical geography with no political information at all, so it
@@ -198,6 +219,35 @@ export function installLayers(map, { land, boundaries, labels, events }) {
     filter: ["!", ["has", "point_count"]],
     paint: POINT_PAINT,
   });
+
+  // City names: above the event markers, under the state names, as a state's name is
+  // placed (so markers never hide a city's name). No mark of their own: the name sits
+  // beside the city's point (below, above, then either side, wherever it fits first),
+  // off a marker there; a cluster's number, placed first, pushes it aside rather than
+  // hiding it. State names and cluster counts are placed before them, so a city name that
+  // would overlap one is not drawn (it returns on zoom).
+  map.addSource("cities", { type: "geojson", data: CITIES });
+  for (const minzoom of CITY_TIERS) {
+    map.addLayer({
+      id: cityLayerId(minzoom),
+      type: "symbol",
+      source: "cities",
+      minzoom,
+      filter: cityFilter(minzoom, year),
+      layout: {
+        "text-field": ["get", "name"],
+        "text-font": LABEL_FONT,
+        "text-size": ["interpolate", ["linear"], ["zoom"], 5, 11, 8, 13],
+        "text-variable-anchor": ["top", "bottom", "left", "right"],
+        "text-radial-offset": 0.8,
+        "text-justify": "auto",
+        "text-max-width": 8,
+        "text-padding": 2,
+      },
+      // #3b3a36 on the land (lib/mapBase.js LAND_ON_SEA, ~#d5dbd7): ~9:1.
+      paint: { "text-color": "#3b3a36", "text-halo-color": "rgba(244,241,234,0.85)", "text-halo-width": 1.2 },
+    });
+  }
 
   // Country labels sit ABOVE the event markers (below only hover/selection) so
   // markers never hide a state's name. Placement priority = state size (bigger
