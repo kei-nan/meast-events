@@ -63,6 +63,16 @@ test("ledger: one entry per QID, each ref documented in docs/data-fixes.md", () 
   for (const { ref } of DATA_FIXES) assert.match(doc, new RegExp(`^## ${ref} - `, "m"), `${ref} has no section`);
 });
 
+test("ledger: `from` (what Wikidata gave when the fix was written) names only fields the fix sets, never the fixed value", () => {
+  for (const f of DATA_FIXES.filter((x) => x.from)) {
+    for (const [field, was] of Object.entries(f.from)) {
+      assert.ok(field in f.set, `${f.ref} ${f.qid}: from.${field} but the fix does not set ${field}`);
+      assert.notEqual(was, f.set[field], `${f.ref} ${f.qid}: from.${field} equals the fixed value`);
+      if (was != null && field.startsWith("date_")) assert.match(was, /^\d{4}-\d{2}-\d{2}$/);
+    }
+  }
+});
+
 test("applyDataFix: sets the listed fields once, with one review reason", () => {
   const ev = { id: "x", wikidata_qid: "Q17286795", date_start: "2014-07-21", date_end: "2014-06-30", review_reasons: ["other"] };
   assert.deepEqual(applyDataFix(ev), ["date_start", "date_end"]);

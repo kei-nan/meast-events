@@ -12,7 +12,8 @@
 // rule's "at least 10 sitelinks". It is kept apart from `sitelinks` (the count discovery saw, carried by
 // discovered events only and used by lib/v21.js to tell them from the hand-picked ones), so adding it
 // to every event changes nothing else. An event whose item cannot be fetched keeps its previous count
-// and aliases; one that never had a count stays without one (listed last).
+// and aliases; one that never had a count stays without one (listed last). An event whose item now redirects to
+// another (a merged item) is skipped the same way and listed in a warning: the target's values are not its own.
 //
 // The aliases are Wikidata's English "also known as" values, stored as-is in Wikidata's order; an item
 // with none has no `wikidata_aliases` field.
@@ -22,7 +23,7 @@
 // year from its start to the current year (docs/DATA_POLICY.md, "Ongoing events"). Refreshed in both modes.
 import { readFile } from "node:fs/promises";
 import { writeFileAtomic } from "./lib/files.js";
-import { fetchEntities, setDateEndOpen, setWikidataAliases } from "./lib/wd-entities.js";
+import { fetchEntities, refreshFromEntities } from "./lib/wd-entities.js";
 
 const APPLY = process.argv.includes("--apply");
 const ALIASES_ONLY = process.argv.includes("--aliases-only");
@@ -34,32 +35,12 @@ const entities = await fetchEntities(
   { props: "sitelinks|aliases|claims", log: (m) => console.log(m) }
 );
 
-let changed = 0;
-let aliasesChanged = 0;
-let openChanged = 0;
-const missing = [];
-for (const e of events) {
-  const rec = entities.get(e.wikidata_qid);
-  if (!rec) {
-    missing.push(`${e.id} (${e.wikidata_qid ?? "no QID"})`);
-    continue;
-  }
-  if (!ALIASES_ONLY && e.sitelinks_current !== rec.sitelinks_all) {
-    console.log(`${e.id}: ${e.sitelinks_current ?? "-"} -> ${rec.sitelinks_all}`);
-    e.sitelinks_current = rec.sitelinks_all;
-    changed++;
-  }
-  const before = e.wikidata_aliases;
-  if (setWikidataAliases(e, rec.aliases)) {
-    console.log(`${e.id}: aliases ${JSON.stringify(before ?? [])} -> ${JSON.stringify(e.wikidata_aliases ?? [])}`);
-    aliasesChanged++;
-  }
-  const openBefore = e.date_end_open;
-  if (setDateEndOpen(e, rec.p582_open)) {
-    console.log(`${e.id}: date_end_open ${openBefore ?? "-"} -> ${e.date_end_open ?? "-"}`);
-    openChanged++;
-  }
-}
+// A merged item (its QID now redirects) is skipped: Wikidata answers with the target item, whose sitelinks, aliases
+// and end time are not necessarily this event's. The QID is for the owner to review (the drift report lists it too).
+const { changed, aliasesChanged, openChanged, missing, redirected } = refreshFromEntities(events, entities, {
+  aliasesOnly: ALIASES_ONLY,
+  log: (m) => console.log(m),
+});
 
 const withAliases = events.filter((e) => e.wikidata_aliases).length;
 const aliasCount = events.reduce((n, e) => n + (e.wikidata_aliases?.length ?? 0), 0);
@@ -70,6 +51,13 @@ console.log(
 ${openChanged} events' date_end_open changed; ${events.filter((e) => e.date_end_open).length} events have one.`
 );
 if (missing.length) console.log(`Not fetched (previous count and aliases kept): ${missing.join(", ")}`);
+if (redirected.length) {
+  // stdout, so refresh-data.yml puts it in the refresh report and pull request description.
+  console.log(
+    `\nWARNING: ${redirected.length} event(s) whose Wikidata item now redirects to another (merged); nothing changed for ` +
+      `them (previous count, aliases and date_end_open kept), review the QID: ${redirected.join(", ")}`
+  );
+}
 if (APPLY) {
   await writeFileAtomic(curatedUrl, JSON.stringify(events, null, 2) + "\n");
   console.log("APPLIED: wrote data/events.json.");

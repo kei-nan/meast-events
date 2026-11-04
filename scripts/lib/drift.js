@@ -4,6 +4,7 @@
 //
 // `entity` is a trimmed record from lib/wd-entities.js fetchEntities (p31, p580, p582, p585, p625, redirected).
 import { EVENT_CLASSES } from "./event-classes.js";
+import { keptDatePrecision } from "./fixes.js";
 
 // Wikidata "1940-00-00" is stored as 1940-01-01 (as in lib/fixes.js).
 const norm = (t) => String(t ?? "").replace(/-00(?=-|$)/g, "-01");
@@ -12,6 +13,63 @@ const COORD_EPS = 5e-7;
 const sameCoords = (a, b) => Math.abs(a.lat - b.lat) <= COORD_EPS && Math.abs(a.lon - b.lon) <= COORD_EPS;
 const fmtTimes = (vals) => (vals.length ? vals.map((v) => `${v.time} (precision ${v.precision})`).join(", ") : "none");
 const fmtPt = (c) => `${c.lat}, ${c.lon}`;
+
+// The ledger fields the drift report can compare with the item, each as { pool, all, same, fmt }:
+//   pool  the values Wikidata gives for the field now, as the pipeline reads them (date_start: P585, else P580 - the
+//         discovery query's COALESCE; date_end: P582; date_precision: the precision of the P585/P580 statement whose
+//         value is the stored date_start, lib/fixes.js keptDatePrecision; coordinates: P625)
+//   all   every value of the item the fixed value may have been taken from (a date fix may use any of P585/P580/P582,
+//         e.g. F6 sets date_end to the item's P585)
+const LEDGER_FIELDS = {
+  date_start: (e) => ({ pool: (e.p585?.length ? e.p585 : e.p580 ?? []).map((v) => norm(v.time)), all: allDates(e) }),
+  date_end: (e) => ({ pool: (e.p582 ?? []).map((v) => norm(v.time)), all: allDates(e) }),
+  date_precision: (e, event) => {
+    const p = keptDatePrecision(e, event.date_start)?.name;
+    return { pool: p ? [p] : [], all: p ? [p] : [] };
+  },
+  coordinates: (e) => ({ pool: e.p625 ? [e.p625] : [], all: e.p625 ? [e.p625] : [] }),
+};
+const allDates = (e) => [...(e.p585 ?? []), ...(e.p580 ?? []), ...(e.p582 ?? [])].map((v) => norm(v.time));
+const sameValue = (field, a, b) => {
+  if (a == null || b == null) return a == null && b == null;
+  if (field === "coordinates") return sameCoords(a, b);
+  if (field === "date_start" || field === "date_end") return norm(a) === norm(b);
+  return a === b;
+};
+const fmtValue = (field, v) => (v == null ? "none" : field === "coordinates" ? fmtPt(v) : String(v));
+const fmtPool = (field, pool) => (pool.length ? pool.map((v) => fmtValue(field, v)).join(", ") : "none");
+
+/**
+ * Ledger fixes that may be stale: for each field the fix sets that the report can compare (LEDGER_FIELDS), whether
+ * Wikidata still gives what the fix was written against. A fix still applies regardless (lib/fixes.js applyDataFix);
+ * this only lists it for a recheck.
+ *  - With `fix.from[field]` (the Wikidata value the fix was written against): stale when Wikidata no longer gives it,
+ *    either because Wikidata now gives the fixed value itself (the fix is no longer needed) or another value.
+ *  - Without it (the fix did not override a Wikidata value, e.g. it took the item's own P580 or P625): stale when
+ *    Wikidata gives a value for the field and the fixed value is none of the item's values any more.
+ * Other fields a fix sets (title, countries, coordinate_source, ...) are not compared with Wikidata.
+ * @returns {{ field, ref, fixed, wikidata, reason }[]}
+ */
+export function staleFixes(event, entity, fix) {
+  if (!entity || !fix?.set) return [];
+  const out = [];
+  for (const [field, fixed] of Object.entries(fix.set)) {
+    const read = LEDGER_FIELDS[field];
+    if (!read) continue;
+    const { pool, all } = read(entity, event);
+    const has = (vals, v) => (v == null ? vals.length === 0 : vals.some((x) => sameValue(field, x, v)));
+    const row = (reason) => out.push({ field, ref: fix.ref, fixed: fmtValue(field, fixed), wikidata: fmtPool(field, pool), reason });
+    if (fix.from && field in fix.from) {
+      const from = fix.from[field];
+      if (has(pool, from)) continue;
+      if (fixed != null && has(pool, fixed)) row("Wikidata now gives the fixed value itself: the fix may no longer be needed");
+      else row(`Wikidata changed since the fix: it gave ${fmtValue(field, from)} when the fix was written`);
+    } else if (pool.length && !has(all, fixed)) {
+      row("the fixed value is none of the item's Wikidata values now, though Wikidata gives one for the field");
+    }
+  }
+  return out;
+}
 
 // The discovery classes: a stored label that is one of them may have been matched through a subclass (P279*) and
 // appended after the direct P31 labels (lib/v21.js buildWikidataClasses), so its absence from P31 is not drift.
@@ -23,20 +81,24 @@ const DISCOVERY_LABELS = new Set(EVENT_CLASSES.map((c) => c.label));
  * @param entity  fetchEntities record for event.wikidata_qid, or null when the item was not returned
  * @param labels  { classQid: English label } for the item's P31 values (a class without one shows its QID)
  * @param fix     the fix-ledger entry for the item (lib/fixes.js FIXES_BY_QID), if any: a field it sets was
- *                checked by hand against the sources, so a difference there is "explained", not listed as drift
- * @returns {{ rows: {field, stored, wikidata}[], explained: string[] }}
+ *                checked by hand against the sources, so a difference there is "explained", not listed as drift -
+ *                unless the fix is stale for that field (staleFixes): then the difference is listed, and the fix too
+ * @returns {{ rows: {field, stored, wikidata}[], explained: string[], stale: ReturnType<typeof staleFixes> }}
  */
 export function driftFor(event, entity, labels = {}, fix = null) {
   const rows = [];
   const explained = [];
   const set = fix?.set ?? {};
+  const stale = staleFixes(event, entity, fix);
+  const staleFields = new Set(stale.map((s) => s.field));
   const add = (field, stored, wikidata, ledgerFields) => {
-    if (ledgerFields.some((f) => f in set)) explained.push(`${field} (${fix.ref})`);
+    const byFix = ledgerFields.filter((f) => f in set);
+    if (byFix.length && !byFix.some((f) => staleFields.has(f))) explained.push(`${field} (${fix.ref})`);
     else rows.push({ field, stored, wikidata });
   };
   if (!entity) {
     rows.push({ field: "item", stored: event.wikidata_qid, wikidata: "not returned by Wikidata (deleted or missing)" });
-    return { rows, explained };
+    return { rows, explained, stale };
   }
   if (entity.redirected) {
     rows.push({ field: "item", stored: event.wikidata_qid, wikidata: `now redirects to ${entity.qid}` });
@@ -83,7 +145,7 @@ export function driftFor(event, entity, labels = {}, fix = null) {
       rows.push({ field: "classes", stored: stored.join(", "), wikidata: parts.join("; ") });
     }
   }
-  return { rows, explained };
+  return { rows, explained, stale };
 }
 
 // Markdown table cell: no pipes or line breaks.
@@ -91,7 +153,7 @@ const cell = (s) => String(s ?? "").replace(/\|/g, "\\|").replace(/\s+/g, " ");
 
 /**
  * The report: one table row per difference, grouped by field.
- * @param results  [{ event, rows, explained }]
+ * @param results  [{ event, rows, explained, stale? }]
  * @param meta     { checked, noQid: ids of events without a wikidata_qid (not checked) }
  */
 export function renderDriftReport(results, { checked, noQid = [] } = {}) {
@@ -117,6 +179,24 @@ export function renderDriftReport(results, { checked, noQid = [] } = {}) {
     lines.push("", `### ${field} (${rows.length})`, "", "| Event | Kind | Item | Stored | Wikidata now |", "|---|---|---|---|---|");
     for (const r of rows) {
       lines.push(`| ${cell(r.id)} | ${r.kind} | [${r.qid}](https://www.wikidata.org/wiki/${r.qid}) | ${cell(r.stored)} | ${cell(r.wikidata)} |`);
+    }
+  }
+  // Ledger fixes whose Wikidata basis changed. They still apply; each is for a recheck against docs/data-fixes.md.
+  const stale = results.flatMap((r) => (r.stale ?? []).map((s) => ({ ...s, id: r.event.id, qid: r.event.wikidata_qid })));
+  if (stale.length) {
+    lines.push(
+      "",
+      `### Fix ledger entries to recheck (${stale.length})`,
+      "",
+      "The fix still applies (lib/fixes.js); Wikidata no longer gives what it was written against.",
+      "",
+      "| Event | Item | Fix | Field | Fixed value | Wikidata now | Why |",
+      "|---|---|---|---|---|---|---|"
+    );
+    for (const s of stale) {
+      lines.push(
+        `| ${cell(s.id)} | [${s.qid}](https://www.wikidata.org/wiki/${s.qid}) | ${cell(s.ref)} | ${s.field} | ${cell(s.fixed)} | ${cell(s.wikidata)} | ${cell(s.reason)} |`
+      );
     }
   }
   return lines.join("\n") + "\n";

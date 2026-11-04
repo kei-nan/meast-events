@@ -1,5 +1,6 @@
 // Wikipedia / Wikidata fetch helpers (read-only; this pipeline never writes to either).
 import { politeFetch, mediaWikiJson } from "./http.js";
+import { wikidataDate } from "./wd-entities.js";
 
 const PRECISION_NAMES = {
   0: "billion years", 1: "hundred million years", 2: "ten million years", 3: "million years",
@@ -27,8 +28,9 @@ function bestClaims(claims) {
 function timeValue(claim) {
   const v = claim?.mainsnak?.datavalue?.value;
   if (!v?.time) return null;
-  // Wikidata: "+1990-08-02T00:00:00Z" (may be "+1990-00-00" when precision < day)
-  return { date: v.time.replace(/^\+/, "").slice(0, 10), precision: v.precision };
+  // Wikidata: "+1990-08-02T00:00:00Z" (may be "+1990-00-00" when precision < day); a Julian day as its Gregorian
+  // day, as the discovery query (WDQS) gives it (lib/wd-entities.js wikidataDate).
+  return { date: wikidataDate(v), precision: v.precision };
 }
 
 // One entity fetch gives: P625 coordinates, the time precision of the event date (P585,
@@ -65,13 +67,14 @@ export async function fetchEntity(qid) {
   };
 }
 
-// Precision of the date actually held as date_start: match the stored day among the
-// candidate P585/P580 values; fall back to the first value.
+// Precision of the date actually held as date_start: the precision of the candidate P585 (else P580) statement whose
+// value is the stored day. null when none has it (docs/DATA_POLICY.md: date_precision is null when no statement of the
+// item has the stored date): another statement's precision would describe a different date.
 export function datePrecisionFor(entity, dateStart) {
   if (!entity) return null;
   const pool = entity.pit.length ? entity.pit : entity.start;
-  if (!pool.length) return null;
-  const hit = pool.find((t) => t.date === dateStart) ?? pool[0];
+  const hit = pool.find((t) => t.date === dateStart);
+  if (!hit) return null;
   return { code: hit.precision, name: precisionName(hit.precision) };
 }
 

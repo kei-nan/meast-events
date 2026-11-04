@@ -2,6 +2,12 @@
 // A fix is applied ONLY to a listed Wikidata item, after the discrepancy was checked against
 // live Wikipedia + Wikidata (2026-09-26). Everything not listed is at most FLAGGED, never changed.
 // ids are never changed.
+//
+// Entry: { qid, ref (docs/data-fixes.md section), set: { field: value applied }, note, from? }. The optional `from`
+// records, for a field the fix sets AGAINST Wikidata, the Wikidata value the fix was written against (as the
+// pipeline stores it, "-00" read as "-01"; null = Wikidata had no value), each as stated in the note. Only the drift
+// report reads it (lib/drift.js staleFixes): Wikidata no longer giving that value means the fix needs a recheck.
+// `from` never changes what a fix applies.
 import { precisionName } from "./wiki.js";
 import { coordinateFlag } from "./flags.js";
 export const DATA_FIXES = [
@@ -17,6 +23,7 @@ export const DATA_FIXES = [
     qid: "Q47465940",
     ref: "F2",
     set: { date_start: "2018-01-20", date_end: "2018-03-24" },
+    from: { date_start: "2019-08-09", date_end: null },
     note:
       "Wikidata P585 (2019-08-09) contradicts the article; Wikidata P580 = 2018-01-20 and the Wikipedia infobox reads " +
       '"20 January - 24 March 2018". date_start = P580, date_end = Wikipedia infobox (Wikidata has no P582)',
@@ -53,6 +60,7 @@ DATA_FIXES.push({
   qid: "Q255997",
   ref: "F5",
   set: { date_start: "2004-06-01" },
+  from: { date_start: "2015-02-06" },
   note:
     "Houthi insurgency: stored date_start 2015-02-06 was Wikidata P585; Wikidata P580 = 2004-06 (month precision) " +
     'and the Wikipedia lead says "The conflict was sparked in 2004" (checked 2026-09-29). date_start = P580, day unknown',
@@ -66,6 +74,7 @@ DATA_FIXES.push(
     qid: "Q17286795",
     ref: "F6",
     set: { date_start: "2014-06-26", date_end: "2014-07-21" },
+    from: { date_start: "2014-07-21", date_end: "2014-06-30" },
     note:
       "First Battle of Tikrit: stored start 2014-07-21 was Wikidata P585, after P582 2014-06-30. Wikipedia infobox " +
       '"26 June – 21 July 2014" = Wikidata P580 (2014-06-26) and P585 (2014-07-21). Dates = the infobox',
@@ -74,6 +83,7 @@ DATA_FIXES.push(
     qid: "Q19926256",
     ref: "F6",
     set: { date_start: "2015-05-13", date_end: "2015-05-26" },
+    from: { date_start: "2015-05-26", date_end: "2015-05-25" },
     note:
       "Palmyra offensive (May 2015): stored start 2015-05-26 was Wikidata P585, after P582 2015-05-25. Wikipedia infobox " +
       '"13–26 May 2015" = Wikidata P580 (2015-05-13) and P585 (2015-05-26). Dates = the infobox',
@@ -82,6 +92,7 @@ DATA_FIXES.push(
     qid: "Q24205448",
     ref: "F6",
     set: { date_start: "2016-05-22", date_end: "2016-06-29" },
+    from: { date_start: "2016-06-29", date_end: "2016-06-26" },
     note:
       "Third Battle of Fallujah: stored start 2016-06-29 was Wikidata P585, after P582 2016-06-26. Wikipedia infobox " +
       '"22 May – 29 June 2016" = Wikidata P580 (2016-05-22) and P585 (2016-06-29). Dates = the infobox',
@@ -94,6 +105,7 @@ DATA_FIXES.push({
   qid: "Q122976243",
   ref: "F7",
   set: { date_start: "2023-10-07" },
+  from: { date_start: "2023-10-01" },
   note:
     "October 7 attacks: stored date_start 2023-10-01 was Wikidata P585 2023-10 (month precision) pinned to the 1st. " +
     'Wikidata P580 = 2023-10-07 (day precision); the Wikipedia infobox reads "October 7–8, 2023" and the lead "On October 7, 2023" ' +
@@ -225,6 +237,7 @@ for (const [qid, label, wikidata, title, revid, says] of [
     qid,
     ref: "F14",
     set: { date_precision: "day" },
+    from: { date_precision: null },
     note:
       `${label}: the seed date_start is no Wikidata value (Wikidata: ${wikidata}). English Wikipedia ${revisionUrl(title, revid)}: ` +
       `${says} (checked 2026-10-24), the stored date_start. date_start unchanged; date_precision = day, from the article`,
@@ -235,30 +248,31 @@ for (const [qid, label, wikidata, title, revid, says] of [
 // strictly between the item's P580 and P582 (the rule's new case (c), reconcileStartDate) or equals its P582 (case (b),
 // which F2 applied to new candidates only). In each, the English article's infobox or lead gives the item's P580 as the
 // start (Wikidata entity and article read live 2026-10-29, at the revisions named). date_end is not changed.
-for (const [qid, date, precision, label, wikidata, title, revid, says] of [
-  ["Q854206", "2009-06-13", "day", "2009 Iranian presidential election protests", "P580 2009-06-13, P585 2010-02-11, P582 2010-12-07 (revision 2559664551)",
+for (const [qid, date, precision, was, label, wikidata, title, revid, says] of [
+  ["Q854206", "2009-06-13", "day", "2010-02-11", "2009 Iranian presidential election protests", "P580 2009-06-13, P585 2010-02-11, P582 2010-12-07 (revision 2559664551)",
     "2009 Iranian presidential election protests", 1381691345, 'infobox "13 June 2009 – 7 December 2010"'],
-  ["Q18357664", "2014-06-15", "day", "Operation Inherent Resolve", "P580 2014-06-15, P585 2014-09-22, P582 2026-04-16 (revision 2536701308)",
+  ["Q18357664", "2014-06-15", "day", "2014-09-22", "Operation Inherent Resolve", "P580 2014-06-15, P585 2014-09-22, P582 2026-04-16 (revision 2536701308)",
     "Operation Inherent Resolve", 1382364857, 'infobox "15 June 2014 – present"'],
-  ["Q130314422", "2024-09-17", "day", "2024 Lebanon electronic device attacks", "P580 2024-09-17, P585 2024-09-18 and 2024-09-17, P582 2024-09-19 (revision 2516289931)",
+  ["Q130314422", "2024-09-17", "day", "2024-09-18", "2024 Lebanon electronic device attacks", "P580 2024-09-17, P585 2024-09-18 and 2024-09-17, P582 2024-09-19 (revision 2516289931)",
     "2024 Lebanon electronic device attacks", 1381300697, 'lead "On 17 and 18 September 2024"; infobox "17–18 September 2024"'],
-  ["Q19906312", "1909-04-30", "day", "Russian occupation of Tabriz", "P580 1909-04-30, P585 1911 (year), P582 1918-02-28 (revision 2402259382)",
+  ["Q19906312", "1909-04-30", "day", "1911-01-01", "Russian occupation of Tabriz", "P580 1909-04-30, P585 1911 (year), P582 1918-02-28 (revision 2402259382)",
     "Russian occupation of Tabriz", 1372095714, 'lead "lasted from 30 April 1909 to 28 February 1918"'],
-  ["Q1132835", "1945-11-01", "month", "Iran crisis of 1946", "P580 1945-11 (month), P585 1946 (year), P582 1946-12-15 (revision 2533867483)",
+  ["Q1132835", "1945-11-01", "month", "1946-01-01", "Iran crisis of 1946", "P580 1945-11 (month), P585 1946 (year), P582 1946-12-15 (revision 2533867483)",
     "Iran crisis of 1946", 1374789395, 'infobox "November 1945 – December 15, 1946"'],
-  ["Q764714", "1941-05-15", "day", "Operation Brevity", "P580 1941-05-15, P585 = P582 1941-05-16 (revision 2491925305)",
+  ["Q764714", "1941-05-15", "day", "1941-05-16", "Operation Brevity", "P580 1941-05-15, P585 = P582 1941-05-16 (revision 2491925305)",
     "Operation Brevity", 1370631131, 'infobox "15–16 May 1941"'],
-  ["Q2756836", "1941-05-26", "day", "Operation Skorpion", "P580 1941-05-26, P585 = P582 1941-05-27 (revision 2491874101)",
+  ["Q2756836", "1941-05-26", "day", "1941-05-27", "Operation Skorpion", "P580 1941-05-26, P585 = P582 1941-05-27 (revision 2491874101)",
     "Operation Skorpion", 1370699589, 'lead "from 26 to 27 May 1941"; infobox "26–27 May 1941"'],
-  ["Q19996727", "1987-01-08", "day", "Siege of Basra", "P580 1987-01-08, P585 = P582 1987-02-26 (revision 2511629204)",
+  ["Q19996727", "1987-01-08", "day", "1987-02-26", "Siege of Basra", "P580 1987-01-08, P585 = P582 1987-02-26 (revision 2511629204)",
     "Siege of Basra", 1370739316, 'infobox "8 January – mid April 1987"'],
-  ["Q19678056", "2015-03-24", "day", "Battle of Idlib (2015)", "P580 2015-03-24, P585 = P582 2015-03-28 (revision 2500221864)",
+  ["Q19678056", "2015-03-24", "day", "2015-03-28", "Battle of Idlib (2015)", "P580 2015-03-24, P585 = P582 2015-03-28 (revision 2500221864)",
     "Battle of Idlib (2015)", 1373023827, 'infobox "24–28 March 2015"'],
 ]) {
   DATA_FIXES.push({
     qid,
     ref: "F15",
     set: { date_start: date, date_precision: precision },
+    from: { date_start: was },
     note:
       `${label}: stored date_start was Wikidata P585, which is not the item's start. Wikidata ${wikidata}; ` +
       `English Wikipedia ${revisionUrl(title, revid)}: ${says} (checked 2026-10-29). date_start = Wikidata P580; date_end unchanged`,

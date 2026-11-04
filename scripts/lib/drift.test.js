@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { driftFor, renderDriftReport } from "./drift.js";
+import { driftFor, renderDriftReport, staleFixes } from "./drift.js";
 
 // Fixtures modelled on the curated data and the Wikidata items as read on 2026-10-30 (no network in tests).
 const entity = (over = {}) => ({
@@ -34,12 +34,13 @@ test("driftFor: an event without a pin whose item now has coordinates (operation
   assert.deepEqual(explained, []);
 });
 
-test("driftFor: a stored start that is no longer any Wikidata P585/P580 value (german-ottoman-alliance, Q261982)", () => {
-  const e = ev({ id: "german-ottoman-alliance", wikidata_qid: "Q261982", date_start: "1914-08-02" });
-  const { rows } = driftFor(e, entity({ p585: [{ time: "1914-07-20", precision: 11 }] }));
+test("driftFor: a stored start that is no longer any Wikidata P585/P580 value", () => {
+  // (A Julian value is not drift: fetchEntities gives it as its Gregorian day, wd-entities.test.js.)
+  const e = ev({ date_start: "1914-08-02" });
+  const { rows } = driftFor(e, entity({ p585: [{ time: "1914-08-03", precision: 11 }] }));
   assert.equal(rows.length, 1);
   assert.equal(rows[0].field, "date_start");
-  assert.equal(rows[0].wikidata, "P585: 1914-07-20 (precision 11); P580: none");
+  assert.equal(rows[0].wikidata, "P585: 1914-08-03 (precision 11); P580: none");
   // A start equal to a P580, or to a coarse value stored as its first day ("1917-00-00" -> 1917-01-01): no drift.
   assert.deepEqual(driftFor(ev({ date_start: "1914-08-02" }), entity({ p580: [{ time: "1914-08-02", precision: 11 }] })).rows, []);
   assert.deepEqual(driftFor(ev({ date_start: "1917-01-01" }), entity({ p585: [{ time: "1917-00-00", precision: 9 }] })).rows, []);
@@ -83,10 +84,70 @@ test("driftFor: classes - new and dropped P31 labels; a discovery class matched 
 test("driftFor: a field the fix ledger sets is explained, not listed; a missing or redirected item is listed", () => {
   const e = ev({ date_start: "1916-06-10" });
   const w = entity({ p580: [{ time: "1916-06-00", precision: 10 }] });
-  assert.deepEqual(driftFor(e, w, {}, { ref: "F14", set: { date_precision: "day" } }), { rows: [], explained: ["date_start (F14)"] });
+  assert.deepEqual(driftFor(e, w, {}, { ref: "F14", set: { date_precision: "day" } }), { rows: [], explained: ["date_start (F14)"], stale: [] });
   assert.deepEqual(driftFor(ev(), null).rows[0].field, "item");
   const moved = driftFor(ev(), entity({ qid: "Q2", redirected: true, p585: [{ time: "1990-08-02", precision: 11 }] })).rows;
   assert.deepEqual(moved, [{ field: "item", stored: "Q1", wikidata: "now redirects to Q2" }]);
+});
+
+// F6 First Battle of Tikrit (Q17286795) as written: P585 2014-07-21 (the end), P580 2014-06-26, P582 2014-06-30.
+const F6 = {
+  qid: "Q17286795",
+  ref: "F6",
+  set: { date_start: "2014-06-26", date_end: "2014-07-21" },
+  from: { date_start: "2014-07-21", date_end: "2014-06-30" },
+};
+const tikrit = ev({ id: "first-battle-of-tikrit", wikidata_qid: "Q17286795", date_start: "2014-06-26", date_end: "2014-07-21" });
+const day = (time) => ({ time, precision: 11 });
+
+test("staleFixes: a fix whose Wikidata basis is unchanged is not stale, and its differences stay explained", () => {
+  const w = entity({ p585: [day("2014-07-21")], p580: [day("2014-06-26")], p582: [day("2014-06-30")] });
+  assert.deepEqual(staleFixes(tikrit, w, F6), []);
+  const { rows, explained, stale } = driftFor(tikrit, w, {}, F6);
+  assert.deepEqual([rows, explained, stale], [[], ["date_end (F6)"], []]);
+});
+
+test("staleFixes: Wikidata now gives the fixed value itself, or another value, than the one the fix was written against", () => {
+  // P585 removed and P582 corrected to 2014-07-21: the pipeline would now take both fixed dates from Wikidata.
+  const fixed = entity({ p580: [day("2014-06-26")], p582: [day("2014-07-21")] });
+  const s = staleFixes(tikrit, fixed, F6);
+  assert.deepEqual(s.map((x) => [x.field, x.wikidata]), [["date_start", "2014-06-26"], ["date_end", "2014-07-21"]]);
+  assert.match(s[0].reason, /no longer be needed/);
+  // P582 moved to another day: the date_end fix is stale, and its difference is listed, not explained.
+  const moved = entity({ p585: [day("2014-07-21")], p580: [day("2014-06-26")], p582: [day("2014-07-01")] });
+  const r = driftFor(tikrit, moved, {}, F6);
+  assert.deepEqual(r.stale.map((x) => [x.field, x.reason]), [["date_end", "Wikidata changed since the fix: it gave 2014-06-30 when the fix was written"]]);
+  assert.deepEqual(r.rows, [{ field: "date_end", stored: "2014-07-21", wikidata: "P582: 2014-07-01 (precision 11)" }]);
+  assert.deepEqual(r.explained, []);
+});
+
+test("staleFixes: without `from`, stale only when Wikidata gives a value and the fixed one is none of the item's", () => {
+  // F11 (Q19831524 Musa Dagh Resistance): coordinates = the item's own P625.
+  const f11 = { ref: "F11", set: { coordinates: { lat: 36.258333, lon: 35.903611 }, coordinate_source: "wikidata" } };
+  const pinned = ev({ coordinates: f11.set.coordinates, coordinate_source: "wikidata", location_quality: "precise" });
+  assert.deepEqual(staleFixes(pinned, entity({ p625: { lat: 36.258333, lon: 35.903611 } }), f11), []);
+  assert.deepEqual(staleFixes(pinned, entity({ p625: { lat: 36.3, lon: 35.9 } }), f11).map((x) => x.wikidata), ["36.3, 35.9"]);
+  // F11 "no location" (Q106786309): stale only once the item has a P625 of its own.
+  const none = { ref: "F11", set: { coordinates: null } };
+  assert.deepEqual(staleFixes(ev(), entity(), none), []);
+  assert.deepEqual(staleFixes(ev(), entity({ p625: { lat: 31, lon: 35 } }), none).map((x) => x.fixed), ["none"]);
+  // F14 (from: no statement had the stored date): Wikidata adds the day itself -> no longer needed.
+  const f14 = { ref: "F14", set: { date_precision: "day" }, from: { date_precision: null } };
+  const e = ev({ date_start: "1924-03-03" });
+  assert.deepEqual(staleFixes(e, entity({ p585: [{ time: "1924-00-00", precision: 9 }] }), f14), []);
+  assert.match(staleFixes(e, entity({ p585: [day("1924-03-03")] }), f14)[0].reason, /no longer be needed/);
+  // F13-style fix to one of the item's own values (any of P585/P580/P582 counts); a missing item gives nothing.
+  const f13 = { ref: "F13", set: { date_start: "1970-09-06" } };
+  assert.deepEqual(staleFixes(ev(), entity({ p585: [day("1970-09-16")], p580: [day("1970-09-06")] }), f13), []);
+  assert.equal(staleFixes(ev(), entity({ p585: [day("1970-09-16")] }), f13).length, 1);
+  assert.deepEqual(staleFixes(ev(), null, f13), []);
+});
+
+test("renderDriftReport: stale ledger fixes get their own table", () => {
+  const results = [{ event: tikrit, rows: [], explained: [], stale: [{ field: "date_end", ref: "F6", fixed: "2014-07-21", wikidata: "2014-07-01", reason: "x|y" }] }];
+  const md = renderDriftReport(results, { checked: 1 });
+  assert.match(md, /### Fix ledger entries to recheck \(1\)/);
+  assert.match(md, /\| first-battle-of-tikrit \| \[Q17286795\]\(https:\/\/www\.wikidata\.org\/wiki\/Q17286795\) \| F6 \| date_end \| 2014-07-21 \| 2014-07-01 \| x\\\|y \|/);
 });
 
 test("renderDriftReport: grouped tables, ledger-explained count, kind column; pipes escaped", () => {

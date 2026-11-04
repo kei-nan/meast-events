@@ -19,12 +19,14 @@ test("datePrecisionFor: matches the stored date among the point-in-time values",
   assert.deepEqual(datePrecisionFor(e, "1956-10-29"), { code: 11, name: "day" });
 });
 
-test("datePrecisionFor: falls back to the first value when no date matches", () => {
+test("datePrecisionFor: null when no statement has the stored date (docs/DATA_POLICY.md), never another value's", () => {
   const e = entity([
     { date: "1956-10-01", precision: 10 },
     { date: "1956-10-29", precision: 11 },
   ]);
-  assert.deepEqual(datePrecisionFor(e, "1957-03-07"), { code: 10, name: "month" });
+  assert.equal(datePrecisionFor(e, "1957-03-07"), null);
+  // Nor the P580's, when the P585 pool has no match.
+  assert.equal(datePrecisionFor(entity([{ date: "1956-10-01", precision: 10 }], [{ date: "1957-03-07", precision: 11 }]), "1957-03-07"), null);
 });
 
 test("datePrecisionFor: P585 wins over P580; P580 is used only when P585 is empty", () => {
