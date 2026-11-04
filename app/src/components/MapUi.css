@@ -580,11 +580,12 @@
   display: none;
 }
 
-/* Events sharing one spot (stacked/unsplittable cluster), listed at the click. */
-.mu-stack:focus {
+/* The border details and the events sharing one spot (stacked/unsplittable
+   cluster), each a card at the click that takes focus when it opens. */
+.mu-popup:focus {
   outline: none;
 }
-.mu-stack:focus-visible {
+.mu-popup:focus-visible {
   outline: 3px solid #1f5a8a;
   outline-offset: 2px;
 }

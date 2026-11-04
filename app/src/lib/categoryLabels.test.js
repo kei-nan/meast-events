@@ -8,6 +8,7 @@ import {
   categorySourceParts,
   categoryNoteOutdated,
   classUrl,
+  CLASS_GROUPS,
 } from "./categoryLabels.js";
 
 const W = "https://www.wikidata.org/wiki/";
@@ -15,9 +16,20 @@ const text = (parts) => parts.map((p) => (typeof p === "string" ? p : p.label)).
 
 test("category labels match the legend and never drop unknown ids", () => {
   assert.equal(categoryLabel("war"), "War");
-  assert.equal(categoryLabel("atrocity"), "Atrocity (genocide, massacre, war crime, ethnic cleansing)");
+  assert.equal(categoryLabel("atrocity"), "Atrocity (Wikidata: genocide, massacre, war crime, pogrom, mass murder, ethnic cleansing)");
   assert.equal(categoryLabel("famine"), "Famine");
   assert.equal(categoryLabel(""), "");
+});
+
+test("the terrorism and atrocity glosses list exactly the Wikidata classes the grouping rule maps to them", () => {
+  // CLASS_GROUPS is kept equal to scripts/lib/event-classes.js by scripts/lib/validate.test.js.
+  for (const group of ["terrorism", "atrocity"]) {
+    const gloss = categoryLabel(group).match(/\(Wikidata: (.*)\)$/);
+    assert.ok(gloss, `${group}: the gloss is "(Wikidata: class, class, ...)"`);
+    const listed = gloss[1].split(", ").sort();
+    const mapped = CLASS_GROUPS.filter(([, g]) => g === group).map(([label]) => label).sort();
+    assert.deepEqual(listed, mapped, `${group}: gloss vs CLASS_GROUPS`);
+  }
 });
 
 test("short labels drop only the parenthetical gloss", () => {

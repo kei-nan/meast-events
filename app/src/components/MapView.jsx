@@ -219,6 +219,7 @@ export default function MapView({
   // Events sharing one spot, listed after a click: {point, items, total}.
   const [stackList, setStackList] = useState(null);
   const stackOpenerRef = useRef(null); // what had focus when the list opened
+  const popupOpenerRef = useRef(null); // the same for the border details
   const hoverLabelRef = useRef(null);
   const compact = useMediaQuery("(max-width: 768px)");
   const landFailedRef = useRef(false);
@@ -506,6 +507,9 @@ export default function MapView({
           return;
         }
         setStackList(null);
+        // Escape or × puts focus back where it was (closePopup), as for the list.
+        const active = document.activeElement;
+        popupOpenerRef.current = active && active !== document.body ? active : null;
         const hits = map.queryRenderedFeatures(e.point, { layers: ["boundaries-fill"] });
         const chunk = boundaryCacheRef.current.get(decadeFloor(yearRef.current)) ?? [];
         let hint = null;
@@ -894,9 +898,15 @@ export default function MapView({
       duration: reducedMotion() ? 0 : 600,
     });
   };
-  const closePopup = useCallback(() => setBorderPopup(null), []);
-  // Closing the list (× or Escape) removes the focused card: focus goes back to
-  // what had it before (or the map itself, which MapLibre makes focusable).
+  // Closing the border details or the list (× or Escape) removes the focused
+  // card: focus goes back to what had it before (or the map itself, which
+  // MapLibre makes focusable).
+  const closePopup = useCallback(() => {
+    setBorderPopup(null);
+    const opener = popupOpenerRef.current;
+    popupOpenerRef.current = null;
+    (opener?.isConnected ? opener : mapRef.current?.getCanvas())?.focus({ preventScroll: true });
+  }, []);
   const closeStack = useCallback(() => {
     setStackList(null);
     const opener = stackOpenerRef.current;
