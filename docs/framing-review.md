@@ -52,7 +52,7 @@ The monthly data refresh (see [DATA_POLICY.md](DATA_POLICY.md), "Refreshing extr
 
 ## Who reviewed it
 
-All 815 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: 561 on 2026-09-30 (updated to 2026-10-04; reviewed as part of the first 571, of which 10 entries that are not events were later removed: 9 on 2026-10-09 and Jordanian independence on 2026-10-15), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. The 5 events added on 2026-10-10 have no Wikipedia article of their own and show exactly the text of an event reviewed earlier (the article their title leads to), so they share that review word for word ([data fixes F12](data-fixes.md)); the counts below include them once per event. The 39 summaries that Wikipedia changed before the refresh of 2026-10-10 were reviewed again on 2026-10-11 by the same model with this method: findings on sentences whose wording did not change were carried over as they were, and only the changed sentences were judged again (see "A snapshot" below). No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
+All 815 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: 561 on 2026-09-30 (updated to 2026-10-04; reviewed as part of the first 571, of which 10 entries that are not events were later removed: 9 on 2026-10-09 and Jordanian independence on 2026-10-15), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. The 5 events added on 2026-10-10 have no Wikipedia article of their own and show exactly the text of an event reviewed earlier (the article their title leads to), so they share that review word for word ([data fixes F12](data-fixes.md)); the counts below include them once per event. The 39 summaries that Wikipedia changed before the refresh of 2026-10-10 were reviewed again on 2026-10-11 by the same model with this method: findings on sentences whose wording did not change were carried over as they were, and only the changed sentences were judged again (see "A snapshot" below). The 84 summaries that Wikipedia changed before the refresh of 2026-11-01 were reviewed again the same way on 2026-11-04. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event.
 
 ## How it shows on the event page
 
@@ -70,10 +70,10 @@ All 815 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI mod
 
 | Guideline | Wording points |
 |---|---|
-| Contentious labels | 54 |
+| Contentious labels | 53 |
 | Synonyms for "said" | 25 |
 | Avoid stating opinions as facts | 13 |
-| Editorializing | 14 |
+| Editorializing | 15 |
 | Expressions of doubt | 11 |
 | Puffery | 1 |
 

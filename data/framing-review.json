@@ -2,7 +2,7 @@
   "about": "Framing review: two review types per Wikipedia summary, shown separately. Overall fairness is the reviewer's judgement of emphasis, balance and omissions; the wording check cites Wikipedia's own neutrality and wording guidelines. Shown next to the summary, never merged into it. Not a fact-check and not a verdict on the events.",
   "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
   "reviewed_on": "2026-09-30",
-  "updated_on": "2026-10-11",
+  "updated_on": "2026-11-04",
   "rubric_version": 5,
   "method": "docs/framing-review.md",
   "guidelines": {
@@ -14,6 +14,11 @@
         "revid": 1376702503,
         "timestamp": "2026-09-25T19:23:26Z",
         "section_sha1": "7877bec0c0a6"
+      },
+      "changed_revision": {
+        "revid": 1382059772,
+        "timestamp": "2026-10-26T09:37:47Z",
+        "section_sha1": "0237f53aee11"
       }
     },
     "EDITORIAL": {
@@ -122,8 +127,8 @@
       "wording": []
     },
     "sykes-picot-agreement": {
-      "text_sha1": "6753ab5b901f",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "81d8335830d6",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Mostly gives both the Arab and British readings of the agreement, but includes an unattributed aside that \"for obvious reasons the Zionists took the same position\".",
         "phrases": [
@@ -179,8 +184,8 @@
       "wording": []
     },
     "armistice-of-mudros": {
-      "text_sha1": "3c59cfd017d4",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "2dbe65a1d19b",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -209,8 +214,8 @@
       "wording": []
     },
     "turkish-war-of-independence": {
-      "text_sha1": "e396f3a88854",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "edba073a782d",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -262,8 +267,8 @@
       "wording": []
     },
     "unification-of-saudi-arabia": {
-      "text_sha1": "c32ebad9aae2",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "f551d5482679",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -308,8 +313,8 @@
       "wording": []
     },
     "syria-lebanon-campaign": {
-      "text_sha1": "03e26b93310e",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "7a76d27622fd",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Defines the campaign as \"the liberation of Syria and Lebanon from German control\" in its own voice, although the rest of the summary describes Vichy French forces holding and defending the territories; the framing is the Allied one.",
         "phrases": [
@@ -325,12 +330,13 @@
       "wording": []
     },
     "united-nations-partition-plan-for-palestine": {
-      "text_sha1": "a863fc5a18da",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "1c2b24f95dbb",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "States as fact that Ben-Gurion saw accepting the plan as \"a steppingstone to future territorial expansion\", and ends on the Palestinian exodus without mentioning the Arab states' military intervention.",
+        "note": "States as fact that Ben-Gurion saw accepting the plan as \"a steppingstone to future territorial expansion\", and ends on the Palestinian exodus without mentioning the Arab states' military intervention. It also states as fact that Arabs \"owned 94% of the territory\": Jews owned about 6–7% of the land by 1947, and much of the rest was classed as state or public land, so 94% is the land not owned by Jews; how much of that was owned by Arabs depends on how state, communal and unregistered land is counted, and is disputed.",
         "phrases": [
-          "a steppingstone to future territorial expansion"
+          "a steppingstone to future territorial expansion",
+          "owned 94% of the territory"
         ]
       },
       "wording": []
@@ -401,12 +407,12 @@
       "wording": []
     },
     "1953-iranian-coup-d-tat": {
-      "text_sha1": "534c831ba932",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "28d142ff7234",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Settles the historians' debate about the role of Iranian domestic actors in Wikipedia's own voice: the CIA's statement \"confirmed\" one view, and the other is described as argued \"on the basis of incomplete evidence\".",
         "phrases": [
-          "this confirmed what many historians had already concluded before",
+          "this confirmed what many historians had already concluded previously",
           "on the basis of incomplete evidence"
         ]
       },
@@ -419,8 +425,8 @@
       ]
     },
     "suez-crisis": {
-      "text_sha1": "ce9aa0aebd6c",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "71e17175c076",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -443,9 +449,16 @@
       "wording": []
     },
     "six-day-war": {
-      "text_sha1": "60a1d3e96a54",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "e95731f6929b",
+      "text_retrieved_at": "2026-11-01",
+      "fairness": {
+        "note": "The rewritten lead tells the run-up mainly through Arab actions: it describes Pan-Arab nationalism as aiming \"to unite Arab nations around opposition to Israel\" and gives Nasser's statement that \"our basic objective will be to destroy Israel\" a paragraph of its own, and it drops the earlier descriptions of Egypt's troops in \"defensive lines\" and of Jordan's limited role, saying instead that Jordan \"joined the offensive\". Israel's surprise first strike and the territories it took are still stated.",
+        "phrases": [
+          "to unite Arab nations around opposition to Israel",
+          "our basic objective will be to destroy Israel",
+          "Jordan joined the offensive"
+        ]
+      },
       "wording": []
     },
     "khartoum-resolution": {
@@ -497,8 +510,8 @@
       "wording": []
     },
     "camp-david-accords": {
-      "text_sha1": "b988c2b57a51",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "14630e339a41",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -521,8 +534,8 @@
       "wording": []
     },
     "iran-hostage-crisis": {
-      "text_sha1": "132182d53bec",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "d7648ed20db5",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -545,8 +558,8 @@
       "wording": []
     },
     "1983-beirut-barracks-bombings": {
-      "text_sha1": "2858a560f657",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "cb4404566898",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -580,8 +593,8 @@
       "wording": []
     },
     "gulf-war": {
-      "text_sha1": "19d448906e6b",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "8f8a48a4cc3a",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Presents one contested study (US bombing as the main cause of Gulf War syndrome) as settled; otherwise a coalition-perspective summary.",
         "phrases": [
@@ -669,10 +682,10 @@
       ]
     },
     "israeli-disengagement-from-gaza": {
-      "text_sha1": "ccfb8e7afc3b",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "cbd9fb641fe9",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "Gives the view that Gaza remained occupied after 2005, attributed to the UN, international organisations, most academic commentators and the 2024 ICJ advisory opinion, and backs it with a legal argument in its own voice (\"it has been generally understood ...\"), without mentioning that Israel and some legal scholars reject this. The same paragraph also dates the occupation \"(1967–2005)\".",
+        "note": "Gives the view that Gaza remained occupied after 2005, attributed to the UN, international organisations, most academic commentators and the 2024 ICJ advisory opinion, and gives Israel's position that the withdrawal ended the occupation; it then backs the first view with a legal argument in its own voice (\"it has been generally understood ...\"), without mentioning legal scholars who share Israel's view. The same paragraph also dates the occupation \"(1967–2005)\".",
         "phrases": [
           "it has been generally understood that a territory remains effectively occupied"
         ]
@@ -751,8 +764,8 @@
       "wording": []
     },
     "yemeni-revolution": {
-      "text_sha1": "aa01754e1850",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "82848d46058f",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -769,8 +782,8 @@
       ]
     },
     "yemeni-civil-war-2014-present": {
-      "text_sha1": "fdb49a9e4095",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "14499a6ab168",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -793,8 +806,8 @@
       "wording": []
     },
     "battle-of-mosul-2016-2017": {
-      "text_sha1": "8ee456e981f6",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "583036954817",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -823,8 +836,8 @@
       "wording": []
     },
     "abraham-accords": {
-      "text_sha1": "df8609d6a134",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ca1d75852581",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -859,10 +872,10 @@
       "wording": []
     },
     "2023-israel-hamas-war": {
-      "text_sha1": "dd2e5059c1cf",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "2ccae2d01f5a",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included."
+        "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the denial by Israel and its supporters; Hamas's crimes and sexual violence by both sides are included."
       },
       "wording": []
     },
@@ -879,8 +892,8 @@
       "wording": []
     },
     "twelve-day-war": {
-      "text_sha1": "25a254a182f4",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c9101251726f",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -897,8 +910,8 @@
       "wording": []
     },
     "battle-of-kunfuda-bay": {
-      "text_sha1": "c437c014880a",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "1fc3f64754a8",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -1383,8 +1396,8 @@
       "wording": []
     },
     "kafr-qasim-massacre": {
-      "text_sha1": "546a8a2404dc",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "164afcab8a87",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Well sourced overall, but states the sweeping claim that \"Arab citizens were regarded by Israel as a hostile population\" as fact.",
         "phrases": [
@@ -1473,8 +1486,8 @@
       "wording": []
     },
     "1973-israeli-raid-in-lebanon": {
-      "text_sha1": "0c6cc8c8b406",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "344aa070b805",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -1555,8 +1568,8 @@
       "wording": []
     },
     "damour-massacre": {
-      "text_sha1": "b07566067a26",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "7505326af4db",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -2081,8 +2094,8 @@
       "wording": []
     },
     "siege-of-talkalakh-may-2011": {
-      "text_sha1": "28bdf9253822",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "250721787d1f",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -2165,8 +2178,8 @@
       "wording": []
     },
     "2013-egyptian-coup-d-etat": {
-      "text_sha1": "c67b0a6e6981",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "830389a8b595",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [
         {
@@ -2212,16 +2225,10 @@
       "wording": []
     },
     "camp-speicher-massacre": {
-      "text_sha1": "22ac1a004e66",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "3d598605423b",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
-      "wording": [
-        {
-          "guideline": "LABEL",
-          "phrase": "the second-deadliest terrorist attack in history",
-          "note": "Uses \"terrorist\" for the massacre in Wikipedia's own voice, without saying who uses the label."
-        }
-      ]
+      "wording": []
     },
     "2014-kidnapping-and-murders-of-israeli-teenagers": {
       "text_sha1": "41d71abe2272",
@@ -2457,8 +2464,8 @@
       "wording": []
     },
     "istanbul-nightclub-shooting": {
-      "text_sha1": "eadc29e6ff65",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "5d4088debf80",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [
         {
@@ -2620,10 +2627,10 @@
       "wording": []
     },
     "october-7-attacks": {
-      "text_sha1": "719cf521fd5c",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "d3f97a298952",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "Hedges claims about the attack itself: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\". \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the aim some analysts give, that the attack was meant to set off a wider regional conflict, is not mentioned. It also notes that 44 governments called the attack terrorism.",
+        "note": "Hedges claims about the attack itself: the sexual-violence reports are hedged (\"numerous sources have reported\"), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\". \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the aim some analysts give, that the attack was meant to set off a wider regional conflict, is not mentioned. It also notes that 44 governments called the attack terrorism.",
         "phrases": [
           "illegal Israeli settlements",
           "The day was labelled the bloodiest in Israel's history",
@@ -2705,8 +2712,8 @@
       "wording": []
     },
     "church-of-saint-porphyrius-airstrike": {
-      "text_sha1": "262f0dab48aa",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "d933248a9078",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -2749,8 +2756,8 @@
       "wording": []
     },
     "killing-of-hind-rajab": {
-      "text_sha1": "7345c532b01c",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "2da2384a866e",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Well documented (independent investigations; the IDF later admitted firing), with one editorial touch (\"finally admitted\").",
         "phrases": [
@@ -2784,13 +2791,13 @@
       "wording": []
     },
     "israeli-airstrike-on-the-iranian-consulate-in-damascus": {
-      "text_sha1": "1cbddeaca779",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "a61596d1e1c1",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "After Israel's position, argues against it in the article's own voice (\"the building was indeed a consulate\"; embassies \"frequently host military attaches\").",
+        "note": "After Israel's position, argues against it in the article's own voice (\"the building was indeed a consulate\"; embassies \"frequently host military attachés\").",
         "phrases": [
           "the building was indeed a consulate",
-          "frequently host military attaches"
+          "frequently host military attachés"
         ]
       },
       "wording": [
@@ -2801,7 +2808,7 @@
         },
         {
           "guideline": "EDITORIAL",
-          "phrase": "Embassies around the world frequently host military attaches",
+          "phrase": "Embassies around the world frequently host military attachés",
           "note": "Adds an argument for one side in Wikipedia's own voice."
         }
       ]
@@ -2904,8 +2911,8 @@
       "wording": []
     },
     "2026-minab-school-attack": {
-      "text_sha1": "ae5d4dceb7fd",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "1e1cf99163f7",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [],
       "disclosure": "This summary mentions Anthropic's Claude as part of a US military targeting system. This review was also produced by Claude, so the reviewer has a connection to the subject of this entry."
@@ -2967,8 +2974,8 @@
       "wording": []
     },
     "world-war-i": {
-      "text_sha1": "625327b97564",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "fa368156f9db",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3009,8 +3016,8 @@
       "wording": []
     },
     "menemen-massacre": {
-      "text_sha1": "7e0e25b09479",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "fa347db53520",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [],
       "data_note": "The start date (1916) comes from Wikidata; the summary dates the massacre to June 1919."
@@ -3108,14 +3115,9 @@
       "wording": []
     },
     "battle-of-the-sakarya": {
-      "text_sha1": "ea298e55c03a",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": {
-        "note": "Closes on a Turkish nationalist quotation with no counterpart view.",
-        "phrases": [
-          "The retreat that started in Vienna on 13 September 1683 stopped 238 years later."
-        ]
-      },
+      "text_sha1": "4198c5afb4b7",
+      "text_retrieved_at": "2026-11-01",
+      "fairness": null,
       "wording": []
     },
     "treaty-of-ankara-1921": {
@@ -3131,8 +3133,8 @@
       "wording": []
     },
     "battle-of-dumlup-nar": {
-      "text_sha1": "dcaff16524fa",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "6646b419c952",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3191,8 +3193,8 @@
       "wording": []
     },
     "dersim-massacre": {
-      "text_sha1": "9279acbd3d90",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "51acd0cd9fe1",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3203,8 +3205,8 @@
       "wording": []
     },
     "world-war-ii": {
-      "text_sha1": "4782daaff070",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "4431eb47fd52",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3323,8 +3325,8 @@
       "wording": []
     },
     "white-revolution": {
-      "text_sha1": "dd7f2998cc80",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "f9e14fd7a932",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Lists the reforms' benefits at length and reduces the opposition largely to clerics protecting their power."
       },
@@ -3344,8 +3346,8 @@
       ]
     },
     "dhofar-rebellion": {
-      "text_sha1": "10c54dbbc3ca",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "c461ca5f51dd",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Calls it \"a revolution ... against British imperialism\" as fact and puts the government side's aim in scare quotes.",
         "phrases": [
@@ -3373,13 +3375,13 @@
       "wording": []
     },
     "palestinian-insurgency-in-south-lebanon": {
-      "text_sha1": "d02f3fe4f17d",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "65ce8a1228e3",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Presents the PLO's stated goal in positive terms and never mentions its attacks on Israeli civilians during the insurgency. It also states in its own voice that the PLO \"established a dictatorship and oppressed the local population\", causing the flight of over 300,000 Shia, without saying who holds that view.",
         "phrases": [
           "established a dictatorship and oppressed the local population",
-          "leading the flight of over 300,000 Shia muslims alone"
+          "leading the flight of over 300,000 Shia Muslims alone"
         ]
       },
       "wording": []
@@ -3444,9 +3446,14 @@
       "wording": []
     },
     "iran-saudi-arabia-proxy-war": {
-      "text_sha1": "4b16b806268b",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "5971383218dc",
+      "text_retrieved_at": "2026-11-01",
+      "fairness": {
+        "note": "The last sentence was changed from Iran and Saudi Arabia exchanging strikes to only \"Iran attacked Saudi Arabia with direct strikes\"; the summary of the 2026 Iran war says Saudi Arabia also attacked Iran.",
+        "phrases": [
+          "Iran attacked Saudi Arabia with direct strikes"
+        ]
+      },
       "wording": []
     },
     "1979-iranian-islamic-republic-referendum": {
@@ -3592,8 +3599,8 @@
       "wording": []
     },
     "operation-praying-mantis": {
-      "text_sha1": "4194ae1d7d2f",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "daaa596fc59d",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3617,8 +3624,8 @@
       "category_note": "Shown as \"terrorism\" because Wikidata types it as a hostage taking; the airliner and its passengers were seized by Iraqi forces during the invasion of Kuwait."
     },
     "1991-iraqi-uprisings": {
-      "text_sha1": "e5bceaf03ec2",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "00731d09f412",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3631,8 +3638,8 @@
       "wording": []
     },
     "operation-provide-comfort": {
-      "text_sha1": "db9590879df6",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "b88c3f2b534d",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3643,8 +3650,8 @@
       "wording": []
     },
     "operation-accountability": {
-      "text_sha1": "434c3e7a74fa",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "cde88eb450f3",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3685,8 +3692,8 @@
       "wording": []
     },
     "iraq-war": {
-      "text_sha1": "f6880bedf906",
-      "text_retrieved_at": "2026-10-03",
+      "text_sha1": "6286ab9c6709",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [
         {
@@ -3757,8 +3764,8 @@
       "wording": []
     },
     "south-yemen-insurgency": {
-      "text_sha1": "740bd96db9d7",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "f6e62fe4db8c",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3870,8 +3877,8 @@
       "wording": []
     },
     "war-in-iraq-2013-2017": {
-      "text_sha1": "bfca699689e9",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "55c3e3314224",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3888,8 +3895,8 @@
       "wording": []
     },
     "yazidi-genocide": {
-      "text_sha1": "1e7ef0a90dd2",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "d7113b57430f",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -3959,8 +3966,8 @@
       "wording": []
     },
     "2016-turkish-coup-d-etat-attempt": {
-      "text_sha1": "8f667488b867",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "21901fa175b5",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Gives extended space to the theory that the coup was staged (a \"Reichstag Fire\", its \"overall absurdity\") and uses \"Erdogan regime\" as fact. The government's case appears mainly as Erdoğan's allegation.",
         "phrases": [
@@ -4054,8 +4061,8 @@
       "wording": []
     },
     "united-states-taliban-deal": {
-      "text_sha1": "d3bbf406ae79",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "1040e40232ce",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -4136,8 +4143,8 @@
       "wording": []
     },
     "gaza-genocide": {
-      "text_sha1": "9d092e92794d",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "75f50907e898",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "The opening sentence defines it as \"the ongoing, intentional, and systematic destruction of the Palestinian people ... carried out by Israel\". The finding is supported by a UN commission and genocide scholars, but Israel, the US and some scholars reject it and the International Court of Justice has not ruled. Israel's position gets one sentence near the end.",
         "phrases": [
@@ -4183,10 +4190,10 @@
       ]
     },
     "sexual-and-gender-based-violence-in-the-october-7-attacks": {
-      "text_sha1": "6ede44c92b35",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "48451b4ea482",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "Apart from the opening sentence, which states the sexual violence as fact, hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas."
+        "note": "Hedged throughout and ordered toward doubt, though it includes the UN findings of \"clear and convincing information\" and \"a pattern indicative of sexual violence\", the EU sanctions and the UN blacklisting of Hamas."
       },
       "wording": []
     },
@@ -4215,8 +4222,8 @@
       "wording": []
     },
     "nuseirat-rescue-and-massacre": {
-      "text_sha1": "59353eae5828",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "ee6544c795dc",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "The title adopts the \"massacre\" label that the text itself attributes to \"some sources\"; the UN human rights office says both sides may have committed war crimes."
       },
@@ -4244,8 +4251,8 @@
       "wording": []
     },
     "2024-lebanon-war": {
-      "text_sha1": "8ec389d376bb",
-      "text_retrieved_at": "2026-09-26",
+      "text_sha1": "79b4fe912d05",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -4311,9 +4318,15 @@
       "wording": []
     },
     "southern-syria-clashes-july-september-2025": {
-      "text_sha1": "72f751e8a8ff",
-      "text_retrieved_at": "2026-09-26",
-      "fairness": null,
+      "text_sha1": "882e3f7eebeb",
+      "text_retrieved_at": "2026-11-01",
+      "fairness": {
+        "note": "With the sentence on the hundreds of Druze civilians killed (\"Black July\") removed, the summary describes Druze groups as having \"reportedly committed massacres\" against Bedouin tribes, while the killing of Druze civilians appears only as \"extrajudicial killings and abuse\" of both groups.",
+        "phrases": [
+          "Extrajudicial killings and abuse of both Druze and Bedouin civilians",
+          "Druze groups reportedly committed massacres against local Bedouin tribes"
+        ]
+      },
       "wording": []
     },
     "august-2025-israeli-attack-on-sanaa": {
@@ -4354,14 +4367,9 @@
       ]
     },
     "2026-iran-war": {
-      "text_sha1": "0c80c353aa76",
-      "text_retrieved_at": "2026-10-10",
-      "fairness": {
-        "note": "Lists \"taking Iran's oil and gas resources\" among the US reasons without saying who claims this.",
-        "phrases": [
-          "taking Iran's oil and gas resources"
-        ]
-      },
+      "text_sha1": "76207c023b7e",
+      "text_retrieved_at": "2026-11-01",
+      "fairness": null,
       "wording": []
     },
     "fall-of-aden-2026": {
@@ -4371,8 +4379,8 @@
       "wording": []
     },
     "mecca-joint-defence-agreement": {
-      "text_sha1": "339286c64210",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "87599d79b8b2",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -4810,8 +4818,8 @@
       "wording": []
     },
     "united-arab-emirates-in-the-2026-iran-war": {
-      "text_sha1": "5815e80518ec",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "c6c6f97797c9",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -4834,14 +4842,9 @@
       "wording": []
     },
     "1920-nebi-musa-riots": {
-      "text_sha1": "9d40a576c066",
-      "text_retrieved_at": "2026-10-06",
-      "fairness": {
-        "note": "Adds an unattributed suggestion that the Arab village sheikhs' condemnation of the riots \"may have been procured with bribes\", which discounts the one Arab statement against the violence without saying who makes that claim.",
-        "phrases": [
-          "This condemnation may have been procured with bribes."
-        ]
-      },
+      "text_sha1": "c44c6bdd47e6",
+      "text_retrieved_at": "2026-11-01",
+      "fairness": null,
       "wording": []
     },
     "1934-thrace-pogroms": {
@@ -5178,8 +5181,8 @@
       "wording": []
     },
     "2022-abu-dhabi-attack": {
-      "text_sha1": "4e39a0cb5c05",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "223848124766",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [
         {
@@ -5202,8 +5205,8 @@
       "wording": []
     },
     "middle-eastern-crisis-2023-present": {
-      "text_sha1": "da6d69208fd5",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "9a0c0366a28c",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Names \"the genocide in Gaza\" as one of the triggers of the crisis, treating the genocide finding as established fact; it is supported by a UN commission and genocide scholars but rejected by Israel, the US and others, and the International Court of Justice has not ruled.",
         "phrases": [
@@ -5213,8 +5216,8 @@
       "wording": []
     },
     "2023-egyptian-presidential-election": {
-      "text_sha1": "c08d8105055e",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "46626722f1dd",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5243,8 +5246,8 @@
       "wording": []
     },
     "israeli-invasion-of-syria-2024-present": {
-      "text_sha1": "1df2e8a7c24b",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "7ad7f3db6a94",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5261,8 +5264,8 @@
       "wording": []
     },
     "2026-lebanon-war": {
-      "text_sha1": "b017fd220d60",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "3acb99cbeeac",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5297,8 +5300,8 @@
       "wording": []
     },
     "mediterranean-and-middle-east-theatre-of-world-war-ii": {
-      "text_sha1": "b0bd8d48e4d1",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "a0d13ede954b",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5380,10 +5383,16 @@
       "wording": []
     },
     "iran-air-flight-655": {
-      "text_sha1": "90376d28ea88",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "172dd9888b28",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
-      "wording": []
+      "wording": [
+        {
+          "guideline": "EDITORIAL",
+          "phrase": "Despite the downing of the aircraft",
+          "note": "\"Despite\" in Wikipedia's own voice presents the captain's later award as at odds with the shootdown, adding an argument rather than stating the award."
+        }
+      ]
     },
     "cave-of-the-patriarchs-massacre": {
       "text_sha1": "c54ed6295d45",
@@ -5392,8 +5401,8 @@
       "wording": []
     },
     "1999-israeli-general-election": {
-      "text_sha1": "cea6594de784",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "e620a1ee6c74",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5469,8 +5478,8 @@
       "wording": []
     },
     "port-said-stadium-riot": {
-      "text_sha1": "26c7b59e9f9e",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "2d636e9423fe",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5678,8 +5687,8 @@
       "wording": []
     },
     "2025-2026-turkish-protests": {
-      "text_sha1": "4cd8220780d4",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "974f99ef66d5",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5695,20 +5704,20 @@
       "wording": []
     },
     "2026-northeastern-syria-offensive": {
-      "text_sha1": "643be82b59e0",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "463027ed86ae",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
     "sinking-of-iris-dena": {
-      "text_sha1": "e5af8a0f0104",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "8c884eb1e978",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
     "2026-yemen-offensives": {
-      "text_sha1": "077903b1c031",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "c7de4b2c5bcb",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5737,8 +5746,8 @@
       "wording": []
     },
     "anglo-soviet-invasion-of-iran": {
-      "text_sha1": "2f2b9b2af2a0",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "5cae00e5aa8e",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5761,8 +5770,8 @@
       "wording": []
     },
     "istanbul-pogrom": {
-      "text_sha1": "2885688f2dcd",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "3821e4022962",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [
         {
@@ -5785,8 +5794,8 @@
       "wording": []
     },
     "syrian-occupation-of-lebanon": {
-      "text_sha1": "5649b80026fc",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "2e7d45542da4",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
         "note": "Describes the whole 1976–2005 period through Syrian abuses and leaves out that the intervention began at the Lebanese president's request and was given an Arab League mandate as the Arab Deterrent Force.",
         "phrases": [
@@ -5819,8 +5828,8 @@
       "wording": []
     },
     "1984-israeli-legislative-election": {
-      "text_sha1": "bf60b7c6b057",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "5de08716efab",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -5932,8 +5941,8 @@
       "wording": []
     },
     "islamic-state-invasion-of-iraq": {
-      "text_sha1": "d9e830855709",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "3aab31e6ddf6",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": [
         {
@@ -6133,8 +6142,8 @@
       "wording": []
     },
     "prelude-to-the-2026-iran-war": {
-      "text_sha1": "1a8a07a19617",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "ef34a5a3249e",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -6145,8 +6154,8 @@
       "wording": []
     },
     "2026-israeli-legislative-election": {
-      "text_sha1": "ac1801912f7d",
-      "text_retrieved_at": "2026-10-06",
+      "text_sha1": "9a7f2a31374f",
+      "text_retrieved_at": "2026-11-01",
       "fairness": null,
       "wording": []
     },
@@ -6157,10 +6166,10 @@
       "wording": []
     },
     "ein-hashlosha-massacre": {
-      "text_sha1": "719cf521fd5c",
-      "text_retrieved_at": "2026-10-10",
+      "text_sha1": "d3f97a298952",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "Hedges claims about the attack itself: the sexual-violence reports are hedged (\"numerous sources have reported\", paired with Hamas's denial), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\". \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the aim some analysts give, that the attack was meant to set off a wider regional conflict, is not mentioned. It also notes that 44 governments called the attack terrorism.",
+        "note": "Hedges claims about the attack itself: the sexual-violence reports are hedged (\"numerous sources have reported\"), and even the day's place as the deadliest in Israel's history is given as a label used \"by many figures and media outlets in the West\". \"Illegal Israeli settlements\" appears in a paraphrase of Hamas's reasons, not a quotation, so it is unclear whether \"illegal\" is Hamas's word or Wikipedia's. Hamas's stated reasons are given at length and attributed, but the aim some analysts give, that the attack was meant to set off a wider regional conflict, is not mentioned. It also notes that 44 governments called the attack terrorism.",
         "phrases": [
           "illegal Israeli settlements",
           "The day was labelled the bloodiest in Israel's history",
@@ -6170,10 +6179,10 @@
       "wording": []
     },
     "israeli-invasion-of-the-gaza-strip": {
-      "text_sha1": "dd2e5059c1cf",
-      "text_retrieved_at": "2026-10-01",
+      "text_sha1": "2ccae2d01f5a",
+      "text_retrieved_at": "2026-11-01",
       "fairness": {
-        "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the Israeli and US denial; Hamas's crimes and sexual violence by both sides are included."
+        "note": "Leans toward the genocide framing but attributes it (\"many scholarly sources ... have concluded\") and states the denial by Israel and its supporters; Hamas's crimes and sexual violence by both sides are included."
       },
       "wording": []
     },
