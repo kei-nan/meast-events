@@ -45,6 +45,32 @@ test("checkProperties: a missing status key is a warning, missing name/years/sou
   assert.ok(bad.errors.some((e) => /missing "source"/.test(e)));
 });
 
+test("checkProperties: a shape not from a CShapes record must name its geometry source", () => {
+  const ok = [
+    "Not in CShapes; https://en.wikipedia.org/wiki/X; Outline from Natural Earth 1:10m countries (public domain)",
+    "Not in CShapes; https://en.wikipedia.org/wiki/X; Island outlines from Natural Earth 10m minor islands (public domain)",
+    "Not a CShapes record; https://en.wikipedia.org/wiki/X; Outline derived from CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0): a difference",
+    "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)",
+  ];
+  assert.deepEqual(checkProperties(ok.map((source) => feature({ source }))).errors, []);
+  const noGeometry = checkProperties([feature({ source: "Not in CShapes; https://en.wikipedia.org/wiki/X" })]);
+  assert.match(noGeometry.errors[0], /names no geometry source/);
+  const noCredit = checkProperties([feature({ source: "Not a CShapes record; https://en.wikipedia.org/wiki/X; Outline from Natural Earth" })]);
+  assert.match(noCredit.errors[0], /does not credit CShapes 2\.0/);
+});
+
+test("checkProperties: a corrected CShapes edge and land-mask land name their source", () => {
+  const ok = [
+    "Geometry corrected per https://x (see data/corrections-geometry.json): its border with Y is from Natural Earth (public domain); CShapes 2.0 for the rest",
+    "CShapes 2.0; coastal strip of the map's land mask (Natural Earth 1:10m, public domain) between this shape and the sea added",
+  ];
+  assert.deepEqual(checkProperties(ok.map((source) => feature({ source }))).errors, []);
+  const corrected = checkProperties([feature({ source: "Geometry corrected per https://x (see data/corrections-geometry.json); CShapes 2.0 for the rest" })]);
+  assert.match(corrected.errors[0], /names no source for the corrected edge/);
+  const mask = checkProperties([feature({ source: "CShapes 2.0; coastal strip of the map's land mask between this shape and the sea added" })]);
+  assert.match(mask.errors[0], /does not name Natural Earth/);
+});
+
 test("checkProperties: unknown status values and bad geometry", () => {
   const r = checkProperties([feature({ status: "made-up" }), feature({ status: "mandate" }), { ...feature(), geometry: { type: "Point", coordinates: [1, 2] } }]);
   assert.equal(r.warnings.length, 1);

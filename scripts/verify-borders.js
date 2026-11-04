@@ -36,7 +36,7 @@ export const BANDS = [
 const read = async (p) => JSON.parse(await readFile(new URL(p, import.meta.url), "utf-8"));
 
 // A shape we changed or added (not plain CShapes): the borders that most need checking.
-export const isModified = (f) => /Not in CShapes|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
+export const isModified = (f) => /Not in CShapes|Not a CShapes record|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
 
 // Distance (km) from a point to a polygon's outline, for Polygon and MultiPolygon alike.
 function distanceToEdge(pt, feature) {

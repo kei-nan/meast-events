@@ -25,11 +25,14 @@
 //   "add" - an entirely new feature with no CShapes counterpart at all: not derived
 //     from filtering/splitting any raw CShapes record, just its own name/dates/
 //     geometry/status. `geometry` references a key in data/corrections-geometry.json.
-//     Optional `geometry_source` credits where that polygon came from, for the cases
-//     where the shape has a different (and separately licensed) provenance from the
-//     historical claim in `source` - it's carried into the output feature's `source`
+//     `geometry_source` (required unless `geometry` is "cshapes:...") credits where that
+//     polygon came from, which is a different (and separately licensed) provenance from
+//     the historical claim in `source` - it's carried into the output feature's `source`
 //     property so the credit travels with the data, which some upstream licenses
-//     require of us.
+//     require of us. `cshapes_derived: true` marks a polygon computed from CShapes
+//     records (the Golan; Gaza, whose land border a "reshape" cuts to CShapes lines): its
+//     `source` then says "Not a CShapes record" rather than "Not in CShapes", and its
+//     geometry_source must credit CShapes (ingest-boundaries.js checks both).
 //
 //   "reshape" - cuts a shape in data/corrections-geometry.json by a CShapes country's
 //     current outline before any entry uses it (`minus: "cshapes:<cntry_name>"`), for a
@@ -65,6 +68,37 @@ const OSLO_GEOMETRY_CREDIT =
   "Areas A/B/C geometry from UN OCHA occupied Palestinian territory, \"State of Palestine " +
   "- Oslo Agreement in the West Bank\" (source: Palestinian Authority Ministry of " +
   "Planning), https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
+
+// How CShapes is credited in every output feature's `source` (ingest-boundaries.js).
+export const CSHAPES_CITATION = "CShapes 2.0 (Schvitz et al., ETH Zurich, CC BY-NC-SA 4.0)";
+
+// Where the other "add" outlines come from (scripts/extract-correction-geometry.js, and the
+// Gaza "reshape" entry below). Each is one source item: no ";" outside brackets, where the
+// app splits a source into items (app/src/lib/boundaryText.js, sourceItems).
+const GAZA_GEOMETRY_CREDIT =
+  "Outline from Natural Earth 1:10m countries (public domain), the Gaza part of its " +
+  "\"Palestine\" feature, with its land border cut to the Egypt line and the 1949-1967 Israel " +
+  `line of ${CSHAPES_CITATION}`;
+const GOLAN_GEOMETRY_CREDIT =
+  `Outline derived from ${CSHAPES_CITATION}: its 1979 Israel record minus its 1948 Israel, ` +
+  "West Bank and Gaza records";
+const HATAY_GEOMETRY_CREDIT =
+  "Outline from Natural Earth 1:10m states and provinces (public domain), Turkey's modern Hatay Province";
+// GeoNames is CC BY 4.0: the credit and licence travel with the shapes that use its coordinates.
+const GEONAMES_CREDIT =
+  "the GeoNames gazetteer (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/), https://www.geonames.org/";
+const SAUDI_KUWAITI_ZONE_GEOMETRY_CREDIT =
+  "Outline digitized by this project from the boundary markers in International Boundary Study " +
+  "No. 103, with the arc's centre (Kuwait town) and 'Ayn al 'Abd from " +
+  GEONAMES_CREDIT +
+  ", and the coast from Natural Earth 1:10m countries (public domain)";
+const SAUDI_IRAQI_ZONE_GEOMETRY_CREDIT =
+  "Outline digitized by this project from the vertex coordinates in the 1975 Agreed Minutes " +
+  "annexed to the 1981 treaty (UN Treaty Series vol. 1638) and U.S. State Department " +
+  "Cartographic Guidance Bulletin No. 4, " +
+  "https://data.geodata.state.gov/guidance/DoS_Bulletin_04-Iraq-Saudi-Arabia-1992.pdf, " +
+  "with the Al-Wuqubah wells from " +
+  GEONAMES_CREDIT;
 
 // The ICJ advisory opinion of 19 July 2024 (Legal Consequences arising from the Policies and
 // Practices of Israel in the Occupied Palestinian Territory, including East Jerusalem), as
@@ -109,7 +143,15 @@ export const CORRECTIONS = [
       // Hatay below for the 1923-1939 period. geometry: "turkeyPre1939" is Turkey's
       // CShapes shape with Hatay subtracted (computed via polygon difference against
       // modern Hatay Province as an approximation of the historical Sanjak boundary).
-      { until: 1939, name: "Turkey", geometry: "turkeyPre1939" },
+      // `geometry_source` (required with `geometry`) says where the corrected edge comes from.
+      {
+        until: 1939,
+        name: "Turkey",
+        geometry: "turkeyPre1939",
+        geometry_source:
+          "its border with the Sanjak of Alexandretta is Turkey's modern Hatay Province from Natural " +
+          "Earth 1:10m states and provinces (public domain), cut out of the CShapes 1923 Turkey record",
+      },
     ],
     note:
       "The Ottoman Empire was formally abolished and the Republic of Turkey proclaimed " +
@@ -406,6 +448,7 @@ export const CORRECTIONS = [
     end_year: 1938,
     status: "mandate",
     geometry: "hatay",
+    geometry_source: HATAY_GEOMETRY_CREDIT,
     note:
       "An autonomous sanjak within the French Mandate for Syria from the Treaty of Ankara of " +
       "20 October 1921 (Article 7: \"A special administrative regime shall be established " +
@@ -458,6 +501,8 @@ export const CORRECTIONS = [
     end_year: 1966,
     status: "occupied-administered",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "Held by Egypt after the 1948 Arab-Israeli War under military administration - " +
       "never annexed, unlike Jordan's West Bank. The Arab League-backed \"All-Palestine " +
@@ -484,6 +529,8 @@ export const CORRECTIONS = [
     end_year: 1981,
     status: "occupied-administered",
     geometry: "golan",
+    geometry_source: GOLAN_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "Captured from Syria by Israel in the Six-Day War of June 1967 and held under military " +
       "administration until the Golan Heights Law of 14 December 1981. Shape derived from " +
@@ -498,6 +545,8 @@ export const CORRECTIONS = [
     end_year: 9999,
     status: "annexed-unrecognized",
     geometry: "golan",
+    geometry_source: GOLAN_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "Israel applied its law to the Golan Heights on 14 December 1981. UN Security Council " +
       "Resolution 497 declared the move \"null and void and without international legal " +
@@ -654,6 +703,8 @@ export const CORRECTIONS = [
     end_year: 1993,
     status: "occupied-administered",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "Israel took Gaza from Egypt in the Six-Day War in June 1967 and ran it under a " +
       "military governorate, then from 1981 through the Israeli Civil Administration (the " +
@@ -668,6 +719,8 @@ export const CORRECTIONS = [
     end_year: 2004,
     status: "autonomous-partial",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "The Gaza-Jericho Agreement of 4 May 1994 created the Palestinian Authority and " +
       "required Israeli withdrawal within three weeks - but its Article V(1)(a) limited PA " +
@@ -687,6 +740,8 @@ export const CORRECTIONS = [
     end_year: 2006,
     status: "autonomous-partial",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "Under Israel's unilateral disengagement plan (Knesset approval 16 February 2005) " +
       "all 21 Gaza settlements were evacuated between 15 and 22 August 2005 and the last " +
@@ -708,6 +763,8 @@ export const CORRECTIONS = [
     end_year: 2022,
     status: "de-facto-separate-administration",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "Hamas won the Palestinian legislative election of 25 January 2006 (74 seats to " +
       "Fatah's 45). The power-sharing that followed collapsed into armed conflict with " +
@@ -732,6 +789,8 @@ export const CORRECTIONS = [
     end_year: 2025,
     status: "active-conflict",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "The Hamas-led attack on Israel of 7 October 2023 was followed by an Israeli ground " +
       "invasion from 27 October 2023 and a war lasting until the ceasefire of 10 October " +
@@ -754,6 +813,8 @@ export const CORRECTIONS = [
     end_year: 9999,
     status: "partitioned-ceasefire",
     geometry: "gaza",
+    geometry_source: GAZA_GEOMETRY_CREDIT,
+    cshapes_derived: true,
     note:
       "The ceasefire that took effect on 10 October 2025 left Gaza split along the " +
       "\"Yellow Line\": Israeli forces east of it (about 53% of the Strip at the " +
@@ -776,6 +837,7 @@ export const CORRECTIONS = [
     end_year: 1969,
     status: "shared-sovereignty",
     geometry: "saudiKuwaitiNeutralZone",
+    geometry_source: SAUDI_KUWAITI_ZONE_GEOMETRY_CREDIT,
     note:
       "Created by the Uqair Protocol of 2 December 1922, which left this strip between " +
       "Kuwait and Najd undivided because the bedouin tribes who watered there moved freely " +
@@ -846,8 +908,9 @@ export const CORRECTIONS = [
     ],
     maxGapKm: 3,
     note:
-      "Gaza's land border follows the Gaza Strip shape (Natural Earth); Egypt's and (1948-1966) " +
-      "Israel's CShapes lines are fitted to it.",
+      "The Gaza Strip shape is Natural Earth's outline (public domain) with its land border cut to " +
+      "CShapes' Egypt and 1949-1967 Israel lines; Egypt's and (1948-1966) Israel's CShapes lines are " +
+      "fitted to it, and from 1967 Israel's shape is widened to wrap it.",
   },
   {
     type: "fit",
@@ -898,7 +961,10 @@ export const CORRECTIONS = [
       { name: "Saudi Arabia", mode: "snap", trim: true, notOnCShapes: "Kuwait" },
     ],
     maxGapKm: 5,
-    note: "the zone was shared territory until its partition took effect in December 1969",
+    note:
+      "the zone was shared territory until its partition took effect in December 1969. Its " +
+      `outline was digitized by this project from its delimitation documents and ${GEONAMES_CREDIT} ` +
+      "(see the zone's own source)",
   },
   {
     type: "fit",
@@ -910,7 +976,9 @@ export const CORRECTIONS = [
       { name: "Iraq", mode: "trim" },
     ],
     maxGapKm: 3,
-    note: "the zone was shared territory until the 1981 partition treaty",
+    note:
+      "the zone was shared territory until the 1981 partition treaty. Its outline was digitized " +
+      `by this project from its delimitation documents and ${GEONAMES_CREDIT} (see the zone's own source)`,
   },
   {
     type: "add",
@@ -919,6 +987,7 @@ export const CORRECTIONS = [
     end_year: 1981,
     status: "shared-sovereignty",
     geometry: "saudiIraqiNeutralZone",
+    geometry_source: SAUDI_IRAQI_ZONE_GEOMETRY_CREDIT,
     note:
       "The larger of the two zones the Uqair Protocol of 2 December 1922 left undivided, " +
       "created by the same logic as the Saudi-Kuwaiti one and defined in the same document: " +
