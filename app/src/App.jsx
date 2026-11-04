@@ -419,8 +419,8 @@ export default function App() {
   // search results in the chosen scope. ResultsList renders 50 rows at a time
   // ("Show more"), so the whole list stays reachable.
   const browseList = useMemo(
-    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear, sort)) : null),
-    [search.status, inViewFilter, visibleEvents, startYear, sort]
+    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, [startYear, endYear], sort)) : null),
+    [search.status, inViewFilter, visibleEvents, startYear, endYear, sort]
   );
   // Memoized (like range below) so a hover re-render of App passes the memoized
   // ResultsList the same props and it skips rendering.

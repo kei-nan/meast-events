@@ -493,8 +493,11 @@ and identify themselves with the `MiddleEastEvents` User-Agent (`MiddleEastEvent
 ## Review flags (advisory only)
 
 Each event may carry `review_reasons` (strings) and `date_flags`; none of them changes the data. The event panel and the event pages' plain-HTML copy show a note only for
-`date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), e.g. "Wikidata gives this event's end
-(1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002." The other date flags stay in the data and the checks
+`date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), each date to its Wikidata precision
+(`date_precision`, `date_end_precision`), e.g. "Wikidata gives this event's end (1970) as before its start (11 February 1979); Wikipedia's
+summary mentions the years 1952, 1956, 1962, 1967, 1970 and 1979." (arab-cold-war). In the results list and the Timeline such an event is
+placed at the year it matches the selected years by: its end year when only that is in them (iraqi-invasion-of-kuwait in 1990–1991: at
+4 August 1990, in the 1990s), never as ongoing from before them. The other date flags stay in the data and the checks
 but are not shown; an event with any date flag still shows only the years in its date line.
 
 | Flag | Where | Meaning |
