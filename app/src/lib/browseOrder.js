@@ -11,6 +11,7 @@
 //   "date": oldest first; "date-desc": newest first.
 
 import { rankEvents } from "./ranking.js";
+import { rawEventYears, yearsReversed } from "./eventYears.js";
 
 export const SORTS = ["coverage", "coverage-asc", "date", "date-desc"];
 const DEFAULT_DIR = { coverage: "desc", date: "asc" };
@@ -31,20 +32,66 @@ export function eventStartYear(event) {
   return y ? Number(y) : NaN;
 }
 
-/** True when the event began before `rangeStart` (so it is ongoing in the range). */
+/**
+ * True when the event began before `rangeStart` (so it is ongoing in the range).
+ * A reversed record (end before start, flagged date_order_invalid) in the range
+ * is never "ongoing": it matches the selected years only at a year one of its
+ * dates names (lib/eventYears.js eventOverlapsRange), never the years between,
+ * and its start is the later of the two, so the start year is not before them.
+ */
 export function startedBefore(event, rangeStart) {
   const y = eventStartYear(event);
   return Number.isFinite(y) && y < rangeStart;
 }
 
+/**
+ * True when the event is listed at its END date within the selected years
+ * `range` ([first, last]): a reversed record (end before start, flagged
+ * date_order_invalid) whose start year is outside them and whose end year is in
+ * them. It matches them by its end year alone (eventOverlapsRange), and its
+ * Timeline bar is drawn there (lib/timelineView.js barGeometry), so it is placed
+ * there too, e.g. iraqi-invasion-of-kuwait (start 2009-08-02, end 1990-08-04)
+ * in 1990-1991: at 4 August 1990, in the 1990s. The dates stay as given.
+ */
+export function listedAtEnd(event, range) {
+  if (!Array.isArray(range) || !event?.date_end || !yearsReversed(event)) return false;
+  const [s, en] = rawEventYears(event);
+  const inR = (y) => y >= range[0] && y <= range[1];
+  return !inR(s) && inR(en);
+}
+
+/** The year the event is listed at in `range` (listedAtEnd): its end year or, as usual, its start year. */
+export function listedYear(event, range) {
+  return listedAtEnd(event, range) ? rawEventYears(event)[1] : eventStartYear(event);
+}
+
+/** The date string the event is ordered by in `range` (listedAtEnd); "" without one. */
+export function listedDate(event, range) {
+  const d = listedAtEnd(event, range) ? event.date_end : event?.date_start;
+  return typeof d === "string" ? d : "";
+}
+
 const hasCount = (e) => Number.isFinite(e?.sitelinks);
 
-/** Events (already restricted to the range) in browse order; stable. */
-export function orderBrowseList(events, rangeStart, sort = "date") {
+/**
+ * Events (already restricted to the range) in browse order; stable. `range`:
+ * the selected years [first, last], or the first year alone (then every event
+ * is ordered by its start date).
+ */
+export function orderBrowseList(events, range, sort = "date") {
   const { key, dir } = parseSort(sort);
+  const rangeStart = Array.isArray(range) ? range[0] : range;
+  let ranked = rankEvents(events, "");
+  if (ranked.some((e) => listedAtEnd(e, range))) {
+    // Chronological by the listed date (rankEvents' order: undated first).
+    ranked = ranked
+      .map((e, i) => ({ e, i, k: listedDate(e, range) }))
+      .sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : a.i - b.i))
+      .map((x) => x.e);
+  }
   const starting = [];
   const ongoing = [];
-  for (const e of rankEvents(events, "")) (startedBefore(e, rangeStart) ? ongoing : starting).push(e);
+  for (const e of ranked) (startedBefore(e, rangeStart) ? ongoing : starting).push(e);
   if (key === "coverage") {
     // Array.prototype.sort is stable, so equal counts stay chronological.
     const sign = dir === "asc" ? 1 : -1;

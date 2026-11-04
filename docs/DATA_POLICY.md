@@ -34,7 +34,7 @@ rather than a second layer of ours. Concretely:
 | `extract`, `extract_retrieved_at` | The **full lead section** (everything before the first heading) of the English article as plain text, and the date it was fetched | Wikipedia |
 | `wikipedia_revid`, `wikipedia_revid_timestamp` | Only where known: the id of the English Wikipedia revision whose lead is exactly `extract`, and when it was saved (see "Revision") | Wikipedia |
 | `wikidata_classes` | ALL class labels of the Wikidata item, see below | Wikidata |
-| `date_start`, `date_end` | Wikidata dates (P585 point in time, else P580 start; P582 end) | Wikidata |
+| `date_start`, `date_end` | Wikidata dates (P585 point in time, else P580 start; P582 end), in the Gregorian calendar: a Wikidata value in the Julian calendar (calendarmodel Q1985786) of day precision is stored as its Gregorian day (`german-ottoman-alliance`: P585 20 July 1914 Julian = 1914-08-02), a coarser one as written, as the Wikidata Query Service gives both (Wikibase `repo/includes/Rdf/JulianDateTimeValueCleaner.php` converts only at `TimeValue::PRECISION_DAY` or finer: "If we are less precise than a day, no point to convert Julian to Gregorian") | Wikidata |
 | `date_precision`, `date_end_precision` | Wikidata's precision ("day", "month", "year", "decade", ...) of the statement whose value is the stored `date_start` (P585/P580) or `date_end` (P582); `null` when no statement of the item has the stored date. The event panel shows each date to its precision and no further ("29 October – 7 November 1956"); without `date_end_precision` the end shows as a year only ("29 October 1956 (ended 1956)"). `date_end_precision` is only on events with a `date_end` (backfilled 2026-10-31 by `scripts/backfill-end-precision.js`: 269 day, 14 month, 13 year, 22 null of 318) | Wikidata |
 | `countries` | Wikidata's country (P17, or P17 of the P276/P131 place), mapped to the 15 tracked names | Wikidata |
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
@@ -67,7 +67,10 @@ in a preview; the page shows it. The structured data's `description` is the lead
 `wikipedia_revid` is the id of the article revision whose lead is exactly the stored `extract`, and `wikipedia_revid_timestamp` is when that
 revision was saved (UTC, as the API gives it, e.g. `2026-10-15T19:38:37Z`). Both come from the same request as the lead
 (`prop=extracts|pageprops|info|revisions&rvprop=ids|timestamp`: MediaWiki's `lastrevid` and its latest revision's timestamp, used only when the two
-name the same revision). They let a citation link that exact version, `https://en.wikipedia.org/w/index.php?title=<title>&oldid=<revid>`, under
+name the same revision). A long batch comes back in several continued parts, and `lastrevid` comes with the first part while a page's lead
+may come in a later one; for such a page `scripts/lib/lead.js` asks for the latest revision once more after the last part (revision ids only grow,
+so the same id before and after means the article did not change while its lead was fetched). An article that did change is fetched again, and if it keeps
+changing the fetch fails rather than store a revision that is not the text's (since 2026-11-03). They let a citation link that exact version, `https://en.wikipedia.org/w/index.php?title=<title>&oldid=<revid>`, under
 that version's date, as APA, MLA and Chicago ask when citing Wikipedia (the citation rules and their sources are in `app/src/lib/citation.js`).
 The two are present together or not at all (`validate-events.js` checks it). They are set in three ways only, and are otherwise **absent**, never guessed:
 
@@ -210,7 +213,7 @@ did: seven bombings Wikidata types only as "suicide attack" (the Dolphinarium, S
 attack" are terrorism - the same mechanism as the 2026-09-28 finding above. The owner chose terrorism (2026-10-07), so that the group no longer
 depends on whether a Wikidata editor added "terrorist attack" next to "suicide attack". It moved one event already shown, the 2011 southern Israel cross-border attacks, from war to terrorism.
 "Terrorism" remains our group name, not a Wikidata label: the UI lists the item's Wikidata classes next to it, and since 2026-10-25 the event header,
-the legend and the filters attribute it ("Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, hijacking)"; "Terrorism, from Wikidata's
+the legend and the filters attribute it ("Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, aircraft hijacking)"; "Terrorism, from Wikidata's
 class "suicide attack"") as the framing review's MOS:LABEL check asks of the word "terrorist". The group still follows the method classes listed above
 (suicide attack, hostage taking, aircraft hijacking) as well as "terrorist attack"; an airstrike or bombardment is war unless Wikidata also types it with
 an atrocity or terrorism class. "Protest" is a new group (protest, demonstration, riot); before, the only
@@ -254,7 +257,11 @@ An event is **proposed** (written to `data/events.proposed.json`) if and only if
 Since data shape v2.1 two former conditions are **gone**: events **without real coordinates** are included (with `location_quality: "none"`,
 `coordinates: null`, no map marker, listed and searchable), and events whose Wikidata **dates are contradictory** (end before start) are included
 with the dates as Wikidata gives them and a `date_flags` reason. Nothing is dropped for either reason any more. Events already in the curated
-`data/events.json` are not re-proposed.
+`data/events.json` are not re-proposed: `scripts/enrich-candidates.js` checks each candidate's QID against `data/events.json` itself
+(`withoutCurated` in `scripts/lib/enrich-run.js`), not the `already_curated` flag stored in `data/event-candidates.json`, which goes stale once events
+are merged (`discover-events.js --predecessors-only` leaves existing rows untouched). A `--keep-existing` run also drops kept proposed records that have been
+merged since. On 2026-11-03 the stale flag had let 254 of the 255 records in `data/events.proposed.json` be curated events; the file was filtered with
+the same check to the 1 that is not (`kocgiri-rebellion`).
 
 ### Events without an article of their own
 
@@ -486,8 +493,11 @@ and identify themselves with the `MiddleEastEvents` User-Agent (`MiddleEastEvent
 ## Review flags (advisory only)
 
 Each event may carry `review_reasons` (strings) and `date_flags`; none of them changes the data. The event panel and the event pages' plain-HTML copy show a note only for
-`date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), e.g. "Wikidata gives this event's end
-(1 January 2002) as before its start (27 March 2002); Wikipedia gives 27 March 2002." The other date flags stay in the data and the checks
+`date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), each date to its Wikidata precision
+(`date_precision`, `date_end_precision`), e.g. "Wikidata gives this event's end (1970) as before its start (11 February 1979); Wikipedia's
+summary mentions the years 1952, 1956, 1962, 1967, 1970 and 1979." (arab-cold-war). In the results list and the Timeline such an event is
+placed at the year it matches the selected years by: its end year when only that is in them (iraqi-invasion-of-kuwait in 1990–1991: at
+4 August 1990, in the 1990s), never as ongoing from before them. The other date flags stay in the data and the checks
 but are not shown; an event with any date flag still shows only the years in its date line.
 
 | Flag | Where | Meaning |
@@ -558,7 +568,8 @@ but are not shown; an event with any date flag still shows only the years in its
   is at the rounded coordinates the source gives, not at a capital. The validator warns about each (`coordinate_low_precision`).
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
   Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 378 of the 816 curated events and 186 of the 254 proposed events
-  (counted from `data/events.json` and `data/events.proposed.json`).
+  (counted from `data/events.json` and `data/events.proposed.json`). Since 2026-11-03 the proposed file holds only events not yet curated: 1 event,
+  without a location.
 - Validation (`scripts/lib/validate.js`): coordinates are required unless `location_quality` is `none` (then they must be `null`), and
   `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override` / `redirect_target`, `approximate` = `country-fallback:<tracked country>`,
   `none` = `null`. Coordinates outside a generous Middle East box (lat 10-44, lon 24-65) are only a warning, because a few events really happened
@@ -659,6 +670,8 @@ node scripts/enrich-seed.js [--apply]                   # -> data/seed-enrichmen
                                                         #    (run 2026-10-24: 83 of 102 applied, 19 left as they are)
 node scripts/backfill-end-precision.js [--apply]        # date_end_precision for curated events with a date_end that lack it
                                                         #    (the P582 statement whose value is the stored date_end; null if none)
+node scripts/backfill-revids.js [--historical] [--apply] # wikipedia_revid and wikipedia_revid_timestamp for events without them,
+                                                        #    only where a lead equals the stored extract exactly (see "Revision")
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
@@ -673,20 +686,34 @@ node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coo
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
+node scripts/fetch-border-references.js                 # -> data/border-reference-points.json: Wikidata border checkpoints, border
+                                                        #    crossings and tripoints with coordinates in the map's countries, the
+                                                        #    independent points scripts/verify-borders.js checks the borders against
+node scripts/build-water.js [--raw-dir=DIR]             # -> app/src/data/water.json: names of seas, gulfs and straits (English
+                                                        #    Wikipedia title and P625 of each Wikidata item) and the Dead Sea and
+                                                        #    Sea of Galilee outlines (Natural Earth 1:10m lakes, data/raw/ne10-lakes.geojson)
 npm run validate-boundaries                             # data/boundaries.json structure, year gaps, overlaps, ring crossings, simplified/coarsened shapes (runs in CI; needs root npm ci)
 node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --apply writes data/events.json. Every run also
                                                         #    applies the "Not events" rule and carries re-derived date-order
-                                                        #    flags to curated records (--no-add: only that, nothing added)
+                                                        #    flags to curated records (--no-add: only that, nothing added).
+                                                        #    The flag copy needs the curated event in the proposed file, which
+                                                        #    no longer happens (curated events are not re-proposed, 2026-11-03):
+                                                        #    it finds nothing to copy; re-derived flags reach curated records
+                                                        #    only through a person's review
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
 Cached entries do not expire by default; `--fresh` ignores the whole cache for a run, and `--cache-max-age=7d` (or `ATLAS_CACHE_MAX_AGE`) ignores entries
-older than that (units s, m, h, d; `scripts/lib/cache.js`). A Wikipedia/Wikidata API error (which that API returns as HTTP 200 with an `error` body)
+older than that (units s, m, h, d; `scripts/lib/cache.js`). One exception: a Wikipedia page the lead fetch finds missing is not cached, and a
+"missing" left in the cache by an earlier version is asked again (`scripts/lib/lead.js`), so a page missing once is not read as missing on every later run
+(the pipeline would otherwise keep the REST summary's extract for it for good). A Wikipedia/Wikidata API error (which that API returns as HTTP 200 with an `error` body)
 fails the request like an HTTP error and is never cached (`mediaWikiJson` in `scripts/lib/http.js`). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
 is then retried like a dropped connection.
 
-Pipeline output never touches `data/events.json`. Only an explicit `merge-proposed.js --apply` run by a person does, plus `refresh-extracts.js --apply`
-(deliberate, and run monthly through a pull request). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
+Pipeline output never touches `data/events.json`. Only these scripts write it, each only with `--apply`: `merge-proposed.js --apply` run by a person;
+`refresh-extracts.js --apply` and `refresh-sitelinks.js --apply` (deliberate, and run monthly by `.github/workflows/refresh-data.yml` through a pull request);
+and the backfills run by a person, `enrich-seed.js --apply` (the hand-picked seed events), `backfill-end-precision.js --apply` and `backfill-revids.js --apply`
+(one-off, re-runnable). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
 There is no second, committed copy of the events any more: `app/public/data/` is generated from `data/` by `app/scripts/split-data.mjs` on every dev start and
 build, and is gitignored.
 
@@ -694,7 +721,12 @@ build, and is gitignored.
 real calendar dates from 1900 to next year, `date_end >= date_start` unless `date_flags` explains it, coordinates present unless `location_quality` is `none`,
 `location_quality` matching `coordinate_source` (see "Location quality"), no lat/lon swap, `category` and `category_group` equal and one of the groups in
 `scripts/lib/event-classes.js` (war, treaty, political, atrocity, terrorism, uprising, protest, migration, diplomatic, economic, unclassified) and equal to what the grouping rule (`groupForEvent`) gives for its `wikidata_classes`, `wikidata_classes` array,
-`extract_retrieved_at` date, no `category_label`, non-empty extract. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
+`extract_retrieved_at` date, no `category_label`, non-empty extract. Since 2026-11-03 also: **every** country tag a tracked country or `regional` (one
+tracked tag no longer excuses a misspelt or untracked one, e.g. `["Iraq", "Isreal"]`), a `wikipedia_url` present and on English Wikipedia (rule 4; it was a
+warning), a `location_quality` present, and a `date_start`/`date_end` that fits its `date_precision`/`date_end_precision` (month precision stored as the
+month's first day, year or coarser as 1 January). No curated or proposed event failed any of these when they were added. The curated file is validated as
+strictly as the proposed one (it used to be "lenient": a missing `wikidata_qid`, or null coordinates with a `location_quality` other than `none`, were warnings),
+and `merge-proposed.js` validates the merged result strictly. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
 shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`
 (merged into one "coordinates are borrowed" warning when the pin is that other item's: `coordinate_source` `redirect_target`, or `wikipedia` with a different
 `resolved_qid`), a `date_start` later than the day the event's data was retrieved (`extract_retrieved_at`; a scheduled event such as an upcoming election),
@@ -707,7 +739,7 @@ of its year, `PRE_1920_CHECK_SHAPES` in `scripts/lib/validate.js`: that shape sp
 not one in the wrong province, and the map's country shading does not use it),
 `possible_duplicates` naming an id that is in neither the file nor (for the proposed file) the curated file, and, for the curated file, an event without a
 framing review or whose review is stale (its `text_sha1` is not the SHA-1 of the current extract, the same test the site uses to show "may no longer apply").
-Since 2026-10-14 also: a `wikipedia_url` that is not on English Wikipedia (rule 4); for discovered events (those with a discovery `sitelinks` count; the hand-picked
+Since 2026-10-14 also (until 2026-11-03, when it became an error: a `wikipedia_url` that is not on English Wikipedia, rule 4); for discovered events (those with a discovery `sitelinks` count; the hand-picked
 seed events are exempt) a discovery count below the rule's 10, a `sitelinks_current` that has since fallen below 10, and a missing `date_precision`; a
 `date_precision` that is not a Wikidata precision name; a decade-or-coarser `date_start` with no `date_end` (e.g. `israeli-lebanese-conflict`, Wikidata
 P580 "+2000" at century precision, i.e. the 20th century, stored as 2000-01-01); an event tagged with 8 or more countries; and two events sharing a

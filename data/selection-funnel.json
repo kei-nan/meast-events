@@ -1,5 +1,5 @@
 {
-  "data_as_of": "2026-10-14",
+  "data_as_of": "2026-11-01",
   "generated_by": "node scripts/build-selection-funnel.js (recomputed from data/*.json; not copied from documents)",
   "rule": "Wikidata class in the event-class list; located in a tracked country; dated 1900+; English article and >= 10 sitelinks (all Wikimedia projects). See docs/DATA_POLICY.md.",
   "stages": [
@@ -40,11 +40,11 @@
     }
   ],
   "proposed_breakdown": {
-    "proposed_total": 255,
-    "location_quality_none_no_map_marker": 187,
-    "date_order_invalid_flagged_and_kept": 1,
+    "proposed_total": 1,
+    "location_quality_none_no_map_marker": 1,
+    "date_order_invalid_flagged_and_kept": 0,
     "excluded_as_redirect_duplicates_by_review": 0,
-    "already_merged_into_curated": 254,
+    "already_merged_into_curated": 0,
     "pending_merge_new_events": 1,
     "pending_merge_new_events_without_location": 1,
     "hard_excluded_no_wikipedia_summary_or_extract": 28

@@ -9,8 +9,8 @@ export const CATEGORY_LABELS = {
   migration: "Migration",
   diplomatic: "Diplomatic",
   economic: "Economic",
-  terrorism: "Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, hijacking)",
-  atrocity: "Atrocity (genocide, massacre, war crime, ethnic cleansing)",
+  terrorism: "Terrorism (Wikidata: terrorist attack, suicide attack, hostage taking, aircraft hijacking)",
+  atrocity: "Atrocity (Wikidata: genocide, massacre, war crime, pogrom, mass murder, ethnic cleansing)",
   mixed: "Mixed (classes from more than one group)",
   unclassified: "Unclassified (no listed Wikidata class)",
 };

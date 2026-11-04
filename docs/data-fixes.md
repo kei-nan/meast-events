@@ -534,8 +534,8 @@ put them outside the tracked set; the validator now rejects any event without a 
 
 | Event (QID) | Field | Stored | Wikidata | Why not applied |
 |---|---|---|---|---|
-| `german-ottoman-alliance` (Q261982) | date_start | 1914-08-02 | P585 1914-07-20 | not drift: the value is in the **Julian** calendar (calendarmodel Q1985786), i.e. 2 August 1914 Gregorian, the stored date and the lead's ("August 2, 1914"). The report compares the raw value |
-| `armistice-of-erzincan` (Q28048694) | date_start | 1917-12-18 | P585 1917-12-05 | not drift: Julian, = 18 December 1917 Gregorian; lead "18 December 1917 (5 December O.S.)" |
+| `german-ottoman-alliance` (Q261982) | date_start | 1914-08-02 | P585 1914-07-20 | not drift: the value is in the **Julian** calendar (calendarmodel Q1985786), i.e. 2 August 1914 Gregorian, the stored date and the lead's ("August 2, 1914"). No longer listed since 2026-11-03 (the report converts it, below) |
+| `armistice-of-erzincan` (Q28048694) | date_start | 1917-12-18 | P585 1917-12-05 | not drift: Julian, = 18 December 1917 Gregorian; lead "18 December 1917 (5 December O.S.)". No longer listed since 2026-11-03 |
 | `mcmahon-hussein-correspondence`, `national-pact`, `khartoum-resolution`, `iranian-green-movement` | date_start | | none | Wikidata has no P585/P580 |
 | `mcmahon-hussein-correspondence`, `1929-palestine-riots`, `peel-commission`, `nakba`, `1949-armistice-agreements`, `khartoum-resolution`, `israeli-disengagement-from-gaza`, `iranian-green-movement`, `fall-of-the-assad-regime` | date_end | | none | Wikidata has no P582: a stored end is not removed (the riots' 29 August 1929 is the infobox's, Peel's 7 July 1937 and the Fall of the Assad regime's 8 December 2024 are the lead's) |
 | `2024-israel-hezbollah-conflict` (Q122974556) | date_end | 2024-11-27 | none | no P582, and a "–present" title: not touched |
@@ -554,4 +554,14 @@ put them outside the tracked set; the validator now rejects any event without a 
 
 - Monthly refresh: the drift report stays **report only**. A listed date difference is applied by hand, by the rule above, in a reviewed pull
   request with an entry here; nothing applies it automatically.
-- Known false positive of the report: a Wikidata date in the Julian calendar (the two above) is compared as written, not converted.
+- Julian calendar (since 2026-11-03): a Wikidata date of day or finer precision in the Julian calendar is read as its Gregorian day, as the
+  Wikidata Query Service (which discovery reads) gives it, so the two above are no longer reported; a coarser Julian value is kept as written,
+  as WDQS keeps it (`scripts/lib/wd-entities.js` `wikidataDate`; see `docs/DATA_POLICY.md`, `date_start`).
+- Stale fixes (since 2026-11-03): a ledger fix still applies whatever Wikidata says, but the report lists it under **"Fix ledger entries to
+  recheck"** when Wikidata no longer gives what the fix was written against (`scripts/lib/drift.js` `staleFixes`; dates, `date_precision`
+  and coordinates only). A ledger entry may record that value in an optional `from` (`{ field: value }`, as the pipeline stores it, `null`
+  = Wikidata had none), taken from its note; entries with one: F2, F5, F6, F7, F14, F15. With `from`, the fix is listed when Wikidata no longer
+  gives that value: "may no longer be needed" when Wikidata now gives the fixed value itself, else "Wikidata changed since the fix". Without
+  it (the fixed value is the item's own, as in F1, F8, F10, F11, F13), it is listed when Wikidata gives a value for the field and the fixed
+  value is none of the item's values. A difference on a listed fix's field is shown as drift, not counted as explained. Add `from` to a new
+  fix that overrides a Wikidata value. On 2026-11-03 no ledger entry was listed.

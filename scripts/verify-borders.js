@@ -16,7 +16,8 @@
 // line, the Wikidata coordinate, or both are off - each listed point links to Wikidata.
 // Points bulk-imported from one border-crossings dataset ("bulk") sit exactly on a border
 // line, often CShapes' own, so they are shown but not counted as independent evidence.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import * as turf from "@turf/turf";
 import { baselineYears } from "./lib/boundary-checks.js";
 
@@ -36,7 +37,7 @@ export const BANDS = [
 const read = async (p) => JSON.parse(await readFile(new URL(p, import.meta.url), "utf-8"));
 
 // A shape we changed or added (not plain CShapes): the borders that most need checking.
-export const isModified = (f) => /Not in CShapes|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
+export const isModified = (f) => /Not in CShapes|Not a CShapes record|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
 
 // Distance (km) from a point to a polygon's outline, for Polygon and MultiPolygon alike.
 function distanceToEdge(pt, feature) {
@@ -125,7 +126,7 @@ async function main() {
       measureYear(points.filter((p) => !p.bulk), all, y, measureAt).map((r) => [r.id, Number.isFinite(r.km) ? Number(r.km.toFixed(3)) : null])
     )]));
     if (writing) {
-      await writeFile(baselineUrl, JSON.stringify({ tolerance_km: TOLERANCE_KM, years: now }, null, 2) + "\n");
+      await writeFileAtomic(baselineUrl, JSON.stringify({ tolerance_km: TOLERANCE_KM, years: now }, null, 2) + "\n");
       console.log(`Wrote data/border-check-baseline.json (${BASELINE_YEARS.join(", ")})`);
       return;
     }
@@ -188,7 +189,7 @@ async function main() {
     ...rows.filter((r) => r.bulk).sort((a, b) => b.km - a.km).map(fmt),
     "",
   ];
-  if (REPORT) await writeFile(REPORT, lines.join("\n"));
+  if (REPORT) await writeFileAtomic(REPORT, lines.join("\n"));
   console.log(`year ${YEAR}: independent points (${indep.length}) - ${tally(indep)}`);
   console.log(`  on changed/added borders (${modified.length}) - ${tally(modified)}`);
   for (const r of modified.sort((a, b) => b.km - a.km).slice(0, 15)) console.log(`  ${Number.isFinite(r.km) ? r.km.toFixed(2) : "-"} km  ${r.label} (${r.id})  [${r.between.join(" / ")}]`);

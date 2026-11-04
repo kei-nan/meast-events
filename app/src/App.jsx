@@ -171,10 +171,33 @@ export default function App() {
   const [sort, setSort] = useState(initial.sort); // browse list order, lib/browseOrder.js SORTS ("coverage" = default)
   const [view, setView] = useState(initial.view); // results panel: "list" | "timeline" (lib/timelineView.js)
   const [aboutSection, setAboutSection] = useState(null); // "credits": the dialog opens at its credits
+  // Close and Escape close the native <dialog>, which puts focus back on what
+  // opened it. Back (handleNavigate) unmounts it without close(), so focus would
+  // fall to <body>: what opened it is kept here and given focus back then.
+  const aboutOpenerRef = useRef(null);
+  const noteAboutOpener = () => {
+    const active = document.activeElement;
+    if (active?.closest?.(".about-dialog")) return; // already open: keep the first opener
+    aboutOpenerRef.current = active && active !== document.body ? active : null;
+  };
   const openAbout = useCallback((section) => {
+    noteAboutOpener();
     setAboutSection(section);
     setAbout(true);
   }, []);
+  const aboutWasOpenRef = useRef(about);
+  useEffect(() => {
+    if (about) {
+      aboutWasOpenRef.current = true;
+      return;
+    }
+    if (!aboutWasOpenRef.current) return;
+    aboutWasOpenRef.current = false;
+    const opener = aboutOpenerRef.current;
+    aboutOpenerRef.current = null;
+    const active = document.activeElement;
+    if ((!active || active === document.body) && opener?.isConnected) opener.focus({ preventScroll: true });
+  }, [about]);
 
   // The map mounts (and its downloads start) after the first paint; see
   // startMapDownloads. On a link known to be fast (lib/landStore.js
@@ -396,8 +419,8 @@ export default function App() {
   // search results in the chosen scope. ResultsList renders 50 rows at a time
   // ("Show more"), so the whole list stays reachable.
   const browseList = useMemo(
-    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, startYear, sort)) : null),
-    [search.status, inViewFilter, visibleEvents, startYear, sort]
+    () => (search.status === "idle" ? inViewFilter(orderBrowseList(visibleEvents, [startYear, endYear], sort)) : null),
+    [search.status, inViewFilter, visibleEvents, startYear, endYear, sort]
   );
   // Memoized (like range below) so a hover re-render of App passes the memoized
   // ResultsList the same props and it skips rendering.
@@ -458,6 +481,7 @@ export default function App() {
     setNotFoundId(null);
     setSelectedEventId(parsed.eventId);
     setAboutSection(null);
+    if (parsed.about) noteAboutOpener(); // Forward onto an About entry
     setAbout(parsed.about);
     setSort(parsed.sort);
     setView(parsed.view);

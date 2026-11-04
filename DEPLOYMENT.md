@@ -176,13 +176,19 @@ or dispatched run (`workflow_dispatch`: the monthly refresh starts it on its pul
 branch, [below](#ci-on-the-refresh-pull-request)). It deploys
 nothing. Its jobs (the names GitHub shows as status checks):
 
-- **Build app/** - lints `app/` (oxlint), runs its unit tests (`npm test`), checks that
-  `.nvmrc` and `app/.nvmrc` agree, and runs `npm run build`, i.e. the same build
-  Cloudflare runs, with all the checks above.
+- **Build app/** - lints `app/` (oxlint, `npm run lint`; warnings fail), runs its unit tests
+  (`npm test`), checks that `.nvmrc` and `app/.nvmrc` agree, runs `npm run build`, i.e. the
+  same build Cloudflare runs, with all the checks above, and then smoke-tests the built site
+  (`npm run smoke`, `scripts/smoke.mjs`: it serves `dist/` under its production headers with
+  `wrangler dev` and checks in an installed Chrome or Edge that the map draws, search answers, an event and the
+  About dialog open, `/event/<id>` loads, and nothing logs an error or a CSP violation;
+  Cloudflare does not run it).
 - **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
-  (`node scripts/validate-events.js`), runs the data-pipeline tests (`npm test` at the
+  (`node scripts/validate-events.js`), checks that the generated reports are current
+  (`node scripts/build-missing-coordinates-report.js --check` and
+  `node scripts/build-selection-funnel.js --check`), runs the data-pipeline tests (`npm test` at the
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
-  plugin, `.oxlintrc.json`; `import/named` is an error, other findings are warnings),
+  plugin, `.oxlintrc.json`; `import/named` is an error, and warnings fail too),
   validates `data/boundaries.json` (`npm run validate-boundaries`; it also fails if a shape
   has fewer vertices or coarser coordinates than in `data/border-geometry-baseline.json`)
   and runs the border check (`node scripts/verify-borders.js --check`, every border period).
@@ -191,8 +197,9 @@ nothing. Its jobs (the names GitHub shows as status checks):
 
 The data pipeline lives in `scripts/` (ingestion, the cited border corrections, the
 proposed-events flow: pipeline output goes to `data/events.proposed.json` plus a report,
-and `data/events.json` changes only through `node scripts/merge-proposed.js`). See
-[docs/DATA_POLICY.md](docs/DATA_POLICY.md).
+and `data/events.json` changes only through `node scripts/merge-proposed.js`, the monthly
+refresh and a few backfills, each only with `--apply`). See
+[docs/DATA_POLICY.md](docs/DATA_POLICY.md), "Pipeline and workflow".
 
 ### Monthly refresh of the Wikipedia summaries
 
@@ -205,6 +212,8 @@ the Actions tab). It:
   are not changed but listed in the PR description for review;
 - refreshes the Wikidata sitelink counts behind the default "most covered" order, and
   the items' English Wikidata aliases (`wikidata_aliases`), which the search also matches;
+  an event whose Wikidata item now redirects to another (a merged item) is skipped, nothing
+  changed, and listed in a WARNING line of the refresh report for review;
 - checks whether the Wikipedia guideline sections the framing review's wording check
   cites were edited since the reviews (recorded in `data/framing-review.json`, with the
   diff at the top of the PR description; if the check cannot run, the PR says so).

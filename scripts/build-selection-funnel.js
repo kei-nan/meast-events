@@ -79,8 +79,12 @@ const excludedIds = new Set(exclusions.map((x) => x.id));
 const noEn = candidates.filter((c) => !c.has_en_wikipedia);
 const lt10 = candidates.filter((c) => c.has_en_wikipedia && c.sitelinks < MIN);
 const pass = candidates.filter((c) => c.has_en_wikipedia && c.sitelinks >= MIN);
-const passAlready = pass.filter((c) => c.already_curated);
 const curatedQids = new Set(curated.map((e) => e.wikidata_qid));
+// Passing candidates that were not enriched because they are curated: checked against data/events.json QIDs (as
+// enrich-candidates.js selects, lib/enrich-run.js withoutCurated), not the candidate's stored already_curated flag,
+// which discover-events.js --predecessors-only never refreshes. Not in enriched-candidates.json, so the enrichment
+// stage's count (enriched + these) does not count an event merged after its enrichment twice.
+const passAlready = pass.filter((c) => curatedQids.has(c.wikidata_qid) && !enrichedByQid.has(c.wikidata_qid));
 const seedCount = curated.filter((e) => e.sitelinks === undefined).length; // legacy curated events carry no discovery sitelinks
 const candQids = new Set(candidates.map((c) => c.wikidata_qid));
 const seedFound = curated.filter((e) => e.sitelinks === undefined && candQids.has(e.wikidata_qid)).length;

@@ -14,7 +14,42 @@ const times = (cl) =>
   notDeprecated(cl)
     .map((c) => c.mainsnak?.datavalue?.value)
     .filter((v) => v?.time)
-    .map((v) => ({ time: v.time.replace(/^\+/, "").slice(0, 10), precision: v.precision }));
+    .map((v) => ({ time: wikidataDate(v), precision: v.precision }));
+
+// A time value's `calendarmodel` for the proleptic Julian calendar (Gregorian is Q1985727).
+export const JULIAN = "http://www.wikidata.org/entity/Q1985786";
+
+// A proleptic Julian calendar date (year >= 1) as the proleptic Gregorian date of the same day, "YYYY-MM-DD"; null
+// for a day the Julian calendar does not have (1900-02-30). Through the Julian Day Number: the Julian-calendar JDN
+// formula, then JavaScript's proleptic Gregorian Date counted from the Unix epoch (JDN 2440588).
+export function julianToGregorian(year, month, day) {
+  if (!(Number.isInteger(year) && year >= 1 && month >= 1 && month <= 12 && day >= 1)) return null;
+  const dim = [31, year % 4 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+  if (day > dim) return null;
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12 * a - 3;
+  const jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - 32083;
+  const d = new Date((jdn - 2440588) * 86400000);
+  const pad = (n, w) => String(n).padStart(w, "0");
+  return `${pad(d.getUTCFullYear(), 4)}-${pad(d.getUTCMonth() + 1, 2)}-${pad(d.getUTCDate(), 2)}`;
+}
+
+// A Wikidata time value ({ time: "+1914-07-20T00:00:00Z", precision, calendarmodel }) as the pipeline's date
+// "YYYY-MM-DD" ("-00" kept in a coarse value, e.g. "1940-00-00"), in the Gregorian calendar the way the Wikidata Query
+// Service gives it (discovery reads its dates there). A Julian value (calendarmodel Q1985786) of day or finer
+// precision becomes the Gregorian day (german-ottoman-alliance, Q261982: P585 1914-07-20 Julian = 1914-08-02). A
+// Julian value less precise than a day is kept as written, as WDQS keeps it: Wikibase's RDF export
+// (repo/includes/Rdf/JulianDateTimeValueCleaner.php, getStandardValue) converts only when
+// `getPrecision() >= TimeValue::PRECISION_DAY` - "If we are less precise than a day, no point to convert Julian to
+// Gregorian since we don't have enough information to do it anyway". A Julian day that cannot be converted here (a
+// BCE year, or no such day) is kept as written too. Gregorian values are unchanged.
+export function wikidataDate(v) {
+  const date = String(v?.time ?? "").replace(/^\+/, "").slice(0, 10);
+  if (v?.calendarmodel !== JULIAN || !(v.precision >= 11)) return date;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  return (m && julianToGregorian(Number(m[1]), Number(m[2]), Number(m[3]))) || date;
+}
 
 // How the item states its end time (P582) when it gives no date for it: "novalue" (Wikidata's "no value")
 // or "somevalue" ("unknown value"), from its non-deprecated P582 statements in Wikidata's order; null when
@@ -139,4 +174,39 @@ export function setDateEndOpen(ev, open) {
   if (open && !ev.date_end) ev.date_end_open = `wikidata_${open}`;
   else delete ev.date_end_open;
   return (ev.date_end_open ?? null) !== before;
+}
+
+// scripts/refresh-sitelinks.js: refreshes sitelinks_current (unless aliasesOnly), wikidata_aliases and date_end_open
+// on each event from its fetchEntities record, in place. An event whose item was not returned is left as it is
+// (missing); so is one whose item now redirects to another (redirected: a merged QID would otherwise silently take
+// the target item's sitelinks and aliases). `log` gets one line per change.
+export function refreshFromEntities(events, entities, { aliasesOnly = false, log = () => {} } = {}) {
+  const out = { changed: 0, aliasesChanged: 0, openChanged: 0, missing: [], redirected: [] };
+  for (const e of events) {
+    const rec = entities.get(e.wikidata_qid);
+    if (!rec) {
+      out.missing.push(`${e.id} (${e.wikidata_qid ?? "no QID"})`);
+      continue;
+    }
+    if (rec.redirected) {
+      out.redirected.push(`${e.id} (${e.wikidata_qid} -> ${rec.qid})`);
+      continue;
+    }
+    if (!aliasesOnly && e.sitelinks_current !== rec.sitelinks_all) {
+      log(`${e.id}: ${e.sitelinks_current ?? "-"} -> ${rec.sitelinks_all}`);
+      e.sitelinks_current = rec.sitelinks_all;
+      out.changed++;
+    }
+    const before = e.wikidata_aliases;
+    if (setWikidataAliases(e, rec.aliases)) {
+      log(`${e.id}: aliases ${JSON.stringify(before ?? [])} -> ${JSON.stringify(e.wikidata_aliases ?? [])}`);
+      out.aliasesChanged++;
+    }
+    const openBefore = e.date_end_open;
+    if (setDateEndOpen(e, rec.p582_open)) {
+      log(`${e.id}: date_end_open ${openBefore ?? "-"} -> ${e.date_end_open ?? "-"}`);
+      out.openChanged++;
+    }
+  }
+  return out;
 }

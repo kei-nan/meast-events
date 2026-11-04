@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { boundedRunError, reuseRecord, fetchErrors, candidateFields, setReason, FETCH_ERROR } from "./enrich-run.js";
+import { boundedRunError, reuseRecord, fetchErrors, candidateFields, setReason, withoutCurated, FETCH_ERROR } from "./enrich-run.js";
 
 test("boundedRunError: a bounded run needs --keep-existing or --out-suffix; a full run may write", () => {
   assert.equal(boundedRunError({}), null);
@@ -72,4 +72,16 @@ test("fetchErrors / candidateFields / setReason", () => {
   setReason(list, "b", null);
   setReason(list, "c", "c: 4");
   assert.deepEqual(list, ["a: 3", "c: 4"]);
+});
+
+test("withoutCurated: curated QIDs are left out whatever the stale already_curated flag says", () => {
+  const curated = [{ id: "a", wikidata_qid: "Q1" }, { id: "no-qid" }];
+  const candidates = [
+    { wikidata_qid: "Q1", already_curated: false }, // stale: merged after discovery
+    { wikidata_qid: "Q2", already_curated: false },
+    { wikidata_qid: "Q3", already_curated: true }, // stale the other way: not in the curated file (any more)
+  ];
+  assert.deepEqual(withoutCurated(candidates, curated).map((c) => c.wikidata_qid), ["Q2", "Q3"]);
+  assert.deepEqual(withoutCurated(candidates, []).length, 3);
+  assert.deepEqual(withoutCurated(null, curated), []);
 });

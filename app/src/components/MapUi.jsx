@@ -349,6 +349,10 @@ export function BoundaryPopup({ popup, onClose, width, height, onPlaceHistory })
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+  // Move focus into the card, as ClusterList does; Escape or × puts it back (MapView closePopup).
+  useEffect(() => {
+    ref.current?.focus({ preventScroll: true });
+  }, [popup]);
   const cardW = Math.min(320, Math.max(0, width - 16));
   const left = Math.max(8, Math.min(popup.point[0] + 12, width - cardW - 8));
   // On phones the results sheet overlaps the bottom of the map, as far as the
@@ -360,6 +364,7 @@ export function BoundaryPopup({ popup, onClose, width, height, onPlaceHistory })
   return (
     <div
       ref={ref}
+      tabIndex={-1}
       className="mu-popup"
       role="dialog"
       aria-label="Border details"
@@ -546,12 +551,11 @@ function LegendContent({ categories }) {
       <ul>
         <li>
           <span className="mu-swatch-line is-solid" aria-hidden="true" />
-          Solid: source-dated border (CShapes geometry)
+          Solid: a border with no status flag (CShapes, or a correction that cites its source)
         </li>
         <li>
           <span className="mu-swatch-line is-flagged" aria-hidden="true" />
-          Dashed: status-flagged (mandate, occupation, annexation or dispute). {capitalise(pointerVerb())} it for
-          details.
+          Dashed: a shape with a status flag (About lists them). {capitalise(pointerVerb())} it to see which.
         </li>
       </ul>
       <h3>Events (category is our grouping)</h3>

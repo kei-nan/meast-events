@@ -5,6 +5,7 @@ import {
   CSHAPES_URL,
   NO_JS_STYLESHEET,
   OCHA_AREAS_URL,
+  GEONAMES_URL,
   SHELL_MARKERS,
   escapeHtml,
   fillAppShell,
@@ -36,14 +37,15 @@ const page = (event) => renderEventPage(event, TEMPLATE);
 const BORDER_CREDITS = [
   { name: "CShapes", used: /CShapes 2\.0/, credit: ["CShapes 2.0", CSHAPES_URL] },
   { name: "UN OCHA", used: /UN OCHA|OCHA's|data\.humdata\.org/, credit: ["UN OCHA", OCHA_AREAS_URL] },
+  { name: "GeoNames", used: /GeoNames|geonames\.org/, credit: ["GeoNames", GEONAMES_URL] },
 ];
 
 test("every border source family in boundaries.json is credited on event pages and in the About dialog", () => {
   const boundaries = JSON.parse(fs.readFileSync(new URL("../../data/boundaries.json", import.meta.url), "utf8"));
   const sources = boundaries.features.map((f) => String(f.properties?.source ?? ""));
   const used = BORDER_CREDITS.filter((family) => sources.some((s) => family.used.test(s)));
-  // Both are in the data today; if one disappears, update the list rather than pass vacuously.
-  assert.deepEqual(used.map((f) => f.name), ["CShapes", "UN OCHA"]);
+  // All are in the data today; if one disappears, update the list rather than pass vacuously.
+  assert.deepEqual(used.map((f) => f.name), ["CShapes", "UN OCHA", "GeoNames"]);
   // The OCHA link credited is the dataset the features name.
   assert.ok(sources.some((s) => s.includes(OCHA_AREAS_URL)), "OCHA dataset URL matches boundaries.json");
 
@@ -256,6 +258,7 @@ test("only an end before the start gets a date note, in plain language", () => {
     date_start: "2002-03-27",
     date_end: "2002-01-01",
     date_precision: "day",
+    date_end_precision: "day",
     date_flags: ["date_order_invalid: x", "wikipedia_dates_note: y"],
     wikipedia_lead_dates: ["2002-03-27"],
   });

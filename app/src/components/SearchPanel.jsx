@@ -14,7 +14,8 @@ import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { effectiveQuery } from "../lib/ranking.js";
 import { eventIdQuery } from "../lib/urlState.js";
-import { timelineOrder } from "../lib/timelineView.js";
+import { timelineAxis, timelineOrder } from "../lib/timelineView.js";
+import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
 import useSheetDrag from "../hooks/useSheetDrag";
@@ -514,7 +515,9 @@ export default function SearchPanel({
     }
     setDownloadFailed(false);
     const { downloadText, exportFileRange, exportFilename, exportQuery, exportRows, toCSV, toJSON } = lib;
-    const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0]) : results;
+    // The Timeline's axis as ResultsList draws it (fitAxis below), for where a reversed record is placed.
+    const axis = timelineAxis(results, range, { fit: searching && filters.scope !== "range", minYear: MIN_YEAR, maxYear: MAX_YEAR });
+    const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0], axis) : results;
     const rows = exportRows(ordered, { range, browse: !searching });
     const name = exportFilename(exportFileRange(range, { searching, scope: filters.scope }), rows.length, kind);
     if (kind === "csv") downloadText(toCSV(rows), name, "text/csv;charset=utf-8");
