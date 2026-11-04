@@ -17,7 +17,9 @@
 //   - Re-derived date-order flags (lib/order-flags.js): a curated event that is also in the proposed file (same id and
 //     QID, same dates and extract) takes the proposed record's date_order_invalid / date_end_precision_coarse /
 //     wikipedia_dates_note flags and wikipedia_lead_dates, so a pipeline fix to those flags reaches the curated record.
-//     Nothing else of the curated record changes.
+//     Nothing else of the curated record changes. Since 2026-11-03 curated events are not re-proposed
+//     (enrich-candidates.js, lib/enrich-run.js withoutCurated), so this finds nothing to copy unless a proposed file
+//     written before then is merged; kept for that case.
 import { readFile } from "node:fs/promises";
 import { readJsonIfExists, writeFileAtomic } from "./lib/files.js";
 import { pathToFileURL } from "node:url";
@@ -71,7 +73,9 @@ if (SKIP_DUP) incoming = incoming.filter((e) => !e.possible_duplicates?.length);
 
 // Also guard QID clashes within the incoming set against curated after id filtering.
 const merged = [...curated, ...incoming];
-const mv = validateEvents(merged, { name: "merged", lenient: true });
+// Strict, like the proposed file: what is written to data/events.json must pass every rule, not the curated-mode
+// leniency (missing wikidata_qid, null coordinates with a location_quality other than "none" as warnings).
+const mv = validateEvents(merged, { name: "merged" });
 if (mv.errors.length) {
   console.error(`Merged result would be invalid (${mv.errors.length} violation(s)); refusing:`);
   for (const e of mv.errors.slice(0, 20)) console.error("  " + e);

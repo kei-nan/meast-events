@@ -53,8 +53,8 @@
 // written to the output file (with `notable_enough: false`) rather than silently
 // dropped, so a human reviewer can override the cutoff by eye rather than trust it
 // blindly.
-import { readFile, writeFile } from "node:fs/promises";
-import { readJsonIfExists } from "./lib/files.js";
+import { readFile } from "node:fs/promises";
+import { readJsonIfExists, writeFileAtomic } from "./lib/files.js";
 import { sleep } from "./lib/http.js";
 import { runSparql, qidFromUri, compareQids } from "./lib/wdqs.js";
 import {
@@ -452,7 +452,7 @@ async function main() {
     all.splice(0, all.length, ...kept);
   } else all.sort(bySitelinks);
 
-  await writeFile(outPath, JSON.stringify(all, null, 2));
+  await writeFileAtomic(outPath, JSON.stringify(all, null, 2));
 
   const noEnwiki = all.filter((c) => !c.has_en_wikipedia).length;
   const passed = all.filter((c) => c.notable_enough);

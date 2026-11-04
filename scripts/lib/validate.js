@@ -93,6 +93,23 @@ export const MANY_COUNTRIES_WARN = 8;
 const ENGLISH_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
 
 const ISO_DAY_RE = /^\d{4}-\d{2}-\d{2}/;
+
+// Inclusion rule 2: a tag is one of the tracked countries/territories, or "regional" (hand-assigned to a few
+// legacy events that concern the whole region).
+export const isKnownCountry = (c) => Object.hasOwn(COUNTRIES, c) || c === "regional";
+
+/**
+ * Why `date` (YYYY-MM-DD) cannot be a date of Wikidata precision `name`, or null when it fits (or cannot be
+ * checked: no date, no or an unknown precision, day or finer). Month precision is stored as the month's first day,
+ * year and coarser as 1 January (the period's first day, as WDQS returns such values).
+ */
+export function precisionShapeProblem(date, name) {
+  const code = precisionCode(name);
+  const m = DATE_RE.exec(String(date ?? ""));
+  if (code === null || code >= 11 || !m) return null;
+  if (code === 10) return m[3] === "01" ? null : "a month-precision date is stored as the month's first day (YYYY-MM-01)";
+  return m[2] === "01" && m[3] === "01" ? null : `a ${name}-precision date is stored as 1 January (YYYY-01-01)`;
+}
 const todayUtc = () => new Date().toISOString().slice(0, 10);
 
 // Index of data/boundaries.json features by name, with bounding boxes, for pinCountryCheck.
@@ -182,8 +199,8 @@ export function isRealDate(s, maxYear = MAX_YEAR) {
   return d <= dim;
 }
 
-// opts.lenient: curated data.events.json may hold events that still
-// need manual coordinates (reported as warnings, not errors). The proposed file may not.
+// opts.lenient: events that still need manual coordinates or a QID are reported as warnings, not errors. No script
+// uses it since 2026-11-03: data/events.json passes strictly, and validate-events.js / merge-proposed.js validate strictly.
 //
 // KNOWN_DUPLICATE_QIDS: pre-existing duplicates in curated data awaiting the user's
 // decision (we never edit curated data automatically). Downgraded to warnings in lenient
@@ -267,8 +284,12 @@ export function validateEvents(
 
     if (!Array.isArray(e.countries) || e.countries.length === 0 || e.countries.some((c) => typeof c !== "string" || !c)) {
       err(i, e, "countries must be a non-empty array of strings");
-    } else if (!e.countries.some((c) => c in COUNTRIES || c === "regional")) {
+    } else if (!e.countries.some(isKnownCountry)) {
       err(i, e, `no tracked country (inclusion rule 2): ${e.countries.join(", ")}`);
+    } else if (!e.countries.every(isKnownCountry)) {
+      // Every tag must be a tracked country (or "regional"): one tracked name next to a misspelt or untracked one
+      // (["Iraq", "Isreal"]) is a typo, not an event in two countries; the app has no shape for the other name.
+      err(i, e, `unknown country ${e.countries.filter((c) => !isKnownCountry(c)).map((c) => JSON.stringify(c)).join(", ")} (each tag must be a tracked country or "regional")`);
     }
     if (typeof e.category !== "string" || !e.category) err(i, e, "category missing");
     else if (!CATEGORIES.includes(e.category)) err(i, e, `category must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category)})`);
@@ -318,7 +339,10 @@ export function validateEvents(
       err(i, e, "wikipedia_revid and wikipedia_revid_timestamp must be present together or not at all");
     }
     if ("category_label" in e) err(i, e, "category_label is deprecated and must not be present");
-    if (e.location_quality != null && !LOCATION_QUALITIES.includes(e.location_quality)) {
+    if (e.location_quality == null) {
+      // Required (shape v2.1): without it the coordinate checks below cannot tell "no known location" from a pin.
+      err(i, e, `location_quality missing (one of ${LOCATION_QUALITIES.join("|")})`);
+    } else if (!LOCATION_QUALITIES.includes(e.location_quality)) {
       err(i, e, `location_quality must be one of ${LOCATION_QUALITIES.join("|")} (got ${JSON.stringify(e.location_quality)})`);
     }
 
@@ -365,11 +389,21 @@ export function validateEvents(
       }
     }
 
-    if (e.wikipedia_url != null && !/^https:\/\/[a-z-]+\.wikipedia\.org\/wiki\//.test(e.wikipedia_url)) {
+    // Inclusion rule 4 (docs/DATA_POLICY.md) and the extract both need the English article: required, and English.
+    if (typeof e.wikipedia_url !== "string" || !e.wikipedia_url) {
+      err(i, e, "wikipedia_url missing (inclusion rule 4 needs an English Wikipedia article)");
+    } else if (!/^https:\/\/[a-z-]+\.wikipedia\.org\/wiki\//.test(e.wikipedia_url)) {
       err(i, e, `wikipedia_url not a Wikipedia article URL (${e.wikipedia_url})`);
-    } else if (e.wikipedia_url != null && !e.wikipedia_url.startsWith(ENGLISH_WIKIPEDIA)) {
-      // Inclusion rule 4 and the extract both need the English article.
-      warn(i, e, `wikipedia_url is not an English Wikipedia article (${e.wikipedia_url}); inclusion rule 4 needs one`);
+    } else if (!e.wikipedia_url.startsWith(ENGLISH_WIKIPEDIA)) {
+      err(i, e, `wikipedia_url is not an English Wikipedia article (${e.wikipedia_url}); inclusion rule 4 needs one`);
+    }
+
+    // A date stored at a precision coarser than a day is the period's first day, as Wikidata/WDQS writes it
+    // (month: YYYY-MM-01; year and coarser: YYYY-01-01). Any other day means the date and its precision disagree
+    // (a ledger date kept with the discovery precision, or a hand edit): the app would show the wrong period.
+    for (const [field, pField] of [["date_start", "date_precision"], ["date_end", "date_end_precision"]]) {
+      const shape = precisionShapeProblem(e[field], e[pField]);
+      if (shape) err(i, e, `${field} ${e[field]} does not fit ${pField} ${JSON.stringify(e[pField])}: ${shape}`);
     }
 
     // Discovered events (they carry `sitelinks`, the count discovery saw) met inclusion rule 4 when found. The
