@@ -38,5 +38,594 @@
     "extract_retrieved_at": "2026-10-14",
     "needs_review": true,
     "wikidata_description": "Kurdish uprising against the Turkish National Movement"
+  },
+  {
+    "id": "tantura-massacre",
+    "title": "Tantura massacre",
+    "date_start": "1948-05-23",
+    "date_end": null,
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "atrocity",
+    "category_group": "atrocity",
+    "wikidata_classes": [
+      "massacre",
+      "mass murder"
+    ],
+    "retrieved_at": "2026-11-04T22:06:02.123Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q5732680",
+    "resolved_qid": "Q5732680",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Tantura_massacre",
+    "extract": "The Tantura massacre took place on 22–23 May 1948 during the 1948 Palestine war, when Palestinian villagers were massacred by Israel's Haganah (a precursor to the Israel Defense Forces), namely the Alexandroni Brigade. The massacre occurred after the surrender of the village of Tantura, a small village of roughly 1,500 located near Haifa. The number of those killed is unknown, with estimates ranging from \"dozens\" to 200+.\n\nAfter the massacre, most of the village was destroyed and its residents were expelled, forming a part of the broader expulsion of Palestinians during the 1948 war and the Nakba. Many of the women and children were transported to the nearby town of Furaydis. The Israeli kibbutz and beach resort of Nahsholim was established on the site of the depopulated village. The victims were buried in mass graves, one of them presently beneath a parking lot for the nearby Tel Dor beach.\n\nInitially, there were few reports of the massacre and oral testimonies by surviving Palestinians were met by skepticism by some historians. A 1998 thesis by an Israeli Haifa University graduate who interviewed Israeli veterans and survivors, brought international attention to the massacre and caused an academic debate and controversy. The Israeli New Historians, most prominently Ilan Pappe, affirmed that a massacre had taken place. In a 2022 Israeli documentary film called Tantura, several Israeli veterans interviewed said they had witnessed a massacre at Tantura after the village had surrendered. In 2023, Forensic Architecture published its commissioned investigation of the area and concluded that there were three potential gravesites in the area of the Tel Dor beach that were connected to a massacre.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q13220089",
+        "label": "1948 Palestinian exodus"
+      },
+      {
+        "qid": "Q2379101",
+        "label": "1947–1948 Civil War in Mandatory Palestine"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"1948 Palestinian exodus\" (Q13220089); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"1947–1948 Civil War in Mandatory Palestine\" (Q2379101); it may overlap with that larger event",
+      "lead_start_day_differs: date_start 1948-05-23 is not named in the first sentence of the Wikipedia lead, which names 1948-05-22; the stored date is kept as the source gives it"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": true,
+    "wikidata_description": "1948 IDF killing of Palestinian civilians"
+  },
+  {
+    "id": "operation-damocles",
+    "title": "Operation Damocles",
+    "date_start": "1960-01-01",
+    "date_end": null,
+    "countries": [
+      "Egypt",
+      "Israel/Palestine"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "covert operation",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:52.525Z",
+    "sitelinks": 11,
+    "wikidata_qid": "Q3487302",
+    "resolved_qid": "Q3487302",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Damocles",
+    "extract": "Operation Damocles was a covert campaign of the Israeli intelligence agency, Mossad in August 1962 which targeted German scientists and technicians, formerly employed in Nazi Germany's rocket program, who were developing rockets for Egypt at a military site known as Factory 333. According to Otto Joklik, an Austrian scientist involved with the project, the rockets being developed were programmed to use radioactive waste.\n\nThe chief tactics were letter bombs and abduction. In March 1963, Israeli Prime Minister David Ben-Gurion demanded the resignation of then chief of Mossad, Isser Harel, over the operation, which effectively ended it. The operation and diplomatic pressure had driven the scientists out of Egypt by the end of 1963.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "decade",
+    "part_of": [],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "category_year_mismatch: Wikipedia year categories mention [1962, 1963] but none is within 1 year of 1960",
+      "date_precision_coarse: Wikidata records the date only to decade precision"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "date_flags": [
+      "date_start_year_not_in_lead: start year 1960 (1960-01-01) is not within 1 year of any year in the Wikipedia lead [1962, 1963]"
+    ],
+    "needs_review": true,
+    "wikidata_description": "Israeli covert operation in Egypt"
+  },
+  {
+    "id": "mossad-assassinations-following-the-munich-massacre",
+    "title": "Mossad assassinations following the Munich massacre",
+    "date_start": "1972-01-01",
+    "date_end": "1973-01-01",
+    "countries": [
+      "Bahrain",
+      "Egypt",
+      "Iran",
+      "Iraq",
+      "Israel/Palestine",
+      "Jordan",
+      "Kuwait",
+      "Lebanon",
+      "Oman",
+      "Qatar",
+      "Saudi Arabia",
+      "Syria",
+      "Turkey",
+      "UAE",
+      "Yemen"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "covert operation",
+      "revenge",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:44.411Z",
+    "sitelinks": 27,
+    "wikidata_qid": "Q27851",
+    "resolved_qid": "Q27851",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Mossad_assassinations_following_the_Munich_massacre",
+    "extract": "Operation Bayonet (also nicknamed Operation Wrath of God) was a covert operation directed by Mossad to assassinate individuals they accused of being involved in the 1972 Munich massacre. The targets were members of the Palestinian armed militant group Black September and operatives of the Palestine Liberation Organisation (PLO). Authorised by Israeli Prime Minister Golda Meir in the autumn of 1972, the operation is believed to have continued for over twenty years. While Mossad killed several prominent Palestinians during the operation, they never managed to kill the mastermind behind Munich, namely Abu Daoud.\n\nThe operation was depicted in the television film Sword of Gideon (1986) and Steven Spielberg's film Munich (2005).",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "decade",
+    "part_of": [],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "many_countries: 15 countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)",
+      "date_precision_coarse: Wikidata records the date only to decade precision"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1972-00-00 is only decade-or-coarser precision; used P580 start time 1972-00-00"
+    ],
+    "needs_review": true,
+    "date_end_precision": "year",
+    "wikidata_description": "covert operation"
+  },
+  {
+    "id": "savoy-hotel-attack",
+    "title": "Savoy Hotel attack",
+    "date_start": "1975-03-06",
+    "date_end": "1975-03-05",
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "terrorism",
+    "category_group": "terrorism",
+    "wikidata_classes": [
+      "terrorist attack"
+    ],
+    "retrieved_at": "2026-11-04T22:05:56.536Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q2468376",
+    "resolved_qid": "Q2468376",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Savoy_Hotel_attack",
+    "extract": "The Savoy Hotel attack was a terrorist attack by the Palestine Liberation Organization against the Savoy Hotel in Tel Aviv, Israel, on 5–6 March 1975.",
+    "coordinates": {
+      "lat": 32.0725,
+      "lon": 34.76583333
+    },
+    "coordinate_source": "wikipedia",
+    "location_quality": "precise",
+    "needs_manual_coordinates": false,
+    "date_precision": "day",
+    "part_of": [],
+    "possible_duplicates": [],
+    "review_reasons": [],
+    "extract_retrieved_at": "2026-11-04",
+    "wikipedia_lead_dates": [
+      "1975-03-06"
+    ],
+    "date_flags": [
+      "date_order_invalid: Wikidata start (1975-03-06) is after end (1975-03-05); shown as Wikidata gives them",
+      "wikipedia_dates_note: Wikipedia lead mentions 6 March 1975; Wikidata gives 1975-03-06 to 1975-03-05"
+    ],
+    "needs_review": true,
+    "date_end_precision": "day",
+    "wikidata_description": "PLO attack"
+  },
+  {
+    "id": "operation-samen-ol-aemeh",
+    "title": "Operation Samen-ol-A'emeh",
+    "date_start": "1981-09-27",
+    "date_end": "1981-09-29",
+    "countries": [
+      "Iran"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:58.656Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q2835454",
+    "resolved_qid": "Q2835454",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Samen-ol-A'emeh",
+    "extract": "Operation Samen-ol-A'emeh (Persian: عملیات ثامن‌الائمه, lit. 'Operation Eighth Imam') was an Iranian offensive and operation in the Iran–Iraq War between 27–29 September 1981 where Iran broke the Iraqi Siege of Abadan. The operation was carried out by the Iranian army joined by the Islamic Revolutionary Guard Corps.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q82664",
+        "label": "Iran–Iraq War"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Iraq War\" (Q82664); it may overlap with that larger event"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": true,
+    "date_end_precision": "day",
+    "wikidata_description": "1981 military operation"
+  },
+  {
+    "id": "operation-dawn-5",
+    "title": "Operation Dawn 5",
+    "date_start": "1984-01-01",
+    "date_end": null,
+    "countries": [
+      "Iraq"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "military operation",
+      "battle",
+      "armed conflict"
+    ],
+    "retrieved_at": "2026-11-04T22:05:54.841Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q1859354",
+    "resolved_qid": "Q1859354",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Dawn_5",
+    "extract": "As 1984 began, Iran launched the largest offensive up to that date Operation Dawn V, also known as Operation Dawn 5 or Operation Valfajr-5 (Persian). The goal of the offensive was to split the Iraqi 4th Army Corps and 6th Army Corps between Basra and Qurna, and if successful, move on the suburbs or even the city of Basra itself. It was fought between the Pasdaran, Basij and the Iraqi Army. In the early phase, a force of an estimated 100,000-150,000 Pasdaran and Basij, using small motorboats and then on foot moved towards the objective, then attacked using human wave tactics and in places came within a few kilometers of the strategic Basra–Baghdad highway. However the Iranians lacked artillery, air support and armored protection, while the Iraqis were well equipped and entrenched in strong fortified positions. The armies inflicted severe casualties on each other and the Iranians failed to achieve their objective. This operation was the biggest of the Dawn operations.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "year",
+    "part_of": [
+      {
+        "qid": "Q82664",
+        "label": "Iran–Iraq War"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Iran–Iraq War\" (Q82664); it may overlap with that larger event"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": true,
+    "wikidata_description": "1984 military operation"
+  },
+  {
+    "id": "night-of-the-gliders",
+    "title": "Night of the Gliders",
+    "date_start": "1987-11-25",
+    "date_end": null,
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "terrorism",
+    "category_group": "terrorism",
+    "wikidata_classes": [
+      "terrorist attack"
+    ],
+    "retrieved_at": "2026-11-04T22:06:00.579Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q2911491",
+    "resolved_qid": "Q2911491",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Night_of_the_Gliders",
+    "extract": "The Night of the Gliders (Hebrew: ליל הגלשונים, lit. 'Leil HaGilshonim') was an attack by the Popular Front for the Liberation of Palestine - General Command (PFLP-GC) against Israeli soldiers in northern Israel on 25 November 1987, in which two Palestinian guerrillas infiltrated into Israel from South Lebanon using hang gliders to launch a surprise attack. One militant was tracked down and killed by Israeli security forces before entering Israel. The other managed to cross into Israel, shooting an army truck and entering an IDF base, killing six Israeli soldiers and wounding at least seven others before being shot dead.\n\nThe Israeli military was heavily criticized for its perceived impotence in the face of the attack, despite Israel initially detecting the hang gliders and issuing warnings to nearby posts. Due to the use of hang gliders and the Israeli military's inability to stop an attack despite its military prowess and advance warning, the Night of the Gliders has been compared to the October 7 attacks.",
+    "coordinates": {
+      "lat": 33.22305556,
+      "lon": 35.60166667
+    },
+    "coordinate_source": "wikipedia",
+    "location_quality": "precise",
+    "needs_manual_coordinates": false,
+    "date_precision": "day",
+    "part_of": [],
+    "possible_duplicates": [],
+    "review_reasons": [],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": false,
+    "wikidata_description": "Palestinian infiltration and attack against Israel in 1987"
+  },
+  {
+    "id": "blockade-of-the-gaza-strip",
+    "title": "Blockade of the Gaza Strip",
+    "date_start": "2000-01-01",
+    "date_end": null,
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "blockade",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:42.774Z",
+    "sitelinks": 31,
+    "wikidata_qid": "Q653112",
+    "resolved_qid": "Q653112",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Blockade_of_the_Gaza_Strip",
+    "extract": "The restrictions on movement and goods in the Gaza Strip imposed by Israel date to the early 1990s, during its military occupation of the Gaza Strip (1967–2005). After Hamas took over in 2007, Israel significantly intensified existing movement restrictions and imposed a blockade on the movement of goods and people in and out of the Gaza Strip. In the same year, Egypt closed the Rafah border crossing. Israel's stated aims were to hold Hamas accountable for rocket attacks on Israeli territory; to constrain Hamas's ability to rule in Gaza; and to put pressure on it to release Gilad Shalit, an Israeli soldier abducted in June 2006. While the blockade's legality has not been adjudicated in court, human rights groups believe it would be deemed illegal and that it is a form of collective punishment, as it restricts the flow of essential goods, contributes to economic hardship, and limits Gazans' freedom of movement. The land, sea, and air blockade isolated Gaza from the rest of the occupied Palestinian territory and the world. The blockade and its effects have led to the territory being called an \"open-air prison\".\n\nExit and entry into Gaza by sea or air is prohibited. There are only three crossings in and out of Gaza, two of them controlled by Israel and one by Egypt. Israel heavily regulates Palestinians' movement through the Erez Crossing, with applications considered only for merchants, workers, and limited medical and humanitarian reasons. Before the Gaza war began in 2023, exits via Erez averaged approximately 40,000 per month. Israel's military cooperation with Egypt and its control of the population registry (through which it controls who can obtain the necessary travel documents) gives it influence over movement through Rafah. Imports are heavily restricted, with \"dual use\" items permitted only as part of donor projects. This includes construction material and computer equipment. Exports are also heavily restricted, with the main impediment to economic development in Gaza being Israel's ban on virtually all exports from the Strip.\n\nIsrael blockaded the Gaza Strip at various levels of intensity in 2005–2006. Israeli-imposed closures date to 1991. In 2007, after Hamas seized control of the Gaza Strip, Israel imposed an indefinite blockade of Gaza that remains in place, on the grounds that Fatah and Palestinian Authority forces had fled the Strip and were no longer able to provide security on the Palestinian side. Israel has said the blockade is necessary to protect itself from Palestinian political violence and rocket attacks, and to prevent dual use goods from entering Gaza.\n\nIsrael has been accused of violating or failing to fulfill specific obligations it has under various ceasefire agreements to alleviate or lift the blockade. \"Crossings were repeatedly shut and buffer zones were reinstated. Imports declined, exports were blocked, and fewer Gazans were given exit permits to Israel and the West Bank.\" Human rights groups, international community representatives, and legal professionals have decried the blockade as a form of collective punishment in contravention of international law, specifically the Fourth Geneva Convention. Rights groups have held Israel mainly responsible as the occupying power.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "decade",
+    "part_of": [],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "category_year_mismatch: Wikipedia year categories mention [2007, 2008, 2009, 2010] but none is within 1 year of 2000",
+      "date_precision_coarse: Wikidata records the date only to decade precision",
+      "durative_class_no_end: Wikidata class blockade describes a span of time, but there is no date_end (ongoing, or the end is not in Wikidata); dates are kept as the sources give them"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "date_flags": [
+      "date_start_year_not_in_lead: start year 2000 (2000-01-01) is not within 1 year of any year in the Wikipedia lead [1967, 2005, 2007, 2006, 2023, 1991]"
+    ],
+    "needs_review": true,
+    "wikidata_description": "2000 ongoing blockade of the Gaza Strip by Israel and Egypt"
+  },
+  {
+    "id": "operation-northern-shield",
+    "title": "Operation Northern Shield",
+    "date_start": "2018-12-04",
+    "date_end": null,
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:06:04.479Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q59417678",
+    "resolved_qid": "Q59417678",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Operation_Northern_Shield",
+    "extract": "Operation Northern Shield (Hebrew: מבצע מגן צפוני, romanized: Mivtza Magen Tzfoni) was an Israeli military operation that took place from 4 December 2018 until 13 January 2019. The operation's declared goal was to locate and destroy Hezbollah tunnels that cross the Blue Line from Lebanon into northern Israel. According to Israel, this operation is part of the ongoing Iran–Israel proxy conflict. On 17 December 2018, United Nations Interim Force in Lebanon (UNIFIL) acknowledged the existence of four tunnels near the Israel–Lebanon border and confirmed that two of them cross the Blue Line in violation of United Nations Security Council Resolution 1701, which helped to end the 2006 Lebanon War.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q8669",
+        "label": "Arab–Israeli conflict"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Arab–Israeli conflict\" (Q8669); it may overlap with that larger event"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": true,
+    "wikidata_description": "2018 military operation"
+  },
+  {
+    "id": "death-of-abu-bakr-al-baghdadi",
+    "title": "Death of Abu Bakr al-Baghdadi",
+    "date_start": "2019-10-26",
+    "date_end": null,
+    "countries": [
+      "Syria"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "covert operation",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:48.727Z",
+    "sitelinks": 18,
+    "wikidata_qid": "Q72587856",
+    "resolved_qid": "Q72587856",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/Death_of_Abu_Bakr_al-Baghdadi",
+    "extract": "On October 26–27, 2019, the United States conducted a military operation codenamed Operation Kayla Mueller that resulted in the death of Abu Bakr al-Baghdadi, the then-leader and self-proclaimed caliph of the Islamic State. The operation took place in the outskirts of Barisha, Idlib Governorate, Syria. According to General Kenneth F. McKenzie Jr., the United States Central Command (CENTCOM) commander who oversaw the operation, Baghdadi killed himself along with two children when he detonated a suicide belt while fleeing from U.S. forces during the raid.\n\nThe U.S. operation was named for Kayla Mueller, an American aid worker who had been captured by and died in the custody of the Islamic State.",
+    "coordinates": {
+      "lat": 36.1658,
+      "lon": 36.6274
+    },
+    "coordinate_source": "wikipedia",
+    "location_quality": "precise",
+    "needs_manual_coordinates": false,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q18357664",
+        "label": "Operation Inherent Resolve"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Operation Inherent Resolve\" (Q18357664); it may overlap with that larger event"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "wikidata_aliases": [
+      "Operation Kayla Mueller",
+      "Incursión de Barisha"
+    ],
+    "needs_review": true,
+    "wikidata_description": "U.S. military operation in Barisha, Syria"
+  },
+  {
+    "id": "31-october-2023-jabalia-refugee-camp-airstrike",
+    "title": "31 October 2023 Jabalia refugee camp airstrike",
+    "date_start": "2023-10-31",
+    "date_end": null,
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "atrocity",
+    "category_group": "atrocity",
+    "wikidata_classes": [
+      "airstrike",
+      "mass killing",
+      "war crime",
+      "armed conflict",
+      "bombardment",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:06:06.195Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q123264996",
+    "resolved_qid": "Q123264996",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/31_October_2023_Jabalia_refugee_camp_airstrike",
+    "extract": "On October 31, 2023, Israel bombed the Jabalia refugee camp in the Gaza Strip – an event that was called the Jabalia camp massacre in the Muslim world.\n\nThe airstrike, which came amidst the Israeli invasion of Gaza, killed more than 120 people, mostly women and children. It was widely condemned as a war crime by human rights organisations and legal experts and the strike led to many countries severing diplomatic ties with Israel due to the attacks disproportionality and killing of civilians.\n\nThe Jabalia refugee camp is very densely populated, and despite an evacuation order, social media videos showed that many civilians remained in the camp. The camp received hits from multiple Israeli air strikes during the Gaza war. The airstrike trapped more than a hundred beneath the rubble, according to the Gaza Health Ministry. The Indonesia Hospital said most casualties were women and children. Gaza Interior Ministry stated the camp had been \"completely destroyed,\" with preliminary estimates of about 400 wounded or dead. IDF spokesperson Daniel Hagari confirmed that Israeli fighter jets attacked the refugee camp, and stated that the attack killed a Hamas commander who led the 7 October attacks and destroyed Hamas tunnels. Hamas denied the presence of any commander and said Israel was using these claims as an excuse for the attack.",
+    "coordinates": {
+      "lat": 31.53271,
+      "lon": 34.49815
+    },
+    "coordinate_source": "wikipedia",
+    "location_quality": "precise",
+    "needs_manual_coordinates": false,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q122983274",
+        "label": "Jabalia refugee camp airstrikes"
+      },
+      {
+        "qid": "Q122962941",
+        "label": "Gaza War"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Jabalia refugee camp airstrikes\" (Q122983274); it may overlap with that larger event",
+      "part_of: Wikidata (P361) lists this event as part of \"Gaza War\" (Q122962941); it may overlap with that larger event"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": true,
+    "wikidata_description": "2023 Israeli attack in the Gaza Strip"
+  },
+  {
+    "id": "2024-rafah-hostage-raid",
+    "title": "2024 Rafah hostage raid",
+    "date_start": "2024-02-12",
+    "date_end": null,
+    "countries": [
+      "Israel/Palestine"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "hostage-rescue mission",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:50.970Z",
+    "sitelinks": 12,
+    "wikidata_qid": "Q124505238",
+    "resolved_qid": "Q124505238",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/2024_Rafah_hostage_raid",
+    "extract": "The 2024 Rafah hostage raid, dubbed Operation Golden Hand (Hebrew: מבצע יד זהב) by the Israel Defense Forces, was a military raid and hostage rescue operation conducted in cooperation with the Shin Bet and Yamam (Israel's National Counter-Terror Unit, part of the Israeli Police) to recover two Israeli civilians kidnapped during the Nir Yitzhak attack on 7 October 2023. The operation commenced on February 12, 2024, at 1:49 AM during combat in the Gaza Strip during the Gaza war, and ended successfully with the rescue of the hostages, along with a soldier who was lightly injured during the operation. At least 74 Palestinians were killed by Israel in the early morning airstrikes used as cover for the operation, though other estimates produced numbers closer to 100.",
+    "coordinates": {
+      "lat": 31.2725,
+      "lon": 34.25861111
+    },
+    "coordinate_source": "wikipedia",
+    "location_quality": "precise",
+    "needs_manual_coordinates": false,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q123036458",
+        "label": "Israeli invasion of the Gaza Strip"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"Israeli invasion of the Gaza Strip\" (Q123036458); it may overlap with that larger event"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "wikidata_aliases": [
+      "Gold Hand operation"
+    ],
+    "needs_review": true,
+    "wikidata_description": "rescue operation for the abductees Fernando Simon Marman and Louis Har, from captives in Rafah on the night of February 12, 2024"
+  },
+  {
+    "id": "2025-2026-united-states-airstrikes-in-syria",
+    "title": "2025–2026 United States airstrikes in Syria",
+    "date_start": "2025-12-19",
+    "date_end": null,
+    "countries": [
+      "Syria"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:06:07.716Z",
+    "sitelinks": 10,
+    "wikidata_qid": "Q137478915",
+    "resolved_qid": "Q137478915",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/2025%E2%80%932026_United_States_airstrikes_in_Syria",
+    "extract": "Operation Hawkeye Strike was a retaliatory military action by the United States against the Islamic State, following the December 2025 Palmyra attack by a Syrian police officer, suspected of being affiliated with the Islamic State, that killed two U.S. soldiers and a civilian interpreter.",
+    "coordinates": null,
+    "coordinate_source": null,
+    "location_quality": "none",
+    "needs_manual_coordinates": true,
+    "date_precision": "day",
+    "part_of": [],
+    "possible_duplicates": [],
+    "review_reasons": [],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": false,
+    "wikidata_description": "military action in Syria"
+  },
+  {
+    "id": "2026-strait-of-hormuz-crisis",
+    "title": "2026 Strait of Hormuz crisis",
+    "date_start": "2026-02-28",
+    "date_end": null,
+    "countries": [
+      "Iran",
+      "Oman",
+      "UAE"
+    ],
+    "category": "war",
+    "category_group": "war",
+    "wikidata_classes": [
+      "blockade",
+      "crisis situation",
+      "military operation"
+    ],
+    "retrieved_at": "2026-11-04T22:05:40.637Z",
+    "sitelinks": 36,
+    "wikidata_qid": "Q138521100",
+    "resolved_qid": "Q138521100",
+    "wikipedia_url": "https://en.wikipedia.org/wiki/2026_Strait_of_Hormuz_crisis",
+    "extract": "Shipping traffic through the Strait of Hormuz, a major maritime choke point for world energy trade, has been largely blocked by Iran since 28 February 2026, when the United States and Israel launched an air war against Iran. In retaliation, the Iranian Revolutionary Guard Corps (IRGC) issued warnings forbidding passage through the strait, boarded and attacked merchant ships, and laid sea mines in the strait. From 13 April to 29 May 2026, the US simultaneously blockaded Iranian ports. Until the war's start, about 25% of the world's seaborne oil trade and 20% of the world's liquefied natural gas (LNG) passed through the strait.\n\nSoon after the start of the conflict, the number of tankers trafficking the strait dropped near zero. On 27 March, the IRGC announced that the strait was closed to any vessel going \"to and from\" the ports of the US, Israel, and their allies. The International Maritime Organization reported on 21 April that about 20,000 mariners and 2,000 ships were stranded in the Persian Gulf due to the closure. Amid fears of prolonged supply shortages, oil prices rose faster than during any other conflict in recent history; Brent crude oil prices surpassed US$100 per barrel on 8 March for the first time in four years, rising to US$126 per barrel at their peak. The largest-ever monthly increase in oil prices occurred in March 2026. The closure of the strait became the largest disruption to world energy supply since the 1970s energy crisis as well as the largest in the history of the world oil market. Other commodity markets to suffer supply disruption and price increases due to the crisis include aluminum, fertilizer, and helium.\n\nIn late March and early April, US president Donald Trump repeatedly threatened to destroy Iran's infrastructure if it did not reopen the strait. On 8 April a temporary ceasefire between Iran and the US was agreed and was to involve the reopening of the strait. However, following the failure of the Islamabad Talks, the US Navy itself began to blockade Iranian ports from 13 April. The situation was described by The Guardian as a \"dual blockade\", with the US Navy blockading Iran and Iran blockading the Gulf. On 17 April, Iran announced that due to an Israel–Lebanon ceasefire agreement, it would allow commercial shipping, but the US continued its blockade of Iran, and Iran reimposed restrictions. On 4 May, Trump launched Operation Project Freedom, a US Navy mission to escort merchant ships out of the Gulf. The Iranian military warned that this would be a ceasefire violation, and on 6 May, Trump paused Project Freedom because of \"great progress\" toward a possible agreement.\n\nOn 17 June, Trump and Iranian president Masoud Pezeshkian signed a memorandum of understanding to end the war and the blockades of the strait. On 19 June, Trump announced a renewed ceasefire between Israel and Hezbollah, facilitated by the US, Qatar, and Iran. However, Israel continued strikes in southern Lebanon, and the following day, Iran said that it closed the strait again, citing the Israeli actions as a violation of the agreement, a claim denied by the US military. On 27 June, the Joint Maritime Information Center (JMIC) overseen by the US Navy announced a widened route through the Strait of Hormuz near Oman, allowing increased naval traffic in both directions and indicating a challenge to Iran's control over the waterway. On 8 July, the interim truce agreement between the US and Iran broke down after Iran struck multiple commercial ships in the Strait of Hormuz. On 25 August, US officials confirmed Trump's claim that the US Navy cleared mines from the Strait of Hormuz Traffic Separation Scheme, adding that over recent months, underwater drones identified over 100 suspected mines and private contractors dealt with them. Trump stated that the US will destroy Iranian vessels laying additional mines in the Strait of Hormuz.\n\nAs of 21 October, the Middle Eastern oil exports, including shipments through the Strait of Hormuz and alternative routes, had averaged more than 24 million barrels per day in the week ending 18 October, exceeding the pre-war level of 23.3 million, according to Kpler. However, preliminary estimates put flows through Hormuz, including offshore transfers in the Gulf of Oman, at approximately 14 million barrels per day, or 82% of pre-war levels. Despite the recovery in exports, shipping costs remained high.",
+    "coordinates": {
+      "lat": 26.7,
+      "lon": 56.55
+    },
+    "coordinate_source": "wikidata",
+    "location_quality": "precise",
+    "needs_manual_coordinates": false,
+    "date_precision": "day",
+    "part_of": [
+      {
+        "qid": "Q138503695",
+        "label": "2026 Iran War"
+      }
+    ],
+    "possible_duplicates": [],
+    "review_reasons": [
+      "part_of: Wikidata (P361) lists this event as part of \"2026 Iran War\" (Q138503695); it may overlap with that larger event",
+      "durative_class_no_end: Wikidata class blockade describes a span of time, but there is no date_end (ongoing, or the end is not in Wikidata); dates are kept as the sources give them"
+    ],
+    "extract_retrieved_at": "2026-11-04",
+    "needs_review": true,
+    "wikidata_description": "2026 geopolitical and economic crisis in Iran"
   }
 ]
