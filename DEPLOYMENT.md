@@ -198,7 +198,8 @@ runs on `main` are never cancelled. Its jobs (the names GitHub shows as status c
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
   plugin, `.oxlintrc.json`; `import/named` is an error, and warnings fail too),
   validates `data/boundaries.json` (`npm run validate-boundaries`; it also fails if a shape
-  has fewer vertices or coarser coordinates than in `data/border-geometry-baseline.json`)
+  has fewer vertices, coarser coordinates or any coordinate different from
+  `data/border-geometry-baseline.json`, which records a sha256 of each shape's coordinates)
   and runs the border check (`node scripts/verify-borders.js --check`, every border period;
   about 3 minutes, so a pull request that changes none of its inputs skips it - the list is
   in `ci.yml` - while pushes to `main` always run it).

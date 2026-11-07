@@ -818,7 +818,9 @@ flagged shape drawn on top of it (the West Bank, Gaza Strip and Golan Heights) a
 Borders are never simplified; 6 decimal places (about 10 cm) is the coarsest rounding allowed without approval. Since 2026-10-28
 `validate-boundaries.js` also fails when a feature has fewer vertices, or fewer coordinate values written with at least 6 decimals, than in
 `data/border-geometry-baseline.json` (per feature; 103 features, 189,472 vertices counting each ring's closing point), or when a feature in that
-file is gone. More vertices or more decimals pass. After an approved geometry change the baseline is rewritten on purpose with
+file is gone. Since 2026-11-08 the baseline also holds, per feature, the sha256 of its coordinates as written in `data/boundaries.json`, and any
+other change fails too, naming the feature: a vertex moved (the counts alone let a Kuwait 1992 vertex moved 7 km pass), added or reordered, or a
+shape that is not in the baseline. After an approved geometry change the baseline is rewritten on purpose with
 `node scripts/validate-boundaries.js --write-geometry-baseline`, so the diff shows which shapes changed.
 
 `node scripts/verify-borders.js --check` (CI) measures the independent Wikidata reference points against the drawn borders of every year in

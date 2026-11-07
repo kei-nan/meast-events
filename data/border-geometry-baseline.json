@@ -1,414 +1,517 @@
 {
   "Persia 1886-1934": {
     "vertices": 1197,
-    "fine": 2184
+    "fine": 2184,
+    "sha256": "527cce9792c8fa261d88a2eb47a2ec6b9f82bda6626a663a65cf5fd5f650da62"
   },
   "Iran 1935-present": {
     "vertices": 1197,
-    "fine": 2184
+    "fine": 2184,
+    "sha256": "527cce9792c8fa261d88a2eb47a2ec6b9f82bda6626a663a65cf5fd5f650da62"
   },
   "Ottoman Empire 1886-1912": {
     "vertices": 3900,
-    "fine": 7024
+    "fine": 7024,
+    "sha256": "8cf34b680fb6a4ae1054623c55bfcd31011babc06d039f893aff728991836d1b"
   },
   "Ottoman Empire 1913-1914": {
     "vertices": 2585,
-    "fine": 4661
+    "fine": 4661,
+    "sha256": "2e2bdcaf6cec499f031bb650e1f7ef75a4d5b8db0244f4cc48ed8663ee2f847e"
   },
   "Ottoman Empire 1915-1917": {
     "vertices": 2209,
-    "fine": 3978
+    "fine": 3978,
+    "sha256": "238625ef701f31f416f9f75084f6598c9e996cdf07d2927354c3f72e92604713"
   },
   "Ottoman Empire 1918": {
     "vertices": 2230,
-    "fine": 4012
+    "fine": 4012,
+    "sha256": "8d62c92924770046fc6811b436f87946abda8848d091e2ad29fee5e6edeec18f"
   },
   "Ottoman Empire 1919": {
     "vertices": 2064,
-    "fine": 3717
+    "fine": 3717,
+    "sha256": "7e33f7593c15e8b5fd1e79f02a98531214c970c4c4c1c2a7789259ca63d9b3de"
   },
   "Ottoman Empire 1920-1921": {
     "vertices": 1164,
-    "fine": 2101
+    "fine": 2101,
+    "sha256": "80f015d9639d57c14d04a1556726cc6235e499efe434255c920a96a72a26f904"
   },
   "Ottoman Empire 1922-1923": {
     "vertices": 1164,
-    "fine": 2100
+    "fine": 2100,
+    "sha256": "10e62246b365e2b802b4e37c2d6e7c712b833fd146dffb9925118ad1ec5b83f8"
   },
   "Turkey 1924-1938": {
     "vertices": 1166,
-    "fine": 2104
+    "fine": 2104,
+    "sha256": "5ede84353068dd1beb28e1b222187167de98ff6ebbc78084e9f1b8c86d4855c0"
   },
   "Turkey 1939-present": {
     "vertices": 1164,
-    "fine": 2101
+    "fine": 2101,
+    "sha256": "80f015d9639d57c14d04a1556726cc6235e499efe434255c920a96a72a26f904"
   },
   "British Mandate of Mesopotamia 1920": {
     "vertices": 359,
-    "fine": 657
+    "fine": 657,
+    "sha256": "923a630e4ec0090f232fd2084c1864ed2564d115ce4af5b2a60e9e6f450be7fa"
   },
   "British Mandate of Mesopotamia 1921": {
     "vertices": 349,
-    "fine": 639
+    "fine": 639,
+    "sha256": "1fd120dd668c6fd4d465bdcf07c6a1f7adcb5d89f5a0e029a8a1ee209a073481"
   },
   "Kingdom of Iraq (British Mandate) 1922": {
     "vertices": 346,
-    "fine": 633
+    "fine": 633,
+    "sha256": "56849c1a81d6a404161f93b2549ab183507c36feaeff73803af65d4a357c2462"
   },
   "Kingdom of Iraq (British Mandate) 1923-1932": {
     "vertices": 346,
-    "fine": 633
+    "fine": 633,
+    "sha256": "56849c1a81d6a404161f93b2549ab183507c36feaeff73803af65d4a357c2462"
   },
   "Kingdom of Iraq 1933-1958": {
     "vertices": 346,
-    "fine": 633
+    "fine": 633,
+    "sha256": "56849c1a81d6a404161f93b2549ab183507c36feaeff73803af65d4a357c2462"
   },
   "Iraq 1959-1981": {
     "vertices": 346,
-    "fine": 633
+    "fine": 633,
+    "sha256": "56849c1a81d6a404161f93b2549ab183507c36feaeff73803af65d4a357c2462"
   },
   "Iraq 1982-present": {
     "vertices": 349,
-    "fine": 639
+    "fine": 639,
+    "sha256": "1fd120dd668c6fd4d465bdcf07c6a1f7adcb5d89f5a0e029a8a1ee209a073481"
   },
   "Egypt 1899-1914": {
     "vertices": 848,
-    "fine": 1533
+    "fine": 1533,
+    "sha256": "443e5e0754f781c6e957109306b75b38a3eca062163bb854fce2ad1f2834ed33"
   },
   "Egypt 1915-1921": {
     "vertices": 848,
-    "fine": 1533
+    "fine": 1533,
+    "sha256": "443e5e0754f781c6e957109306b75b38a3eca062163bb854fce2ad1f2834ed33"
   },
   "Egypt 1922-1925": {
     "vertices": 848,
-    "fine": 1533
+    "fine": 1533,
+    "sha256": "443e5e0754f781c6e957109306b75b38a3eca062163bb854fce2ad1f2834ed33"
   },
   "Egypt 1926-1947": {
     "vertices": 808,
-    "fine": 1454
+    "fine": 1454,
+    "sha256": "c474660175fd577fbceb5d5d536bba2010ccdae2bdf9118758bdcbbccc5ccca6"
   },
   "Egypt 1948-1966": {
     "vertices": 752,
-    "fine": 1350
+    "fine": 1350,
+    "sha256": "6332b504f246a76ee78c6b861dfc45330ec05023c4091c6b8d278d51b62223dd"
   },
   "Egypt 1967-1978": {
     "vertices": 638,
-    "fine": 1159
+    "fine": 1159,
+    "sha256": "c16ffa22757617b000d0756283fc3c220ebbe72b54bfc0012f68abd0c64f74f8"
   },
   "Egypt 1979-1981": {
     "vertices": 752,
-    "fine": 1350
+    "fine": 1350,
+    "sha256": "6332b504f246a76ee78c6b861dfc45330ec05023c4091c6b8d278d51b62223dd"
   },
   "Egypt 1982-present": {
     "vertices": 752,
-    "fine": 1350
+    "fine": 1350,
+    "sha256": "6332b504f246a76ee78c6b861dfc45330ec05023c4091c6b8d278d51b62223dd"
   },
   "French Mandate of Syria 1920": {
     "vertices": 277,
-    "fine": 512
+    "fine": 512,
+    "sha256": "c5e23d696a36a82faf10acfb8a97a3fea33eb8467459ebbd3848e0d558886e00"
   },
   "French Mandate of Syria 1921": {
     "vertices": 266,
-    "fine": 491
+    "fine": 491,
+    "sha256": "2c78d09ea6e5eb7d4ac47e8335d5ea997f02a97f12d8fcff3a2b89da18c52d32"
   },
   "French Mandate of Syria 1922": {
     "vertices": 330,
-    "fine": 607
+    "fine": 607,
+    "sha256": "dcb7d96bdfa274789bac1b719e5fbb8fdcb0b496be2c81b198089f308e122582"
   },
   "French Mandate of Syria 1923": {
     "vertices": 330,
-    "fine": 607
+    "fine": 607,
+    "sha256": "dcb7d96bdfa274789bac1b719e5fbb8fdcb0b496be2c81b198089f308e122582"
   },
   "French Mandate of Syria 1924-1938": {
     "vertices": 363,
-    "fine": 673
+    "fine": 673,
+    "sha256": "64a4592419bfad49b2eb66c077b20c9481fb763c1ecad4fe89c09d4945be27ab"
   },
   "French Mandate of Syria 1939-1945": {
     "vertices": 266,
-    "fine": 491
+    "fine": 491,
+    "sha256": "2c78d09ea6e5eb7d4ac47e8335d5ea997f02a97f12d8fcff3a2b89da18c52d32"
   },
   "Syria 1946-1966": {
     "vertices": 266,
-    "fine": 491
+    "fine": 491,
+    "sha256": "2c78d09ea6e5eb7d4ac47e8335d5ea997f02a97f12d8fcff3a2b89da18c52d32"
   },
   "Syria 1967-present": {
     "vertices": 252,
-    "fine": 465
+    "fine": 465,
+    "sha256": "e7f401512c211a9fa06850b7e89bd4cccde7d3bc3e22cc863efce180963ae9ff"
   },
   "Lebanon (French Mandate) 1920": {
     "vertices": 118,
-    "fine": 212
+    "fine": 212,
+    "sha256": "fbdfe3bef39993c0e2c5a384b25f171026a7ab676cea2e259bdba6daeb0ab402"
   },
   "Lebanon (French Mandate) 1921-1943": {
     "vertices": 118,
-    "fine": 212
+    "fine": 212,
+    "sha256": "fbdfe3bef39993c0e2c5a384b25f171026a7ab676cea2e259bdba6daeb0ab402"
   },
   "Lebanon 1944": {
     "vertices": 118,
-    "fine": 212
+    "fine": 212,
+    "sha256": "fbdfe3bef39993c0e2c5a384b25f171026a7ab676cea2e259bdba6daeb0ab402"
   },
   "Lebanon 1945-present": {
     "vertices": 118,
-    "fine": 212
+    "fine": 212,
+    "sha256": "fbdfe3bef39993c0e2c5a384b25f171026a7ab676cea2e259bdba6daeb0ab402"
   },
   "Transjordan 1920": {
     "vertices": 121,
-    "fine": 216
+    "fine": 216,
+    "sha256": "e0bcff2da4ae51d2443c6a4c64d94920b16bb610fe634edc6007d915b984edbf"
   },
   "Transjordan 1921-1923": {
     "vertices": 121,
-    "fine": 216
+    "fine": 216,
+    "sha256": "e0bcff2da4ae51d2443c6a4c64d94920b16bb610fe634edc6007d915b984edbf"
   },
   "Transjordan 1924-1925": {
     "vertices": 119,
-    "fine": 214
+    "fine": 214,
+    "sha256": "253ac16aba7e874977d848f00f3a4902cc769fab3c150f65deb9929c4649051e"
   },
   "Transjordan 1926-1945": {
     "vertices": 119,
-    "fine": 214
+    "fine": 214,
+    "sha256": "253ac16aba7e874977d848f00f3a4902cc769fab3c150f65deb9929c4649051e"
   },
   "Jordan 1946-1999": {
     "vertices": 119,
-    "fine": 214
+    "fine": 214,
+    "sha256": "253ac16aba7e874977d848f00f3a4902cc769fab3c150f65deb9929c4649051e"
   },
   "Jordan 2000-present": {
     "vertices": 3477,
-    "fine": 6254
+    "fine": 6254,
+    "sha256": "e75c31d97a83f049875c224ed726d3a6205276e2e80089e25a035cee5926b08f"
   },
   "Mandatory Palestine 1920": {
     "vertices": 165,
-    "fine": 297
+    "fine": 297,
+    "sha256": "7ccfa8ea274b0931c8a05ae5a2464e06f2725165e7f398500e2f1be9fa34ab5f"
   },
   "Mandatory Palestine 1921-1923": {
     "vertices": 165,
-    "fine": 297
+    "fine": 297,
+    "sha256": "7ccfa8ea274b0931c8a05ae5a2464e06f2725165e7f398500e2f1be9fa34ab5f"
   },
   "Mandatory Palestine 1924-1947": {
     "vertices": 165,
-    "fine": 297
+    "fine": 297,
+    "sha256": "7ccfa8ea274b0931c8a05ae5a2464e06f2725165e7f398500e2f1be9fa34ab5f"
   },
   "Israel 1948-1966": {
     "vertices": 194,
-    "fine": 343
+    "fine": 343,
+    "sha256": "094382e2f6a646b7f9e51b456d250bc6ea86af487c94a1d0f093479e50d20981"
   },
   "Israel 1967-1978": {
     "vertices": 273,
-    "fine": 488
+    "fine": 488,
+    "sha256": "56934f124e5dac849b2fa18a7174547af84603a57507356ccf7a8a60ba807a1a"
   },
   "Israel 1979-1999": {
     "vertices": 164,
-    "fine": 300
+    "fine": 300,
+    "sha256": "48ceb885a3a769515815094b572e48a915e0e5197162614ee59bd7054fcdee98"
   },
   "Israel 2000-present": {
     "vertices": 3523,
-    "fine": 6343
+    "fine": 6343,
+    "sha256": "4f2b15280115cafce25a37454f53051ed230bcaaa6e9e8eb8bf5e66286909361"
   },
   "Saudi Arabia 1933-1934": {
     "vertices": 737,
-    "fine": 1317
+    "fine": 1317,
+    "sha256": "23e1db2b8f2f4f2f69f333bee737996ee5f2d2ed2cff0d535e5f186491a6db9e"
   },
   "Saudi Arabia 1935-1960": {
     "vertices": 737,
-    "fine": 1317
+    "fine": 1317,
+    "sha256": "23e1db2b8f2f4f2f69f333bee737996ee5f2d2ed2cff0d535e5f186491a6db9e"
   },
   "Saudi Arabia 1961-1969": {
     "vertices": 735,
-    "fine": 1313
+    "fine": 1313,
+    "sha256": "2fdb67245ffc87dfc8bd2958971a8390dc48fc48b9a74dd5a7b36a6d076cefe5"
   },
   "Saudi Arabia 1970-1981": {
     "vertices": 733,
-    "fine": 1307
+    "fine": 1307,
+    "sha256": "40a6554ae8d186ee4ef324f38a7c94bd5e6332689ca964708525300d7f899f1a"
   },
   "Saudi Arabia 1982-1999": {
     "vertices": 882,
-    "fine": 1583
+    "fine": 1583,
+    "sha256": "fff81cbd87ce3ae6fd21269450f485b04b157e0f6409a131391c8451f91f2c9c"
   },
   "Saudi Arabia 2000-present": {
     "vertices": 886,
-    "fine": 1584
+    "fine": 1584,
+    "sha256": "66b721ebc1751a9b7b8114c464997184aabb8c0deec37ecd7250a04c33672a3c"
   },
   "Mutawakkilite Kingdom of Yemen 1919-1933": {
     "vertices": 204,
-    "fine": 368
+    "fine": 368,
+    "sha256": "fd62afcac2ab94422a9f86335e070cd1d099b42eb7784e00ee20cc8b2cff708b"
   },
   "Mutawakkilite Kingdom of Yemen 1934-1962": {
     "vertices": 204,
-    "fine": 368
+    "fine": 368,
+    "sha256": "fd62afcac2ab94422a9f86335e070cd1d099b42eb7784e00ee20cc8b2cff708b"
   },
   "Yemen Arab Republic 1963-1989": {
     "vertices": 204,
-    "fine": 368
+    "fine": 368,
+    "sha256": "fd62afcac2ab94422a9f86335e070cd1d099b42eb7784e00ee20cc8b2cff708b"
   },
   "Yemen 1990-1999": {
     "vertices": 556,
-    "fine": 978
+    "fine": 978,
+    "sha256": "4afba08bcacc640c6ffb91ff0403158d4ef68d6802fa9eb283218e0afa0b25c3"
   },
   "Yemen 2000-present": {
     "vertices": 558,
-    "fine": 976
+    "fine": 976,
+    "sha256": "fa74067c9e1b8cb57b8e917cb3f9ea8493307d181c1ded0509476f1a4472a9ec"
   },
   "People's Republic of South Yemen 1968-1970": {
     "vertices": 381,
-    "fine": 662
+    "fine": 662,
+    "sha256": "906bb545c9425da219a937bcb27a812571086292c3e24347ec966f452d0947d3"
   },
   "People's Democratic Republic of Yemen 1971-1989": {
     "vertices": 381,
-    "fine": 662
+    "fine": 662,
+    "sha256": "906bb545c9425da219a937bcb27a812571086292c3e24347ec966f452d0947d3"
   },
   "Aden Colony and Western Aden Protectorate 1937-1961": {
     "vertices": 185,
-    "fine": 328
+    "fine": 328,
+    "sha256": "69711d236c835d58a0c37f8babf02676ff40ec6029f8ed61851f95f89d103cfd"
   },
   "Kuwait 1961-1969": {
     "vertices": 499,
-    "fine": 983
+    "fine": 983,
+    "sha256": "80e82ed7c399f45295ead4213c82583042f9e1182c6891a2e9ab15a80e2170e5"
   },
   "Kuwait 1970-1989": {
     "vertices": 136,
-    "fine": 254
+    "fine": 254,
+    "sha256": "2bb0b9c0a8b7ddf8f46218e7f17fe99dfd48614838bbc816b20fabbf0348a1f4"
   },
   "Kuwait (annexed by Iraq) 1990-1991": {
     "vertices": 136,
-    "fine": 254
+    "fine": 254,
+    "sha256": "2bb0b9c0a8b7ddf8f46218e7f17fe99dfd48614838bbc816b20fabbf0348a1f4"
   },
   "Kuwait 1992-present": {
     "vertices": 136,
-    "fine": 254
+    "fine": 254,
+    "sha256": "2bb0b9c0a8b7ddf8f46218e7f17fe99dfd48614838bbc816b20fabbf0348a1f4"
   },
   "Bahrain 1972-2001": {
     "vertices": 87,
-    "fine": 151
+    "fine": 151,
+    "sha256": "bb859bd6f07547a65967831e1d7ddbfe3cb24a97d9cb516cdf73895fee1ea35a"
   },
   "Bahrain 2002-present": {
     "vertices": 87,
-    "fine": 151
+    "fine": 151,
+    "sha256": "bb859bd6f07547a65967831e1d7ddbfe3cb24a97d9cb516cdf73895fee1ea35a"
   },
   "Qatar 1917-1971": {
     "vertices": 151,
-    "fine": 274
+    "fine": 274,
+    "sha256": "29a66fb88563a5a44b6bb4967503c3dd1f21235c47fb9e3a0894e156ad040214"
   },
   "Qatar 1972-present": {
     "vertices": 151,
-    "fine": 274
+    "fine": 274,
+    "sha256": "29a66fb88563a5a44b6bb4967503c3dd1f21235c47fb9e3a0894e156ad040214"
   },
   "Trucial States 1892-1913": {
     "vertices": 271,
-    "fine": 491
+    "fine": 491,
+    "sha256": "925e02785ab9ce2c8bc04ededfa0181f28a59e52bcc2b203304f35c1bc6a6cc8"
   },
   "Trucial States 1914-1951": {
     "vertices": 271,
-    "fine": 491
+    "fine": 491,
+    "sha256": "925e02785ab9ce2c8bc04ededfa0181f28a59e52bcc2b203304f35c1bc6a6cc8"
   },
   "Trucial States 1952-1971": {
     "vertices": 271,
-    "fine": 491
+    "fine": 491,
+    "sha256": "925e02785ab9ce2c8bc04ededfa0181f28a59e52bcc2b203304f35c1bc6a6cc8"
   },
   "United Arab Emirates 1972-1974": {
     "vertices": 271,
-    "fine": 491
+    "fine": 491,
+    "sha256": "925e02785ab9ce2c8bc04ededfa0181f28a59e52bcc2b203304f35c1bc6a6cc8"
   },
   "United Arab Emirates 1975-present": {
     "vertices": 271,
-    "fine": 491
+    "fine": 491,
+    "sha256": "925e02785ab9ce2c8bc04ededfa0181f28a59e52bcc2b203304f35c1bc6a6cc8"
   },
   "Muscat and Oman 1886-1970": {
     "vertices": 517,
-    "fine": 937
+    "fine": 937,
+    "sha256": "528ddf999cd678f1cd1d74dbc961776825d3acbed9ae6f5087e7468270e05811"
   },
   "Oman 1971-1989": {
     "vertices": 517,
-    "fine": 937
+    "fine": 937,
+    "sha256": "528ddf999cd678f1cd1d74dbc961776825d3acbed9ae6f5087e7468270e05811"
   },
   "Oman 1990-present": {
     "vertices": 517,
-    "fine": 937
+    "fine": 937,
+    "sha256": "528ddf999cd678f1cd1d74dbc961776825d3acbed9ae6f5087e7468270e05811"
   },
   "Federation of South Arabia 1962-1967": {
     "vertices": 381,
-    "fine": 662
+    "fine": 662,
+    "sha256": "906bb545c9425da219a937bcb27a812571086292c3e24347ec966f452d0947d3"
   },
   "Eastern Aden Protectorate 1937-1961": {
     "vertices": 280,
-    "fine": 495
+    "fine": 495,
+    "sha256": "b2314cc4e0b4eb31930abfc1047d58aafce79f4b5420e862e6f8999ac46c11cf"
   },
   "Sanjak of Alexandretta (Hatay) 1922-1938": {
     "vertices": 168,
-    "fine": 304
+    "fine": 304,
+    "sha256": "4446e8f3df5d2a808ec08310811626726f0d2424482993142585608005d21a7a"
   },
   "West Bank (held by Jordan) 1948-1949": {
     "vertices": 67,
-    "fine": 116
+    "fine": 116,
+    "sha256": "b2e68be6831ccbe72be4b1b6823dcff3506bd6e936ba34a8f8e01de4eae756e5"
   },
   "West Bank (annexed by Jordan) 1950-1966": {
     "vertices": 67,
-    "fine": 116
+    "fine": 116,
+    "sha256": "b2e68be6831ccbe72be4b1b6823dcff3506bd6e936ba34a8f8e01de4eae756e5"
   },
   "Gaza Strip (held by Egypt) 1948-1966": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Golan Heights (held by Israel) 1967-1981": {
     "vertices": 27,
-    "fine": 52
+    "fine": 52,
+    "sha256": "6b7ccb70534c72ac53c7a39e8d8bee7d8bafff8b5ca80f897740706679057c62"
   },
   "Golan Heights (annexed by Israel) 1982-present": {
     "vertices": 27,
-    "fine": 52
+    "fine": 52,
+    "sha256": "6b7ccb70534c72ac53c7a39e8d8bee7d8bafff8b5ca80f897740706679057c62"
   },
   "Abu Musa and Greater Tunb (held by Iran, claimed by the UAE) 1972-present": {
     "vertices": 27,
-    "fine": 48
+    "fine": 48,
+    "sha256": "c9a39cf6db67ef0237c348879c2b414b4de65c02f6ba70d48d5a0ed5fa2e35cc"
   },
   "West Bank (held by Israel) 1967-1994": {
     "vertices": 67,
-    "fine": 116
+    "fine": 116,
+    "sha256": "b2e68be6831ccbe72be4b1b6823dcff3506bd6e936ba34a8f8e01de4eae756e5"
   },
   "West Bank (held by Israel, phased Oslo transfers) 1995-1999": {
     "vertices": 67,
-    "fine": 116
+    "fine": 116,
+    "sha256": "b2e68be6831ccbe72be4b1b6823dcff3506bd6e936ba34a8f8e01de4eae756e5"
   },
   "West Bank Area A (Palestinian Authority) 2000-present": {
     "vertices": 14717,
-    "fine": 26601
+    "fine": 26601,
+    "sha256": "a1a0f6aebc84999c807f19aaac99d6848e584b0c0c853965df1a4706efe47a9f"
   },
   "West Bank Area B (Palestinian civil, joint security) 2000-present": {
     "vertices": 53213,
-    "fine": 95707
+    "fine": 95707,
+    "sha256": "f3d8c75f162cb4a9cf3772bab904f32b52f696a0943323e0a0a37e50e811b616"
   },
   "West Bank Area C (held by Israel) 2000-present": {
     "vertices": 67752,
-    "fine": 121908
+    "fine": 121908,
+    "sha256": "7f8c6a98c8e4d0a005acb3e097c67aefce01afc20ebecc12987d376b5281487b"
   },
   "Gaza Strip (held by Israel) 1967-1993": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Gaza Strip (Palestinian Authority, Israeli settlements retained) 1994-2004": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Gaza Strip (Palestinian Authority, post-disengagement) 2005-2006": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Gaza Strip (Hamas government, under blockade) 2007-2022": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Gaza Strip (Israeli ground offensive) 2023-2025": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Gaza Strip (ceasefire, divided at the Yellow Line) 2026-present": {
     "vertices": 30,
-    "fine": 55
+    "fine": 55,
+    "sha256": "7a462bc19214a307067ab2ab9348fefa79855b3b12c36252c70c6949d0fee39a"
   },
   "Saudi-Kuwaiti Neutral Zone 1922-1969": {
     "vertices": 451,
-    "fine": 890
+    "fine": 890,
+    "sha256": "8a46c565555ffcd141afa8f0c4f93dbc93eac955d5fcc2b10b71bc5fcbbf53ef"
   },
   "Saudi-Iraqi Neutral Zone 1922-1981": {
     "vertices": 5,
-    "fine": 6
+    "fine": 6,
+    "sha256": "3dc08b1b3eac4dd31c0f6347a4a51815301eb7cb3d3b9b72f290b6f5ca222cf1"
   }
 }

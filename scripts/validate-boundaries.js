@@ -1,15 +1,21 @@
 // Validates data/boundaries.json: required properties, per-name year continuity, and areas
 // that two features shown in the same year both cover. Reports only; never changes the file.
 // Exits non-zero on structural errors, on ring crossings not in ACCEPTED_RING_CROSSINGS, and
-// on any feature with fewer vertices or coarser coordinates than in
-// data/border-geometry-baseline.json (borders are never simplified); gaps and unexpected
-// overlaps are warnings.
+// on any feature with fewer vertices, coarser coordinates or different coordinates (sha256)
+// than in data/border-geometry-baseline.json (borders are never simplified, nor moved
+// without approval), or one new to or gone from it; gaps and unexpected overlaps are warnings.
 //   node scripts/validate-boundaries.js [path]
 //   node scripts/validate-boundaries.js --write-geometry-baseline   (only after an approved geometry change)
 // Needs the repo-root dependencies (`npm ci` at the root) for @turf/turf.
 import { readFile, writeFile } from "node:fs/promises";
 import * as turf from "@turf/turf";
-import { checkBoundaries, geometryFingerprint, OVERLAP_MIN_KM2, INTENTIONAL_OVERLAY_STATUSES } from "./lib/boundary-checks.js";
+import {
+  checkBoundaries,
+  geometryFingerprint,
+  ACCEPT_GEOMETRY_CHANGE,
+  OVERLAP_MIN_KM2,
+  INTENTIONAL_OVERLAY_STATUSES,
+} from "./lib/boundary-checks.js";
 
 const pathArg = process.argv.slice(2).find((a) => !a.startsWith("--"));
 const path = pathArg ?? new URL("../data/boundaries.json", import.meta.url);
@@ -44,9 +50,14 @@ if (overlaps) console.log(`info ${slivers} border sliver(s) under ${OVERLAP_MIN_
 if (errors.length) {
   console.error(`FAIL ${shown}: ${errors.length} violation(s)`);
   for (const e of errors) console.error(`  ${e}`);
-  if (errors.some((e) => /simplified|coarsened|geometry baseline/.test(e))) {
-    console.error("Borders are never simplified (DATA_POLICY.md). Only for an approved geometry change: node scripts/validate-boundaries.js --write-geometry-baseline");
+  if (errors.some((e) => /simplified|coarsened|geometry baseline|coordinates changed/.test(e))) {
+    console.error(
+      "Borders are never simplified, and not changed without approval (DATA_POLICY.md). Only for an approved geometry change, " +
+        `rewrite the baseline so its diff shows which shapes changed: ${ACCEPT_GEOMETRY_CHANGE}`
+    );
   }
   process.exit(1);
 }
-console.log(`ok   ${shown}: ${geojson.features.length} features valid, none simplified or coarsened vs data/border-geometry-baseline.json (${warnings.length} warning(s))`);
+console.log(
+  `ok   ${shown}: ${geojson.features.length} features valid, coordinates identical to data/border-geometry-baseline.json (${warnings.length} warning(s))`
+);

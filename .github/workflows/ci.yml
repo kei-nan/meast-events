@@ -176,9 +176,10 @@ jobs:
         run: npm run lint
       # data/boundaries.json: required properties, per-name year gaps, overlaps between shapes
       # shown in the same year (with their unit tests, which need the geometry library).
-      # Fails on structural errors and on any shape with fewer vertices or coarser coordinates
-      # than in data/border-geometry-baseline.json (borders are never simplified); gaps and
-      # unexpected overlaps are listed as warnings.
+      # Fails on structural errors and on any shape with fewer vertices, coarser coordinates or
+      # different coordinates (sha256) than in data/border-geometry-baseline.json (borders are
+      # never simplified, nor changed without approval); gaps and unexpected overlaps are
+      # listed as warnings.
       - name: Validate boundaries
         run: npm run validate-boundaries
       # Borders vs independent Wikidata reference points (border crossings, tripoints) in
