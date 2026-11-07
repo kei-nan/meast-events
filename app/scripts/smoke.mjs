@@ -26,7 +26,7 @@
 //   7. throughout: no console error, uncaught exception, CSP violation, failed
 //      request or same-origin HTTP error;
 //   8. the failure states: a lost search index chunk, a two-word search with one
-//      word's chunk gone after a deploy (HTTP 404), matches only outside the
+//      word's chunk gone after a deploy (HTTP 404) or failing once, matches only outside the
 //      selected years, the full text failing to load, no WebGL 2;
 //   9. an event page on a phone shifts its layout by no more than CLS_BUDGET.
 // Exits 1 with the failures listed, or prints one line per check.
@@ -334,6 +334,35 @@ async function twoWordsOneChunkGone(context) {
   ok(`"${TWO_WORDS.join(" ")}" with an index chunk gone (HTTP 404, as after a deploy) shows the outage notice, then recovers`);
 }
 
+// The same chunk failing only once (a dropped request). Pagefind 1.6.0 asks for a failed chunk again on the next
+// search, so a check run after the query could pass and show the other word's events: never those.
+async function twoWordsChunkFailsOnce(context) {
+  const browser = context.browser();
+  const [mine, other] = await Promise.all(TWO_WORDS.map((w) => chunksFor(browser, w)));
+  const gone = [...mine].filter((c) => !other.has(c));
+  if (!gone.length) throw new Error(`"${TWO_WORDS[0]}" and "${TWO_WORDS[1]}" are in the same index chunks`);
+  let failed = false;
+  await context.route("**/pagefind/v.*/index/**", (r) => {
+    if (failed || !gone.includes(new URL(r.request().url()).pathname)) return r.fallback();
+    failed = true;
+    return r.abort();
+  });
+  const page = await context.newPage();
+  await page.goto(`${ORIGIN}/`);
+  await page.locator(".sp-searchbox input").fill(TWO_WORDS.join(" "));
+  const banner = page.locator(".sp-banner");
+  const rows = page.locator("button.sp-row .sp-row-title");
+  try {
+    await banner.waitFor({ state: "visible" });
+  } catch {
+    const titles = await rows.allInnerTexts();
+    throw new Error(`with "${TWO_WORDS[0]}"'s index chunk failing once, "${TWO_WORDS.join(" ")}" showed no outage notice but ${titles.length} event(s): ${titles.slice(0, 3).join("; ")}`);
+  }
+  await banner.waitFor({ state: "detached" });
+  await rows.first().waitFor({ state: "visible" });
+  ok(`"${TWO_WORDS.join(" ")}" with an index chunk failing once shows the outage notice, then recovers`);
+}
+
 // Matches outside the selected years: the empty list says that, as the status line does.
 async function matchesOutsideYears(context) {
   const start = Number(String(query.event.date_start).slice(0, 4));
@@ -464,7 +493,7 @@ try {
     args: ["--enable-unsafe-swiftshader"],
   });
   await run(browser);
-  for (const check of [lostIndexChunk, twoWordsOneChunkGone, matchesOutsideYears, fullTextRetry]) await failureCheck(browser, check);
+  for (const check of [lostIndexChunk, twoWordsOneChunkGone, twoWordsChunkFailsOnce, matchesOutsideYears, fullTextRetry]) await failureCheck(browser, check);
   await layoutShiftCheck(browser).catch((err) => problems.push(`layoutShiftCheck: ${err.message.split("\n")[0]}`));
   noWebGL = await chromium.launch({ channel: CHANNEL, headless: true, args: ["--disable-3d-apis"] });
   await failureCheck(noWebGL, withoutWebGL);

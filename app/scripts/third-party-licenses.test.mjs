@@ -121,8 +121,10 @@ test("NOTICE names every Pagefind wasm crate whose licence is neither MIT nor Ap
   const notice = readFileSync(new URL("../../NOTICE", import.meta.url), "utf8").replace(/\s+/g, " ");
   const permissive = /^\(?(MIT|Apache-2\.0)( OR (MIT|Apache-2\.0))?\)?( AND Unicode-3\.0)?$/;
   const others = wasmManifest.crates.filter((c) => !permissive.test(c.license));
-  assert.deepEqual(others.map((c) => c.name).sort(), ["minicbor", "pagefind_microjson"]);
+  assert.deepEqual(others.map((c) => c.name).sort(), ["minicbor"]);
   for (const c of others) assert.ok(notice.includes(`${c.name}, ${c.license}`), `NOTICE: ${c.name}, ${c.license}`);
+  // Pagefind 1.6.0 dropped pagefind_microjson (GPL-3.0-only): NOTICE names a GPL crate only while one is compiled in.
+  if (!wasmManifest.crates.some((c) => /GPL/.test(c.license))) assert.doesNotMatch(notice, /\bGPL-|microjson|corresponding source/i);
   // pagefind_stem is MIT, but carries the Snowball stemmers' BSD-3-Clause notice (manifest note).
   assert.match(wasmManifest.crates.find((c) => c.name === "pagefind_stem").note, /Snowball stemmers \(BSD-3-Clause\)/);
   assert.ok(notice.includes("Snowball stemmers in pagefind_stem, BSD 3-Clause"));
@@ -139,7 +141,7 @@ test("NOTICE and data/LICENSE credit the Wikipedia text on the map: city and wat
 test("pagefindWasmNotices: another Pagefind version fails the build, so an upgrade forces a re-check", () => {
   const root = fakePagefind("9.9.9");
   try {
-    assert.throws(() => pagefindWasmNotices(root), /Pagefind 9\.9\.9 is installed, but the notices .* are for Pagefind 1\.5\.2/);
+    assert.throws(() => pagefindWasmNotices(root), /Pagefind 9\.9\.9 is installed, but the notices .* are for Pagefind 1\.6\.0/);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
@@ -151,12 +153,12 @@ test("pagefindWasmNotices: the installed Pagefind is the version the notices wer
   assert.equal(JSON.parse(readFileSync(installed, "utf8")).version, wasmManifest.pagefind);
 });
 
-test("pagefindWasmNotices: every crate with its version, licence, sources and texts; GPL with its corresponding source", () => {
+test("pagefindWasmNotices: every crate with its version, licence, sources and texts; a GPL one with its corresponding source", () => {
   const root = fakePagefind(wasmManifest.pagefind);
   try {
     const text = pagefindWasmNotices(root);
     assert.ok(text.includes("Rust crates compiled into Pagefind's search (wasm)"));
-    for (const name of ["wasm-bindgen", "bit-set", "pagefind_stem", "minicbor", "pagefind_microjson", "write-json"]) {
+    for (const name of ["wasm-bindgen", "bit-set", "pagefind_stem", "minicbor", "hifijson", "write-json"]) {
       assert.ok(wasmManifest.crates.some((c) => c.name === name), name);
     }
     for (const c of wasmManifest.crates) {
@@ -169,14 +171,16 @@ test("pagefindWasmNotices: every crate with its version, licence, sources and te
         if (f.source.startsWith("https://github.com/")) assert.match(f.source, /\/blob\/[0-9a-f]{40}\//, f.source);
       }
     }
+    // A crate without a licence text of its own says so (hifijson ships none, and its repository has none).
+    for (const c of wasmManifest.crates.filter((c) => !c.files.length)) assert.match(c.note ?? "", /Ships no licence file/, c.name);
+    // Pagefind 1.5.2's pagefind_microjson (GPL-3.0-only) is gone in 1.6.0 (hifijson replaced it); a GPL crate would
+    // need the full GPL text and its corresponding source.
     const gpl = wasmManifest.crates.filter((c) => /GPL/.test(c.license));
-    assert.deepEqual(gpl.map((c) => c.name), ["pagefind_microjson"]);
+    assert.deepEqual(gpl.map((c) => c.name), []);
     for (const c of gpl) {
       assert.ok(c.files.some((f) => f.file === "GPL-3.0.txt"));
       assert.ok(c.correspondingSource?.some((s) => s.startsWith(`https://static.crates.io/crates/${c.name}/${c.name}-${c.version}.crate`)));
     }
-    assert.ok(text.includes("Corresponding source: https://static.crates.io/crates/pagefind_microjson/pagefind_microjson-0.1.4.crate"));
-    assert.ok(text.includes("END OF TERMS AND CONDITIONS"));
     // every vendored file is used
     const used = new Set(["manifest.json", ...wasmManifest.crates.flatMap((c) => c.files.map((f) => f.file))]);
     assert.deepEqual(readdirSync(PAGEFIND_WASM_DIR).filter((f) => !used.has(f)), []);

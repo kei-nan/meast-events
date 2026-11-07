@@ -60,8 +60,8 @@ test("maps Pagefind result ids to event ids in relevance order, dropping unknown
   const pf = fakePagefind({ results: [{ id: "p2" }, { id: "p9" }, { id: "p1" }] });
   const calls = stubIds({ p1: "event-1", p2: "event-2" });
   assert.deepEqual(await searchEventIds("suez canal"), ["event-2", "event-1"]);
-  // Each word alone too: one lost index chunk would otherwise go unnoticed.
-  assert.deepEqual(pf.calls.search, ["suez canal", "suez", "canal"]);
+  // Each word alone first: one lost index chunk would otherwise go unnoticed.
+  assert.deepEqual(pf.calls.search, ["suez", "canal", "suez canal"]);
   assert.deepEqual(pf.calls.options, [{ basePath: "/pagefind/v.test/" }]);
   assert.deepEqual(calls, ["/pagefind/v.test/ids.json"]);
 });
@@ -225,7 +225,7 @@ test("a word no indexed word starts with answers no events, without Pagefind's p
   assert.deepEqual(await searchEventIds("Suez"), ["e1"]);
   assert.deepEqual(await searchEventIds("jerus"), ["e1"]);
   assert.deepEqual(await searchEventIds("Suez wars"), ["e1"]);
-  assert.deepEqual(pf.calls.search, ["Suez", "jerus", "Suez wars", "suez", "wars"]);
+  assert.deepEqual(pf.calls.search, ["Suez", "jerus", "suez", "wars", "Suez wars"]);
   assert.deepEqual(calls.words, ["/pagefind/v.test/words.json"]);
 });
 
@@ -238,13 +238,14 @@ test("symbols, never part of an indexed word, are left out of the query", async 
   assert.deepEqual(pf.calls.search, ["8000", "US500"]);
 });
 
-// Pagefind 1.5.2 only logs an index chunk it could not load, and then answers
-// as if that chunk's words were in no event: alone a word finds nothing, and
-// next to others it is ignored (measured: "jerusalem suez" -> the suez events).
+// Pagefind only logs an index chunk it could not load, and then answers as if
+// that chunk's words were in no event: alone a word finds nothing, and next to
+// others it is ignored (measured: "jerusalem suez" -> the suez events). Since
+// 1.6.0 (PR #1329) it asks for the chunk again on the next search.
 const WORLD = ["canal", "jerusalem", "suez"];
 const answers = (byQuery) => (q) => (byQuery[q] ?? []).map((id) => ({ id }));
 
-test("a word the word list holds but the index answers with nothing is a lost chunk: an outage, and a fresh engine", async () => {
+test("a word the word list holds but the index answers with nothing is a lost chunk: an outage; the same engine then recovers", async () => {
   const { searchEventIds } = await fresh();
   let lost = true;
   const pf = fakePagefind({ results: (q) => (lost && q.includes("jerusalem") ? [] : [{ id: "p1" }]) });
@@ -252,10 +253,28 @@ test("a word the word list holds but the index answers with nothing is a lost ch
   await assert.rejects(searchEventIds("jerusalem"), /part of the search index/);
   assert.equal(calls.meta, 1);
   lost = false;
-  // The next search reads meta.json again and loads the engine anew (a new module URL).
+  // The next search reads meta.json again (the folder may be gone) and keeps the
+  // engine, which asks for the chunk again.
   assert.deepEqual(await searchEventIds("jerusalem"), ["e1"]);
   assert.equal(calls.meta, 2);
-  assert.equal(pf.calls.init, 2);
+  assert.equal(pf.calls.init, 1);
+  assert.equal(pf.calls.options.length, 1);
+});
+
+test("a lost chunk after a deploy removed the folder: the next search moves to the folder meta.json names", async () => {
+  globalThis.__SEARCH_DIR__ = "v.deployed-over";
+  try {
+    const { searchEventIds } = await fresh();
+    const pf = fakePagefind({ results: () => (pf.calls.options.length < 2 ? [] : [{ id: "p1" }]) });
+    const calls = stubIds({ p1: "e1" }, { words: WORLD });
+    await assert.rejects(searchEventIds("jerusalem"), /part of the search index/);
+    assert.equal(calls.meta, 0);
+    assert.deepEqual(await searchEventIds("jerusalem"), ["e1"]);
+    assert.equal(calls.meta, 1);
+    assert.deepEqual(pf.calls.options.map((o) => o.basePath), ["/pagefind/v.deployed-over/", "/pagefind/v.test/"]);
+  } finally {
+    delete globalThis.__SEARCH_DIR__;
+  }
 });
 
 test("several words: one word's lost chunk is an outage, not the other word's events", async () => {
@@ -264,6 +283,38 @@ test("several words: one word's lost chunk is an outage, not the other word's ev
   fakePagefind({ results: answers({ "jerusalem suez": ["p2", "p3"], suez: ["p2", "p3"] }) });
   stubIds({ p2: "e2", p3: "e3" }, { words: WORLD });
   await assert.rejects(searchEventIds("jerusalem suez"), /part of the search index/);
+});
+
+// Pagefind 1.6.0: a chunk whose load failed is asked for again on the next search, which may succeed. Here
+// jerusalem's chunk fails for the first search that needs it and loads for the next.
+function failsOnce() {
+  let failed = false;
+  const all = { jerusalem: ["p1", "p2"], suez: ["p2", "p3"], "jerusalem suez": ["p2"] };
+  return (q) => {
+    const needsIt = q.includes("jerusalem");
+    if (needsIt && !failed) {
+      failed = true;
+      return (q === "jerusalem" ? [] : all.suez).map((id) => ({ id })); // jerusalem ignored
+    }
+    return (all[q] ?? []).map((id) => ({ id }));
+  };
+}
+
+test("several words, a chunk that fails once: an outage, never the query's answer without that word", async () => {
+  const { searchEventIds } = await fresh();
+  fakePagefind({ results: failsOnce() });
+  stubIds({ p1: "e1", p2: "e2", p3: "e3" }, { words: WORLD });
+  // A check after the query would reload the chunk, pass, and let "jerusalem suez" answer the suez events.
+  await assert.rejects(searchEventIds("jerusalem suez"), /part of the search index/);
+  assert.deepEqual(await searchEventIds("jerusalem suez"), ["e2"]);
+});
+
+test("one word, a chunk that fails once: the check loads it and the word is searched again", async () => {
+  const { searchEventIds } = await fresh();
+  const pf = fakePagefind({ results: failsOnce() });
+  stubIds({ p1: "e1", p2: "e2", p3: "e3" }, { words: WORLD });
+  assert.deepEqual(await searchEventIds("jerusalem"), ["e1", "e2"]);
+  assert.deepEqual(pf.calls.search, ["jerusalem", "jerusalem", "jerusalem"]);
 });
 
 test("several words each found, but never in one event, are no match, not an outage", async () => {

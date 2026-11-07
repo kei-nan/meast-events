@@ -14,15 +14,18 @@
 // (the dev server), or after a load failed (a page older than the deploy, whose
 // folder is gone), the current folder is read from pagefind/meta.json.
 //
-// Pagefind (1.5.2, _loadGenericChunk) does not report an index chunk it could
-// not load (a dropped connection, or a folder a deploy removed): it logs it,
-// keeps the failed load (the chunk is never asked for again) and answers as if
-// the chunk's words were in no event. A word on its own then finds nothing, and
-// in a query of several words it is ignored: measured (2026-11, one chunk
-// aborted) "jerusalem suez" answered the 29 "suez" events instead of 2. So each
-// word the word list says the index holds is also searched alone; one that
-// finds nothing means a lost chunk, and the engine is dropped (a fresh one
-// loads on the next try) and the search fails as an outage.
+// Pagefind (1.6.0, loadChunk) does not report an index chunk it could not load
+// (a dropped connection, or a folder a deploy removed): it logs it and answers
+// as if the chunk's words were in no event. A word on its own then finds
+// nothing, and in a query of several words it is ignored: measured (2026-11,
+// one chunk aborted) "jerusalem suez" answered the 29 "suez" events instead of
+// 2. So each word the word list says the index holds is also searched alone;
+// one that finds nothing means a lost chunk, and the search fails as an outage.
+// Since 1.6.0 (Pagefind PR #1329) the engine forgets the failed load and asks
+// for the chunk again on the next search, so it is kept (1.5.2 kept the failure
+// for good, and the engine had to be replaced); only meta.json is read again
+// before the next try, in case a deploy removed the folder (load() then moves
+// to the new folder's engine).
 
 import { everyTermIndexed, pagefindQuery, queryTerms } from "./searchTerms.js";
 
@@ -33,7 +36,6 @@ const BUILD_DIR = typeof __SEARCH_DIR__ === "string" ? __SEARCH_DIR__ : null;
 let dirPromise = BUILD_DIR ? Promise.resolve(BUILD_DIR) : null;
 let loadedDir = null; // the folder enginePromise and idsPromise come from
 let enginePromise = null;
-let engine = null; // what enginePromise resolved to
 let idsPromise = null;
 let engineFailures = 0;
 
@@ -67,7 +69,6 @@ async function load() {
   if (dir !== loadedDir) {
     loadedDir = dir;
     enginePromise = null;
-    engine = null;
     idsPromise = null;
   }
   const base = `${ROOT}${dir}/`;
@@ -79,7 +80,6 @@ async function load() {
     const p = import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
       await pf.options({ basePath: base });
       await pf.init();
-      if (enginePromise === p) engine = pf;
       return pf;
     });
     enginePromise = p;
@@ -114,26 +114,14 @@ async function load() {
   return Promise.all([enginePromise, idsPromise]);
 }
 
-// An engine that lost an index chunk keeps it lost, so it is replaced: the next
-// load reads meta.json (the folder may be gone) and imports the engine under a
-// new URL (engineUrl); the same module URL would give back the same engine.
-function discardEngine(pf) {
-  if (engine !== pf) return;
-  engine = null;
-  enginePromise = null;
-  engineFailures++;
-  dirPromise = null;
-  Promise.resolve()
-    .then(() => pf.destroy?.()) // its web worker
-    .catch(() => {});
-}
-
 // Every word of a query that the word list holds finds something on its own,
-// unless Pagefind lost the chunk it is in.
+// unless Pagefind lost the chunk it is in. The engine is kept (it asks for a
+// failed chunk again on the next search); meta.json is read again before the
+// next try, as the folder may be gone.
 async function assertChunksLoaded(pf, terms) {
   const answers = await Promise.all([...new Set(terms)].map((t) => pf.search(t)));
   if (answers.some((a) => a?.results?.length === 0)) {
-    discardEngine(pf);
+    dirPromise = null;
     throw new Error("Failed to load part of the search index");
   }
 }
@@ -148,12 +136,21 @@ export async function searchEventIds(q) {
   const [pf, { ids, words }] = await load();
   const query = pagefindQuery(q);
   if (!everyTermIndexed(query, words)) return [];
-  const res = await pf.search(query);
-  // One word that found something needs no check; several words, or nothing
-  // found, are checked word by word. Words each found, but never in one event,
-  // are a real "no match".
+  // Several words are checked word by word BEFORE the query: Pagefind 1.6.0
+  // asks for a failed chunk again on each search, so a check run after the
+  // query could load the chunk the query went without, pass, and leave the
+  // query's answer short of that word. Once each word has found something, its
+  // chunks are loaded and the query runs on all of them. One word is checked
+  // only if it found nothing, and then searched again: the check may have
+  // loaded its chunk. Words each found, but never in one event, are a real
+  // "no match".
   const terms = queryTerms(query);
-  if (terms.length > 1 || res?.results?.length === 0) await assertChunksLoaded(pf, terms);
+  if (terms.length > 1) await assertChunksLoaded(pf, terms);
+  let res = await pf.search(query);
+  if (terms.length <= 1 && res?.results?.length === 0) {
+    await assertChunksLoaded(pf, terms);
+    res = await pf.search(query);
+  }
   const out = [];
   for (const r of res?.results ?? []) {
     const id = ids[r.id];

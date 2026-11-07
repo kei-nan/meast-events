@@ -8,6 +8,9 @@ test("queryTerms cuts and folds the query as pagefind.js does", () => {
   assert.deepEqual(queryTerms("Kıbrıs"), ["kıbrıs"]); // dotless i has no NFD decomposition
   assert.deepEqual(queryTerms("القدس ירושלים"), ["القدس", "ירושלים"]);
   assert.deepEqual(queryTerms("--"), []);
+  // Pagefind 1.6.0 drops a word that folds to nothing (a lone combining mark); it is not searched for.
+  assert.deepEqual(queryTerms("suez ́"), ["suez"]);
+  assert.deepEqual(queryTerms("suez ́ canal"), ["suez", "canal"]);
 });
 
 test("pagefindQuery drops symbols and bidi marks, never part of an indexed word", () => {

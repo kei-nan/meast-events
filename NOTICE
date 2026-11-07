@@ -14,11 +14,10 @@ Data (data/): see data/LICENSE. Each part keeps its source's licence:
 Third-party software in the built site (MapLibre GL JS, BSD 3-Clause, and the
 packages its prebuilt bundle includes, such as kdbush, earcut and pbf; React,
 Pagefind and uqr, MIT; the Rust crates compiled into Pagefind's WebAssembly
-search runtime, mostly MIT or Apache-2.0, among them pagefind_microjson,
-GPL-3.0-only, minicbor, BlueOak-1.0.0, and the Snowball stemmers in
-pagefind_stem, BSD 3-Clause; the Fontsource font packages, OFL 1.1): their
-licence notices are generated at build time into third-party-licenses.txt
-(with the corresponding source of pagefind_microjson), served at
+search runtime, mostly MIT or Apache-2.0, among them minicbor,
+BlueOak-1.0.0, and the Snowball stemmers in pagefind_stem, BSD 3-Clause;
+the Fontsource font packages, OFL 1.1): their licence notices are
+generated at build time into third-party-licenses.txt, served at
 https://middleeast.events/third-party-licenses.txt
 (app/scripts/third-party-licenses.mjs).
 
