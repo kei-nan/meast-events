@@ -158,7 +158,7 @@ export const CORRECTIONS = [
       "on 29 October 1923. Separately: this shape excludes Hatay/Alexandretta until " +
       "1939 (see the Hatay entry below) - CShapes' own polygon incorrectly included it " +
       "from 1923.",
-    source: "https://en.wikipedia.org/wiki/Republic_of_Turkey_(1923%E2%80%93present)",
+    source: "https://en.wikipedia.org/wiki/Ottoman_Empire",
   },
   {
     type: "split",
@@ -386,7 +386,7 @@ export const CORRECTIONS = [
       "Sovereignty over the Hawar Islands was contested by Qatar from the 1930s until the " +
       "International Court of Justice awarded them to Bahrain in 2001. Current geometry " +
       "reflects the final ruling; this window marks when it was still unsettled.",
-    source: "https://en.wikipedia.org/wiki/Hawar_Islands_dispute",
+    source: "https://en.wikipedia.org/wiki/Qatar_v._Bahrain",
   },
   // CShapes has no notion of either Uqair Protocol neutral zone: it hands each zone's two
   // eventual halves to their modern owners for the whole 20th century, so the later
@@ -592,7 +592,8 @@ export const CORRECTIONS = [
       "Jerusalem \"null and void\". This shape (CShapes 2.0's West Bank record, 1949 Armistice " +
       "Line) includes East Jerusalem throughout, also after 1980: no source we use outlines " +
       "it on its own before 2000, so it is not drawn as an annexed shape like the Golan " +
-      "Heights. No part of the West Bank passed to Palestinian control in this period.",
+      "Heights. No part of the West Bank passed to Palestinian control in this period before " +
+      "the 4 May 1994 Gaza-Jericho Agreement.",
     source: `https://en.wikipedia.org/wiki/Israeli_occupation_of_the_West_Bank; ${UNSC_252}; ${UNSC_478}`,
   },
   {

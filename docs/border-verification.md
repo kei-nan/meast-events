@@ -13,6 +13,8 @@ A large distance means the drawn line, the Wikidata coordinate, or both are off:
 
 Not every point is a valid reference for every year: a crossing on a border drawn later (e.g. the 1969 Kuwait-Saudi partition line, for 1960) is expected to be far off, and some checkpoints are not on an international border (e.g. on the Jerusalem barrier).
 
+**Map year 1960, report only (10 points that existed then):** within 1 km: 2, 1-3 km: 3, 3-10 km: 0, no land border within 10 km: 5. See the last section.
+
 ## Borders this project changed or added
 
 | km | Reference point | Kind | Wikidata countries | Nearest drawn border between |
@@ -307,3 +309,22 @@ Not every point is a valid reference for every year: a crossing on a border draw
 | 0.00 | [Israel Jordan border crossing #1398](https://www.wikidata.org/wiki/Q68036334) (Q68036334) | border checkpoint | Israel, Jordan | Israel / Jordan |
 | 0.00 | [Egypt Israel border crossing #1344](https://www.wikidata.org/wiki/Q68036300) (Q68036300) | border checkpoint | Egypt, Israel | Egypt / Israel |
 | 0.00 | [Oman United Arab Emirates border crossing #1320](https://www.wikidata.org/wiki/Q68036288) (Q68036288) | border checkpoint | Oman, United Arab Emirates | Oman / United Arab Emirates |
+
+## Map year 1960 (report only), with the points that existed then
+
+Only the 10 independent points that Wikidata dates as existing in 1960 (inception or opening 1960 or before, not dissolved or closed by then; dates in `WIKIDATA_DATES` in scripts/verify-borders.js). The other 156 independent points have no date in Wikidata or a later one, so they say nothing about the 1960 lines. This section never fails the build; `--check` compares every border period with its own baseline and only fails on a change.
+
+**Points that existed in 1960 (10):** within 1 km: 2, 1-3 km: 3, 3-10 km: 0, no land border within 10 km: 5.
+
+| km in 1960 | km in 2026 | Reference point | Kind | Wikidata dates | Nearest drawn border in 1960 between |
+|---:|---:|---|---|---|---|
+| - | - | [Doğukapı railway station](https://www.wikidata.org/wiki/Q5303894) (Q5303894) | border train station | 1899-1993 |  |
+| - | - | [Zahedan Railway Station](https://www.wikidata.org/wiki/Q18536636) (Q18536636) | border train station | 1919- |  |
+| - | - | [Kermanshah Custom House](https://www.wikidata.org/wiki/Q97216919) (Q97216919) | custom house | 1935- |  |
+| - | 0.12 | [al-Abdali Border Crossing](https://www.wikidata.org/wiki/Q113700600) (Q113700600) | border crossing | 1958- |  |
+| - | - | [Kaz Ova bridge](https://www.wikidata.org/wiki/Q131403358) (Q131403358) | international bridge | 1873- |  |
+| 2.92 | 2.92 | [Arar Border Crossing](https://www.wikidata.org/wiki/Q111974111) (Q111974111) | border crossing | 1960- | Iraq / Saudi Arabia |
+| 1.34 | 1.34 | [Upper customs house](https://www.wikidata.org/wiki/Q6968100) (Q6968100) | custom house | 1921- | Israel / Syria |
+| 1.14 | 0.02 | [Mandelbaum Gate](https://www.wikidata.org/wiki/Q731063) (Q731063) | border checkpoint | 1949-1967 | Israel / West Bank (annexed by Jordan) |
+| 0.34 | 0.09 | [King Abdullah Bridge](https://www.wikidata.org/wiki/Q6411207) (Q6411207) | border checkpoint | 1955- | Jordan / West Bank (annexed by Jordan) |
+| 0.09 | 0.09 | [Karkamış Bridge](https://www.wikidata.org/wiki/Q25379775) (Q25379775) | international bridge | 1915- | Syria / Turkey |

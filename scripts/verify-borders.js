@@ -6,6 +6,7 @@
 // two shapes meet, so coastlines do not count - and the two shapes that meet there.
 //
 //   node scripts/verify-borders.js [--year=2026] [--report=docs/border-verification.md]
+//     (the report adds EARLY_YEAR, scored only with the points that existed then; report only)
 //   node scripts/verify-borders.js --write-baseline   (baselineYears() -> data/border-check-baseline.json)
 //   node scripts/verify-borders.js --check            (fails if any independent point moved
 //                                                      more than ${TOLERANCE_KM} km further from the border than in the baseline)
@@ -33,6 +34,48 @@ export const BANDS = [
   { max: SEARCH_KM, label: `3-${SEARCH_KM} km` },
   { max: Infinity, label: `no land border within ${SEARCH_KM} km` },
 ];
+
+// The report also scores one year before 2000 (report only: --check is unchanged), with
+// only the points Wikidata dates as existing in that year. A crossing opened later says
+// nothing about where an older line ran: most of the West Bank checkpoints are on the
+// barrier, built from 2002, and the pre-2000 West Bank line is not the 2000-onward one.
+export const EARLY_YEAR = 1960;
+// Every independent point that has a date in Wikidata (retrieved 2026-11-06, wbgetentities):
+// from = the earlier of inception (P571) and official opening (P1619), to = the earlier of
+// dissolved (P576) and closure (P3999); null = no such statement, "unknown" = a statement
+// with no date. Only the year is kept (most are year-precision).
+export const WIKIDATA_DATES = {
+  Q387952: { from: 1994, to: null }, // Karni crossing
+  Q712133: { from: 1994, to: null }, // Allenby Bridge (P571 2008, P1619 1994)
+  Q731063: { from: 1949, to: 1967 }, // Mandelbaum Gate
+  Q827735: { from: 1981, to: null }, // King Fahd Causeway
+  Q2071881: { from: 1976, to: 2000 }, // Fatima Gate
+  Q2386953: { from: 1982, to: null }, // Menachem Begin-Taba Border Crossing
+  Q2386965: { from: 1982, to: null }, // Nitzana Border Crossing
+  Q2559756: { from: 1994, to: null }, // Wadi Araba Crossing
+  Q2671245: { from: 1994, to: null }, // Jordan River Crossing
+  Q3125423: { from: 1969, to: null }, // Habur Border Crossing
+  Q5303894: { from: 1899, to: 1993 }, // Doğukapı railway station
+  Q6367420: { from: 1971, to: null }, // Kapıkule railway station
+  Q6411207: { from: 1955, to: null }, // King Abdullah Bridge
+  Q6968100: { from: 1921, to: null }, // Upper customs house
+  Q12840560: { from: 1992, to: null }, // Umut Bridge
+  Q18536636: { from: 1919, to: null }, // Zahedan Railway Station
+  Q25379775: { from: 1915, to: null }, // Karkamış Bridge
+  Q67893141: { from: null, to: "unknown" }, // Horadiz border post
+  Q97216919: { from: 1935, to: null }, // Kermanshah Custom House
+  Q111974111: { from: 1960, to: null }, // Arar Border Crossing
+  Q112040540: { from: 2008, to: null }, // Haj Emran Border Crossing
+  Q113700600: { from: 1958, to: null }, // al-Abdali Border Crossing
+  Q124751083: { from: 2018, to: null }, // railway border crossing Astara
+  Q131403358: { from: 1873, to: null }, // Kaz Ova bridge
+};
+// A point is a reference for `year` only if Wikidata dates it from that year or before and,
+// if it was dissolved or closed, not before that year. Undated points are not.
+export const existedIn = (id, year, dates = WIKIDATA_DATES) => {
+  const d = dates[id];
+  return !!d && d.from != null && d.from <= year && (d.to == null || (typeof d.to === "number" && d.to > year));
+};
 
 const read = async (p) => JSON.parse(await readFile(new URL(p, import.meta.url), "utf-8"));
 
@@ -151,6 +194,8 @@ async function main() {
   const modified = indep.filter((r) => r.modified);
   const fmt = (r) =>
     `| ${Number.isFinite(r.km) ? r.km.toFixed(2) : "-"} | [${r.label}](${r.source}) (${r.id}) | ${r.kind} | ${r.countries.join(", ")} | ${r.between.join(" / ")} |`;
+  // The early year: report only, never a failure (the regression check is --check).
+  const early = YEAR === EARLY_YEAR ? [] : measureYear(indep.filter((p) => existedIn(p.id, EARLY_YEAR)), all, EARLY_YEAR);
   const lines = [
     `# Border check against Wikidata reference points (map year ${YEAR})`,
     "",
@@ -170,6 +215,9 @@ async function main() {
       "partition line, for 1960) is expected to be far off, and some checkpoints are not on an international border " +
       "(e.g. on the Jerusalem barrier).",
     "",
+    ...(early.length
+      ? [`**Map year ${EARLY_YEAR}, report only (${early.length} points that existed then):** ${tally(early)}. See the last section.`, ""]
+      : []),
     "## Borders this project changed or added",
     "",
     "| km | Reference point | Kind | Wikidata countries | Nearest drawn border between |",
@@ -189,10 +237,34 @@ async function main() {
     ...rows.filter((r) => r.bulk).sort((a, b) => b.km - a.km).map(fmt),
     "",
   ];
+  const nowKm = new Map(indep.map((r) => [r.id, r.km]));
+  const km = (v) => (Number.isFinite(v) ? v.toFixed(2) : "-");
+  if (early.length) {
+    lines.push(
+      `## Map year ${EARLY_YEAR} (report only), with the points that existed then`,
+      "",
+      `Only the ${early.length} independent points that Wikidata dates as existing in ${EARLY_YEAR} (inception or opening ` +
+        `${EARLY_YEAR} or before, not dissolved or closed by then; dates in \`WIKIDATA_DATES\` in scripts/verify-borders.js). ` +
+        `The other ${indep.length - early.length} independent points have no date in Wikidata or a later one, so they ` +
+        `say nothing about the ${EARLY_YEAR} lines. This section never fails the build; \`--check\` compares every border ` +
+        "period with its own baseline and only fails on a change.",
+      "",
+      `**Points that existed in ${EARLY_YEAR} (${early.length}):** ${tally(early)}.`,
+      "",
+      `| km in ${EARLY_YEAR} | km in ${YEAR} | Reference point | Kind | Wikidata dates | Nearest drawn border in ${EARLY_YEAR} between |`,
+      "|---:|---:|---|---|---|---|",
+      ...early.sort((a, b) => b.km - a.km).map((r) => {
+        const d = WIKIDATA_DATES[r.id];
+        return `| ${km(r.km)} | ${km(nowKm.get(r.id))} | [${r.label}](${r.source}) (${r.id}) | ${r.kind} | ${d.from}-${d.to ?? ""} | ${r.between.join(" / ")} |`;
+      }),
+      "",
+    );
+  }
   if (REPORT) await writeFileAtomic(REPORT, lines.join("\n"));
   console.log(`year ${YEAR}: independent points (${indep.length}) - ${tally(indep)}`);
   console.log(`  on changed/added borders (${modified.length}) - ${tally(modified)}`);
   for (const r of modified.sort((a, b) => b.km - a.km).slice(0, 15)) console.log(`  ${Number.isFinite(r.km) ? r.km.toFixed(2) : "-"} km  ${r.label} (${r.id})  [${r.between.join(" / ")}]`);
+  if (early.length) console.log(`year ${EARLY_YEAR} (report only): points that existed then (${early.length}) - ${tally(early)}`);
 }
 
 if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, "/")}` || process.argv[1]?.endsWith("verify-borders.js")) await main();

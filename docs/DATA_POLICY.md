@@ -629,9 +629,21 @@ Checked on 2026-10-06 by testing a point in each place against every feature for
 | Qatar | 1900-1916 | Qatar from 3 Nov 1916 (first map year 1917). |
 | Aden and South Arabia (Aden, Lahij, Mukalla, Seiyun) | 1900-1936 | Nothing for the area before 1937. From 1937 its Aden unit (shown as Aden Colony and Western Aden Protectorate) and East Aden Protectorate (Apr 1937 - Apr 1962, map years 1937-1961), then its Federation of South Arabia (Apr 1962 - Nov 1967, map years 1962-1967; the shape also covers the Protectorate of South Arabia states that never joined), then the People's Republic of South Yemen from 30 Nov 1967 (first map year 1968). |
 
-Everywhere else among the 15 tracked countries a point is covered in every year: Turkey and Iran from before 1900, Egypt from 1899, Iraq, Syria,
-Lebanon, Jordan and Israel/Palestine by the Ottoman Empire shape through 1919 and by mandate or state shapes from 1920, the Trucial States
-(later the UAE) from 1892, Muscat and Oman from before 1900, and northern Yemen by the Ottoman Empire shape through 1918 and the Mutawakkilite Kingdom from 1919.
+Elsewhere among the 15 tracked countries a point is covered in every year, apart from slivers along coasts and borders and the areas in the
+next table: Turkey and Iran from before 1900, Egypt from 1899, Iraq, Syria, Lebanon, Jordan and Israel/Palestine by the Ottoman Empire shape
+through 1919 and by mandate or state shapes from 1920, the Trucial States (later the UAE) from 1892, Muscat and Oman from before 1900, and
+northern Yemen by the Ottoman Empire shape through 1918 and the Mutawakkilite Kingdom from 1919. Neither the Ottoman Empire shape nor the first
+mandate or state shape reaches these areas (checked on 2026-11-06 on a 0.1-degree grid against Natural Earth's modern countries):
+
+| Place | No shape in | First shape |
+|---|---|---|
+| Western and south-western Iraq, the desert towards Syria, Jordan and Saudi Arabia (Rutba, 33.03N 40.28E); about 37% of modern Iraq | 1900-1920 | British Mandate of Mesopotamia from 1921 (its 1920 shape is smaller) |
+| Eastern Jordan (Ruwaished, 32.5N 38.2E); about 48% of modern Jordan | 1900-1923 | Transjordan from 1924 (its 1920-1923 shape is smaller) |
+| The south-eastern tip of modern Syria (38.2-39.4E, 33.2-33.8N); about 2.5% of it | 1900-1920 | French Mandate of Syria from 1921 |
+| Kars and Ardahan, north-eastern Turkey; about 3% of modern Turkey | 1900-1917 | Ottoman Empire from 1918 |
+| Eastern parts of northern Yemen (Marib, Al Jawf) | 1900-1918 | Mutawakkilite Kingdom of Yemen from 1919 |
+
+
 Kuwait in 1990-1991 is drawn under the name "Kuwait (annexed by Iraq)", which `validate-boundaries.js` reports as a gap in the name "Kuwait".
 
 Where one of our added shapes (the Sanjak of Alexandretta, the Saudi-Kuwaiti Neutral Zone) meets a CShapes neighbour, the two sources' lines leave

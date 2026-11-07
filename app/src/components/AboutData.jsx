@@ -524,8 +524,7 @@ export default function AboutData({ section = null, onClose }) {
           <a href={`${REPO}/blob/main/scripts/build-cities.js`} target="_blank" rel="noreferrer" title="Opens in a new tab">
             list
           </a>{" "}
-          quotes the sentences, and names the changes left out because no article dates them (Aintab for Gaziantep, Soltan
-          Abad for Arak).
+          quotes the sentences, and names the changes left out because no article dates them (Soltan Abad for Arak).
         </p>
 
         {/* The footer's "Sources & licences" opens the dialog here: these are
