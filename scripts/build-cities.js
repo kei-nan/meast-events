@@ -22,8 +22,8 @@
 // leaves those years unnamed. A year shows the name taken that year (Istanbul in 1930). The
 // current period is always the article's title, even where the official name differs (Tel
 // Aviv, officially Tel Aviv-Yafo since 1950; Urfa, officially Şanlıurfa since 1984). Not
-// listed, because the article does not date the change: Gaziantep (Aintab; "Gazi" added),
-// Arak (Soltan Abad, "under the reign of Reza Shah"), and English spellings that went out
+// listed, because the article does not date the change: Arak (Soltan Abad, "under the
+// reign of Reza Shah"), and English spellings that went out
 // of use (Trebizond, Jedda, Assuan). Kermanshah's article does not mention Bakhtaran.
 //
 // Checks (the build fails): every place has a Wikidata item with an English Wikipedia
@@ -115,6 +115,16 @@ const RENAMES = {
     cite: [
       { article: "Tel Aviv", quote: "The city was founded in 1909 by the Yishuv (Jewish residents) and initially given the Hebrew name Ahuzat Bayit" },
       { article: "Tel Aviv", quote: "On 21 May 1910, the name Tel Aviv was adopted." },
+    ],
+  },
+  // "Gazi" added in February 1921; the present spelling "after 1928" (counted from 1928, as
+  // Kahramanmaraş's "After 1973" is).
+  Q93338: {
+    names: [{ name: "Aintab", to: 1921 }, { name: "Gazi Ayıntap", from: 1921, to: 1928 }, { from: 1928 }],
+    cite: [
+      { article: "Gaziantep", quote: "Gaziantep, historically Aintab and still informally called Antep, is a major city in south-central Turkey." },
+      { article: "Gaziantep", quote: "Gazi Ayıntap in official Turkish after February 1921" },
+      { article: "Gaziantep", quote: "Gaziantep in official Turkish after 1928" },
     ],
   },
   // Settled "around 1923": not named before.
