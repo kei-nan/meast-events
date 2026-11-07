@@ -6,7 +6,7 @@ export const RETRY_MS = 20000;
 
 // Owns the event store: a ref-held Map of every event (lite records; full leads
 // are kept by App, not here), filled ONCE from the static
-// events/all.<hash>.json - no API call. Everything else (range, viewport,
+// events/v.<DATA_VERSION>/all.json (lib/dataClient.js loadAllLite) - no API call. Everything else (range, viewport,
 // filters, drawn areas) is derived from this store locally.
 //
 // `loading` is true until the first attempt to load the lite set has ended;

@@ -128,7 +128,8 @@ test("loadAllLite: a missing versioned folder falls back to events/meta.json (no
 });
 
 // The shape check runs before the file is cached, so a bad answer is evicted
-// and useAllEvents' retry fetches again.
+// and useAllEvents' retry fetches again. A file that arrived but is wrong is
+// not a missing folder, so meta.json is not asked.
 test("loadAllLite: a non-array file is an error and the next call tries again", async () => {
   const { loadAllLite } = await freshClient();
   let good = false;
@@ -139,29 +140,53 @@ test("loadAllLite: a non-array file is an error and the next call tries again", 
   await assert.rejects(loadAllLite(), /not an array/);
   good = true;
   assert.equal((await loadAllLite()).length, 1);
-  assert.equal(count(calls, all(V1)), 3); // first try, meta retry, next call
+  assert.equal(count(calls, all(V1)), 2); // first try, next call
+  assert.equal(count(calls, META), 0);
 });
 
 // A connection that never answers must end as an outage (not "Loading events…"
-// forever), so useAllEvents shows the outage state and retries.
-test("loadAllLite: a stalled request times out as an outage and the next call tries again", async (t) => {
+// forever), so useAllEvents shows the outage state and retries. It ends after
+// ONE timeout: an outage is not a missing folder, so there is no meta.json
+// fallback to wait through (which made it 60-90 s).
+test("loadAllLite: a stalled request times out as an outage after one timeout and the next call tries again", async (t) => {
   const { loadAllLite, ALL_LITE_TIMEOUT_MS } = await freshClient();
   t.mock.timers.enable({ apis: ["setTimeout"] });
   let stall = true;
+  const urls = [];
   const hang = (init) =>
     new Promise((_, reject) => init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))));
   globalThis.fetch = async (url, init) => {
+    urls.push(url);
     if (stall) return hang(init);
     return url === META ? json({ version: V1, fullBuckets: B1 }) : json(LITE);
   };
   const first = loadAllLite();
-  const failed = assert.rejects(first, (e) => e.outage === true && !e.aborted);
-  t.mock.timers.tick(ALL_LITE_TIMEOUT_MS); // all.json
+  let settled = false;
+  const failed = assert.rejects(first, (e) => e.outage === true && !e.aborted).finally(() => (settled = true));
+  t.mock.timers.tick(ALL_LITE_TIMEOUT_MS - 1);
   await new Promise((r) => setImmediate(r));
-  t.mock.timers.tick(ALL_LITE_TIMEOUT_MS); // the meta.json fallback
+  assert.equal(settled, false);
+  t.mock.timers.tick(1); // all.json's timeout
   await failed;
+  assert.deepEqual(urls, [all(V1)]);
   stall = false;
   assert.equal((await loadAllLite()).length, 1);
+});
+
+test("loadAllLite: a 5xx or network failure is not retried via meta.json", async () => {
+  for (const fail of [() => json({}, 503), () => { throw new TypeError("fetch failed"); }]) {
+    const { loadAllLite } = await freshClient();
+    const calls = stubFetch({ [all(V1)]: fail, [META]: () => json({ version: "v2", fullBuckets: B1 }) });
+    await assert.rejects(loadAllLite(), (e) => e.outage === true);
+    assert.deepEqual(calls.map((c) => c.url), [all(V1)]);
+  }
+});
+
+test("loadAllLite: a missing folder that meta.json still names is not fetched again", async () => {
+  const { loadAllLite } = await freshClient();
+  const calls = stubFetch({ [all(V1)]: () => html(200), [META]: () => json({ version: V1, fullBuckets: B1 }) });
+  await assert.rejects(loadAllLite(), (e) => e.outage === false && /Not found/.test(e.message));
+  assert.deepEqual(calls.map((c) => c.url), [all(V1), META]);
 });
 
 test("loadFullLead: the record, or null when its bucket lacks the id", async () => {
