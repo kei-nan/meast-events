@@ -114,7 +114,11 @@ html, body, #root {
     padding: 8px 14px;
   }
 
+  /* Shrinks, and so wraps, only when it is wider than the header on its own
+     (large text): otherwise it is as wide as its words, as before. */
   .app-header h1 {
+    flex: 0 1 auto;
+    min-width: 0;
     font-size: 1.05rem;
   }
 

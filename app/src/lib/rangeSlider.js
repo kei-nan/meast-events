@@ -65,6 +65,16 @@ export function keyTarget(key, value) {
 }
 
 /**
+ * The name of the years button (Timeline.jsx): its visible text first ("1900 –
+ * 2026", or one year when both ends are the same and no handle is held), then
+ * what it does, so a reader speaking what they see can press it (WCAG 2.5.3).
+ */
+export function yearButtonLabel(start, end, handleActive) {
+  const shown = start === end && !handleActive ? `${start}` : `${start} – ${end}`;
+  return `${shown}: type exact years`;
+}
+
+/**
  * Checks a typed year for one handle. Returns { year } when it can be applied
  * as is, or { error } with a sentence to show next to the field. Nothing is
  * clamped silently: a typed year is either used exactly or explained.

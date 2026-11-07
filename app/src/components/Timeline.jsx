@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { playRestart, playStep } from "../lib/playback";
-import { checkTypedYear, handleForDirection, keyTarget, moveHandle, pickHandle } from "../lib/rangeSlider";
+import { checkTypedYear, handleForDirection, keyTarget, moveHandle, pickHandle, yearButtonLabel } from "../lib/rangeSlider";
 import "../Timeline.css";
 
 const PLAY_INTERVAL_MS = 350;
@@ -288,7 +288,7 @@ function Timeline({
             ref={yearBtnRef}
             aria-expanded={editing}
             aria-controls="timeline-years-edit"
-            aria-label={`${startYear === endYear ? startYear : `${startYear} to ${endYear}`}: type exact years`}
+            aria-label={yearButtonLabel(startYear, endYear, active)}
             title="Type exact years"
             onClick={() => setEditing((v) => !v)}
           >

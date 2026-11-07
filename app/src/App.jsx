@@ -773,6 +773,7 @@ export default function App() {
             counts={counts}
             interim={search.interim}
             notFoundId={notFoundId}
+            linkedEventId={initial.eventId}
             placeView={placeView}
             onOpenPlace={openPlace}
             onRetryLead={retryLead}

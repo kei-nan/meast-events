@@ -20,6 +20,8 @@ import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
 import useSheetDrag from "../hooks/useSheetDrag";
+import { initialSheet } from "../lib/sheetSnap.js";
+import { panelLiveText } from "../lib/panelLive.js";
 import { RETRY_MS } from "../hooks/useAllEvents";
 import "../SidePanel.css";
 
@@ -168,6 +170,7 @@ export default function SearchPanel({
   view = "list",
   onViewChange,
   notFoundId = null,
+  linkedEventId = null, // the event the page's URL named when it loaded (App's initial.eventId)
   placeView = null,
   onOpenPlace, // ({lon, lat}): an open event's "History of this place"
   onRetryLead,
@@ -193,9 +196,10 @@ export default function SearchPanel({
   // An event (or "What was this place?") opens at half height, so its place stays
   // in sight on the map above (at full only a strip shows, under the map's
   // controls); a search opens the list at full. Tapping the lowered bar reopens
-  // it the same way.
+  // it the same way. A link to an event starts at half before the event has
+  // loaded (lib/sheetSnap.js initialSheet), so the sheet does not jump up then.
   const { sheet, setSheet, dragHeight, barProps } = useSheetDrag(
-    selectedEvent || placeView ? "half" : query ? "full" : "peek",
+    initialSheet({ eventOpen: Boolean(selectedEvent), linkedEventId, placeOpen: Boolean(placeView), query }),
     panelRef,
     selectedEvent || placeView ? "half" : "full"
   );
@@ -215,11 +219,12 @@ export default function SearchPanel({
     setPrevSelectedId(selectedId);
     if (selectedId && sheet === "peek") setSheet("half");
   }
-  // So does a link to no event, whose notice is at the top of the panel.
+  // So does a link to no event, whose notice is at the top of the panel, at full
+  // height (also when the sheet started at half for it, above).
   const [prevNotFoundId, setPrevNotFoundId] = useState(notFoundId);
   if (notFoundId !== prevNotFoundId) {
     setPrevNotFoundId(notFoundId);
-    if (notFoundId && sheet === "peek") setSheet("full");
+    if (notFoundId && (sheet === "peek" || (sheet === "half" && notFoundId === linkedEventId))) setSheet("full");
   }
   // "What was this place?" opens the same way as an event; it shows while no event is open.
   const placeKey = placeView ? `${placeView.place.lon},${placeView.place.lat}` : null;
@@ -491,7 +496,12 @@ export default function SearchPanel({
   const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
   const spoken = describeStatus(yearsText);
   const paused = pausedAt === rangeKey;
-  const liveText = playing ? "" : (paused ? `Paused at ${range[1]}. ` : "") + spoken.text + spoken.extra;
+  const liveText = panelLiveText({
+    playing,
+    pausedAtYear: paused ? range[1] : null,
+    eventsError: Boolean(eventsError) && !eventsLoading, // as App.jsx shows its notice
+    status: spoken.text + spoken.extra,
+  });
   // Settled text only (typing, slider arrows), except "Paused at", which is immediate.
   const settledLiveText = useDebouncedValue(liveText, ANNOUNCE_DELAY_MS);
   const announced = paused ? liveText : settledLiveText;

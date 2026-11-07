@@ -5,6 +5,7 @@ import { FontaineTransform } from 'fontaine'
 import { defineConfig } from 'vite'
 import thirdPartyLicenses from './scripts/third-party-licenses.mjs'
 import { LABEL_FONT_FAMILY } from './src/lib/labelFont.js'
+import { VENDOR_CHUNKS } from './vendorChunks.js'
 
 // The event list (data/events/v.<DATA_VERSION>/all.json, scripts/split-data.mjs)
 // is the largest file on the critical path and grows with the dataset. The app
@@ -115,5 +116,11 @@ export default defineConfig(({ command }) => ({
     // downloaded with the main stylesheet on every first visit even when no character
     // on the page needs it; as a file it is fetched only if its unicode-range is used.
     assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined),
+    // MapLibre and React in chunks of their own, so deploys keep their cached files (vendorChunks.js).
+    rolldownOptions: {
+      output: {
+        codeSplitting: { groups: VENDOR_CHUNKS },
+      },
+    },
   },
 }))

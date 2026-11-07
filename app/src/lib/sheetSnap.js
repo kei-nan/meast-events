@@ -28,6 +28,17 @@ export function sheetDetents(areaH, peekH) {
   return out;
 }
 
+/**
+ * Where the sheet starts. An event (or "What was this place?") opens at half
+ * height, a search at full, otherwise peek. An event the page's URL names counts
+ * as open from the first render: its record arrives with the event list, and a
+ * sheet that waited for it at peek jumped to half as the page settled.
+ */
+export function initialSheet({ eventOpen, linkedEventId, placeOpen, query }) {
+  if (eventOpen || linkedEventId || placeOpen) return "half";
+  return query ? "full" : "peek";
+}
+
 /** `h` kept between the lowest and highest resting heights. */
 export function clampSheet(h, detents) {
   return Math.min(Math.max(h, detents[0].h), detents.at(-1).h);

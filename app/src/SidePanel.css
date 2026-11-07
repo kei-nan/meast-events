@@ -1274,7 +1274,9 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-primary);
 }
 
+/* On touch screens its tap area grows without moving the line, as .fr-ai-btn's. */
 .framing-pointer-link {
+  position: relative;
   padding: 0;
   border: 0;
   background: none;
@@ -1477,7 +1479,8 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 @media (pointer: coarse) {
-  .fr-ai-btn::after {
+  .fr-ai-btn::after,
+  .framing-pointer-link::after {
     content: "";
     position: absolute;
     inset: -12px -4px;
@@ -1683,8 +1686,15 @@ button.sp-chip[aria-pressed="true"] {
     display: none;
   }
 
+  /* Hidden from sight only: it stays the search box's name for screen readers. */
   .side-panel[data-sheet="peek"] .sp-label {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .event-detail-showmap {
@@ -1891,6 +1901,11 @@ button.sp-chip[aria-pressed="true"] {
   margin-left: 6px;
   font-variant-numeric: tabular-nums;
   color: var(--text-tertiary);
+}
+
+/* On the selected tab's gold tint --text-tertiary falls under 4.5:1. */
+.rel-tab[aria-selected="true"] .rel-tab-count {
+  color: var(--text-secondary);
 }
 
 @media (pointer: coarse) {

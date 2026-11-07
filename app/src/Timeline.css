@@ -570,8 +570,13 @@
     gap: 0 6px;
   }
 
+  /* Wider than the row only with large text (200%): the years then wrap under
+     Play instead of running off the screen. */
   .timeline-controls {
     gap: 6px;
+    flex-shrink: 1;
+    flex-wrap: wrap;
+    min-width: 0;
   }
 
   .timeline-presets {
