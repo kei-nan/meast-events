@@ -1,14 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import config, { VENDOR_CHUNKS } from "../vite.config.js";
+import { readFileSync } from "node:fs";
+import { VENDOR_CHUNKS } from "../vendorChunks.js";
 
 // MapLibre and React are chunks of their own, so their file names (content
-// hashes) survive a deploy that changes only the app's code.
+// hashes) survive a deploy that changes only the app's code. vendorChunks.js is
+// imported on its own: importing vite.config.js needs a built search index
+// (searchDir), which the unit tests run without.
 const groupOf = (id) => VENDOR_CHUNKS.find((g) => g.test.test(id))?.name ?? null;
 
+test("vite.config.js hands the vendor groups to the build", () => {
+  const config = readFileSync(new URL("../vite.config.js", import.meta.url), "utf8");
+  assert.match(config, /^import \{ VENDOR_CHUNKS \} from '\.\/vendorChunks\.js'$/m);
+  assert.match(config, /rolldownOptions:\s*\{\s*output:\s*\{\s*codeSplitting:\s*\{\s*groups:\s*VENDOR_CHUNKS\s*\}/);
+});
+
 test("the build puts MapLibre and React in vendor chunks of their own", () => {
-  const groups = config({ command: "build", mode: "production" }).build.rolldownOptions.output.codeSplitting.groups;
-  assert.equal(groups, VENDOR_CHUNKS);
   // The package's "import" entry (maplibre-gl 6) and its shared module.
   assert.equal(groupOf("C:\\a\\app\\node_modules\\maplibre-gl\\dist\\maplibre-gl.mjs"), "maplibre");
   assert.equal(groupOf("/a/app/node_modules/maplibre-gl/dist/maplibre-gl-shared.mjs"), "maplibre");
