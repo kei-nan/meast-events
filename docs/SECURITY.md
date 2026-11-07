@@ -248,7 +248,9 @@ splat.
     longer than any backtick run in the text and line breaks flattened), so
     an edit containing `<!--`, markdown, links or `@mentions` shows as plain
     text: it cannot hide the rest of the description from the reviewer or
-    notify anyone. Unit tests in `scripts/lib/title-refresh.test.js`.
+    notify anyone. Unit tests in `scripts/lib/title-refresh.test.js`. The
+    drift list's Wikidata values (`scripts/lib/drift.js`), such as class
+    labels, go the same way.
 
 ## 5. Reporting a vulnerability
 

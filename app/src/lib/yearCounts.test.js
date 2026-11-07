@@ -12,11 +12,11 @@ test("events are counted in their start year", () => {
 });
 
 test("a reversed record counts in its date_start year, not its lower (end) year", () => {
-  // iraqi-invasion-of-kuwait as the data gives it: start 2009-08-02, end 1990-08-04.
+  // arab-cold-war as the data gives it: start 1979-02-11, end 1970-01-01.
   const counts = countEventsByStartYear([
-    { id: "iraqi-invasion-of-kuwait", date_start: "2009-08-02", date_end: "1990-08-04" },
+    { id: "arab-cold-war", date_start: "1979-02-11", date_end: "1970-01-01" },
   ]);
-  assert.deepEqual(counts, { 2009: 1 });
+  assert.deepEqual(counts, { 1979: 1 });
 });
 
 test("events without a start date are not counted", () => {

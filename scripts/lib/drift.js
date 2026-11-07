@@ -5,6 +5,7 @@
 // `entity` is a trimmed record from lib/wd-entities.js fetchEntities (p31, p580, p582, p585, p625, redirected).
 import { EVENT_CLASSES } from "./event-classes.js";
 import { keptDatePrecision } from "./fixes.js";
+import { mdCode } from "./title-refresh.js";
 
 // Wikidata "1940-00-00" is stored as 1940-01-01 (as in lib/fixes.js).
 const norm = (t) => String(t ?? "").replace(/-00(?=-|$)/g, "-01");
@@ -150,6 +151,10 @@ export function driftFor(event, entity, labels = {}, fix = null) {
 
 // Markdown table cell: no pipes or line breaks.
 const cell = (s) => String(s ?? "").replace(/\|/g, "\\|").replace(/\s+/g, " ");
+// A value that comes from Wikidata, which anyone can edit: the report becomes the monthly PR description, so it is an
+// inline code span (lib/title-refresh.js mdCode), and a label cannot mention anyone or add a link or an image. GFM
+// reads a table cell's \| as a pipe inside a code span too.
+const codeCell = (s) => cell(mdCode(s));
 
 /**
  * The report: one table row per difference, grouped by field.
@@ -178,7 +183,7 @@ export function renderDriftReport(results, { checked, noQid = [] } = {}) {
     if (!rows.length) continue;
     lines.push("", `### ${field} (${rows.length})`, "", "| Event | Kind | Item | Stored | Wikidata now |", "|---|---|---|---|---|");
     for (const r of rows) {
-      lines.push(`| ${cell(r.id)} | ${r.kind} | [${r.qid}](https://www.wikidata.org/wiki/${r.qid}) | ${cell(r.stored)} | ${cell(r.wikidata)} |`);
+      lines.push(`| ${cell(r.id)} | ${r.kind} | [${r.qid}](https://www.wikidata.org/wiki/${r.qid}) | ${codeCell(r.stored)} | ${codeCell(r.wikidata)} |`);
     }
   }
   // Ledger fixes whose Wikidata basis changed. They still apply; each is for a recheck against docs/data-fixes.md.
@@ -195,7 +200,7 @@ export function renderDriftReport(results, { checked, noQid = [] } = {}) {
     );
     for (const s of stale) {
       lines.push(
-        `| ${cell(s.id)} | [${s.qid}](https://www.wikidata.org/wiki/${s.qid}) | ${cell(s.ref)} | ${s.field} | ${cell(s.fixed)} | ${cell(s.wikidata)} | ${cell(s.reason)} |`
+        `| ${cell(s.id)} | [${s.qid}](https://www.wikidata.org/wiki/${s.qid}) | ${cell(s.ref)} | ${s.field} | ${cell(s.fixed)} | ${codeCell(s.wikidata)} | ${cell(s.reason)} |`
       );
     }
   }

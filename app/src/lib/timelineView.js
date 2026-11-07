@@ -52,7 +52,7 @@ export function timelineOrder(events, rangeStart = null, axis = null) {
  * The first year of the decade the event starts in, or null when it has no
  * start year. With `axis`: the decade of the year its bar sits at, which for a
  * reversed record whose start is off the axis is its end year (listedAtEnd):
- * iraqi-invasion-of-kuwait (2009 / 1990) in 1990-1991 is in the 1990s.
+ * a record dated 2009 / 1990 is in the 1990s in 1990-1991.
  */
 export function startDecade(e, axis = null) {
   const s = listedYear(e, axis);

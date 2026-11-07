@@ -3773,8 +3773,7 @@
       "text_sha1": "0e9c26b18d97",
       "text_retrieved_at": "2026-09-26",
       "fairness": null,
-      "wording": [],
-      "data_note": "The start date (2009) comes from Wikidata and is wrong; the invasion began on 2 August 1990."
+      "wording": []
     },
     "zurich-protocols": {
       "text_sha1": "6c19a783d2be",

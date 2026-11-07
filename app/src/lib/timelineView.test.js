@@ -96,8 +96,8 @@ test("axis: the selected years, or with fit the events' own span", () => {
 });
 
 test("axis with fit: a reversed record counts at its start year only", () => {
-  // Wikidata's Iraqi invasion of Kuwait: start 2009, end 1990.
-  const events = [ev("kuwait", "2009-08-02", "1990-08-04"), ev("x", "2003-03-20", "2003-05-01")];
+  // A reversed record: start 2009, end 1990.
+  const events = [ev("reversed", "2009-08-02", "1990-08-04"), ev("x", "2003-03-20", "2003-05-01")];
   assert.deepEqual(timelineAxis(events, [1900, 2026], { fit: true }), [2003, 2009]);
 });
 
@@ -189,22 +189,24 @@ test("Timeline: a reversed record sits at the year its bar is drawn at (real rec
   const { readFileSync } = await import("node:fs");
   const { eventOverlapsRange } = await import("./eventYears.js");
   const events = JSON.parse(readFileSync(new URL("../../../data/events.json", import.meta.url), "utf8"));
-  const kuwait = events.find((e) => e.id === "iraqi-invasion-of-kuwait"); // start 2009-08-02, end 1990-08-04
-  const axis = [1990, 1991];
-  assert.equal(barGeometry(kuwait, axis).left, 0, "its bar at 1990, the end year");
-  assert.equal(startDecade(kuwait, axis), 1990, "under 1990s, not 2000s");
-  assert.equal(startDecade(kuwait), 2000, "without an axis: its start, as given");
-  assert.equal(startDecade(kuwait, [2005, 2010]), 2000);
-  assert.equal(startDecade(kuwait, [1985, 2010]), 2000, "both years on the axis: its start, like its bar");
+  const coldWar = events.find((e) => e.id === "arab-cold-war"); // start 1979-02-11, end 1970 (stored as 1970-01-01)
+  const axis = [1970, 1971];
+  assert.equal(barGeometry(coldWar, axis).left, 0, "its bar at 1970, the end year");
+  // Both of its years are in one decade, so the decade rule is shown on a record whose years are not.
+  const reversed = ev("reversed", "2009-08-02", "1990-08-04");
+  assert.equal(startDecade(reversed, [1990, 1991]), 1990, "under 1990s, not 2000s");
+  assert.equal(startDecade(reversed), 2000, "without an axis: its start, as given");
+  assert.equal(startDecade(reversed, [2005, 2010]), 2000);
+  assert.equal(startDecade(reversed, [1985, 2010]), 2000, "both years on the axis: its start, like its bar");
 
-  const inRange = events.filter((e) => eventOverlapsRange(e, 1990, 1991));
-  const order = timelineOrder(inRange, 1990, axis);
-  const i = order.indexOf(kuwait);
+  const inRange = events.filter((e) => eventOverlapsRange(e, 1970, 1971));
+  const order = timelineOrder(inRange, 1970, axis);
+  const i = order.indexOf(coldWar);
   const decades = order.map((e) => startDecade(e, axis));
-  assert.equal(decades[i], 1990);
-  // Oldest first by the year each row is placed at: Kuwait among the 4 August 1990 neighbours.
+  assert.equal(decades[i], 1970);
+  // Oldest first by the year each row is placed at: among the neighbours of its end, not after them at 1979.
   const prev = order[i - 1];
   const next = order[i + 1];
-  if (prev) assert.ok((prev.date_start ?? "") <= "1990-08-04");
-  if (next) assert.ok((next.date_start ?? "") >= "1990-08-04");
+  if (prev) assert.ok((prev.date_start ?? "") <= "1970-01-01");
+  if (next) assert.ok((next.date_start ?? "") >= "1970-01-01");
 });

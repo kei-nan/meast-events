@@ -509,7 +509,7 @@ test("validateEvents: the curated records whose end is before their start are ea
   const { readFile } = await import("node:fs/promises");
   const curated = JSON.parse(await readFile(new URL("../../data/events.json", import.meta.url), "utf-8"));
   const expected = {
-    "iraqi-invasion-of-kuwait": /date_end \(1990-08-04\) precedes date_start \(2009-08-02\) - flagged in date_flags/,
+    "second-battle-of-inonu": /date_end \(1921-03-31\) precedes date_start \(1921-04-01\) - flagged in date_flags/,
     "arab-cold-war": /date_end \(1970-01-01\) precedes date_start \(1979-02-11\) - flagged in date_flags/,
     "passover-massacre": /date_end \(2002-01-01\) is a coarse Wikidata end \(year precision\) that reaches date_start \(2002-03-27\)/,
   };

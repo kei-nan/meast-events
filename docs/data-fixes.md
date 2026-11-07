@@ -112,7 +112,7 @@ put them outside the tracked set; the validator now rejects any event without a 
   - `second-battle-of-inonu` (Q2659746): Wikidata P580 1921-03-26, P582 1921-03-31, P585 1921-04-01; the infobox says
     "March 23 – April 1, 1921". The end agrees with P585, but the start differs (23 vs 26 March).
   - `iraqi-invasion-of-kuwait` (Q856650): Wikidata P580 is 2009-08-02, P582 1990-08-04, no P585; the infobox says "2–4 August 1990".
-    Wikidata's start is wrong; with it, the event is not shown when the timeline is set to 1990-1991.
+    Wikidata's start is wrong; with it, the event is not shown when the timeline is set to 1990-1991. (Fixed since: F16.)
 
 ## F7 - October 7 attacks dated 1 October 2023 (`october-7-attacks`, Q122976243)
 
@@ -562,6 +562,31 @@ put them outside the tracked set; the validator now rejects any event without a 
   and coordinates only). A ledger entry may record that value in an optional `from` (`{ field: value }`, as the pipeline stores it, `null`
   = Wikidata had none), taken from its note; entries with one: F2, F5, F6, F7, F14, F15. With `from`, the fix is listed when Wikidata no longer
   gives that value: "may no longer be needed" when Wikidata now gives the fixed value itself, else "Wikidata changed since the fix". Without
-  it (the fixed value is the item's own, as in F1, F8, F10, F11, F13), it is listed when Wikidata gives a value for the field and the fixed
+  it (the fixed value is the item's own, as in F1, F8, F10, F11, F13, F16), it is listed when Wikidata gives a value for the field and the fixed
   value is none of the item's values. A difference on a listed fix's field is shown as drift, not counted as explained. Add `from` to a new
   fix that overrides a Wikidata value. On 2026-11-03 no ledger entry was listed.
+
+## F16 - Iraqi invasion of Kuwait dated 2009 instead of 1990 (`iraqi-invasion-of-kuwait`, Q856650)
+
+- Cause: the stored `date_start` 2009-08-02 was Wikidata's P580 as it stood, a year after the item's own P582 1990-08-04 (see F6 and "Checks of
+  2026-10-14"). So the site titled the event "Iraqi invasion of Kuwait (2009–1990)".
+- Evidence (checked live 2026-11-06):
+  - Wikidata `wbgetentities`, revision 2565421916: P580 = `+1990-08-02T00:00:00Z` (precision 11, day); P582 = `+1990-08-04T00:00:00Z` (day); no P585.
+  - English Wikipedia ([1383243347](https://en.wikipedia.org/w/index.php?title=Iraqi_invasion_of_Kuwait&oldid=1383243347)): lead "began on
+    2 August 1990"; infobox "2–4 August 1990"; categories "1990 in Iraq", "August 1990 in Iraq".
+- Wikipedia and Wikidata now agree against our record. -> `date_start: "1990-08-02"` (ledger entry F16, no `from`: the value is the item's own, so the
+  drift report lists the fix again if Wikidata stops giving it). `date_precision` (day) and `date_end` are unchanged. Applied to `data/events.json` only; the
+  event has no copy in `data/events.proposed.json`. `data/event-candidates.json` is the discovery run's snapshot and keeps 2009-08-02 until the next run;
+  the ledger corrects it on enrichment.
+- Removed because they were true only of the wrong date: `date_start_year_not_in_lead`, `date_order_invalid` and `wikipedia_dates_note` in `date_flags`,
+  `wikipedia_lead_dates`, `category_year_mismatch` in `review_reasons`, and the framing review's `data_note` ("The start date (2009) comes from Wikidata and is
+  wrong; the invasion began on 2 August 1990."). The review's verdicts and `text_sha1` are unchanged. The reversed-date tests and `docs/DATA_POLICY.md` now use
+  `arab-cold-war`, a record still reversed. The suggestion for this item is gone from `data/wikidata-date-suggestions.tsv`.
+- Reversed records (`date_order_invalid`), curated: 3 -> 2 (`second-battle-of-inonu`, `arab-cold-war`).
+
+### Mirrors follow a renamed article (`scripts/lib/mirrors.js`, no data value changed)
+
+- When the article of an event with a mirror (F12) was renamed, the refresh updated the source's `wikipedia_url`, but the mirror's update was held as
+  `qid_mismatch`, so it kept the old URL. `mirrorPairs` compared URLs, so the pair was lost without a message and the mirror's text stopped following.
+- Pairs are now found by item (the mirror's `resolved_qid` = the source's `wikidata_qid`). On 2026-11-06 the same 4 pairs result; the other 4 events without an
+  article of their own show articles that no event on the map owns, and stay unpaired.

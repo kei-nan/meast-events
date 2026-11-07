@@ -79,33 +79,33 @@ test("parseSort / sortValue", () => {
   assert.equal(sortValue("date", "desc"), "date-desc");
 });
 
-// iraqi-invasion-of-kuwait as stored (data/events.json): start 2009-08-02, end
-// 1990-08-04, flagged date_order_invalid. In 1990-1991 it matches by its end
+// arab-cold-war as stored (data/events.json): start 1979-02-11, end 1970 (stored
+// as 1970-01-01), flagged date_order_invalid. In 1970-1971 it matches by its end
 // year only (eventOverlapsRange), so it is listed there: among the events
-// starting in those years, at 4 August 1990, not after them at 2009.
+// starting in those years, at its end, not after them at 1979.
 test("a reversed record is listed at the year it matches the range by (real record)", async () => {
   const { readFileSync } = await import("node:fs");
   const { eventOverlapsRange } = await import("./eventYears.js");
   const { listedAtEnd, listedYear } = await import("./browseOrder.js");
   const events = JSON.parse(readFileSync(new URL("../../../data/events.json", import.meta.url), "utf8"));
-  const kuwait = events.find((e) => e.id === "iraqi-invasion-of-kuwait");
-  assert.ok(kuwait.date_flags.some((f) => f.startsWith("date_order_invalid")));
-  assert.equal(listedAtEnd(kuwait, [1990, 1991]), true);
-  assert.equal(listedYear(kuwait, [1990, 1991]), 1990);
-  assert.equal(listedYear(kuwait, [2009, 2009]), 2009);
-  assert.equal(listedYear(kuwait, [1985, 2010]), 2009, "both years in range: its start, as given");
-  assert.equal(listedYear(kuwait, 1990), 2009, "a start year alone: its start");
-  assert.equal(startedBefore(kuwait, 1990), false, "never 'ongoing from earlier'");
+  const coldWar = events.find((e) => e.id === "arab-cold-war");
+  assert.ok(coldWar.date_flags.some((f) => f.startsWith("date_order_invalid")));
+  assert.equal(listedAtEnd(coldWar, [1970, 1971]), true);
+  assert.equal(listedYear(coldWar, [1970, 1971]), 1970);
+  assert.equal(listedYear(coldWar, [1979, 1979]), 1979);
+  assert.equal(listedYear(coldWar, [1965, 1985]), 1979, "both years in range: its start, as given");
+  assert.equal(listedYear(coldWar, 1970), 1979, "a start year alone: its start");
+  assert.equal(startedBefore(coldWar, 1970), false, "never 'ongoing from earlier'");
 
-  const inRange = events.filter((e) => eventOverlapsRange(e, 1990, 1991));
-  const ordered = orderBrowseList(inRange, [1990, 1991], "date");
-  const starting = ordered.filter((e) => !startedBefore(e, 1990));
-  const i = starting.indexOf(kuwait);
+  const inRange = events.filter((e) => eventOverlapsRange(e, 1970, 1971));
+  const ordered = orderBrowseList(inRange, [1970, 1971], "date");
+  const starting = ordered.filter((e) => !startedBefore(e, 1970));
+  const i = starting.indexOf(coldWar);
   assert.ok(i >= 0, "in the 'starting in the selected years' part");
-  assert.equal(ordered.indexOf(kuwait), i);
+  assert.equal(ordered.indexOf(coldWar), i);
   const before = starting.slice(0, i).map((e) => e.date_start ?? "");
   const after = starting.slice(i + 1).map((e) => e.date_start ?? "");
-  assert.ok(before.every((d) => d <= "1990-08-04"), before.join(" "));
-  assert.ok(after.every((d) => d >= "1990-08-04"), after.join(" "));
-  assert.ok(after.length > 0, "events after 4 August 1990 follow it");
+  assert.ok(before.every((d) => d <= "1970-01-01"), before.join(" "));
+  assert.ok(after.every((d) => d >= "1970-01-01"), after.join(" "));
+  assert.ok(after.length > 0, "events later in 1970-1971 follow it");
 });

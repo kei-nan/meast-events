@@ -410,7 +410,7 @@ Such an event counts in **every year from its start to the current year** (the t
 visitor's UTC year, capped by the build; never before its start): the year filter, the results list's Timeline bars, playback and the map include
 it in each of those years (`app/src/lib/eventYears.js` `ongoingSignal`, `eventSpanYears`). An event with an end date keeps it, even when its title
 says "present" (Hezbollah–Israel conflict (2023–present): end 2024-11-27, as Wikidata gives it). Records whose end is before their start are
-unchanged (iraqi-invasion-of-kuwait still counts in 1990 and 2009 only). The timeline's density chart and the "N events starting that year"
+unchanged (arab-cold-war still counts in 1970 and 1979 only). The timeline's density chart and the "N events starting that year"
 counts stay by start year.
 
 Dates and titles are not changed. Where the site shows the dates (event panel, list rows, event pages, the CSV/JSON download's `notes`) such
@@ -496,13 +496,13 @@ Each event may carry `review_reasons` (strings) and `date_flags`; none of them c
 `date_order_invalid`, in plain language without the flag code (`app/src/lib/dateOrderNote.js`), each date to its Wikidata precision
 (`date_precision`, `date_end_precision`), e.g. "Wikidata gives this event's end (1970) as before its start (11 February 1979); Wikipedia's
 summary mentions the years 1952, 1956, 1962, 1967, 1970 and 1979." (arab-cold-war). In the results list and the Timeline such an event is
-placed at the year it matches the selected years by: its end year when only that is in them (iraqi-invasion-of-kuwait in 1990–1991: at
-4 August 1990, in the 1990s), never as ongoing from before them. The other date flags stay in the data and the checks
+placed at the year it matches the selected years by: its end year when only that is in them (arab-cold-war in 1970–1971: at
+1970, not 1979), never as ongoing from before them. The other date flags stay in the data and the checks
 but are not shown; an event with any date flag still shows only the years in its date line.
 
 | Flag | Where | Meaning |
 |---|---|---|
-| `date_order_invalid` | `date_flags` | Wikidata's `date_end` is before `date_start` (4 curated events on 2026-10-10, e.g. Iraqi invasion of Kuwait: start 2009-08-02, end 1990-08-04). Kept, shown as Wikidata gives them. Validation downgrades the order error to a warning only when this flag is present. |
+| `date_order_invalid` | `date_flags` | Wikidata's `date_end` is before `date_start` (2 curated events on 2026-11-06, e.g. Arab Cold War: start 1979-02-11, end 1970). Kept, shown as Wikidata gives them. Validation downgrades the order error to a warning only when this flag is present. |
 | `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. The same dates, as data, are in `wikipedia_lead_dates` ("YYYY-MM-DD", or "YYYY" years when the lead gives no full date; `wikipediaLeadDates`), set only next to `date_order_invalid`, for the shown note. |
 | `date_end_precision_coarse` | `date_flags` | Wikidata's end time is coarser than a day (e.g. the year "2002", stored as 2002-01-01) and the stored `date_end` is before `date_start` only because of that: the whole year (month, decade, century) reaches the start, so the dates are not reversed. Replaces `date_order_invalid` in that case (Passover massacre: P585 27 March 2002, P582 "2002"; added 2026-10-14, `dateOrderFlags` in `scripts/lib/v21.js`). When a coarse end is reversed even at its precision, `date_order_invalid` names the precision. Not shown; the stored dates are unchanged. |
 | `date_start_year_not_in_lead` | `date_flags` | Start year is not within 1 year of any year in the full lead. A heuristic on prose: "look", not "wrong". |

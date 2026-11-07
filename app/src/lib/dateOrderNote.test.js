@@ -86,7 +86,9 @@ test("dateOrderNote on the real records: arab-cold-war's year-precision end is a
     "Wikidata gives this event’s end (1970) as before its start (11 February 1979); Wikipedia’s summary mentions the years 1952, 1956, 1962, 1967, 1970 and 1979."
   );
   assert.equal(
-    dateOrderNote(record("iraqi-invasion-of-kuwait")),
-    "Wikidata gives this event’s end (4 August 1990) as before its start (2 August 2009); Wikipedia’s summary mentions 2 August 1990, 4 August 1990, 28 August 1990 and 15 January 1991."
+    dateOrderNote(record("second-battle-of-inonu")),
+    "Wikidata gives this event’s end (31 March 1921) as before its start (1 April 1921); Wikipedia gives 1 April 1921."
   );
+  // Corrected (docs/data-fixes.md F16): no note any more.
+  assert.equal(dateOrderNote(record("iraqi-invasion-of-kuwait")), null);
 });

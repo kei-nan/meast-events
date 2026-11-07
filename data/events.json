@@ -22070,7 +22070,7 @@
   {
     "id": "iraqi-invasion-of-kuwait",
     "title": "Iraqi invasion of Kuwait",
-    "date_start": "2009-08-02",
+    "date_start": "1990-08-02",
     "date_end": "1990-08-04",
     "countries": [
       "Kuwait"
@@ -22101,24 +22101,13 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "category_year_mismatch: Wikipedia year categories mention [1990] but none is within 1 year of 2009-1990",
-      "part_of: Wikidata (P361) lists this event as part of \"Gulf War\" (Q37643); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Gulf War\" (Q37643); it may overlap with that larger event",
+      "data_fix F16: Iraqi invasion of Kuwait: stored date_start 2009-08-02 was Wikidata P580 as it stood, after the item's own P582 1990-08-04. Wikidata P580 is now 1990-08-02 (day precision, revision 2565421916); English Wikipedia https://en.wikipedia.org/w/index.php?title=Iraqi_invasion_of_Kuwait&oldid=1383243347: lead \"began on 2 August 1990\"; infobox \"2–4 August 1990\" (checked 2026-11-06). date_start = Wikidata P580; date_end unchanged (fields: date_start; see docs/data-fixes.md)"
     ],
     "needs_review": true,
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1375300033,
     "wikipedia_revid_timestamp": "2026-09-17T00:29:38Z",
-    "date_flags": [
-      "date_start_year_not_in_lead: start year 2009 (2009-08-02) is not within 1 year of any year in the Wikipedia lead [1990, 1991]",
-      "date_order_invalid: Wikidata start (2009-08-02) is after end (1990-08-04); shown as Wikidata gives them",
-      "wikipedia_dates_note: Wikipedia lead mentions 2 August 1990; 4 August 1990; 28 August 1990; 15 January 1991; Wikidata gives 2009-08-02 to 1990-08-04 (start year 2009 not in lead)"
-    ],
-    "wikipedia_lead_dates": [
-      "1990-08-02",
-      "1990-08-04",
-      "1990-08-28",
-      "1991-01-15"
-    ],
     "wikidata_description": "1990 major conflict between the Ba'athist Iraq and the state of Kuwait",
     "sitelinks_current": 45,
     "wikidata_aliases": [

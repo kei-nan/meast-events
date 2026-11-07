@@ -50,8 +50,8 @@ export function startedBefore(event, rangeStart) {
  * date_order_invalid) whose start year is outside them and whose end year is in
  * them. It matches them by its end year alone (eventOverlapsRange), and its
  * Timeline bar is drawn there (lib/timelineView.js barGeometry), so it is placed
- * there too, e.g. iraqi-invasion-of-kuwait (start 2009-08-02, end 1990-08-04)
- * in 1990-1991: at 4 August 1990, in the 1990s. The dates stay as given.
+ * there too, e.g. arab-cold-war (start 1979-02-11, end 1970) in 1970-1971: at
+ * 1970, not 1979. The dates stay as given.
  */
 export function listedAtEnd(event, range) {
   if (!Array.isArray(range) || !event?.date_end || !yearsReversed(event)) return false;
