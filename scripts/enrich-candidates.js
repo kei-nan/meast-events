@@ -201,6 +201,8 @@ async function resolveCandidate(candidate, index, total) {
     needs_manual_coordinates: !hasRealCoordinates,
     date_precision: precision?.name ?? null,
     _part_of_qids: partOfQids,
+    // finalizeEvent re-checks category_year_mismatch against the dates the record keeps (kept in enriched-candidates.json)
+    _category_years: categoryYears(cats),
     _review: reasons,
   };
 }
@@ -473,6 +475,7 @@ ${m}      `),
         error: _error,
         _review,
         _part_of_qids,
+        _category_years: _categoryYears,
         source_qid: _sourceQid,
         enrich_version: _enrichVersion,
         predecessor_rule: _predecessorRule, // kept in enriched-candidates.json; the proposed record carries the flag

@@ -25359,7 +25359,6 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "category_year_mismatch: Wikipedia year categories mention [2025, 2026, 2023] but none is within 1 year of 2020",
       "part_of: Wikidata (P361) lists this event as part of \"Asian Spring\" (Q136338700); it may overlap with that larger event"
     ],
     "needs_review": true,
@@ -36928,7 +36927,6 @@
     ],
     "review_reasons": [
       "qid_mismatch: title resolved to Q122962941, candidate was discovered under Q123036458 (possible redirect/disambiguation)",
-      "category_year_mismatch: Wikipedia year categories mention [2023] but none is within 1 year of 2020",
       "part_of: Wikidata (P361) lists this event as part of \"Gaza War\" (Q122962941); it may overlap with that larger event",
       "possible_duplicate: possible duplicate of \"Gaza war\" (2023-israel-hamas-war) - same Wikidata item (QID / resolved QID)",
       "title_differs_from_article: record title \"Israeli invasion of the Gaza Strip\" differs from the Wikipedia article title \"Gaza war\" and does not appear in its lead",

@@ -11,6 +11,7 @@ import {
   finalizeEvent,
 } from "./v21.js";
 import { FIXES_BY_QID } from "./fixes.js";
+import { dateFlags } from "./flags.js";
 
 // Real Wikidata QIDs, used only as identifiers here.
 const Q = {
@@ -256,6 +257,43 @@ test("finalizeEvent: reconcileDates swaps a decade-precision P585 for the item's
   assert.equal(candidate.date_start, "1941-06-08");
   assert.deepEqual(candidate.date_flags.map((f) => f.split(":")[0]), ["date_source_adjusted"]);
   assert.match(candidate.date_flags[0], /P585 1930-00-00 is only decade-or-coarser precision; used P580 start time 1941-06-08/);
+});
+
+test("finalizeEvent: category_year_mismatch is checked against the start it keeps, not the P585 it set aside", () => {
+  // Shape of 2025–2026 Iranian protests (Q137612545, live 2026-11-07): P585 "2020" (decade), P580 2025-12-28 (day); the
+  // article's year categories give 2025, 2026 and 2023. enrich-candidates.js writes the note from the discovery date
+  // (2020-01-01), as lib/flags.js dateFlags gives it; before this check it stayed after the start became 2025-12-28.
+  const catYears = [2025, 2026, 2023];
+  const [stale] = dateFlags({ dateStart: "2020-01-01", dateEnd: null, extractYears: [2025], catYears }).filter((f) => f.startsWith("category_year_mismatch"));
+  assert.equal(stale, "category_year_mismatch: Wikipedia year categories mention [2025, 2026, 2023] but none is within 1 year of 2020");
+  const entity = { p31: [], p585: [{ time: "2020-00-00", precision: 8 }], p580: [{ time: "2025-12-28", precision: 11 }], p582: [] };
+  const base = {
+    title: "P", wikipedia_url: "https://en.wikipedia.org/wiki/P", wikidata_qid: SANDBOX_QID,
+    date_start: "2020-01-01", date_end: null, countries: ["Iran"], category: "mixed",
+    review_reasons: [stale, "kept: unrelated reason"], _category_years: catYears,
+  };
+  const ctx = ctxWith({
+    leads: { P: { extract: "Protests began in Tehran on 28 December 2025.", retrieved_at: "2026-10-10T00:00:00Z" } },
+    entities: { [SANDBOX_QID]: entity },
+    reconcileDates: true,
+  });
+  const ev = finalizeEvent(structuredClone(base), ctx);
+  assert.equal(ev.date_start, "2025-12-28");
+  assert.deepEqual(ev.review_reasons, ["kept: unrelated reason"]);
+
+  // A record cached before _category_years: the note's own list is read instead.
+  const { _category_years: _unused, ...cached } = structuredClone(base);
+  assert.deepEqual(finalizeEvent(cached, ctx).review_reasons, ["kept: unrelated reason"]);
+
+  // The note stays where the kept start is still more than a year from every category, and names that start.
+  const far = finalizeEvent({ ...structuredClone(base), _category_years: [2010] }, ctx);
+  assert.deepEqual(far.review_reasons, [
+    "category_year_mismatch: Wikipedia year categories mention [2010] but none is within 1 year of 2025",
+    "kept: unrelated reason",
+  ]);
+  // And is added when the kept start, unlike the discovery date, is far from the categories.
+  const added = finalizeEvent({ ...structuredClone(base), review_reasons: [], _category_years: [2020] }, ctx);
+  assert.deepEqual(added.review_reasons, ["category_year_mismatch: Wikipedia year categories mention [2020] but none is within 1 year of 2025"]);
 });
 
 test("finalizeEvent: a year-precision Wikidata end in the start's year is not flagged as reversed", () => {
