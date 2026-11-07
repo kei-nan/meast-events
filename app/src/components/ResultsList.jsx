@@ -1,18 +1,21 @@
-import { Fragment, memo, useId, useMemo, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useId, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { eventYears, highlight, inRange } from "./resultsUtil.jsx";
 import { categoryLabel } from "../lib/categoryLabels.js";
-import { startedBefore } from "../lib/browseOrder.js";
+import { listedYear, startedBefore } from "../lib/browseOrder.js";
 import { countryLabel } from "../lib/eventCountries.js";
 import { matchedAlias } from "../lib/ranking.js";
 import {
   axisTicks,
   barGeometry,
   decadeLabel,
+  jumpIndex,
   rangeBand,
   startDecade,
   timelineAxis,
   timelineOrder,
+  yearAtAxis,
+  yearMark,
 } from "../lib/timelineView.js";
 import { warmEvent } from "../lib/warmEvent.js";
 import { eventYearsText, ongoingSignal } from "../lib/eventYears.js";
@@ -119,6 +122,7 @@ const at = (g) => ({ left: `${g.left}%`, width: `${g.width}%` });
 const TimelineRow = memo(function TimelineRow({
   ev,
   idx,
+  listed,
   query,
   axis,
   band,
@@ -150,6 +154,7 @@ const TimelineRow = memo(function TimelineRow({
         type="button"
         className={"sp-row sp-trow" + (selected ? " sp-row--selected" : "")}
         data-id={ev.id}
+        data-year={listed ?? undefined}
         tabIndex={tabbable ? 0 : -1}
         aria-labelledby={`${id}-title ${id}-meta`}
         aria-describedby={hasTags ? `${id}-tags` : undefined}
@@ -216,24 +221,65 @@ const TimelineRow = memo(function TimelineRow({
 });
 
 // The Timeline view's year scale, above the rows and aligned with their bars:
-// the axis's first and last year and a few round years between.
-function TimelineAxis({ axis, band }) {
+// the axis's first and last year and a few round years between. It stays in
+// view (sticky) and works like a menu's section bar: a click anywhere on it
+// jumps the list to that year, its years are buttons for the keyboard, and a
+// notch marks the year of the row now at the top of the list.
+function TimelineAxis({ axis, band, current, onJump, axisRef }) {
   const [a0, a1] = axis;
+  const mark = yearMark(current, axis);
+  const yearBtn = (year, className, style) => (
+    <button
+      key={year}
+      type="button"
+      className={className}
+      style={style}
+      aria-label={`Jump to ${year}`}
+      onClick={(e) => {
+        e.stopPropagation(); // not the scale's click as well
+        onJump(year);
+      }}
+    >
+      {year}
+    </button>
+  );
   return (
-    <div className="sp-taxis" aria-hidden="true">
-      <div className="sp-taxis-scale">
-        {band && <span className="sp-track-band" style={at(band)} />}
-        <span className="sp-taxis-end sp-taxis-end--start">{a0}</span>
-        {axisTicks(axis).map((t) => (
-          <span key={t.year} className="sp-taxis-tick" style={{ left: `${t.at}%` }}>
-            {t.year}
-          </span>
-        ))}
-        {a1 !== a0 && <span className="sp-taxis-end sp-taxis-end--end">{a1}</span>}
+    <div className="sp-taxis" ref={axisRef} role="group" aria-label="Jump to a year in the list">
+      {/* The click between the years is for the pointer only; the keyboard
+          has the year buttons. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+      <div
+        className="sp-taxis-scale"
+        title="Click a year to jump to it in the list"
+        onClick={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          if (r.width > 0) onJump(yearAtAxis((e.clientX - r.left) / r.width, axis));
+        }}
+      >
+        {band && <span className="sp-track-band" style={at(band)} aria-hidden="true" />}
+        {mark != null && <span className="sp-taxis-mark" style={{ left: `${mark}%` }} aria-hidden="true" />}
+        {yearBtn(a0, "sp-taxis-end sp-taxis-end--start")}
+        {axisTicks(axis).map((t) => yearBtn(t.year, "sp-taxis-tick", { left: `${t.at}%` }))}
+        {a1 !== a0 && yearBtn(a1, "sp-taxis-end sp-taxis-end--end")}
       </div>
     </div>
   );
 }
+
+// The first row whose bottom is below `line` (rows top to bottom, so their
+// rects are in order: a binary search, one rect read per step).
+function firstRowBelow(rows, line) {
+  let lo = 0;
+  let hi = rows.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (rows[mid].getBoundingClientRect().bottom > line + 1) hi = mid;
+    else lo = mid + 1;
+  }
+  return rows[lo] ?? null;
+}
+
+const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 /**
  * Results as a list of buttons. With `browse` (the idle list, ordered by
@@ -280,6 +326,75 @@ function ResultsList({
   // row then takes the tab stop, so the list always has one.
   const tabStop = Math.min(active, visible.length - 1);
   const listRef = useRef(null);
+  const axisRef = useRef(null);
+
+  // Each row's year on the axis (the one it is grouped and ordered by), null
+  // for an undated row or one in the ongoing group: the axis does not place them.
+  const ongoingOf = (e) => Boolean(browse && range && startedBefore(e, range[0]));
+  const rowYears = useMemo(() => {
+    if (!timeline) return null;
+    return ordered.map((e) => {
+      if (browse && range && startedBefore(e, range[0])) return null;
+      const y = listedYear(e, axis);
+      return Number.isFinite(y) && y > 0 ? y : null;
+    });
+  }, [timeline, ordered, browse, range, axis]);
+
+  // The year of the row at the top of the list, just under the sticky axis,
+  // as the panel (.sp-scroll) scrolls: the axis marks it.
+  const [topYear, setTopYear] = useState(null);
+  useEffect(() => {
+    if (!timeline) return undefined;
+    const list = listRef.current;
+    const scroller = list?.closest(".sp-scroll");
+    if (!scroller) return undefined;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const line = axisRef.current?.getBoundingClientRect().bottom ?? scroller.getBoundingClientRect().top;
+      const row = firstRowBelow(list.querySelectorAll("button.sp-row"), line);
+      setTopYear(row?.dataset.year ? Number(row.dataset.year) : null);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      scroller.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [timeline, shown, rowYears]);
+
+  // A year picked on the axis: the list scrolls so that year's first row (or
+  // its decade heading, when the row starts a decade) sits just under the
+  // axis, showing more rows first if it is not shown yet; focus moves to it.
+  function jumpToYear(year) {
+    const i = jumpIndex(rowYears ?? [], year);
+    if (i < 0) return;
+    // A page of rows after it too, so the list can scroll it to the top.
+    if (i + PAGE > shown) flushSync(() => setShown(i + PAGE));
+    const list = listRef.current;
+    const scroller = list?.closest(".sp-scroll");
+    const row = list?.querySelectorAll("button.sp-row")[i];
+    if (!scroller || !row) return;
+    const li = row.closest("li");
+    const heading = li && !li.previousElementSibling ? li.parentElement.previousElementSibling : null;
+    const target = heading?.tagName === "H2" ? heading : row;
+    // Where the axis's bottom is once it sticks, wherever it is now: sticky
+    // `top` counts from the scroller's padding edge (on desktop it is minus
+    // that padding, SidePanel.css, so the axis sits at the very top).
+    const axisEl = axisRef.current;
+    const stickTop = axisEl ? parseFloat(getComputedStyle(axisEl).top) || 0 : 0;
+    const padTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+    const line =
+      scroller.getBoundingClientRect().top + padTop + stickTop + (axisEl?.getBoundingClientRect().height ?? 0);
+    scroller.scrollBy({ top: target.getBoundingClientRect().top - line, behavior: reducedMotion() ? "auto" : "smooth" });
+    setActive(i);
+    row.focus({ preventScroll: true });
+  }
 
   // The last "Show more" goes away with its click, and focus with it (to the
   // page): focus the first of the rows it showed instead.
@@ -327,7 +442,6 @@ function ResultsList({
   // events that began before the selected years last (timelineOrder) under one
   // heading; in the list only that "ongoing" group has a heading. Rows keep
   // their index in `visible` (roving tab stop, "Show more" focus).
-  const ongoingOf = (e) => Boolean(browse && range && startedBefore(e, range[0]));
   const groupOf = timeline ? (e) => (ongoingOf(e) ? "ongoing" : startDecade(e, axis)) : (e) => (ongoingOf(e) ? "ongoing" : "");
   const groups = [];
   visible.forEach((ev, idx) => {
@@ -339,7 +453,7 @@ function ResultsList({
 
   return (
     <div className={"sp-results" + (busy ? " sp-results--busy" : "")}>
-      {timeline && <TimelineAxis axis={axis} band={band} />}
+      {timeline && <TimelineAxis axis={axis} band={band} current={topYear} onJump={jumpToYear} axisRef={axisRef} />}
       <div ref={listRef} onKeyDown={onKeyDown} aria-busy={busy || undefined}>
         {groups.map(({ key, rows }, gi) => (
           <Fragment key={`${gi}:${key}`}>
@@ -355,6 +469,7 @@ function ResultsList({
                     key={ev.id}
                     ev={ev}
                     idx={idx}
+                    listed={rowYears[idx]}
                     query={query}
                     axis={axis}
                     band={band}
