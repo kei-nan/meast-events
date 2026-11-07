@@ -3,7 +3,7 @@
 import { createHash } from "node:crypto";
 import { COUNTRIES, GROUPS, INCLUSION_MIN_SITELINKS, groupForEvent, notEventClasses } from "./event-classes.js";
 import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
-import { precisionName, precisionCode } from "./wiki.js";
+import { precisionName, precisionCode, yearOf, yearsIn } from "./wiki.js";
 import { durativeWithoutEndFlag, leadStartDayFlag, lowPrecisionCoordinateFlag, presentWithoutEndFlag, titleYearsFlag } from "./flags.js";
 import { isRevid, isRevTimestamp } from "./revid.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
@@ -199,6 +199,93 @@ export function isRealDate(s, maxYear = MAX_YEAR) {
   return d <= dim;
 }
 
+// Date notes that state something about an event's stored dates, re-checked against them. A date changed by a ledger
+// fix or by hand keeps its old notes unless they are removed too: before F16 the Kuwait invasion's corrected start
+// would have kept "Wikidata start (2009-08-02) is after end (1990-08-04)" (docs/data-fixes.md). Each note is read as
+// the pipeline writes it (lib/v21.js finalizeEvent / dateOrderFlags, lib/flags.js dateFlags, enrich-candidates.js,
+// lib/seed-enrichment.js); a note of another form, or one with nothing checkable, is not judged.
+// Returns { flags, reasons }: why each stale entry of date_flags / review_reasons no longer fits.
+const wdDay = (s) => String(s).replace(/-00(?=-|$)/g, "-01"); // Wikidata "1986-00-00" is stored as 1986-01-01
+export function staleDateNotes(e) {
+  const out = { flags: [], reasons: [] };
+  const start = e.date_start;
+  const end = e.date_end ?? null;
+  if (!isRealDate(start)) return out; // already an error
+  const sy = yearOf(start);
+  const ey = yearOf(end);
+  const reversed = end != null && end < start;
+  const stored = `stored ${start}${end ? ` to ${end}` : ", no end"}`;
+  const leadYears = yearsIn(e.extract);
+  const inLead = (y) => leadYears.some((x) => Math.abs(x - y) <= 1);
+  const near = (years, lo, hi) => years.some((y) => y >= lo - 1 && y <= hi + 1);
+  const listed = (f) => (/\[([^\]]*)\]/.exec(f)?.[1] ?? "").split(",").map(Number).filter(Number.isInteger);
+  const named = (s, en) => `names ${s}${en ? ` to ${en}` : ""}`;
+
+  const flagProblem = (f) => {
+    const kind = f.split(":")[0];
+    if (kind === "date_order_invalid") {
+      const m = /Wikidata start \(([^)]+)\) is after end \(([^,)]+)/.exec(f);
+      const old = /date_end \(([^)]+)\) precedes date_start \(([^)]+)\)/.exec(f);
+      const [s, en] = m ? [m[1], m[2]] : old ? [old[2], old[1]] : [];
+      if (!reversed) return `the stored dates are in order (${stored})`;
+      if (s && (s !== start || en !== end)) return `${named(s, en)}, ${stored}`;
+    } else if (kind === DATE_END_COARSE_FLAG) {
+      const m = /end time (\S+) .*the start \(([^)]+)\)/.exec(f);
+      if (!reversed) return `the stored end is not before the start (${stored})`;
+      if (m && (m[1] !== end || m[2] !== start)) return `${named(m[2], m[1])}, ${stored}`;
+    } else if (kind === "wikipedia_dates_note") {
+      // Written only next to date_order_invalid, for reversed dates.
+      const m = /Wikidata gives (\S+?)(?: to (\d{4}-\d\d-\d\d))?(?: \(|;|$)/.exec(f);
+      if (!reversed) return `the stored dates are in order (${stored})`;
+      if (m && (m[1] !== start || (m[2] ?? null) !== end)) return `${named(m[1], m[2])}, ${stored}`;
+      const y = /\(start year (\d+) not in lead\)/.exec(f);
+      if (y && Number(y[1]) !== sy) return `names start year ${y[1]}, ${stored}`;
+    } else if (kind === "date_start_year_not_in_lead") {
+      const m = /start year (\d+) \(([^)]+)\)/.exec(f);
+      if (m && m[2] !== start) return `names ${m[2]}, ${stored}`;
+      if (leadYears.length && inLead(sy)) return `the stored lead has a year within 1 of ${sy}`;
+    } else if (kind === "date_source_adjusted") {
+      const m = /used (P580|P585) start time (\S+)$/.exec(f);
+      if (m && wdDay(m[2]) !== start) return `says ${m[1]} ${m[2]} was used, ${stored}`;
+    }
+    return null;
+  };
+  const reasonProblem = (f) => {
+    const kind = f.split(":")[0];
+    if (kind === "category_year_mismatch") {
+      const m = /within 1 year of (\d+)(?:-(\d+))?$/.exec(f);
+      if (!m) return null;
+      const [lo, hi] = [Number(m[1]), Number(m[2] ?? m[1])];
+      if (lo !== sy || hi !== (ey ?? sy)) return `names ${m[1]}${m[2] ? `-${m[2]}` : ""}, ${stored}`;
+      if (near(listed(f), lo, hi)) return `a category year it lists is within 1 year of ${lo}${hi !== lo ? `-${hi}` : ""}`;
+    } else if (kind === "date_year_mismatch" || kind === "date_end_year_mismatch") {
+      const m = /year \((\d+)\)/.exec(f);
+      const y = kind === "date_year_mismatch" ? sy : ey;
+      if (m && Number(m[1]) !== y) return `names ${m[1]}, ${stored}`;
+    } else if (kind === "unverified_date") {
+      const m = /do not confirm (\d+)/.exec(f);
+      if (m && Number(m[1]) !== sy) return `names ${m[1]}, ${stored}`;
+    } else if (kind === "month_precision_day_in_lead") {
+      const m = /date_start (\S+) has only month precision/.exec(f);
+      if (m && (m[1] !== start || e.date_precision !== "month")) return `names ${m[1]} at month precision, ${stored} at ${e.date_precision ?? "no"} precision`;
+    } else if (kind === "date_precision_coarse") {
+      const m = /only to (.+?) precision/.exec(f);
+      if (m && m[1] !== e.date_precision) return `says ${m[1]} precision, date_precision is ${JSON.stringify(e.date_precision ?? null)}`;
+    } else if (kind === "date_order_invalid") {
+      return flagProblem(f);
+    }
+    return null;
+  };
+  for (const [list, check, key] of [[e.date_flags, flagProblem, "flags"], [e.review_reasons, reasonProblem, "reasons"]]) {
+    if (!Array.isArray(list)) continue;
+    for (const f of list) {
+      const why = typeof f === "string" ? check(f) : null;
+      if (why) out[key].push(`${f.split(":")[0]} no longer fits the stored dates: ${why}`);
+    }
+  }
+  return out;
+}
+
 // opts.lenient: events that still need manual coordinates or a QID are reported as warnings, not errors. No script
 // uses it since 2026-11-03: data/events.json passes strictly, and validate-events.js / merge-proposed.js validate strictly.
 //
@@ -281,6 +368,12 @@ export function validateEvents(
         else err(i, e, `date_end (${e.date_end}) precedes date_start (${e.date_start}) and date_flags has no date_order_invalid reason`);
       }
     }
+    // The converse: a date note that no longer fits the stored dates (staleDateNotes). date_flags are shown on the
+    // event's page, so one is an error, as an unflagged reversal above is; review_reasons are the owner's review notes
+    // (not shown), so a stale one is a warning, as a stale framing review is.
+    const staleNotes = staleDateNotes(e);
+    for (const why of staleNotes.flags) err(i, e, `date_flags: ${why}`);
+    for (const why of staleNotes.reasons) warn(i, e, `review_reasons: ${why}`);
 
     if (!Array.isArray(e.countries) || e.countries.length === 0 || e.countries.some((c) => typeof c !== "string" || !c)) {
       err(i, e, "countries must be a non-empty array of strings");
@@ -575,6 +668,28 @@ export function checkFramingCoverage(events, review, { name = "framing-review" }
   const orphans = Object.keys(reviews).filter((id) => !ids.has(id));
   for (const id of orphans) warnings.push(`${name}: review for "${id}", which is not an event`);
   return { warnings, missing, stale, orphans: orphans.length };
+}
+
+// A framing review's data note that quotes an event's date ("The start date (2009) comes from Wikidata and is wrong")
+// must quote the date the event still stores: shown on the site, it would otherwise blame a date the page no longer
+// gives. Only "start date (...)" / "end date (...)" with a year or ISO date are read; other wording is not judged.
+// Warnings, as the other framing-review checks are (the review file is changed only by the owner's review).
+export function checkDataNotes(events, review, { name = "framing-review" } = {}) {
+  const warnings = [];
+  const reviews = review?.events;
+  if (!reviews || typeof reviews !== "object") return { warnings };
+  for (const e of events) {
+    const note = e?.id ? reviews[e.id]?.data_note : null;
+    if (typeof note !== "string") continue;
+    for (const m of note.matchAll(/\b(start|end) date \((\d{4}(?:-\d\d){0,2})\)/gi)) {
+      const field = m[1].toLowerCase() === "start" ? "date_start" : "date_end";
+      const value = e[field];
+      if (typeof value !== "string" || !value.startsWith(m[2])) {
+        warnings.push(`${name}: ${e.id} data_note quotes the ${m[1].toLowerCase()} date as ${m[2]}, but ${field} is ${value ?? "none"}: "${note}"`);
+      }
+    }
+  }
+  return { warnings };
 }
 
 // Cross-file check used by merge-proposed.js: ids/QIDs of `incoming` must not clash with `base`.

@@ -25,8 +25,10 @@
 //   6. /event/<id> loads the app with that event open;
 //   7. throughout: no console error, uncaught exception, CSP violation, failed
 //      request or same-origin HTTP error;
-//   8. the failure states: a lost search index chunk, matches only outside the
-//      selected years, the full text failing to load, no WebGL 2.
+//   8. the failure states: a lost search index chunk, a two-word search with one
+//      word's chunk gone after a deploy (HTTP 404), matches only outside the
+//      selected years, the full text failing to load, no WebGL 2;
+//   9. an event page on a phone shifts its layout by no more than CLS_BUDGET.
 // Exits 1 with the failures listed, or prints one line per check.
 import { spawn, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -268,6 +270,70 @@ async function lostIndexChunk(context) {
   ok("a lost index chunk shows the outage notice, then the search recovers");
 }
 
+// Two words, one of whose index chunks a deploy removed (a tab older than the deploy asks
+// for its build's folder, and the server answers its 404 page): an outage with its notice,
+// not the other word's events, which is what Pagefind answers (#168: "jerusalem suez" gave
+// the 29 "suez" events). Each word's chunks are found first, so only a chunk the other word
+// does not need is lost.
+const TWO_WORDS = ["jerusalem", "suez"];
+async function chunksFor(browser, word) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  context.setDefaultTimeout(TIMEOUT);
+  const chunks = new Set();
+  let pending = 0;
+  let last = Date.now();
+  try {
+    await context.route("**/pagefind/v.*/index/**", async (r) => {
+      chunks.add(new URL(r.request().url()).pathname);
+      pending++;
+      try {
+        await r.fulfill({ response: await r.fetch() });
+      } finally {
+        pending--;
+        last = Date.now();
+      }
+    });
+    const page = await context.newPage();
+    await page.goto(`${ORIGIN}/?q=${encodeURIComponent(word)}`);
+    // The list's own title matches can show before Pagefind has asked for its chunks:
+    // wait until it has, and for a second without another.
+    const deadline = Date.now() + TIMEOUT;
+    while (!(chunks.size && !pending && Date.now() - last > 1000)) {
+      if (Date.now() > deadline) throw new Error(`no index chunk was loaded for "${word}"`);
+      await page.waitForTimeout(100);
+    }
+    return chunks;
+  } finally {
+    await context.close();
+  }
+}
+async function twoWordsOneChunkGone(context) {
+  const browser = context.browser();
+  const [mine, other] = await Promise.all(TWO_WORDS.map((w) => chunksFor(browser, w)));
+  const gone = [...mine].filter((c) => !other.has(c));
+  if (!gone.length) throw new Error(`"${TWO_WORDS[0]}" and "${TWO_WORDS[1]}" are in the same index chunks: the check below would prove nothing (${[...mine].join(", ")} / ${[...other].join(", ")})`);
+  let blocked = true;
+  await context.route("**/pagefind/v.*/index/**", async (r) => {
+    if (!blocked || !gone.includes(new URL(r.request().url()).pathname)) return r.fallback();
+    // The server's own answer for a file that is no longer there (dist/404.html, status 404).
+    return r.fulfill({ response: await r.fetch({ url: `${ORIGIN}/pagefind/v.removed-by-a-deploy/index/gone.pf_index` }) });
+  });
+  const page = await context.newPage();
+  await page.goto(`${ORIGIN}/`);
+  await page.locator(".sp-searchbox input").fill(TWO_WORDS.join(" "));
+  const banner = page.locator(".sp-banner");
+  try {
+    await banner.waitFor({ state: "visible" });
+  } catch {
+    const rows = await page.locator("button.sp-row .sp-row-title").allInnerTexts();
+    throw new Error(`with "${TWO_WORDS[0]}"'s index chunk gone, "${TWO_WORDS.join(" ")}" showed no outage notice but ${rows.length} event(s): ${rows.slice(0, 3).join("; ")}`);
+  }
+  blocked = false;
+  await page.locator("button.sp-row").first().waitFor({ state: "visible" });
+  await banner.waitFor({ state: "detached" });
+  ok(`"${TWO_WORDS.join(" ")}" with an index chunk gone (HTTP 404, as after a deploy) shows the outage notice, then recovers`);
+}
+
 // Matches outside the selected years: the empty list says that, as the status line does.
 async function matchesOutsideYears(context) {
   const start = Number(String(query.event.date_start).slice(0, 4));
@@ -317,6 +383,71 @@ async function withoutWebGL(context) {
   ok("without WebGL 2 only the map says so; the panel, search and an event link work");
 }
 
+// Layout shift of an event page on a phone. Before #169 a link to an event opened the
+// sheet at peek and raised it once the event list arrived: CLS 0.245 measured (2026-11,
+// live site, this device, 1.6 Mbps / 150 ms, 4x CPU). The budget is web.dev's "good"
+// threshold, well above the 0.03 measured after #169, so it does not flake. The network
+// and CPU are slowed as then: on an unslowed local server the list is there before the
+// first paint, and a shift it causes would not be seen. Layout shifts are layout, not
+// drawing, so a runner without a GPU measures them as a phone does.
+const PHONE = { viewport: { width: 412, height: 823 }, deviceScaleFactor: 1.75, isMobile: true, hasTouch: true };
+const CLS_BUDGET = 0.1;
+async function eventPageLayoutShift(browser) {
+  const context = await browser.newContext(PHONE);
+  context.setDefaultTimeout(TIMEOUT);
+  try {
+    const page = await context.newPage();
+    // CLS as Chrome reports it: the largest burst of shifts (gaps under 1 s, at most 5 s long)
+    // not caused by input (https://web.dev/articles/cls).
+    await page.addInitScript(() => {
+      const w = (window.__smokeCls = { value: 0, shifts: [] });
+      let start = 0;
+      let last = 0;
+      let sum = 0;
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) {
+          if (e.hadRecentInput) continue;
+          if (e.startTime - last > 1000 || e.startTime - start > 5000) {
+            start = e.startTime;
+            sum = 0;
+          }
+          last = e.startTime;
+          sum += e.value;
+          w.value = Math.max(w.value, sum);
+          const src = (e.sources ?? []).map((s) => s.node?.className || s.node?.nodeName).filter(Boolean);
+          w.shifts.push(`${e.value.toFixed(3)} at ${Math.round(e.startTime)} ms (${src.slice(0, 3).join(", ") || "?"})`);
+        }
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    const cdp = await context.newCDPSession(page);
+    await cdp.send("Network.enable");
+    await cdp.send("Network.emulateNetworkConditions", {
+      offline: false,
+      latency: 150,
+      downloadThroughput: (1.6 * 1024 * 1024) / 8,
+      uploadThroughput: (750 * 1024) / 8,
+    });
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+    await page.goto(`${ORIGIN}/event/${encodeURIComponent(pageEvent.id)}`);
+    await page.locator("#event-detail-title").filter({ hasText: pageEvent.title }).waitFor({ state: "visible" });
+    await page.locator(".map-cover").waitFor({ state: "detached" });
+    await page.evaluate(() => document.fonts.ready);
+    // What comes later (the full text, the map's first frames) can shift the page too.
+    await page.waitForTimeout(3000);
+    return await page.evaluate(() => window.__smokeCls);
+  } finally {
+    await context.close();
+  }
+}
+async function layoutShiftCheck(browser) {
+  const cls = await eventPageLayoutShift(browser);
+  if (cls.value > CLS_BUDGET) {
+    problems.push(`layout shift on a phone at /event/${pageEvent.id}: CLS ${cls.value.toFixed(3)} over the ${CLS_BUDGET} budget; shifts: ${cls.shifts.join("; ")}`);
+  } else {
+    ok(`/event/${pageEvent.id} on a phone (412x823, slowed): CLS ${cls.value.toFixed(3)}, within ${CLS_BUDGET}`);
+  }
+}
+
 const server = startServer();
 let browser;
 let noWebGL;
@@ -333,7 +464,8 @@ try {
     args: ["--enable-unsafe-swiftshader"],
   });
   await run(browser);
-  for (const check of [lostIndexChunk, matchesOutsideYears, fullTextRetry]) await failureCheck(browser, check);
+  for (const check of [lostIndexChunk, twoWordsOneChunkGone, matchesOutsideYears, fullTextRetry]) await failureCheck(browser, check);
+  await layoutShiftCheck(browser).catch((err) => problems.push(`layoutShiftCheck: ${err.message.split("\n")[0]}`));
   noWebGL = await chromium.launch({ channel: CHANNEL, headless: true, args: ["--disable-3d-apis"] });
   await failureCheck(noWebGL, withoutWebGL);
 } catch (err) {

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { driftFor, renderDriftReport, staleFixes } from "./drift.js";
+import { dateShownReason, driftFor, renderDriftReport, staleFixes } from "./drift.js";
+import { KUWAIT_PRE_F16, KUWAIT_PRE_F16_DATA_NOTE } from "./kuwait-pre-f16.fixture.js";
 
 // Fixtures modelled on the curated data and the Wikidata items as read on 2026-10-30 (no network in tests).
 const entity = (over = {}) => ({
@@ -170,7 +171,7 @@ test("renderDriftReport: a Wikidata label is a code span, whatever it contains, 
 
 test("renderDriftReport: grouped tables, ledger-explained count, kind column; pipes escaped", () => {
   const results = [
-    { event: ev({ id: "a" }), rows: [{ field: "date_end", stored: "none", wikidata: "P582: 2024-12-08 (precision 11)" }], explained: [] },
+    { event: ev({ id: "a", sitelinks: undefined }), rows: [{ field: "date_end", stored: "none", wikidata: "P582: 2024-12-08 (precision 11)" }], explained: [] },
     { event: ev({ id: "b", sitelinks: undefined }), rows: [{ field: "classes", stored: "x|y", wikidata: "new P31: z" }], explained: ["date_start (F14)"] },
   ];
   const md = renderDriftReport(results, { checked: 2, noQid: ["c"] });
@@ -178,9 +179,52 @@ test("renderDriftReport: grouped tables, ledger-explained count, kind column; pi
   assert.match(md, /Checked 2 events with a Wikidata item: 2 difference\(s\) in 2 event\(s\)\./);
   assert.match(md, /Not listed: 1 difference\(s\) the fix ledger explains \(b: date_start \(F14\)\)/);
   assert.match(md, /Not checked \(no wikidata_qid\): c\./);
-  assert.match(md, /### date_end \(1\)[\s\S]*\| a \| discovered \| \[Q1\]\(https:\/\/www\.wikidata\.org\/wiki\/Q1\) \| `none` \|/);
+  assert.match(md, /### date_end \(1\)[\s\S]*\| a \| seed \| \[Q1\]\(https:\/\/www\.wikidata\.org\/wiki\/Q1\) \| `none` \|/);
+  assert.doesNotMatch(md, /### Wikidata changed a date the site shows/);
   assert.match(md, /\| b \| seed \| .* \| `x\\\|y` \| `new P31: z` \|/);
   assert.doesNotMatch(md, /### coordinates/);
   // Nothing to report: the summary line only.
   assert.match(renderDriftReport([], { checked: 5 }), /Checked 5 events with a Wikidata item: 0 difference\(s\) in 0 event\(s\)\.\n$/);
+});
+
+// The Kuwait record before F16 (kuwait-pre-f16.fixture.js) against its item once Wikidata had corrected P580 to
+// 1990-08-02 (revision 2565421916, docs/data-fixes.md F16): the difference the report listed then, among 32 seed events'.
+const kuwaitItem = entity({ qid: "Q856650", p31: [], p580: [{ time: "1990-08-02", precision: 11 }], p582: [{ time: "1990-08-04", precision: 11 }] });
+const seedDrift = (i) => ({
+  event: ev({ id: `seed-${i}`, wikidata_qid: `Q${100 + i}`, sitelinks: undefined }),
+  rows: [{ field: "date_start", stored: "1950-01-01", wikidata: "P585: 1950-06-01 (precision 11); P580: none" }],
+  explained: [],
+});
+
+test("renderDriftReport: Wikidata correcting a date the site shows comes first, above the seed events' differences", () => {
+  const kuwait = { ...structuredClone(KUWAIT_PRE_F16), wikidata_classes: [] };
+  const drift = driftFor(kuwait, kuwaitItem, {});
+  assert.deepEqual(drift.rows, [{ field: "date_start", stored: "2009-08-02", wikidata: "P585: none; P580: 1990-08-02 (precision 11)" }]);
+  const results = [...Array.from({ length: 32 }, (_, i) => seedDrift(i)), { event: kuwait, dataNote: KUWAIT_PRE_F16_DATA_NOTE, ...drift }];
+  const md = renderDriftReport(results, { checked: 33 });
+  const top = md.indexOf("### Wikidata changed a date the site shows (1)");
+  assert.ok(top > 0 && top < md.indexOf("### date_start (32)"), md);
+  // In code spans, as every Wikidata value in the report (#166).
+  assert.ok(
+    md.includes(
+      "| iraqi-invasion-of-kuwait | discovered | [Q856650](https://www.wikidata.org/wiki/Q856650) | date_start | `2009-08-02` | `P585: none; P580: 1990-08-02 (precision 11)` | discovered: its dates are Wikidata's; flagged date_start_year_not_in_lead, date_order_invalid, wikipedia_dates_note, category_year_mismatch; its data note names Wikidata |"
+    ),
+    md
+  );
+  // Not listed twice.
+  assert.equal(md.split("iraqi-invasion-of-kuwait").length, 2);
+});
+
+test("dateShownReason: discovered, a flag doubting Wikidata's date, or a data note naming Wikidata; else a seed event waits below", () => {
+  const seed = ev({ sitelinks: undefined });
+  assert.equal(dateShownReason(seed), null);
+  assert.equal(dateShownReason({ ...seed, date_flags: ["date_source_adjusted: x", "date_end_precision_coarse: y"], review_reasons: ["unverified_date: z"] }), null);
+  assert.equal(dateShownReason(seed, "A Russia-Ukraine grain agreement, tagged Turkey because it was signed in Istanbul."), null);
+  assert.equal(dateShownReason({ ...seed, review_reasons: ["category_year_mismatch: x"] }), "flagged category_year_mismatch");
+  assert.equal(dateShownReason(seed, "The start date (1916) comes from Wikidata; the summary dates the massacre to June 1919."), "its data note names Wikidata");
+  assert.equal(dateShownReason(ev()), "discovered: its dates are Wikidata's");
+  // Only date rows go first: a discovered event's class difference stays in its own table.
+  const md = renderDriftReport([{ event: ev({ id: "d" }), rows: [{ field: "classes", stored: "a", wikidata: "new P31: b" }], explained: [] }], { checked: 1 });
+  assert.doesNotMatch(md, /### Wikidata changed a date/);
+  assert.match(md, /### classes \(1\)/);
 });
