@@ -13,6 +13,7 @@ import { loadEventDetail, loadExportResults, loadPlaceHistory } from "../lib/laz
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { effectiveQuery } from "../lib/ranking.js";
+import { emptyResultsText } from "../lib/emptyResults.js";
 import { eventIdQuery } from "../lib/urlState.js";
 import { timelineAxis, timelineOrder } from "../lib/timelineView.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
@@ -129,6 +130,7 @@ const VIEWS = [
  *                                          {place, events, onBack, onShowOnMap, onChooseYears, onListNearby}
  *                                          (components/PlaceHistory.jsx; its events open with onSelect)
  * @param {(p:{lon:number,lat:number})=>void} [props.onOpenPlace] opens it for a point (the open event's)
+ * @param {()=>void} [props.onRetryLead]   loads the open event's full record again after it failed
  * @param {import("react").Ref<{skipTo: ()=>void}>} [props.ref]  skipTo() opens the sheet and focuses the
  *                                          event heading (event open) or the search box: App's skip link
  */
@@ -168,6 +170,7 @@ export default function SearchPanel({
   notFoundId = null,
   placeView = null,
   onOpenPlace, // ({lon, lat}): an open event's "History of this place"
+  onRetryLead,
   ref,
 }) {
   const inputId = useId();
@@ -602,6 +605,7 @@ export default function SearchPanel({
                 onShowOnMap={showOnMap}
                 onSelectEvent={onSelect}
                 onPlaceHistory={onOpenPlace}
+                onRetryLead={onRetryLead}
               />
             </Suspense>
           </div>
@@ -920,13 +924,8 @@ export default function SearchPanel({
             ) : total === 0 && !loading && results.length === 0 ? (
               <div className="sp-empty">
                 <p>
-                  {textQuery
-                    ? `No events in this atlas match “${textQuery}”.`
-                    : searching
-                      ? "No events in this atlas match these filters."
-                      : inView
-                        ? "No events in the selected years in this map view."
-                        : "No events in the selected years."}
+                  {/* Agrees with the status line: matches in other years or outside the map view are not "no match". */}
+                  {emptyResultsText({ textQuery, searching, inView, scope: filters.scope, counts, offline })}
                 </p>
                 <p className="sp-muted">
                   The atlas covers only a partial selection of events, so a missing result says

@@ -7,6 +7,9 @@ import { Component } from "react";
 // from a link to an event or a view, reloading it fails again); or the plain
 // list of every event (/event/), which needs no JavaScript. React logs the
 // error itself, so nothing is logged here.
+//
+// With a `fallback` (App.jsx, around the map) only that part is replaced, by
+// the fallback, and the rest of the page keeps working.
 export default class ErrorBoundary extends Component {
   state = { failed: false };
 
@@ -16,6 +19,7 @@ export default class ErrorBoundary extends Component {
 
   render() {
     if (!this.state.failed) return this.props.children;
+    if (this.props.fallback) return this.props.fallback;
     return (
       <main className="app-error" role="alert">
         <h1>Something went wrong</h1>
