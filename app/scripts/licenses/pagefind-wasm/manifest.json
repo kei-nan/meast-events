@@ -1,11 +1,11 @@
 {
-  "pagefind": "1.5.2",
+  "pagefind": "1.6.0",
   "intro": [
     "Pagefind's search runtime (dist/pagefind/v.*/wasm.en.pagefind and wasm.unknown.pagefind) is WebAssembly compiled",
     "from Pagefind's pagefind_web crate (MIT, Pagefind's own licence, above) and the Rust crates below. Pagefind",
-    "publishes no third-party notices for it; these were collected for Pagefind 1.5.2 from pagefind_web/Cargo.lock",
-    "at tag v1.5.2 (commit bf17396721be637cc67c8ed7ead1dc7b8ac43d96):",
-    "https://github.com/Pagefind/pagefind/blob/bf17396721be637cc67c8ed7ead1dc7b8ac43d96/pagefind_web/Cargo.lock",
+    "publishes no third-party notices for it; these were collected for Pagefind 1.6.0 from pagefind_web/Cargo.lock",
+    "at tag v1.6.0 (commit 860a4ea87e7a52379520f9eaefd0f8a6b23eb462):",
+    "https://github.com/Pagefind/pagefind/blob/860a4ea87e7a52379520f9eaefd0f8a6b23eb462/pagefind_web/Cargo.lock",
     "Unless its entry says otherwise, each crate's text was taken from its repository at the commit its crates.io package names",
     "(.cargo_vcs_info.json) and is identical to the file in that package (sha256 as in Cargo.lock).",
     "Where a crate is offered under MIT OR Apache-2.0, it is used here under MIT. Crates listed \"in case any of it",
@@ -14,21 +14,21 @@
   "crates": [
     {
       "name": "wasm-bindgen",
-      "version": "0.2.117",
+      "version": "0.2.129",
       "license": "MIT OR Apache-2.0",
       "usedUnder": "MIT",
       "files": [
-        { "file": "wasm-bindgen-0.2.117.LICENSE-MIT.txt", "source": "https://github.com/wasm-bindgen/wasm-bindgen/blob/fb403cfef5041fbe320eb8423003bda49ca33125/LICENSE-MIT" }
+        { "file": "wasm-bindgen-0.2.129.LICENSE-MIT.txt", "source": "https://github.com/wasm-bindgen/wasm-bindgen/blob/165586f854c852bcbc4d14d8a75a0a0e0d0abc12/LICENSE-MIT" }
       ]
     },
     {
       "name": "wasm-bindgen-shared",
-      "version": "0.2.117",
+      "version": "0.2.129",
       "license": "MIT OR Apache-2.0",
       "usedUnder": "MIT",
       "note": "A dependency of wasm-bindgen. Its LICENSE-MIT is a link to the repository's, given here.",
       "files": [
-        { "file": "wasm-bindgen-shared-0.2.117.LICENSE-MIT.txt", "source": "https://github.com/wasm-bindgen/wasm-bindgen/blob/fb403cfef5041fbe320eb8423003bda49ca33125/LICENSE-MIT" }
+        { "file": "wasm-bindgen-shared-0.2.129.LICENSE-MIT.txt", "source": "https://github.com/wasm-bindgen/wasm-bindgen/blob/165586f854c852bcbc4d14d8a75a0a0e0d0abc12/LICENSE-MIT" }
       ]
     },
     {
@@ -64,21 +64,22 @@
     },
     {
       "name": "bit-set",
-      "version": "0.10.0",
+      "version": "0.11.1",
       "license": "Apache-2.0 OR MIT",
       "usedUnder": "MIT",
+      "note": "Published from the bit-vec repository (path set/), whose set/LICENSE-MIT is a link to the repository's, given here.",
       "files": [
-        { "file": "bit-set-0.10.0.LICENSE-MIT.txt", "source": "https://github.com/contain-rs/bit-set/blob/2a569e1a5bffaee2c2974bcf070ef4e8ee85550b/LICENSE-MIT" }
+        { "file": "bit-set-0.11.1.LICENSE-MIT.txt", "source": "https://github.com/contain-rs/bit-vec/blob/cd5b4392be151fb507f3bdbf71ce1e73885dbc28/LICENSE-MIT" }
       ]
     },
     {
       "name": "bit-vec",
-      "version": "0.9.1",
+      "version": "0.10.1",
       "license": "Apache-2.0 OR MIT",
       "usedUnder": "MIT",
-      "note": "A dependency of bit-set.",
+      "note": "A dependency of bit-set. Its vec/LICENSE-MIT is a link to the repository's, given here.",
       "files": [
-        { "file": "bit-vec-0.9.1.LICENSE-MIT.txt", "source": "https://github.com/contain-rs/bit-vec/blob/2fb0305422ff7fd915a107b91209abbff9fce50f/LICENSE-MIT" }
+        { "file": "bit-vec-0.10.1.LICENSE-MIT.txt", "source": "https://github.com/contain-rs/bit-vec/blob/cd5b4392be151fb507f3bdbf71ce1e73885dbc28/LICENSE-MIT" }
       ]
     },
     {
@@ -102,20 +103,40 @@
       ]
     },
     {
+      "name": "borsh",
+      "version": "1.7.0",
+      "license": "MIT OR Apache-2.0",
+      "usedUnder": "MIT",
+      "note": "Cargo.lock lists it as a dependency of bit-vec (an optional one, like serde); listed in case any of it is linked. Its borsh/LICENSE-MIT is a link to the repository's, given here; it has no copyright line, and the crate's Cargo.toml names Near Inc as author.",
+      "files": [
+        { "file": "borsh-1.7.0.LICENSE-MIT.txt", "source": "https://github.com/near/borsh-rs/blob/3348776d27adf4df8acd0694238590d25e485258/LICENSE-MIT" }
+      ]
+    },
+    {
+      "name": "bytes",
+      "version": "1.12.1",
+      "license": "MIT",
+      "note": "A dependency of borsh (an optional one); listed for the same reason.",
+      "files": [
+        { "file": "bytes-1.12.1.LICENSE.txt", "source": "https://github.com/tokio-rs/bytes/blob/76c0fbb54ed4336caf9d2311658a2f4a5627c21d/LICENSE" }
+      ]
+    },
+    {
       "name": "pagefind_stem",
       "version": "1.0.0",
       "license": "MIT",
       "note": "Ships no licence file. Its notices are the header of its src/lib.rs, reproduced below: the rust-stemmers API (MIT) and the Snowball stemmers (BSD-3-Clause), whose second clause asks for this notice with a binary redistribution.",
       "files": [
-        { "file": "pagefind_stem-1.0.0.lib-rs-notice.txt", "source": "https://github.com/Pagefind/pagefind/blob/bf17396721be637cc67c8ed7ead1dc7b8ac43d96/pagefind_stem/src/lib.rs (lines 7-63, comment markers removed; identical in https://static.crates.io/crates/pagefind_stem/pagefind_stem-1.0.0.crate)" }
+        { "file": "pagefind_stem-1.0.0.lib-rs-notice.txt", "source": "https://github.com/Pagefind/pagefind/blob/860a4ea87e7a52379520f9eaefd0f8a6b23eb462/pagefind_stem/src/lib.rs (lines 7-63, comment markers removed; identical in https://static.crates.io/crates/pagefind_stem/pagefind_stem-1.0.0.crate)" }
       ]
     },
     {
       "name": "minicbor",
-      "version": "2.2.1",
+      "version": "2.3.1",
       "license": "BlueOak-1.0.0",
+      "note": "Its minicbor/LICENSE.md is a link to the repository's, given here.",
       "files": [
-        { "file": "minicbor-2.2.1.LICENSE.md.txt", "source": "https://github.com/twittner/minicbor/blob/b22bf310922e79da6ecac1ec0f0a3a4419962222/LICENSE.md" }
+        { "file": "minicbor-2.3.1.LICENSE.md.txt", "source": "https://github.com/twittner/minicbor/blob/0432e74b1c85edf45db3c64da9f8b0d0897cdfda/LICENSE.md" }
       ]
     },
     {
@@ -129,31 +150,36 @@
       ]
     },
     {
-      "name": "pagefind_microjson",
-      "version": "0.1.4",
-      "license": "GPL-3.0-only",
-      "note": "Declared GPL-3.0-only in its Cargo.toml; the notice in its src/lib.rs says version 3 \"or (at your option) any later version\". Both notices are reproduced as published. The crate's LICENCE file is the GPL-3.0 text up to \"END OF TERMS AND CONDITIONS\" (identical in https://github.com/rspencer01/microjson/blob/0a19858180bf7688e689bf982ea444c30d981594/LICENCE); the full text from gnu.org follows.",
-      "correspondingSource": [
-        "https://static.crates.io/crates/pagefind_microjson/pagefind_microjson-0.1.4.crate (sha256 8f97aa64cde14e78d6274c473f36cec98d401f0b583282055e953d2df907e210, as in Pagefind's Cargo.lock), built from commit 51e27c165e26c7125666403b796fb5d8564a8be5 (the package's .cargo_vcs_info.json), a commit not in the public repository https://github.com/rspencer01/microjson; the crate file above is the exact source.",
-        "Pagefind's build of it: https://github.com/Pagefind/pagefind/tree/bf17396721be637cc67c8ed7ead1dc7b8ac43d96/pagefind_web (tag v1.5.2)."
-      ],
-      "files": [
-        { "file": "pagefind_microjson-0.1.4.lib-rs-notice.txt", "source": "https://static.crates.io/crates/pagefind_microjson/pagefind_microjson-0.1.4.crate, src/lib.rs lines 1-15" },
-        { "file": "GPL-3.0.txt", "source": "https://www.gnu.org/licenses/gpl-3.0.txt" }
-      ]
+      "name": "hifijson",
+      "version": "0.5.0",
+      "license": "MIT",
+      "note": "Ships no licence file, and its repository (https://github.com/01mf02/hifijson) has none: its Cargo.toml declares MIT and names Michael Färber as author, and no licence text is published with it. The package (https://static.crates.io/crates/hifijson/hifijson-0.5.0.crate, sha256 242402749acf71e6f32f5857598b7002c4058a4e3c3b22b4c7d51cab9aea754e, as in Cargo.lock) names commit fcd2b9ae489d962fb245063649e497bebb571cc2, which is not in the public repository. Pagefind uses it without default features, with \"alloc\" only (pagefind_web/Cargo.toml), so its optional serde is not compiled in.",
+      "files": []
     }
   ],
   "notCompiledIn": {
-    "note": "Also in pagefind_web/Cargo.lock, but proc-macros, a build script dependency and what only they use, which run while compiling and are not part of the WebAssembly:",
+    "note": "Also in pagefind_web/Cargo.lock, but proc-macros, build script dependencies and what only they use, which run while compiling and are not part of the WebAssembly:",
     "crates": [
-      "wasm-bindgen-macro 0.2.117",
-      "wasm-bindgen-macro-support 0.2.117",
+      "wasm-bindgen-macro 0.2.129",
+      "wasm-bindgen-macro-support 0.2.129",
       "bumpalo 3.20.2",
       "rustversion 1.0.22",
       "serde_derive 1.0.228",
+      "borsh-derive 1.7.0",
+      "cfg_aliases 0.2.1",
+      "proc-macro-crate 3.5.0",
+      "toml_edit 0.25.12+spec-1.1.0",
+      "toml_datetime 1.1.1+spec-1.1.0",
+      "toml_parser 1.1.2+spec-1.1.0",
+      "winnow 1.0.3",
+      "memchr 2.8.3",
+      "indexmap 2.14.0",
+      "hashbrown 0.17.1",
+      "equivalent 1.0.2",
       "proc-macro2 1.0.106",
       "quote 1.0.45",
-      "syn 2.0.117"
+      "syn 2.0.117",
+      "syn 3.0.5"
     ]
   }
 }
