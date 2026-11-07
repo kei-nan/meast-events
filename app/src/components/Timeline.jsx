@@ -324,14 +324,15 @@ function Timeline({
         ) : (
           <Presets startYear={startYear} endYear={endYear} onPick={applyPreset} />
         )}
-        <p id="timeline-mode-help" className="timeline-mode-help" hidden={!modeHelpOpen}>
-          {PLAY_MODES.map((m) => (
-            <span key={m.id}>
-              <strong>{m.label}:</strong> {m.help}{" "}
-            </span>
-          ))}
-        </p>
       </div>
+      {/* Below the row, not in it: the desktop row does not wrap. */}
+      <p id="timeline-mode-help" className="timeline-mode-help" hidden={!modeHelpOpen}>
+        {PLAY_MODES.map((m) => (
+          <span key={m.id}>
+            <strong>{m.label}:</strong> {m.help}{" "}
+          </span>
+        ))}
+      </p>
       <div className="timeline-strip">
         <span className="timeline-bound">{MIN_YEAR}</span>
         {/* One strip: the density bars sit behind the two handles, so the

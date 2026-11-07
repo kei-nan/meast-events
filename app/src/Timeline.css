@@ -161,8 +161,6 @@
 
 /* A line of its own under the controls, only while the ⓘ has it open. */
 .timeline-mode-help {
-  flex-basis: 100%;
-  order: 10;
   margin: 2px 0 0;
   font-size: 0.75rem;
   line-height: 1.35;
