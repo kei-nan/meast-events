@@ -29,7 +29,7 @@ const frac = (y) => (y - MIN_YEAR) / (MAX_YEAR - MIN_YEAR);
 
 // Ids stay "accumulate"/"slide" (lib/playback.js); the labels say what Play does
 // in plain words. The help is each button's description for screen readers, its
-// tooltip, and, behind the ⓘ beside them, a line in sight (phones show no tooltips).
+// tooltip, and, behind the ⓘ beside them, a popover in sight (phones show no tooltips).
 const PLAY_MODES = [
   { id: "accumulate", label: "Grow", help: "Play keeps the start year and advances the end year." },
   { id: "slide", label: "Move", help: "Play moves the whole period forward, keeping its length." },
@@ -74,6 +74,19 @@ function Timeline({
   const handleRefs = { start: useRef(null), end: useRef(null) };
   const drag = useRef(null);
   const yearBtnRef = useRef(null);
+  const modeInfoRef = useRef(null);
+  const modeHelpRef = useRef(null);
+
+  // The help popover closes on a press anywhere else (the ⓘ toggles it itself).
+  useEffect(() => {
+    if (!modeHelpOpen) return undefined;
+    function onPointerDown(e) {
+      if (modeInfoRef.current?.contains(e.target) || modeHelpRef.current?.contains(e.target)) return;
+      setModeHelpOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [modeHelpOpen]);
 
   // Back to the years button once the editor is gone (on phones the button is
   // hidden while editing, so it can take focus only after the re-render).
@@ -264,9 +277,11 @@ function Timeline({
               </span>
             ))}
             {/* The help in sight, for touch screens (no tooltips) and anyone
-                else: a line under the controls while it is open. */}
+                else: a popover over the map while it is open, so the timeline
+                keeps its height. */}
             <button
               type="button"
+              ref={modeInfoRef}
               className="timeline-mode-info"
               aria-expanded={modeHelpOpen}
               aria-controls="timeline-mode-help"
@@ -282,6 +297,13 @@ function Timeline({
               <span aria-hidden="true">ⓘ</span>
             </button>
           </div>
+          <p id="timeline-mode-help" className="timeline-mode-help" ref={modeHelpRef} hidden={!modeHelpOpen}>
+            {PLAY_MODES.map((m) => (
+              <span key={m.id}>
+                <strong>{m.label}:</strong> {m.help}
+              </span>
+            ))}
+          </p>
           <button
             type="button"
             className="timeline-year"
@@ -325,14 +347,6 @@ function Timeline({
           <Presets startYear={startYear} endYear={endYear} onPick={applyPreset} />
         )}
       </div>
-      {/* Below the row, not in it: the desktop row does not wrap. */}
-      <p id="timeline-mode-help" className="timeline-mode-help" hidden={!modeHelpOpen}>
-        {PLAY_MODES.map((m) => (
-          <span key={m.id}>
-            <strong>{m.label}:</strong> {m.help}{" "}
-          </span>
-        ))}
-      </p>
       <div className="timeline-strip">
         <span className="timeline-bound">{MIN_YEAR}</span>
         {/* One strip: the density bars sit behind the two handles, so the

@@ -98,6 +98,7 @@
 }
 
 .timeline-controls {
+  position: relative; /* anchors the play-mode help popover */
   display: flex;
   align-items: center;
   flex: none;
@@ -159,12 +160,35 @@
   outline-offset: 2px;
 }
 
-/* A line of its own under the controls, only while the ⓘ has it open. */
+/* Over the map, above the controls, only while the ⓘ has it open: the
+   timeline keeps its height, so the map and the strip do not move. */
 .timeline-mode-help {
-  margin: 2px 0 0;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: max-content;
+  max-width: min(380px, calc(100vw - 32px));
+  margin: 0;
+  padding: 8px 10px;
   font-size: 0.75rem;
   line-height: 1.35;
   color: var(--text-secondary);
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
+}
+
+/* While it is open the timeline ranks over the phone's results sheet (z-index
+   5, SidePanel.css), which sits right above it: the popover is drawn over the
+   sheet, not under it. Closed, the sheet stays on top as before. */
+.timeline:has(.timeline-mode-help:not([hidden])) {
+  position: relative;
+  z-index: 6;
 }
 
 .timeline-mode-help[hidden] {

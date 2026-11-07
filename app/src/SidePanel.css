@@ -1063,19 +1063,62 @@ button.sp-chip[aria-pressed="true"] {
   box-shadow: none;
 }
 
+/* A click anywhere on the scale jumps the list to that year (ResultsList
+   TimelineAxis), so the whole scale takes the pointer. */
+.sp-taxis-scale {
+  cursor: pointer;
+}
+
 .sp-taxis-end,
 .sp-taxis-tick {
   position: absolute;
   top: 0;
+  z-index: 1;
+  padding: 0 3px;
+  font: inherit;
   line-height: 1.1rem;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.sp-taxis-end:hover,
+.sp-taxis-tick:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sp-taxis-end:focus-visible,
+.sp-taxis-tick:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 0;
+  color: var(--text-primary);
+}
+
+/* The year of the row now at the top of the list: a gold notch on the
+   scale's bottom edge, pointing down at it. Moves as the list scrolls. */
+.sp-taxis-mark {
+  position: absolute;
+  bottom: -6px;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top: 6px solid var(--accent);
+  border-bottom: 0;
+  pointer-events: none;
+  transition: left 0.12s ease-out;
 }
 
 .sp-taxis-end--start {
-  left: 0;
+  left: -3px; /* its padding: the year's text stays at the axis's start */
 }
 
 .sp-taxis-end--end {
-  right: 0;
+  right: -3px;
 }
 
 .sp-taxis-tick {
@@ -2109,5 +2152,17 @@ button.sp-chip[aria-pressed="true"] {
 
   .sp-row--selected {
     border-left-color: Highlight;
+  }
+
+  /* The timeline axis's notch: its border colour would be forced to text. */
+  .sp-taxis-mark {
+    forced-color-adjust: none;
+    border-top-color: Highlight;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-taxis-mark {
+    transition: none;
   }
 }
