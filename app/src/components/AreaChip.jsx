@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { MAP_UNAVAILABLE_NOTE } from "../lib/mapUnavailable.js";
 
 /**
  * Area row: shows the active area (removable) and the "Only in current map
@@ -57,6 +58,7 @@ export default function AreaChip({
   inView,
   onInViewChange,
   viewCount,
+  mapUnavailable = false, // no map, so no view to keep to: the box is disabled, saying why
 }) {
   const checkRef = useRef(null);
   return (
@@ -76,11 +78,21 @@ export default function AreaChip({
           ref={checkRef}
           type="checkbox"
           checked={!!inView}
-          onChange={(e) => onInViewChange?.(e.target.checked)}
+          // aria-disabled, not disabled: it stays in the tab order, its label saying why. It can
+          // still be turned off.
+          aria-disabled={mapUnavailable || undefined}
+          onChange={(e) => {
+            if (!mapUnavailable || !e.target.checked) onInViewChange?.(e.target.checked);
+          }}
         />
         <span>
           Only in current map view
-          {typeof viewCount === "number" && (
+          {mapUnavailable ? (
+            <span className="sp-muted">
+              {" "}
+              ({MAP_UNAVAILABLE_NOTE})
+            </span>
+          ) : typeof viewCount === "number" && (
             <span className="sp-muted">
               {" "}
               ({viewCount.toLocaleString("en-US")} {viewCount === 1 ? "event" : "events"} in view)

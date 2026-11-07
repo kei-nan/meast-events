@@ -132,6 +132,26 @@ test("an outage reports once and falls back to local matches", async () => {
   assert.deepEqual(index.calls, ["event"]);
 });
 
+test("when the filters leave no match, the text's matches without them are counted", async () => {
+  const index = stubIndex(["e1", "e2", "gone"]); // "gone": not in the store, not counted
+  const p = props();
+  const h = renderHook(useEventSearch, p);
+  await index.settle();
+  assert.equal(h.rerender(p).unfilteredTotal, null); // no filter
+  assert.equal(h.rerender({ ...p, categories: ["war"] }).unfilteredTotal, null); // the filter keeps e1
+  const none = h.rerender({ ...p, countries: ["Iran"] });
+  assert.deepEqual(ids(none), []);
+  assert.equal(none.unfilteredTotal, 2);
+  // Answered locally (the index down): the local title/summary matches.
+  const index2 = stubIndex();
+  const p2 = props({ countries: ["Iran"] });
+  const h2 = renderHook(useEventSearch, p2);
+  await index2.settle(true);
+  const s = h2.rerender(p2);
+  assert.equal(s.source, "static");
+  assert.equal(s.unfilteredTotal, 3);
+});
+
 test("filters alone are answered locally, without the index", () => {
   const index = stubIndex();
   const h = renderHook(useEventSearch, props({ query: "", categories: ["treaty"] }));

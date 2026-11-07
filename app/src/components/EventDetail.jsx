@@ -23,6 +23,7 @@ import { shownClasses } from "../lib/eventClasses.js";
 import { fallbackLocationNote } from "../lib/fallbackPoint.js";
 import { HAND_PICKED_NOTE } from "../lib/handPicked.js";
 import { importOr } from "../lib/importOr.js";
+import { MAP_UNAVAILABLE_NOTE, needsMapButton } from "../lib/mapUnavailable.js";
 import EventLink from "./EventLink.jsx";
 import RelatedEvents from "./RelatedEvents.jsx";
 
@@ -195,7 +196,7 @@ function LoadingNote() {
  * hover, and this view re-splits and marks its whole lead each render; keep
  * its props stable (SearchPanel's onShowOnMap is a useCallback).
  */
-function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent, onPlaceHistory, onRetryLead }) {
+function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavailable = false, onSelectEvent, onPlaceHistory, onRetryLead }) {
   const headingRef = useRef(null);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
@@ -341,9 +342,14 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
         </button>
         {onShowOnMap && quality !== "none" && (
           // "Find on map": lowers the sheet and aims the map at the event (the
-          // sheet's bar, "Show map", only lowers it).
-          <button type="button" className="sp-btn event-detail-showmap" onClick={onShowOnMap}>
+          // sheet's bar, "Show map", only lowers it). Without a map: disabled, saying why.
+          <button
+            type="button"
+            className={`sp-btn event-detail-showmap${mapUnavailable ? " sp-btn--nomap" : ""}`}
+            {...needsMapButton(mapUnavailable, onShowOnMap)}
+          >
             Find on map
+            {mapUnavailable && <span className="sp-sr"> ({MAP_UNAVAILABLE_NOTE})</span>}
           </button>
         )}
         {/* "Cite" once the full record (retrieval date, revision) is in. */}

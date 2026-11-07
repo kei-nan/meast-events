@@ -436,6 +436,20 @@
   accent-color: var(--accent);
 }
 
+/* Controls that need the map while there is none (lib/mapUnavailable.js):
+   aria-disabled, so they keep focus and their reason; drawn as disabled. */
+.sp-check:has(input[aria-disabled="true"]) {
+  cursor: default;
+}
+.sp-check input[aria-disabled="true"],
+.sp-btn.sp-btn--nomap {
+  opacity: 0.5;
+  cursor: default;
+}
+.sp-btn.sp-btn--nomap:hover {
+  border-color: var(--border);
+}
+
 .sp-seg {
   display: inline-flex;
   align-items: stretch;

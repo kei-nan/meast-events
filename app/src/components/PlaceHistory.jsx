@@ -6,6 +6,7 @@ import { BoundaryNote, BoundarySource } from "./BoundaryText.jsx";
 import { NO_STATUS_LABEL, humaniseStatus, isDashedStatus } from "./mapBorders.js";
 import { loadBoundaryHistory, loadDeferredGeometry } from "../lib/dataClient.js";
 import { eventsNear, historyAt, pendingRefsAt, periodLabel } from "../lib/placeHistory.js";
+import { MAP_UNAVAILABLE_NOTE, needsMapButton } from "../lib/mapUnavailable.js";
 import { placeLabel } from "../lib/placeParam.js";
 import { NEARBY_KM, RELATED_SHOWN } from "../lib/related.js";
 import { compassPoint, compassScale, formatKm } from "../lib/relatedViz.js";
@@ -84,7 +85,7 @@ function Shape({ item }) {
  * `onChooseYears(start, end)`: show a period's years on the timeline and map.
  * `onListNearby()`: list every nearby event in the results (a circle area).
  */
-export default function PlaceHistory({ place, events, eventsLoading, mapYear, onBack, onShowOnMap, onChooseYears, onSelectEvent, onListNearby }) {
+export default function PlaceHistory({ place, events, eventsLoading, mapYear, onBack, onShowOnMap, mapUnavailable = false, onChooseYears, onSelectEvent, onListNearby }) {
   const { lon, lat } = place;
   const key = `${lon},${lat}`;
   const headingRef = useRef(null);
@@ -123,8 +124,13 @@ export default function PlaceHistory({ place, events, eventsLoading, mapYear, on
           <span aria-hidden="true">←</span> Back<span className="event-detail-back-more"> to results</span>
         </button>
         {onShowOnMap && (
-          <button type="button" className="sp-btn" onClick={onShowOnMap}>
+          <button
+            type="button"
+            className={mapUnavailable ? "sp-btn sp-btn--nomap" : "sp-btn"}
+            {...needsMapButton(mapUnavailable, onShowOnMap)}
+          >
             Find on map
+            {mapUnavailable && <span className="sp-sr"> ({MAP_UNAVAILABLE_NOTE})</span>}
           </button>
         )}
         <ShareButton title={`History of this place (${label})`} />

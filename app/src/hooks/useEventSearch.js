@@ -153,6 +153,20 @@ export default function useEventSearch({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, full, q, area, cats, cs, version]);
 
+  // The text's matches with no category, country or area filter, over the
+  // whole timeline: only counted when those filters leave none, for the empty
+  // list's wording (lib/emptyResults.js). From the index's ids when it answered
+  // (the same ids, unfiltered), else the same local title/summary match.
+  const filtered = Boolean(area || cats.length || cs.length);
+  const answer = fullResults ?? local;
+  const unfilteredTotal = useMemo(() => {
+    if (!ready || !q || !filtered || answer.length > 0) return null;
+    if (full.status === "ready" && full.q === q) return full.ids.filter((id) => storeRef.current.has(id)).length;
+    return localSearch([...storeRef.current.values()], { q }).length;
+    // version signals that the (mutable) store has new entries.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, q, filtered, answer, full, version]);
+
   // The text is still changing (the debounce has not caught up with it).
   const typing = q !== settledQ;
   if (!active) return IDLE;
@@ -167,6 +181,7 @@ export default function useEventSearch({
     interim: false,
     textSearch: Boolean(q),
     typing,
+    unfilteredTotal,
   });
 
   if (!q) return localState("local");
@@ -180,6 +195,7 @@ export default function useEventSearch({
       source: "fulltext",
       textSearch: true,
       typing,
+      unfilteredTotal,
     };
   }
   if (degraded || (full.q === q && full.status === "failed")) {

@@ -99,8 +99,9 @@ const VIEWS = [
  * @param {object[]} props.results          lite events {id,title,date_start,date_end,countries,category,
  *                                          location_quality,snippet}, already ordered
  * @param {number}   props.total            total matches (may exceed results.length)
- * @param {{all:number, inRange:number}} [props.counts] search matches over the whole timeline / in the
- *                                          selected years (all is used for the "show all N" button)
+ * @param {{all:number, inRange:number, unfiltered:number|null}} [props.counts] search matches over the whole
+ *                                          timeline / in the selected years (all is used for the "show all N"
+ *                                          button) / for the text alone, when the filters leave none
  * @param {"fulltext"|"local"|"static"} props.source   "static" (full-text index unavailable) shows a
  *                                          notice under the search box
  * @param {boolean} [props.eventsError]     the event list could not be loaded (it is retried): the list
@@ -174,6 +175,7 @@ export default function SearchPanel({
   placeView = null,
   onOpenPlace, // ({lon, lat}): an open event's "History of this place"
   onRetryLead,
+  mapUnavailable = false, // no map (App.jsx): what needs it is disabled, saying why (lib/mapUnavailable.js)
   ref,
 }) {
   const inputId = useId();
@@ -499,6 +501,7 @@ export default function SearchPanel({
   const liveText = panelLiveText({
     playing,
     pausedAtYear: paused ? range[1] : null,
+    eventsLoading, // the header says "Loading events…" (App.jsx)
     eventsError: Boolean(eventsError) && !eventsLoading, // as App.jsx shows its notice
     status: spoken.text + spoken.extra,
   });
@@ -613,6 +616,7 @@ export default function SearchPanel({
                 borderYear={mapBorderYear}
                 onBack={onBack}
                 onShowOnMap={showOnMap}
+                mapUnavailable={mapUnavailable}
                 onSelectEvent={onSelect}
                 onPlaceHistory={onOpenPlace}
                 onRetryLead={onRetryLead}
@@ -638,6 +642,7 @@ export default function SearchPanel({
                 mapYear={mapBorderYear}
                 onBack={placeView.onBack}
                 onShowOnMap={showPlaceOnMap}
+                mapUnavailable={mapUnavailable}
                 onChooseYears={placeView.onChooseYears}
                 onSelectEvent={onSelect}
                 onListNearby={placeView.onListNearby}
@@ -902,6 +907,7 @@ export default function SearchPanel({
               inView={filters.inView}
               onInViewChange={(v) => onFiltersChange({ ...filters, inView: v })}
               viewCount={viewCount}
+              mapUnavailable={mapUnavailable}
             />
             <FilterBar
               filters={filters}
@@ -934,8 +940,17 @@ export default function SearchPanel({
             ) : total === 0 && !loading && results.length === 0 ? (
               <div className="sp-empty">
                 <p>
-                  {/* Agrees with the status line: matches in other years or outside the map view are not "no match". */}
-                  {emptyResultsText({ textQuery, searching, inView, scope: filters.scope, counts, offline })}
+                  {/* Agrees with the status line: matches in other years, outside the map view or outside the
+                      filters are not "no match". */}
+                  {emptyResultsText({
+                    textQuery,
+                    searching,
+                    inView,
+                    scope: filters.scope,
+                    counts,
+                    filters: { categories: cats.length > 0, countries: countries.length > 0, area: Boolean(area) },
+                    offline,
+                  })}
                 </p>
                 <p className="sp-muted">
                   The atlas covers only a partial selection of events, so a missing result says

@@ -8,6 +8,10 @@ test("the panel announces its status line, after 'Paused at' when Play paused", 
   assert.equal(panelLiveText({ playing: true, status: "40 events in 1960–1967" }), "");
 });
 
+test("'Loading events…' is announced once, by the header's notice, not again by the panel", () => {
+  assert.equal(panelLiveText({ playing: false, eventsLoading: true, status: "Loading events…" }), "");
+});
+
 test("events that failed to load are announced once, by the header's notice, not again by the panel", () => {
   assert.equal(panelLiveText({ playing: false, eventsError: true, status: "Events could not be loaded - retrying" }), "");
 });
