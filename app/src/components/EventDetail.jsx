@@ -190,11 +190,12 @@ function LoadingNote() {
  * `onSelectEvent(id)` opens another event (the "Part of", "Includes" and related links).
  * `borderYear` is the year whose borders the map draws (for the shading note).
  * `onPlaceHistory({lon, lat})` (optional) opens "What was this place?" for the event's point.
+ * `onRetryLead()` (optional) loads the full lead again after it failed ("Try again").
  * Memoized (default export): App re-renders on every Play step, map move and
  * hover, and this view re-splits and marks its whole lead each render; keep
  * its props stable (SearchPanel's onShowOnMap is a useCallback).
  */
-function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent, onPlaceHistory }) {
+function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEvent, onPlaceHistory, onRetryLead }) {
   const headingRef = useRef(null);
   // The chosen review tab, remembered per event; otherwise the first tab whose review found something.
   const [chosenTab, setChosenTab] = useState(null);
@@ -424,9 +425,26 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, onSelectEv
           event is open, so a failure that comes later is announced. */}
       <div role="status">
         {event.leadStatus === "loading" && <LoadingNote key={event.id} />}
+        {/* The Wikipedia link comes with the full record, so there is none to point to here. */}
         {event.leadStatus === "error" && (
           <p className="event-detail-note">
-            The full text could not be loaded; only the opening is shown. Read the whole article on Wikipedia.
+            The full text could not be loaded; only the opening is shown.
+            {onRetryLead && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  className="sp-btn"
+                  onClick={() => {
+                    // The button goes while it loads: focus stays in the view, on its heading.
+                    headingRef.current?.focus({ preventScroll: true });
+                    onRetryLead();
+                  }}
+                >
+                  Try again
+                </button>
+              </>
+            )}
           </p>
         )}
       </div>

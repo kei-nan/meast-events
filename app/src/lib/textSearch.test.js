@@ -9,6 +9,7 @@ register("./testing/viteNodeHooks.mjs", import.meta.url);
 let copies = 0;
 const fresh = () => import(`./textSearch.js?copy=${++copies}`);
 
+// `results`: the answer to every query, or a function of the query giving it.
 function fakePagefind({ results = [], initFails = 0 } = {}) {
   const pf = {
     calls: { options: [], init: 0, search: [] },
@@ -21,7 +22,7 @@ function fakePagefind({ results = [], initFails = 0 } = {}) {
     },
     async search(q) {
       pf.calls.search.push(q);
-      return { results };
+      return { results: typeof results === "function" ? results(q) : results };
     },
   };
   globalThis.__fakePagefind = pf;
@@ -59,7 +60,8 @@ test("maps Pagefind result ids to event ids in relevance order, dropping unknown
   const pf = fakePagefind({ results: [{ id: "p2" }, { id: "p9" }, { id: "p1" }] });
   const calls = stubIds({ p1: "event-1", p2: "event-2" });
   assert.deepEqual(await searchEventIds("suez canal"), ["event-2", "event-1"]);
-  assert.deepEqual(pf.calls.search, ["suez canal"]);
+  // Each word alone too: one lost index chunk would otherwise go unnoticed.
+  assert.deepEqual(pf.calls.search, ["suez canal", "suez", "canal"]);
   assert.deepEqual(pf.calls.options, [{ basePath: "/pagefind/v.test/" }]);
   assert.deepEqual(calls, ["/pagefind/v.test/ids.json"]);
 });
@@ -200,7 +202,7 @@ test("the engine is looked up under BASE_URL", async () => {
   globalThis.__VITE_ENV__ = { BASE_URL: "/sub/" };
   try {
     const { searchEventIds } = await fresh();
-    const pf = fakePagefind({ results: [] });
+    const pf = fakePagefind({ results: [{ id: "p1" }] });
     const calls = stubIds({});
     await searchEventIds("q");
     assert.deepEqual(pf.calls.options, [{ basePath: "/sub/pagefind/v.test/" }]);
@@ -223,7 +225,7 @@ test("a word no indexed word starts with answers no events, without Pagefind's p
   assert.deepEqual(await searchEventIds("Suez"), ["e1"]);
   assert.deepEqual(await searchEventIds("jerus"), ["e1"]);
   assert.deepEqual(await searchEventIds("Suez wars"), ["e1"]);
-  assert.deepEqual(pf.calls.search, ["Suez", "jerus", "Suez wars"]);
+  assert.deepEqual(pf.calls.search, ["Suez", "jerus", "Suez wars", "suez", "wars"]);
   assert.deepEqual(calls.words, ["/pagefind/v.test/words.json"]);
 });
 
@@ -234,6 +236,45 @@ test("symbols, never part of an indexed word, are left out of the query", async 
   assert.deepEqual(await searchEventIds("8000+"), ["e1"]);
   assert.deepEqual(await searchEventIds("US$500"), ["e1"]);
   assert.deepEqual(pf.calls.search, ["8000", "US500"]);
+});
+
+// Pagefind 1.5.2 only logs an index chunk it could not load, and then answers
+// as if that chunk's words were in no event: alone a word finds nothing, and
+// next to others it is ignored (measured: "jerusalem suez" -> the suez events).
+const WORLD = ["canal", "jerusalem", "suez"];
+const answers = (byQuery) => (q) => (byQuery[q] ?? []).map((id) => ({ id }));
+
+test("a word the word list holds but the index answers with nothing is a lost chunk: an outage, and a fresh engine", async () => {
+  const { searchEventIds } = await fresh();
+  let lost = true;
+  const pf = fakePagefind({ results: (q) => (lost && q.includes("jerusalem") ? [] : [{ id: "p1" }]) });
+  const calls = stubIds({ p1: "e1" }, { words: WORLD });
+  await assert.rejects(searchEventIds("jerusalem"), /part of the search index/);
+  assert.equal(calls.meta, 1);
+  lost = false;
+  // The next search reads meta.json again and loads the engine anew (a new module URL).
+  assert.deepEqual(await searchEventIds("jerusalem"), ["e1"]);
+  assert.equal(calls.meta, 2);
+  assert.equal(pf.calls.init, 2);
+});
+
+test("several words: one word's lost chunk is an outage, not the other word's events", async () => {
+  const { searchEventIds } = await fresh();
+  // "jerusalem suez" answered with the suez events, as Pagefind does with jerusalem's chunk gone.
+  fakePagefind({ results: answers({ "jerusalem suez": ["p2", "p3"], suez: ["p2", "p3"] }) });
+  stubIds({ p2: "e2", p3: "e3" }, { words: WORLD });
+  await assert.rejects(searchEventIds("jerusalem suez"), /part of the search index/);
+});
+
+test("several words each found, but never in one event, are no match, not an outage", async () => {
+  const { searchEventIds } = await fresh();
+  const pf = fakePagefind({ results: answers({ jerusalem: ["p1"], canal: ["p2"] }) });
+  const calls = stubIds({ p1: "e1", p2: "e2" }, { words: WORLD });
+  assert.deepEqual(await searchEventIds("jerusalem canal"), []);
+  // An exact phrase with no match, but its words found.
+  assert.deepEqual(await searchEventIds('"jerusalem"'), []);
+  assert.equal(pf.calls.init, 1);
+  assert.equal(calls.meta, 1);
 });
 
 test("a word list that is not a list is a failed load", async () => {

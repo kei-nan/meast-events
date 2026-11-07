@@ -13,8 +13,18 @@
 // bundle names its build's folder (__SEARCH_DIR__, vite.config.js). Without one
 // (the dev server), or after a load failed (a page older than the deploy, whose
 // folder is gone), the current folder is read from pagefind/meta.json.
+//
+// Pagefind (1.5.2, _loadGenericChunk) does not report an index chunk it could
+// not load (a dropped connection, or a folder a deploy removed): it logs it,
+// keeps the failed load (the chunk is never asked for again) and answers as if
+// the chunk's words were in no event. A word on its own then finds nothing, and
+// in a query of several words it is ignored: measured (2026-11, one chunk
+// aborted) "jerusalem suez" answered the 29 "suez" events instead of 2. So each
+// word the word list says the index holds is also searched alone; one that
+// finds nothing means a lost chunk, and the engine is dropped (a fresh one
+// loads on the next try) and the search fails as an outage.
 
-import { everyTermIndexed, pagefindQuery } from "./searchTerms.js";
+import { everyTermIndexed, pagefindQuery, queryTerms } from "./searchTerms.js";
 
 const ROOT = `${import.meta.env.BASE_URL}pagefind/`;
 /* global __SEARCH_DIR__ */
@@ -23,6 +33,7 @@ const BUILD_DIR = typeof __SEARCH_DIR__ === "string" ? __SEARCH_DIR__ : null;
 let dirPromise = BUILD_DIR ? Promise.resolve(BUILD_DIR) : null;
 let loadedDir = null; // the folder enginePromise and idsPromise come from
 let enginePromise = null;
+let engine = null; // what enginePromise resolved to
 let idsPromise = null;
 let engineFailures = 0;
 
@@ -56,6 +67,7 @@ async function load() {
   if (dir !== loadedDir) {
     loadedDir = dir;
     enginePromise = null;
+    engine = null;
     idsPromise = null;
   }
   const base = `${ROOT}${dir}/`;
@@ -67,6 +79,7 @@ async function load() {
     const p = import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
       await pf.options({ basePath: base });
       await pf.init();
+      if (enginePromise === p) engine = pf;
       return pf;
     });
     enginePromise = p;
@@ -101,16 +114,46 @@ async function load() {
   return Promise.all([enginePromise, idsPromise]);
 }
 
+// An engine that lost an index chunk keeps it lost, so it is replaced: the next
+// load reads meta.json (the folder may be gone) and imports the engine under a
+// new URL (engineUrl); the same module URL would give back the same engine.
+function discardEngine(pf) {
+  if (engine !== pf) return;
+  engine = null;
+  enginePromise = null;
+  engineFailures++;
+  dirPromise = null;
+  Promise.resolve()
+    .then(() => pf.destroy?.()) // its web worker
+    .catch(() => {});
+}
+
+// Every word of a query that the word list holds finds something on its own,
+// unless Pagefind lost the chunk it is in.
+async function assertChunksLoaded(pf, terms) {
+  const answers = await Promise.all([...new Set(terms)].map((t) => pf.search(t)));
+  if (answers.some((a) => a?.results?.length === 0)) {
+    discardEngine(pf);
+    throw new Error("Failed to load part of the search index");
+  }
+}
+
 // Event ids matching every word of q (each word, stemmed, also as a prefix, so
 // search-as-you-type works), most relevant first. A word the index does not
 // hold means no events: Pagefind would instead answer it with the events of a
 // shorter indexed word ("jerusalemxyz" -> "jerusalem"), or ignore it in a
-// longer query (searchTerms.js).
+// longer query (searchTerms.js). Rejects if part of the index could not be
+// loaded (see the top of this file).
 export async function searchEventIds(q) {
   const [pf, { ids, words }] = await load();
   const query = pagefindQuery(q);
   if (!everyTermIndexed(query, words)) return [];
   const res = await pf.search(query);
+  // One word that found something needs no check; several words, or nothing
+  // found, are checked word by word. Words each found, but never in one event,
+  // are a real "no match".
+  const terms = queryTerms(query);
+  if (terms.length > 1 || res?.results?.length === 0) await assertChunksLoaded(pf, terms);
   const out = [];
   for (const r of res?.results ?? []) {
     const id = ids[r.id];

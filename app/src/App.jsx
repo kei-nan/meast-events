@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AboutDataFailed } from "./components/LoadFailed.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { importOr } from "./lib/importOr.js";
 import { loadEventDetail } from "./lib/lazyChunks.js";
 import MapLoading from "./components/MapLoading.jsx";
@@ -39,6 +40,25 @@ import "./App.css";
 const MapViewFailed = () => (
   <div className="map-view map-placeholder" role="alert">
     The map could not be loaded. Please reload the page.
+  </div>
+);
+// The map failed after its code loaded: most often MapLibre cannot start
+// without WebGL 2 (turned off, or not supported by the browser or device),
+// which a reload does not change. Only the map area says so (ErrorBoundary
+// below); search, the list, the events and the timeline keep working.
+function hasWebGL2() {
+  try {
+    return Boolean(document.createElement("canvas").getContext("webgl2"));
+  } catch {
+    return false;
+  }
+}
+const MapViewCrashed = () => (
+  <div className="map-view map-placeholder" role="alert">
+    {hasWebGL2()
+      ? "The map stopped working because of an error. Please reload the page."
+      : "The map needs WebGL 2, which this browser has turned off or does not support."}{" "}
+    Search, the event list and the timeline still work.
   </div>
 );
 // The map chunk is requested as soon as this module runs, not when React first
@@ -355,6 +375,9 @@ export default function App() {
   // id -> {extract, extract_retrieved_at, framing_review} | "error"
   const [leads, setLeads] = useState({});
   const leadRequestedRef = useRef(new Set());
+  // Bumped by the event view's "Try again" after a failure, which runs the effect below again.
+  const [leadAttempt, setLeadAttempt] = useState(0);
+  const retryLead = useCallback(() => setLeadAttempt((n) => n + 1), []);
   const needsLead =
     Boolean(selectedEventRaw) &&
     (selectedEventRaw.extract === undefined || selectedEventRaw.framing_review === undefined);
@@ -362,7 +385,7 @@ export default function App() {
     if (!needsLead || leadRequestedRef.current.has(selectedEventId)) return;
     const id = selectedEventId;
     leadRequestedRef.current.add(id);
-    // A retry (re-opening after a failure) shows "loading" again, not the old error.
+    // A retry ("Try again", or re-opening after a failure) shows "loading" again, not the old error.
     setLeads((m) => {
       if (!(id in m)) return m;
       const next = { ...m };
@@ -370,13 +393,13 @@ export default function App() {
       return next;
     });
     const failed = () => {
-      leadRequestedRef.current.delete(id); // allow a retry on re-open
+      leadRequestedRef.current.delete(id); // allow a retry
       setLeads((m) => ({ ...m, [id]: "error" }));
     };
     loadFullLead(id)
       .then((lead) => (lead ? setLeads((m) => ({ ...m, [id]: lead })) : failed()))
       .catch(failed);
-  }, [needsLead, selectedEventId]);
+  }, [needsLead, selectedEventId, leadAttempt]);
 
   const selectedEvent = useMemo(() => {
     const raw = selectedEventRaw;
@@ -682,34 +705,36 @@ export default function App() {
         </header>
         <main className="app-body">
           {mapStarted ? (
-            <Suspense fallback={MAP_PLACEHOLDER}>
-              <MapView
-                events={mapEvents}
-                matchIds={matchIds}
-                eventsLoading={eventsLoading}
-                // An event link without years shows the event's year, known once the events load.
-                yearPending={Boolean(initial.eventId && !initial.years && eventsLoading && !eventsError)}
-                year={endYear}
-                borderYear={borderYear}
-                eventYear={eventYear}
-                eventYearLabel={eventYearLabel}
-                onChooseBorderYear={chooseBorderYear}
-                highlightEvent={highlightEvent}
-                selectedEventId={selectedEventId}
-                hoverId={hoverId}
-                focus={focus}
-                keepPin={keepPin}
-                areaMode={areaMode}
-                area={area}
-                onAreaModeChange={setAreaMode}
-                onAreaChange={setArea}
-                onViewportChange={handleViewportChange}
-                onSelectEvent={handleSelectFromMap}
-                categories={categoryOptions.length ? categoryOptions : null}
-                place={selectedEventId ? null : place}
-                onPlaceHistory={openPlace}
-              />
-            </Suspense>
+            <ErrorBoundary fallback={<MapViewCrashed />}>
+              <Suspense fallback={MAP_PLACEHOLDER}>
+                <MapView
+                  events={mapEvents}
+                  matchIds={matchIds}
+                  eventsLoading={eventsLoading}
+                  // An event link without years shows the event's year, known once the events load.
+                  yearPending={Boolean(initial.eventId && !initial.years && eventsLoading && !eventsError)}
+                  year={endYear}
+                  borderYear={borderYear}
+                  eventYear={eventYear}
+                  eventYearLabel={eventYearLabel}
+                  onChooseBorderYear={chooseBorderYear}
+                  highlightEvent={highlightEvent}
+                  selectedEventId={selectedEventId}
+                  hoverId={hoverId}
+                  focus={focus}
+                  keepPin={keepPin}
+                  areaMode={areaMode}
+                  area={area}
+                  onAreaModeChange={setAreaMode}
+                  onAreaChange={setArea}
+                  onViewportChange={handleViewportChange}
+                  onSelectEvent={handleSelectFromMap}
+                  categories={categoryOptions.length ? categoryOptions : null}
+                  place={selectedEventId ? null : place}
+                  onPlaceHistory={openPlace}
+                />
+              </Suspense>
+            </ErrorBoundary>
           ) : (
             MAP_PLACEHOLDER
           )}
@@ -750,6 +775,7 @@ export default function App() {
             notFoundId={notFoundId}
             placeView={placeView}
             onOpenPlace={openPlace}
+            onRetryLead={retryLead}
           />
         </main>
         <Timeline

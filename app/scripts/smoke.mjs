@@ -24,7 +24,9 @@
 //   5. "Sources & licences" opens the About dialog at the credits;
 //   6. /event/<id> loads the app with that event open;
 //   7. throughout: no console error, uncaught exception, CSP violation, failed
-//      request or same-origin HTTP error.
+//      request or same-origin HTTP error;
+//   8. the failure states: a lost search index chunk, matches only outside the
+//      selected years, the full text failing to load, no WebGL 2.
 // Exits 1 with the failures listed, or prints one line per check.
 import { spawn, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -233,8 +235,91 @@ async function run(browser) {
   await context.close();
 }
 
+// What the reader sees when a part fails. Plain pages, not watchedPage: these
+// failures log errors on purpose.
+//
+// Each in a context of its own, and a failure is listed without skipping the others.
+async function failureCheck(browser, check) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  context.setDefaultTimeout(TIMEOUT);
+  try {
+    await check(context);
+  } catch (err) {
+    problems.push(`${check.name}: ${err.message.split("\n")[0]}`);
+  } finally {
+    await context.close();
+  }
+}
+
+// An index chunk that fails to load (Pagefind only logs it): an outage with its
+// notice, not "no events match", and the search recovers once the chunk loads.
+async function lostIndexChunk(context) {
+  let blocked = true;
+  await context.route("**/pagefind/v.*/index/**", (r) => (blocked ? r.abort() : r.fallback()));
+  const page = await context.newPage();
+  await page.goto(`${ORIGIN}/`);
+  await page.locator(".sp-searchbox input").fill(query.word);
+  await page.locator(".sp-banner").waitFor({ state: "visible" });
+  const lost = await page.locator(".sp-empty").innerText();
+  if (lost.includes("in this atlas match")) throw new Error(`a lost index chunk read as no match: "${lost}"`);
+  blocked = false;
+  await page.locator("button.sp-row", { hasText: query.event.title }).first().waitFor({ state: "visible" });
+  await page.locator(".sp-banner").waitFor({ state: "detached" });
+  ok("a lost index chunk shows the outage notice, then the search recovers");
+}
+
+// Matches outside the selected years: the empty list says that, as the status line does.
+async function matchesOutsideYears(context) {
+  const start = Number(String(query.event.date_start).slice(0, 4));
+  const years = start < 1950 ? "2020-2021" : "1900-1901";
+  const page = await context.newPage();
+  await page.goto(`${ORIGIN}/?q=${encodeURIComponent(query.word)}&y=${years}&scope=range`);
+  const scoped = page.locator(".sp-empty p").first();
+  await scoped.waitFor({ state: "visible" });
+  await page.locator(".sp-scope-link", { hasText: "Show all" }).waitFor({ state: "visible" });
+  const scopedText = await scoped.innerText();
+  if (!scopedText.includes("selected years") || scopedText.includes("in this atlas")) {
+    throw new Error(`matches outside the selected years read as: "${scopedText}"`);
+  }
+  ok("matches outside the selected years are not called no match");
+}
+
+// The full text fails to load: a retry in place brings it.
+async function fullTextRetry(context) {
+  let blocked = true;
+  await context.route("**/data/events/v.*/full/**", (r) => (blocked ? r.abort() : r.fallback()));
+  const page = await context.newPage();
+  await page.goto(`${ORIGIN}/event/${encodeURIComponent(pageEvent.id)}`);
+  const retry = page.getByRole("button", { name: "Try again" });
+  await retry.waitFor({ state: "visible" });
+  blocked = false;
+  await retry.click();
+  await page.locator(".event-detail-asof").waitFor({ state: "visible" });
+  await retry.waitFor({ state: "detached" });
+  ok("the event's full text loads with Try again after a failure");
+}
+
+// Without WebGL 2 (a browser launched with --disable-3d-apis) the map cannot
+// start: it says so in its own area, and the rest works.
+async function withoutWebGL(context) {
+  const page = await context.newPage();
+  await page.goto(`${ORIGIN}/?q=${encodeURIComponent(query.word)}`);
+  if (await page.evaluate(() => Boolean(document.createElement("canvas").getContext("webgl2")))) {
+    throw new Error("--disable-3d-apis left WebGL 2 on: the check below would prove nothing");
+  }
+  await page.locator(".map-view[role=alert]", { hasText: "WebGL" }).waitFor({ state: "visible" });
+  await page.locator("button.sp-row", { hasText: query.event.title }).first().waitFor({ state: "visible" });
+  await page.locator(".timeline").first().waitFor({ state: "visible" });
+  const res = await page.goto(`${ORIGIN}/event/${encodeURIComponent(pageEvent.id)}`);
+  if (res.status() !== 200) throw new Error(`/event/${pageEvent.id} answered HTTP ${res.status()}`);
+  await page.locator("#event-detail-title").filter({ hasText: pageEvent.title }).waitFor({ state: "visible" });
+  await page.locator(".map-view[role=alert]", { hasText: "WebGL" }).waitFor({ state: "visible" });
+  ok("without WebGL 2 only the map says so; the panel, search and an event link work");
+}
+
 const server = startServer();
 let browser;
+let noWebGL;
 let failed = false;
 try {
   const home = await waitForServer(server);
@@ -248,11 +333,15 @@ try {
     args: ["--enable-unsafe-swiftshader"],
   });
   await run(browser);
+  for (const check of [lostIndexChunk, matchesOutsideYears, fullTextRetry]) await failureCheck(browser, check);
+  noWebGL = await chromium.launch({ channel: CHANNEL, headless: true, args: ["--disable-3d-apis"] });
+  await failureCheck(noWebGL, withoutWebGL);
 } catch (err) {
   failed = true;
   problems.unshift(err.message);
 } finally {
   await browser?.close();
+  await noWebGL?.close();
   stopServer(server);
 }
 
