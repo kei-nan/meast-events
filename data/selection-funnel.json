@@ -5,7 +5,7 @@
   "stages": [
     {
       "stage": "raw_candidates",
-      "label": "Raw Wikidata candidates (23 event classes, 15 tracked countries, dated 1900+)",
+      "label": "Raw Wikidata candidates (40 event classes, 15 tracked countries, dated 1900+)",
       "count": 5148
     },
     {
@@ -53,6 +53,7 @@
     "curated_total": 815,
     "seed_events_hand_picked": 102,
     "seed_events_also_found_by_discovery": 61,
+    "seed_events_found_with_other_countries_than_wikidata": 25,
     "seed_events_not_reachable_by_discovery": 41,
     "discovered_events_merged": 713,
     "location_quality": {

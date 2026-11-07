@@ -55,7 +55,7 @@ export const SITE_NAME = "Middle East, 1900–present";
 export const CSHAPES_CREDIT =
   "CShapes 2.0 - historical country borders. Schvitz, G., et al. (2022). CC BY-NC-SA 4.0. https://icr.ethz.ch/data/cshapes/ (modified by middleeast.events)";
 export const OCHA_CREDIT =
-  "West Bank Areas A/B/C: UN OCHA / HDX \"Oslo Agreement\" Areas A/B/C (West Bank). Distributed under the legacy HumanitarianResponse.info terms: non-commercial use with credit to UN OCHA. https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
+  "West Bank Areas A/B/C: UN OCHA / HDX \"Oslo Agreement\" Areas A/B/C (West Bank), source: Palestinian Authority, Ministry of Planning (PA MOP). Distributed under the legacy HumanitarianResponse.info terms: non-commercial use with credit to UN OCHA and PA MOP. https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 export const GEONAMES_CREDIT =
   "some corrected border points: GeoNames - CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). https://www.geonames.org/";
 export const BORDERS_CREDIT = [CSHAPES_CREDIT, OCHA_CREDIT, GEONAMES_CREDIT].join("; ");

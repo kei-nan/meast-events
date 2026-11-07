@@ -18,18 +18,25 @@ Two other sources in the border data keep their own terms:
 - The West Bank Areas A/B/C come from UN OCHA / HDX "Oslo Agreement"
   Areas A/B/C (West Bank):
       https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0
-  They are distributed under the legacy HumanitarianResponse.info terms,
-  not a Creative Commons licence: non-commercial use with credit to
-  UN OCHA (derivative works are permitted subject to the inclusion of
-  credit to the source; see scripts/extract-correction-geometry.js).
-  The credit is carried in the `source` field of the boundaries.json
-  features drawn from it (Areas A/B/C) or fitted to it.
+  The dataset's source, as HDX gives it: Palestinian Authority, Ministry
+  of Planning (PA MOP). They are distributed under the legacy
+  HumanitarianResponse.info terms, not a Creative Commons licence:
+  non-commercial use, and "Compilation or creation of derivative works
+  from these Materials is subject to the inclusion of credit to the
+  source of the Materials used (which may or may not be OCHA)", so they
+  are credited to UN OCHA and PA MOP (see
+  scripts/extract-correction-geometry.js). The credit is carried in the
+  `source` field of the boundaries.json features drawn from it
+  (Areas A/B/C); the features fitted to it name OCHA's Area C.
 - Some corrected border points (the wells and capes that treaties name)
   are located with GeoNames gazetteer coordinates, CC BY 4.0
   (https://creativecommons.org/licenses/by/4.0/), https://www.geonames.org/
   (used in scripts/extract-correction-geometry.js).
 
-Event text (extracts) comes from Wikipedia and remains under CC BY-SA 4.0
-with attribution to the article authors; see NOTICE at the repository root.
+Event text (titles, extracts) comes from Wikipedia and remains under
+CC BY-SA 4.0 with attribution to the article authors, as do the city and
+water names on the map (English Wikipedia article titles, in
+app/src/data/cities.json and water.json) and the sentences quoted from
+articles in scripts/build-cities.js; see NOTICE at the repository root.
 
 Full credits: ../NOTICE
