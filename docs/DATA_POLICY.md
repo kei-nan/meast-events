@@ -8,7 +8,8 @@ rather than a second layer of ours. Concretely:
   `countries` and `wikidata_classes` are copied from Wikipedia/Wikidata as returned. The only change made to text is
   whitespace normalisation of the extract, plus dropping an empty "()" left by stripped markup (see "Extract"). The exception is the hand-picked seed list: the dates and
   countries of those 102 events were typed by hand for it (on 2026-10-24, 24 of the 60 seed events the rule also finds had
-  other countries than Wikidata's, and 30 seed start dates were none of the item's Wikidata P585/P580 values, 11 of them
+  other countries than Wikidata's, 25 of 61 since the discovery re-run of 2026-11-04 (`shown_now` in `data/selection-funnel.json`, which the
+  About page shows); and on 2026-10-24, 30 seed start dates were none of the item's Wikidata P585/P580 values, 11 of them
   checked against the article, `docs/data-fixes.md` F14). They are kept as they are; each such event says so on the site
   ("Hand-picked event: ... its dates and countries were typed by hand for that list, so they can differ from Wikidata's").
   Since the owner-approved Wikidata date refresh of 2026-10-30 (`docs/data-fixes.md`), a seed date that differs from Wikidata is set to Wikidata's
@@ -261,7 +262,7 @@ with the dates as Wikidata gives them and a `date_flags` reason. Nothing is drop
 (`withoutCurated` in `scripts/lib/enrich-run.js`), not the `already_curated` flag stored in `data/event-candidates.json`, which goes stale once events
 are merged (`discover-events.js --predecessors-only` leaves existing rows untouched). A `--keep-existing` run also drops kept proposed records that have been
 merged since. On 2026-11-03 the stale flag had let 254 of the 255 records in `data/events.proposed.json` be curated events; the file was filtered with
-the same check to the 1 that is not (`kocgiri-rebellion`).
+the same check to the 1 that is not (`kocgiri-rebellion`). The discovery re-run of 2026-11-04 proposed 14 more, so the file holds 15 (none merged).
 
 ### Events without an article of their own
 
@@ -303,12 +304,12 @@ The rule stays as coded (all projects); the documentation now says so.
 - **Wikidata modelling is uneven.** Only events that some editor has typed with a class, dated and located in a tracked country are found at all. Multi-country events
   carry only the countries Wikidata lists.
 - **English Wikipedia is required** for an extract, which biases toward what English Wikipedia covers.
-- **The hand-picked seed list** (102 events, 42 of them not reachable by the rule; 112 before 2026-10-09 and 103 before 2026-10-15, see "Not events" below) is our own selection.
+- **The hand-picked seed list** (102 events, 41 of them not reachable by the rule on the candidates of 2026-11-04, 42 before; 112 before 2026-10-09 and 103 before 2026-10-15, see "Not events" below) is our own selection.
   It is still the only source of economic events; the rule now also finds diplomatic ones (summits, ceasefires, peace conferences).
 - **Location is not required, but it changes visibility.** Events without coordinates are listed but have no marker; abstract and large-area events (wars, referendums,
   treaties) lack coordinates far more often than point-like ones.
 
-The funnel from 5,063 raw candidates to what is shown, with breakdowns by country, class, group and decade, is machine readable in `data/selection-funnel.json`
+The funnel from the raw candidates (5,148 in the discovery run of 2026-11-04) to what is shown, with breakdowns by country, class, group and decade, is machine readable in `data/selection-funnel.json`
 (recomputed from the data files by `scripts/build-selection-funnel.js`, not copied from documents) so the app's About page can render it.
 Its `coverage` block (added 2026-10-15) counts what is shown (`data/events.json`): per country as tagged and again without the events tagged
 with 8 or more countries (17 on 2026-10-15: the world wars and other region-wide conflicts, which otherwise count in each of their countries),

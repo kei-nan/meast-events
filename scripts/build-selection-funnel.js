@@ -11,7 +11,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { openCache } from "./lib/cache.js";
 import { fetchEntities } from "./lib/wd-entities.js";
-import { INCLUSION_MIN_SITELINKS, COUNTRIES, groupForEvent } from "./lib/event-classes.js";
+import { INCLUSION_MIN_SITELINKS, COUNTRIES, EVENT_CLASSES, groupForEvent } from "./lib/event-classes.js";
 
 const read = async (n) => JSON.parse(await readFile(new URL(`../data/${n}`, import.meta.url), "utf-8"));
 const candidates = await read("event-candidates.json");
@@ -88,6 +88,12 @@ const passAlready = pass.filter((c) => curatedQids.has(c.wikidata_qid) && !enric
 const seedCount = curated.filter((e) => e.sitelinks === undefined).length; // legacy curated events carry no discovery sitelinks
 const candQids = new Set(candidates.map((c) => c.wikidata_qid));
 const seedFound = curated.filter((e) => e.sitelinks === undefined && candQids.has(e.wikidata_qid)).length;
+// Of those, the ones whose hand-typed countries are not the set discovery derived from Wikidata (About the data cites it).
+const candByQid = new Map(candidates.map((c) => [c.wikidata_qid, c]));
+const countrySet = (a) => JSON.stringify([...new Set(a ?? [])].sort());
+const seedOtherCountries = curated.filter(
+  (e) => e.sitelinks === undefined && candByQid.has(e.wikidata_qid) && countrySet(e.countries) !== countrySet(candByQid.get(e.wikidata_qid).countries)
+).length;
 const proposedNoLoc = proposed.filter((e) => e.location_quality === "none");
 const proposedDateFlagged = proposed.filter((e) => (e.date_flags ?? []).some((f) => f.startsWith("date_order_invalid")));
 const dupExcluded = proposed.filter((e) => excludedIds.has(e.id));
@@ -95,7 +101,7 @@ const mergedDiscovered = curated.filter((e) => e.sitelinks !== undefined);
 const pendingNew = proposed.filter((e) => !curatedQids.has(e.wikidata_qid) && !excludedIds.has(e.id));
 
 const stages = [
-  { stage: "raw_candidates", label: "Raw Wikidata candidates (23 event classes, 15 tracked countries, dated 1900+)", count: candidates.length },
+  { stage: "raw_candidates", label: `Raw Wikidata candidates (${EVENT_CLASSES.length} event classes, ${Object.keys(COUNTRIES).length} tracked countries, dated 1900+)`, count: candidates.length },
   { stage: "english_article", label: "Has an English Wikipedia article", count: candidates.length - noEn.length, removed: noEn.length, removed_by_reason: { no_english_article: noEn.length } },
   { stage: "sitelinks", label: `At least ${MIN} sitelinks (all Wikimedia projects)`, count: pass.length, removed: lt10.length, removed_by_reason: { fewer_than_min_sitelinks: lt10.length } },
   {
@@ -132,6 +138,7 @@ const funnel = {
     curated_total: curated.length,
     seed_events_hand_picked: seedCount,
     seed_events_also_found_by_discovery: seedFound,
+    seed_events_found_with_other_countries_than_wikidata: seedOtherCountries,
     seed_events_not_reachable_by_discovery: seedCount - seedFound,
     discovered_events_merged: mergedDiscovered.length,
     location_quality: curated.reduce((o, e) => (inc(o, e.location_quality), o), {}),

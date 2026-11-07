@@ -9,8 +9,12 @@ exhaustion** of the Workers Free plan.
 
 (The Redis Cloud database and the API Worker that used to sit behind the site,
 with their CORS, rate-limiting and credential-rotation notes, were removed from
-the repo; git history keeps them. Shutting down what is still deployed is the
-owner's manual checklist in
+the repo; git history keeps them. The API Worker's `workers.dev` address no
+longer answers: a GET on 2026-11-07 returned 404, Cloudflare "error code: 1042",
+the same response as a Worker name that never existed. That shows the address
+is gone, not whether the Worker was deleted or only its address turned off.
+Whether the Redis Cloud database has been deleted is not verified. The
+owner's manual checklist for both is in
 [DEPLOYMENT.md](../DEPLOYMENT.md#retiring-the-old-api-manual-one-time).)
 
 **Found a vulnerability?** See [Reporting a vulnerability](#5-reporting-a-vulnerability).
@@ -226,11 +230,13 @@ splat.
   environment or the `git` binary of later steps, including the step that
   holds the token. Hiding the token from earlier steps does not stop that.
   - Job `refresh` (`contents: read`): runs the refresh scripts, `npm ci`, the
-    tests, the build and `check-dist.mjs`, and uploads `data/events.json`,
-    `data/framing-review.json` and the reports as workflow artifacts.
+    tests, the build and `check-dist.mjs`, and uploads four data files
+    (`data/events.json`, `data/framing-review.json`,
+    `data/missing-coordinates-report.md`, `data/selection-funnel.json`) and the
+    reports as workflow artifacts.
   - Job `open-pr` (`contents: write`, `pull-requests: write`, `actions:
     write`; only when `refresh` succeeded and found changes): a fresh checkout
-    of the same commit (`persist-credentials: false`), the two data files
+    of the same commit (`persist-credentials: false`), those four data files
     copied in from the artifact (nothing else from it reaches the commit),
     then commit, push, `gh pr create` and `gh workflow run ci.yml` on the new
     branch (`actions: write` is for that dispatch only; DEPLOYMENT.md,
@@ -239,7 +245,7 @@ splat.
     step, and only for the push through git's `GIT_CONFIG_*` environment
     (never written to `.git/config`).
   - Left over: a compromised dependency in `refresh` can still choose the
-    content of those two data files (or the PR description, from the
+    content of those four data files (or the PR description, from the
     reports). That reaches only the unmerged pull request, which the owner
     reviews; it cannot push elsewhere, change workflows, or merge.
   - Wikipedia text in the PR description: the report lists changed titles

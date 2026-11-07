@@ -5,13 +5,20 @@ Data (data/): see data/LICENSE. Each part keeps its source's licence:
 - Border data (boundaries.json, corrections-geometry.json): CC BY-NC-SA 4.0
   (CShapes 2.0), with the UN OCHA areas under their own terms (below).
   Non-commercial use only. The non-commercial limit applies to this part only.
-- Event text (titles, extracts) from Wikipedia: CC BY-SA 4.0, credited to
-  Wikipedia contributors. It has no non-commercial restriction.
+- Text from Wikipedia (event titles and extracts; the city and water names
+  on the map, which are English Wikipedia article titles; the sentences
+  quoted from articles in scripts/build-cities.js as the sources of city
+  renames): CC BY-SA 4.0, credited to Wikipedia contributors. It has no
+  non-commercial restriction.
 - Facts from Wikidata (dates, places, identifiers): CC0.
 Third-party software in the built site (MapLibre GL JS, BSD 3-Clause, and the
 packages its prebuilt bundle includes, such as kdbush, earcut and pbf; React,
-Pagefind and uqr, MIT; the Fontsource font packages, OFL 1.1): their licence
-notices are generated at build time into third-party-licenses.txt, served at
+Pagefind and uqr, MIT; the Rust crates compiled into Pagefind's WebAssembly
+search runtime, mostly MIT or Apache-2.0, among them pagefind_microjson,
+GPL-3.0-only, minicbor, BlueOak-1.0.0, and the Snowball stemmers in
+pagefind_stem, BSD 3-Clause; the Fontsource font packages, OFL 1.1): their
+licence notices are generated at build time into third-party-licenses.txt
+(with the corresponding source of pagefind_microjson), served at
 https://middleeast.events/third-party-licenses.txt
 (app/scripts/third-party-licenses.mjs).
 
@@ -19,10 +26,13 @@ https://middleeast.events/third-party-licenses.txt
   CC BY-NC-SA 4.0. https://icr.ethz.ch/data/cshapes/
   Modified in this project: splits, flags and additions listed in
   scripts/boundary-corrections.js, each cited per feature.
-- UN OCHA / HDX "Oslo Agreement" Areas A/B/C (West Bank). Distributed under
+- UN OCHA / HDX "Oslo Agreement" Areas A/B/C (West Bank), source:
+  Palestinian Authority, Ministry of Planning (PA MOP). Distributed under
   the legacy HumanitarianResponse.info terms: non-commercial use with
-  credit to UN OCHA. The credit is carried in the `source` field of the
-  boundaries.json features drawn from it (Areas A/B/C) or fitted to it.
+  credit to the source of the materials, UN OCHA and PA MOP. The credit is
+  carried in the `source` field of the boundaries.json features drawn from
+  it (Areas A/B/C); the features fitted to it name OCHA's Area C.
+  https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0
 - Natural Earth - public domain. https://www.naturalearthdata.com/
 - Inter (Copyright 2016 The Inter Project Authors) and Spectral (Copyright
   2017 The Spectral Project Authors) - interface fonts (Inter also draws the
@@ -32,8 +42,11 @@ https://middleeast.events/third-party-licenses.txt
 - GeoNames - CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
   https://www.geonames.org/ Gazetteer coordinates of the wells and capes
   that treaties name, used in scripts/extract-correction-geometry.js.
-- Wikipedia / Wikidata - event titles, extracts and metadata. Text is
+- Wikipedia / Wikidata - event titles, extracts and metadata; the city and
+  water names on the map (English Wikipedia article titles of Wikidata
+  items) and the sentences quoted in scripts/build-cities.js. Text is
   CC BY-SA 4.0, credited to Wikipedia contributors; each event links to its
-  source article. Wikidata is CC0.
+  source article, and each quoted sentence names its article and revision.
+  Wikidata is CC0.
 - U.S. Department of State, Office of the Geographer (International
   Boundary Study documents) - cited as sources in border corrections.

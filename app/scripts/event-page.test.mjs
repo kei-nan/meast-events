@@ -23,8 +23,9 @@ import {
   SITE_NAME,
   titleHasYear,
 } from "./event-page.mjs";
-import { SITE as citationSite, SITE_NAME as citationSiteName } from "../src/lib/citation.js";
+import { BORDERS_CREDIT, SITE as citationSite, SITE_NAME as citationSiteName } from "../src/lib/citation.js";
 import { safeUrl as appSafeUrl } from "../src/lib/safeUrl.js";
+import { otherArticleTitle } from "../src/lib/otherArticle.js";
 
 // The app's own index.html (its source; the build fills in the built one, which
 // differs only in the script and style tags Vite writes).
@@ -36,11 +37,17 @@ const page = (event) => renderEventPage(event, TEMPLATE);
 // (Natural Earth, also named in some sources, is public domain: no credit required.)
 const BORDER_CREDITS = [
   { name: "CShapes", used: /CShapes 2\.0/, credit: ["CShapes 2.0", CSHAPES_URL] },
-  { name: "UN OCHA", used: /UN OCHA|OCHA's|data\.humdata\.org/, credit: ["UN OCHA", OCHA_AREAS_URL] },
+  // The HDX terms ask for credit "to the source of the Materials used (which may or may not be OCHA)", and HDX's
+  // dataset_source for it is "Palestinian Authority, Ministry of Planning (PA MOP)": both are credited.
+  {
+    name: "UN OCHA",
+    used: /UN OCHA|OCHA's|data\.humdata\.org/,
+    credit: ["UN OCHA", OCHA_AREAS_URL, "Palestinian Authority, Ministry of Planning (PA MOP)", "UN OCHA and PA MOP"],
+  },
   { name: "GeoNames", used: /GeoNames|geonames\.org/, credit: ["GeoNames", GEONAMES_URL] },
 ];
 
-test("every border source family in boundaries.json is credited on event pages and in the About dialog", () => {
+test("every border source family in boundaries.json is credited on event pages, in the About dialog, NOTICE and data/LICENSE", () => {
   const boundaries = JSON.parse(fs.readFileSync(new URL("../../data/boundaries.json", import.meta.url), "utf8"));
   const sources = boundaries.features.map((f) => String(f.properties?.source ?? ""));
   const used = BORDER_CREDITS.filter((family) => sources.some((s) => family.used.test(s)));
@@ -53,14 +60,35 @@ test("every border source family in boundaries.json is credited on event pages a
     "event page": page({ id: "x", title: "X" }),
     "event index": renderIndexPage([{ id: "x", title: "X" }]),
     "AboutData.jsx": fs.readFileSync(new URL("../src/components/AboutData.jsx", import.meta.url), "utf8"),
+    NOTICE: fs.readFileSync(new URL("../../NOTICE", import.meta.url), "utf8"),
+    "data/LICENSE": fs.readFileSync(new URL("../../data/LICENSE", import.meta.url), "utf8"),
+    "Cite this (citation.js)": BORDERS_CREDIT,
   };
   for (const family of used) {
-    for (const [where, text] of Object.entries(pages)) {
+    for (const [where, raw] of Object.entries(pages)) {
+      const text = raw.replace(/\s+/g, " "); // NOTICE, data/LICENSE and the JSX wrap lines
       for (const needle of family.credit) {
+        if (where === "data/LICENSE" && needle === CSHAPES_URL) continue; // it names CShapes and its licence; NOTICE has the URL
         assert.ok(text.includes(needle), `${where} credits ${family.name}: missing ${JSON.stringify(needle)}`);
       }
     }
   }
+});
+
+test("the attribution names the article it links to, also when the text is another item's article", () => {
+  // Every curated event whose text is the article of another Wikidata item (text_from_article, as
+  // split-data.mjs publishes it): the link text is that article's title, not the event's own title.
+  const events = JSON.parse(fs.readFileSync(new URL("../../data/events.json", import.meta.url), "utf8"));
+  const other = events.map((e) => ({ ...e, text_from_article: otherArticleTitle(e) })).filter((e) => e.text_from_article);
+  assert.ok(other.length >= 8, `expected the redirect-only events, found ${other.length}`);
+  for (const e of other) {
+    const html = page(e);
+    const link = `from the article <a href="${escapeHtml(e.wikipedia_url)}" rel="noreferrer">${escapeHtml(e.text_from_article)}</a>.`;
+    assert.ok(html.includes(link), `${e.id}: attribution links "${e.text_from_article}" under its own title`);
+  }
+  // An event with an article of its own keeps its title.
+  const own = page({ id: "six-day-war", title: "Six-Day War", wikipedia_url: "https://en.wikipedia.org/wiki/Six-Day_War" });
+  assert.ok(own.includes(`from the article <a href="https://en.wikipedia.org/wiki/Six-Day_War" rel="noreferrer">Six-Day War</a>.`));
 });
 
 test("escapeHtml escapes every HTML-significant character", () => {
@@ -171,7 +199,7 @@ test("Cite this: the Wikipedia article in APA, MLA and Chicago, the revision's p
   assert.match(html, /This event on Middle East, 1900–present: https:\/\/middleeast\.events\/event\/six-day-war/);
   assert.match(html, /CShapes 2\.0 - historical country borders\. Schvitz, G\., et al\. \(2022\)/);
   // "If you use the map's borders" names every border source NOTICE credits, OCHA with its own (non-CC) terms.
-  assert.match(html, /UN OCHA \/ HDX &quot;Oslo Agreement&quot; Areas A\/B\/C \(West Bank\)\. Distributed under the legacy HumanitarianResponse\.info terms: non-commercial use with credit to UN OCHA\./);
+  assert.match(html, /UN OCHA \/ HDX &quot;Oslo Agreement&quot; Areas A\/B\/C \(West Bank\), source: Palestinian Authority, Ministry of Planning \(PA MOP\)\. Distributed under the legacy HumanitarianResponse\.info terms: non-commercial use with credit to UN OCHA and PA MOP\./);
   assert.match(html, /GeoNames - CC BY 4\.0/);
   assert.doesNotMatch(html, /cite-live/);
 

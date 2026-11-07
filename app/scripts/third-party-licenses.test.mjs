@@ -117,6 +117,25 @@ function fakePagefind(version) {
 }
 const wasmManifest = JSON.parse(readFileSync(join(PAGEFIND_WASM_DIR, "manifest.json"), "utf8"));
 
+test("NOTICE names every Pagefind wasm crate whose licence is neither MIT nor Apache-2.0, and the Snowball stemmers", () => {
+  const notice = readFileSync(new URL("../../NOTICE", import.meta.url), "utf8").replace(/\s+/g, " ");
+  const permissive = /^\(?(MIT|Apache-2\.0)( OR (MIT|Apache-2\.0))?\)?( AND Unicode-3\.0)?$/;
+  const others = wasmManifest.crates.filter((c) => !permissive.test(c.license));
+  assert.deepEqual(others.map((c) => c.name).sort(), ["minicbor", "pagefind_microjson"]);
+  for (const c of others) assert.ok(notice.includes(`${c.name}, ${c.license}`), `NOTICE: ${c.name}, ${c.license}`);
+  // pagefind_stem is MIT, but carries the Snowball stemmers' BSD-3-Clause notice (manifest note).
+  assert.match(wasmManifest.crates.find((c) => c.name === "pagefind_stem").note, /Snowball stemmers \(BSD-3-Clause\)/);
+  assert.ok(notice.includes("Snowball stemmers in pagefind_stem, BSD 3-Clause"));
+});
+
+test("NOTICE and data/LICENSE credit the Wikipedia text on the map: city and water names, the quoted rename sentences", () => {
+  for (const f of ["../../NOTICE", "../../data/LICENSE"]) {
+    const text = readFileSync(new URL(f, import.meta.url), "utf8").replace(/\s+/g, " ");
+    assert.ok(text.includes("city and water names"), f);
+    assert.ok(text.includes("quoted") && text.includes("scripts/build-cities.js"), f);
+  }
+});
+
 test("pagefindWasmNotices: another Pagefind version fails the build, so an upgrade forces a re-check", () => {
   const root = fakePagefind("9.9.9");
   try {

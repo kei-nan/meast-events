@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient";
 import { countryLabel } from "../lib/eventCountries.js";
+import { handPickedCountriesClause } from "../lib/funnelText.js";
 import "./AboutData.css";
 
 const REPO = "https://github.com/kei-nan/meast-events";
@@ -355,8 +356,7 @@ export default function AboutData({ section = null, onClose }) {
           This site shows Wikipedia and Wikidata content as it is. Titles and article text are copied from
           Wikipedia, not rewritten, and the dates and countries of the events the rule below finds are
           Wikidata&apos;s. The dates and countries of the 102 hand-picked events (see below) were typed by hand for
-          that list and can differ from Wikidata&apos;s: of the 60 the rule also finds, 24 have other countries than
-          Wikidata gives, and 30 hand-picked start dates are none of the item&apos;s Wikidata dates (11 of them
+          that list and can differ from Wikidata&apos;s: {handPickedCountriesClause(funnel.data?.shown_now)}30 hand-picked start dates are none of the item&apos;s Wikidata dates (11 of them
           checked against the article). Each hand-picked event says so. Wikidata&apos;s classes are listed only where
           they are on our event-class list, with a link to the item for all of them. The other exceptions are a
           small number of documented corrections, where a value was checked against both sources and changed by
@@ -485,8 +485,8 @@ export default function AboutData({ section = null, onClose }) {
           <a href={OCHA_AREAS_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
             &ldquo;State of Palestine &ndash; Oslo Agreement in the West Bank&rdquo;
           </a>{" "}
-          (source: Palestinian Authority Ministry of Planning, published on HDX), used under its terms: non-commercial
-          use with credit to UN OCHA. The map draws the borders of the last year in the selected period.
+          (source: Palestinian Authority, Ministry of Planning (PA MOP), published on HDX), used under its terms:
+          non-commercial use with credit to the source, UN OCHA and PA MOP. The map draws the borders of the last year in the selected period.
         </p>
         <p>
           Dashed borders mark a shape with a status: a mandate, an occupation, an unrecognized annexation, a dispute (current or
@@ -554,7 +554,8 @@ export default function AboutData({ section = null, onClose }) {
           <a href={OCHA_AREAS_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
             UN OCHA (HDX)
           </a>
-          , non-commercial use, credited to UN OCHA.
+          {" "}(source: Palestinian Authority, Ministry of Planning (PA MOP)), non-commercial use, credited to UN OCHA
+          and PA MOP.
         </p>
         <p>
           <a href={REPO} target="_blank" rel="noreferrer" title="Opens in a new tab">Source code</a>:{" "}
