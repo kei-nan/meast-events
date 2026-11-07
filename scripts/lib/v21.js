@@ -5,6 +5,7 @@ import { yearsIn, yearOf, precisionName } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
 import { applyDataFix, reconcileStartDate, keptEndPrecision, lastDayOfPeriod } from "./fixes.js";
 import { detectExtractHold } from "./title-refresh.js";
+import { CATEGORY_YEAR_FLAG, categoryYearFlag, categoryYearsInFlag } from "./flags.js";
 import { setDateEndOpen, setWikidataAliases } from "./wd-entities.js";
 
 export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
@@ -228,6 +229,17 @@ export function finalizeEvent(ev, ctx) {
     );
   }
   dateFlags.push(...dateOrderFlags({ ...ev, endPrecision: keptEndPrecision(entity, ev.date_end)?.code ?? null }));
+  // category_year_mismatch on the KEPT dates: enrich-candidates.js writes it from the discovery date, which step 3 may
+  // have replaced (a decade-precision P585 "2020" set aside for P580 2025-12-28). The article's year categories come
+  // as _category_years; a record cached before they did has only the years its note lists (without a note, nothing).
+  const catIdx = ev.review_reasons.findIndex((r) => r.startsWith(`${CATEGORY_YEAR_FLAG}:`));
+  const catYears = ev._category_years ?? (catIdx >= 0 ? categoryYearsInFlag(ev.review_reasons[catIdx]) : null);
+  if (catYears) {
+    const cat = categoryYearFlag({ dateStart: ev.date_start, dateEnd: ev.date_end, catYears });
+    if (catIdx >= 0 && cat) ev.review_reasons[catIdx] = cat;
+    else if (catIdx >= 0) ev.review_reasons.splice(catIdx, 1);
+    else if (cat) ev.review_reasons.push(cat);
+  }
   const leadDates = dateFlags.some((f) => f.startsWith("date_order_invalid")) ? wikipediaLeadDates(ev.extract) : [];
   if (leadDates.length) ev.wikipedia_lead_dates = leadDates;
   else delete ev.wikipedia_lead_dates;

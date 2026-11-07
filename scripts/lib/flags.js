@@ -22,7 +22,6 @@ export function dateFlags({ dateStart, dateEnd, extractYears, catYears }) {
   const flags = [];
   const sy = yearOf(dateStart);
   const ey = yearOf(dateEnd);
-  const hi = ey ?? sy;
 
   if (dateStart && dateEnd && dateEnd < dateStart) {
     flags.push(`date_order_invalid: date_end (${dateEnd}) precedes date_start (${dateStart}) in source Wikidata`);
@@ -47,14 +46,28 @@ export function dateFlags({ dateStart, dateEnd, extractYears, catYears }) {
     );
   }
 
-  if (catYears.length > 0 && sy !== null && !within(catYears, sy, hi)) {
-    flags.push(
-      `category_year_mismatch: Wikipedia year categories mention [${catYears.join(", ")}] but none is within 1 year of ${sy}${
-        hi !== sy ? `-${hi}` : ""
-      }`
-    );
-  }
+  const cat = categoryYearFlag({ dateStart, dateEnd, catYears });
+  if (cat) flags.push(cat);
   return flags;
+}
+
+// Wikipedia year categories that are all more than a year away from the dates. dateFlags above runs on the discovery
+// date; lib/v21.js finalizeEvent runs this again on the date the record keeps (after reconcileStartDate and the fix
+// ledger), so the note never names a date that was set aside (a decade-precision P585 "2020" replaced by P580).
+export const CATEGORY_YEAR_FLAG = "category_year_mismatch";
+export function categoryYearFlag({ dateStart, dateEnd, catYears }) {
+  const sy = yearOf(dateStart);
+  const hi = yearOf(dateEnd) ?? sy;
+  if (!catYears?.length || sy === null || within(catYears, sy, hi)) return null;
+  return `${CATEGORY_YEAR_FLAG}: Wikipedia year categories mention [${catYears.join(", ")}] but none is within 1 year of ${sy}${
+    hi !== sy ? `-${hi}` : ""
+  }`;
+}
+
+// The years a category_year_mismatch note lists (every year category of the article when it was written), or null.
+export function categoryYearsInFlag(flag) {
+  const m = /^category_year_mismatch: Wikipedia year categories mention \[([^\]]*)\]/.exec(String(flag ?? ""));
+  return m ? m[1].split(",").map(Number).filter(Number.isInteger) : null;
 }
 
 export function coordinateFlag(coordinates, countries) {

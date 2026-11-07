@@ -590,3 +590,19 @@ put them outside the tracked set; the validator now rejects any event without a 
   `qid_mismatch`, so it kept the old URL. `mirrorPairs` compared URLs, so the pair was lost without a message and the mirror's text stopped following.
 - Pairs are now found by item (the mirror's `resolved_qid` = the source's `wikidata_qid`). On 2026-11-06 the same 4 pairs result; the other 4 events without an
   article of their own show articles that no event on the map owns, and stay unpaired.
+
+### `category_year_mismatch` checked against the start the record keeps (`scripts/lib/v21.js`, no data value changed)
+
+- Cause: `enrich-candidates.js` wrote the note from the discovery date (`lib/flags.js` `dateFlags`), before `finalizeEvent` replaced that date by
+  `reconcileStartDate` or the fix ledger, and nothing checked it again. Two curated events kept a note naming 2020, Wikidata's decade-precision P585
+  that the pipeline had set aside for P580 (`date_source_adjusted`), as the stale-note check in `validate-events.js` reported:
+  - `2025-2026-iranian-protests` (Q137612545): P585 `2020-00-00` (decade), P580 2025-12-28 (day), checked live 2026-11-07; the article's year
+    categories give 2025, 2026 and 2023 ("2025 in Iran", "2026 protests", "Middle Eastern crisis (2023–present)", ...).
+  - `israeli-invasion-of-the-gaza-strip` (Q123036458): P585 `2020-00-00` (decade), P580 `2023-10-00` (month), stored 2023-10-01; its title leads to
+    "Gaza war", whose only year category is "Middle Eastern crisis (2023–present)" (2023).
+- `finalizeEvent` now runs the check again on the kept dates (`lib/flags.js` `categoryYearFlag`), with the article's year categories that
+  `enrich-candidates.js` keeps as `_category_years` in `data/enriched-candidates.json` (a record cached before that: the years its note lists).
+- Both stored starts are within a year of a category year, so the check gives no note: removed from the two records, with the same function on the
+  live categories and the stored dates. `needs_review` stays true (other notes). The framing reviews do not mention the note and are unchanged.
+- Curated events are not re-enriched, so only these two were recomputed; on 2026-11-07 every other stored `category_year_mismatch` gives the same
+  note when checked against the years it lists and the stored dates.
