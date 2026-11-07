@@ -210,35 +210,3 @@ test("Timeline: a reversed record sits at the year its bar is drawn at (real rec
   if (prev) assert.ok((prev.date_start ?? "") <= "1970-01-01");
   if (next) assert.ok((next.date_start ?? "") >= "1970-01-01");
 });
-
-test("yearAtAxis: the year whose cell is under the point, clamped to the axis", async () => {
-  const { yearAtAxis } = await import("./timelineView.js");
-  assert.equal(yearAtAxis(0, [1960, 1969]), 1960);
-  assert.equal(yearAtAxis(0.099, [1960, 1969]), 1960);
-  assert.equal(yearAtAxis(0.1, [1960, 1969]), 1961);
-  assert.equal(yearAtAxis(0.999, [1960, 1969]), 1969);
-  assert.equal(yearAtAxis(1, [1960, 1969]), 1969);
-  assert.equal(yearAtAxis(-0.2, [1960, 1969]), 1960);
-  assert.equal(yearAtAxis(0.5, [1967, 1967]), 1967);
-});
-
-test("yearMark: the middle of the year's cell; null off the axis", async () => {
-  const { yearMark } = await import("./timelineView.js");
-  assert.equal(yearMark(1960, [1960, 1969]), 5);
-  assert.equal(yearMark(1969, [1960, 1969]), 95);
-  assert.equal(yearMark(1967, [1967, 1967]), 50);
-  assert.equal(yearMark(1959, [1960, 1969]), null);
-  assert.equal(yearMark(null, [1960, 1969]), null);
-});
-
-test("jumpIndex: the first row at or after the year, else the last before it; rows without a year skipped", async () => {
-  const { jumpIndex } = await import("./timelineView.js");
-  const years = [1948, 1956, 1956, 1967, null]; // null: undated, or in the ongoing group
-  assert.equal(jumpIndex(years, 1900), 0);
-  assert.equal(jumpIndex(years, 1956), 1);
-  assert.equal(jumpIndex(years, 1960), 3);
-  assert.equal(jumpIndex(years, 1990), 3);
-  assert.equal(jumpIndex([1948, null, 1967], 1950), 2);
-  assert.equal(jumpIndex([null, null], 1950), -1);
-  assert.equal(jumpIndex([], 1950), -1);
-});

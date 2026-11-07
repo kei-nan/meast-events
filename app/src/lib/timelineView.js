@@ -146,36 +146,3 @@ export function axisTicks([a0, a1], max = 5) {
   }
   return ticks;
 }
-
-/**
- * The axis year under a point `frac` (0-1) across the scale: each year is one
- * equal cell (barGeometry), clamped to the axis.
- */
-export function yearAtAxis(frac, [a0, a1]) {
-  const cells = a1 - a0 + 1;
-  const y = a0 + Math.floor(Math.max(0, frac) * cells);
-  return Math.min(a1, Math.max(a0, y));
-}
-
-/** Where `year` sits on `axis`: the middle of its cell, in percent; null off the axis. */
-export function yearMark(year, [a0, a1]) {
-  if (!Number.isFinite(year) || year < a0 || year > a1) return null;
-  return pct((year - a0 + 0.5) / (a1 - a0 + 1));
-}
-
-/**
- * The row a click on `year` in the axis jumps to: `years` holds each row's
- * year in list order (null for a row with none, or one in the ongoing group,
- * which the axis does not place). The first row at or after `year`; past the
- * last one, the last row before it. -1 when no row has a year.
- */
-export function jumpIndex(years, year) {
-  let before = -1;
-  for (let i = 0; i < years.length; i++) {
-    const y = years[i];
-    if (!Number.isFinite(y)) continue;
-    if (y >= year) return i;
-    before = i;
-  }
-  return before;
-}
