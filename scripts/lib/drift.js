@@ -156,9 +156,39 @@ const cell = (s) => String(s ?? "").replace(/\|/g, "\\|").replace(/\s+/g, " ");
 // reads a table cell's \| as a pipe inside a code span too.
 const codeCell = (s) => cell(mdCode(s));
 
+// Flags the pipeline writes when Wikidata's date looks wrong (lib/v21.js, lib/flags.js): the site then shows the date
+// as Wikidata gives it, with the flag as a note. date_end_precision_coarse (not wrong), date_source_adjusted and
+// unverified_date (nothing to compare) are not among them.
+const DOUBT_FLAGS = [
+  "date_order_invalid",
+  "wikipedia_dates_note",
+  "date_start_year_not_in_lead",
+  "category_year_mismatch",
+  "date_year_mismatch",
+  "date_end_year_mismatch",
+  "month_precision_day_in_lead",
+];
 /**
- * The report: one table row per difference, grouped by field.
- * @param results  [{ event, rows, explained, stale? }]
+ * Why a date difference on this event goes first in the report, or null: its dates are Wikidata's (a discovered
+ * event), or a flag or its framing review's data note says Wikidata's date is wrong. Then the site may show a date,
+ * and a note blaming Wikidata, that Wikidata itself has since corrected (the Kuwait invasion's 2009 start, F16, sat
+ * unnoticed among the seed events' differences).
+ */
+export function dateShownReason(event, dataNote = null) {
+  const why = [];
+  if (event.sitelinks !== undefined) why.push("discovered: its dates are Wikidata's");
+  const kinds = [...(event.date_flags ?? []), ...(event.review_reasons ?? [])]
+    .map((f) => String(f).split(":")[0])
+    .filter((k) => DOUBT_FLAGS.includes(k));
+  if (kinds.length) why.push(`flagged ${[...new Set(kinds)].join(", ")}`);
+  if (typeof dataNote === "string" && /wikidata/i.test(dataNote)) why.push("its data note names Wikidata");
+  return why.length ? why.join("; ") : null;
+}
+
+/**
+ * The report: one table row per difference, grouped by field. Date differences on events dateShownReason picks come
+ * first, in a table of their own.
+ * @param results  [{ event, rows, explained, stale?, dataNote? }] (dataNote: the framing review's data_note, if any)
  * @param meta     { checked, noQid: ids of events without a wikidata_qid (not checked) }
  */
 export function renderDriftReport(results, { checked, noQid = [] } = {}) {
@@ -171,15 +201,41 @@ export function renderDriftReport(results, { checked, noQid = [] } = {}) {
       "found by the inclusion rule, with Wikidata's values at the time."
   );
   lines.push("");
-  const all = results.flatMap((r) =>
-    r.rows.map((row) => ({ ...row, id: r.event.id, qid: r.event.wikidata_qid, kind: r.event.sitelinks === undefined ? "seed" : "discovered" }))
-  );
+  const all = results.flatMap((r) => {
+    const shown = dateShownReason(r.event, r.dataNote);
+    return r.rows.map((row) => ({
+      ...row,
+      id: r.event.id,
+      qid: r.event.wikidata_qid,
+      kind: r.event.sitelinks === undefined ? "seed" : "discovered",
+      first: shown && (row.field === "date_start" || row.field === "date_end") ? shown : null,
+    }));
+  });
   const explained = results.flatMap((r) => r.explained.map((x) => `${r.event.id}: ${x}`));
   lines.push(`Checked ${checked} events with a Wikidata item: ${all.length} difference(s) in ${new Set(all.map((x) => x.id)).size} event(s).`);
   if (explained.length) lines.push(`Not listed: ${explained.length} difference(s) the fix ledger explains (${explained.join("; ")}).`);
   if (noQid.length) lines.push(`Not checked (no wikidata_qid): ${noQid.join(", ")}.`);
+  const first = all.filter((x) => x.first);
+  if (first.length) {
+    lines.push(
+      "",
+      `### Wikidata changed a date the site shows (${first.length})`,
+      "",
+      "The site shows these dates as Wikidata gave them (a discovered event), or with a flag or note saying Wikidata's " +
+        "date is wrong; Wikidata now gives another. Check these first: the page may show a date, or blame Wikidata for " +
+        "one, that Wikidata has since corrected. Not listed again below.",
+      "",
+      "| Event | Kind | Item | Field | Stored | Wikidata now | Why first |",
+      "|---|---|---|---|---|---|---|"
+    );
+    for (const r of first) {
+      lines.push(
+        `| ${cell(r.id)} | ${r.kind} | [${r.qid}](https://www.wikidata.org/wiki/${r.qid}) | ${r.field} | ${codeCell(r.stored)} | ${codeCell(r.wikidata)} | ${cell(r.first)} |`
+      );
+    }
+  }
   for (const field of ["item", "date_start", "date_end", "coordinates", "classes"]) {
-    const rows = all.filter((x) => x.field === field);
+    const rows = all.filter((x) => x.field === field && !x.first);
     if (!rows.length) continue;
     lines.push("", `### ${field} (${rows.length})`, "", "| Event | Kind | Item | Stored | Wikidata now |", "|---|---|---|---|---|");
     for (const r of rows) {

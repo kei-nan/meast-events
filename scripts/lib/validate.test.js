@@ -12,7 +12,10 @@ import {
   MAX_END_YEAR,
   eventIdProblem,
   checkShapeNamesFor,
+  staleDateNotes,
+  checkDataNotes,
 } from "./validate.js";
+import { KUWAIT_PRE_F16, KUWAIT_PRE_F16_DATA_NOTE } from "./kuwait-pre-f16.fixture.js";
 import { shapeNamesFor } from "../../app/src/lib/eventCountries.js";
 import { isValidEventId } from "../../app/src/lib/urlState.js";
 import { MIN_YEAR as APP_MIN_YEAR, MAX_YEAR as APP_MAX_YEAR } from "../../app/src/lib/years.js";
@@ -256,6 +259,80 @@ test("checkFramingCoverage: missing, stale and orphaned reviews are reported", (
   assert.deepEqual([r.missing, r.stale, r.orphans], [1, 1, 1]);
   assert.equal(r.warnings.length, 3);
   assert.equal(textSha1("abc"), "a9993e364706"); // sha1("abc") = a9993e36 4706816a ...
+});
+
+// The Kuwait record before F16 (kuwait-pre-f16.fixture.js), and the same record with only its date corrected: the
+// date notes that described 2009-08-02 must go with it (F16 removed them by hand; nothing checked that it did).
+const kuwaitF16DateOnly = () => ({ ...structuredClone(KUWAIT_PRE_F16), date_start: "1990-08-02" });
+
+test("staleDateNotes: the Kuwait record before F16 was consistent; its notes described the dates it stored", () => {
+  assert.deepEqual(staleDateNotes(KUWAIT_PRE_F16), { flags: [], reasons: [] });
+  const r = validateEvents([structuredClone(KUWAIT_PRE_F16)]);
+  assert.deepEqual(r.errors, []);
+  assert.ok(!r.warnings.some((w) => /no longer fits/.test(w)), r.warnings.join("\n"));
+});
+
+test("validateEvents: the Kuwait start corrected to 1990 with its 2009 notes kept: each stale date flag is an error", () => {
+  const r = validateEvents([kuwaitF16DateOnly()]);
+  const id = "events[0] iraqi-invasion-of-kuwait";
+  assert.deepEqual(r.errors, [
+    `${id}: date_flags: date_start_year_not_in_lead no longer fits the stored dates: names 2009-08-02, stored 1990-08-02 to 1990-08-04`,
+    `${id}: date_flags: date_order_invalid no longer fits the stored dates: the stored dates are in order (stored 1990-08-02 to 1990-08-04)`,
+    `${id}: date_flags: wikipedia_dates_note no longer fits the stored dates: the stored dates are in order (stored 1990-08-02 to 1990-08-04)`,
+  ]);
+  // review_reasons are not shown on the site: a warning.
+  assert.ok(
+    r.warnings.includes(`${id}: review_reasons: category_year_mismatch no longer fits the stored dates: names 2009-1990, stored 1990-08-02 to 1990-08-04`),
+    r.warnings.join("\n")
+  );
+  // As on main after F16 (the notes removed, the data_fix reason added): nothing stale.
+  const fixed = kuwaitF16DateOnly();
+  delete fixed.date_flags;
+  delete fixed.wikipedia_lead_dates;
+  fixed.review_reasons = fixed.review_reasons.filter((x) => !x.startsWith("category_year_mismatch"));
+  assert.deepEqual(staleDateNotes(fixed), { flags: [], reasons: [] });
+  assert.deepEqual(validateEvents([fixed]).errors, []);
+});
+
+test("staleDateNotes: each note form the pipeline writes is re-read against the stored dates", () => {
+  const base = { date_start: "2014-06-05", date_end: "2014-06-25", date_precision: "day", extract: "Fought in June 2014." };
+  const why = (over) => {
+    const r = staleDateNotes({ ...base, ...over });
+    return [...r.flags, ...r.reasons];
+  };
+  // Still true: nothing.
+  assert.deepEqual(why({ date_flags: ["date_source_adjusted: Wikidata P585 2014-06-25 equals the item's end time (P582); used P580 start time 2014-06-05"] }), []);
+  assert.deepEqual(why({ date_start: "1917-04-01", date_precision: "month", extract: "1917", date_flags: ["date_source_adjusted: x; used P580 start time 1917-04-00"] }), []);
+  assert.deepEqual(why({ date_start: "2002-03-27", date_end: "2002-01-01", extract: "2002", date_flags: ["date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (the year runs to 2002-12-31), so it is not before the start (2002-03-27); stored as Wikidata gives it"] }), []);
+  assert.deepEqual(why({ review_reasons: ["category_year_mismatch: Wikipedia year categories mention [1958] but none is within 1 year of 2014"] }), []);
+  assert.deepEqual(why({ date_start: "2023-05-01", date_precision: "month", review_reasons: ["month_precision_day_in_lead: date_start 2023-05-01 has only month precision in Wikidata, but ..."] }), []);
+  assert.deepEqual(why({ date_precision: "century", review_reasons: ["date_precision_coarse: Wikidata records the date only to century precision"] }), []);
+  // No longer true.
+  assert.match(why({ date_flags: ["date_source_adjusted: x; used P580 start time 2014-06-04"] })[0], /says P580 2014-06-04 was used, stored 2014-06-05/);
+  assert.match(why({ date_start: "2002-03-27", date_end: "2002-12-31", date_flags: ["date_end_precision_coarse: Wikidata end time 2002-01-01 has only year precision (...), so it is not before the start (2002-03-27); x"] })[0], /end is not before the start/);
+  assert.match(why({ date_start: "1921-04-01", date_end: "1921-03-30", date_flags: ["date_order_invalid: Wikidata start (1921-04-01) is after end (1921-03-31); shown as Wikidata gives them"] })[0], /names 1921-04-01 to 1921-03-31, stored 1921-04-01 to 1921-03-30/);
+  assert.match(why({ date_flags: ["date_start_year_not_in_lead: start year 2014 (2014-06-05) is not within 1 year of any year in the Wikipedia lead [2001]"] })[0], /lead has a year within 1 of 2014/);
+  assert.match(why({ review_reasons: ["category_year_mismatch: Wikipedia year categories mention [2014] but none is within 1 year of 2020"] })[0], /names 2020, stored 2014-06-05/);
+  assert.match(why({ review_reasons: ["category_year_mismatch: Wikipedia year categories mention [2015] but none is within 1 year of 2014"] })[0], /category year it lists is within 1 year of 2014/);
+  assert.match(why({ date_precision: "day", review_reasons: ["month_precision_day_in_lead: date_start 2014-06-05 has only month precision in Wikidata, x"] })[0], /at day precision/);
+  assert.match(why({ review_reasons: ["date_precision_coarse: Wikidata records the date only to century precision"] })[0], /date_precision is "day"/);
+  assert.match(why({ review_reasons: ["unverified_date: no year appears in the Wikipedia extract and category years [2011] do not confirm 1979; x"] })[0], /names 1979/);
+  // A note with nothing to compare is not judged.
+  assert.deepEqual(why({ date_flags: ["date_order_invalid: shown as Wikidata gives them"], date_end: "2014-06-01" }), []);
+});
+
+test("checkDataNotes: a data note quoting a date the event no longer stores is a warning", () => {
+  const review = { events: { "iraqi-invasion-of-kuwait": { data_note: KUWAIT_PRE_F16_DATA_NOTE }, other: { data_note: "A note with no date." } } };
+  // Before F16: the note quoted the stored start year.
+  assert.deepEqual(checkDataNotes([KUWAIT_PRE_F16, event({ id: "other" })], review).warnings, []);
+  const { warnings } = checkDataNotes([kuwaitF16DateOnly()], review, { name: "data/framing-review.json" });
+  assert.deepEqual(warnings, [
+    `data/framing-review.json: iraqi-invasion-of-kuwait data_note quotes the start date as 2009, but date_start is 1990-08-02: "${KUWAIT_PRE_F16_DATA_NOTE}"`,
+  ]);
+  // An end date, and a full ISO date.
+  const e = event({ id: "x", date_end: "1967-06-10" });
+  assert.equal(checkDataNotes([e], { events: { x: { data_note: "The end date (1967-06-11) is Wikidata's." } } }).warnings.length, 1);
+  assert.equal(checkDataNotes([e], { events: { x: { data_note: "The End date (1967-06-10) is Wikidata's." } } }).warnings.length, 0);
 });
 
 test("validateEvents: a start date after the data was retrieved is a warning, not an error", () => {
@@ -502,7 +579,8 @@ test("validateEvents: a coarse end that reaches the start is a warning only with
   assert.match(ok.warnings.join(), /coarse Wikidata end \(year precision\) that reaches date_start/);
   // The flag cannot excuse a real reversal (Arab Cold War: start 1979-02-11, end "1970", year precision).
   const real = found({ date_start: "1979-02-11", date_end: "1970-01-01", date_flags: [flag.replace(/2002/g, "1970")] });
-  assert.equal(validateEvents([real]).errors.length, 1);
+  // Two errors: the reversal, and the flag naming a start (1970-03-27) that is not the stored one (staleDateNotes).
+  assert.deepEqual(validateEvents([real]).errors.map((x) => x.split(": ")[1]), ["date_end (1970-01-01) precedes date_start (1979-02-11) and date_flags has no date_order_invalid reason", "date_flags"]);
 });
 
 test("validateEvents: the curated records whose end is before their start are each caught", async () => {

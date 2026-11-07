@@ -3,7 +3,7 @@
 //   node scripts/validate-events.js [file ...]
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { validateEvents, checkFramingCoverage } from "./lib/validate.js";
+import { validateEvents, checkFramingCoverage, checkDataNotes } from "./lib/validate.js";
 
 const root = new URL("../", import.meta.url);
 // Both files are validated strictly (since 2026-11-03 the curated file passes without the "lenient" mode, which turned a
@@ -72,6 +72,7 @@ for (const t of targets) {
     const review = JSON.parse(await readFile(reviewUrl, "utf-8"));
     const cov = checkFramingCoverage(events, review, { name: "data/framing-review.json" });
     for (const w of cov.warnings) console.warn(`warn ${w}`);
+    for (const w of checkDataNotes(events, review, { name: "data/framing-review.json" }).warnings) console.warn(`warn ${w}`);
     console.log(
       `ok   data/framing-review.json: ${events.length - cov.missing - cov.stale} of ${events.length} events have a current review (${cov.missing} missing, ${cov.stale} stale, ${cov.orphans} orphaned)`
     );

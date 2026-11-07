@@ -26,8 +26,12 @@ const entities = await fetchEntities(
 const classQids = [...new Set([...entities.values()].flatMap((r) => r?.p31 ?? []))];
 const labels = await fetchLabelsCached(classQids);
 
+// A framing review's data note that names Wikidata ("The start date (1916) comes from Wikidata") puts the event's date
+// differences first in the report (lib/drift.js dateShownReason).
+const reviews = JSON.parse(await readFile(new URL("../data/framing-review.json", import.meta.url), "utf-8")).events ?? {};
 const results = withQid.map((e) => ({
   event: e,
+  dataNote: reviews[e.id]?.data_note ?? null,
   ...driftFor(e, entities.get(e.wikidata_qid) ?? null, labels, FIXES_BY_QID.get(e.wikidata_qid) ?? null),
 }));
 const text = renderDriftReport(results, {
