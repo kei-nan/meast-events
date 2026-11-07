@@ -31,13 +31,14 @@
 //
 // Run via `npm run build` / `npm run dev` (pre-steps) or directly.
 import { createHash } from "node:crypto";
-import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import * as pagefind from "pagefind";
 import { hasWordWithPrefix, pagefindQuery, queryTerms, stemEnglish } from "../src/lib/searchTerms.js";
 import { eventPath } from "../src/lib/urlState.js";
+import { publishVersionedDir } from "./publish-dir.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // ATLAS_DATA_DIR overrides the repo-root data/ (as in split-data.mjs).
@@ -45,7 +46,8 @@ const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR
   ? path.resolve(process.env.ATLAS_DATA_DIR)
   : path.join(__dirname, "..", "..", "data");
 const ROOT_OUT_DIR = path.join(__dirname, "..", "public", "pagefind");
-// Written here first, then renamed to v.<version> once the files are final.
+// Written here first, then moved to v.<version> once the files are final
+// (publish-dir.mjs: the previous folder and meta.json stay until then).
 const OUT_DIR = path.join(ROOT_OUT_DIR, "staging");
 
 // Every file under `dir`, as sorted paths relative to it (with "/").
@@ -158,7 +160,10 @@ async function main() {
     if (res.errors.length) throw new Error(`pagefind: ${e.id}: ${res.errors.join("; ")}`);
   }
 
-  await rm(ROOT_OUT_DIR, { recursive: true, force: true });
+  // Only staging is cleared: the published folder and meta.json stay until the
+  // new folder replaces them (publishVersionedDir below), so a failed run, or a
+  // dev server reading public/ meanwhile, still has the previous index.
+  await rm(OUT_DIR, { recursive: true, force: true, maxRetries: 5 });
   const written = await index.writeFiles({ outputPath: OUT_DIR });
   if (written.errors.length) throw new Error(`pagefind: ${written.errors.join("; ")}`);
   await pagefind.close();
@@ -201,8 +206,8 @@ async function main() {
   }
   const version = await folderVersion(OUT_DIR);
   const dir = `v.${version}`;
-  await rename(OUT_DIR, path.join(ROOT_OUT_DIR, dir));
-  await writeFile(path.join(ROOT_OUT_DIR, "meta.json"), JSON.stringify({ version, dir }));
+  const left = await publishVersionedDir({ root: ROOT_OUT_DIR, staging: OUT_DIR, dir, meta: { version, dir } });
+  if (left.length) console.warn(`search index: could not remove the previous ${left.join(", ")} (in use?); the next run retries`);
   const files = (await filesUnder(path.join(ROOT_OUT_DIR, dir))).length;
   console.log(`search index: ${events.length} events -> ${path.relative(process.cwd(), path.join(ROOT_OUT_DIR, dir))} (${files} files)`);
 }
