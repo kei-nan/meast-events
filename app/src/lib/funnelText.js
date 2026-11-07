@@ -10,3 +10,13 @@ export function handPickedCountriesClause(shownNow) {
   if (!Number.isInteger(found) || !Number.isInteger(other)) return "";
   return `of the ${found} the rule also finds, ${other} ${other === 1 ? "has" : "have"} other countries than Wikidata gives, and `;
 }
+
+// The hand-picked start dates that are none of the item's Wikidata P585/P580 values, and how many of those the
+// English article states to the day (ledger F14), as build-selection-funnel.js counts them (`shown_now`).
+// "" while the file loads or if it lacks the counts.
+export function handPickedStartDatesSentence(shownNow) {
+  const none = shownNow?.seed_start_dates_none_of_wikidata_values;
+  const checked = shownNow?.seed_start_dates_none_of_wikidata_values_checked_against_article;
+  if (!Number.isInteger(none) || !Number.isInteger(checked)) return "";
+  return `${none} hand-picked start ${none === 1 ? "date is" : "dates are"} none of the item's Wikidata dates (${checked} of them checked against the article). `;
+}

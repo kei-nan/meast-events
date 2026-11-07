@@ -55,6 +55,8 @@
     "seed_events_also_found_by_discovery": 61,
     "seed_events_found_with_other_countries_than_wikidata": 25,
     "seed_events_not_reachable_by_discovery": 41,
+    "seed_start_dates_none_of_wikidata_values": 19,
+    "seed_start_dates_none_of_wikidata_values_checked_against_article": 11,
     "discovered_events_merged": 713,
     "location_quality": {
       "approximate": 73,

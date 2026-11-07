@@ -291,6 +291,36 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
   }
 });
 
+test("CLI: a mirror's note names its source's article under the current title after a rename", async () => {
+  // The source's article is renamed; the real refresh functions apply it: the source's URL moves, the
+  // mirror's is held as qid_mismatch and keeps the old title (lib/title-refresh.js, lib/mirrors.js).
+  const { applyTitleChanges, detectTitleChange } = await import("../../scripts/lib/title-refresh.js");
+  const url = (t) => `https://en.wikipedia.org/wiki/${t}`;
+  const events = [
+    event("src", { title: "Gaza war", wikidata_qid: "Q1", wikipedia_url: url("Gaza_war"), sitelinks: 9 }),
+    event("mir", { title: "Invasion", wikidata_qid: "Q2", resolved_qid: "Q1", wikipedia_url: url("Gaza_war"), sitelinks: 9 }),
+    event("lone", { title: "Strike", wikidata_qid: "Q3", resolved_qid: "Q9", wikipedia_url: url("List_of_strikes"), sitelinks: 9 }),
+  ];
+  const lead = { title: "Renamed war", url: url("Renamed_war"), wikibase_item: "Q1", pageid: 1, redirected_from: "Gaza war", redirect_fragment: null };
+  const changes = events.slice(0, 2).map((e) => detectTitleChange(e, lead));
+  assert.deepEqual(changes.map((c) => c.hold), [null, "qid_mismatch"]);
+  assert.deepEqual(applyTitleChanges(events, changes).applied, ["src"]);
+  assert.equal(events[1].wikipedia_url, url("Gaza_war"), "the mirror's URL is held");
+  const r = runSplit(events);
+  try {
+    assert.equal(r.status, 0, r.stderr);
+    const meta = JSON.parse(fs.readFileSync(path.join(r.out, "events", "meta.json"), "utf8"));
+    const dir = path.join(r.out, "events", meta.dir, "full");
+    const full = Object.assign({}, ...fs.readdirSync(dir).map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"))));
+    assert.equal(full.mir.text_from_article, "Renamed war");
+    assert.equal(full.mir.wikipedia_url, url("Gaza_war"), "the held URL is published unchanged");
+    assert.equal(full.lone.text_from_article, "List of strikes", "no source on the map: the event's own URL");
+    assert.equal(full.src.text_from_article, null);
+  } finally {
+    r.cleanup();
+  }
+});
+
 test("CLI: the boundaries folder's version changes when only a shared geometry does", () => {
   const version = (boundaries) => {
     const r = runSplit([event("a")], { boundaries });

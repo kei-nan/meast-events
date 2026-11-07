@@ -94,6 +94,17 @@ const countrySet = (a) => JSON.stringify([...new Set(a ?? [])].sort());
 const seedOtherCountries = curated.filter(
   (e) => e.sitelinks === undefined && candByQid.has(e.wikidata_qid) && countrySet(e.countries) !== countrySet(candByQid.get(e.wikidata_qid).countries)
 ).length;
+// Hand-picked start dates that are none of the item's Wikidata P585/P580 values (About the data cites both counts).
+// No network: the comparison is the one the pipeline already made and stored. A seed event's `date_precision` is
+// written only from the P585/P580 statement whose value IS its date_start (lib/fixes.js keptDatePrecision: equal,
+// or equal after Wikidata's "-00" month/day becomes "-01", so 1920-01-01 is the year-precision value 1920), by
+// enrich-seed.js (live Wikidata, 2026-10-24) and the date refresh of 2026-10-30 (docs/data-fixes.md). So a seed
+// without one has a start that matched none of those values; so has a seed whose `date_precision` comes from the
+// fix ledger's F14 instead (lib/fixes.js; applying it adds the review note "data_fix F14: ..."), the dates the
+// English article states to the day (checked against the article, the sentence's sub-count). A later change on
+// Wikidata is listed by the monthly drift report, not written here.
+const isF14 = (e) => (e.review_reasons ?? []).some((r) => String(r).startsWith("data_fix F14:"));
+const seedStartNotWikidata = curated.filter((e) => e.sitelinks === undefined && (e.date_precision == null || isF14(e)));
 const proposedNoLoc = proposed.filter((e) => e.location_quality === "none");
 const proposedDateFlagged = proposed.filter((e) => (e.date_flags ?? []).some((f) => f.startsWith("date_order_invalid")));
 const dupExcluded = proposed.filter((e) => excludedIds.has(e.id));
@@ -140,6 +151,8 @@ const funnel = {
     seed_events_also_found_by_discovery: seedFound,
     seed_events_found_with_other_countries_than_wikidata: seedOtherCountries,
     seed_events_not_reachable_by_discovery: seedCount - seedFound,
+    seed_start_dates_none_of_wikidata_values: seedStartNotWikidata.length,
+    seed_start_dates_none_of_wikidata_values_checked_against_article: seedStartNotWikidata.filter(isF14).length,
     discovered_events_merged: mergedDiscovered.length,
     location_quality: curated.reduce((o, e) => (inc(o, e.location_quality), o), {}),
     seed_file_entries: seed.length,
