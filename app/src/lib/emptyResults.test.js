@@ -34,6 +34,36 @@ test("matches outside the map view say the map view", () => {
   );
 });
 
+test("matches the category, country or area filters leave out are not called no match (/?q=suez&cat=famine)", () => {
+  const counts = { all: 0, inRange: 0, unfiltered: 29 };
+  assert.equal(
+    emptyResultsText({ textQuery: "suez", searching: true, counts, filters: { categories: true } }),
+    "No events matching “suez” with the category filter."
+  );
+  assert.equal(
+    emptyResultsText({ textQuery: "suez", searching: true, counts, filters: { countries: true, area: true } }),
+    "No events matching “suez” with the country and area filters."
+  );
+  assert.equal(
+    emptyResultsText({ textQuery: "suez", searching: true, scope: "range", inView: true, counts, filters: { categories: true, countries: true, area: true } }),
+    "No events matching “suez” with the category, country and area filters."
+  );
+  assert.equal(
+    emptyResultsText({ textQuery: "suez", searching: true, offline: true, counts, filters: { categories: true } }),
+    "No titles or summaries matching “suez” with the category filter; the full text could not be searched."
+  );
+  // No match even without the filters: none in the atlas.
+  assert.equal(
+    emptyResultsText({ textQuery: "zzz", searching: true, counts: { all: 0, inRange: 0, unfiltered: 0 }, filters: { categories: true } }),
+    "No events in this atlas match “zzz”."
+  );
+  // Filters only, no text: nothing outside them to point at.
+  assert.equal(
+    emptyResultsText({ searching: true, counts: { all: 0, inRange: 0, unfiltered: null }, filters: { categories: true } }),
+    "No events in this atlas match these filters."
+  );
+});
+
 test("with the full text unavailable, no title or summary match is not no event", () => {
   assert.equal(
     emptyResultsText({ textQuery: "abandonment", searching: true, offline: true, counts: { all: 0, inRange: 0 } }),

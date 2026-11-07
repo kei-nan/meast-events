@@ -176,6 +176,7 @@ export default function MapView({
   categories = null, // category ids that have events: the Map key lists only these (null = all)
   place = null, // {lon, lat} "What was this place?" describes: marked on the map (usePlaceMarker.js)
   onPlaceHistory, // ({lon, lat}): the border popup's "History of this place"
+  onMapStatus, // ("ready"): the map has started (App.jsx; its stand-ins report "failed")
 }) {
   const year = borderYear ?? timelineYear;
   const containerRef = useRef(null);
@@ -833,6 +834,11 @@ export default function MapView({
     map.on("movestart", onMoveStart);
     return () => map.off("movestart", onMoveStart);
   }, [mapReady]);
+
+  // The panel's controls that need the map work (App.jsx, lib/mapUnavailable.js).
+  useEffect(() => {
+    if (mapReady) onMapStatus?.("ready");
+  }, [mapReady, onMapStatus]);
 
   usePlaceMarker({ mapRef, mapReady, place });
 

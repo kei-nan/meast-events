@@ -33,6 +33,37 @@
   --font-sans: "Inter Variable", "Inter Variable fallback", system-ui, -apple-system, sans-serif;
 }
 
+/* Digits and the en dash of "Spectral fallback". Georgia's figures are
+   old-style and proportional (font-variant-numeric: tabular-nums does not
+   change them) and 6.8% wider than Spectral's in "1900 – 2026": on a 360px
+   phone that pushed the timeline's presets onto a row of their own until
+   Spectral loaded (95 -> 139px, a layout shift). Times New Roman's figures are
+   tabular, 0.5em: scaled 107.2% they are Spectral's 0.536em; its en dash is
+   Spectral's 0.5em. Defined after fontaine's face (vite.config.js), so these
+   win for their characters; the vertical metrics are Spectral's, as there. */
+@font-face {
+  font-family: "Spectral fallback";
+  src: local("Times New Roman"), local("TimesNewRomanPSMT");
+  font-weight: 600;
+  font-style: normal;
+  unicode-range: U+0030-0039;
+  size-adjust: 107.2%;
+  ascent-override: 98.79%;
+  descent-override: 43.19%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Spectral fallback";
+  src: local("Times New Roman"), local("TimesNewRomanPSMT");
+  font-weight: 600;
+  font-style: normal;
+  unicode-range: U+2013;
+  size-adjust: 100%;
+  ascent-override: 105.9%;
+  descent-override: 46.3%;
+  line-gap-override: 0%;
+}
+
 body {
   margin: 0;
 }

@@ -3,6 +3,7 @@ import { AboutDataFailed } from "./components/LoadFailed.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { importOr } from "./lib/importOr.js";
 import { loadEventDetail } from "./lib/lazyChunks.js";
+import { mapUnavailableAfter } from "./lib/mapUnavailable.js";
 import MapLoading from "./components/MapLoading.jsx";
 import SearchPanel from "./components/SearchPanel.jsx";
 import ShareButton from "./components/ShareButton.jsx";
@@ -37,11 +38,17 @@ import "./App.css";
 // If the chunk cannot be downloaded (retried once, then the page reloads once: a
 // tab older than a deploy), the map area says so instead of the whole app failing
 // (lib/importOr.js).
-const MapViewFailed = () => (
-  <div className="map-view map-placeholder" role="alert">
-    The map could not be loaded. Please reload the page.
-  </div>
-);
+// Both stand-ins report "failed" (onMapStatus), so the panel's controls that
+// need the map are disabled (lib/mapUnavailable.js). This one gets MapView's
+// props, through lazy().
+function MapViewFailed({ onMapStatus }) {
+  useEffect(() => onMapStatus?.("failed"), [onMapStatus]);
+  return (
+    <div className="map-view map-placeholder" role="alert">
+      The map could not be loaded. Please reload the page.
+    </div>
+  );
+}
 // The map failed after its code loaded: most often MapLibre cannot start
 // without WebGL 2 (turned off, or not supported by the browser or device),
 // which a reload does not change. Only the map area says so (ErrorBoundary
@@ -53,14 +60,17 @@ function hasWebGL2() {
     return false;
   }
 }
-const MapViewCrashed = () => (
-  <div className="map-view map-placeholder" role="alert">
-    {hasWebGL2()
-      ? "The map stopped working because of an error. Please reload the page."
-      : "The map needs WebGL 2, which this browser has turned off or does not support."}{" "}
-    Search, the event list and the timeline still work.
-  </div>
-);
+function MapViewCrashed({ onMapStatus }) {
+  useEffect(() => onMapStatus?.("failed"), [onMapStatus]);
+  return (
+    <div className="map-view map-placeholder" role="alert">
+      {hasWebGL2()
+        ? "The map stopped working because of an error. Please reload the page."
+        : "The map needs WebGL 2, which this browser has turned off or does not support."}{" "}
+      Search, the event list and the timeline still work.
+    </div>
+  );
+}
 // The map chunk is requested as soon as this module runs, not when React first
 // renders <MapView>: the lazy() import below then reuses the same download.
 // Measured (2026-10, slow 4G 1.6 Mbps/150 ms, 4x CPU, phone, cache off, median
@@ -227,6 +237,10 @@ export default function App() {
   // 5), and on a phone on a fast link (10 Mbps/50 ms, 3x CPU, median of 7) LCP
   // 1.10 -> 1.00 s, with the first paint unchanged in both.
   const [mapStarted, setMapStarted] = useState(false);
+  // No map (its code failed to load, or no WebGL 2): the panel's controls that
+  // act on it are disabled until a map reports "ready" (lib/mapUnavailable.js).
+  const [mapUnavailable, setMapUnavailable] = useState(false);
+  const handleMapStatus = useCallback((status) => setMapUnavailable(mapUnavailableAfter(status)), []);
   useEffect(() => {
     const start = () => {
       startMapDownloads();
@@ -332,8 +346,9 @@ export default function App() {
       inRange: resultsInRange.length,
       shown: scopedResults.length,
       truncated: search.truncated,
+      unfiltered: search.unfilteredTotal ?? null, // the text's matches without category/country/area filters
     }),
-    [search.total, search.truncated, resultsInRange.length, scopedResults.length]
+    [search.total, search.truncated, search.unfilteredTotal, resultsInRange.length, scopedResults.length]
   );
 
   const handleViewportChange = useCallback((bounds) => setViewportBbox(normalizeBounds(bounds)), []);
@@ -705,7 +720,7 @@ export default function App() {
         </header>
         <main className="app-body">
           {mapStarted ? (
-            <ErrorBoundary fallback={<MapViewCrashed />}>
+            <ErrorBoundary fallback={<MapViewCrashed onMapStatus={handleMapStatus} />}>
               <Suspense fallback={MAP_PLACEHOLDER}>
                 <MapView
                   events={mapEvents}
@@ -732,6 +747,7 @@ export default function App() {
                   categories={categoryOptions.length ? categoryOptions : null}
                   place={selectedEventId ? null : place}
                   onPlaceHistory={openPlace}
+                  onMapStatus={handleMapStatus}
                 />
               </Suspense>
             </ErrorBoundary>
@@ -777,6 +793,7 @@ export default function App() {
             placeView={placeView}
             onOpenPlace={openPlace}
             onRetryLead={retryLead}
+            mapUnavailable={mapUnavailable}
           />
         </main>
         <Timeline
