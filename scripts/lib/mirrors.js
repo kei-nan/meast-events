@@ -9,15 +9,19 @@ import { setRevid } from "./revid.js";
 
 const hasOwnArticle = (e) => !e.resolved_qid || e.resolved_qid === e.wikidata_qid;
 
-/** [{ mirror, source }] for every mirror whose article is another event's own article. */
+/**
+ * [{ mirror, source }] for every mirror whose article is another event's own article: the mirror's
+ * resolved_qid (the item of the article it shows) is the source's wikidata_qid. Not by URL: when the article is
+ * renamed the source's URL follows, but the mirror's update is held as qid_mismatch and keeps the old one.
+ */
 export function mirrorPairs(events) {
   const owners = new Map();
-  for (const e of events) if (e.wikipedia_url && hasOwnArticle(e)) owners.set(e.wikipedia_url, e);
+  for (const e of events) if (e.wikipedia_url && e.wikidata_qid && hasOwnArticle(e)) owners.set(e.wikidata_qid, e);
   const pairs = [];
   for (const e of events) {
     if (hasOwnArticle(e) || !e.wikipedia_url) continue;
-    const source = owners.get(e.wikipedia_url);
-    if (source && source.wikidata_qid === e.resolved_qid) pairs.push({ mirror: e, source });
+    const source = owners.get(e.resolved_qid);
+    if (source) pairs.push({ mirror: e, source });
   }
   return pairs;
 }

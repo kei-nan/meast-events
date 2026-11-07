@@ -73,7 +73,7 @@ export function eventYearsText(e) {
  * True when the end year comes before the start year. A few records have their
  * dates in that order as Wikidata gives them (shown unchanged; the data flags
  * each one, date_order_invalid, and the validator fails an unflagged one), e.g.
- * iraqi-invasion-of-kuwait: start 2009-08-02, end 1990-08-04.
+ * arab-cold-war: start 1979-02-11, end 1970.
  */
 export function yearsReversed(e) {
   const [s, en] = rawEventYears(e);

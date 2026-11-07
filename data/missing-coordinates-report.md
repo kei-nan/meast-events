@@ -69,7 +69,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 50 | Qatar diplomatic crisis | 2017-06-05 | 46 | pin at Qatar capital (approximate) | [article](https://en.wikipedia.org/wiki/Qatar_diplomatic_crisis) | [Q30130610](https://www.wikidata.org/wiki/Q30130610) |
 | 51 | 2024 Lebanon electronic device attacks | 2024-09-17 | 46 | no location | [article](https://en.wikipedia.org/wiki/2024_Lebanon_electronic_device_attacks) | [Q130314422](https://www.wikidata.org/wiki/Q130314422) |
 | 52 | Black September | 1970-09-06 | 45 | pin at Jordan capital (approximate) | [article](https://en.wikipedia.org/wiki/Black_September) | [Q154288](https://www.wikidata.org/wiki/Q154288) |
-| 53 | Iraqi invasion of Kuwait | 2009-08-02 | 45 | no location | [article](https://en.wikipedia.org/wiki/Iraqi_invasion_of_Kuwait) | [Q856650](https://www.wikidata.org/wiki/Q856650) |
+| 53 | Iraqi invasion of Kuwait | 1990-08-02 | 45 | no location | [article](https://en.wikipedia.org/wiki/Iraqi_invasion_of_Kuwait) | [Q856650](https://www.wikidata.org/wiki/Q856650) |
 | 54 | 2025 United States strikes on Iranian nuclear sites | 2025-06-22 | 45 | no location | [article](https://en.wikipedia.org/wiki/2025_United_States_strikes_on_Iranian_nuclear_sites) | [Q135005864](https://www.wikidata.org/wiki/Q135005864) |
 | 55 | Gezi Park protests | 2013-05-28 | 42 | no location | [article](https://en.wikipedia.org/wiki/Gezi_Park_protests) | [Q13410316](https://www.wikidata.org/wiki/Q13410316) |
 | 56 | 2019 Turkish offensive into northeastern Syria | 2019-01-01 | 41 | no location | [article](https://en.wikipedia.org/wiki/2019_Turkish_offensive_into_northeastern_Syria) | [Q70207089](https://www.wikidata.org/wiki/Q70207089) |

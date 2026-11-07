@@ -279,6 +279,19 @@ for (const [qid, date, precision, was, label, wikidata, title, revid, says] of [
   });
 }
 
+// F16: the stored start was a year typed wrongly on Wikidata (P580 2009-08-02), since corrected there. No `from`: the
+// fixed value is the item's own P580, so the drift report lists this fix again if Wikidata stops giving it.
+DATA_FIXES.push({
+  qid: "Q856650",
+  ref: "F16",
+  set: { date_start: "1990-08-02" },
+  note:
+    "Iraqi invasion of Kuwait: stored date_start 2009-08-02 was Wikidata P580 as it stood, after the item's own P582 1990-08-04. " +
+    "Wikidata P580 is now 1990-08-02 (day precision, revision 2565421916); English Wikipedia " +
+    `${revisionUrl("Iraqi invasion of Kuwait", 1383243347)}: lead "began on 2 August 1990"; infobox "2–4 August 1990" (checked 2026-11-06). ` +
+    "date_start = Wikidata P580; date_end unchanged",
+});
+
 // The only ledger entries scripts/enrich-seed.js --apply applies (to hand-picked seed events).
 export const SEED_FIX_REFS = ["F13", "F14"];
 

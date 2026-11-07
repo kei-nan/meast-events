@@ -3,9 +3,6 @@
 # Wikidata values fetched live 2026-10-14 (wbgetentities); Wikipedia infobox "date" lines read 2026-10-14 at the revisions named. Remove all comment lines (starting with #) before pasting into QuickStatements.
 # Context: these are the Wikidata dates behind the date_order_invalid / century-precision events in data/events.json (docs/data-fixes.md, "Checks of 2026-10-14"). middleeast.events never edits Wikidata; these are suggestions for the owner's own account.
 #
-# Iraqi invasion of Kuwait (Q856650): P580 start time 2009-08-02 (day) is after its own P582 1990-08-04; infobox "2–4 August 1990" (rev 1375300033). The year looks mistyped. Confidence: high.
--Q856650	P580	+2009-08-02T00:00:00Z/11
-Q856650	P580	+1990-08-02T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1375300033"
 # Second Battle of İnönü (Q2659746): P582 end time 1921-03-31 is before P585 1921-04-01; infobox "March 23 – April 1, 1921" (rev 1379641867) agrees with P585 for the end. Confidence: medium (P580 1921-03-26 vs the infobox's 23 March is a second disagreement; not suggested, the two sources differ).
 -Q2659746	P582	+1921-03-31T00:00:00Z/11
 Q2659746	P582	+1921-04-01T00:00:00Z/11	S143	Q328	S4656	"https://en.wikipedia.org/w/index.php?oldid=1379641867"

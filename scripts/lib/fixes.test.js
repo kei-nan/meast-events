@@ -73,6 +73,27 @@ test("ledger: `from` (what Wikidata gave when the fix was written) names only fi
   }
 });
 
+test("F16: the Iraqi invasion of Kuwait starts on 2 August 1990, and the flags of the wrong date are gone", () => {
+  // Re-running the pipeline on the discovery record (data/event-candidates.json: start 2009-08-02) gives the same date.
+  const ev = { id: "x", wikidata_qid: "Q856650", date_start: "2009-08-02", date_end: "1990-08-04" };
+  assert.deepEqual(applyDataFix(ev), ["date_start"]);
+  assert.equal(ev.date_start, "1990-08-02");
+  assert.equal(ev.date_end, "1990-08-04");
+  assert.match(ev.review_reasons[0], /^data_fix F16:/);
+
+  const data = (f) => readFileSync(new URL(`../../data/${f}`, import.meta.url), "utf8");
+  const stored = JSON.parse(data("events.json")).find((e) => e.id === "iraqi-invasion-of-kuwait");
+  assert.equal(stored.date_start, "1990-08-02");
+  assert.equal(stored.date_end, "1990-08-04");
+  assert.equal(stored.date_flags, undefined);
+  assert.equal(stored.wikipedia_lead_dates, undefined);
+  assert.ok(stored.review_reasons.some((r) => r.startsWith("data_fix F16:")));
+  assert.ok(!stored.review_reasons.some((r) => r.startsWith("category_year_mismatch")));
+  assert.deepEqual(applyDataFix(stored), [], "the stored record is what the ledger gives");
+  assert.equal(JSON.parse(data("framing-review.json")).events["iraqi-invasion-of-kuwait"].data_note, undefined);
+  assert.doesNotMatch(data("wikidata-date-suggestions.tsv"), /Q856650/);
+});
+
 test("applyDataFix: sets the listed fields once, with one review reason", () => {
   const ev = { id: "x", wikidata_qid: "Q17286795", date_start: "2014-07-21", date_end: "2014-06-30", review_reasons: ["other"] };
   assert.deepEqual(applyDataFix(ev), ["date_start", "date_end"]);

@@ -147,7 +147,25 @@ test("renderDriftReport: stale ledger fixes get their own table", () => {
   const results = [{ event: tikrit, rows: [], explained: [], stale: [{ field: "date_end", ref: "F6", fixed: "2014-07-21", wikidata: "2014-07-01", reason: "x|y" }] }];
   const md = renderDriftReport(results, { checked: 1 });
   assert.match(md, /### Fix ledger entries to recheck \(1\)/);
-  assert.match(md, /\| first-battle-of-tikrit \| \[Q17286795\]\(https:\/\/www\.wikidata\.org\/wiki\/Q17286795\) \| F6 \| date_end \| 2014-07-21 \| 2014-07-01 \| x\\\|y \|/);
+  assert.match(md, /\| first-battle-of-tikrit \| \[Q17286795\]\(https:\/\/www\.wikidata\.org\/wiki\/Q17286795\) \| F6 \| date_end \| 2014-07-21 \| `2014-07-01` \| x\\\|y \|/);
+});
+
+test("renderDriftReport: a Wikidata label is a code span, whatever it contains, and cannot break the table", () => {
+  const label = "@someuser [click](https://example.com) ![x](https://example.com/x.png) <!-- `a|b`\n# Heading";
+  const md = renderDriftReport(
+    [
+      {
+        event: ev({ id: "a" }),
+        rows: [{ field: "classes", stored: label, wikidata: `new P31: ${label}` }],
+        explained: [],
+        stale: [{ field: "date_end", ref: "F6", fixed: "2014-07-21", wikidata: label, reason: "why" }],
+      },
+    ],
+    { checked: 1 }
+  );
+  const inner = "@someuser [click](https://example.com) ![x](https://example.com/x.png) <!-- `a\\|b` # Heading";
+  assert.ok(md.includes(`| \`\`${inner}\`\` | \`\`new P31: ${inner}\`\` |`), md);
+  assert.ok(md.includes(`| 2014-07-21 | \`\`${inner}\`\` | why |`), md);
 });
 
 test("renderDriftReport: grouped tables, ledger-explained count, kind column; pipes escaped", () => {
@@ -160,8 +178,8 @@ test("renderDriftReport: grouped tables, ledger-explained count, kind column; pi
   assert.match(md, /Checked 2 events with a Wikidata item: 2 difference\(s\) in 2 event\(s\)\./);
   assert.match(md, /Not listed: 1 difference\(s\) the fix ledger explains \(b: date_start \(F14\)\)/);
   assert.match(md, /Not checked \(no wikidata_qid\): c\./);
-  assert.match(md, /### date_end \(1\)[\s\S]*\| a \| discovered \| \[Q1\]\(https:\/\/www\.wikidata\.org\/wiki\/Q1\) \| none \|/);
-  assert.match(md, /\| b \| seed \| .* \| x\\\|y \| new P31: z \|/);
+  assert.match(md, /### date_end \(1\)[\s\S]*\| a \| discovered \| \[Q1\]\(https:\/\/www\.wikidata\.org\/wiki\/Q1\) \| `none` \|/);
+  assert.match(md, /\| b \| seed \| .* \| `x\\\|y` \| `new P31: z` \|/);
   assert.doesNotMatch(md, /### coordinates/);
   // Nothing to report: the summary line only.
   assert.match(renderDriftReport([], { checked: 5 }), /Checked 5 events with a Wikidata item: 0 difference\(s\) in 0 event\(s\)\.\n$/);
