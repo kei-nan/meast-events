@@ -1,6 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { FLICK_PX_PER_MS, SHEET_STRIP_PX, clampSheet, sheetDetents, snapSheet, stepSheet } from "./sheetSnap.js";
+import { FLICK_PX_PER_MS, SHEET_STRIP_PX, clampSheet, initialSheet, sheetDetents, snapSheet, stepSheet } from "./sheetSnap.js";
+
+test("a link to an event starts the sheet at half, before the event's record has loaded", () => {
+  assert.equal(initialSheet({ eventOpen: false, linkedEventId: "six-day-war", placeOpen: false, query: "" }), "half");
+  assert.equal(initialSheet({ eventOpen: true, linkedEventId: null, placeOpen: false, query: "" }), "half");
+  assert.equal(initialSheet({ eventOpen: false, linkedEventId: null, placeOpen: true, query: "" }), "half");
+  assert.equal(initialSheet({ eventOpen: false, linkedEventId: null, placeOpen: false, query: "suez" }), "full");
+  assert.equal(initialSheet({ eventOpen: false, linkedEventId: null, placeOpen: false, query: "" }), "peek");
+});
 
 // A 390x844 phone: about 560 px of map area under the header, above the timeline.
 const phone = sheetDetents(560, 130);

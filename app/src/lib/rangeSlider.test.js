@@ -1,7 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { checkTypedYear, handleForDirection, keyTarget, moveHandle, pickHandle } from "./rangeSlider.js";
+import { checkTypedYear, handleForDirection, keyTarget, moveHandle, pickHandle, yearButtonLabel } from "./rangeSlider.js";
 import { MAX_YEAR, MIN_YEAR } from "./years.js";
+
+test("the years button's name starts with the years it shows", () => {
+  assert.equal(yearButtonLabel(1900, 2026, null), "1900 – 2026: type exact years");
+  assert.equal(yearButtonLabel(1967, 1967, null), "1967: type exact years");
+  // While a handle is held both ends show, even when they are the same year.
+  assert.equal(yearButtonLabel(1967, 1967, "end"), "1967 – 1967: type exact years");
+});
 
 test("overlapping thumbs leave the choice to the drag direction", () => {
   // A single year: both thumbs are under the pointer.
