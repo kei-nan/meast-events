@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { handPickedCountriesClause } from "./funnelText.js";
+import { handPickedCountriesClause, handPickedStartDatesSentence } from "./funnelText.js";
 
 test("handPickedCountriesClause: the About sentence's counts come from selection-funnel.json", () => {
   assert.equal(
@@ -17,10 +17,30 @@ test("handPickedCountriesClause: the About sentence's counts come from selection
   assert.equal(handPickedCountriesClause({ seed_events_also_found_by_discovery: 61 }), "");
 });
 
+test("handPickedStartDatesSentence: the hand-picked start dates that are no Wikidata value, from selection-funnel.json", () => {
+  const counts = (none, checked) => ({
+    seed_start_dates_none_of_wikidata_values: none,
+    seed_start_dates_none_of_wikidata_values_checked_against_article: checked,
+  });
+  assert.equal(
+    handPickedStartDatesSentence(counts(19, 11)),
+    "19 hand-picked start dates are none of the item's Wikidata dates (11 of them checked against the article). "
+  );
+  assert.equal(
+    handPickedStartDatesSentence(counts(1, 0)),
+    "1 hand-picked start date is none of the item's Wikidata dates (0 of them checked against the article). "
+  );
+  assert.equal(handPickedStartDatesSentence(undefined), "");
+  assert.equal(handPickedStartDatesSentence({ seed_start_dates_none_of_wikidata_values: 19 }), "");
+});
+
 test("the committed funnel has the counts the About sentence uses, and About types no count of its own", () => {
   const funnel = JSON.parse(readFileSync(new URL("../../../data/selection-funnel.json", import.meta.url), "utf8"));
   assert.notEqual(handPickedCountriesClause(funnel.shown_now), "");
+  assert.notEqual(handPickedStartDatesSentence(funnel.shown_now), "");
   const about = readFileSync(new URL("../components/AboutData.jsx", import.meta.url), "utf8");
   assert.doesNotMatch(about, /of the \d+ the rule also finds/);
+  assert.doesNotMatch(about, /\d+ hand-picked start dates?/);
   assert.match(about, /handPickedCountriesClause\(funnel\.data\?\.shown_now\)/);
+  assert.match(about, /handPickedStartDatesSentence\(funnel\.data\?\.shown_now\)/);
 });

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { loadFramingReviewSummary, loadSelectionFunnel } from "../lib/dataClient";
 import { countryLabel } from "../lib/eventCountries.js";
-import { handPickedCountriesClause } from "../lib/funnelText.js";
+import { handPickedCountriesClause, handPickedStartDatesSentence } from "../lib/funnelText.js";
 import "./AboutData.css";
 
 const REPO = "https://github.com/kei-nan/meast-events";
@@ -356,8 +356,8 @@ export default function AboutData({ section = null, onClose }) {
           This site shows Wikipedia and Wikidata content as it is. Titles and article text are copied from
           Wikipedia, not rewritten, and the dates and countries of the events the rule below finds are
           Wikidata&apos;s. The dates and countries of the 102 hand-picked events (see below) were typed by hand for
-          that list and can differ from Wikidata&apos;s: {handPickedCountriesClause(funnel.data?.shown_now)}30 hand-picked start dates are none of the item&apos;s Wikidata dates (11 of them
-          checked against the article). Each hand-picked event says so. Wikidata&apos;s classes are listed only where
+          that list and can differ from Wikidata&apos;s: {handPickedCountriesClause(funnel.data?.shown_now)}
+          {handPickedStartDatesSentence(funnel.data?.shown_now)}Each hand-picked event says so. Wikidata&apos;s classes are listed only where
           they are on our event-class list, with a link to the item for all of them. The other exceptions are a
           small number of documented corrections, where a value was checked against both sources and changed by
           hand; each of those events says so and links to its entry in our{" "}

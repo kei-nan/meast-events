@@ -61,6 +61,7 @@ import { fullBucket, fullBucketCount } from "../src/lib/fullBucket.js";
 import { countPositions, decodeGeo, encodeGeo, forEachCoordinate, geoMismatch, MAX_SCALE, roundedTo6 } from "../src/lib/geoCodec.js";
 import { MAP_EXTENT, NEAR_LAND_EXTENT } from "../src/lib/mapExtent.js";
 import { otherArticleTitle } from "../src/lib/otherArticle.js";
+import { mirrorPairs } from "../../scripts/lib/mirrors.js";
 import { resolvePartOf } from "../src/lib/partOf.js";
 import { resolveRelated } from "../src/lib/related.js";
 import { DECADE_SIZE, decadeFloor } from "../src/lib/eventYears.js";
@@ -193,7 +194,9 @@ export function publicEvent(e) {
 
 // wikidata_classes are Wikidata's own labels, shown as-is. `fixAnchors`: Map
 // ref -> heading anchor in docs/data-fixes.md (src/lib/dataFixes.js dataFixAnchors).
-export function detailFields(e, fixAnchors = new Map()) {
+// `articleUrl`: the current URL of the article the text comes from when that is another event's own
+// (a mirror's source, scripts/lib/mirrors.js), for text_from_article (src/lib/otherArticle.js).
+export function detailFields(e, fixAnchors = new Map(), articleUrl = undefined) {
   const fixes = dataFixRefs(e.review_reasons).map((ref) => ({ ref, anchor: fixAnchors.get(ref) ?? null }));
   return {
     // The documented corrections applied to this event (only on those 18 or so events).
@@ -206,7 +209,7 @@ export function detailFields(e, fixAnchors = new Map()) {
     wikipedia_lead_dates: strings(e.wikipedia_lead_dates),
     coordinate_source: e.coordinate_source ?? null,
     // Set when the text is the article of another Wikidata item (no article of its own).
-    text_from_article: otherArticleTitle(e),
+    text_from_article: otherArticleTitle(e, articleUrl),
     // A hand-picked seed event (no discovery sitelinks count): its dates and countries were typed by hand.
     ...(e.sitelinks === undefined ? { hand_picked: true } : {}),
   };
@@ -500,6 +503,9 @@ async function splitEvents(boundariesVersion) {
     relations
   );
 
+  // A mirror's text is its source event's article (scripts/lib/mirrors.js): the note names that article
+  // by the source's URL, which a rename moves, not the mirror's own, which the refresh holds.
+  const mirrorSource = new Map(mirrorPairs(allEvents).map((p) => [p.mirror.id, p.source]));
   // Detail records, bucketed by id hash (see header comment).
   const bucketCount = fullBucketCount(allEvents.length);
   const fullBuckets = Array.from({ length: bucketCount }, () => ({}));
@@ -522,7 +528,7 @@ async function splitEvents(boundariesVersion) {
       ...(e.wikipedia_revid && e.wikipedia_revid_timestamp
         ? { wikipedia_revid: e.wikipedia_revid, wikipedia_revid_timestamp: e.wikipedia_revid_timestamp }
         : {}),
-      ...detailFields(e, fixAnchors),
+      ...detailFields(e, fixAnchors, mirrorSource.get(e.id)?.wikipedia_url),
       // Wikidata's precision of date_start ("day", "month", "year", "decade"),
       // and of date_end where recorded (its P582 statement's).
       date_precision: e.date_precision ?? null,

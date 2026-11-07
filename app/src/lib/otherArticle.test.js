@@ -18,6 +18,11 @@ test("otherArticleTitle: the article of another item, decoded; null for an event
   assert.equal(otherArticleTitle({ ...ev, resolved_qid: undefined }), null);
   assert.equal(otherArticleTitle({ ...ev, wikipedia_url: null }), null);
   assert.equal(otherArticleTitle({ ...ev, wikipedia_url: "https://en.wikipedia.org/wiki/%E0%A4" }), null);
+  // the article's current URL, where known (a mirror's source event's), wins over the event's held one
+  const renamed = "https://en.wikipedia.org/wiki/Renamed_article";
+  assert.equal(otherArticleTitle(ev, renamed), "Renamed article");
+  assert.equal(otherArticleTitle(ev, undefined), "List of attacks during the Twelve-Day War");
+  assert.equal(otherArticleTitle({ ...ev, resolved_qid: ev.wikidata_qid }, renamed), null);
   assert.match(otherArticleNote("Gaza war"), /no Wikipedia article of its own.*“Gaza war”/);
 });
 
