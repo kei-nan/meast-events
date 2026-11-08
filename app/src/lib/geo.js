@@ -7,12 +7,15 @@ export const MAX_RADIUS_KM = 20000;
 const toRad = (deg) => (deg * Math.PI) / 180;
 const toDeg = (rad) => (rad * 180) / Math.PI;
 
-export function haversineKm(lon1, lat1, lon2, lat2) {
+// The one great-circle distance of the project (the data scripts use it too, through
+// scripts/lib/geo.js latLonDistanceKm). Arguments in lon, lat order, like GeoJSON. `radiusKm`
+// defaults to the mean Earth radius; the scripts pass their own, so their flags stay as they were.
+export function haversineKm(lon1, lat1, lon2, lat2, radiusKm = EARTH_RADIUS_KM) {
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * EARTH_RADIUS_KM * Math.asin(Math.min(1, Math.sqrt(a)));
+  return 2 * radiusKm * Math.asin(Math.min(1, Math.sqrt(a)));
 }
 
 // The point `km` from [lon, lat] along the initial bearing `bearingDeg`

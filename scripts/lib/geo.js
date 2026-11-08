@@ -1,11 +1,15 @@
-export function haversineKm(a, b) {
-  const R = 6371;
-  const toRad = (d) => (d * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLon = toRad(b.lon - a.lon);
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
+// Great-circle distance between two { lat, lon } objects (event coordinates), in km. The formula is
+// app/src/lib/geo.js haversineKm (lon, lat argument order); this wrapper only takes objects, so the
+// two argument orders cannot be mixed up. It keeps the 6371 km radius the pipeline has always used
+// (the app uses 6371.0088): the coordinate flags print the rounded distance (flags.js
+// coordinateFlag) and the duplicate check compares it with 150 km, and the stored flags must not
+// change with this refactor.
+import { haversineKm } from "../../app/src/lib/geo.js";
+
+export const PIPELINE_EARTH_RADIUS_KM = 6371;
+
+export function latLonDistanceKm(a, b) {
+  return haversineKm(a.lon, a.lat, b.lon, b.lat, PIPELINE_EARTH_RADIUS_KM);
 }
 
 // Country-level marker points (capitals). Used ONLY as (a) the labelled "approximate"

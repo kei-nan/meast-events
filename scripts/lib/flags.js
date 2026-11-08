@@ -1,6 +1,6 @@
 // Flag-only accuracy checks. Nothing here ever changes event data; every function
 // returns hints/reasons that are attached to the event as review notes.
-import { haversineKm, COUNTRY_CAPITALS } from "./geo.js";
+import { latLonDistanceKm, COUNTRY_CAPITALS } from "./geo.js";
 import { yearOf } from "./wiki.js";
 // Plain module (no imports of its own), shared with the app.
 import { isLowPrecisionPin } from "../../app/src/lib/coordPrecision.js";
@@ -74,7 +74,7 @@ export function coordinateFlag(coordinates, countries) {
   if (!coordinates) return null;
   const refs = (countries ?? []).map((c) => COUNTRY_CAPITALS[c]).filter(Boolean);
   if (!refs.length) return null;
-  const nearest = Math.min(...refs.map((r) => haversineKm(coordinates, r)));
+  const nearest = Math.min(...refs.map((r) => latLonDistanceKm(coordinates, r)));
   return nearest > COORD_FAR_KM
     ? `coordinate_far_from_countries: point is ${Math.round(nearest)} km from the nearest tagged country's reference point (${countries.join(", ")})`
     : null;
@@ -296,7 +296,7 @@ export function duplicateHints(events, targetIds) {
       ) {
         const bothPrecise = A.e.precise && B.e.precise && A.e.coordinates && B.e.coordinates;
         const near = bothPrecise
-          ? haversineKm(A.e.coordinates, B.e.coordinates) <= 150
+          ? latLonDistanceKm(A.e.coordinates, B.e.coordinates) <= 150
           : (A.e.countries ?? []).some((c) => (B.e.countries ?? []).includes(c));
         if (near) reason = "similar title, date within 1 year and nearby / same country";
       }
