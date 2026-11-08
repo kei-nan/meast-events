@@ -5,7 +5,6 @@ import {
   allSameCoordinates,
   clusterClickAction,
   largestStack,
-  eventYearLabel,
   eventsBounds,
   hoverLabel,
   stackItems,
@@ -15,14 +14,6 @@ const pt = (lon, lat, properties = {}) => ({
   type: "Feature",
   properties,
   geometry: { type: "Point", coordinates: [lon, lat] },
-});
-
-test("eventYearLabel: single year, span, missing", () => {
-  assert.equal(eventYearLabel({ date_start: "1937-07-07" }), "1937");
-  assert.equal(eventYearLabel({ date_start: "1936-04-19", date_end: "1939-08-01" }), "1936–1939");
-  assert.equal(eventYearLabel({ date_start: "1948-05-14", date_end: "1948-12-01" }), "1948");
-  assert.equal(eventYearLabel({}), "");
-  assert.equal(eventYearLabel(null), "");
 });
 
 test("allSameCoordinates", () => {

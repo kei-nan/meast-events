@@ -25,9 +25,10 @@ import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 
 const PAGE = 50;
 
-// "1956", "1956–1957", or "2014–ongoing" for an event a source says is still going on (lib/eventYears.js).
+// "1956", "1956–1957", or "2014–ongoing" for an event a source says is still going on
+// (lib/eventYears.js); "" without a start year (its old fallback printed "0").
 function yearLabel(e) {
-  return eventYearsText(e) || `${eventYears(e)[0]}`;
+  return eventYearsText(e);
 }
 
 // One result row. Its accessible name is the title and the year/place line;

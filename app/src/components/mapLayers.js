@@ -1,7 +1,7 @@
 // Pure helpers and layer definitions for MapView: colours, GeoJSON builders,
 // geodesic area geometry (plain spherical maths - no extra dependencies).
 import { circleBbox, destination } from "../lib/geo.js";
-import { eventYearLabel } from "../lib/mapStack.js";
+import { eventYearsText } from "../lib/eventYears.js";
 
 // A curated "historical atlas" ink palette - muted, warm-leaning hues evocative of
 // hand-tinted cartography (brick, verdigris, indigo, ochre) rather than generic
@@ -119,7 +119,7 @@ export function eventFeature(e, matchIds) {
       id: e.id,
       category: e.category,
       title: e.title,
-      y: eventYearLabel(e), // year label for the hover label and stacked-event list
+      y: eventYearsText(e), // year label for the hover label and stacked-event list
       m: matchIds ? (matchIds.has(e.id) ? 1 : 0) : 1,
       s: matchIds ? 1 : 0,
       a: e.location_quality === "approximate" ? 1 : 0,
