@@ -11,12 +11,19 @@
 //    the specifier that was imported); each distinct
 //    URL (base or query) is its own module, so a failed import stays failed
 //    for that URL only, as in a browser;
-//  - extensionless relative imports ("../lib/x") resolve to x.js, as in Vite;
+//  - extensionless relative imports ("../lib/x") resolve to x.js (or x.jsx),
+//    as in Vite;
+//  - .jsx files are compiled with Vite's own transform (transformWithOxc,
+//    automatic React runtime), loaded only when the first .jsx is imported;
+//  - CSS imports ("./AboutData.css") are empty modules;
 //  - `data.aliases` ({ specifier: url }) replaces whole packages (e.g. react).
 //
 // Nothing in the app imports this file, so it never reaches the bundle.
 // Usage, before the module under test is imported (dynamically):
 //   register("./testing/viteNodeHooks.mjs", import.meta.url, { data: { aliases } });
+
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 export const TEST_DATA_VERSION = "test-v1";
 export const TEST_FULL_BUCKETS = 64;
@@ -37,8 +44,18 @@ const PAGEFIND_URL = js(
     "export const search = (q) => pf().search(q);",
   ].join("\n")
 );
+const EMPTY_CSS_URL = js("export default {};");
 // One line, prepended without a newline, so stack-trace line numbers stay right.
 const ENV_PRELUDE = 'import.meta.env = globalThis.__VITE_ENV__ ?? { BASE_URL: "/" }; ';
+
+// Vite's JSX transform, imported once per test process and only if a .jsx file is loaded.
+let transformJsx = null;
+async function compileJsx(code, filename) {
+  transformJsx ??= import("vite").then(({ transformWithOxc }) => transformWithOxc);
+  const transform = await transformJsx;
+  const out = await transform(code, filename, { lang: "jsx", jsx: { runtime: "automatic" }, sourcemap: false });
+  return out.code;
+}
 
 let aliases = {};
 export function initialize(data) {
@@ -54,17 +71,28 @@ export async function resolve(specifier, context, next) {
   if (/(^|\/)pagefind\/(v\.[^/]+\/)?pagefind\.js(\?.*)?$/.test(specifier)) {
     return { url: PAGEFIND_URL + encodeURIComponent(`\n// ${specifier}`), shortCircuit: true };
   }
+  if (/\.css(\?.*)?$/.test(specifier)) return { url: EMPTY_CSS_URL, shortCircuit: true };
   try {
     return await next(specifier, context);
   } catch (err) {
     if (err?.code === "ERR_MODULE_NOT_FOUND" && /^\.{1,2}\//.test(specifier) && !/\.[cm]?jsx?$/.test(specifier)) {
-      return next(`${specifier}.js`, context);
+      try {
+        return await next(`${specifier}.js`, context);
+      } catch {
+        return next(`${specifier}.jsx`, context);
+      }
     }
     throw err;
   }
 }
 
 export async function load(url, context, next) {
+  if (url.startsWith("file:") && /\.jsx(\?.*)?$/.test(url)) {
+    const path = fileURLToPath(url.split("?")[0]);
+    let source = await compileJsx(await readFile(path, "utf8"), path);
+    if (source.includes("import.meta.env")) source = ENV_PRELUDE + source;
+    return { format: "module", source, shortCircuit: true };
+  }
   const result = await next(url, context);
   if (url.startsWith("file:") && /\/src\//.test(url) && result.format === "module") {
     const source = String(result.source);

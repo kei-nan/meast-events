@@ -604,3 +604,4 @@ function YearField({ handle, startYear, endYear, onChangeRange }) {
     </div>
   );
 }
+export { Presets, YearField }; // for Timeline.test.js

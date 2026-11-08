@@ -34,13 +34,10 @@ test("handPickedStartDatesSentence: the hand-picked start dates that are no Wiki
   assert.equal(handPickedStartDatesSentence({ seed_start_dates_none_of_wikidata_values: 19 }), "");
 });
 
-test("the committed funnel has the counts the About sentence uses, and About types no count of its own", () => {
+// That About renders these sentences from the loaded file, and types no count of its own, is checked on the
+// rendered dialog (components/AboutData.test.js).
+test("the committed funnel has the counts the About sentence uses", () => {
   const funnel = JSON.parse(readFileSync(new URL("../../../data/selection-funnel.json", import.meta.url), "utf8"));
   assert.notEqual(handPickedCountriesClause(funnel.shown_now), "");
   assert.notEqual(handPickedStartDatesSentence(funnel.shown_now), "");
-  const about = readFileSync(new URL("../components/AboutData.jsx", import.meta.url), "utf8");
-  assert.doesNotMatch(about, /of the \d+ the rule also finds/);
-  assert.doesNotMatch(about, /\d+ hand-picked start dates?/);
-  assert.match(about, /handPickedCountriesClause\(funnel\.data\?\.shown_now\)/);
-  assert.match(about, /handPickedStartDatesSentence\(funnel\.data\?\.shown_now\)/);
 });
