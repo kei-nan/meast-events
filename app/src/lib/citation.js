@@ -52,9 +52,9 @@ export const SITE_NAME = "Middle East, 1900–present";
 // other sources the drawn borders carry - UN OCHA's West Bank Areas A/B/C (not a Creative Commons
 // licence: the legacy HumanitarianResponse.info terms) and GeoNames (the treaty wells and capes
 // located in scripts/extract-correction-geometry.js).
-export const CSHAPES_CREDIT =
+const CSHAPES_CREDIT =
   "CShapes 2.0 - historical country borders. Schvitz, G., et al. (2022). CC BY-NC-SA 4.0. https://icr.ethz.ch/data/cshapes/ (modified by middleeast.events)";
-export const OCHA_CREDIT =
+const OCHA_CREDIT =
   "West Bank Areas A/B/C: UN OCHA / HDX \"Oslo Agreement\" Areas A/B/C (West Bank), source: Palestinian Authority, Ministry of Planning (PA MOP). Distributed under the legacy HumanitarianResponse.info terms: non-commercial use with credit to UN OCHA and PA MOP. https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 export const GEONAMES_CREDIT =
   "some corrected border points: GeoNames - CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). https://www.geonames.org/";

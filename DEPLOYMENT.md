@@ -196,7 +196,9 @@ runs on `main` are never cancelled. Its jobs (the names GitHub shows as status c
   (`node scripts/build-missing-coordinates-report.js --check` and
   `node scripts/build-selection-funnel.js --check`), runs the data-pipeline tests (`npm test` at the
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
-  plugin, `.oxlintrc.json`; `import/named` is an error, and warnings fail too),
+  plugin, `.oxlintrc.json`; `import/named` is an error, and warnings fail too; then
+  `node scripts/check-unused-exports.js`, which fails on an export in `scripts/` or `app/`
+  that no other file mentions),
   validates `data/boundaries.json` (`npm run validate-boundaries`; it also fails if a shape
   has fewer vertices, coarser coordinates or any coordinate different from
   `data/border-geometry-baseline.json`, which records a sha256 of each shape's coordinates)

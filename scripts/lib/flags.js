@@ -6,7 +6,7 @@ import { yearOf } from "./wiki.js";
 import { isLowPrecisionPin } from "../../app/src/lib/coordPrecision.js";
 
 export const MAX_COUNTRIES_BEFORE_FLAG = 4;
-export const COORD_FAR_KM = 1500;
+const COORD_FAR_KM = 1500;
 
 // Years in Wikipedia category names ("1990 in Kuwait", "Conflicts in 1990"), non-hidden only.
 export function categoryYears(categories) {
@@ -141,7 +141,7 @@ export function presentWithoutEndFlag({ title, date_end }) {
 // Wikidata classes (the labels stored in wikidata_classes) of events that by their nature last a span of time: a
 // war, an insurgency, an occupation, a movement. Narrow on purpose: "armed conflict", "rebellion", "revolution" and
 // "protest" also label single-day clashes, coups and demonstrations, so they are left out.
-export const DURATIVE_CLASSES = new Set([
+const DURATIVE_CLASSES = new Set([
   "war",
   "civil war",
   "world war",
@@ -238,7 +238,7 @@ export function leadStartDayFlag({ date_start, date_end, date_precision, extract
 }
 
 // ---------- duplicate hints (never auto-drop) ----------
-export function normTitle(t) {
+function normTitle(t) {
   return (t ?? "")
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")

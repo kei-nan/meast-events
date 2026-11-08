@@ -52,7 +52,7 @@ export function titleFromWikipediaUrl(url) {
 // parts), the latest revision is asked for again once all parts are in (latestRevids). Revision ids only grow, so
 // the same lastrevid before and after means the page did not change while its lead was fetched. A page that did
 // change is fetched again (up to `retries` times); if it keeps changing the fetch throws (nothing is cached).
-export async function queryAllParts(titles, { maxParts = 50, retries = 2 } = {}) {
+async function queryAllParts(titles, { maxParts = 50, retries = 2 } = {}) {
   const base = {
     action: "query",
     // revisions (latest only, ids|timestamp): the date of the revision the lead comes from (lib/revid.js)

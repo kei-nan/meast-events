@@ -34,7 +34,7 @@ const DATE_RES = [
 
 // NOTE only (never changes dates): what the Wikipedia article's lead says about the dates,
 // next to what Wikidata gives. Returns a string or null when the lead offers nothing to compare.
-export function wikipediaDatesNote({ date_start, date_end, extract }) {
+function wikipediaDatesNote({ date_start, date_end, extract }) {
   if (!extract) return null;
   const full = [];
   for (const re of DATE_RES) for (const m of extract.matchAll(re)) full.push(m[0]);
@@ -91,7 +91,7 @@ export function dateOrderFlags({ date_start, date_end, extract, endPrecision = n
 
 // Countries (tracked-set names) that Wikidata itself supports for an item, split by source:
 // direct P17 vs. P17 of the P276/P131 places. Also returns all raw P17 QIDs (any country).
-export function wikidataCountries(entity, placeEntities) {
+function wikidataCountries(entity, placeEntities) {
   const direct = new Set((entity?.p17 ?? []).map((q) => QID_TO_COUNTRY[q]).filter(Boolean));
   const viaPlace = new Set();
   for (const pq of [...(entity?.p276 ?? []), ...(entity?.p131 ?? [])]) {
@@ -138,7 +138,7 @@ export function tagsFromOutsidePlaces(event, entity, placeEntities, sovereign) {
 export const hasTrackedCountry = (event) => (event.countries ?? []).some((c) => c in COUNTRIES || c === "regional");
 
 // title-vs-lead mismatch: article title (from URL) is not the record title AND record title is not in lead.
-export function normText(s) {
+function normText(s) {
   return (s ?? "")
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")

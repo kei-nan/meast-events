@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "node --test \"scripts/lib/*.test.js\"",
-    "lint": "oxlint scripts --deny-warnings",
+    "lint": "oxlint scripts --deny-warnings && node scripts/check-unused-exports.js",
     "validate-boundaries": "node --test scripts/lib/boundary-checks.test.js && node scripts/validate-boundaries.js",
     "verify-borders": "node scripts/verify-borders.js --year=2026 --report=docs/border-verification.md && node scripts/verify-borders.js --check"
   },

@@ -30,17 +30,17 @@ const CHANNEL = process.env.OG_BROWSER || (process.platform === "win32" ? "msedg
 const WIDTH = 1200;
 const HEIGHT = 630;
 
-export const BRAND = "middleeast.events";
+const BRAND = "middleeast.events";
 export const TITLE = ["Middle East,", "1900–present"];
-export const SUBTITLE = "An interactive map and timeline of major events, with historical borders.";
-export const CREDIT = "Borders: CShapes 2.0 (CC BY-NC-SA 4.0); text: Wikipedia (CC BY-SA 4.0)";
+const SUBTITLE = "An interactive map and timeline of major events, with historical borders.";
+const CREDIT = "Borders: CShapes 2.0 (CC BY-NC-SA 4.0); text: Wikipedia (CC BY-SA 4.0)";
 
 const font = (pkg, file) =>
   `data:font/woff2;base64,${readFileSync(path.join(APP, "node_modules", ...pkg.split("/"), "files", file)).toString("base64")}`;
 const escape = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** The image as one HTML page: the map screenshot (a data: URL) on the right. */
-export function ogHtml(mapDataUrl, { spectral, inter }) {
+function ogHtml(mapDataUrl, { spectral, inter }) {
   return `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face { font-family: "Spectral"; font-weight: 600; src: url(${spectral}) format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 100 900; src: url(${inter}) format("woff2"); }

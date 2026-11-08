@@ -7,7 +7,7 @@ export const USER_AGENT = "MiddleEastEvents/0.1 (data pipeline; +https://github.
 
 // A request (including reading its body) that has not finished after this long is aborted and
 // treated like a dropped connection: retried.
-export const DEFAULT_TIMEOUT_MS = 60_000;
+const DEFAULT_TIMEOUT_MS = 60_000;
 // Longest wait honoured from a Retry-After header.
 export const MAX_RETRY_AFTER_MS = 60_000;
 

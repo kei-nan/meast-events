@@ -34,7 +34,7 @@ export function largestStack(features) {
 
 // Share of a cluster's leaves on one point above which we list rather than zoom:
 // zooming would only peel off a few dots and leave the same unsplittable stack.
-export const STACK_SHARE = 2 / 3;
+const STACK_SHARE = 2 / 3;
 
 // What a click on a cluster should do. Zoom while zooming can still split the
 // cluster; list its events once it can't usefully: (nearly) all leaves on one

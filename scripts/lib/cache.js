@@ -16,7 +16,7 @@ import { writeFileAtomicSync } from "./files.js";
 
 const argVal = (argv, name) => argv.find((a) => a.startsWith(`--${name}=`))?.split("=").slice(1).join("=");
 
-export function defaultCacheDir(argv = process.argv) {
+function defaultCacheDir(argv = process.argv) {
   return argVal(argv, "cache-dir") ?? process.env.ATLAS_CACHE_DIR ?? join(tmpdir(), "atlaswiki-cache");
 }
 

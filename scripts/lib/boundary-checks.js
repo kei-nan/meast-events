@@ -12,11 +12,11 @@ import { sourceItems } from "../../app/src/lib/boundaryText.js";
 
 // Every feature carries these keys (null allowed for status). name/years/source missing is
 // an error; a missing status or note KEY is a warning (the value null is fine).
-export const REQUIRED_PROPERTIES = ["name", "start_year", "end_year", "source"];
-export const EXPECTED_KEYS = ["status", "note"];
+const REQUIRED_PROPERTIES = ["name", "start_year", "end_year", "source"];
+const EXPECTED_KEYS = ["status", "note"];
 // end_year 9999 = "still current" (scripts/ingest-boundaries.js).
-export const OPEN_END_YEAR = 9999;
-export const KNOWN_STATUSES = Object.keys(BOUNDARY_STATUS_LABELS);
+const OPEN_END_YEAR = 9999;
+const KNOWN_STATUSES = Object.keys(BOUNDARY_STATUS_LABELS);
 
 // Intentional overlays: a shape whose status ends in "-included" CONTAINS a flagged area that
 // is drawn on top of it as its own shape (app/src/components/mapBorders.js, isDashedStatus;
@@ -37,7 +37,7 @@ export const OVERLAP_MIN_KM2 = 0.5;
 const NOT_CSHAPES_PREFIXES = ["Not in CShapes", "Not a CShapes record"];
 const GEOMETRY_ITEM = /\b(outlines?|geometry)\b/i;
 const NON_CSHAPES_SOURCE = /Natural Earth|OCHA|GeoNames|digitized/;
-export function geometrySourceError(source) {
+function geometrySourceError(source) {
   const items = sourceItems(source);
   const corrected = items.find((item) => item.startsWith("Geometry corrected per"));
   if (corrected && !NON_CSHAPES_SOURCE.test(corrected)) return "a corrected geometry names no source for the corrected edge";
@@ -203,7 +203,7 @@ export function findSelfIntersections(features) {
 }
 
 const round6 = (v) => Math.round(v * 1e6) / 1e6;
-export function selfIntersectionWarning({ feature, crossings }) {
+function selfIntersectionWarning({ feature, crossings }) {
   const where = crossings
     .map((c) => `polygon ${c.polygon} ring ${c.ring}${c.ring === 0 ? " (outer)" : " (hole)"} segments ${c.segments[0]}/${c.segments[1]} near (${round6(c.at[0])}, ${round6(c.at[1])})`)
     .join("; ");
@@ -255,7 +255,7 @@ export function checkSelfIntersections(features, accepted = ACCEPTED_RING_CROSSI
 // other change to the coordinates (a vertex moved, added or reordered) fails on the hash, as
 // does a feature that is new or gone. Rewriting the baseline is the deliberate step for an
 // approved change: node scripts/validate-boundaries.js --write-geometry-baseline
-export const FINE_DECIMALS = 6;
+const FINE_DECIMALS = 6;
 export const ACCEPT_GEOMETRY_CHANGE = "node scripts/validate-boundaries.js --write-geometry-baseline";
 
 // sha256 (hex) of a geometry's coordinates as data/boundaries.json writes them: the file is

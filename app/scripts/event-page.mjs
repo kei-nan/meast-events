@@ -45,10 +45,10 @@ export const CSHAPES_URL = "https://icr.ethz.ch/data/cshapes/";
 export const OCHA_AREAS_URL = "https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 export const GEONAMES_URL = "https://www.geonames.org/";
 const OG_IMAGE = `${SITE}/og-image.png`;
-export const DESCRIPTION_LENGTH = 160;
+const DESCRIPTION_LENGTH = 160;
 // Link previews show the description under our site name, so it says whose words they are.
 // The same for every event: a label on the flagged ones only would make the others look checked.
-export const PREVIEW_SOURCE = "Wikipedia: ";
+const PREVIEW_SOURCE = "Wikipedia: ";
 
 const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };
 
@@ -368,7 +368,7 @@ ${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta 
 // The site's icons (public/, made by scripts/make-icons.mjs), as index.html links
 // them: the SVG for browsers that take it, favicon.ico for the rest (and for the
 // /favicon.ico they ask for on their own), and the home-screen icon for iOS.
-export const ICON_LINKS = `<link rel="icon" href="/favicon.ico" sizes="32x32">
+const ICON_LINKS = `<link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
 
@@ -432,7 +432,7 @@ const siteHeader = `<header class="site-header"><a href="/" class="site-name">${
 
 const siteFooter = `<footer class="site-footer"><p>${escapeHtml(SITE_NAME)} is a non-commercial project: an interactive map and timeline of major Middle East events since 1900. Event text comes from Wikipedia and Wikidata; borders are adapted from ${link(CSHAPES_URL, "CShapes 2.0", { external: true })} (CC BY-NC-SA 4.0), and the West Bank&#39;s Areas A, B and C from ${link(OCHA_AREAS_URL, "UN OCHA", { external: true })} (source: Palestinian Authority, Ministry of Planning (PA MOP); non-commercial use, credited to UN OCHA and PA MOP); some corrected border points come from ${link(GEONAMES_URL, "GeoNames", { external: true })} (CC BY 4.0). ${link(REPO, "Source and data documentation on GitHub", { external: true })}.</p></footer>`;
 
-export function eventDateText(event) {
+function eventDateText(event) {
   const flags = (event.date_flags ?? []).filter(Boolean);
   return formatEventDate(event.date_start, event.date_end, {
     precision: event.date_precision ?? null,

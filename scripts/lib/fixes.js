@@ -175,7 +175,7 @@ DATA_FIXES.push({
 });
 
 // A link to one revision of an English Wikipedia page (the evidence for F13/F14).
-export const revisionUrl = (title, revid) =>
+const revisionUrl = (title, revid) =>
   `https://en.wikipedia.org/w/index.php?title=${encodeURIComponent(title.replace(/ /g, "_"))}&oldid=${revid}`;
 
 // F13 and F14: hand-picked seed events whose stored date_start is none of the item's Wikidata P585/P580 values

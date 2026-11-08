@@ -29,7 +29,7 @@ const REPORT = arg("report");
 const TOLERANCE_KM = 0.25; // how much further from a reference point a border may move before --check fails
 const SEARCH_KM = 10; // look for borders within this distance of a point
 const SHARED_KM = 0.3; // an edge counts as a land border if another shape is this close to it
-export const BANDS = [
+const BANDS = [
   { max: 1, label: "within 1 km" },
   { max: 3, label: "1-3 km" },
   { max: SEARCH_KM, label: `3-${SEARCH_KM} km` },
@@ -81,7 +81,7 @@ export const existedIn = (id, year, dates = WIKIDATA_DATES) => {
 const read = async (p) => JSON.parse(await readFile(new URL(p, import.meta.url), "utf-8"));
 
 // A shape we changed or added (not plain CShapes): the borders that most need checking.
-export const isModified = (f) => /Not in CShapes|Not a CShapes record|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
+const isModified = (f) => /Not in CShapes|Not a CShapes record|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
 
 function segmentsNear(feature, area) {
   const out = [];

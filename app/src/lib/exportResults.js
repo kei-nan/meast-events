@@ -35,11 +35,11 @@ import { startedBefore } from "./browseOrder.js";
 import { eventPath, shareLink } from "./urlState.js";
 import { downloadBlob } from "./downloadFile.js";
 
-export const SITE_ORIGIN = "https://middleeast.events";
-export const TEXT_LICENSE = "CC BY-SA 4.0";
-export const TEXT_LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/";
+const SITE_ORIGIN = "https://middleeast.events";
+const TEXT_LICENSE = "CC BY-SA 4.0";
+const TEXT_LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/";
 export const ATTRIBUTION = `Text: Wikipedia contributors, ${TEXT_LICENSE} (${TEXT_LICENSE_URL}); identifiers: Wikidata, CC0; dates and places: mostly Wikidata (CC0), others from the event's Wikipedia article or set by hand by middleeast.events; source article linked from site_url`;
-export const NOTICE_URL = "https://github.com/kei-nan/meast-events/blob/main/NOTICE";
+const NOTICE_URL = "https://github.com/kei-nan/meast-events/blob/main/NOTICE";
 
 /** The CSV header, in column order: [key, header text]. */
 export const CSV_COLUMNS = [

@@ -34,8 +34,8 @@ import { stringifyFeatureCollection } from "./lib/json-lines.js";
 // [minLon, minLat, maxLon, maxLat], on the CELL grid. Must hold every border in
 // data/boundaries.json (1900-present: 9.31..63.33E, 12.14..43.58N - the Ottoman Empire's
 // Tripolitania and Balkans, Iran's east, Yemen's south); the build fails if one reaches out.
-export const REGION = [5, 10, 65, 45];
-export const CELL = 5;
+const REGION = [5, 10, 65, 45];
+const CELL = 5;
 // The light land: ~2 km tolerance (degrees) and 2 decimals (~1 km). At the zooms where it
 // shows alone that is about a pixel; inside REGION it gives way to 1:10m as cells load.
 const LIGHT_TOLERANCE = 0.02;

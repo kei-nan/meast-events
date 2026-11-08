@@ -35,14 +35,14 @@ export function setReason(list, prefix, text) {
   else if (text) list.push(text);
 }
 
-export const MANY_COUNTRIES_FLAG = "many_countries";
+const MANY_COUNTRIES_FLAG = "many_countries";
 export function manyCountriesFlag(countries) {
   const n = countries?.length ?? 0;
   return n > MAX_COUNTRIES_BEFORE_FLAG
     ? `${MANY_COUNTRIES_FLAG}: ${n} countries tagged (kept exactly as Wikidata lists them; verify the event really concerns all of them)`
     : null;
 }
-export const FAR_FLAG = "coordinate_far_from_countries";
+const FAR_FLAG = "coordinate_far_from_countries";
 
 /** The fields of an enriched record that come from the candidate file (discover-events.js), as Wikidata gives them. */
 export function candidateFields(candidate) {

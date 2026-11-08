@@ -74,8 +74,8 @@ export function cellsInBounds(cells, size, [w, s, e, n]) {
 // link: `finePointer` (matchMedia "(pointer: fine)": a mouse or trackpad, i.e. a
 // desktop or laptop, usually on a fixed line) keeps the fill on; a touch screen
 // gets only the cells it zooms in to (MapView's onView), as a slow link does.
-export const SLOW_RTT_MS = 150;
-export const SLOW_DOWNLINK_MBPS = 1;
+const SLOW_RTT_MS = 150;
+const SLOW_DOWNLINK_MBPS = 1;
 export function wantsBackgroundDetail(connection, finePointer = false) {
   if (!connection) return finePointer;
   if (connection.saveData) return false;
@@ -96,8 +96,8 @@ export function wantsBackgroundDetail(connection, finePointer = false) {
 // reported 1.45-1.75 Mbps with 100 or 50 ms (2026-10), hence the bandwidth floor;
 // and below 100 ms, as a mobile network's round trip (150 ms+) never is. Chromium
 // reports at most 10 Mbps, in 25 ms and 25 kbps steps.
-export const FAST_RTT_MS = 100;
-export const FAST_DOWNLINK_MBPS = 5;
+const FAST_RTT_MS = 100;
+const FAST_DOWNLINK_MBPS = 5;
 export function isFastConnection(connection) {
   if (!connection || connection.saveData) return false;
   if (connection.effectiveType && connection.effectiveType !== "4g") return false;
