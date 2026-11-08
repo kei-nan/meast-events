@@ -629,9 +629,11 @@ the Oslo areas (paras. 78, 102), and Security Council Resolutions 252 (1968) and
 ## Map borders: where there is no shape
 
 The time-driven borders (`data/boundaries.json`) come from CShapes 2.0 plus our documented corrections (`scripts/boundary-corrections.js`).
-The two gitignored upstream files the import reads (`data/raw/cshapes-2.0.geojson` and Natural Earth's `data/raw/ne10-countries.geojson`) are
-pinned by sha256 in `scripts/lib/raw-inputs.js` (since 2026-11-08, taken from the files that rebuild the committed `data/boundaries.json` byte for
-byte); a different file stops the import, and `--allow-raw-change` is only for a deliberate source upgrade, pinned in the same reviewed change.
+The gitignored upstream files in `data/raw/` that the import (`scripts/ingest-boundaries.js`) and the correction-geometry extraction
+(`scripts/extract-correction-geometry.js`) read - CShapes 2.0, Natural Earth's countries, admin-1 and minor-islands layers, and OCHA's Oslo
+areas shapefile - are pinned by sha256 in `scripts/lib/raw-inputs.js` (since 2026-11-08, taken from the files that rebuild the committed
+`data/boundaries.json` and `data/corrections-geometry.json` byte for byte); a different file stops either script, and `--allow-raw-change` is
+only for a deliberate source upgrade, pinned in the same reviewed change.
 CShapes codes independent states and only some colonial dependencies, and the import (`REGION_ENTITIES` in `scripts/ingest-boundaries.js`) takes
 20 of its entities. A territory with no shape for a year is simply blank on the map that year: we do not draw a border we have no source for.
 The map gives each year to the record in force on 1 July, so a state that CShapes starts in the second half of a year appears the next year.

@@ -20,7 +20,7 @@ import { dropRepeatedPositionsInGeometry } from "./lib/ring-positions.js";
 import { untangleRing } from "./lib/ring-repair.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
-import { checkRawInput, ALLOW_RAW_CHANGE_FLAG } from "./lib/raw-inputs.js";
+import { requireRawInput } from "./lib/raw-inputs.js";
 
 // CLI (all optional; the first two for checking a change without touching the committed files):
 //   --raw-dir=DIR   read cshapes-2.0.geojson / ne10-countries.geojson from DIR (default data/raw)
@@ -30,18 +30,9 @@ import { checkRawInput, ALLOW_RAW_CHANGE_FLAG } from "./lib/raw-inputs.js";
 const argVal = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=").slice(1).join("=");
 const RAW_DIR = argVal("raw-dir") ? pathToFileURL(resolve(argVal("raw-dir")) + "/") : new URL("../data/raw/", import.meta.url);
 const OUT = argVal("out") ? pathToFileURL(resolve(argVal("out"))) : new URL("../data/boundaries.json", import.meta.url);
-const ALLOW_RAW_CHANGE = process.argv.includes(ALLOW_RAW_CHANGE_FLAG);
-
-// Checks a raw upstream file's bytes against its pinned sha256, then parses it.
-function pinnedRaw(bytes, name) {
-  const r = checkRawInput(name, bytes, { allow: ALLOW_RAW_CHANGE });
-  if (!r.ok) {
-    console.error(`FAIL ${r.message}`);
-    process.exit(1);
-  }
-  if (r.message) console.warn(`warn ${r.message}`);
-  return JSON.parse(bytes.toString("utf-8"));
-}
+// Checks a raw upstream file's bytes against its pinned sha256 (scripts/lib/raw-inputs.js),
+// then parses it.
+const pinnedRaw = (bytes, name) => JSON.parse(requireRawInput(name, bytes).toString("utf-8"));
 
 const REGION_ENTITIES = [
   "Turkey (Ottoman Empire)",

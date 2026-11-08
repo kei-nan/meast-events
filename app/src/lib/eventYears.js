@@ -44,9 +44,11 @@ export function ongoingNote(e) {
 /**
  * The years an event's dates name, in the order the source gives them:
  * [start, end], with end = start when there is no end date. For labels.
+ * Without a start year the start is NaN (never 0, which would compare as a year).
  */
 export function rawEventYears(e) {
-  const s = Number(String(e?.date_start ?? "").slice(0, 4));
+  const ys = String(e?.date_start ?? "").slice(0, 4);
+  const s = ys ? Number(ys) : NaN;
   const en = e?.date_end ? Number(String(e.date_end).slice(0, 4)) : s;
   return [s, Number.isFinite(en) ? en : s];
 }
@@ -64,7 +66,7 @@ export function eventSpanYears(e, through = MAX_YEAR) {
 /** "1956", "1956–1957" or, for an ongoing event, "2014–ongoing". "" without a start year. */
 export function eventYearsText(e) {
   const [s, en] = rawEventYears(e);
-  if (!Number.isFinite(s) || s === 0) return "";
+  if (!Number.isFinite(s)) return "";
   if (ongoingSignal(e)) return `${s}–ongoing`;
   return en !== s ? `${s}–${en}` : `${s}`;
 }

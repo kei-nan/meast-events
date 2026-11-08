@@ -12,6 +12,21 @@ export function latLonDistanceKm(a, b) {
   return haversineKm(a.lon, a.lat, b.lon, b.lat, PIPELINE_EARTH_RADIUS_KM);
 }
 
+// Shortest distance in km from a point to the outline of a Polygon/MultiPolygon feature: every
+// ring, holes included (turf.pointToLineDistance, geodesic). Used by the pin check
+// (validate.js) and the border check (verify-borders.js). `turf` is passed in, not imported:
+// validate.js runs where @turf/turf is not installed (Workers Builds) and loads it only when
+// it is there.
+export function distanceToRingsKm(turf, pt, feature) {
+  const g = feature.geometry;
+  const polys = g.type === "MultiPolygon" ? g.coordinates : [g.coordinates];
+  let best = Infinity;
+  for (const rings of polys) {
+    for (const ring of rings) best = Math.min(best, turf.pointToLineDistance(pt, turf.lineString(ring), { units: "kilometers" }));
+  }
+  return best;
+}
+
 // Country-level marker points (capitals). Used ONLY as (a) the labelled "approximate"
 // fallback pin and (b) a reference for the coordinate sanity flag. Never as a real location.
 export const COUNTRY_CAPITALS = {

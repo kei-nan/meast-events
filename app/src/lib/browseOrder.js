@@ -27,9 +27,9 @@ export function sortValue(key, dir) {
   return dir === DEFAULT_DIR[key] ? key : `${key}-${dir}`;
 }
 
+/** The event's start year; NaN without one (lib/eventYears.js rawEventYears). */
 export function eventStartYear(event) {
-  const y = String(event?.date_start ?? "").slice(0, 4);
-  return y ? Number(y) : NaN;
+  return rawEventYears(event)[0];
 }
 
 /**

@@ -138,6 +138,13 @@ test("eventYearsText and ongoingNote name the reading and its source", () => {
   assert.equal(eventYearsText(hezbollah), "2023–2024");
   assert.equal(eventYearsText(reversed), "2009–1990");
   assert.equal(eventYearsText({ title: "x" }), "");
+  assert.equal(eventYearsText(null), "");
+  assert.equal(eventYearsText({ date_start: "1937-07-07" }), "1937");
+  assert.equal(eventYearsText({ date_start: "1936-04-19", date_end: "1939-08-01" }), "1936–1939");
+  assert.equal(eventYearsText({ date_start: "1948-05-14", date_end: "1948-12-01" }), "1948");
+  // no start year: NaN, never 0 (which would compare as a year in range checks)
+  assert.ok(Number.isNaN(rawEventYears({ title: "x" })[0]));
+  assert.ok(Number.isNaN(rawEventYears({ date_end: "1950" })[0]));
   assert.match(ongoingNote(yemen), /Wikipedia article title says “present”/);
   assert.match(ongoingNote({ ...syria, date_end_open: "wikidata_novalue" }), /Wikidata gives its end time as “no value”/);
   assert.match(ongoingNote({ ...syria, date_end_open: "wikidata_somevalue" }), /“unknown value”/);
