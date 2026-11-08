@@ -10,6 +10,9 @@ app/public/pagefind/
 # Names the versioned data folder events/v.<version>/ and its bucket count;
 # rewritten by app/scripts/split-data.mjs on every dev start and build.
 app/src/lib/dataVersion.js
+# The data policy's "Known gaps" table, read by app/scripts/split-data.mjs on every
+# dev start and build for the search panel's "not in this atlas" note.
+app/src/data/known-gaps.json
 .vite/
 
 # Secrets. server/.env and worker/.dev.vars held the Redis connection string

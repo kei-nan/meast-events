@@ -527,6 +527,23 @@ export default function AboutData({ section = null, onClose }) {
           quotes the sentences, and names the changes left out because no article dates them (Soltan Abad for Arak).
         </p>
 
+        {/* What the licence files say (NOTICE, data/LICENSE, LICENSE; the frame-ancestors
+            'none' of public/_headers), for a reader who wants to reuse something. Not advice. */}
+        <h3>Using this in a publication</h3>
+        <p>
+          Each part keeps its source&apos;s licence (
+          <a href={`${REPO}/blob/main/NOTICE`} target="_blank" rel="noreferrer" title="Opens in a new tab">NOTICE</a>
+          ). Event text is Wikipedia&apos;s, CC BY-SA 4.0, credited to Wikipedia contributors with a link to the
+          article; it has no non-commercial restriction. The border data, the borders drawn on the map, is CC BY-NC-SA
+          4.0 (CShapes 2.0) with the West Bank areas under UN OCHA&apos;s terms: <strong>non-commercial use only</strong>,
+          credited to CShapes 2.0 (Schvitz et al.) and, for those areas, to UN OCHA and PA MOP, and adaptations shared
+          under the same licence (
+          <a href={`${REPO}/blob/main/data/LICENSE`} target="_blank" rel="noreferrer" title="Opens in a new tab">data license</a>
+          ). The source code is AGPL-3.0. <strong>Cite</strong>, in an event&apos;s Share menu, gives the article&apos;s
+          citation in APA, MLA and Chicago and the credit lines for the map&apos;s borders. The site cannot be shown inside
+          another page (an iframe): it does not allow framing, so link to it instead.
+        </p>
+
         {/* The footer's "Sources & licences" opens the dialog here: these are
             the site's required credits, so none of them may be dropped. */}
         <h3 id="about-credits" tabIndex={-1}>

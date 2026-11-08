@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useId, useImperativeHandle, use
 import { flushSync } from "react-dom";
 import AreaChip, { AreaTag } from "./AreaChip.jsx";
 import FilterBar from "./FilterBar.jsx";
+import KnownGapNote from "./KnownGapNote.jsx";
 import PanelResizer from "./PanelResizer.jsx";
 import ResultsList from "./ResultsList.jsx";
 import { inRange } from "./resultsUtil.jsx";
@@ -923,6 +924,7 @@ export default function SearchPanel({
             />
           </div>
 
+          {!eventsLoading && <KnownGapNote query={textQuery} />}
           <div ref={listWrapRef}>
             {eventsLoading ? (
               <ul className="sp-list" aria-hidden="true" data-testid="results-skeleton">

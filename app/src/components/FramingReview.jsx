@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import { REVIEW_TABS, TAB_NAMES, tabStatus } from "../lib/reviewTabs.js";
 import { safeUrl } from "../lib/safeUrl.js";
+import { REPO, issueUrl } from "../lib/githubIssue.js";
 import { categoryNoteOutdated, categoryShortLabel } from "../lib/categoryLabels.js";
 
 // The Popover API (Safari 17+, Chrome 114+, Firefox 125+). Where it is missing, the
@@ -14,7 +15,6 @@ import { categoryNoteOutdated, categoryShortLabel } from "../lib/categoryLabels.
 // matches(":popover-open") throws, so the note is a plain toggle instead.
 const HAS_POPOVER = typeof HTMLElement !== "undefined" && typeof HTMLElement.prototype.showPopover === "function";
 
-const REPO = "https://github.com/kei-nan/meast-events";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 
 // x.url opens the guideline as it read when the review was made (app/scripts/split-data.mjs).
@@ -30,11 +30,10 @@ function contestUrl(event, review) {
     "",
     "Wording check:",
     ...(w.length ? w.map((x) => `- ${x.guideline_name}: "${x.phrase}"`) : ["- nothing found"]),
-    "",
-    "What is wrong with this review, and what shows it?",
-    "",
-  ].join("\n");
-  return `${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}&labels=framing-review`;
+  ];
+  // The question stays whole; a review too long for a link is shortened above it (lib/githubIssue.js).
+  const tail = ["", "What is wrong with this review, and what shows it?", ""];
+  return issueUrl({ title, body, tail, labels: "framing-review" });
 }
 
 function FairnessPanel({ r }) {

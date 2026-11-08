@@ -1,4 +1,4 @@
-import { Fragment, Suspense, lazy, memo, useEffect, useRef, useState } from "react";
+import { Fragment, Suspense, lazy, memo, useEffect, useMemo, useRef, useState } from "react";
 import { useStickyClearance } from "../hooks/useStickyClearance.js";
 import { FramingPointer } from "./FramingPointer.jsx";
 import { FramingReviewFailed } from "./LoadFailed.jsx";
@@ -8,6 +8,7 @@ import { rtlRuns, splitBidi } from "../lib/bidi.js";
 import { otherArticleNote } from "../lib/otherArticle.js";
 import { roundedLocationNote } from "../lib/coordPrecision.js";
 import { dataFixUrl } from "../lib/dataFixes.js";
+import { reportUrl } from "../lib/eventReport.js";
 import { safeUrl } from "../lib/safeUrl.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
@@ -194,8 +195,9 @@ function LoadingNote() {
  * `onPlaceHistory({lon, lat})` (optional) opens "What was this place?" for the event's point.
  * `onRetryLead()` (optional) loads the full lead again after it failed ("Try again").
  * Memoized (default export): App re-renders on every Play step, map move and
- * hover, and this view re-splits and marks its whole lead each render; keep
- * its props stable (SearchPanel's onShowOnMap is a useCallback).
+ * hover; keep its props stable (SearchPanel's onShowOnMap is a useCallback).
+ * borderYear does change on each Play step, so the split and marked lead is
+ * kept (useMemo) until the text or its highlights change.
  */
 function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavailable = false, onSelectEvent, onPlaceHistory, onRetryLead }) {
   const headingRef = useRef(null);
@@ -242,11 +244,18 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
   const review = event.framing_review;
   // Each paragraph as plain and highlighted pieces, with its right-to-left runs
   // (lib/bidi.js). Paragraphs past the first LEAD_PARAGRAPHS are hidden or
-  // shown whole, never cut or rewritten.
-  const paragraphs = (event.extract ?? "")
-    .split(/\n+/)
-    .filter((p) => p.trim())
-    .map((p) => ({ segs: markSegments(p, review?.highlights), runs: rtlRuns(p) }));
+  // shown whole, never cut or rewritten. Worked out again only for another text or
+  // other highlights: borderYear changes on every Play step and re-renders this view.
+  const extract = event.extract ?? "";
+  const highlights = review?.highlights;
+  const paragraphs = useMemo(
+    () =>
+      extract
+        .split(/\n+/)
+        .filter((p) => p.trim())
+        .map((p) => ({ segs: markSegments(p, highlights), runs: rtlRuns(p) })),
+    [extract, highlights]
+  );
   const clamps = paragraphs.length > LEAD_PARAGRAPHS;
   const expanded = expandedId === event.id;
   const hiddenFlagged = clamps && paragraphs.slice(LEAD_PARAGRAPHS).some(({ segs }) => segs.some((s) => s.flagged));
@@ -542,6 +551,16 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
           .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
           {event.part_of?.length > 0 && <> &ldquo;Part of&rdquo; is Wikidata&apos;s statement, in its labels (CC0).</>}
         </p>
+        {/* With the full record only, so the report names the revision and the Wikidata item (lib/eventReport.js). */}
+        {!event.leadStatus && (
+          <p className="event-detail-report">
+            <a href={reportUrl(event)} target="_blank" rel="noreferrer">
+              Report a problem with this entry
+              <span className="sp-sr-status"> (opens in a new tab)</span>
+            </a>{" "}
+            on GitHub: the form opens with this entry&apos;s details filled in.
+          </p>
+        )}
       </section>
     </article>
   );

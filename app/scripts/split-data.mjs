@@ -51,6 +51,11 @@
 //
 // data/selection-funnel.json (written by the data pipeline) is copied to
 // public/data/ for the "About the data" page; missing is a warning, not an error.
+//
+// KNOWN GAPS: the "Known gaps" table of docs/DATA_POLICY.md is read into
+// src/data/known-gaps.json (src/lib/knownGaps.js), for the search panel's note on
+// a well-known event that is not in the atlas. Unlike the funnel this is not
+// optional: a table that cannot be read fails the build.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -68,6 +73,7 @@ import { DECADE_SIZE, decadeFloor } from "../src/lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../src/lib/years.js";
 import { isLowPrecisionPin } from "../src/lib/coordPrecision.js";
 import { dataFixAnchors, dataFixRefs } from "../src/lib/dataFixes.js";
+import { parseKnownGaps } from "../src/lib/knownGaps.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.join(__dirname, "..", "src", "data"); // land.json
@@ -78,6 +84,8 @@ const ROOT_DATA_DIR = process.env.ATLAS_DATA_DIR
 const EVENTS_FILE = path.join(ROOT_DATA_DIR, "events.json"); // repo-root source of truth
 // The log of documented corrections, for the anchors of its "## Fn" entries (src/lib/dataFixes.js).
 const DATA_FIXES_FILE = path.join(__dirname, "..", "..", "docs", "data-fixes.md");
+// The data policy, for its "Known gaps" table (src/lib/knownGaps.js).
+const DATA_POLICY_FILE = path.join(__dirname, "..", "..", "docs", "DATA_POLICY.md");
 const BOUNDARIES_FILE = path.join(ROOT_DATA_DIR, "boundaries.json");
 const OUT_DIR = process.env.SPLIT_OUT_DIR
   ? path.resolve(process.env.SPLIT_OUT_DIR)
@@ -728,11 +736,28 @@ async function copyFunnel() {
   console.log("selection-funnel.json: copied for the About the data page");
 }
 
+// The policy's known gaps, without those whose Wikidata item is one of `events` (the
+// table names two hand-picked events as shown; they are on the site, not missing).
+export function knownGapsData(markdown, events) {
+  const { anchor, intro, entries } = parseKnownGaps(markdown);
+  const shown = new Set(events.map((e) => e.wikidata_qid).filter(Boolean));
+  return { anchor, intro, entries: entries.filter((e) => !shown.has(e.qid)) };
+}
+
+async function writeKnownGaps() {
+  const events = JSON.parse(await readFile(EVENTS_FILE, "utf8"));
+  const data = knownGapsData(await readFile(DATA_POLICY_FILE, "utf8"), events);
+  // Next to the bundle's other data (not public/data/): the search panel imports it.
+  if (!process.env.SPLIT_OUT_DIR) await writeJSON(path.join(SRC_DIR, "known-gaps.json"), data);
+  console.log(`known-gaps.json: ${data.entries.length} events from the data policy's "Known gaps" table that are not in the atlas`);
+}
+
 async function main() {
   await rm(OUT_DIR, { recursive: true, force: true });
   await splitEvents(await splitBoundaries());
   await copyLand();
   await copyFunnel();
+  await writeKnownGaps();
   const t = geoTotals;
   console.log(
     `geometry: ${t.files} .tbin files, ${t.positions} vertices, each file decoded and identical to its source ` +
