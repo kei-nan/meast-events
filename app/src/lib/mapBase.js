@@ -67,6 +67,11 @@ export function openingPadding(height, sheetPx) {
 // MapLibre's tile size: at zoom z the world is 512 * 2^z pixels wide.
 const TILE_SIZE = 512;
 
+// The map's zoom limits (MapLibre's own defaults, passed to it explicitly by
+// MapView): a link's `m` zoom is clamped to them (lib/urlState.js parseMapView).
+export const MAP_MIN_ZOOM = 0;
+export const MAP_MAX_ZOOM = 22;
+
 // Web Mercator, as MapLibre computes it: [0, 1] across the world, y down.
 export const mercatorX = (lon) => (180 + lon) / 360;
 export const mercatorY = (lat) =>
@@ -93,9 +98,21 @@ export function defaultCamera(width, height, { bounds = defaultBounds(width), pa
     (width - pad.left - pad.right) / (right - left),
     (height - pad.top - pad.bottom) / (bottom - top)
   );
-  let cx = (left + right) / 2 - (pad.left - pad.right) / 2 / worldSize;
-  let cy = (top + bottom) / 2 - (pad.top - pad.bottom) / 2 / worldSize;
+  const cx = (left + right) / 2 - (pad.left - pad.right) / 2 / worldSize;
+  const cy = (top + bottom) / 2 - (pad.top - pad.bottom) / 2 / worldSize;
+  return constrainCamera(width, height, worldSize, cx, cy, extent);
+}
 
+/**
+ * The camera MapLibre settles on for `new Map({center: [lon, lat], zoom,
+ * maxBounds: MAP_EXTENT})`, a view from a link's `m` (lib/urlState.js): the same
+ * constrain step as defaultCamera, from that centre and zoom. Same return value.
+ */
+export function viewCamera(width, height, { lon, lat, zoom }, extent = MAP_EXTENT) {
+  return constrainCamera(width, height, TILE_SIZE * 2 ** zoom, mercatorX(lon), mercatorY(lat), extent);
+}
+
+function constrainCamera(width, height, worldSize, cx, cy, extent) {
   const [minLon, minLat, maxLon, maxLat] = extent;
   const mx0 = mercatorX(minLon);
   const mx1 = mercatorX(maxLon);
@@ -105,12 +122,12 @@ export function defaultCamera(width, height, { bounds = defaultBounds(width), pa
   worldSize = Math.max(worldSize, width / (mx1 - mx0), height / (my1 - my0));
   const halfW = width / 2 / worldSize;
   const halfH = height / 2 / worldSize;
-  cx = Math.min(Math.max(cx, mx0 + halfW), mx1 - halfW);
-  cy = Math.min(Math.max(cy, my0 + halfH), my1 - halfH);
+  const x = Math.min(Math.max(cx, mx0 + halfW), mx1 - halfW);
+  const y = Math.min(Math.max(cy, my0 + halfH), my1 - halfH);
   return {
     zoom: Math.log2(worldSize / TILE_SIZE),
     worldSize,
-    x0: cx * worldSize - width / 2,
-    y0: cy * worldSize - height / 2,
+    x0: x * worldSize - width / 2,
+    y0: y * worldSize - height / 2,
   };
 }

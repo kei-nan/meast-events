@@ -17,8 +17,9 @@ const DOC = Math.random().toString(36).slice(2);
 //  - Selecting/deselecting an event PUSHES a history entry (Back walks
 //    through selections) and writes immediately; closing it again in the app
 //    goes BACK to the entry it was opened from, so Back does not re-open it.
-//  - Every other change (text, filters, years, scope, area) REPLACES the
-//    current entry, debounced so typing doesn't spam history.
+//  - Every other change (text, filters, years, scope, area, the map's camera)
+//    REPLACES the current entry, debounced so typing (or Play, or panning)
+//    doesn't spam history.
 //  - popstate re-reads the URL (strictly validated) and hands the parsed
 //    state to `onNavigate`; the write-back that follows is suppressed.
 // See urlWriteMode (lib/urlState.js).
@@ -27,7 +28,7 @@ const DOC = Math.random().toString(36).slice(2);
 // overwrite the current entry instead of pushing one (clearing a link to an
 // unknown event, so Back does not return to the dead URL).
 //
-// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort}
+// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view, place, mapView}
 export default function useUrlState(state, onNavigate) {
   const url = stateUrl(state);
   const lastRef = useRef(currentUrl());

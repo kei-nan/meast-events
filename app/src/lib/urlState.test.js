@@ -8,7 +8,9 @@ import {
   eventIdFromPath,
   eventIdQuery,
   eventPath,
+  mapViewToParam,
   parseArea,
+  parseMapView,
   parseUrl,
   parseUrlState,
   serializeUrlState,
@@ -18,6 +20,7 @@ import {
   YEAR_MAX,
   YEAR_MIN,
 } from "./urlState.js";
+import { MAP_MAX_ZOOM, MAP_MIN_ZOOM } from "./mapBase.js";
 
 const base = { q: "", categories: [], countries: [], startYear: 1900, endYear: YEAR_MAX, scope: "all", area: null, eventId: null };
 
@@ -35,7 +38,57 @@ test("defaults serialize to empty and parse back to defaults", () => {
     sort: "coverage",
     view: "list",
     place: null,
+    mapView: null,
   });
+});
+
+test("m (the map's camera): parse, serialize, round trip", () => {
+  assert.deepEqual(parseUrlState("?m=44.5,31.25,4.5").mapView, { lon: 44.5, lat: 31.25, zoom: 4.5 });
+  assert.deepEqual(parseMapView("-0.5,-12,0"), { lon: -0.5, lat: -12, zoom: 0 });
+  // Rounded on the way out: 4 decimals for the centre, 2 for the zoom.
+  assert.equal(mapViewToParam({ lon: 35.123456, lat: 31.987654, zoom: 6.12345 }), "35.1235,31.9877,6.12");
+  assert.equal(serializeUrlState({ ...base, mapView: { lon: 35.123456, lat: 31.987654, zoom: 6.12345 } }), "?m=35.1235,31.9877,6.12");
+  // Absent (the map not moved yet) or junk: nothing written.
+  assert.equal(serializeUrlState({ ...base, mapView: null }), "");
+  assert.equal(mapViewToParam({ lon: NaN, lat: 1, zoom: 1 }), null);
+  assert.equal(mapViewToParam({ lon: 181, lat: 1, zoom: 1 }), null);
+  assert.equal(mapViewToParam({ lon: 1, lat: 1 }), null);
+  // What it writes, it reads back, and writes again the same.
+  const url = stateUrl({ ...base, q: "suez", eventId: "suez-crisis", mapView: { lon: 32.55, lat: 30.6, zoom: 5.25 } });
+  assert.equal(url, "/event/suez-crisis?q=suez&m=32.55,30.6,5.25");
+  const p = parseUrl(url);
+  assert.deepEqual(p.mapView, { lon: 32.55, lat: 30.6, zoom: 5.25 });
+  assert.equal(stateUrl({ ...base, q: p.q, eventId: p.eventId, mapView: p.mapView }), url);
+  // A camera change alone is a debounced replace, never a history entry of its own.
+  assert.equal(urlWriteMode("/?y=1950-1960", "/?y=1950-1960&m=35,31,5"), "debounce");
+  assert.equal(urlWriteMode("/?m=35,31,5", "/?m=36,31,5"), "debounce");
+});
+
+test("m: the zoom is clamped to the map's limits; anything else malformed is dropped", () => {
+  assert.equal(parseMapView("35,31,99").zoom, MAP_MAX_ZOOM);
+  assert.equal(parseMapView("35,31,-3").zoom, MAP_MIN_ZOOM);
+  assert.equal(mapViewToParam({ lon: 35, lat: 31, zoom: 40 }), `35,31,${MAP_MAX_ZOOM}`);
+  for (const raw of [
+    "",
+    "35,31",
+    "35,31,5,1",
+    "181,31,5",
+    "35,-91,5",
+    "35,31,abc",
+    "35,31,Infinity",
+    "35,31,NaN",
+    "1e2,31,5",
+    "0x10,31,5",
+    " 35,31,5",
+    "35,,5",
+    "35,31,5.1234567890123", // more decimals than any link writes
+    "1234,31,5",
+  ]) {
+    assert.equal(parseMapView(raw), null, raw);
+    assert.equal(parseUrlState(`?m=${encodeURIComponent(raw)}`).mapView, null, raw);
+  }
+  assert.equal(parseMapView(null), null);
+  assert.equal(parseMapView(undefined), null);
 });
 
 test("view=timeline round trips; the list (default) and junk stay out of the URL", () => {

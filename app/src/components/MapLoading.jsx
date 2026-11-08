@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 import { loadLand } from "../lib/dataClient";
-import { LAND_ON_SEA, SEA_COLOR, defaultCamera, mercatorX, mercatorY, openingPadding } from "../lib/mapBase";
+import { LAND_ON_SEA, SEA_COLOR, defaultCamera, mercatorX, mercatorY, openingPadding, viewCamera } from "../lib/mapBase";
 import WATER from "../data/water.json";
 import { sheetCover } from "../lib/mapInsets";
 
@@ -18,7 +18,7 @@ let landCache = null;
 // projecting every coastline again while the map's code is starting up.
 let lastDrawn = null;
 
-function draw(canvas, land) {
+function draw(canvas, land, view) {
   const { clientWidth: width, clientHeight: height } = canvas;
   if (!width || !height) return;
   const dpr = window.devicePixelRatio || 1;
@@ -33,8 +33,11 @@ function draw(canvas, land) {
     return;
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  // The view MapView opens on: on phones, above the lowered sheet.
-  const { worldSize, x0, y0 } = defaultCamera(width, height, { padding: openingPadding(height, sheetCover(canvas)) });
+  // The view MapView opens on: a link's own (its `m`), else the default, on
+  // phones above the lowered sheet.
+  const { worldSize, x0, y0 } = view
+    ? viewCamera(width, height, view)
+    : defaultCamera(width, height, { padding: openingPadding(height, sheetCover(canvas)) });
   // One path, one fill: the land is cut into pieces (cells), and separate fills would
   // leave a faint line where two pieces meet (each antialiased edge half-covers it).
   ctx.fillStyle = LAND_ON_SEA;
@@ -69,8 +72,10 @@ function fillPolygons(ctx, features, worldSize, x0, y0) {
 /**
  * @param cover  true: drawn over MapView's canvas (MapView announces loading
  *               itself, so no status text); false: App's stand-in for the map.
+ * @param view   {lon, lat, zoom}: the camera a link opens the map on (lib/urlState.js
+ *               parseMapView), or null for the default view. Read at the first draw.
  */
-export default function MapLoading({ cover = false }) {
+export default function MapLoading({ cover = false, view = null }) {
   const canvasRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -81,7 +86,7 @@ export default function MapLoading({ cover = false }) {
       const size = `${canvas.clientWidth}x${canvas.clientHeight}`;
       if (!landCache || size === drawnSize) return; // the observer's first call repeats the first draw
       drawnSize = size;
-      draw(canvas, landCache);
+      draw(canvas, landCache, view);
     };
     if (landCache) redraw();
     else
@@ -98,7 +103,7 @@ export default function MapLoading({ cover = false }) {
       ro.disconnect();
       if (cover) lastDrawn = null; // the map has drawn: free the bitmap
     };
-  }, [cover]);
+  }, [cover, view]);
 
   return (
     <div

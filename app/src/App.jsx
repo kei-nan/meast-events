@@ -29,7 +29,7 @@ import { orderBrowseList } from "./lib/browseOrder";
 import { rankEvents } from "./lib/ranking";
 import { countEventsByStartYear } from "./lib/yearCounts";
 import { ShareLinkContext } from "./lib/shareLinkContext.js";
-import { canonicalPath, parseUrlState, shareLink } from "./lib/urlState";
+import { canonicalPath, mapViewToParam, parseMapView, parseUrlState, shareLink } from "./lib/urlState";
 import { MAX_YEAR, MIN_YEAR } from "./lib/years";
 import "./App.css";
 
@@ -81,8 +81,6 @@ function MapViewCrashed({ onMapStatus }) {
 // A failure here is ignored: importOr reports and retries it.
 import("./components/MapView").catch(() => {});
 const MapView = lazy(() => importOr(() => import("./components/MapView"), MapViewFailed));
-// Sea, then the land as soon as land.json is in (components/MapLoading.jsx).
-const MAP_PLACEHOLDER = <MapLoading />;
 // Opened from the footer or a link only, so its code loads on first use.
 const AboutData = lazy(() => importOr(() => import("./components/AboutData.jsx"), AboutDataFailed));
 
@@ -169,12 +167,30 @@ export default function App() {
   const [hoverId, setHoverId] = useState(null);
   // "What was this place?" ({lon, lat}, lib/placeParam.js), shown in the panel while no event is open.
   const [place, setPlace] = useState(initial.place);
+  // The map's camera ({lon, lat, zoom}, lib/urlState.js `m`) once it has been
+  // moved, for the link: a link that has one opens the map there (MapView
+  // initialView). It then wins over the flight an event or place link would
+  // otherwise make to its point: the view was shared as it was seen, event and all.
+  const [mapView, setMapView] = useState(initial.mapView);
+  // Sea, then the land as soon as land.json is in (components/MapLoading.jsx),
+  // in the view the map will open on. One element, so a re-render keeps it.
+  const mapPlaceholder = useMemo(() => <MapLoading view={initial.mapView} />, [initial]);
+  // Kept as the link writes it (rounded), so a move too small to change the link re-renders nothing.
+  const handleCameraChange = useCallback((next) => {
+    const param = mapViewToParam(next);
+    if (!param) return;
+    setMapView((prev) => (mapViewToParam(prev) === param ? prev : parseMapView(param)));
+  }, []);
   // {id, lon, lat, nonce}; a place link (no event) opens with the map on its point.
   const [focus, setFocus] = useState(() =>
-    initial.place && !initial.eventId ? { id: null, lon: initial.place.lon, lat: initial.place.lat, nonce: -1 } : null
+    initial.place && !initial.eventId && !initial.mapView
+      ? { id: null, lon: initial.place.lon, lat: initial.place.lat, nonce: -1 }
+      : null
   );
   const focusNonceRef = useRef(0);
-  const pendingFocusRef = useRef(initial.eventId); // deep link (or Back/Forward) awaiting its event
+  // A deep link (or Back/Forward) awaiting its event, to fly to it once loaded;
+  // not a link with its own camera (above).
+  const pendingFocusRef = useRef(initial.mapView ? null : initial.eventId);
   const selectedIdRef = useRef(initial.eventId); // for handleNavigate
   useEffect(() => {
     selectedIdRef.current = selectedEventId;
@@ -426,21 +442,33 @@ export default function App() {
     return { ...raw, extract: raw.snippet ?? "", leadStatus: lead === "error" ? "error" : "loading" };
   }, [selectedEventRaw, leads]);
 
-  // Map events: everything in the selected years, plus search matches outside
-  // them (scope "all"), plus the selected event. matchIds dims the rest.
-  const mapEvents = useMemo(() => {
-    const byId = new Map(visibleEvents.map((e) => [e.id, e]));
-    for (const e of scopedResults) if (!byId.has(e.id)) byId.set(e.id, e);
-    if (selectedEventRaw && !byId.has(selectedEventRaw.id)) byId.set(selectedEventRaw.id, selectedEventRaw);
-    return [...byId.values()];
-  }, [visibleEvents, scopedResults, selectedEventRaw]);
-
   // While the text is still being typed the map keeps its last dimming: each
   // keystroke would otherwise re-send every marker whose match changed to the
   // map's worker (over a thousand at 8,000 events). It updates once the text
   // settles (useEventSearch's debounce), and at once for filters or a cleared search.
+  // The matches it adds outside the years (mapEvents) wait for the same pause:
+  // otherwise each keystroke built a new mapEvents and re-rendered the whole
+  // map (MapView, its toolbar and key) for markers the next keystroke replaced.
   const lastMatchIdsRef = useRef(null);
   const typing = search.typing;
+  const lastMapResultsRef = useRef(scopedResults);
+  const mapResults = useMemo(
+    () => (typing ? lastMapResultsRef.current : scopedResults),
+    [typing, scopedResults]
+  );
+  useEffect(() => {
+    lastMapResultsRef.current = mapResults;
+  }, [mapResults]);
+
+  // Map events: everything in the selected years, plus search matches outside
+  // them (scope "all"), plus the selected event. matchIds dims the rest.
+  const mapEvents = useMemo(() => {
+    const byId = new Map(visibleEvents.map((e) => [e.id, e]));
+    for (const e of mapResults) if (!byId.has(e.id)) byId.set(e.id, e);
+    if (selectedEventRaw && !byId.has(selectedEventRaw.id)) byId.set(selectedEventRaw.id, selectedEventRaw);
+    return [...byId.values()];
+  }, [visibleEvents, mapResults, selectedEventRaw]);
+
   const matchIds = useMemo(() => {
     if (search.status === "idle") return null;
     if (typing) return lastMatchIdsRef.current;
@@ -504,7 +532,10 @@ export default function App() {
   // Back/forward: re-apply the parsed URL to every piece of state. Play pauses:
   // its next step would move the restored years and overwrite the entry. Area
   // drawing is disarmed (an armed mode would take the next map drag); "only in
-  // current map view" is not in the URL and stays as it is, like the map's view.
+  // current map view" is not in the URL and stays as it is. So does the map's
+  // view: an entry's `m` is not flown to (the map would jump on every Back), and
+  // the entry then gets the camera as it is (mapView is left as it is, so the
+  // write that follows is a debounced replace).
   const handleNavigate = useCallback((parsed) => {
     setPlayState((p) => (p === "playing" ? "paused" : p));
     setAreaMode("off");
@@ -526,7 +557,7 @@ export default function App() {
     setPlace(parsed.place);
   }, []);
 
-  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort, view, place };
+  const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort, view, place, mapView };
   const replaceNextUrl = useUrlState(urlState, handleNavigate);
 
   // Share links come from the state as it is now, not the address bar: URL
@@ -714,14 +745,14 @@ export default function App() {
               <span className="app-notice">Full-text search is unavailable - matching titles and summaries only</span>
             )}
           </div>
-          {/* The URL holds the view (years, filters, area), so this shares it as seen. While
+          {/* The URL holds the view (years, filters, area, the map's camera), so this shares it as seen. While
               an event is open its own Share (EventDetail) takes over, so there is only ever one. */}
           {!selectedEventRaw && <ShareButton title={SITE_TITLE} align="end" className="sp-btn app-share-btn" />}
         </header>
         <main className="app-body">
           {mapStarted ? (
             <ErrorBoundary fallback={<MapViewCrashed onMapStatus={handleMapStatus} />}>
-              <Suspense fallback={MAP_PLACEHOLDER}>
+              <Suspense fallback={mapPlaceholder}>
                 <MapView
                   events={mapEvents}
                   matchIds={matchIds}
@@ -748,11 +779,13 @@ export default function App() {
                   place={selectedEventId ? null : place}
                   onPlaceHistory={openPlace}
                   onMapStatus={handleMapStatus}
+                  initialView={initial.mapView}
+                  onCameraChange={handleCameraChange}
                 />
               </Suspense>
             </ErrorBoundary>
           ) : (
-            MAP_PLACEHOLDER
+            mapPlaceholder
           )}
           <SearchPanel
             ref={panelRef}

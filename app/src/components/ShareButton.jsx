@@ -86,8 +86,9 @@ const slug = (s) =>
 
 /**
  * "Share" for the current view: the app's link for it (ShareLinkContext, built
- * from the state as it is now - an open event's own page /event/<id>, else the
- * map link with the years, filters and area; lib/urlState.js shareLink), or the
+ * from the state as it is now - an open event's own page /event/<id>, else /,
+ * with the years, filters, area and, once the map has been moved, its camera
+ * (`m`), so the link opens on the map as it was seen; lib/urlState.js shareLink), or the
  * address bar without a provider. Opens a small panel:
  * the device's own share sheet where the browser offers one (phones, some
  * desktops), "Copy link", and a QR code that can be saved as a PNG. The QR is

@@ -10,6 +10,7 @@ import {
   mercatorX,
   mercatorY,
   openingPadding,
+  viewCamera,
 } from "./mapBase.js";
 import { FALLBACK_PLACES } from "./fallbackPoint.js";
 import { MAP_EXTENT } from "./mapExtent.js";
@@ -45,6 +46,22 @@ test("defaultCamera keeps the view inside MAP_EXTENT (MapLibre's maxBounds)", ()
     const cam = defaultCamera(w, h);
     const [left, bottom] = toScreen(cam, [minLon, minLat]);
     const [right, top] = toScreen(cam, [maxLon, maxLat]);
+    const eps = 1e-6;
+    assert.ok(left <= eps && right >= w - eps && top <= eps && bottom >= h - eps, `${w}x${h}`);
+  }
+});
+
+test("viewCamera puts a link's centre in the middle at its zoom, and keeps the view inside MAP_EXTENT", () => {
+  const cam = viewCamera(1060, 740, { lon: 35.5, lat: 32, zoom: 6 });
+  assert.equal(cam.zoom, 6);
+  const [x, y] = toScreen(cam, [35.5, 32]);
+  assert.ok(Math.abs(x - 530) < 1e-6 && Math.abs(y - 370) < 1e-6, `${x},${y}`);
+  // A centre at the extent's corner, zoomed out past it: shifted and zoomed in, as MapLibre's maxBounds does.
+  const [minLon, minLat, maxLon, maxLat] = MAP_EXTENT;
+  for (const [w, h] of SIZES) {
+    const c = viewCamera(w, h, { lon: minLon, lat: maxLat, zoom: 0 });
+    const [left, bottom] = toScreen(c, [minLon, minLat]);
+    const [right, top] = toScreen(c, [maxLon, maxLat]);
     const eps = 1e-6;
     assert.ok(left <= eps && right >= w - eps && top <= eps && bottom >= h - eps, `${w}x${h}`);
   }
