@@ -55,7 +55,8 @@ export function cellsInBounds(cells, size, [w, s, e, n]) {
 
 // Whether to fetch every cell in the background (so a zoom-in finds its coast drawn), or
 // only the ones in and around the view once zoomed in (MapView's onView): not when the
-// visitor has asked to save data, or the link looks slow. All cells are ~257 KB; on a
+// visitor has asked to save data, or the link looks slow. All 45 cells are ~220 KB
+// (~150 KB gzipped, measured 2026-11); on a
 // slow link that download runs for seconds after the map shows (measured 2026-10 on a
 // throttled phone, 1.6 Mbps/150 ms: until ~10 s, ~4.6 s past the map) and delays what a
 // click asks for next, an event's details or another decade's borders. The effective
@@ -65,11 +66,18 @@ export function cellsInBounds(cells, size, [w, s, e, n]) {
 // profile on a fast desktop link reported 100 ms, 1.45 Mbps). That estimate's downlink is why bandwidth only
 // counts below 1 Mbps: 1-2 Mbps is also what a fast link reports at first.
 // `connection` is navigator.connection (Network Information API, Chromium only): an
-// unknown field, or no API, keeps the fill on, as does a 0 (no estimate).
+// unknown field keeps the fill on, as does a 0 (no estimate).
+// Without the API (Safari, every iOS browser, Firefox) nothing is known about the
+// link. That case used to keep the fill on as well, so every iPhone and Firefox
+// phone downloaded all the cells, on cellular too, though a phone that never zooms
+// in past DETAIL_FETCH_ZOOM never shows one. Now the pointer stands in for the
+// link: `finePointer` (matchMedia "(pointer: fine)": a mouse or trackpad, i.e. a
+// desktop or laptop, usually on a fixed line) keeps the fill on; a touch screen
+// gets only the cells it zooms in to (MapView's onView), as a slow link does.
 export const SLOW_RTT_MS = 150;
 export const SLOW_DOWNLINK_MBPS = 1;
-export function wantsBackgroundDetail(connection) {
-  if (!connection) return true;
+export function wantsBackgroundDetail(connection, finePointer = false) {
+  if (!connection) return finePointer;
   if (connection.saveData) return false;
   if (/(^|-)[23]g$/.test(connection.effectiveType ?? "")) return false;
   const { downlink, rtt } = connection;

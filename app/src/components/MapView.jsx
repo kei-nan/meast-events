@@ -581,8 +581,9 @@ export default function MapView({
 
       // The Middle East's Natural Earth 1:10m coast, one cell at a time (lib/landStore.js,
       // scripts/build-land.js): first the cells in and around the view once zoomed in past
-      // DETAIL_FETCH_ZOOM, then - unless the visitor asked to save data or the link looks
-      // slow (wantsBackgroundDetail) - all the others in the background, nearest first, so
+      // DETAIL_FETCH_ZOOM, then - unless the visitor asked to save data, the link looks
+      // slow, or a browser without the link's estimate has a touch screen
+      // (wantsBackgroundDetail) - all the others in the background, nearest first, so
       // a zoom-in finds its coast already drawn. Only the cells land.json lists have a
       // file: an unlisted cell's light piece is already its exact 1:10m land, and stays.
       const DETAIL_FETCH_ZOOM = 5;
@@ -640,7 +641,8 @@ export default function MapView({
       let detailStarted = false;
       let fillStarted = false;
       const startFill = () => {
-        if (fillStarted || !landRef.current.near || !wantsBackgroundDetail(navigator.connection)) return;
+        const finePointer = window.matchMedia?.("(pointer: fine)").matches ?? false;
+        if (fillStarted || !landRef.current.near || !wantsBackgroundDetail(navigator.connection, finePointer)) return;
         fillStarted = true;
         backgroundFill();
       };
