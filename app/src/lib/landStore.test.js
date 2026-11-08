@@ -69,8 +69,16 @@ test("cellsInBounds: overlap on the grid, edges that only touch excluded", () =>
   assert.deepEqual(cellsInBounds(cells, 5, [0, 0, 10, 10]), []);
 });
 
+test("wantsBackgroundDetail: without the Network Information API, on only for a fine pointer", () => {
+  assert.equal(wantsBackgroundDetail(undefined, true), true); // desktop Safari/Firefox
+  assert.equal(wantsBackgroundDetail(undefined, false), false); // iPhone, Firefox on Android
+  assert.equal(wantsBackgroundDetail(undefined), false);
+  // With the API, the link decides, whatever the pointer.
+  assert.equal(wantsBackgroundDetail({ effectiveType: "4g", downlink: 10, rtt: 50 }, false), true);
+  assert.equal(wantsBackgroundDetail({ effectiveType: "3g" }, true), false);
+});
+
 test("wantsBackgroundDetail: off for save-data, 2G/3G or a slow link, on otherwise or when unknown", () => {
-  assert.equal(wantsBackgroundDetail(undefined), true);
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g" }), true);
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g", saveData: false, downlink: 10, rtt: 50 }), true);
   assert.equal(wantsBackgroundDetail({ effectiveType: "4g", saveData: true }), false);

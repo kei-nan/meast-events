@@ -246,9 +246,18 @@ export function loadAllLite() {
         source = { version, buckets };
         return normalizeEvents(list);
       });
-    allLitePromise = load(DATA_VERSION, FULL_BUCKETS).catch(() =>
-      fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache", timeoutMs: ALL_LITE_TIMEOUT_MS }).then(({ version, fullBuckets }) => load(version, fullBuckets))
-    );
+    // Only a missing folder (a 4xx, err.outage === false) is worth asking
+    // meta.json about, as for boundaries and full records. An outage (timeout,
+    // network failure, 5xx) is rethrown at once: falling back on it waited
+    // through a second and third timeout (~90 s) before "could not be loaded",
+    // and on a slow but working link downloaded all.json twice. Nor is the
+    // same folder fetched again when meta.json names it.
+    allLitePromise = load(DATA_VERSION, FULL_BUCKETS).catch(async (err) => {
+      if (err.outage !== false) throw err;
+      const meta = await fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache", timeoutMs: ALL_LITE_TIMEOUT_MS });
+      if (!meta?.version || meta.version === DATA_VERSION) throw err;
+      return load(meta.version, meta.fullBuckets);
+    });
     allLitePromise.catch(() => {
       allLitePromise = null;
     });
