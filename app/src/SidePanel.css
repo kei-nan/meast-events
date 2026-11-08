@@ -812,6 +812,34 @@ button.sp-chip[aria-pressed="true"] {
   margin: 0 0 8px;
 }
 
+/* "Not in this atlas" (KnownGapNote.jsx): a small note above the list, set off like
+   the event panel's notes, so it never reads as a result. */
+.sp-gap-note {
+  margin: 8px 0 0;
+  border-left: 2px solid var(--accent);
+  padding-left: 9px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.sp-gap-note p {
+  margin: 0 0 4px;
+}
+
+.sp-gap-note-name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.sp-gap-note a {
+  color: var(--link);
+}
+
+.sp-gap-note code {
+  font-size: 0.95em;
+}
+
 /* A search still running (ResultsList busy): the rows shown are real and can
    be opened, so they keep their full contrast (dimming them took the text
    below WCAG AA). A thin line in the gap above the list says it is running
@@ -1669,6 +1697,18 @@ button.sp-chip[aria-pressed="true"] {
 }
 
 .event-detail-attribution a {
+  font-size: inherit;
+}
+
+/* "Report a problem with this entry": the last line of "About this entry". */
+.event-detail-report {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.event-detail-report a {
   font-size: inherit;
 }
 

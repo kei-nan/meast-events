@@ -568,9 +568,10 @@ but are not shown; an event with any date flag still shows only the years in its
   the approximate treatment (hollow ring, "Approximate location" tag, left out of drawn-area searches, its countries shaded) with its own note: the marker
   is at the rounded coordinates the source gives, not at a capital. The validator warns about each (`coordinate_low_precision`).
 - `none`: no real location known. `coordinates: null`, `coordinate_source: null`. The event is listed and searchable but has no map marker and never matches an area/bbox query.
-  Discovered events never get a capital-fallback pin any more. As of 2026-10-10: 378 of the 816 curated events and 186 of the 254 proposed events
-  (counted from `data/events.json` and `data/events.proposed.json`). Since 2026-11-03 the proposed file holds only events not yet curated: 1 event,
-  without a location.
+  Discovered events never get a capital-fallback pin any more. How many events have no location changes with every merge, so this policy gives
+  no count: `data/missing-coordinates-report.md` (below) lists them (its curated table also has the capital fallbacks, each marked), with
+  the totals in its section headings, regenerated from
+  `data/events.json` and `data/events.proposed.json` and checked against them in CI. Since 2026-11-03 the proposed file holds only events not yet curated.
 - Validation (`scripts/lib/validate.js`): coordinates are required unless `location_quality` is `none` (then they must be `null`), and
   `coordinate_source` must match the quality: `precise` = `wikipedia` / `wikidata` / `manual-override` / `redirect_target`, `approximate` = `country-fallback:<tracked country>`,
   `none` = `null`. Coordinates outside a generous Middle East box (lat 10-44, lon 24-65) are only a warning, because a few events really happened
