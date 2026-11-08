@@ -28,6 +28,8 @@
 //     host reads;
 //   - every inline <script> in the HTML (index.html's "js" class script) has its
 //     sha256 hash in the CSP's script-src, or the browser would block it;
+//   - no page has an inline style (<style> or style="...") the CSP blocks
+//     (style-src 'self' has no 'unsafe-inline': styles go in stylesheets);
 //   - the icons index.html links are valid: favicon.ico an ICO, apple-touch-icon.png
 //     a 180x180 PNG (scripts/make-icons.mjs), each with a caching rule in _headers,
 //     and og-image.png a 1200x630 PNG (scripts/make-og-image.mjs);
@@ -61,6 +63,30 @@ export function inlineScripts(html) {
   }
   return out;
 }
+// Inline styles in an HTML page: each <style> element and each element with a
+// style="..." attribute (the tag, cut short), outside scripts and comments, so a
+// JSON-LD block or a comment that mentions one is not counted.
+export function inlineStyles(html) {
+  const markup = html.replace(/<script\b[\s\S]*?<\/script>/gi, "").replace(/<!--[\s\S]*?-->/g, "");
+  const elements = [...markup.matchAll(/<style\b[^>]*>/gi)].map((m) => m[0]);
+  const attributes = [...markup.matchAll(/<[a-z][^<>]*?\sstyle\s*=[^>]*>/gi)].map((m) => m[0].slice(0, 80));
+  return [...elements, ...attributes];
+}
+
+// The sources of one CSP directive, with the fallbacks browsers apply (CSP Level 3):
+// style-src-attr and style-src-elem fall back to style-src, which falls back to
+// default-src. null when none of them is set.
+export function cspSources(policy, directive) {
+  const directives = new Map();
+  for (const part of policy.replace(/^content-security-policy:\s*/i, "").split(";")) {
+    const [name, ...sources] = part.trim().split(/\s+/);
+    if (name && !directives.has(name.toLowerCase())) directives.set(name.toLowerCase(), sources);
+  }
+  const chain = { "style-src-attr": ["style-src-attr", "style-src"], "style-src-elem": ["style-src-elem", "style-src"] }[directive] ?? [directive];
+  for (const name of [...chain, "default-src"]) if (directives.has(name)) return directives.get(name);
+  return null;
+}
+
 export const scriptHash = (text) => `'sha256-${createHash("sha256").update(text, "utf8").digest("base64")}'`;
 
 // Width and height of a PNG (its IHDR chunk), or null.
@@ -340,6 +366,30 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   }
   for (const [hash, rel] of unlisted) fail(`${rel} has an inline script whose hash ${hash} is not in the CSP's script-src (public/_headers)`);
 
+  // 6c'. Inline styles against the CSP: with no 'unsafe-inline' for style
+  // attributes (style-src-attr, else style-src) or <style> elements
+  // (style-src-elem, else style-src), the browser ignores them and logs a
+  // violation, so a page would lose its styling. Put the rules in a stylesheet
+  // (the no-JavaScript ones: public/noscript.css, public/event/event.css).
+  // Styles set from JavaScript through el.style (React's style={}, MapLibre)
+  // are not governed by the CSP and do not show up here.
+  if (csp) {
+    const allows = (directive) => cspSources(csp, directive)?.includes("'unsafe-inline'") ?? true;
+    const attrOk = allows("style-src-attr");
+    const elemOk = allows("style-src-elem");
+    const blocked = new Map();
+    for (const [rel, page] of htmlPages) {
+      for (const style of inlineStyles(page)) {
+        const isElement = /^<style\b/i.test(style);
+        if ((isElement ? elemOk : attrOk) || blocked.has(rel)) continue;
+        blocked.set(rel, style);
+      }
+    }
+    for (const [rel, style] of blocked) {
+      fail(`${rel} has an inline style the CSP blocks (no 'unsafe-inline' for it in public/_headers): ${style}`);
+    }
+  }
+
   // 6d. Icons (scripts/make-icons.mjs), linked by index.html and every page.
   if (!existsSync(distFile("favicon.ico"))) fail("favicon.ico is missing (scripts/make-icons.mjs)");
   else for (const p of icoProblems(readFileSync(distFile("favicon.ico")))) fail(`favicon.ico ${p}`);
@@ -378,7 +428,7 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   const summary =
     `${dir}, ${meta.totalEvents} events, ${meta.fullBuckets} full-record buckets, ` +
     `${refs.length} index.html references, ${eventPages} event pages, search index present, 404.html, assets/ hashed, ${headerRules} header rules, ` +
-    `inline scripts in the CSP, icons, ${redirectCount} redirects, ${fileCount} files (limit ${maxFiles})`;
+    `inline scripts in the CSP, no blocked inline styles, icons, ${redirectCount} redirects, ${fileCount} files (limit ${maxFiles})`;
   return { problems, warnings, summary };
 }
 

@@ -7,7 +7,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkDist, scriptHash } from "./check-dist.mjs";
+import { checkDist, cspSources, inlineStyles, scriptHash } from "./check-dist.mjs";
 import { NO_JS_STYLESHEET, preloadTag } from "./event-page.mjs";
 import { topology } from "topojson-server";
 import { fullBucket } from "../src/lib/fullBucket.js";
@@ -238,6 +238,36 @@ test("an inline script whose hash the CSP does not list, or no CSP at all", asyn
   await assertProblem((f) => f.write("_headers", HEADERS(ENTRY, "X-Other: 1")), /the \/\* rule has no Content-Security-Policy/);
   // Data blocks (JSON-LD) and external scripts are not inline scripts.
   assert.deepEqual(await problemsAfter((f) => f.write("404.html", '<script type="application/ld+json">{}</script><script src="/a.js"></script>')), []);
+});
+
+test("an inline style the CSP blocks: a style attribute or a <style> element", async () => {
+  const strict = (styleSrc) => (f) => f.write("_headers", HEADERS(ENTRY, CSP(`; ${styleSrc}`)));
+  await assertProblem((f) => f.write("index.html", shell('<noscript><main style="color: red">x</main></noscript>')), /index\.html has an inline style the CSP blocks.*<main style="color: red">/);
+  await assertProblem((f) => f.write("404.html", "<style>p{}</style>"), /404\.html has an inline style the CSP blocks.*<style>/);
+  await assertProblem((f) => {
+    strict("style-src 'self'; style-src-attr 'unsafe-inline'")(f);
+    f.write("404.html", "<style>p{}</style>");
+  }, /404\.html has an inline style the CSP blocks/);
+  // Allowed where the CSP allows them: 'unsafe-inline' in style-src, or style-src-attr for attributes.
+  assert.deepEqual(await problemsAfter((f) => {
+    strict("style-src 'self' 'unsafe-inline'")(f);
+    f.write("404.html", '<style>p{}</style><p style="color: red">x</p>');
+  }), []);
+  assert.deepEqual(await problemsAfter((f) => {
+    strict("style-src 'self'; style-src-attr 'unsafe-inline'")(f);
+    f.write("404.html", '<p style="color: red">x</p>');
+  }), []);
+  // Text, comments and scripts that only mention one are not inline styles.
+  assert.deepEqual(await problemsAfter((f) => f.write("404.html", '<p>style="x" &lt;style&gt;</p><!-- <p style="x"> --><script type="application/ld+json">{"a":"<p style=1>"}</script>')), []);
+});
+
+test("cspSources: a directive's sources with the CSP Level 3 fallbacks", () => {
+  const policy = "Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; style-src-attr 'none'";
+  assert.deepEqual(cspSources(policy, "style-src-attr"), ["'none'"]);
+  assert.deepEqual(cspSources(policy, "style-src-elem"), ["'self'", "'unsafe-inline'"]);
+  assert.deepEqual(cspSources("default-src 'self'", "style-src-attr"), ["'self'"]);
+  assert.equal(cspSources("script-src 'self'", "style-src"), null);
+  assert.deepEqual(inlineStyles('<div style="a"></div><STYLE media="x">b</STYLE><span data-style="c"></span>'), ['<STYLE media="x">', '<div style="a">']);
 });
 
 test("icons: missing, not an ICO, a touch icon of the wrong size, or not linked", async () => {

@@ -1,0 +1,26 @@
+/* The home page's note for readers without JavaScript (index.html, the
+   <noscript> in its body). Linked inside <noscript> in index.html's <head>, so it
+   loads only without JavaScript and never touches the app; an event's page
+   replaces that link with its own (scripts/event-page.mjs NO_JS_STYLESHEET).
+   A stylesheet, not style="..." attributes: the CSP (public/_headers) allows
+   styles from same-origin files only, and scripts/check-dist.mjs fails the build
+   on an inline style it would block. Colours follow the app (src/index.css). */
+
+/* The app's CSS (App.css: html, body, #root at 100% height) would leave the
+   empty #root filling the first screen and push the note below it. */
+#root:empty {
+  display: none;
+}
+
+.noscript-note {
+  font-family: system-ui, sans-serif;
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #ece2c9;
+  background: #1d1a15;
+}
+
+.noscript-note a {
+  color: #7badb0;
+}
