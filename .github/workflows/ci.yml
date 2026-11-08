@@ -24,6 +24,15 @@ on:
 permissions:
   contents: read
 
+# One run per branch or pull request at a time. A new push to a pull request
+# cancels its run still in progress (only the newest commit's result matters
+# there); runs on main are never cancelled, so every commit on main gets a
+# complete run. github.ref keeps the groups apart: refs/pull/<n>/merge for a
+# pull request, refs/heads/<branch> for a push or workflow_dispatch.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     name: Build app/
@@ -95,7 +104,8 @@ jobs:
   data:
     name: Validate event data
     runs-on: ubuntu-latest
-    # Usually 2-4 minutes (the border checks).
+    # Usually 2-4 minutes (the border checks); under a minute on a pull request
+    # that leaves the border check's inputs alone (it is skipped, see below).
     timeout-minutes: 20
     steps:
       - name: Check out repository
@@ -103,6 +113,10 @@ jobs:
         with:
           # No step pushes or calls the API: keep the token out of .git/config.
           persist-credentials: false
+          # Full history and every branch (origin/<base>), for the border check's
+          # `git diff` against the pull request's base below. The whole
+          # repository is about 30 MB.
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -153,7 +167,38 @@ jobs:
       # further from the drawn border than in data/border-check-baseline.json, for a year
       # inside every border period (derived from the data). No network. Report:
       # docs/border-verification.md.
+      #
+      # It takes about 3 minutes, so a pull request that changes none of its inputs
+      # skips it; a push to main and a workflow_dispatch run always run it. The
+      # inputs: the script, scripts/lib/ (it imports boundary-checks.js and
+      # files.js; the whole folder, to be safe), the two app/src files
+      # boundary-checks.js imports, the three data files it reads, the turf version
+      # (package*.json), the Node version and this workflow. A new import or data
+      # file read by verify-borders.js must be added here. The pull request's
+      # checkout is GitHub's merge commit, so `origin/<base>...HEAD` is exactly
+      # the pull request's changes even if the base has moved on since. A failed
+      # diff (e.g. a missing ref) counts as changed. The base branch name reaches
+      # the shell only through an environment variable, never as workflow text.
+      - name: Did the border check's inputs change? (pull requests only)
+        id: border-inputs
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if git diff --quiet "origin/${BASE_REF}...HEAD" -- \
+              scripts/verify-borders.js scripts/lib/ \
+              app/src/components/mapBorders.js app/src/lib/boundaryText.js \
+              data/boundaries.json data/border-reference-points.json data/border-check-baseline.json \
+              package.json package-lock.json .nvmrc .github/workflows/ci.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No input of the border check changed against origin/${BASE_REF}: skipping it."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "An input of the border check changed against origin/${BASE_REF} (or the diff failed): running it."
+          fi
+
       - name: Border check against reference points
+        if: github.event_name != 'pull_request' || steps.border-inputs.outputs.changed != 'false'
         run: node scripts/verify-borders.js --check
 
   audit:

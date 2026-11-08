@@ -63,8 +63,8 @@ includeSubDomains`, `Cross-Origin-Opener-Policy: same-origin`,
 
 CSP (enforcing, not report-only): `default-src 'self'; script-src 'self'
 'sha256-qOhFsq0QMV2REqNwk5hGH5bZE9SkX6gt6yeyKdYPv+U='
-'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self'
-'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src
+'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self';
+font-src 'self'; img-src 'self' data: blob:; connect-src
 'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self';
 object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
 'none'`.
@@ -86,8 +86,34 @@ object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors
   violation in the console; add `blob:` back then. `img-src` keeps `blob:`
   (not re-tested; left as it was).
 
-- `style-src 'unsafe-inline'` is required by MapLibre and React inline
-  `style` attributes; scripts stay locked to same-origin files (no `eval`)
+- `style-src 'self'` without `'unsafe-inline'` (2026-11-08; it had
+  `'unsafe-inline'` before): styles come from same-origin stylesheets only.
+  The only inline styles were four `style="..."` attributes on the home
+  page's `<noscript>` note; they are now the class `noscript-note` in
+  `public/noscript.css`, linked inside `<noscript>` (so it loads only without
+  JavaScript, like an event page's `event.css`). React's `style={}` and
+  MapLibre set styles through the CSSOM (`el.style.x = ...`), which CSP does
+  not govern; a `style` attribute from markup, `setAttribute("style", ...)`
+  or an injected `<style>` would be blocked. Checked on the built `dist/`:
+  no HTML file (index, 815 event pages, `/event/`, 404) has a `style=`
+  attribute or a `<style>` element, and the bundles (app, React, MapLibre,
+  its worker, Pagefind) contain no `insertRule`, `CSSStyleSheet`,
+  `adoptedStyleSheets`, `cssText`, `setAttribute("style"` or
+  `createElement("style")`; React's `innerHTML` is only for
+  `dangerouslySetInnerHTML`, which the app does not use. Run under
+  `wrangler dev` (Playwright + Edge): the smoke test (map, search, an event,
+  About, `/event/<id>`, the failure states; it fails on any CSP violation)
+  passed, and with JavaScript off the home page, an event page, `/event/`
+  and the 404 page logged no CSP message and the note kept its look
+  (computed font, width, colours and link colour unchanged). Positive
+  control: putting a `style="..."` back on the note logs "Applying inline
+  style violates ... 'style-src 'self''" and the style is not applied.
+  `app/scripts/check-dist.mjs` fails the build if a page in `dist/` has an
+  inline style the CSP would block. Not checked: Cloudflare's injected Web
+  Analytics beacon on the live site (`wrangler dev` does not inject it); if
+  it ever adds inline styles, they show as `style-src` violations in the
+  console.
+- Scripts stay locked to same-origin files (no `eval`)
   plus one inline script allowed by its hash: index.html's
   `document.documentElement.classList.add("js")`, which hides an event page's
   plain-HTML copy before the first paint (added 2026-10-24, replacing

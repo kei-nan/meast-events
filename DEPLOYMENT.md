@@ -158,7 +158,8 @@ Cloudflare does not deploy it.
      `index.html` loads is missing, the search index is missing, **a file under
      `dist/assets/` has no content hash** (each gets an immutable rule in `_headers`),
      `_headers` has an immutable splat rule, was not expanded or has more than 100
-     rules, an inline `<script>` has a hash the CSP does not list, `favicon.ico` or the
+     rules, an inline `<script>` has a hash the CSP does not list, a page has an inline
+     style (`style="..."` or `<style>`) the CSP blocks, `favicon.ico` or the
      180x180 `apple-touch-icon.png` is missing or malformed, an event page does not
      preload its own (existing) bucket, `_redirects` redirects a live id or points to a
      missing one, the search index is not the one versioned folder `pagefind/meta.json` and
@@ -175,13 +176,16 @@ changing `favicon.svg`.
 `.github/workflows/ci.yml` runs on every push and pull request to `main`, and on a manual
 or dispatched run (`workflow_dispatch`: the monthly refresh starts it on its pull request's
 branch, [below](#ci-on-the-refresh-pull-request)). It deploys
-nothing. Its jobs (the names GitHub shows as status checks):
+nothing. A new push to a pull request cancels that pull request's run still in progress;
+runs on `main` are never cancelled. Its jobs (the names GitHub shows as status checks):
 
 - **Build app/** - lints `app/` (oxlint, `npm run lint`; warnings fail), runs its unit tests
   (`npm test`), checks that `.nvmrc` and `app/.nvmrc` agree, runs `npm run build`, i.e. the
   same build Cloudflare runs, with all the checks above, and then smoke-tests the built site
   (`npm run smoke`, `scripts/smoke.mjs`: it serves `dist/` under its production headers with
-  `wrangler dev` and checks in an installed Chrome or Edge that the map draws, search answers, an event and the
+  `wrangler dev`, checks the served cache headers (hashed files immutable, the 404 for a
+  missing hashed file not, `/event/<id>` revalidated, `.tbin` typed) and checks in an
+  installed Chrome or Edge that the map draws, search answers, an event and the
   About dialog open, `/event/<id>` loads, and nothing logs an error or a CSP violation;
   Cloudflare does not run it).
 - **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
@@ -192,7 +196,9 @@ nothing. Its jobs (the names GitHub shows as status checks):
   plugin, `.oxlintrc.json`; `import/named` is an error, and warnings fail too),
   validates `data/boundaries.json` (`npm run validate-boundaries`; it also fails if a shape
   has fewer vertices or coarser coordinates than in `data/border-geometry-baseline.json`)
-  and runs the border check (`node scripts/verify-borders.js --check`, every border period).
+  and runs the border check (`node scripts/verify-borders.js --check`, every border period;
+  about 3 minutes, so a pull request that changes none of its inputs skips it - the list is
+  in `ci.yml` - while pushes to `main` always run it).
 - **Dependency audit (.)** and **Dependency audit (app)** - `npm audit` of production
   dependencies (high and critical block) plus a report-only audit of everything.
 

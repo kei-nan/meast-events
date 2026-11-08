@@ -16,7 +16,10 @@
 // default 5183) set the two local ports.
 //
 // Checks, in order:
-//   1. the response carries the CSP from _headers (so the checks below run under it);
+//   1. the response carries the CSP from _headers (so the checks below run under it),
+//      and the cache and type headers come out as _headers intends (servedHeaderChecks:
+//      hashed files immutable, a missing hashed file's 404 not, /event/<id>
+//      revalidated, .tbin typed for compression);
 //   2. the map's canvas draws (MapLibre's own canvas, not the stand-in, and not blank);
 //   3. a full-text search finds an event by a word that is in no title or
 //      summary, so only Pagefind (its engine, WebAssembly and index) can answer;
@@ -35,6 +38,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright-core";
+import { IMMUTABLE } from "./expand-headers.mjs";
 
 const APP = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(APP, "dist");
@@ -477,6 +481,47 @@ async function layoutShiftCheck(browser) {
   }
 }
 
+// --- the served headers ----------------------------------------------------
+// What wrangler dev sends for dist/_headers (public/_headers as expand-headers.mjs
+// expanded it), checked on the responses rather than on the file: rules match
+// the requested path and are merged, so the file alone does not show the result.
+// The regression this guards: "/assets/* immutable" also marked the 404 for a
+// missing hashed file immutable, and a browser kept that 404 for a year
+// (DEPLOYMENT.md, scripts/expand-headers.mjs). So an existing hashed file must be
+// immutable (exactly, not comma-joined with the splat's value), and a missing one
+// must revalidate.
+async function servedHeaderChecks() {
+  const get = async (rel) => {
+    const res = await fetch(`${ORIGIN}${rel}`, { redirect: "manual" });
+    await res.arrayBuffer();
+    return { rel, status: res.status, cache: res.headers.get("cache-control") ?? "", type: res.headers.get("content-type") ?? "" };
+  };
+  const expect = (r, status, test, what) => {
+    if (r.status !== status || !test(r)) {
+      problems.push(`served headers: ${r.rel} should be HTTP ${status} with ${what}; got HTTP ${r.status}, Cache-Control "${r.cache}", Content-Type "${r.type}"`);
+    }
+  };
+  const immutable = (r) => r.cache === IMMUTABLE;
+  const revalidates = (r) => !r.cache.includes("immutable") && r.cache.includes("must-revalidate");
+  // The app's entry script, as index.html names it: a hashed file that exists.
+  const entry = readFileSync(path.join(DIST, "index.html"), "utf8").match(/<script type="module"[^>]* src="(\/assets\/[^"]+\.js)"/)?.[1];
+  if (!entry) throw new Error("dist/index.html names no /assets/*.js entry script");
+  const checks = [
+    [await get(entry), 200, immutable, `Cache-Control "${IMMUTABLE}"`],
+    [await get(`/data/events/${meta.dir}/all.json`), 200, immutable, `Cache-Control "${IMMUTABLE}"`],
+    // Missing hashed names (another build's): the 404 page, never cached as immutable.
+    [await get("/assets/nope-deadbeef.js"), 404, revalidates, "a Cache-Control that revalidates (no immutable)"],
+    [await get("/data/events/v.000000000000/all.json"), 404, revalidates, "a Cache-Control that revalidates (no immutable)"],
+    // Un-hashed HTML that names the deploy's hashed assets: revalidated on every visit.
+    [await get(`/event/${encodeURIComponent(pageEvent.id)}`), 200, (r) => r.cache === "public, max-age=0, must-revalidate", `Cache-Control "public, max-age=0, must-revalidate"`],
+    // Workers sends .tbin with no type of its own; _headers labels it so Cloudflare compresses it.
+    [await get("/data/land.tbin"), 200, (r) => r.type === "application/x-protobuf", `Content-Type "application/x-protobuf"`],
+  ];
+  const before = problems.length;
+  for (const [r, status, test, what] of checks) expect(r, status, test, what);
+  if (problems.length === before) ok(`served headers: hashed files immutable, missing hashed files revalidate, /event/<id> revalidates, .tbin typed (${checks.length} responses)`);
+}
+
 const server = startServer();
 let browser;
 let noWebGL;
@@ -486,6 +531,7 @@ try {
   const csp = home.headers.get("content-security-policy");
   if (!csp) throw new Error("/ has no Content-Security-Policy header: wrangler dev did not apply dist/_headers");
   ok(`wrangler dev serves dist/ with _headers applied (CSP ${csp.length} chars)`);
+  await servedHeaderChecks();
   browser = await chromium.launch({
     channel: CHANNEL,
     headless: true,

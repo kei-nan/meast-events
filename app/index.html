@@ -40,24 +40,28 @@
       content="Over 800 major Middle East events since 1900 on an interactive map and timeline, with Wikipedia’s summaries and the borders as they were at each date."
     />
     <meta name="twitter:image" content="https://middleeast.events/og-image.png" />
+    <!-- The no-JavaScript note's styles (public/noscript.css): a stylesheet, since
+         the CSP allows no inline style. Inside page-meta, so an event's page gets
+         its own no-JavaScript stylesheet (event.css) instead. -->
+    <noscript><link rel="stylesheet" href="/noscript.css" /></noscript>
     <!-- /page-meta -->
   </head>
   <body>
     <!-- page-body -->
     <div id="root"></div>
     <noscript>
-      <main style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #ece2c9; background: #1d1a15">
+      <main class="noscript-note">
         <h1>Middle East, 1900–present</h1>
         <p>
           An interactive map and timeline of major Middle East events since 1900, with historical
           borders. Event text comes from
-          <a href="https://www.wikipedia.org/" style="color: #7badb0">Wikipedia</a> and Wikidata; borders are
+          <a href="https://www.wikipedia.org/">Wikipedia</a> and Wikidata; borders are
           adapted from CShapes 2.0. It is a non-commercial project.
         </p>
         <p>
           The map needs JavaScript. Please enable it to explore events, browse
-          <a href="/event/" style="color: #7badb0">every event as a plain page</a>, or read the
-          <a href="https://github.com/kei-nan/meast-events" style="color: #7badb0">source and data documentation on GitHub</a>.
+          <a href="/event/">every event as a plain page</a>, or read the
+          <a href="https://github.com/kei-nan/meast-events">source and data documentation on GitHub</a>.
         </p>
       </main>
     </noscript>

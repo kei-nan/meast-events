@@ -18,6 +18,15 @@
 # script runs ('unsafe-inline' stays out). scripts/check-dist.mjs fails the build
 # if an inline script in dist/ has a hash this CSP does not list.
 #
+# Styles come from same-origin stylesheets only (style-src 'self', no
+# 'unsafe-inline'): no page has a <style> element or a style="..." attribute (the
+# no-JavaScript notes use public/noscript.css and public/event/event.css), and
+# scripts/check-dist.mjs fails the build if one appears. Styles set from
+# JavaScript through the CSSOM (el.style, as React's style={} and MapLibre do)
+# are not governed by style-src; setAttribute("style", ...), innerHTML with a
+# style attribute or an injected <style> would be blocked and logged as a
+# violation (the smoke test fails on one).
+#
 # --- every response ---------------------------------------------------------
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains
@@ -26,7 +35,7 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-qOhFsq0QMV2REqNwk5hGH5bZE9SkX6gt6yeyKdYPv+U=' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-qOhFsq0QMV2REqNwk5hGH5bZE9SkX6gt6yeyKdYPv+U=' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloudflareinsights.com; worker-src 'self'; child-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # --- caching ----------------------------------------------------------------
 # Content-hashed files are immutable, but NOT through a splat rule: rules match the
