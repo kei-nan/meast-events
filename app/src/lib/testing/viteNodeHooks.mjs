@@ -16,6 +16,8 @@
 //  - .jsx files are compiled with Vite's own transform (transformWithOxc,
 //    automatic React runtime), loaded only when the first .jsx is imported;
 //  - CSS imports ("./AboutData.css") are empty modules;
+//  - JSON imported without an import attribute ("../data/water.json", as Vite
+//    allows) is a module whose default export is the parsed data;
 //  - `data.aliases` ({ specifier: url }) replaces whole packages (e.g. react).
 //
 // Nothing in the app imports this file, so it never reaches the bundle.
@@ -92,6 +94,11 @@ export async function load(url, context, next) {
     let source = await compileJsx(await readFile(path, "utf8"), path);
     if (source.includes("import.meta.env")) source = ENV_PRELUDE + source;
     return { format: "module", source, shortCircuit: true };
+  }
+  // A .json imported the Vite way (no `with { type: "json" }`): its data as the default export.
+  if (url.startsWith("file:") && /\.json(\?.*)?$/.test(url) && context.importAttributes?.type !== "json") {
+    const text = await readFile(fileURLToPath(url.split("?")[0]), "utf8");
+    return { format: "module", source: `export default ${JSON.stringify(JSON.parse(text))};`, shortCircuit: true };
   }
   const result = await next(url, context);
   if (url.startsWith("file:") && /\/src\//.test(url) && result.format === "module") {
