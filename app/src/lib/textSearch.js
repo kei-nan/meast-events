@@ -118,12 +118,31 @@ async function load() {
 // unless Pagefind lost the chunk it is in. The engine is kept (it asks for a
 // failed chunk again on the next search); meta.json is read again before the
 // next try, as the folder may be gone.
+//
+// A word that once found something alone has its chunks loaded in that engine,
+// and Pagefind keeps a loaded chunk for the engine's life (only a failed load
+// is forgotten), so the word is not searched alone again: a settled query of
+// several words then costs one extra search per word new to this engine, not
+// per word. Kept per engine instance: a new engine (another folder, or a
+// failed engine load retried) has loaded nothing and checks every word again.
+const confirmedByEngine = new WeakMap();
+
 async function assertChunksLoaded(pf, terms) {
-  const answers = await Promise.all([...new Set(terms)].map((t) => pf.search(t)));
+  let confirmed = confirmedByEngine.get(pf);
+  if (!confirmed) confirmedByEngine.set(pf, (confirmed = new Set()));
+  const unchecked = [...new Set(terms)].filter((t) => !confirmed.has(t));
+  if (!unchecked.length) return false;
+  const answers = await Promise.all(unchecked.map((t) => pf.search(t)));
+  // Only a word that found something is confirmed; one that found nothing
+  // (null is no answer, not a lost chunk, as before) is checked again next time.
+  unchecked.forEach((t, i) => {
+    if (answers[i]?.results?.length > 0) confirmed.add(t);
+  });
   if (answers.some((a) => a?.results?.length === 0)) {
     dirPromise = null;
     throw new Error("Failed to load part of the search index");
   }
+  return true;
 }
 
 // Event ids matching every word of q (each word, stemmed, also as a prefix, so
@@ -143,13 +162,13 @@ export async function searchEventIds(q) {
   // chunks are loaded and the query runs on all of them. One word is checked
   // only if it found nothing, and then searched again: the check may have
   // loaded its chunk. Words each found, but never in one event, are a real
-  // "no match".
+  // "no match". A word already confirmed in this engine is not checked again
+  // (assertChunksLoaded), and one word already confirmed is not searched again.
   const terms = queryTerms(query);
   if (terms.length > 1) await assertChunksLoaded(pf, terms);
   let res = await pf.search(query);
   if (terms.length <= 1 && res?.results?.length === 0) {
-    await assertChunksLoaded(pf, terms);
-    res = await pf.search(query);
+    if (await assertChunksLoaded(pf, terms)) res = await pf.search(query);
   }
   const out = [];
   for (const r of res?.results ?? []) {
