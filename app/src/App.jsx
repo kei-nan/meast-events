@@ -3,7 +3,6 @@ import { AboutDataFailed } from "./components/LoadFailed.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { importOr } from "./lib/importOr.js";
 import { loadEventDetail } from "./lib/lazyChunks.js";
-import { mapUnavailableAfter } from "./lib/mapUnavailable.js";
 import MapLoading from "./components/MapLoading.jsx";
 import SearchPanel from "./components/SearchPanel.jsx";
 import ShareButton from "./components/ShareButton.jsx";
@@ -11,15 +10,10 @@ import Timeline from "./components/Timeline";
 import useAllEvents, { RETRY_MS } from "./hooks/useAllEvents";
 import useEventSearch from "./hooks/useEventSearch";
 import useUrlState from "./hooks/useUrlState";
-import {
-  eventOverlapsRange,
-  eventYearRange,
-  loadFullLead,
-  loadLand,
-  prefetchFullLead,
-} from "./lib/dataClient";
+import useMapStart from "./hooks/useMapStart";
+import useEventLead from "./hooks/useEventLead";
+import { eventOverlapsRange, eventYearRange, prefetchFullLead } from "./lib/dataClient";
 import { eventYearsText } from "./lib/eventYears";
-import { isFastConnection } from "./lib/landStore";
 import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, makeCircleArea, normalizeBounds } from "./lib/geo";
 import { roundPlace } from "./lib/placeParam.js";
@@ -83,63 +77,6 @@ import("./components/MapView").catch(() => {});
 const MapView = lazy(() => importOr(() => import("./components/MapView"), MapViewFailed));
 // Opened from the footer or a link only, so its code loads on first use.
 const AboutData = lazy(() => importOr(() => import("./components/AboutData.jsx"), AboutDataFailed));
-
-// What the map needs before its chunk arrives (land.json, for the land
-// MapLoading draws; the map chunk itself is lazy-loaded) starts downloading
-// right after the FIRST PAINT. Not before it: on a slow connection these
-// downloads would share bandwidth with index.js and delay the header, panel and
-// timeline (Lighthouse measured LCP 4.1 s -> 5.6 s with land and the borders
-// decade preloaded from index.html). The data loaders cache their requests, so
-// MapView reuses this one.
-function startMapDownloads() {
-  // The borders decade is not fetched ahead either: MapView requests it at
-  // mount. Fetched here (~95 KB: the decade file and the shared geometries it
-  // needs) it competed with the MapView chunk, and the first-visit map tip in
-  // that chunk is the phone's LCP: measured (2026-10, slow 4G 1.6 Mbps/150 ms,
-  // 4x CPU, median of 7) LCP 4.33 -> 3.85 s without it, with the map showing
-  // its borders no later and desktop unchanged.
-  //
-  // MapLibre's worker (self-contained since 6.13.0) is not preloaded: Chromium
-  // ignores <link rel=preload as=worker>, and modulepreload would parse it on
-  // the main thread. It downloads when the map starts it. A fetch() from here
-  // would fill the HTTP cache for the Worker (Chromium reuses it), but measured
-  // (2026-10) it took bandwidth from the panel's content on a slow phone
-  // connection (LCP 4.5 -> 5.2 s) to save ~0.25 s of map wait on desktop, and
-  // re-measured alongside the map chunk it delayed that chunk (LCP +0.73 s).
-  // The land MapLoading draws from land.json covers that wait instead.
-  loadLand().catch(() => {}); // MapView retries
-}
-
-// Calls fn once the browser reports the First Contentful Paint. "The next frame"
-// is not enough: while a web font loads, frames paint no text. Falls back to a
-// timer where paint timing is unsupported or never reported (e.g. a background
-// tab). Returns a cancel function.
-function afterFirstContentfulPaint(fn, fallbackMs = 3000) {
-  let done = false;
-  let observer = null;
-  let timer;
-  const run = () => {
-    if (done) return;
-    done = true;
-    observer?.disconnect();
-    clearTimeout(timer);
-    fn();
-  };
-  if (window.PerformanceObserver?.supportedEntryTypes?.includes("paint")) {
-    observer = new PerformanceObserver((list) => {
-      if (list.getEntriesByName("first-contentful-paint").length) setTimeout(run);
-    });
-    observer.observe({ type: "paint", buffered: true });
-  } else {
-    fallbackMs = 0;
-  }
-  timer = setTimeout(run, fallbackMs);
-  return () => {
-    done = true;
-    observer?.disconnect();
-    clearTimeout(timer);
-  };
-}
 
 const SITE_TITLE = "Middle East, 1900–present"; // as in index.html
 
@@ -245,27 +182,8 @@ export default function App() {
     if ((!active || active === document.body) && opener?.isConnected) opener.focus({ preventScroll: true });
   }, [about]);
 
-  // The map mounts (and its downloads start) after the first paint; see
-  // startMapDownloads. On a link known to be fast (lib/landStore.js
-  // isFastConnection) it starts at once instead of waiting for the First
-  // Contentful Paint (~0.2 s on desktop): measured (2026-10, local HTTP/2
-  // server, cold cache) the map completes ~0.09 s sooner on desktop (median of
-  // 5), and on a phone on a fast link (10 Mbps/50 ms, 3x CPU, median of 7) LCP
-  // 1.10 -> 1.00 s, with the first paint unchanged in both.
-  const [mapStarted, setMapStarted] = useState(false);
-  // No map (its code failed to load, or no WebGL 2): the panel's controls that
-  // act on it are disabled until a map reports "ready" (lib/mapUnavailable.js).
-  const [mapUnavailable, setMapUnavailable] = useState(false);
-  const handleMapStatus = useCallback((status) => setMapUnavailable(mapUnavailableAfter(status)), []);
-  useEffect(() => {
-    const start = () => {
-      startMapDownloads();
-      setMapStarted(true);
-    };
-    if (!isFastConnection(navigator.connection)) return afterFirstContentfulPaint(start);
-    start();
-    return undefined;
-  }, [initial]);
+  // When the map mounts (after the first paint), and whether it is unavailable (hooks/useMapStart.js).
+  const { mapStarted, mapUnavailable, handleMapStatus } = useMapStart();
   // An event link: the event's detail record, and the code of the view that
   // shows it (its own chunk, lib/lazyChunks.js), download alongside the event
   // list instead of after it.
@@ -400,47 +318,8 @@ export default function App() {
   const hoverEvent = hoverId ? (storeRef.current.get(hoverId) ?? null) : null;
   const highlightEvent = [hoverEvent, selectedEventRaw].find(needsCountryShading) ?? null;
 
-  // Full leads are fetched lazily, only for the opened event (never for lists);
-  // usually the request is already under way, started when its row or link was
-  // pointed at, focused or pressed (lib/warmEvent.js), and loadFullLead shares it.
-  // id -> {extract, extract_retrieved_at, framing_review} | "error"
-  const [leads, setLeads] = useState({});
-  const leadRequestedRef = useRef(new Set());
-  // Bumped by the event view's "Try again" after a failure, which runs the effect below again.
-  const [leadAttempt, setLeadAttempt] = useState(0);
-  const retryLead = useCallback(() => setLeadAttempt((n) => n + 1), []);
-  const needsLead =
-    Boolean(selectedEventRaw) &&
-    (selectedEventRaw.extract === undefined || selectedEventRaw.framing_review === undefined);
-  useEffect(() => {
-    if (!needsLead || leadRequestedRef.current.has(selectedEventId)) return;
-    const id = selectedEventId;
-    leadRequestedRef.current.add(id);
-    // A retry ("Try again", or re-opening after a failure) shows "loading" again, not the old error.
-    setLeads((m) => {
-      if (!(id in m)) return m;
-      const next = { ...m };
-      delete next[id];
-      return next;
-    });
-    const failed = () => {
-      leadRequestedRef.current.delete(id); // allow a retry
-      setLeads((m) => ({ ...m, [id]: "error" }));
-    };
-    loadFullLead(id)
-      .then((lead) => (lead ? setLeads((m) => ({ ...m, [id]: lead })) : failed()))
-      .catch(failed);
-  }, [needsLead, selectedEventId, leadAttempt]);
-
-  const selectedEvent = useMemo(() => {
-    const raw = selectedEventRaw;
-    if (!raw) return raw;
-    const lead = leads[raw.id];
-    const full = lead && lead !== "error" ? lead : null;
-    if (full) return { ...raw, ...full };
-    // Until the full lead arrives (or if it cannot be fetched) show the snippet, flagged as partial.
-    return { ...raw, extract: raw.snippet ?? "", leadStatus: lead === "error" ? "error" : "loading" };
-  }, [selectedEventRaw, leads]);
+  // The open event with its full lead, fetched lazily (hooks/useEventLead.js).
+  const { selectedEvent, retryLead } = useEventLead(selectedEventRaw, selectedEventId);
 
   // While the text is still being typed the map keeps its last dimming: each
   // keystroke would otherwise re-send every marker whose match changed to the

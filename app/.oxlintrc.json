@@ -41,8 +41,13 @@
     },
     {
       // Delegated keyboard handling: arrow keys between the result buttons, and
-      // Escape anywhere in the year editor or the event panel.
-      "files": ["src/components/ResultsList.jsx", "src/components/Timeline.jsx", "src/components/SearchPanel.jsx"],
+      // Escape anywhere in the year editor, the event panel or the Download choices.
+      "files": [
+        "src/components/ResultsList.jsx",
+        "src/components/Timeline.jsx",
+        "src/components/SearchPanel.jsx",
+        "src/components/ResultsDownload.jsx"
+      ],
       "rules": {
         "jsx-a11y/no-noninteractive-element-interactions": "off",
         "jsx-a11y/no-static-element-interactions": "off"
