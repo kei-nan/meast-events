@@ -1,9 +1,12 @@
 // Events without a Wikipedia article of their own (docs/DATA_POLICY.md, "Events without an article of
 // their own") whose title leads to the article of ANOTHER event on the map show that event's text
-// (docs/data-fixes.md F12). This keeps such a "mirror" in step with its "source" event: same text,
-// same framing review. The refresh never copies another item's lead into an event directly
-// (lib/title-refresh.js detectExtractHold); for a mirror it copies the source's stored text instead.
-// Pure.
+// (docs/data-fixes.md F12). This keeps such a "mirror" in step with its "source" event's text. The
+// refresh never copies another item's lead into an event directly (lib/title-refresh.js
+// detectExtractHold); for a mirror it copies the source's stored text instead. The framing review
+// is not copied by any script: no script writes the event reviews in data/framing-review.json
+// (a changed summary's review is redone in a review pass, docs/framing-review.md, which gives a
+// mirror its source's review word for word), and app/src/lib/framingReview.test.js fails
+// whenever a mirror with its source's text does not carry its source's review. Pure.
 
 import { setRevid } from "./revid.js";
 
@@ -40,14 +43,3 @@ export function syncMirrorTexts(events) {
   return changed;
 }
 
-/** Copies each source's framing review to its mirror (texts equal). Returns the mirrors' ids that changed. */
-export function syncMirrorReviews(events, reviews) {
-  const changed = [];
-  for (const { mirror, source } of mirrorPairs(events)) {
-    if (mirror.extract !== source.extract || !reviews[source.id]) continue;
-    if (JSON.stringify(reviews[mirror.id]) === JSON.stringify(reviews[source.id])) continue;
-    reviews[mirror.id] = structuredClone(reviews[source.id]);
-    changed.push(mirror.id);
-  }
-  return changed;
-}

@@ -137,7 +137,9 @@ const say = (s = "") => {
 const curated = await read(curatedUrl);
 const res = await refresh(curated, "curated", "curated");
 // An event without an article of its own that shows another event's article (its "source") follows that
-// event's text (lib/mirrors.js); its framing review is redone together with the source's.
+// event's text (lib/mirrors.js). Its framing review is not touched here: the refresh leaves both reviews stale,
+// the review pass that redoes the source's gives the mirror the same review, and app/src/lib/framingReview.test.js
+// fails if the two differ while their texts match.
 const mirrored = APPLY ? syncMirrorTexts(curated) : [];
 const propRes = PROPOSED ? { events: await read(proposedUrl) } : null;
 if (propRes) propRes.res = await refresh(propRes.events, "proposed", "proposed");
