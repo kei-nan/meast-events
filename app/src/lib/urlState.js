@@ -14,7 +14,8 @@
 //   sort=coverage-asc|date|date-desc (browse list order, lib/browseOrder.js; the
 //   default, most covered first, is omitted),
 //   view=timeline (the results panel's Timeline view; the default list is omitted),
-//   place=lon,lat ("What was this place?" is open for that point, lib/placeParam.js)
+//   place=lon,lat ("What was this place?" is open for that point, lib/placeParam.js),
+//   m=lon,lat,zoom (the map's camera: parseMapView; absent until the map is moved)
 //
 // Older links put the event in the query, /?e=<id>: still read (the path wins
 // if both are given), and rewritten to /event/<id> by the next URL write.
@@ -23,6 +24,7 @@ import { SORTS } from "./browseOrder.js";
 import { CATEGORY_LABELS } from "./categoryLabels.js";
 import { COUNTRY_SHAPES } from "./eventCountries.js";
 import { MAX_RADIUS_KM, makeCircleArea, makeRectArea } from "./geo.js";
+import { MAP_MAX_ZOOM, MAP_MIN_ZOOM } from "./mapBase.js";
 import { parsePlace, placeToParam } from "./placeParam.js";
 import { MAX_YEAR, MIN_YEAR } from "./years.js";
 
@@ -131,7 +133,7 @@ export function areaToParam(area) {
   return null;
 }
 
-// -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort, view, place}
+// -> {q, categories, countries, years:[s,e]|null, scope, area, eventId, about, sort, view, place, mapView}
 export function parseUrlState(search, pathname = "/") {
   const p = new URLSearchParams(search);
   let q = p.get("q") ?? "";
@@ -162,12 +164,13 @@ export function parseUrlState(search, pathname = "/") {
     sort: SORTS.includes(p.get("sort")) ? p.get("sort") : "coverage",
     view: p.get("view") === "timeline" ? "timeline" : "list",
     place: parsePlace(p.get("place")),
+    mapView: parseMapView(p.get("m")),
   };
 }
 
 const enc = (v) => encodeURIComponent(v).replace(/%2C/g, ",").replace(/%3A/g, ":");
 
-// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view, place}
+// state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view, place, mapView}
 // -> the query string: "" or "?a=b&..." (defaults omitted so the bare URL stays
 // clean). The event is not in it: it is the path (stateUrl).
 export function serializeUrlState(state) {
@@ -193,6 +196,8 @@ export function serializeUrlState(state) {
   if (state.view === "timeline") parts.push("view=timeline");
   const place = placeToParam(state.place);
   if (place) parts.push(`place=${place}`);
+  const m = mapViewToParam(state.mapView);
+  if (m) parts.push(`m=${m}`);
   return parts.length ? `?${parts.join("&")}` : "";
 }
 
@@ -232,6 +237,28 @@ export function urlWriteMode(prevUrl, nextUrl, { replace = false, backUrl = null
   if (replace) return "replace";
   if (typeof backUrl === "string" && samePush(parseUrl(backUrl), next)) return "back";
   return "push";
+}
+
+// The map's camera, m=lon,lat,zoom: where the map looks, so a shared link opens
+// on the view as it was seen. Validated like an area (plain decimals only, the
+// longitude and latitude in range, else dropped); the zoom is clamped to the
+// map's limits (lib/mapBase.js), not dropped. Written rounded: 4 decimals for
+// the centre (about 11 m), 2 for the zoom, enough to restore the view to within
+// a pixel or two at the zooms the map is used at, and short.
+export function parseMapView(raw) {
+  if (typeof raw !== "string") return null;
+  const v = nums(raw, 3);
+  if (!v) return null;
+  const [lon, lat, zoom] = v;
+  if (!validLon(lon) || !validLat(lat)) return null;
+  return { lon, lat, zoom: Math.min(Math.max(zoom, MAP_MIN_ZOOM), MAP_MAX_ZOOM) };
+}
+
+export function mapViewToParam(view) {
+  if (!view || ![view.lon, view.lat, view.zoom].every(Number.isFinite)) return null;
+  if (!validLon(view.lon) || !validLat(view.lat)) return null;
+  const zoom = Math.min(Math.max(view.zoom, MAP_MIN_ZOOM), MAP_MAX_ZOOM);
+  return `${round(view.lon)},${round(view.lat)},${String(Math.round(zoom * 100) / 100)}`;
 }
 
 // An area that survives its own link: what parseArea reads back from

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CATEGORY_COLORS } from "./mapLayers";
 import { NO_STATUS_LABEL, humaniseStatus, isDashedStatus, yearsLabel } from "./mapBorders";
 import { categoryLabel } from "../lib/categoryLabels";
@@ -238,7 +238,9 @@ function useClearOfSheet(ref, open) {
 // moving the map are in MapNav (bottom right), besides the wheel, pinch,
 // double-click and MapLibre's keyboard handler (+ / - and arrows with the map
 // focused).
-export function MapToolbar({
+// Memoized, like MapKey: MapView re-renders for things neither shows (a list
+// row hovered, a popup), and passes both the same props then.
+export const MapToolbar = memo(function MapToolbar({
   areaMode,
   hasArea,
   compact,
@@ -272,7 +274,7 @@ export function MapToolbar({
       </div>
     </div>
   );
-}
+});
 
 // A key panel's line icon (MapUi.css .mu-keys): an SVG path in a 20x20 box, so
 // every platform draws the same shape at the same weight.
@@ -408,7 +410,15 @@ export function BoundaryPopup({ popup, onClose, width, height, onPlaceHistory })
 // year (pressed), so the button says just "Borders" (a phone fits the two in
 // one row); its accessible name and the Borders tab still give the year.
 const KEY_TABS = ["legend", "borders"];
-export function MapKey({ year, shownYear, updating, eventYearShown, items, categories = null, yearBeside = false }) {
+export const MapKey = memo(function MapKey({
+  year,
+  shownYear,
+  updating,
+  eventYearShown,
+  items,
+  categories = null,
+  yearBeside = false,
+}) {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("legend"); // kept while the page is open
   const panelRef = useRef(null);
@@ -533,7 +543,7 @@ export function MapKey({ year, shownYear, updating, eventYearShown, items, categ
       )}
     </div>
   );
-}
+});
 
 // Alphabetical by label, like the search panel's category list (deliberate:
 // no category is put first). Labels are the shared ones (lib/categoryLabels.js).

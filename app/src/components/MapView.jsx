@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Map as MaplibreMap, prewarm, setWorkerUrl } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
@@ -53,7 +53,7 @@ import {
 } from "../lib/deferredBoundaries";
 import { MAP_EXTENT } from "../lib/mapExtent";
 import { cellsInBounds, createLandStore, wantsBackgroundDetail } from "../lib/landStore";
-import { SEA_COLOR, defaultBounds, openingPadding } from "../lib/mapBase";
+import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, SEA_COLOR, defaultBounds, openingPadding } from "../lib/mapBase";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years";
 import { reducedMotion } from "../lib/reducedMotion";
 import { isUnhandledEscape } from "../lib/escapeKey";
@@ -115,6 +115,11 @@ const HINT_AUTO_HIDE_MS = 8000;
 
 // Drag/tap hit tolerance around area handles, in CSS pixels.
 const HANDLE_HIT_PX = { mouse: 10, touch: 22, pen: 14 };
+// The area handle at `pt` ([x, y] in the map's pixels; lib/areaDrag.js), or null.
+const handleAt = (map, pt, pointerType) => {
+  const r = HANDLE_HIT_PX[pointerType] ?? HANDLE_HIT_PX.mouse;
+  return pickHandle(map.queryRenderedFeatures(handleBox(pt, r), { layers: ["area-handles"] }));
+};
 // A drag shorter than this (px) is treated as a stray click, not a drawn area.
 const MIN_DRAW_PX = 6;
 // How long "Search area: the map view" stays under the toolbar after Use map view.
@@ -152,7 +157,10 @@ async function withRetry(fn, onFirstFail) {
 
 const MAP_DESCRIPTION_ID = "map-description";
 
-export default function MapView({
+// Memoized (the export at the end): App re-renders on every keystroke in the
+// search box, and while the text is being typed its props to the map stay the
+// same (App.jsx mapEvents, matchIds), so the map skips those renders.
+function MapView({
   events,
   year: timelineYear,
   borderYear = null, // an opened event's year: shown instead of the timeline year (App.jsx)
@@ -177,6 +185,8 @@ export default function MapView({
   place = null, // {lon, lat} "What was this place?" describes: marked on the map (usePlaceMarker.js)
   onPlaceHistory, // ({lon, lat}): the border popup's "History of this place"
   onMapStatus, // ("ready"): the map has started (App.jsx; its stand-ins report "failed")
+  initialView = null, // {lon, lat, zoom}: the link's camera to open on (lib/urlState.js `m`); read at mount
+  onCameraChange, // ({lon, lat, zoom}): the camera after a move settles, for the link
 }) {
   const year = borderYear ?? timelineYear;
   const containerRef = useRef(null);
@@ -222,6 +232,7 @@ export default function MapView({
   const stackOpenerRef = useRef(null); // what had focus when the list opened
   const popupOpenerRef = useRef(null); // the same for the border details
   const hoverLabelRef = useRef(null);
+  const hoverRingRef = useRef(null); // (feature | null): the hover ring, set by the load handler
   const compact = useMediaQuery("(max-width: 768px)");
   const landFailedRef = useRef(false);
   // The land source draws both light files (lib/mapExtent.js NEAR_LAND_EXTENT) and,
@@ -304,16 +315,25 @@ export default function MapView({
   }, [fetchDecade, fetchLand]);
 
   useEffect(() => {
+    // A link's camera (its `m`, lib/urlState.js) opens the map where it was
+    // seen; without one, the tracked countries on a narrow (phone) map, the
+    // wider region otherwise, on phones above the lowered sheet (lib/mapBase.js
+    // openingPadding). MapLoading draws its stand-in in this same view
+    // (lib/mapBase.js viewCamera, defaultCamera).
+    const opening = initialView
+      ? { center: [initialView.lon, initialView.lat], zoom: initialView.zoom }
+      : {
+          bounds: defaultBounds(containerRef.current.clientWidth),
+          fitBoundsOptions: {
+            padding: openingPadding(containerRef.current.clientHeight, sheetCover(containerRef.current)),
+          },
+        };
     const map = new MaplibreMap({
       container: containerRef.current,
       style: BASE_STYLE,
-      // The tracked countries on a narrow (phone) map, the wider region
-      // otherwise; on phones above the lowered sheet (lib/mapBase.js openingPadding).
-      bounds: defaultBounds(containerRef.current.clientWidth),
-      // MapLoading draws its stand-in in this same view (lib/mapBase.js defaultCamera).
-      fitBoundsOptions: {
-        padding: openingPadding(containerRef.current.clientHeight, sheetCover(containerRef.current)),
-      },
+      ...opening,
+      minZoom: MAP_MIN_ZOOM,
+      maxZoom: MAP_MAX_ZOOM,
       // land.json is clipped to this extent (scripts/split-data.mjs), so panning
       // further would show a sea where land was dropped.
       maxBounds: [MAP_EXTENT.slice(0, 2), MAP_EXTENT.slice(2)],
@@ -381,16 +401,6 @@ export default function MapView({
         eventsRef.current.filter((e) => e.coordinates).map((e) => [e.id, eventSignature(e, matchIdsRef.current)])
       );
 
-      const pointerCursor = (on) => () => {
-        if (propsRef.current.areaMode === "off" && !draggingRef.current) {
-          map.getCanvas().style.cursor = on ? "pointer" : "";
-        }
-      };
-      for (const layer of ["clusters", "unclustered-point", "selected-point"]) {
-        map.on("mouseenter", layer, pointerCursor(true));
-        map.on("mouseleave", layer, pointerCursor(false));
-      }
-
       const clusterRadius = (count) => (count >= 15 ? 24 : count >= 5 ? 18 : 14);
       const ringFor = (f, extra) => ({
         type: "FeatureCollection",
@@ -402,19 +412,15 @@ export default function MapView({
           },
         ],
       });
-      // Hover state for clusters and dots: a gold ring around whatever is under the pointer.
+      // Hover state for clusters and dots: a gold ring around whatever is under
+      // the pointer, from the hover label's query (handleHover, below).
       let hoverKey = null;
-      const setHoverRing = (f) => {
+      hoverRingRef.current = (f) => {
         const key = f ? (f.properties.cluster_id ?? f.properties.id) : null;
         if (key === hoverKey) return;
         hoverKey = key;
         map.getSource("pointer-hover")?.setData(f ? ringFor(f, 5) : EMPTY_FC);
       };
-      map.on("mousemove", (e) => {
-        if (propsRef.current.areaMode !== "off" || draggingRef.current) return setHoverRing(null);
-        setHoverRing(map.queryRenderedFeatures(e.point, { layers: ["clusters", "unclustered-point"] })[0] ?? null);
-      });
-      map.getCanvas().addEventListener("mouseleave", () => setHoverRing(null));
 
       const clickable = () => propsRef.current.areaMode === "off" && !suppressClickRef.current;
 
@@ -844,12 +850,25 @@ export default function MapView({
 
   usePlaceMarker({ mapRef, mapReady, place });
 
+  // The hover label's one query per frame (useMapHoverLabel.js) also draws the
+  // ring and sets the cursor: "grab" on an area handle (a press there drags it,
+  // even over a marker: the pointer effect below), "pointer" on a marker.
+  // Neither is touched while drawing ("cell", applyInteractivity) or dragging.
+  const isIdle = () => propsRef.current.areaMode === "off" && !draggingRef.current;
+  const handleHover = ({ hits, point }) => {
+    hoverRingRef.current?.(hits.find((h) => h.layer.id !== "selected-point") ?? null);
+    const map = mapRef.current;
+    if (!point || !isIdle()) return;
+    const onHandle = propsRef.current.area && handleAt(map, [point.x, point.y], "mouse");
+    map.getCanvas().style.cursor = onHandle ? "grab" : hits.length ? "pointer" : "";
+  };
   useMapHoverLabel({
     mapRef,
     mapReady,
     labelRef: hoverLabelRef,
-    isIdle: () => propsRef.current.areaMode === "off" && !draggingRef.current,
+    isIdle,
     clusterMaxZoom: CLUSTER_MAX_ZOOM,
+    onHover: handleHover,
   });
 
   // The first-visit hint steps aside after a few seconds (for this visit only),
@@ -929,7 +948,10 @@ export default function MapView({
   // "Zoom to results": fit the view around the search/filter matches that
   // have coordinates. Only on request - never on each keystroke.
   const matchBounds = useMemo(() => (matchIds ? eventsBounds(events, matchIds) : null), [events, matchIds]);
-  const showMatches = () => {
+  // This and the toolbar's other callbacks are useCallback: MapToolbar (and
+  // MapKey) are memoized (MapUi.jsx), so a render of the map for something else -
+  // a list row hovered (hoverId), a popup - does not render them again.
+  const showMatches = useCallback(() => {
     const map = mapRef.current;
     if (!map || !matchBounds) return;
     const [w, s, e, n] = matchBounds.bbox;
@@ -945,13 +967,13 @@ export default function MapView({
         duration: reducedMotion() ? 0 : 700,
       }
     );
-  };
+  }, [matchBounds, compact]);
   // The × on the tip, and any use of the toolbar, retire it for good (the map
   // itself is covered by the auto-hide effect above).
-  const dismissHint = () => {
+  const dismissHint = useCallback(() => {
     setHintOpen(false);
     writeHintDismissed();
-  };
+  }, []);
 
   // Reports the settled viewport ([west, south, east, north]) after each
   // pan/zoom so the parent can count events in view (computed client-side
@@ -979,6 +1001,31 @@ export default function MapView({
       map.off("moveend", handleMoveEnd);
     };
   }, [mapReady, onViewportChange]);
+
+  // The camera, for the link (App.jsx, lib/urlState.js `m`): reported after
+  // each move settles, the same 200 ms after moveend as the viewport above (an
+  // arrow key held down, or a fling, ends many moves in a row); the URL write
+  // that follows is a debounced replace (hooks/useUrlState.js), never a history
+  // entry. Not reported for the opening view: a link nobody moved keeps no `m`,
+  // so it opens on the default view of the screen it is opened on.
+  useEffect(() => {
+    if (!mapReady || !onCameraChange) return;
+    const map = mapRef.current;
+    let timeoutId;
+    const report = () => {
+      const c = map.getCenter();
+      onCameraChange({ lon: c.lng, lat: c.lat, zoom: map.getZoom() });
+    };
+    const handleMoveEnd = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(report, 200);
+    };
+    map.on("moveend", handleMoveEnd);
+    return () => {
+      clearTimeout(timeoutId);
+      map.off("moveend", handleMoveEnd);
+    };
+  }, [mapReady, onCameraChange]);
 
   // The point sources' effects below re-run on every timeline step (`events`
   // changes) while the point itself rarely does, and every setData makes
@@ -1102,6 +1149,14 @@ export default function MapView({
     const el = map.getCanvasContainer();
     let drag = null;
     let aborted = null; // pointer id of a drag dropped by Escape, until its release
+    // A drag redraws the shape at most once per animation frame, for the latest
+    // move: each redraw is three setData calls (setAreaSources), each a new
+    // GeoJSON tile job in MapLibre's worker, and a pointer can report several
+    // moves per frame. `pending` is that latest move, `frame` its frame; the
+    // release applies a move still pending first (flushMove), so the committed
+    // shape is always where the pointer let go.
+    let frame = 0;
+    let pending = null;
 
     const locate = (ev) => {
       const r = el.getBoundingClientRect();
@@ -1110,13 +1165,28 @@ export default function MapView({
       return { pt, ll: [ll.lng, ll.lat] };
     };
 
-    // The area handle under the pointer (lib/areaDrag.js), or null.
-    const handleAt = (pt, pointerType) => {
-      const r = HANDLE_HIT_PX[pointerType] ?? HANDLE_HIT_PX.mouse;
-      return pickHandle(map.queryRenderedFeatures(handleBox(pt, r), { layers: ["area-handles"] }));
+    const applyMove = (ev) => {
+      const { pt, ll } = locate(ev);
+      if (!drag.moved) {
+        if (Math.hypot(pt[0] - drag.startPt[0], pt[1] - drag.startPt[1]) < MIN_DRAW_PX) return;
+        drag.moved = true;
+      }
+      drag.current = dragArea(drag, ll);
+      setAreaSources(drag.current, drag.kind !== "rect" && drag.kind !== "circle");
+    };
+    const dropMove = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      pending = null;
+    };
+    const flushMove = () => {
+      const ev = pending;
+      dropMove();
+      if (ev && drag) applyMove(ev);
     };
 
     const end = (commit) => {
+      dropMove();
       const d = drag;
       drag = null;
       draggingRef.current = false;
@@ -1144,7 +1214,7 @@ export default function MapView({
       const { pt, ll } = locate(ev);
       let kind = null;
       if (p.areaMode !== "off") kind = p.areaMode;
-      else if (p.area) kind = handleAt(pt, ev.pointerType);
+      else if (p.area) kind = handleAt(map, pt, ev.pointerType);
       if (!kind) return;
       drag = { kind, id: ev.pointerId, start: ll, startPt: pt, area0: p.area, moved: false, current: null };
       draggingRef.current = true;
@@ -1157,21 +1227,11 @@ export default function MapView({
       ev.preventDefault();
     };
 
+    // Hovering a handle (no drag) sets the "grab" cursor in handleHover, above.
     const onMove = (ev) => {
-      const { pt, ll } = locate(ev);
-      if (!drag) {
-        if (ev.pointerType === "mouse" && propsRef.current.areaMode === "off" && propsRef.current.area) {
-          map.getCanvas().style.cursor = handleAt(pt, "mouse") ? "grab" : "";
-        }
-        return;
-      }
-      if (ev.pointerId !== drag.id) return;
-      if (!drag.moved) {
-        if (Math.hypot(pt[0] - drag.startPt[0], pt[1] - drag.startPt[1]) < MIN_DRAW_PX) return;
-        drag.moved = true;
-      }
-      drag.current = dragArea(drag, ll);
-      setAreaSources(drag.current, drag.kind !== "rect" && drag.kind !== "circle");
+      if (!drag || ev.pointerId !== drag.id) return;
+      pending = ev;
+      if (!frame) frame = requestAnimationFrame(flushMove);
     };
 
     const releaseAborted = (ev) => {
@@ -1183,7 +1243,9 @@ export default function MapView({
     };
     const onUp = (ev) => {
       if (releaseAborted(ev)) return;
-      if (drag && ev.pointerId === drag.id) end(true);
+      if (!drag || ev.pointerId !== drag.id) return;
+      flushMove();
+      end(true);
     };
     const onCancel = (ev) => {
       if (releaseAborted(ev)) return;
@@ -1211,6 +1273,7 @@ export default function MapView({
     el.addEventListener("pointercancel", onCancel);
     window.addEventListener("keydown", onKey);
     return () => {
+      dropMove();
       abortDragRef.current = null;
       window.removeEventListener("keydown", onKey);
       el.removeEventListener("pointerdown", onDown);
@@ -1232,7 +1295,7 @@ export default function MapView({
     return () => clearTimeout(timer);
   }, [viewArea]);
   const viewAreaNote = viewArea != null && viewArea === area && areaMode === "off";
-  const areaFromView = () => {
+  const areaFromView = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
     const b = map.getBounds();
@@ -1240,7 +1303,8 @@ export default function MapView({
     onAreaChange?.(next);
     onAreaModeChange?.("off");
     setViewArea(next);
-  };
+  }, [onAreaChange, onAreaModeChange]);
+  const clearArea = useCallback(() => onAreaChange?.(null), [onAreaChange]);
 
   // Zoom buttons: one level, eased like the other camera moves (none with reduced motion).
   const zoomBy = (dir) => {
@@ -1262,7 +1326,10 @@ export default function MapView({
     if (hintOpen) dismissHint();
   };
 
-  const toggle = (mode) => onAreaModeChange?.(areaMode === mode ? "off" : mode);
+  const toggle = useCallback(
+    (mode) => onAreaModeChange?.(areaMode === mode ? "off" : mode),
+    [areaMode, onAreaModeChange]
+  );
   const hint =
     areaMode === "rect"
       ? "Drag on the map from one corner to the opposite corner, or choose Use map view under Draw area. Esc cancels."
@@ -1275,13 +1342,13 @@ export default function MapView({
   return (
     <div className="map-view" style={{ position: "relative" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
-      {!landDrawn && <MapLoading cover />}
+      {!landDrawn && <MapLoading cover view={initialView} />}
       <MapToolbar
         areaMode={areaMode}
         hasArea={!!area}
         compact={compact}
         onToggleMode={toggle}
-        onClearArea={() => onAreaChange?.(null)}
+        onClearArea={clearArea}
         onUseView={areaFromView}
         matchCount={matchBounds?.count ?? null}
         matchTotal={matchIds?.size ?? null}
@@ -1362,3 +1429,5 @@ export default function MapView({
     </div>
   );
 }
+
+export default memo(MapView);
