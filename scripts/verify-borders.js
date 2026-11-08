@@ -21,6 +21,7 @@ import { readFile } from "node:fs/promises";
 import { writeFileAtomic } from "./lib/files.js";
 import * as turf from "@turf/turf";
 import { baselineYears } from "./lib/boundary-checks.js";
+import { distanceToRingsKm } from "./lib/geo.js";
 
 const arg = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=")[1];
 const YEAR = Number(arg("year") ?? new Date().getUTCFullYear());
@@ -82,13 +83,6 @@ const read = async (p) => JSON.parse(await readFile(new URL(p, import.meta.url),
 // A shape we changed or added (not plain CShapes): the borders that most need checking.
 export const isModified = (f) => /Not in CShapes|Not a CShapes record|fitted|corrected per|its "West Bank" record/.test(f.properties.source ?? "");
 
-// Distance (km) from a point to a polygon's outline, for Polygon and MultiPolygon alike.
-function distanceToEdge(pt, feature) {
-  let best = Infinity;
-  for (const line of turf.flatten(turf.polygonToLine(feature)).features) best = Math.min(best, turf.pointToLineDistance(pt, line));
-  return best;
-}
-
 function segmentsNear(feature, area) {
   const out = [];
   for (const line of turf.flatten(turf.polygonToLine(feature)).features) {
@@ -112,7 +106,7 @@ function measureNear(p, area, near) {
   for (const a of near) {
     for (const seg of segmentsNear(a, area)) {
       const mid = turf.midpoint(...turf.getCoords(seg).map((c) => turf.point(c)));
-      const other = near.find((b) => b !== a && (turf.booleanPointInPolygon(mid, b) || distanceToEdge(mid, b) <= SHARED_KM));
+      const other = near.find((b) => b !== a && (turf.booleanPointInPolygon(mid, b) || distanceToRingsKm(turf, mid, b) <= SHARED_KM));
       if (!other) continue; // coastline or the edge of the mapped region
       const d = turf.pointToLineDistance(p, seg);
       if (!best || d < best.km) best = { km: d, a, b: other };

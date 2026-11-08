@@ -6,6 +6,7 @@ import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode, yearOf, yearsIn } from "./wiki.js";
 import { durativeWithoutEndFlag, leadStartDayFlag, lowPrecisionCoordinateFlag, presentWithoutEndFlag, titleYearsFlag } from "./flags.js";
 import { isRevid, isRevTimestamp } from "./revid.js";
+import { distanceToRingsKm } from "./geo.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
 // Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
@@ -123,17 +124,6 @@ export function indexBoundaries(boundaries, turf) {
     byName.get(p.name).push({ f, bbox: turf.bbox(f), from: p.start_year, to: p.end_year });
   }
   return { byName, turf };
-}
-
-// Shortest distance (km) from a point to a polygon feature's rings.
-function distanceToRingsKm(turf, pt, f) {
-  const g = f.geometry;
-  const polys = g.type === "MultiPolygon" ? g.coordinates : [g.coordinates];
-  let best = Infinity;
-  for (const rings of polys) {
-    for (const ring of rings) best = Math.min(best, turf.pointToLineDistance(pt, turf.lineString(ring), { units: "kilometers" }));
-  }
-  return best;
 }
 
 // CHECK ONLY (never used for the map's country shading or the displayed country tags): before 1920

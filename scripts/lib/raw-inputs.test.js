@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { checkRawInput, sha256, RAW_INPUT_SHA256, ALLOW_RAW_CHANGE_FLAG } from "./raw-inputs.js";
 
 const bytes = Buffer.from('{"type":"FeatureCollection","features":[]}');
@@ -29,7 +30,30 @@ test("checkRawInput: a file with no pinned hash fails, saying so", () => {
   assert.equal(checkRawInput("ne10-countries.geojson", bytes, { pins, allow: true }).ok, true);
 });
 
-test("RAW_INPUT_SHA256: both files the boundary ingest reads are pinned", () => {
-  assert.deepEqual(Object.keys(RAW_INPUT_SHA256).sort(), ["cshapes-2.0.geojson", "ne10-countries.geojson"]);
+test("RAW_INPUT_SHA256: every data/raw/ file the boundary ingest and the correction geometry read is pinned", () => {
+  assert.deepEqual(Object.keys(RAW_INPUT_SHA256).sort(), [
+    "cshapes-2.0.geojson",
+    "ne10-admin1.geojson",
+    "ne10-countries.geojson",
+    "ne10-minor-islands.geojson",
+    "oslo-agreement/OsloAgreement.dbf",
+    "oslo-agreement/OsloAgreement.shp",
+  ]);
   for (const h of Object.values(RAW_INPUT_SHA256)) assert.match(h, /^[0-9a-f]{64}$/);
+});
+
+test("the two scripts read data/raw/ only through the pinned check", () => {
+  for (const script of ["ingest-boundaries.js", "extract-correction-geometry.js"]) {
+    const src = readFileSync(new URL(`../${script}`, import.meta.url), "utf8");
+    // Every raw file named in code (not in comments: the download commands) goes through the check.
+    const code = src
+      .split("\n")
+      .filter((l) => !l.trim().startsWith("//"))
+      .join("\n");
+    const named = [...code.matchAll(/["'`]([\w./-]+\.(?:geojson|shp|dbf))["'`]/g)].map((m) => m[1]);
+    assert.ok(named.length > 0, `${script} names its raw files`);
+    for (const n of named) assert.ok(Object.hasOwn(RAW_INPUT_SHA256, n), `${script}: ${n} is pinned`);
+    // A literal path into data/raw/ (the helpers build theirs from a checked name: `${name}`).
+    assert.doesNotMatch(code, /new URL\(["'`]\.\.\/data\/raw\/[^"'`$]+["'`]/, `${script} opens no data/raw/ file directly`);
+  }
 });

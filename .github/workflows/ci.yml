@@ -191,8 +191,9 @@ jobs:
       # It takes about 3 minutes, so a pull request that changes none of its inputs
       # skips it; a push to main and a workflow_dispatch run always run it. The
       # inputs: the script, scripts/lib/ (it imports boundary-checks.js and
-      # files.js; the whole folder, to be safe), the two app/src files
-      # boundary-checks.js imports, the three data files it reads, the turf version
+      # files.js and geo.js; the whole folder, to be safe), the app/src files
+      # those import (mapBorders.js and boundaryText.js from boundary-checks.js,
+      # lib/geo.js from geo.js), the three data files it reads, the turf version
       # (package*.json), the Node version and this workflow. A new import or data
       # file read by verify-borders.js must be added here. The pull request's
       # checkout is GitHub's merge commit, so `origin/<base>...HEAD` is exactly
@@ -207,7 +208,7 @@ jobs:
         run: |
           if git diff --quiet "origin/${BASE_REF}...HEAD" -- \
               scripts/verify-borders.js scripts/lib/ \
-              app/src/components/mapBorders.js app/src/lib/boundaryText.js \
+              app/src/components/mapBorders.js app/src/lib/boundaryText.js app/src/lib/geo.js \
               data/boundaries.json data/border-reference-points.json data/border-check-baseline.json \
               package.json package-lock.json .nvmrc .github/workflows/ci.yml; then
             echo "changed=false" >> "$GITHUB_OUTPUT"

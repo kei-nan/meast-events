@@ -68,6 +68,20 @@ import { dropRepeatedPositions } from "./lib/ring-positions.js";
 import { roundRingWithoutCrossings } from "./lib/ring-repair.js";
 import * as turf from "@turf/turf";
 import * as shapefile from "shapefile";
+import { requireRawInput } from "./lib/raw-inputs.js";
+
+// The data/raw/ inputs above, each checked against its pinned sha256 (scripts/lib/raw-inputs.js)
+// before use: a different download would silently change data/corrections-geometry.json.
+// --allow-raw-change goes on with a warning, for a deliberate upgrade of a source.
+const rawUrl = (name) => new URL(`../data/raw/${name}`, import.meta.url);
+async function rawJson(name) {
+  return JSON.parse(requireRawInput(name, await readFile(rawUrl(name))).toString("utf-8"));
+}
+// The shapefile reader opens its files by path; their bytes are checked first.
+async function rawPath(name) {
+  requireRawInput(name, await readFile(rawUrl(name)));
+  return rawUrl(name).pathname.slice(1);
+}
 
 const dms = (deg, min, sec = 0) => deg + min / 60 + sec / 3600;
 
@@ -270,9 +284,9 @@ function reportNeutralZoneChecks({ saudiIraqi, saudiKuwaiti, arc, radiusKm, land
 }
 
 async function main() {
-  const cshapes = JSON.parse(await readFile(new URL("../data/raw/cshapes-2.0.geojson", import.meta.url), "utf-8"));
-  const ne10 = JSON.parse(await readFile(new URL("../data/raw/ne10-countries.geojson", import.meta.url), "utf-8"));
-  const ne10admin1 = JSON.parse(await readFile(new URL("../data/raw/ne10-admin1.geojson", import.meta.url), "utf-8"));
+  const cshapes = await rawJson("cshapes-2.0.geojson");
+  const ne10 = await rawJson("ne10-countries.geojson");
+  const ne10admin1 = await rawJson("ne10-admin1.geojson");
 
   // Turkey's current CShapes geometry (single 1923-9999 record) already includes Hatay,
   // correctly, for the post-1939 period - we only need to subtract Hatay to get the
@@ -308,8 +322,8 @@ async function main() {
   // (Area A is 15-16 large blocks around the cities, Area B is ~210 small village
   // enclaves), and the resulting area percentages, which match the published figures.
   const oslo = await shapefile.read(
-    new URL("../data/raw/oslo-agreement/OsloAgreement.shp", import.meta.url).pathname.slice(1),
-    new URL("../data/raw/oslo-agreement/OsloAgreement.dbf", import.meta.url).pathname.slice(1)
+    await rawPath("oslo-agreement/OsloAgreement.shp"),
+    await rawPath("oslo-agreement/OsloAgreement.dbf")
   );
   const osloByClass = (cls) => oslo.features.filter((f) => f.properties.CLASS === cls);
   const osloOne = (cls) => {
@@ -423,7 +437,7 @@ async function main() {
   // UAE). Natural Earth 10m "minor islands" (public domain), picked by the point on each
   // island. Lesser Tunb (~2 km2) is not in any Natural Earth layer, so it is not drawn.
   //      curl -sL https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_minor_islands.geojson -o data/raw/ne10-minor-islands.geojson
-  const minorIslands = JSON.parse(await readFile(new URL("../data/raw/ne10-minor-islands.geojson", import.meta.url), "utf-8"));
+  const minorIslands = await rawJson("ne10-minor-islands.geojson");
   const islandPolygon = (label, point) => {
     for (const f of minorIslands.features) {
       const polys = f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates;
