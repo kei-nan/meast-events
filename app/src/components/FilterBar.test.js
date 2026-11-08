@@ -47,21 +47,42 @@ test("FilterBar: pressing a chip adds the category, pressing it again removes it
   ]);
 });
 
-test("FilterBar: the country select offers every country under its display label, with its note", () => {
-  const { v, changes } = render({ filters: { ...FILTERS, countries: ["Iraq"] } });
-  const select = elements(v.html, "select")[0];
-  assert.equal(select.attrs["aria-describedby"], "sp-country-note");
-  const options = elements(select.html, "option").map((o) => [o.attrs.value, o.text, "selected" in o.attrs]);
+test("FilterBar: with no country chosen, the select offers every country under its display label, with its note", () => {
+  const { v, changes } = render();
+  const fieldset = elements(v.html, "fieldset").find((f) => /<legend>Country<\/legend>/.test(f.html));
+  assert.equal(fieldset.attrs["aria-describedby"], "sp-country-note");
+  assert.match(v.html, /<span>Add a country<\/span>/);
+  const options = elements(elements(v.html, "select")[0].html, "option").map((o) => [o.attrs.value, o.text]);
   assert.deepEqual(options, [
-    ["", "All countries", false],
-    ["Iraq", "Iraq", true],
-    ["regional", "Region-wide", false],
+    ["", "All countries"],
+    ["Iraq", "Iraq"],
+    ["regional", "Region-wide"],
   ]);
   assert.match(v.html, /id="sp-country-note"[^>]*>Countries are where Wikidata places an event/);
+  assert.match(v.html, /With several chosen, an event in any of them is listed\./);
   const onChange = v.find((e) => e.type === "select")[0].props.onChange;
   onChange({ target: { value: "regional" } });
+  // the placeholder adds nothing
   onChange({ target: { value: "" } });
-  assert.deepEqual(changes.map((f) => f.countries), [["regional"], []]);
+  assert.deepEqual(changes.map((f) => f.countries), [["regional"]]);
+});
+
+test("FilterBar: a chosen country is a removable tag, the select offers only the others and adds to the list", () => {
+  const { v, changes } = render({ filters: { ...FILTERS, countries: ["Iraq"] } });
+  const removes = elements(v.html, "button").filter((b) => /\bsp-chip-x\b/.test(b.attrs.class));
+  assert.deepEqual(
+    removes.map((b) => b.attrs["aria-label"]),
+    ["Remove country: Iraq"]
+  );
+  assert.match(v.html, /<span>Add another<\/span>/);
+  const options = elements(elements(v.html, "select")[0].html, "option").map((o) => [o.attrs.value, o.text]);
+  assert.deepEqual(options, [
+    ["", "Choose…"],
+    ["regional", "Region-wide"],
+  ]);
+  v.find((e) => e.type === "select")[0].props.onChange({ target: { value: "regional" } });
+  v.find((e) => e.type === "button" && e.props["aria-label"] === "Remove country: Iraq")[0].props.onClick();
+  assert.deepEqual(changes.map((f) => f.countries), [["Iraq", "regional"], []]);
 });
 
 test("FilterBar: no country select without countries; the scope toggle only when asked for", () => {
