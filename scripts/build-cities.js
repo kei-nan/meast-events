@@ -41,7 +41,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { fetchEntities } from "./lib/wd-entities.js";
-import { politeFetch, mediaWikiJson, sleep } from "./lib/http.js";
+import { mediaWikiFetch, sleep } from "./lib/http.js";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
 
 const COUNTRIES = new Set(["TUR", "IRN", "IRQ", "SYR", "LBN", "JOR", "ISR", "PSX", "EGY", "SAU", "YEM", "KWT", "BHR", "QAT", "ARE", "OMN"]);
@@ -166,7 +166,7 @@ const displayName = (t) => t.replace(/ \([^)]*\)$/, "").replace(/, [^,]+$/, "");
 const articles = new Map();
 for (const article of new Set(Object.values(RENAMES).flatMap((r) => r.cite.map((c) => c.article)))) {
   const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&prop=extracts|revisions&rvprop=ids&explaintext=1&titles=${encodeURIComponent(article)}`;
-  const page = (await mediaWikiJson(await politeFetch(url), "extracts")).query.pages[0];
+  const page = (await mediaWikiFetch(url, "extracts")).query.pages[0];
   if (page.missing || !page.extract) problems.push(`${article}: no English Wikipedia article`);
   articles.set(article, { text: (page.extract ?? "").replace(/\s+/g, " "), revid: page.revisions?.[0]?.revid ?? null });
   await sleep(300);

@@ -1,5 +1,5 @@
 // Wikipedia / Wikidata fetch helpers (read-only; this pipeline never writes to either).
-import { politeFetch, mediaWikiJson } from "./http.js";
+import { politeFetch, mediaWikiFetch } from "./http.js";
 import { wikidataDate } from "./wd-entities.js";
 
 const PRECISION_NAMES = {
@@ -83,10 +83,10 @@ export async function fetchCategories(title) {
   const url =
     "https://en.wikipedia.org/w/api.php?action=query&prop=categories&cllimit=max&clshow=!hidden" +
     `&redirects=1&format=json&formatversion=2&titles=${encodeURIComponent(title)}`;
-  const res = await politeFetch(url);
-  if (!res.ok) return null;
-  // An API error (HTTP 200 with an `error` body) throws rather than reading as "no categories".
-  const data = await mediaWikiJson(res, "categories");
+  // An API error (HTTP 200 with an `error` body) throws rather than reading as "no categories"; a 404 is null
+  // (politeFetch throws on any other HTTP error).
+  const data = await mediaWikiFetch(url, "categories", { allow404: true });
+  if (data === null) return null;
   const page = data.query?.pages?.[0];
   return (page?.categories ?? []).map((c) => c.title.replace(/^Category:/, ""));
 }
@@ -102,7 +102,7 @@ export async function fetchLabels(qids) {
       "https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels&languages=en&format=json&ids=" +
       chunk.join("|");
     // An HTTP error or an API error (HTTP 200 with an `error` body, no entities) throws.
-    const data = await mediaWikiJson(await politeFetch(url), "labels");
+    const data = await mediaWikiFetch(url, "labels");
     for (const [q, ent] of Object.entries(data.entities ?? {})) out[q] = ent.labels?.en?.value ?? null;
   }
   return out;

@@ -5,6 +5,8 @@
 import { COUNTRIES, QID_TO_COUNTRY, ALL_COUNTRY_QIDS } from "./event-classes.js";
 // Plain module (no imports of its own), shared with the app: country -> border-shape names per year.
 import { shapeNamesFor } from "../../app/src/lib/eventCountries.js";
+// The timeline's first year (inclusion rule 3), as scripts/lib/validate.js uses it.
+import { MIN_YEAR } from "../../app/src/lib/years.js";
 
 // The predecessor states of the tracked countries: every entity X with "X replaced by (P1366) <tracked>" or
 // "<tracked> replaces (P1365) X". A tracked QID is never its own predecessor (Mandatory Palestine, Q193714, is one
@@ -41,7 +43,7 @@ SELECT DISTINCT ?item WHERE {
   VALUES ?pred { ${predQids.map((q) => `wd:${q}`).join(" ")} }
   ?item wdt:P17 ?pred .
   { ?item wdt:P585 ?date } UNION { ?item wdt:P580 ?date }
-  FILTER(YEAR(?date) >= 1900)
+  FILTER(YEAR(?date) >= ${MIN_YEAR})
 }`;
 }
 

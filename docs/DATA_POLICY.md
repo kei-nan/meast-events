@@ -750,7 +750,9 @@ Cached entries do not expire by default; `--fresh` ignores the whole cache for a
 older than that (units s, m, h, d; `scripts/lib/cache.js`). One exception: a Wikipedia page the lead fetch finds missing is not cached, and a
 "missing" left in the cache by an earlier version is asked again (`scripts/lib/lead.js`), so a page missing once is not read as missing on every later run
 (the pipeline would otherwise keep the REST summary's extract for it for good). A Wikipedia/Wikidata API error (which that API returns as HTTP 200 with an `error` body)
-fails the request like an HTTP error and is never cached (`mediaWikiJson` in `scripts/lib/http.js`). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
+fails the request like an HTTP error and is never cached (`mediaWikiJson` in `scripts/lib/http.js`); a transient one (`ratelimited`, `maxlag`, `readonly`,
+`internal_api_error_*`) is first retried up to 3 times, waiting as its Retry-After header (or a `maxlag` error's `lag`) says, at most 60 s
+(`mediaWikiFetch`). Every Action API request sends `maxlag=5`, so the API turns it away while its database replicas lag (not the REST API or WDQS). Every request times out after 60 s (WDQS queries 90 s, past the service's own 60 s limit) and
 is then retried like a dropped connection.
 
 Pipeline output never touches `data/events.json`. Only these scripts write it, each only with `--apply`: `merge-proposed.js --apply` run by a person;

@@ -11,7 +11,8 @@
 // instead, and is carried through to every output feature's `source`/`status`/`note`
 // properties, so the generated file is self-documenting about what came from where.
 import { readFileSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { CORRECTIONS, CSHAPES_CITATION } from "./boundary-corrections.js";
 import * as turf from "@turf/turf";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
@@ -306,7 +307,7 @@ async function main() {
     features: fitted,
   };
 
-  await writeFile(outPath, stringifyFeatureCollection(out));
+  await writeFileAtomic(outPath, stringifyFeatureCollection(out));
   console.log(`Wrote ${fitted.length} boundary features to ${argVal("out") ?? "data/boundaries.json"}`);
 
   const modified = fitted.filter((f) => f.properties.note);

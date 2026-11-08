@@ -6,7 +6,7 @@
 // without network access and a reader can look up every point by its QID.
 //
 //   node scripts/fetch-border-references.js   -> data/border-reference-points.json
-import { writeFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { runSparql, qidFromUri } from "./lib/wdqs.js";
 
 // The map's countries (checked: each QID's English label is the country). Looking items up
@@ -61,5 +61,5 @@ const out = {
   source: "Wikidata (CC0), via query.wikidata.org; query in scripts/fetch-border-references.js",
   points,
 };
-await writeFile(new URL("../data/border-reference-points.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");
+await writeFileAtomic(new URL("../data/border-reference-points.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");
 console.log(`Wrote ${points.length} reference points to data/border-reference-points.json`);

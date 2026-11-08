@@ -3,7 +3,7 @@
 // coordinates (P625), sitelinks (all projects / Wikipedia editions only), English aliases
 // (only when "aliases" is among the requested props), and whether the end time (P582) is given as
 // "no value" / "unknown value" instead of a date (p582_open).
-import { politeFetch, sleep, mediaWikiJson } from "./http.js";
+import { sleep, mediaWikiFetch } from "./http.js";
 
 const API = "https://www.wikidata.org/w/api.php";
 const BATCH = 40;
@@ -108,8 +108,9 @@ export async function fetchEntities(
   for (let i = 0; i < todo.length; i += BATCH) {
     const chunk = todo.slice(i, i + BATCH);
     const url = `${API}?action=wbgetentities&format=json&languages=en&props=${props}&ids=${chunk.join("|")}`;
-    // An API error (HTTP 200 with an `error` body) throws: never read as "every item missing" and cached as null.
-    const data = await mediaWikiJson(await politeFetch(url), "wbgetentities");
+    // An API error (HTTP 200 with an `error` body) throws once its retries (if transient) are spent: never read as
+    // "every item missing" and cached as null.
+    const data = await mediaWikiFetch(url, "wbgetentities");
     const byId = new Map();
     for (const [k, ent] of Object.entries(data.entities ?? {})) {
       byId.set(k, ent);
@@ -139,8 +140,8 @@ export async function fetchLabelsCached(qids, { cache = null, delayMs = 300 } = 
   }
   for (let i = 0; i < todo.length; i += 50) {
     const chunk = todo.slice(i, i + 50);
-    const res = await politeFetch(`${API}?action=wbgetentities&props=labels&languages=en&format=json&ids=${chunk.join("|")}`);
-    const data = await mediaWikiJson(res, "labels"); // an API error throws (never cached as a null label)
+    const url = `${API}?action=wbgetentities&props=labels&languages=en&format=json&ids=${chunk.join("|")}`;
+    const data = await mediaWikiFetch(url, "labels"); // an API error throws (never cached as a null label)
     for (const q of chunk) {
       const label = data.entities?.[q]?.labels?.en?.value ?? null;
       out[q] = label;

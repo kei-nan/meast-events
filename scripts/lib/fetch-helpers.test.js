@@ -230,7 +230,9 @@ function memoryCache() {
   const data = new Map();
   return { data, has: (k) => data.has(k), get: (k) => data.get(k), set: (k, v) => data.set(k, v), flush() {} };
 }
-const apiError = (code = "ratelimited", info = "You've exceeded your rate limit.") =>
+// The callers' tests use a permanent error (badvalue): a transient one (ratelimited, maxlag, ...) is first retried with
+// real waits (http.test.js covers those retries with a mocked sleep).
+const apiError = (code = "badvalue", info = "Unrecognized value for parameter.") =>
   new Response(JSON.stringify({ error: { code, info } }), {
     status: 200,
     headers: { "Content-Type": "application/json", "MediaWiki-API-Error": code },
@@ -238,7 +240,10 @@ const apiError = (code = "ratelimited", info = "You've exceeded your rate limit.
 
 test("mediaWikiJson: returns the body; throws on an error body, on the MediaWiki-API-Error header alone, and on HTTP errors", async () => {
   assert.deepEqual(await mediaWikiJson(json({ query: {} }), "x"), { query: {} });
-  await assert.rejects(mediaWikiJson(apiError(), "lead fetch"), /lead fetch: API error ratelimited \(You've exceeded/);
+  await assert.rejects(
+    mediaWikiJson(apiError("ratelimited", "You've exceeded your rate limit."), "lead fetch"),
+    /lead fetch: API error ratelimited \(You've exceeded/
+  );
   const headerOnly = new Response("{}", { status: 200, headers: { "MediaWiki-API-Error": "readonly" } });
   await assert.rejects(mediaWikiJson(headerOnly, "x"), /x: API error readonly/);
   await assert.rejects(mediaWikiJson(json({}, 404), "x"), /x HTTP 404/);
@@ -248,7 +253,7 @@ test("fetchLeads: an API error body throws and nothing is cached", async () => {
   const cache = memoryCache();
   await withFetch(
     () => apiError(),
-    async () => assert.rejects(fetchLeads(["Alpha", "Beta"], { cache, delayMs: 0 }), /lead fetch: API error ratelimited/)
+    async () => assert.rejects(fetchLeads(["Alpha", "Beta"], { cache, delayMs: 0 }), /lead fetch: API error badvalue/)
   );
   assert.equal(cache.data.size, 0);
 });
@@ -273,13 +278,28 @@ test("fetchLabelsCached / fetchLabels / fetchCategories / fetchRevisions: an API
   await withFetch(
     () => apiError(),
     async () => {
-      await assert.rejects(fetchLabelsCached(["Q1"], { cache, delayMs: 0 }), /labels: API error ratelimited/);
-      await assert.rejects(fetchLabels(["Q1"]), /labels: API error ratelimited/);
-      await assert.rejects(fetchCategories("Alpha"), /categories: API error ratelimited/);
-      await assert.rejects(fetchRevisions("Alpha", "2020-01-01T00:00:00Z", { delayMs: 0 }), /revisions \(Alpha\): API error ratelimited/);
+      await assert.rejects(fetchLabelsCached(["Q1"], { cache, delayMs: 0 }), /labels: API error badvalue/);
+      await assert.rejects(fetchLabels(["Q1"]), /labels: API error badvalue/);
+      await assert.rejects(fetchCategories("Alpha"), /categories: API error badvalue/);
+      await assert.rejects(fetchRevisions("Alpha", "2020-01-01T00:00:00Z", { delayMs: 0 }), /revisions \(Alpha\): API error badvalue/);
     }
   );
   assert.equal(cache.data.size, 0);
+});
+
+test("Action API callers send maxlag=5; a 404 from the categories query is null", async () => {
+  await withFetch(
+    (url) => (url.searchParams.get("prop") === "categories" ? json({}, 404) : json({ entities: {}, query: { pages: [] } })),
+    async (calls) => {
+      await fetchLabels(["Q1"]);
+      await fetchLabelsCached(["Q2"], { delayMs: 0 });
+      await fetchEntities(["Q3"], { props: "sitelinks", delayMs: 0 });
+      await fetchRevisions("Alpha", "2020-01-01T00:00:00Z", { delayMs: 0 });
+      assert.equal(await fetchCategories("Alpha"), null);
+      assert.equal(calls.length, 5);
+      for (const c of calls) assert.equal(new URL(c).searchParams.get("maxlag"), "5", c);
+    }
+  );
 });
 
 test("setWikidataAliases: sets, replaces or removes the field; undefined (not fetched) leaves it", () => {

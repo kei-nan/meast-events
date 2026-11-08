@@ -35,6 +35,8 @@ export function retryAfterMs(value, now = Date.now()) {
 // a `MediaWiki-API-Error: <code>` header, not as an HTTP error. Read naively, such a body has no pages/entities, so every
 // title or item in the batch would look "missing" - and be cached as null. This throws instead, so the caller writes
 // nothing for the batch. `what` names the request in the message.
+// The thrown error carries `apiCode`, `lag` (seconds, from a maxlag error's body) and `retryAfter` (the
+// Retry-After header), so mediaWikiFetch can tell a transient error from a permanent one.
 export async function mediaWikiJson(res, what) {
   if (!res.ok) throw new Error(`${what} HTTP ${res.status}`);
   const header = res.headers?.get?.("mediawiki-api-error") ?? null;
@@ -42,9 +44,69 @@ export async function mediaWikiJson(res, what) {
   const err = data?.error;
   if (err || header) {
     const code = err?.code ?? header;
-    throw new Error(`${what}: API error ${code}${err?.info ? ` (${err.info})` : ""}`);
+    const e = new Error(`${what}: API error ${code}${err?.info ? ` (${err.info})` : ""}`);
+    e.apiCode = code;
+    e.lag = typeof err?.lag === "number" ? err.lag : null;
+    e.retryAfter = res.headers?.get?.("retry-after") ?? null;
+    throw e;
   }
   return data;
+}
+
+// The `maxlag` sent with every Action API request (https://www.mediawiki.org/wiki/Manual:Maxlag_parameter): when the
+// database replicas lag more than this many seconds, the API refuses the request with a `maxlag` error (HTTP 200) so a
+// bot backs off. Not sent to the REST API or WDQS SPARQL, which do not take it.
+export const MAXLAG_SECONDS = 5;
+
+// API error codes that mean "try again later", not "this request is wrong": rate limit, replica lag, read-only mode
+// (maintenance) and an internal error (`internal_api_error_<ExceptionClass>`).
+export function isTransientApiError(code) {
+  return code === "ratelimited" || code === "maxlag" || code === "readonly" || String(code ?? "").startsWith("internal_api_error_");
+}
+
+// `url` with maxlag=N appended (left alone when it already has one). Appended as text, so the rest of the URL is
+// byte-for-byte what the caller built.
+export function withMaxlag(url, seconds = MAXLAG_SECONDS) {
+  if (/[?&]maxlag=/.test(url)) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}maxlag=${seconds}`;
+}
+
+// Wait before retrying a transient API error: its Retry-After header, else a maxlag error's `lag` (seconds), else
+// exponential backoff; never longer than MAX_RETRY_AFTER_MS.
+export function apiRetryDelayMs(err, attempt, { baseDelayMs, now = Date.now() }) {
+  const header = retryAfterMs(err.retryAfter, now);
+  if (header != null) return header;
+  if (typeof err.lag === "number" && err.lag > 0) return Math.min(Math.ceil(err.lag * 1000), MAX_RETRY_AFTER_MS);
+  return Math.min(baseDelayMs * 2 ** attempt, MAX_RETRY_AFTER_MS);
+}
+
+// Fetch a MediaWiki Action API URL (Wikipedia or Wikidata api.php) and return its JSON body (mediaWikiJson). Sends
+// maxlag (MAXLAG_SECONDS). A transient API error (isTransientApiError; HTTP 200 with an error body, which politeFetch
+// cannot see) is retried up to `apiRetries` times, waiting apiRetryDelayMs; any other API error, and the last
+// transient one, throws. HTTP-level retries (429/5xx/network) stay politeFetch's. allow404: a 404 returns null.
+export async function mediaWikiFetch(
+  url,
+  what,
+  {
+    apiRetries = 3,
+    baseDelayMs = 5000,
+    allow404 = false,
+    fetchImpl = globalThis.fetch,
+    sleepImpl = sleep,
+    nowImpl = Date.now,
+  } = {}
+) {
+  const full = withMaxlag(url);
+  for (let attempt = 0; ; attempt++) {
+    const res = await politeFetch(full, {}, { fetchImpl, sleepImpl, nowImpl });
+    if (allow404 && res.status === 404) return null;
+    try {
+      return await mediaWikiJson(res, what);
+    } catch (err) {
+      if (!isTransientApiError(err.apiCode) || attempt >= apiRetries) throw err;
+      await sleepImpl(apiRetryDelayMs(err, attempt, { baseDelayMs, now: nowImpl() }));
+    }
+  }
 }
 
 const isTimeout = (err) => err?.name === "TimeoutError" || err?.name === "AbortError";

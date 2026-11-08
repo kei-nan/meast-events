@@ -3,7 +3,7 @@
 // (`reviewed_revision`) and a fingerprint of that section's text, so a later edit of the section on
 // Wikipedia can be found and shown (scripts/refresh-guidelines.js). Read-only: nothing here writes to Wikipedia.
 import { createHash } from "node:crypto";
-import { politeFetch } from "./http.js";
+import { mediaWikiFetch } from "./http.js";
 
 const API = "https://en.wikipedia.org/w/api.php";
 
@@ -62,11 +62,7 @@ export function changedSpan(oldLine, newLine, context = 80) {
 }
 
 async function api(params) {
-  const res = await politeFetch(`${API}?${new URLSearchParams({ format: "json", formatversion: "2", ...params })}`);
-  if (!res.ok) throw new Error(`Wikipedia API: HTTP ${res.status}`);
-  const data = await res.json();
-  if (data.error) throw new Error(`Wikipedia API: ${data.error.code} ${data.error.info}`);
-  return data;
+  return mediaWikiFetch(`${API}?${new URLSearchParams({ format: "json", formatversion: "2", ...params })}`, "Wikipedia API");
 }
 
 /** The page's latest revision, or the last one at or before `at` (ISO timestamp). */

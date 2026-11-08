@@ -72,6 +72,8 @@ import {
 } from "./lib/predecessor.js";
 import { fetchEntities } from "./lib/wd-entities.js";
 import { openCache } from "./lib/cache.js";
+import { titleFromWikipediaUrl } from "./lib/lead.js";
+import { MIN_YEAR } from "../app/src/lib/years.js";
 
 // Countries, event classes and the sitelink threshold live in scripts/lib/event-classes.js
 // (shared with the enrichment step and docs/DATA_POLICY.md). Every class QID there was
@@ -146,7 +148,7 @@ SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?e
       # An item with several values gets the earliest start and the latest end (MIN/MAX, not
       # SAMPLE, so every run picks the same value).
       BIND(COALESCE(?pit, ?start) AS ?date)
-      FILTER(BOUND(?date) && YEAR(?date) >= 1900 && YEAR(?date) <= ${maxYear})
+      FILTER(BOUND(?date) && YEAR(?date) >= ${MIN_YEAR} && YEAR(?date) <= ${maxYear})
       ?item wikibase:sitelinks ?sitelinks .
       OPTIONAL {
         ?enArticle schema:about ?item ;
@@ -208,13 +210,6 @@ function toDateString(iso) {
   return iso ? iso.slice(0, 10) : null;
 }
 
-function titleFromEnwikiUrl(url) {
-  if (!url) return null;
-  const slug = url.split("/wiki/")[1];
-  if (!slug) return null;
-  return decodeURIComponent(slug).replace(/_/g, " ");
-}
-
 // Event classes, dates (the same rule as buildQuery), sitelinks and English article of the given items.
 function predecessorDetailQuery(itemQids) {
   const maxYear = new Date().getUTCFullYear() + 1;
@@ -231,7 +226,7 @@ SELECT ?item ?itemLabel ?itemDescription ?eventDate ?eventDateEnd ?nSitelinks ?e
       OPTIONAL { ?item wdt:P580 ?start }
       OPTIONAL { ?item wdt:P582 ?dateEnd }
       BIND(COALESCE(?pit, ?start) AS ?date)
-      FILTER(BOUND(?date) && YEAR(?date) >= 1900 && YEAR(?date) <= ${maxYear})
+      FILTER(BOUND(?date) && YEAR(?date) >= ${MIN_YEAR} && YEAR(?date) <= ${maxYear})
       ?item wikibase:sitelinks ?sitelinks .
       OPTIONAL { ?enArticle schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> . }
     }
@@ -300,7 +295,7 @@ async function predecessorPass(byQid, { keepExisting = false } = {}) {
     }
     byQid.set(qid, {
       wikidata_qid: qid,
-      wikipedia_title: titleFromEnwikiUrl(row.enwiki?.value),
+      wikipedia_title: titleFromWikipediaUrl(row.enwiki?.value),
       wikidata_label: row.itemLabel?.value ?? null,
       wikidata_description: row.itemDescription?.value ?? null,
       date_start: toDateString(row.eventDate?.value),
@@ -388,7 +383,7 @@ async function main() {
       if (!existing) {
         byQid.set(qid, {
           wikidata_qid: qid,
-          wikipedia_title: titleFromEnwikiUrl(row.enwiki?.value),
+          wikipedia_title: titleFromWikipediaUrl(row.enwiki?.value),
           wikidata_label: row.itemLabel?.value ?? null,
           wikidata_description: row.itemDescription?.value ?? null,
           date_start: toDateString(row.eventDate?.value),

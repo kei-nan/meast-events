@@ -75,3 +75,21 @@ test("openCache: --fresh ignores what was cached before, but keeps what this run
     b.flush();
     assert.equal(openCache("x", dir, { fresh: false, maxAgeMs: null }).get("k"), 2);
   }));
+
+test("openCache: a corrupt cache file starts empty, with a warning naming the file", () =>
+  withDir((dir) => {
+    const file = join(dir, "broken.json");
+    writeFileSync(file, '{"k": 1, "trunc');
+    const real = console.warn;
+    const warnings = [];
+    console.warn = (msg) => warnings.push(String(msg));
+    try {
+      const c = openCache("broken", dir, { fresh: false, maxAgeMs: null });
+      assert.equal(c.size(), 0);
+      assert.equal(c.has("k"), false);
+    } finally {
+      console.warn = real;
+    }
+    assert.equal(warnings.length, 1);
+    assert.ok(warnings[0].includes(file), warnings[0]);
+  }));
