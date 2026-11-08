@@ -84,17 +84,10 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 
 .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 1.2rem 0; }
 
-.open-map, .wiki {
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.open-map { background: var(--accent); color: var(--bg); }
-.open-map:hover { background: var(--accent-strong); }
-.wiki { border: 1px solid var(--border); }
+/* "Open the map" and "Read on Wikipedia" take you somewhere, so they are links like the app's
+   (docs/design-contract.md "Controls"): teal and underlined, the `a` rule above, not a box or a gold fill (solid
+   gold is for data). Bold, as the page's main way on. */
+.open-map, .wiki { font-weight: 600; }
 
 .extract p { margin: 0 0 1em; }
 
@@ -183,8 +176,8 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
 .cite .note { overflow-wrap: anywhere; }
 .cite-live { padding: 6px 10px; border-left: 3px solid var(--accent); color: var(--text-primary); }
 
-/* Printing: text only. Title, dates, text, citations, attribution and licence; no header links, actions,
-   framing review or lists of other events. Black on white. */
+/* Printing: text only. Title, dates, text, the framing review (shown with every event, docs/DATA_POLICY.md),
+   citations, attribution and licence; no header links, actions or lists of other events. Black on white. */
 @media print {
   :root {
     --bg: #fff;
@@ -201,9 +194,14 @@ h3 { font-size: 1rem; margin: 1rem 0 0.3rem; }
   /* The app's own stylesheet is on this page too (it is the app shell): black on white over both. */
   html { background: #fff !important; }
   body, body * { color: #000 !important; background: transparent !important; }
-  .site-header, .site-footer, .actions, .framing-pointer, .framing-review, .includes, .ai-note { display: none !important; }
+  /* The review's links (method, contest) lead nowhere on paper; its "Reviewed by AI" note is printed instead. */
+  .site-header, .site-footer, .actions, .framing-review-meta, .includes { display: none !important; }
   main { max-width: none; padding: 0; }
-  .framing-mark { background: none; text-decoration: none; padding: 0; }
+  .framing-review { font-size: 10pt; }
+  .fr-section { break-inside: avoid; }
+  .ai-note { display: block !important; position: static; inset: auto; max-width: none; margin: 0.6em 0 0; padding: 0; border: 0; font-size: 9pt; }
+  /* Its tint is left out on paper; the underline stays and reads in black and white too. */
+  .framing-mark { background: none; padding: 0; }
   .cite, .cite h3 + .cite-text { break-inside: avoid; }
   p { orphans: 3; widows: 3; }
 }

@@ -18,6 +18,8 @@ import {
   yearMark,
 } from "../lib/timelineView.js";
 import { warmEvent } from "../lib/warmEvent.js";
+import { measureStuck, stuckBottom } from "../lib/stickyClear.js";
+import { useStickyClearance } from "../hooks/useStickyClearance.js";
 import { eventYearsText, ongoingSignal } from "../lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 
@@ -337,6 +339,10 @@ function ResultsList({
   const tabStop = Math.min(active, visible.length - 1);
   const listRef = useRef(null);
   const axisRef = useRef(null);
+  // The sticky axis covers the top of the panel's scroller, so a row focus
+  // moves up to (ArrowUp, Shift+Tab) would be scrolled under it: the scroller
+  // keeps the axis's height clear while it is shown.
+  useStickyClearance(axisRef, timeline);
 
   // Each row's year on the axis (the one it is grouped and ordered by), null
   // for an undated row or one in the ongoing group: the axis does not place them.
@@ -393,14 +399,10 @@ function ResultsList({
     const li = row.closest("li");
     const heading = li && !li.previousElementSibling ? li.parentElement.previousElementSibling : null;
     const target = heading?.tagName === "H2" ? heading : row;
-    // Where the axis's bottom is once it sticks, wherever it is now: sticky
-    // `top` counts from the scroller's padding edge (on desktop it is minus
-    // that padding, SidePanel.css, so the axis sits at the very top).
+    // Where the axis's bottom is once it sticks, wherever it is now (the same
+    // line the scroller keeps clear for focus, lib/stickyClear.js).
     const axisEl = axisRef.current;
-    const stickTop = axisEl ? parseFloat(getComputedStyle(axisEl).top) || 0 : 0;
-    const padTop = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
-    const line =
-      scroller.getBoundingClientRect().top + padTop + stickTop + (axisEl?.getBoundingClientRect().height ?? 0);
+    const line = scroller.getBoundingClientRect().top + (axisEl ? stuckBottom(measureStuck(axisEl, scroller)) : 0);
     scroller.scrollBy({ top: target.getBoundingClientRect().top - line, behavior: reducedMotion() ? "auto" : "smooth" });
     setActive(i);
     row.focus({ preventScroll: true });
@@ -462,9 +464,14 @@ function ResultsList({
   });
 
   return (
+    // While a search is running the rows shown are real and usable (the
+    // title/summary matches while full-text search loads, or the last
+    // results), so they stay at full contrast and are not marked busy: a thin
+    // moving line above them (SidePanel.css) and the status line say it is
+    // running. Only an empty list that is still loading is busy.
     <div className={"sp-results" + (busy ? " sp-results--busy" : "")}>
       {timeline && <TimelineAxis axis={axis} band={band} current={topYear} onJump={jumpToYear} axisRef={axisRef} />}
-      <div ref={listRef} onKeyDown={onKeyDown} aria-busy={busy || undefined}>
+      <div ref={listRef} onKeyDown={onKeyDown} aria-busy={(busy && results.length === 0) || undefined}>
         {groups.map(({ key, rows }, gi) => (
           <Fragment key={`${gi}:${key}`}>
             {key !== "" && (

@@ -1,8 +1,10 @@
 /* ---------- Printing an open event: text only ----------
    The event's category, title, dates and places, its text (the whole lead, also the paragraphs behind "Show full
-   text"), the citations (Citation.jsx CitationPrint), and "About this entry" with the attribution and licence.
-   No map (and no snapshot of it), timeline, header, controls, framing review or related events. Black on white
-   whatever the screen theme. Only while an event is open: printing the map view is left to the browser. */
+   text"), the framing review, the citations (Citation.jsx CitationPrint), and "About this entry" with the
+   attribution and licence. The framing review is shown with every event (docs/DATA_POLICY.md), so it is printed
+   too: the notice above the text, the words it marks, and both reviews with the "Reviewed by AI" note.
+   No map (and no snapshot of it), timeline, header, controls or related events. Black on white whatever the screen
+   theme. Only while an event is open: printing the map view is left to the browser. */
 @media print {
   html:has(.event-detail),
   html:has(.event-detail) body,
@@ -63,8 +65,7 @@
 
   .event-detail-actions,
   .event-detail-more,
-  .framing-pointer,
-  .framing-review,
+  .framing-pointer-link,
   .event-detail-includes,
   .event-detail-related,
   .event-detail [role="status"] {
@@ -76,13 +77,56 @@
     display: block !important;
   }
 
-  /* Highlights are the framing review's, which is not printed: plain text. */
+  /* The framing review's marks: the browser leaves out their tint, so only their underline, which reads in black
+     and white too. */
   .event-detail mark.framing-mark {
     background: none;
     color: inherit;
     border: 0;
     padding: 0;
-    text-decoration: none;
+  }
+
+  /* Paper has no tabs: both reviews, one after the other (FramingReview.jsx .fr-print), in place of the tabs and
+     the open one. The "Reviewed by AI" note in the page, not behind its button; the links to the method and to
+     contest the review lead nowhere on paper. */
+  .framing-review > .fr-tabs,
+  .framing-review > #fr-panel,
+  .framing-review-meta {
+    display: none !important;
+  }
+
+  .event-detail .framing-review {
+    margin-top: 1.2em;
+    padding: 0.6em 0.8em;
+    border: 1px solid #999;
+    font-size: 10pt;
+  }
+
+  .framing-review .fr-print {
+    display: block;
+  }
+
+  .fr-print .fr-panel {
+    break-inside: avoid;
+  }
+
+  .fr-print h4 {
+    margin: 0 0 0.2em;
+    font-size: 10pt;
+    font-weight: 600;
+  }
+
+  .framing-review .fr-ai-note {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    margin: 0.6em 0 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: none;
+    color: #333;
+    font-size: 9pt;
   }
 
   .event-detail {

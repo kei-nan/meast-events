@@ -812,12 +812,52 @@ button.sp-chip[aria-pressed="true"] {
   margin: 0 0 8px;
 }
 
+/* A search still running (ResultsList busy): the rows shown are real and can
+   be opened, so they keep their full contrast (dimming them took the text
+   below WCAG AA). A thin line in the gap above the list says it is running
+   instead, a gold stretch moving along it, the colour of the app's loading
+   spinner; the status line says what is running. With reduced motion it
+   stands still, dashed, so it does not read as a divider. */
 .sp-results {
-  transition: opacity 0.15s;
+  position: relative;
 }
 
-.sp-results--busy {
-  opacity: 0.5;
+.sp-results--busy::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent) no-repeat var(--border);
+  background-size: 30% 100%;
+  animation: sp-busy 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sp-busy {
+  from {
+    background-position: -50% 0;
+  }
+  to {
+    background-position: 150% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-results--busy::before {
+    animation: none;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 10px);
+  }
+}
+
+@media (forced-colors: active) {
+  .sp-results--busy::before {
+    forced-color-adjust: none;
+    background: repeating-linear-gradient(90deg, Highlight 0 6px, transparent 6px 10px);
+    animation: none;
+  }
 }
 
 .sp-list {
@@ -1135,6 +1175,25 @@ button.sp-chip[aria-pressed="true"] {
   bottom: -6px;
   height: 4px;
   border-left: 1px solid var(--border-field);
+}
+
+/* On touch screens and phones the years are only 1.1rem tall, too small to a
+   finger (WCAG 2.5.8). Their tap areas, and the scale's for a tap between
+   them, grow to the axis's whole height (over its 6px padding above and
+   below), without moving anything (::before: a tick's ::after is its tick
+   mark). Up and down only, so the wrong year never wins: across, a year's tap
+   area stays its label, which neighbours never overlap more than they already
+   do, and a tap beside a label lands on the scale, which jumps to the year
+   under the finger. Not past the axis either, so a tap just below it still
+   opens the row there. */
+@media (pointer: coarse), (max-width: 768px) {
+  .sp-taxis-scale::before,
+  .sp-taxis-end::before,
+  .sp-taxis-tick::before {
+    content: "";
+    position: absolute;
+    inset: -6px 0;
+  }
 }
 
 /* ---------- Event detail ---------- */
@@ -1480,6 +1539,11 @@ button.sp-chip[aria-pressed="true"] {
 
 .fr-panel--wording.fr-panel--found { --panel-color: var(--fr-wording); }
 .fr-panel--fairness.fr-panel--found { --panel-color: var(--fr-fairness); }
+
+/* Both reviews at once, for print only (print.css): on screen the tabs show them. */
+.fr-print {
+  display: none;
+}
 
 .framing-review .fr-method {
   font-size: 0.78rem;
