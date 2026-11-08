@@ -39,7 +39,7 @@ export function writeFileAtomicSync(file, text) {
   }
 }
 
-export const isMissingFile = (err) => err?.code === "ENOENT";
+const isMissingFile = (err) => err?.code === "ENOENT";
 
 export async function readJsonIfExists(file, fallback) {
   let text;

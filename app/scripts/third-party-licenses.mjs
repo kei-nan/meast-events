@@ -23,7 +23,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const EXTRA = ["@fontsource-variable/inter", "@fontsource/spectral", "pagefind"];
-export const FILE_NAME = "third-party-licenses.txt";
+const FILE_NAME = "third-party-licenses.txt";
 
 // "…/node_modules/@scope/name/dist/x.js?url" -> { name: "@scope/name", dir: "…/node_modules/@scope/name" }.
 // The LAST node_modules segment wins (a nested copy is its own package); dot folders (.cache, .vite) are not

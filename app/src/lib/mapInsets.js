@@ -88,7 +88,7 @@ function pushRect(out, el, box) {
  * The boxes of everything over `container` (the map), in px from its top
  * left corner and clipped to it. Reads the page.
  */
-export function overlayRects(container) {
+function overlayRects(container) {
   if (typeof document === "undefined" || !container) return [];
   const view = container.closest(".map-view") ?? container.parentElement;
   const scope = view?.parentElement ?? document;

@@ -5,13 +5,13 @@
 
 export const PANEL_MIN = 320;
 /** The widest the panel may be, as a share of the window: the map keeps the rest. */
-export const PANEL_MAX_SHARE = 0.6;
+const PANEL_MAX_SHARE = 0.6;
 /**
  * And never wider than its content: the event view stops at 53rem
  * (SidePanel.css .event-detail), plus the panel's padding and a scrollbar.
  * Past this, widening would only add empty space.
  */
-export const PANEL_MAX_REM = 56;
+const PANEL_MAX_REM = 56;
 export const PANEL_STEP = 20; // arrow keys
 export const PANEL_STEP_BIG = 80; // Page Up / Page Down, Shift+arrow
 export const STORAGE_KEY = "atlas.panelWidth"; // localStorage, as mapBorders.js HINT_KEY

@@ -90,7 +90,7 @@ export const settle = () => new Promise((r) => setImmediate(r));
  * rendered further) for which `pred(element)` holds: for reaching a handler
  * such as a button's onClick.
  */
-export function findElements(node, pred, out = []) {
+function findElements(node, pred, out = []) {
   if (Array.isArray(node)) {
     for (const n of node) findElements(n, pred, out);
   } else if (node && typeof node === "object" && "props" in node) {

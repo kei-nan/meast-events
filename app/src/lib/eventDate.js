@@ -26,7 +26,7 @@ function formatStart(date, precision) {
   return year;
 }
 
-export const ONGOING_TEXT = "ongoing (per source)";
+const ONGOING_TEXT = "ongoing (per source)";
 
 export function formatEventDate(start, end, { precision = null, endPrecision = null, yearOnly = false, ongoing = false } = {}) {
   if (!start) return "";

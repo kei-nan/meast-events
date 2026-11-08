@@ -19,7 +19,7 @@ export function decimalPlaces(n) {
 }
 
 // At most this many decimal places in BOTH latitude and longitude.
-export const LOW_PRECISION_MAX_DECIMALS = 1;
+const LOW_PRECISION_MAX_DECIMALS = 1;
 
 const SOURCE_NAMES = { wikipedia: "Wikipedia", wikidata: "Wikidata" };
 

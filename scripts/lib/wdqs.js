@@ -1,6 +1,6 @@
 import { politeFetch } from "./http.js";
 
-export const ENDPOINT = "https://query.wikidata.org/sparql";
+const ENDPOINT = "https://query.wikidata.org/sparql";
 
 export async function runSparql(query) {
   const res = await politeFetch(

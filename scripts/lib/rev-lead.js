@@ -22,7 +22,7 @@ const API = "https://en.wikipedia.org/w/api.php";
 const VOID = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);
 
 // [tag or null, class or null]: an element matches when its tag (if given) and one of its classes (if given) match.
-export const REMOVE = [
+const REMOVE = [
   ["table", null],
   ["div", null],
   ["figure", null],

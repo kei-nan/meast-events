@@ -3,7 +3,7 @@
 // record (merge-proposed.js). No imports: merge-proposed.js must not pull in the network pipeline.
 
 // date_order_invalid / date_end_precision_coarse and the note that goes with the first; plus wikipedia_lead_dates.
-export const ORDER_FLAG_RE = /^(date_order_invalid|date_end_precision_coarse|wikipedia_dates_note)\b/;
+const ORDER_FLAG_RE = /^(date_order_invalid|date_end_precision_coarse|wikipedia_dates_note)\b/;
 
 // Copies `fresh`'s date-order flags onto `kept`, only when both describe the same dates and the same text (the flags
 // are derived from exactly those, plus Wikidata's end precision). Other date flags of `kept` stay, in their order.

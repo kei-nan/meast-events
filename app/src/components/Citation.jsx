@@ -22,7 +22,7 @@ async function copyText(text) {
  * event page and the border data's credit. `copy` adds a "Copy" button to each citation.
  * `headingLevel` is the level of each style's heading.
  */
-export function CitationList({ cite, copy = false, headingLevel = 3 }) {
+function CitationList({ cite, copy = false, headingLevel = 3 }) {
   const [copied, setCopied] = useState(null);
   useEffect(() => {
     if (!copied) return undefined;

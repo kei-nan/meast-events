@@ -22,7 +22,7 @@ import { MIN_YEAR, MAX_YEAR } from "../../app/src/lib/years.js";
 // (index) or a Windows reserved device name (a checkout on Windows could not hold a file or
 // folder named after it).
 const ID_RE = /^[a-z0-9-]+$/;
-export const RESERVED_IDS = new Set([
+const RESERVED_IDS = new Set([
   "index",
   "con",
   "prn",
@@ -48,7 +48,7 @@ const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 // A start date after the day its data was fetched (a scheduled election, say) is valid but WARNED about.
 export { MIN_YEAR, MAX_YEAR };
 export const MAX_END_YEAR = MAX_YEAR + 1;
-export const LOCATION_QUALITIES = ["precise", "approximate", "none"];
+const LOCATION_QUALITIES = ["precise", "approximate", "none"];
 
 // The allowed `category` / `category_group` values: the groups the pipeline can assign, "unclassified" included
 // (scripts/lib/event-classes.js). The app's CATEGORY_LABELS has one label per group
@@ -63,7 +63,7 @@ export const CATEGORIES = GROUPS;
 // (the article the event's title redirects to, or that article's P625), not the event's own.
 // Allowed, and always warned about (see BORROWED_SOURCE below).
 export const BORROWED_SOURCE = "redirect_target";
-export const PRECISE_SOURCES = ["wikipedia", "wikidata", "manual-override", BORROWED_SOURCE];
+const PRECISE_SOURCES = ["wikipedia", "wikidata", "manual-override", BORROWED_SOURCE];
 // coordinate_source for a point read from the Wikipedia article at wikipedia_url: when that
 // article belongs to another item than the event's (otherItem), the point is borrowed.
 export const borrowedSource = (source, otherItem) => (otherItem && source === "wikipedia" ? BORROWED_SOURCE : source);
@@ -72,20 +72,20 @@ const FALLBACK_RE = /^country-fallback:(.+)$/;
 // A generous box around the 15 tracked countries (Egypt's west edge ~25E, Iran's east
 // ~63.3E, Yemen ~12N, Turkey's north ~42.1N). A point outside it is only a WARNING: a few
 // events really happened abroad (conferences, signings, a hijacking).
-export const REGION_BBOX = { minLat: 10, maxLat: 44, minLon: 24, maxLon: 65 };
+const REGION_BBOX = { minLat: 10, maxLat: 44, minLon: 24, maxLon: 65 };
 const inRegion = (lat, lon) =>
   lat >= REGION_BBOX.minLat && lat <= REGION_BBOX.maxLat && lon >= REGION_BBOX.minLon && lon <= REGION_BBOX.maxLon;
 
 // The app's list snippet is the first 160 characters of the extract (app/scripts/split-data.mjs,
 // SNIPPET_LENGTH). A lead no longer than its own preview is suspicious (stub, truncated
 // fetch), so it is reported - as a warning only.
-export const MIN_EXTRACT_CHARS = 160;
+const MIN_EXTRACT_CHARS = 160;
 
 // A precise pin is checked against the border shapes of the event's tagged countries in its
 // start year (the same country -> shape table the map uses to shade countries,
 // app/src/lib/eventCountries.js COUNTRY_SHAPES). Points within this distance of a shape count
 // as inside it: coastal battles and border crossings sit on or just off the drawn line.
-export const PIN_TOLERANCE_KM = 5;
+const PIN_TOLERANCE_KM = 5;
 
 // Warnings only. An event tagged with this many countries counts in each of them (per-country figures); the
 // region-wide events (world wars, regional conflicts) carry 8-15 tags. lib/flags.js already flags > 4 as
@@ -97,14 +97,14 @@ const ISO_DAY_RE = /^\d{4}-\d{2}-\d{2}/;
 
 // Inclusion rule 2: a tag is one of the tracked countries/territories, or "regional" (hand-assigned to a few
 // legacy events that concern the whole region).
-export const isKnownCountry = (c) => Object.hasOwn(COUNTRIES, c) || c === "regional";
+const isKnownCountry = (c) => Object.hasOwn(COUNTRIES, c) || c === "regional";
 
 /**
  * Why `date` (YYYY-MM-DD) cannot be a date of Wikidata precision `name`, or null when it fits (or cannot be
  * checked: no date, no or an unknown precision, day or finer). Month precision is stored as the month's first day,
  * year and coarser as 1 January (the period's first day, as WDQS returns such values).
  */
-export function precisionShapeProblem(date, name) {
+function precisionShapeProblem(date, name) {
   const code = precisionCode(name);
   const m = DATE_RE.exec(String(date ?? ""));
   if (code === null || code >= 11 || !m) return null;
@@ -114,7 +114,7 @@ export function precisionShapeProblem(date, name) {
 const todayUtc = () => new Date().toISOString().slice(0, 10);
 
 // Index of data/boundaries.json features by name, with bounding boxes, for pinCountryCheck.
-export function indexBoundaries(boundaries, turf) {
+function indexBoundaries(boundaries, turf) {
   const features = Array.isArray(boundaries) ? boundaries : boundaries?.features ?? [];
   const byName = new Map();
   for (const f of features) {
@@ -135,7 +135,7 @@ export function indexBoundaries(boundaries, turf) {
 // wrong province. eventCountries.js keeps the Ottoman shape out of COUNTRY_SHAPES for that reason.
 // Kuwait, Bahrain, Qatar and the Trucial coast were not Ottoman-ruled in these years, so they are
 // not listed. Each entry is [feature name, first year, last year], as in COUNTRY_SHAPES.
-export const PRE_1920_CHECK_SHAPES = Object.fromEntries(
+const PRE_1920_CHECK_SHAPES = Object.fromEntries(
   ["Turkey", "Iraq", "Syria", "Lebanon", "Jordan", "Israel/Palestine", "Saudi Arabia"].map((c) => [c, [["Ottoman Empire", 1886, 1919]]])
 );
 /** The shape names the pin check uses for a country in a year: the map's own, else the check-only pre-1920 one. */
@@ -153,7 +153,7 @@ export function checkShapeNamesFor(country, year) {
 // tagged country, or one of them, has no shape that year: e.g. "regional", Kuwait before
 // 1961). Otherwise { year, km, wide } with the distance to the nearest of those shapes; `wide`
 // when a pre-1920 check-only shape (PRE_1920_CHECK_SHAPES) was among them.
-export function pinCountryCheck(e, index) {
+function pinCountryCheck(e, index) {
   const { byName, turf } = index;
   const year = Number(String(e.date_start).slice(0, 4));
   const countries = Array.isArray(e.countries) ? e.countries : [];
@@ -284,7 +284,7 @@ export function staleDateNotes(e) {
 // (curated) mode so CI stays green; any NEW duplicate still fails.
 //   Q2429253: curated "Islamic State of Iraq and the Levant" (2013) and "Islamic State"
 //   (2014) are two seed titles that resolve to the same Wikipedia article.
-export const KNOWN_DUPLICATE_QIDS = new Set([]);
+const KNOWN_DUPLICATE_QIDS = new Set([]);
 
 // ---- The allowed fields ----
 // Every top-level field an event record may carry, with its type (docs/DATA_POLICY.md, "What each field is", lists
@@ -298,9 +298,9 @@ const isStringArray = (v) => Array.isArray(v) && v.every(isNonEmptyString);
 const isNonNegativeInteger = (v) => Number.isInteger(v) && v >= 0;
 // The enrichment time (enrich-candidates.js: new Date().toISOString()), a real calendar day.
 const ISO_TIMESTAMP_RE = /^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d{1,9})?Z$/;
-export const isIsoTimestamp = (v) => typeof v === "string" && ISO_TIMESTAMP_RE.test(v) && isRealDate(v.slice(0, 10));
+const isIsoTimestamp = (v) => typeof v === "string" && ISO_TIMESTAMP_RE.test(v) && isRealDate(v.slice(0, 10));
 // The P582 "no value" / "unknown value" of lib/wd-entities.js setDateEndOpen.
-export const DATE_END_OPEN_VALUES = ["wikidata_novalue", "wikidata_somevalue"];
+const DATE_END_OPEN_VALUES = ["wikidata_novalue", "wikidata_somevalue"];
 // wikipedia_lead_dates: lib/v21.js wikipediaLeadDates, "YYYY-MM-DD" or a "YYYY" year.
 const LEAD_DATE_RE = /^\d{4}(-\d{2}-\d{2})?$/;
 // part_of: enrich-candidates.js / lib/seed-enrichment.js write { qid, label } (label null when Wikidata has none).

@@ -52,7 +52,7 @@ import { NO_JS_STYLESHEET, preloadTag } from "./event-page.mjs";
 import { checkRedirectsText } from "./redirects.mjs";
 
 // Inline scripts (no src, and not a data block such as JSON-LD) in an HTML page.
-export function inlineScripts(html) {
+function inlineScripts(html) {
   const out = [];
   for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     const attrs = m[1];

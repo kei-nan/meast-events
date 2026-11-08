@@ -30,7 +30,7 @@ export const QID_TO_COUNTRY = Object.fromEntries(
 );
 export const ALL_COUNTRY_QIDS = Object.values(COUNTRIES).flat();
 
-export const ORIGINAL_EVENT_CLASSES = [
+const ORIGINAL_EVENT_CLASSES = [
   { qid: "Q178561", label: "battle", category: "war" },
   { qid: "Q198", label: "war", category: "war" },
   { qid: "Q645883", label: "military operation", category: "war" },
@@ -49,7 +49,7 @@ export const ORIGINAL_EVENT_CLASSES = [
 // matches, and the class has dated in-region instances) on 2026-09-26; see DATA_POLICY.md
 // for the instance counts. "embargo" and "nationalization" are kept because they were
 // asked for even though WDQS shows 0 and 0 in-region instances with >=10 sitelinks.
-export const NEW_EVENT_CLASSES = [
+const NEW_EVENT_CLASSES = [
   { qid: "Q188055", label: "siege", category: "war" },
   { qid: "Q135010", label: "war crime", category: "atrocity" },
   { qid: "Q1371150", label: "hostage taking", category: "terrorism" },
@@ -69,7 +69,7 @@ export const NEW_EVENT_CLASSES = [
 // was checked with wbsearchentities and each class probed in WDQS on 2026-10-06 (counts in
 // DATA_POLICY.md). Appended last, so a class above still decides the group of an item that
 // matches both.
-export const GAP_EVENT_CLASSES = [
+const GAP_EVENT_CLASSES = [
   { qid: "Q350604", label: "armed conflict", category: "war" },
   { qid: "Q831663", label: "military campaign", category: "war" },
   { qid: "Q188686", label: "military occupation", category: "war" },
@@ -85,7 +85,7 @@ export const GAP_EVENT_CLASSES = [
 ];
 
 // Added 2026-10-06 for civic events the policy named as under-found (elections, protests, summits).
-export const CIVIC_EVENT_CLASSES = [
+const CIVIC_EVENT_CLASSES = [
   { qid: "Q40231", label: "public election", category: "political" },
   { qid: "Q273120", label: "protest", category: "protest" },
   { qid: "Q175331", label: "demonstration", category: "protest" },
@@ -124,7 +124,7 @@ export const INCLUSION_MIN_SITELINKS = 10;
 // displacement" and "atrocity" there) is in the overriding atrocity group like genocide and massacre. Before, the five
 // events Wikidata types this way were shown as "migration" through their "population transfer" class. The class has 5
 // dated in-region items with >=10 sitelinks, all already found by other classes, so it adds no new events today.
-export const ATROCITY_GAP_CLASSES = [{ qid: "Q154278", label: "ethnic cleansing", category: "atrocity" }];
+const ATROCITY_GAP_CLASSES = [{ qid: "Q154278", label: "ethnic cleansing", category: "atrocity" }];
 
 export const EVENT_CLASSES = [
   ...ORIGINAL_EVENT_CLASSES,

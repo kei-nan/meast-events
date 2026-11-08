@@ -8,8 +8,8 @@ import { MAP_EXTENT } from "./mapExtent.js";
 // A calm, slightly greyed sea (was a bright #d8f2ff): the map's background.
 export const SEA_COLOR = "#b9d5e3";
 // Land (mapInstallLayers.js "land-fill"): drawn at LAND_OPACITY over the sea.
-export const LAND_COLOR = "#e4ded0";
-export const LAND_OPACITY = 0.65;
+const LAND_COLOR = "#e4ded0";
+const LAND_OPACITY = 0.65;
 // The land as ONE opaque colour: LAND_COLOR at LAND_OPACITY over the sea (nothing else is
 // drawn below the land). Opaque, pieces of land that meet along a cut (cells, tiles) show
 // no seam: a translucent fill darkens or lightens the antialiased pixels on a shared edge.
