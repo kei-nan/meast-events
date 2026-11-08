@@ -711,7 +711,8 @@ node scripts/build-selection-funnel.js [--check|--offline] # -> data/selection-f
                                                         #    --offline keeps the committed sitelink_measurement, no network)
 node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
-node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
+node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI); fails on a
+                                                        #    warning not in data/validation-warnings-baseline.json (--write-warnings-baseline)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
 node scripts/fetch-border-references.js                 # -> data/border-reference-points.json: Wikidata border checkpoints, border
                                                         #    crossings and tripoints with coordinates in the map's countries, the
@@ -786,6 +787,15 @@ military occupation, blockade, ethnic, international or border conflict, social,
 `DURATIVE_CLASSES` in `scripts/lib/flags.js`; `durative_class_no_end`). Classes that also label one-day events (armed conflict, rebellion,
 revolution, protest) are left out of that list. Neither changes how the site places an event in time. Warnings are for a person to look at; nothing is changed automatically.
 
+**Warnings baseline** (since 2026-11-08). The curated warnings above are printed on every run (171 on the committed files), so one more would go
+unseen. `data/validation-warnings-baseline.json` lists every warning of the committed data as `[file, event id, warning code]` (the code is stable,
+the message may carry counts that change; each warning's code is set in `scripts/lib/validate.js`, framing-review warnings as `framing_review_*`).
+`validate-events.js` prints a warning not in it as `NEW` and **fails**, and lists a baseline entry that no longer occurs as `gone` (not a failure;
+prune it). After checking new warnings, record them with `node scripts/validate-events.js --write-warnings-baseline` (it needs the root `npm ci`, so the
+pin check's warnings are not dropped, and writes nothing while there are errors). A run of only some files (the build's `../data/events.json`) compares
+only those files' entries, and the pin check's entries are not "gone" when the check is skipped. The monthly refresh writes the baseline itself and lists
+the new warnings in its pull request (see "Refreshing extracts").
+
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
 `end_year` or `source`, a bad year range or geometry type, two shapes with the same name in the same year, or (since 2026-10-27) a ring that
 crosses itself (two of its segments cross at a point inside both; touching at a vertex is not counted; one error per feature listing ring, segments
@@ -830,8 +840,10 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
    (a start that is none of the item's P585/P580 values, an end that is none of its P582 values or a P582 where none is stored, a moved or
    removed P625, a P625 on an event without a precise pin, new or dropped P31 labels). Fields the fix ledger sets (docs/data-fixes.md) are
    counted, not listed. Nothing in that list is changed: a fix goes through the ledger.
-2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description starts with the
-   guideline sections that changed (with their changed lines) and the Wikidata drift list, then lists the title changes, the held title cases, and, for each changed lead, the
+2. If nothing changed, it stops. Otherwise it validates the events (an error stops it; new warnings, such as the stale framing review of a changed
+   summary, are written into `data/validation-warnings-baseline.json` with `--write-warnings-baseline`, so the pull request carries the updated
+   baseline and its CI passes), runs the unit tests and opens a pull request whose description starts with the
+   guideline sections that changed (with their changed lines), the Wikidata drift list and the new (and gone) validation warnings, then lists the title changes, the held title cases, and, for each changed lead, the
    removed and added sentences. It never merges.
 3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
    For a changed guideline, the question is whether the edit changes what the wording check flags; if so, redo that part of the review.

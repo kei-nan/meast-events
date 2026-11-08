@@ -189,7 +189,8 @@ runs on `main` are never cancelled. Its jobs (the names GitHub shows as status c
   About dialog open, `/event/<id>` loads, and nothing logs an error or a CSP violation;
   Cloudflare does not run it).
 - **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
-  (`node scripts/validate-events.js`), checks that the generated reports are current
+  (`node scripts/validate-events.js`; it also fails on a warning not in
+  `data/validation-warnings-baseline.json`), checks that the generated reports are current
   (`node scripts/build-missing-coordinates-report.js --check` and
   `node scripts/build-selection-funnel.js --check`), runs the data-pipeline tests (`npm test` at the
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
@@ -227,15 +228,19 @@ the Actions tab). It:
 
 If `data/events.json` or `data/framing-review.json` changed, it installs the repo-root
 dependencies (`npm ci`: the geometry library, without which `validate-events.js` skips its
-pin-in-country check and the root tests skip the geometry tests), validates the data,
+pin-in-country check and the root tests skip the geometry tests), validates the data
+(an error stops the refresh; a validation warning the data did not have before, such as a
+framing review made stale by a changed summary, does not: it is written into
+`data/validation-warnings-baseline.json`, which the PR carries, and listed under
+"Validation warnings" in the PR description, so CI on the PR passes and the reviewer sees it),
 regenerates the two generated reports (`data/missing-coordinates-report.md`, and
 `data/selection-funnel.json` with `--offline`, which keeps its committed sitelink measurement)
 and checks that they are current, runs both unit-test suites and builds the site
 (`npm ci && npm run build` in `app/`, which includes the build-time checks above), and then
 a pull request is opened and CI is started on it (below). The workflow has two jobs: the
 **Refresh summaries** job (`refresh`) does all of the above with a read-only token and
-hands the four data files (`events.json`, `framing-review.json`, `missing-coordinates-report.md`,
-`selection-funnel.json`) and the generated and refresh reports on as artifacts; the pull request is opened by
+hands the five data files (`events.json`, `framing-review.json`, `missing-coordinates-report.md`,
+`selection-funnel.json`, `validation-warnings-baseline.json`) and the generated and refresh reports on as artifacts; the pull request is opened by
 a separate job, **Open a pull request** (`open-pr`), which holds the write token and runs
 no npm code and no repository scripts, so nothing the refresh installs or builds holds a
 token that can push. The PR description holds the start of the refresh report; the full

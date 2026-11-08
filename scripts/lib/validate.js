@@ -950,10 +950,16 @@ export function validateEvents(events, opts = {}) {
 // re-reviewed, so everything here is a warning.
 export const textSha1 = (text) => createHash("sha1").update(text ?? "").digest("hex").slice(0, 12);
 
+// Both framing checks also return `items`: each warning as { id, code, text } (text = the warnings entry), for the
+// warnings baseline.
 export function checkFramingCoverage(events, review, { name = "framing-review" } = {}) {
   const reviews = review?.events;
-  if (!reviews || typeof reviews !== "object") return { warnings: [`${name}: no "events" object`], missing: 0, stale: 0, orphans: 0 };
-  const warnings = [];
+  if (!reviews || typeof reviews !== "object") {
+    const text = `${name}: no "events" object`;
+    return { warnings: [text], items: [{ id: null, code: "framing_review_unreadable", text }], missing: 0, stale: 0, orphans: 0 };
+  }
+  const items = [];
+  const add = (id, code, text) => items.push({ id, code, text });
   let missing = 0;
   let stale = 0;
   const ids = new Set();
@@ -963,15 +969,15 @@ export function checkFramingCoverage(events, review, { name = "framing-review" }
     const r = reviews[e.id];
     if (!r) {
       missing++;
-      warnings.push(`${name}: ${e.id} has no framing review`);
+      add(e.id, "framing_review_missing", `${name}: ${e.id} has no framing review`);
     } else if (r.text_sha1 !== textSha1(e.extract)) {
       stale++;
-      warnings.push(`${name}: ${e.id} review is stale (text changed since it was reviewed; reviewed text of ${r.text_retrieved_at ?? "?"}, current text of ${e.extract_retrieved_at ?? "?"})`);
+      add(e.id, "framing_review_stale", `${name}: ${e.id} review is stale (text changed since it was reviewed; reviewed text of ${r.text_retrieved_at ?? "?"}, current text of ${e.extract_retrieved_at ?? "?"})`);
     }
   }
   const orphans = Object.keys(reviews).filter((id) => !ids.has(id));
-  for (const id of orphans) warnings.push(`${name}: review for "${id}", which is not an event`);
-  return { warnings, missing, stale, orphans: orphans.length };
+  for (const id of orphans) add(id, "framing_review_orphan", `${name}: review for "${id}", which is not an event`);
+  return { warnings: items.map((x) => x.text), items, missing, stale, orphans: orphans.length };
 }
 
 // A framing review's data note that quotes an event's date ("The start date (2009) comes from Wikidata and is wrong")
@@ -979,9 +985,9 @@ export function checkFramingCoverage(events, review, { name = "framing-review" }
 // gives. Only "start date (...)" / "end date (...)" with a year or ISO date are read; other wording is not judged.
 // Warnings, as the other framing-review checks are (the review file is changed only by the owner's review).
 export function checkDataNotes(events, review, { name = "framing-review" } = {}) {
-  const warnings = [];
+  const items = [];
   const reviews = review?.events;
-  if (!reviews || typeof reviews !== "object") return { warnings };
+  if (!reviews || typeof reviews !== "object") return { warnings: [], items };
   for (const e of events) {
     const note = e?.id ? reviews[e.id]?.data_note : null;
     if (typeof note !== "string") continue;
@@ -989,11 +995,12 @@ export function checkDataNotes(events, review, { name = "framing-review" } = {})
       const field = m[1].toLowerCase() === "start" ? "date_start" : "date_end";
       const value = e[field];
       if (typeof value !== "string" || !value.startsWith(m[2])) {
-        warnings.push(`${name}: ${e.id} data_note quotes the ${m[1].toLowerCase()} date as ${m[2]}, but ${field} is ${value ?? "none"}: "${note}"`);
+        const text = `${name}: ${e.id} data_note quotes the ${m[1].toLowerCase()} date as ${m[2]}, but ${field} is ${value ?? "none"}: "${note}"`;
+        items.push({ id: e.id, code: "framing_data_note_date", text });
       }
     }
   }
-  return { warnings };
+  return { warnings: items.map((x) => x.text), items };
 }
 
 // Cross-file check used by merge-proposed.js: ids/QIDs of `incoming` must not clash with `base`.

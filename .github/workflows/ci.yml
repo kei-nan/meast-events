@@ -131,8 +131,9 @@ jobs:
         run: npm ci
 
       # Schema, ids, dates, coordinates and extracts on data/events.json and
-      # data/events.proposed.json; warnings (e.g. a pin outside its tagged
-      # countries) do not fail. No network.
+      # data/events.proposed.json; a warning (e.g. a pin outside its tagged
+      # countries) fails only when it is not in data/validation-warnings-baseline.json.
+      # No network.
       - name: Validate events
         run: node scripts/validate-events.js
 
