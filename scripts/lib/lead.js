@@ -5,7 +5,7 @@
 // not only the first paragraph. The text is Wikipedia's own; the ONLY changes we make are
 // whitespace normalisation and dropping empty "()" left by stripped markup (see normalizeLead).
 // Never edited, summarised or reworded.
-import { politeFetch, sleep, mediaWikiJson } from "./http.js";
+import { sleep, mediaWikiFetch } from "./http.js";
 
 const API = "https://en.wikipedia.org/w/api.php";
 export const LEAD_BATCH = 20; // TextExtracts hard limit with exintro (exlimit max 20)
@@ -76,9 +76,9 @@ export async function queryAllParts(titles, { maxParts = 50, retries = 2 } = {})
   const changed = new Set(); // titles whose lastrevid differed between two parts
   let cont = null;
   for (let part = 0; part < maxParts; part++) {
-    const res = await politeFetch(`${API}?${new URLSearchParams({ ...base, ...cont })}`);
-    // An API error (HTTP 200 with an `error` body) throws: never read as "every title missing" and cached as null.
-    const data = await mediaWikiJson(res, "lead fetch");
+    // An API error (HTTP 200 with an `error` body) throws once its retries (if transient) are spent: never read as
+    // "every title missing" and cached as null.
+    const data = await mediaWikiFetch(`${API}?${new URLSearchParams({ ...base, ...cont })}`, "lead fetch");
     const q = data.query ?? {};
     for (const n of q.normalized ?? []) normalized.set(n.from, n);
     for (const r of q.redirects ?? []) redirects.set(r.from, r);
@@ -118,7 +118,7 @@ export async function queryAllParts(titles, { maxParts = 50, retries = 2 } = {})
 // The current lastrevid of each (canonical) title: Map(title -> lastrevid). At most LEAD_BATCH titles (one batch).
 async function latestRevids(titles) {
   const params = { action: "query", prop: "info", format: "json", formatversion: "2", titles: titles.join("|") };
-  const data = await mediaWikiJson(await politeFetch(`${API}?${new URLSearchParams(params)}`), "lead revision check");
+  const data = await mediaWikiFetch(`${API}?${new URLSearchParams(params)}`, "lead revision check");
   return new Map((data.query?.pages ?? []).map((p) => [p.title, p.lastrevid]));
 }
 
