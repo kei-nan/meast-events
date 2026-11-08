@@ -19,13 +19,28 @@ import { dropRepeatedPositionsInGeometry } from "./lib/ring-positions.js";
 import { untangleRing } from "./lib/ring-repair.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
+import { checkRawInput, ALLOW_RAW_CHANGE_FLAG } from "./lib/raw-inputs.js";
 
-// CLI (both optional; for checking a change without touching the committed files):
+// CLI (all optional; the first two for checking a change without touching the committed files):
 //   --raw-dir=DIR   read cshapes-2.0.geojson / ne10-countries.geojson from DIR (default data/raw)
 //   --out=FILE      write the result to FILE instead of data/boundaries.json
+//   --allow-raw-change  go on when a raw file's sha256 is not the one pinned in
+//                   scripts/lib/raw-inputs.js (only for a deliberate upgrade of the source)
 const argVal = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=").slice(1).join("=");
 const RAW_DIR = argVal("raw-dir") ? pathToFileURL(resolve(argVal("raw-dir")) + "/") : new URL("../data/raw/", import.meta.url);
 const OUT = argVal("out") ? pathToFileURL(resolve(argVal("out"))) : new URL("../data/boundaries.json", import.meta.url);
+const ALLOW_RAW_CHANGE = process.argv.includes(ALLOW_RAW_CHANGE_FLAG);
+
+// Checks a raw upstream file's bytes against its pinned sha256, then parses it.
+function pinnedRaw(bytes, name) {
+  const r = checkRawInput(name, bytes, { allow: ALLOW_RAW_CHANGE });
+  if (!r.ok) {
+    console.error(`FAIL ${r.message}`);
+    process.exit(1);
+  }
+  if (r.message) console.warn(`warn ${r.message}`);
+  return JSON.parse(bytes.toString("utf-8"));
+}
 
 const REGION_ENTITIES = [
   "Turkey (Ottoman Empire)",
@@ -144,7 +159,7 @@ async function main() {
   const geometryPath = new URL("../data/corrections-geometry.json", import.meta.url);
   const outPath = OUT;
 
-  const raw = JSON.parse(await readFile(sourcePath, "utf-8"));
+  const raw = pinnedRaw(await readFile(sourcePath), "cshapes-2.0.geojson");
   RAW_RECORDS = raw.features;
   const correctionsGeometry = JSON.parse(await readFile(geometryPath, "utf-8"));
   const land = JSON.parse(await readFile(new URL("../data/land-mask.json", import.meta.url), "utf-8"));
@@ -207,7 +222,7 @@ async function main() {
   // several corrections-geometry shapes), loaded only if a reshape asks for them.
   let ne10 = null;
   const ne10Land = (area) => {
-    ne10 ??= JSON.parse(readFileSync(new URL("ne10-countries.geojson", RAW_DIR), "utf-8"));
+    ne10 ??= pinnedRaw(readFileSync(new URL("ne10-countries.geojson", RAW_DIR)), "ne10-countries.geojson");
     return area ? ne10.features.filter((f) => turf.booleanIntersects(f, area)).map((f) => asFeature(f.geometry)) : [];
   };
   const reshapedByCshapes = new Set();
