@@ -10,19 +10,20 @@ import { categoryLabel, categoryShortLabel } from "../lib/categoryLabels";
 import { CATEGORY_COLORS } from "./mapLayers";
 import { EventDetailFailed, PlaceHistoryFailed } from "./LoadFailed.jsx";
 import { importOr } from "../lib/importOr.js";
-import { loadEventDetail, loadExportResults, loadPlaceHistory } from "../lib/lazyChunks.js";
+import { loadEventDetail, loadPlaceHistory } from "../lib/lazyChunks.js";
 import { preloadTextSearch } from "../lib/textSearch";
 import { parseSort, sortValue } from "../lib/browseOrder.js";
 import { effectiveQuery } from "../lib/ranking.js";
 import { emptyResultsText } from "../lib/emptyResults.js";
 import { eventIdQuery } from "../lib/urlState.js";
-import { timelineAxis, timelineOrder } from "../lib/timelineView.js";
-import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
+import { DownloadMenu, DownloadToggle } from "./ResultsDownload.jsx";
+import useResultsDownload from "../hooks/useResultsDownload";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import usePanelWidth from "../hooks/usePanelWidth";
 import useSheetDrag from "../hooks/useSheetDrag";
 import { initialSheet } from "../lib/sheetSnap.js";
 import { panelLiveText } from "../lib/panelLive.js";
+import { describeStatus, scopeAction as scopeActionFor } from "../lib/panelStatus.js";
 import { RETRY_MS } from "../hooks/useAllEvents";
 import "../SidePanel.css";
 
@@ -211,9 +212,6 @@ export default function SearchPanel({
   // Filters sit behind a disclosure so results start near the top of the panel.
   const [filtersOpen, setFiltersOpen] = useState(false);
   // "Download": a disclosure under the toolbar offering CSV and JSON of the list.
-  const [downloadOpen, setDownloadOpen] = useState(false);
-  const downloadId = useId();
-  const downloadBtnRef = useRef(null);
 
   // Selecting an event (from a row or the map) opens the sheet on mobile, at
   // half height; a sheet the reader left at full stays at full.
@@ -432,46 +430,27 @@ export default function SearchPanel({
   // Whole-timeline count while only the selected years are listed. Unknown
   // with "in map view" on, since App only counts the view-trimmed scoped list.
   const allCount = filters.scope === "range" && !filters.inView ? (counts?.all ?? null) : null;
-  const plural = (n) => `${n} result${n === 1 ? "" : "s"}`;
   const settled = !eventsLoading && !loading && searching;
 
-  // `years` names the selected years: the visible line says "selected years"
-  // (the timeline shows them), the announcement below spells them out.
-  // `extra` repeats what the scope button next to the visible line says, as
-  // screen-reader-only text.
-  function describeStatus(years) {
-    const sel = years ?? "selected years";
-    if (eventsLoading) return { text: "Loading events…", extra: "" };
-    if (eventsError) return { text: "Events could not be loaded - retrying", extra: "" };
-    if (loading && interim && results.length > 0)
-      return { text: `${total} title/summary match${total === 1 ? "" : "es"} so far - full-text search running…`, extra: "" };
-    if (loading && results.length === 0) return { text: "Searching…", extra: "" };
-    if (!searching)
-      return {
-        text: `${total} event${total === 1 ? "" : "s"} in ${years ?? "the selected years"}${inView ? ", in map view" : ""}`,
-        extra: "",
-      };
-    if (filters.scope === "range") return { text: `${plural(total)} in ${sel}`, extra: "" };
-    if (total === 0) return { text: "0 results", extra: "" };
-    if (shownInRange === 0) return { text: `${plural(total)} (none in ${sel})`, extra: "" };
-    if (shownInRange !== null && shownInRange !== total)
-      return { text: plural(total), extra: `, ${shownInRange} in ${sel}` };
-    return { text: plural(total), extra: "" };
-  }
-  const { text: statusText, extra: statusExtra } = describeStatus(null);
-
-  // The relevance order is kept in both scopes; this button only switches
-  // between listing every match and listing the ones in the selected years.
-  let scopeAction = null;
-  if (settled && filters.scope === "range" && (allCount === null || allCount > total)) {
-    scopeAction = {
-      label: allCount === null ? "Show whole timeline" : `Show all ${allCount}`,
-      aria: allCount === null ? "Show results from the whole timeline" : `Show all ${plural(allCount)}, whole timeline`,
-      scope: "all",
-    };
-  } else if (settled && filters.scope !== "range" && total > 0 && shownInRange && shownInRange !== total) {
-    scopeAction = { label: `Show the ${shownInRange} in selected years`, aria: null, scope: "range" };
-  }
+  // The status line and the scope button beside it (lib/panelStatus.js). The
+  // visible line passes no years ("selected years": the timeline shows them);
+  // the announcement below spells them out.
+  const statusOf = (years) =>
+    describeStatus({
+      years,
+      eventsLoading,
+      eventsError,
+      loading,
+      interim,
+      resultCount: results.length,
+      total,
+      searching,
+      inView,
+      scope: filters.scope,
+      shownInRange,
+    });
+  const { text: statusText, extra: statusExtra } = statusOf(null);
+  const scopeAction = scopeActionFor({ settled, scope: filters.scope, allCount, total, shownInRange });
 
   // The button usually flips in place, but "Show all N" with none of the N in
   // the selected years leaves no "Show the M in selected years" to flip to: the
@@ -498,7 +477,7 @@ export default function SearchPanel({
     setPausedAt(playState === "paused" ? rangeKey : null);
   }
   const yearsText = range[0] === range[1] ? `${range[0]}` : `${range[0]}–${range[1]}`;
-  const spoken = describeStatus(yearsText);
+  const spoken = statusOf(yearsText);
   const paused = pausedAt === rangeKey;
   const liveText = panelLiveText({
     playing,
@@ -516,37 +495,8 @@ export default function SearchPanel({
   // goes back to its first page itself when the searched text changes.
   const resultsKey = `${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
 
-  // The download is the list as the panel shows it: the same results, in the
-  // order ResultsList lists them (the Timeline view: timelineOrder, as there),
-  // every row, not only the ones "Show more" has revealed. Built from the lite
-  // records in memory (lib/exportResults.js says what that leaves out). Its code
-  // is a chunk of its own: opening the menu starts it, a choice waits for it.
-  const showDownload = !eventsLoading && !eventsError;
-  const canDownload = showDownload && !loading && results.length > 0;
-  const downloadLabel = `Download ${results.length === 1 ? "this result" : `these ${results.length} results`}`;
-  const [downloadFailed, setDownloadFailed] = useState(false);
-  async function download(kind) {
-    if (!canDownload) return;
-    let lib;
-    try {
-      lib = await loadExportResults();
-    } catch {
-      setDownloadFailed(true);
-      return;
-    }
-    setDownloadFailed(false);
-    const { downloadText, exportFileRange, exportFilename, exportQuery, exportRows, toCSV, toJSON } = lib;
-    // The Timeline's axis as ResultsList draws it (fitAxis below), for where a reversed record is placed.
-    const axis = timelineAxis(results, range, { fit: searching && filters.scope !== "range", minYear: MIN_YEAR, maxYear: MAX_YEAR });
-    const ordered = view === "timeline" ? timelineOrder(results, searching ? null : range[0], axis) : results;
-    const rows = exportRows(ordered, { range, browse: !searching });
-    const name = exportFilename(exportFileRange(range, { searching, scope: filters.scope }), rows.length, kind);
-    if (kind === "csv") downloadText(toCSV(rows), name, "text/csv;charset=utf-8");
-    else {
-      const q = exportQuery({ query: textQuery, filters, area, range, sort, view });
-      downloadText(toJSON(rows, { query: q }), name, "application/json;charset=utf-8");
-    }
-  }
+  // Download: the list as shown, as CSV or JSON (ResultsDownload.jsx).
+  const download = useResultsDownload({ results, loading, eventsLoading, eventsError, range, searching, filters, view, textQuery, area, sort });
 
   return (
     <aside
@@ -756,67 +706,10 @@ export default function SearchPanel({
                 {scopeAction.label}
               </button>
             )}
-            {/* At the line's end and always the same width ("Download"; the count is
-                in its name), so nothing moves when the results change: disabled
-                while there is nothing settled to save. */}
-            {showDownload && (
-              <button
-                ref={downloadBtnRef}
-                type="button"
-                className="sp-download-toggle"
-                aria-expanded={downloadOpen}
-                aria-controls={downloadId}
-                aria-label={canDownload ? downloadLabel : "Download (no results to save)"}
-                title={canDownload ? `${downloadLabel} as CSV or JSON` : undefined}
-                disabled={!canDownload}
-                onClick={() => {
-                  if (!downloadOpen) loadExportResults().catch(() => {}); // a choice reports a failure
-                  setDownloadOpen(!downloadOpen);
-                }}
-              >
-                <span className="sp-caret" aria-hidden="true" />
-                Download
-              </button>
-            )}
+            <DownloadToggle d={download} />
           </div>
 
-          {/* The download choices, right under their button. */}
-          {showDownload && (
-            <div
-              id={downloadId}
-              className="sp-download"
-              role="group"
-              aria-label={downloadLabel}
-              hidden={!downloadOpen || !canDownload}
-              onKeyDown={(e) => {
-                if (e.key !== "Escape") return;
-                e.preventDefault();
-                setDownloadOpen(false);
-                downloadBtnRef.current?.focus();
-              }}
-            >
-              <p className="sp-download-what">
-                {downloadLabel}, in the order listed:
-              </p>
-              <div className="sp-download-btns">
-                <button type="button" className="sp-btn" onClick={() => download("csv")}>
-                  CSV <span className="sp-download-hint">(spreadsheet)</span>
-                </button>
-                <button type="button" className="sp-btn" onClick={() => download("json")}>
-                  JSON
-                </button>
-              </div>
-              <p className="sp-download-note">
-                Titles are Wikipedia text (CC BY-SA 4.0, credited in the file). No summaries or borders
-                are included; each row links its event page.
-              </p>
-              {downloadFailed && (
-                <p className="load-failed" role="alert">
-                  The download could not be prepared. Please reload the page.
-                </p>
-              )}
-            </div>
-          )}
+          <DownloadMenu d={download} />
 
           {/* Line 2: how the results are shown. */}
           <div className="sp-toolbar">
