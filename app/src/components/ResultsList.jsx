@@ -291,7 +291,8 @@ const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce
  * subheading), each with a bar on a shared year axis (lib/timelineView.js):
  * the selected years, or with `fitAxis` (a search over the whole timeline) the
  * results' own span, with the selected years shaded.
- * Remount (change `key`) to reset pagination when the result set changes.
+ * Remount (change `key`) to reset pagination when the result set changes; a
+ * new `query` resets it without a remount.
  * Memoized: hovering a row re-renders App, not this list (keep props stable).
  */
 function ResultsList({
@@ -309,6 +310,15 @@ function ResultsList({
 }) {
   const [shown, setShown] = useState(PAGE);
   const [active, setActive] = useState(0);
+  // A new search text starts at the first page and row, as a remount would,
+  // but rows still listed keep their nodes (SearchPanel keys this list on the
+  // filters, area and view only, so typing does not rebuild every row).
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setShown(PAGE);
+    setActive(0);
+  }
   const timeline = layout === "timeline";
   const rangeStart = browse && range ? range[0] : null;
   const axis = useMemo(

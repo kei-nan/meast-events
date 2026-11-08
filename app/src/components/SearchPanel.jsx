@@ -87,7 +87,8 @@ const VIEWS = [
  *
  * @param {object}   props
  * @param {string}   props.query            current search text
- * @param {Filters}  props.filters          categories (Wikidata class ids), countries (0 or 1 used by the select),
+ * @param {Filters}  props.filters          categories (Wikidata class ids), countries (any number, an event in any
+ *                                          of them matches; FilterBar adds them one at a time),
  *                                          scope ("all" = whole timeline, "range" = only selected years),
  *                                          inView (restrict to current map view)
  * @param {Area|null} props.area            active drawn area, or null
@@ -509,7 +510,10 @@ export default function SearchPanel({
   const settledLiveText = useDebouncedValue(liveText, ANNOUNCE_DELAY_MS);
   const announced = paused ? liveText : settledLiveText;
 
-  const resultsKey = `${query}|${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
+  // A new list for other filters, area or view. Not for the text: each keystroke
+  // would rebuild every row (and drop the list's roving focus); ResultsList
+  // goes back to its first page itself when the searched text changes.
+  const resultsKey = `${JSON.stringify(filters)}|${JSON.stringify(area)}|${view}`;
 
   // The download is the list as the panel shows it: the same results, in the
   // order ResultsList lists them (the Timeline view: timelineOrder, as there),
@@ -659,7 +663,7 @@ export default function SearchPanel({
               <div className="sp-notfound">
                 <p className="sp-notfound-title">No event found for this link.</p>
                 <p className="sp-muted">
-                  The link asked for <code className="sp-notfound-id">{notFoundId}</code>, which is not an event in
+                  The link asked for <code className="sp-notfound-id" dir="auto">{notFoundId}</code>, which is not an event in
                   this atlas.
                 </p>
                 <button
@@ -685,6 +689,7 @@ export default function SearchPanel({
                 id={inputId}
                 type="text"
                 inputMode="search"
+                dir="auto" // a pasted Arabic, Hebrew or Persian query reads right to left
                 autoComplete="off"
                 spellCheck={false}
                 maxLength={100}

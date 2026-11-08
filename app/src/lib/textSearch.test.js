@@ -317,6 +317,61 @@ test("one word, a chunk that fails once: the check loads it and the word is sear
   assert.deepEqual(pf.calls.search, ["jerusalem", "jerusalem", "jerusalem"]);
 });
 
+test("a word found alone once is not searched alone again by the same engine", async () => {
+  const { searchEventIds } = await fresh();
+  const pf = fakePagefind({ results: answers({ jerusalem: ["p1", "p2"], suez: ["p2", "p3"], canal: ["p3"], "jerusalem suez": ["p2"], "suez canal": ["p3"], "jerusalem suez canal": [] }) });
+  stubIds({ p1: "e1", p2: "e2", p3: "e3" }, { words: WORLD });
+  assert.deepEqual(await searchEventIds("jerusalem suez"), ["e2"]);
+  assert.deepEqual(await searchEventIds("jerusalem suez"), ["e2"]);
+  assert.deepEqual(await searchEventIds("suez canal"), ["e3"]);
+  assert.deepEqual(await searchEventIds("jerusalem suez canal"), []);
+  assert.deepEqual(pf.calls.search, [
+    "jerusalem", "suez", "jerusalem suez",
+    "jerusalem suez",
+    "canal", "suez canal",
+    "jerusalem suez canal",
+  ]);
+});
+
+test("words already found do not hide a new word's lost chunk", async () => {
+  const { searchEventIds } = await fresh();
+  let lost = true;
+  const all = { jerusalem: ["p1"], suez: ["p2"], canal: ["p3"], "jerusalem suez": ["p1"], "jerusalem suez canal": ["p1"] };
+  const pf = fakePagefind({ results: (q) => (lost && q === "canal" ? [] : (all[q] ?? []).map((id) => ({ id }))) });
+  stubIds({ p1: "e1", p2: "e2", p3: "e3" }, { words: WORLD });
+  assert.deepEqual(await searchEventIds("jerusalem suez"), ["e1"]);
+  // canal's chunk is lost: Pagefind would answer the query with the "jerusalem suez" events.
+  await assert.rejects(searchEventIds("jerusalem suez canal"), /part of the search index/);
+  lost = false;
+  // Only canal, never confirmed, is checked again.
+  pf.calls.search.length = 0;
+  assert.deepEqual(await searchEventIds("jerusalem suez canal"), ["e1"]);
+  assert.deepEqual(pf.calls.search, ["canal", "jerusalem suez canal"]);
+});
+
+test("the engine of a new folder checks every word again", async () => {
+  // The bundle's folder engine confirms jerusalem and suez, then loses canal's
+  // chunk; the retry reads meta.json, moves to v.test and its own engine, which
+  // has loaded nothing.
+  globalThis.__SEARCH_DIR__ = "v.confirmed";
+  try {
+    const { searchEventIds } = await fresh();
+    let canalLost = true;
+    const all = { jerusalem: ["p1"], suez: ["p2"], canal: ["p3"], "jerusalem suez": ["p1"], "jerusalem suez canal": ["p1"] };
+    const pf = fakePagefind({ results: (q) => (canalLost && q === "canal" ? [] : (all[q] ?? []).map((id) => ({ id }))) });
+    stubIds({ p1: "e1", p2: "e2", p3: "e3" }, { words: WORLD });
+    assert.deepEqual(await searchEventIds("jerusalem suez"), ["e1"]);
+    await assert.rejects(searchEventIds("jerusalem suez canal"), /part of the search index/);
+    canalLost = false;
+    pf.calls.search.length = 0;
+    assert.deepEqual(await searchEventIds("jerusalem suez"), ["e1"]);
+    assert.deepEqual(pf.calls.options.map((o) => o.basePath), ["/pagefind/v.confirmed/", "/pagefind/v.test/"]);
+    assert.deepEqual(pf.calls.search, ["jerusalem", "suez", "jerusalem suez"]);
+  } finally {
+    delete globalThis.__SEARCH_DIR__;
+  }
+});
+
 test("several words each found, but never in one event, are no match, not an outage", async () => {
   const { searchEventIds } = await fresh();
   const pf = fakePagefind({ results: answers({ jerusalem: ["p1"], canal: ["p2"] }) });
