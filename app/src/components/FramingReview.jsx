@@ -191,6 +191,18 @@ export default function FramingReview({ event, tab, onTab }) {
       >
         {tab === "fairness" ? <FairnessPanel r={r} /> : <WordingPanel r={r} />}
       </div>
+      {/* Printed in place of the tabs (print.css; hidden on screen, SidePanel.css): paper has no tabs, so both
+          reviews, one after the other, each under its name and what it found. */}
+      <div className="fr-print">
+        {REVIEW_TABS.map((t) => (
+          <div key={t} className={`fr-panel fr-panel--${t}${review[t].found ? " fr-panel--found" : ""}`}>
+            <h4>
+              {TAB_NAMES[t]}: {tabStatus(t, review[t])}
+            </h4>
+            {t === "fairness" ? <FairnessPanel r={review[t]} /> : <WordingPanel r={review[t]} />}
+          </div>
+        ))}
+      </div>
       {review.stale && (
         <p className="framing-review-flag">
           Wikipedia&apos;s text has changed since this review, so it may no longer apply.

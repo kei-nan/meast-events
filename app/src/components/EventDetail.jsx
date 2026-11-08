@@ -1,4 +1,5 @@
-import { Fragment, Suspense, lazy, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, Suspense, lazy, memo, useEffect, useRef, useState } from "react";
+import { useStickyClearance } from "../hooks/useStickyClearance.js";
 import { FramingPointer } from "./FramingPointer.jsx";
 import { FramingReviewFailed } from "./LoadFailed.jsx";
 import ShareButton from "./ShareButton.jsx";
@@ -215,29 +216,10 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
 
   // The sticky action row covers the top of the panel's scroller, so focus
   // moving up the article (Shift+Tab) would land under it: the scroller keeps
-  // that much clear (scroll-padding-top), measured, since the row wraps to two
-  // lines on a narrow phone. The row sticks at its `top` from the scroller's
-  // content edge (inside its padding), plus a little air.
+  // that much clear (scroll-padding-top; measured, since the row wraps to two
+  // lines on a narrow phone).
   const actionsRef = useRef(null);
-  useLayoutEffect(() => {
-    const row = actionsRef.current;
-    const scroller = row?.closest(".sp-scroll");
-    if (!row || !scroller) return;
-    const update = () => {
-      const top = parseFloat(getComputedStyle(row).top) || 0;
-      const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
-      scroller.style.scrollPaddingTop = `${Math.max(0, Math.ceil(pad + top + row.offsetHeight + 8))}px`;
-    };
-    update();
-    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
-    ro?.observe(row);
-    window.addEventListener("resize", update); // the offset differs on phones (SidePanel.css)
-    return () => {
-      ro?.disconnect();
-      window.removeEventListener("resize", update);
-      scroller.style.scrollPaddingTop = "";
-    };
-  }, []);
+  useStickyClearance(actionsRef);
 
   const quality = event.location_quality; // always set by lib/dataClient.js normalizeEvent
   // Only the classes on the event-class list, and only when they say more than the category does (lib/eventClasses.js).
