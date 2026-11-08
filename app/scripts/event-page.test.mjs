@@ -26,6 +26,20 @@ import {
 import { BORDERS_CREDIT, SITE as citationSite, SITE_NAME as citationSiteName } from "../src/lib/citation.js";
 import { safeUrl as appSafeUrl } from "../src/lib/safeUrl.js";
 import { otherArticleTitle } from "../src/lib/otherArticle.js";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { elements, moduleUrl, registerRenderHooks, textOf } from "../src/lib/testing/render.mjs";
+
+// The About dialog as rendered (its credits do not depend on what it loads, so its loaders never answer): its
+// text and its links' addresses.
+registerRenderHooks({
+  "../lib/dataClient": moduleUrl(
+    "const never = () => new Promise(() => {}); export const loadSelectionFunnel = never; export const loadFramingReviewSummary = never;"
+  ),
+});
+const { default: AboutData } = await import("../src/components/AboutData.jsx");
+const aboutHtml = renderToStaticMarkup(createElement(AboutData, { onClose() {} }));
+const ABOUT_RENDERED = [textOf(aboutHtml), ...elements(aboutHtml, "a").map((a) => a.attrs.href)].join(" ");
 
 // The app's own index.html (its source; the build fills in the built one, which
 // differs only in the script and style tags Vite writes).
@@ -59,7 +73,7 @@ test("every border source family in boundaries.json is credited on event pages, 
   const pages = {
     "event page": page({ id: "x", title: "X" }),
     "event index": renderIndexPage([{ id: "x", title: "X" }]),
-    "AboutData.jsx": fs.readFileSync(new URL("../src/components/AboutData.jsx", import.meta.url), "utf8"),
+    "About dialog (AboutData.jsx)": ABOUT_RENDERED,
     NOTICE: fs.readFileSync(new URL("../../NOTICE", import.meta.url), "utf8"),
     "data/LICENSE": fs.readFileSync(new URL("../../data/LICENSE", import.meta.url), "utf8"),
     "Cite this (citation.js)": BORDERS_CREDIT,

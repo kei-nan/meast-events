@@ -11,6 +11,9 @@
 
 let current = null;
 
+/** True while renderHook is rendering (lib/testing/renderReact.mjs uses React's own hooks otherwise). */
+export const rendering = () => current !== null;
+
 const changed = (prev, next) =>
   !prev || !next || prev.length !== next.length || next.some((v, i) => !Object.is(v, prev[i]));
 
