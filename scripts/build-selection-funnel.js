@@ -10,6 +10,7 @@
 // Network: only to measure Wikipedia-editions-only sitelink counts (Wikidata wbgetentities, cached; see lib/cache.js).
 import { readFile, writeFile } from "node:fs/promises";
 import { openCache } from "./lib/cache.js";
+import { matchExclusions } from "./lib/exclusions.js";
 import { fetchEntities } from "./lib/wd-entities.js";
 import { INCLUSION_MIN_SITELINKS, COUNTRIES, EVENT_CLASSES, groupForEvent } from "./lib/event-classes.js";
 
@@ -75,7 +76,8 @@ if (OFFLINE && !CHECK && !sitelinkMeasurement) {
 
 // ---- funnel ----
 const enrichedByQid = new Map(enriched.map((e) => [e.wikidata_qid, e]));
-const excludedIds = new Set(exclusions.map((x) => x.id));
+// The proposed events left out by review, matched by id or wikidata_qid as merge-proposed.js does.
+const excludedIds = matchExclusions(exclusions, proposed).excludedIds;
 const noEn = candidates.filter((c) => !c.has_en_wikipedia);
 const lt10 = candidates.filter((c) => c.has_en_wikipedia && c.sitelinks < MIN);
 const pass = candidates.filter((c) => c.has_en_wikipedia && c.sitelinks >= MIN);

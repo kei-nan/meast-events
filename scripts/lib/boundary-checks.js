@@ -6,6 +6,7 @@
 // No hard dependency: the overlap check needs @turf/turf (a root devDependency), which the
 // caller passes in, so the property/continuity checks and their tests also run where only
 // Node is installed (CI's unit-test step and the refresh workflow run before `npm ci`).
+import { createHash } from "node:crypto";
 import { BOUNDARY_STATUS_LABELS } from "../../app/src/components/mapBorders.js";
 import { sourceItems } from "../../app/src/lib/boundaryText.js";
 
@@ -245,13 +246,25 @@ export function checkSelfIntersections(features, accepted = ACCEPTED_RING_CROSSI
   return { errors, warnings };
 }
 
-// Guard against simplified or coarsened geometry (the rule: borders are never simplified;
-// rounding to 6 decimal places, ~10 cm, is the coarsest allowed without approval). Per
-// feature the baseline (data/border-geometry-baseline.json) records how many vertices it has
-// and how many coordinate values are written with at least FINE_DECIMALS decimals. A drop in
-// either fails; more vertices, or more precision, is fine. Rewriting the baseline is the
-// deliberate step for an approved change: node scripts/validate-boundaries.js --write-geometry-baseline
+// Guard against simplified, coarsened or moved geometry (the rule: borders are never
+// simplified; rounding to 6 decimal places, ~10 cm, is the coarsest allowed without
+// approval). Per feature the baseline (data/border-geometry-baseline.json) records how many
+// vertices it has, how many coordinate values are written with at least FINE_DECIMALS
+// decimals, and the sha256 of its coordinates as written in data/boundaries.json. A drop in
+// vertices or fine values fails with that message (it says what kind of change it is); any
+// other change to the coordinates (a vertex moved, added or reordered) fails on the hash, as
+// does a feature that is new or gone. Rewriting the baseline is the deliberate step for an
+// approved change: node scripts/validate-boundaries.js --write-geometry-baseline
 export const FINE_DECIMALS = 6;
+export const ACCEPT_GEOMETRY_CHANGE = "node scripts/validate-boundaries.js --write-geometry-baseline";
+
+// sha256 (hex) of a geometry's coordinates as data/boundaries.json writes them: the file is
+// one JSON.stringify'd feature per line (scripts/lib/json-lines.js), and JSON.stringify of
+// the parsed numbers gives back the same text, so this is the hash of the coordinates text
+// in the file.
+export function coordinatesHash(geometry) {
+  return createHash("sha256").update(JSON.stringify(geometry?.coordinates ?? null)).digest("hex");
+}
 
 // Decimal places a number is written with. JSON keeps the shortest form, so 31.5 -> 1 and a
 // value rounded to 4 places can never show more than 4.
@@ -275,10 +288,12 @@ export function geometryFingerprint(features) {
         fine += (decimals(pos[0]) >= FINE_DECIMALS) + (decimals(pos[1]) >= FINE_DECIMALS);
       }
     }
-    out[featureKey(f)] = { vertices, fine };
+    out[featureKey(f)] = { vertices, fine, sha256: coordinatesHash(f.geometry) };
   }
   return out;
 }
+
+const short = (h) => (h ? h.slice(0, 12) : "none");
 
 export function checkGeometryBaseline(features, baseline) {
   const errors = [];
@@ -289,6 +304,19 @@ export function checkGeometryBaseline(features, baseline) {
     else if (is.vertices < was.vertices) errors.push(`${key}: ${was.vertices} -> ${is.vertices} vertices (simplified?)`);
     else if (is.fine < was.fine) {
       errors.push(`${key}: coordinate values with >= ${FINE_DECIMALS} decimals ${was.fine} -> ${is.fine} (coarsened?)`);
+    } else if (!was.sha256) {
+      errors.push(`${key}: the geometry baseline has no coordinates hash for it (an older baseline); after checking the shape is unchanged, ${ACCEPT_GEOMETRY_CHANGE}`);
+    } else if (is.sha256 !== was.sha256) {
+      const counts = is.vertices === was.vertices ? `same ${is.vertices} vertices` : `${was.vertices} -> ${is.vertices} vertices`;
+      errors.push(
+        `${key}: coordinates changed (${counts}; sha256 ${short(was.sha256)} -> ${short(is.sha256)}): a vertex moved, was added or reordered; ` +
+          `if this change is approved, accept it with ${ACCEPT_GEOMETRY_CHANGE}`
+      );
+    }
+  }
+  for (const key of Object.keys(now)) {
+    if (!(key in baseline)) {
+      errors.push(`${key}: not in the geometry baseline (a new shape); if it is approved, accept it with ${ACCEPT_GEOMETRY_CHANGE}`);
     }
   }
   return errors;

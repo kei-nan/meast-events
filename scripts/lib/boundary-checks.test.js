@@ -12,6 +12,7 @@ import {
   decimals,
   geometryFingerprint,
   checkGeometryBaseline,
+  coordinatesHash,
   baselineYears,
 } from "./boundary-checks.js";
 
@@ -189,10 +190,13 @@ test("decimals: counts the decimal places a coordinate is written with", () => {
   assert.equal(decimals(1e-7), 7);
 });
 
-test("checkGeometryBaseline: unchanged and finer geometry pass; simplified, coarsened or missing features fail", () => {
+test("checkGeometryBaseline: unchanged geometry passes; simplified, coarsened or missing features fail", () => {
   const original = [feature({ name: "Israel", start_year: 1967, end_year: 1978 }, detailed())];
   const baseline = geometryFingerprint(original);
-  assert.deepEqual(baseline, { "Israel 1967-1978": { vertices: 13, fine: 26 } });
+  assert.deepEqual(baseline, {
+    "Israel 1967-1978": { vertices: 13, fine: 26, sha256: coordinatesHash(detailed()) },
+  });
+  assert.match(baseline["Israel 1967-1978"].sha256, /^[0-9a-f]{64}$/);
   assert.deepEqual(checkGeometryBaseline(original, baseline), []);
   // Rounding 11-15 decimals down to 6 is allowed; it does not lose a 6-decimal value.
   assert.equal(geometryFingerprint([feature({}, { type: "Polygon", coordinates: [[[35.123456789012, 31.1], [35.123457, 31.2]]] })])["A 1900-1950"].fine, 2);
@@ -210,11 +214,68 @@ test("checkGeometryBaseline: unchanged and finer geometry pass; simplified, coar
 
   // MultiPolygon parts count too; a feature gone from the file fails.
   const multi = [feature({ name: "Israel", start_year: 1967, end_year: 1978 }, { type: "MultiPolygon", coordinates: [detailed().coordinates] })];
-  assert.deepEqual(checkGeometryBaseline(multi, baseline), []);
+  assert.deepEqual(geometryFingerprint(multi)["Israel 1967-1978"].vertices, 13);
+  assert.deepEqual(checkGeometryBaseline(multi, geometryFingerprint(multi)), []);
   assert.match(checkGeometryBaseline([], baseline)[0], /no longer in the file/);
 
   // checkBoundaries reports it as an error when given the baseline.
   assert.match(checkBoundaries(fc(...coarse), { geometryBaseline: baseline }).errors[0], /coarsened/);
+});
+
+test("checkGeometryBaseline: a moved, added or reordered vertex fails on the coordinates hash, naming the feature", () => {
+  const kuwait = (geometry) => [feature({ name: "Kuwait", start_year: 1992, end_year: 9999 }, geometry)];
+  const baseline = geometryFingerprint(kuwait(detailed()));
+
+  // Identical data (a fresh copy, as a re-read of the file gives) passes.
+  assert.deepEqual(checkGeometryBaseline(kuwait(structuredClone(detailed())), baseline), []);
+
+  // One vertex moved about 7 km east (0.07 degrees of longitude), still 6 decimals: the vertex
+  // and fine-decimal counts are unchanged, so only the hash catches it.
+  const moved = detailed();
+  moved.coordinates[0][3] = [Number((moved.coordinates[0][3][0] + 0.07).toFixed(6)), moved.coordinates[0][3][1]];
+  assert.deepEqual(
+    { vertices: geometryFingerprint(kuwait(moved))["Kuwait 1992-present"].vertices, fine: geometryFingerprint(kuwait(moved))["Kuwait 1992-present"].fine },
+    { vertices: 13, fine: 26 }
+  );
+  const errors = checkGeometryBaseline(kuwait(moved), baseline);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /^Kuwait 1992-present: coordinates changed \(same 13 vertices; sha256 [0-9a-f]{12} -> [0-9a-f]{12}\)/);
+  assert.match(errors[0], /accept it with node scripts\/validate-boundaries\.js --write-geometry-baseline$/);
+  // A moved vertex is also an error through checkBoundaries.
+  assert.match(checkBoundaries(fc(...kuwait(moved)), { geometryBaseline: baseline }).errors[0], /coordinates changed/);
+
+  // A vertex added (more vertices, finer is not enough on its own any more) fails too.
+  const added = detailed();
+  added.coordinates[0].splice(1, 0, [35.812345, 31.512345]);
+  assert.match(checkGeometryBaseline(kuwait(added), baseline)[0], /coordinates changed \(13 -> 14 vertices;/);
+
+  // A ring started at another vertex (same positions, different order) fails.
+  const ring = detailed().coordinates[0].slice(0, -1);
+  const rotated = [...ring.slice(1), ring[0], ring[1]];
+  assert.match(checkGeometryBaseline(kuwait({ type: "Polygon", coordinates: [rotated] }), baseline)[0], /coordinates changed/);
+
+  // A shape not in the baseline fails until the baseline is rewritten.
+  const extra = [...kuwait(detailed()), feature({ name: "Bahrain", start_year: 1971, end_year: 9999 })];
+  assert.deepEqual(checkGeometryBaseline(extra, baseline), [
+    "Bahrain 1971-present: not in the geometry baseline (a new shape); if it is approved, accept it with node scripts/validate-boundaries.js --write-geometry-baseline",
+  ]);
+
+  // Rewriting the baseline on purpose (what --write-geometry-baseline does) accepts the change.
+  const rewritten = geometryFingerprint(kuwait(moved));
+  assert.notEqual(rewritten["Kuwait 1992-present"].sha256, baseline["Kuwait 1992-present"].sha256);
+  assert.deepEqual(checkGeometryBaseline(kuwait(moved), rewritten), []);
+  assert.deepEqual(checkGeometryBaseline(extra, geometryFingerprint(extra)), []);
+  // ...and the original geometry then fails against the rewritten baseline.
+  assert.match(checkGeometryBaseline(kuwait(detailed()), rewritten)[0], /coordinates changed/);
+});
+
+test("coordinatesHash: the sha256 of the coordinates text as the boundaries file writes it", async () => {
+  const { createHash } = await import("node:crypto");
+  const { stringifyFeatureCollection } = await import("./json-lines.js");
+  const f = feature({}, { type: "Polygon", coordinates: [[[35.123456, 31.000001], [35.5, 31.25], [1e-7, 31], [35.123456, 31.000001]]] });
+  const line = stringifyFeatureCollection(fc(f)).split("\n")[1];
+  const text = line.slice(line.indexOf('"coordinates":') + '"coordinates":'.length, -2);
+  assert.equal(coordinatesHash(JSON.parse(line).geometry), createHash("sha256").update(text).digest("hex"));
 });
 
 test("baselineYears: at least one year inside every distinct period, few years, stable over time", () => {

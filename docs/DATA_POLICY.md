@@ -629,6 +629,9 @@ the Oslo areas (paras. 78, 102), and Security Council Resolutions 252 (1968) and
 ## Map borders: where there is no shape
 
 The time-driven borders (`data/boundaries.json`) come from CShapes 2.0 plus our documented corrections (`scripts/boundary-corrections.js`).
+The two gitignored upstream files the import reads (`data/raw/cshapes-2.0.geojson` and Natural Earth's `data/raw/ne10-countries.geojson`) are
+pinned by sha256 in `scripts/lib/raw-inputs.js` (since 2026-11-08, taken from the files that rebuild the committed `data/boundaries.json` byte for
+byte); a different file stops the import, and `--allow-raw-change` is only for a deliberate source upgrade, pinned in the same reviewed change.
 CShapes codes independent states and only some colonial dependencies, and the import (`REGION_ENTITIES` in `scripts/ingest-boundaries.js`) takes
 20 of its entities. A territory with no shape for a year is simply blank on the map that year: we do not draw a border we have no source for.
 The map gives each year to the record in force on 1 July, so a state that CShapes starts in the second half of a year appears the next year.
@@ -730,7 +733,16 @@ node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --
                                                         #    The flag copy needs the curated event in the proposed file, which
                                                         #    no longer happens (curated events are not re-proposed, 2026-11-03):
                                                         #    it finds nothing to copy; re-derived flags reach curated records
-                                                        #    only through a person's review
+                                                        #    only through a person's review.
+                                                        #    --only=ID,ID adds just those proposed events (each must be in the
+                                                        #    proposed file and not excluded by review). Since 2026-11-08 the dry
+                                                        #    run lists events to add that have no entry in
+                                                        #    data/framing-review.json, and --apply refuses them unless
+                                                        #    --allow-unreviewed (a stale review is listed, not refused).
+                                                        #    data/proposed-exclusions.json entries match by id or wikidata_qid
+                                                        #    (an article rename changes the id, not the item; all 28 entries
+                                                        #    carry their QID), and the run counts matched and unmatched entries
+                                                        #    and warns about each entry that matches nothing
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
@@ -818,7 +830,9 @@ flagged shape drawn on top of it (the West Bank, Gaza Strip and Golan Heights) a
 Borders are never simplified; 6 decimal places (about 10 cm) is the coarsest rounding allowed without approval. Since 2026-10-28
 `validate-boundaries.js` also fails when a feature has fewer vertices, or fewer coordinate values written with at least 6 decimals, than in
 `data/border-geometry-baseline.json` (per feature; 103 features, 189,472 vertices counting each ring's closing point), or when a feature in that
-file is gone. More vertices or more decimals pass. After an approved geometry change the baseline is rewritten on purpose with
+file is gone. Since 2026-11-08 the baseline also holds, per feature, the sha256 of its coordinates as written in `data/boundaries.json`, and any
+other change fails too, naming the feature: a vertex moved (the counts alone let a Kuwait 1992 vertex moved 7 km pass), added or reordered, or a
+shape that is not in the baseline. After an approved geometry change the baseline is rewritten on purpose with
 `node scripts/validate-boundaries.js --write-geometry-baseline`, so the diff shows which shapes changed.
 
 `node scripts/verify-borders.js --check` (CI) measures the independent Wikidata reference points against the drawn borders of every year in
