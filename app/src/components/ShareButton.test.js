@@ -113,7 +113,8 @@ test("ShareButton: QR code says it is being made, then shows a labelled code wit
   const making = elements(v.html, "button").find((b) => b.text === "QR code");
   assert.equal(making.attrs["aria-disabled"], "true", "kept while the code is made, so focus stays on it");
   assert.match(v.html, /role="status">Making the QR code…</);
-  for (let i = 0; i < 5 && /aria-disabled/.test(v.html); i++) {
+  // The QR module is a dynamic import: on a slow CI runner it can take many turns.
+  for (let i = 0; i < 200 && /aria-disabled/.test(v.html); i++) {
     await settle();
     v.rerender();
   }

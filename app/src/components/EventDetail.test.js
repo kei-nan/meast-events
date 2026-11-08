@@ -43,8 +43,14 @@ const buttons = (html) => elements(html, "button").map((b) => b.text);
 const about = (html) => textOf(html.slice(html.indexOf('id="event-detail-about-title"')));
 
 // Let the lazily loaded framing review arrive once; later renders show it at once.
-render(opened("sykes-picot-agreement"));
-await settle();
+// Its module is imported first, then the view is rendered until the review is in
+// it: one settle() was enough here but not on a slower CI runner, where compiling
+// FramingReview.jsx and its imports outlasted it and the review tests failed.
+await import("./FramingReview.jsx");
+for (let i = 0; !/role="tablist"/.test(render(opened("sykes-picot-agreement")).html); i++) {
+  assert.ok(i < 200, "the lazily loaded framing review never arrived");
+  await settle();
+}
 
 test("EventDetail: an event with a precise location: title, date and countries, Find on map, place history, and its Wikipedia credit", () => {
   const event = opened("siege-of-adrianople-1912-1913");
