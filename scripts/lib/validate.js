@@ -296,301 +296,561 @@ export function staleDateNotes(e) {
 //   (2014) are two seed titles that resolve to the same Wikipedia article.
 export const KNOWN_DUPLICATE_QIDS = new Set([]);
 
-// opts.boundaries + opts.turf: data/boundaries.json and the @turf/turf module; with both, every
-// precise pin is checked against its tagged countries' shapes (pinCountryCheck; a warning).
-// opts.today (YYYY-MM-DD): "now" for events without extract_retrieved_at (default: today, UTC).
-export function validateEvents(
-  events,
-  { name = "events", lenient = false, otherIds = new Set(), boundaries = null, turf = null, today = todayUtc() } = {}
-) {
-  const errors = [];
-  const warnings = [];
-  const shapeIndex = boundaries && turf ? indexBoundaries(boundaries, turf) : null;
-  const err = (i, e, msg) => errors.push(`${name}[${i}] ${e?.id ?? "(no id)"}: ${msg}`);
-  const warn = (i, e, msg) => warnings.push(`${name}[${i}] ${e?.id ?? "(no id)"}: ${msg}`);
+// ---- The allowed fields ----
+// Every top-level field an event record may carry, with its type (docs/DATA_POLICY.md, "What each field is", lists
+// the same fields). Any other key is an error: a typo ("date_ends") or a pipeline-internal field (_review,
+// source_qid, enrich_version) would otherwise be published unnoticed. `check(value)` is true when a present value
+// has the field's type; a field without one is type-checked by its own checker below (its message names the field).
+// Optional fields stay optional here: what the pipeline writes on every record is not required of a hand-written one.
+const isPlainObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+const isNonEmptyString = (v) => typeof v === "string" && v.trim() !== "";
+const isStringArray = (v) => Array.isArray(v) && v.every(isNonEmptyString);
+const isNonNegativeInteger = (v) => Number.isInteger(v) && v >= 0;
+// The enrichment time (enrich-candidates.js: new Date().toISOString()), a real calendar day.
+const ISO_TIMESTAMP_RE = /^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d{1,9})?Z$/;
+export const isIsoTimestamp = (v) => typeof v === "string" && ISO_TIMESTAMP_RE.test(v) && isRealDate(v.slice(0, 10));
+// The P582 "no value" / "unknown value" of lib/wd-entities.js setDateEndOpen.
+export const DATE_END_OPEN_VALUES = ["wikidata_novalue", "wikidata_somevalue"];
+// wikipedia_lead_dates: lib/v21.js wikipediaLeadDates, "YYYY-MM-DD" or a "YYYY" year.
+const LEAD_DATE_RE = /^\d{4}(-\d{2}-\d{2})?$/;
+// part_of: enrich-candidates.js / lib/seed-enrichment.js write { qid, label } (label null when Wikidata has none).
+const isPartOf = (p) =>
+  isPlainObject(p) &&
+  Object.keys(p).every((k) => k === "qid" || k === "label") &&
+  typeof p.qid === "string" &&
+  QID_RE.test(p.qid) &&
+  "label" in p &&
+  (p.label === null || isNonEmptyString(p.label));
 
-  if (!Array.isArray(events)) return { errors: [`${name}: top level must be an array`], warnings };
+export const EVENT_FIELDS = {
+  id: { type: "string (lower-case slug)" },
+  title: { type: "non-empty string" },
+  wikipedia_url: { type: "English Wikipedia article URL" },
+  extract: { type: "non-empty string" },
+  extract_retrieved_at: { type: "ISO date or timestamp" },
+  retrieved_at: { type: "an ISO UTC timestamp (YYYY-MM-DDTHH:MM:SS[.sss]Z)", check: isIsoTimestamp },
+  wikipedia_revid: { type: "positive integer" },
+  wikipedia_revid_timestamp: { type: "UTC timestamp" },
+  wikidata_qid: { type: "QID" },
+  resolved_qid: { type: "a QID", check: (v) => typeof v === "string" && QID_RE.test(v) },
+  wikidata_classes: { type: "array of non-empty strings" },
+  wikidata_description: { type: "a non-empty string or null", check: (v) => v === null || isNonEmptyString(v) },
+  wikidata_aliases: { type: "non-empty array of distinct non-empty strings" },
+  date_start: { type: "YYYY-MM-DD" },
+  date_end: { type: "YYYY-MM-DD or null" },
+  date_precision: { type: "Wikidata precision name or null" },
+  date_end_precision: { type: "Wikidata precision name or null" },
+  date_end_open: { type: DATE_END_OPEN_VALUES.map((v) => JSON.stringify(v)).join(" or "), check: (v) => DATE_END_OPEN_VALUES.includes(v) },
+  date_flags: { type: "array of non-empty strings" },
+  wikipedia_lead_dates: {
+    type: 'a non-empty array of "YYYY-MM-DD" or "YYYY" strings',
+    check: (v) => Array.isArray(v) && v.length > 0 && v.every((d) => typeof d === "string" && LEAD_DATE_RE.test(d)),
+  },
+  countries: { type: "non-empty array of distinct tracked countries" },
+  category: { type: "category group" },
+  category_group: { type: "category group" },
+  location_quality: { type: LOCATION_QUALITIES.join("|") },
+  coordinates: {
+    type: "null or { lat, lon } with no other keys",
+    check: (v) => v === null || (isPlainObject(v) && Object.keys(v).every((k) => k === "lat" || k === "lon")),
+  },
+  coordinate_source: { type: "coordinate source or null" },
+  needs_manual_coordinates: { type: "a boolean", check: (v) => typeof v === "boolean" },
+  review_reasons: { type: "an array of non-empty strings", check: isStringArray },
+  needs_review: { type: "a boolean", check: (v) => typeof v === "boolean" },
+  part_of: { type: "an array of { qid, label } (label a non-empty string or null)", check: (v) => Array.isArray(v) && v.every(isPartOf) },
+  possible_duplicates: { type: "array" },
+  sitelinks: { type: "a non-negative integer", check: isNonNegativeInteger },
+  sitelinks_current: { type: "a non-negative integer", check: isNonNegativeInteger },
+};
+// Reported by checkDeprecatedFields, not as unknown.
+const DEPRECATED_FIELDS = new Set(["category_label"]);
 
-  const ids = new Map();
-  const qids = new Map();
+const shortJson = (v) => {
+  const s = JSON.stringify(v) ?? String(v);
+  return s.length > 80 ? `${s.slice(0, 77)}...` : s;
+};
 
-  events.forEach((e, i) => {
-    if (!e || typeof e !== "object") return err(i, e, "not an object");
+// ---- Per-event checks ----
+// Each checker reads one event (and `ctx`: the options, the event's index, the ids/QIDs seen so far) and returns its
+// findings: error(msg), or warning(code, msg). A warning's code is stable across runs (its message may carry counts
+// that change): the warnings baseline (data/validation-warnings-baseline.json, scripts/validate-events.js) keys on
+// [file, event id, code]. validateEvents runs them in EVENT_CHECKS order, so the messages come out in a fixed order.
+const error = (msg) => ({ level: "error", msg });
+const warning = (code, msg) => ({ level: "warning", code, msg });
+// A lib/flags.js flag reads "<code>: ...".
+const flagWarning = (flag, suffix = "") => warning(flag.split(":")[0], flag + suffix);
 
-    const idProblem = eventIdProblem(e.id);
-    if (idProblem) err(i, e, idProblem);
-    else if (ids.has(e.id)) err(i, e, `duplicate id (also at index ${ids.get(e.id)})`);
-    else ids.set(e.id, i);
+function checkId(e, ctx) {
+  const problem = eventIdProblem(e.id);
+  if (problem) return [error(problem)];
+  if (ctx.ids.has(e.id)) return [error(`duplicate id (also at index ${ctx.ids.get(e.id)})`)];
+  ctx.ids.set(e.id, ctx.i);
+  return [];
+}
 
-    if (typeof e.title !== "string" || !e.title.trim()) err(i, e, "title missing/empty");
+function checkTitle(e) {
+  return typeof e.title !== "string" || !e.title.trim() ? [error("title missing/empty")] : [];
+}
 
-    if (e.wikidata_qid != null) {
-      if (typeof e.wikidata_qid !== "string" || !QID_RE.test(e.wikidata_qid)) {
-        err(i, e, `wikidata_qid malformed (${JSON.stringify(e.wikidata_qid)})`);
-      } else if (qids.has(e.wikidata_qid) && lenient && KNOWN_DUPLICATE_QIDS.has(e.wikidata_qid)) {
-        warnings.push(`${name}[${i}] ${e.id}: known duplicate wikidata_qid ${e.wikidata_qid} (awaiting user decision)`);
-      } else if (qids.has(e.wikidata_qid)) {
-        err(i, e, `duplicate wikidata_qid ${e.wikidata_qid} (also at index ${qids.get(e.wikidata_qid)})`);
-      } else qids.set(e.wikidata_qid, i);
-    } else if (!lenient) {
-      err(i, e, "wikidata_qid missing");
-    } else warnings.push(`${name}[${i}] ${e.id}: no wikidata_qid`);
+function checkWikidataQid(e, ctx) {
+  const q = e.wikidata_qid;
+  if (q == null) return ctx.lenient ? [warning("no_wikidata_qid", "no wikidata_qid")] : [error("wikidata_qid missing")];
+  if (typeof q !== "string" || !QID_RE.test(q)) return [error(`wikidata_qid malformed (${JSON.stringify(q)})`)];
+  if (ctx.qids.has(q) && ctx.lenient && KNOWN_DUPLICATE_QIDS.has(q)) {
+    return [warning("known_duplicate_qid", `known duplicate wikidata_qid ${q} (awaiting user decision)`)];
+  }
+  if (ctx.qids.has(q)) return [error(`duplicate wikidata_qid ${q} (also at index ${ctx.qids.get(q)})`)];
+  ctx.qids.set(q, ctx.i);
+  return [];
+}
 
-    if (!isRealDate(e.date_start)) err(i, e, `date_start invalid (${JSON.stringify(e.date_start)})`);
-    else {
-      // Dated after its data was fetched: a scheduled/planned event (valid up to MAX_YEAR, but
-      // what Wikipedia said then may no longer hold). Compared with the fetch day, so the
-      // result depends on the data, not on when validation runs.
-      const fetched = typeof e.extract_retrieved_at === "string" && ISO_DAY_RE.test(e.extract_retrieved_at);
-      const asOf = fetched ? e.extract_retrieved_at.slice(0, 10) : today;
-      if (e.date_start > asOf) {
-        warn(i, e, `date_start (${e.date_start}) is after the day its data was ${fetched ? "retrieved" : "validated"} (${asOf}): a scheduled or planned event; shown as Wikidata gives it`);
-      }
-    }
-    if (e.date_flags != null && (!Array.isArray(e.date_flags) || e.date_flags.some((f) => typeof f !== "string" || !f))) {
-      err(i, e, "date_flags must be an array of non-empty strings");
-    }
-    if (e.date_end != null) {
-      if (!isRealDate(e.date_end, MAX_END_YEAR)) err(i, e, `date_end invalid (${JSON.stringify(e.date_end)})`);
-      else if (isRealDate(e.date_start) && e.date_end < e.date_start) {
-        // v2.1: Wikidata's own date-order errors are kept and flagged, not dropped. The order problem is
-        // only tolerated (as a warning) when date_flags carries a date_order_invalid reason explaining it.
-        const flags = Array.isArray(e.date_flags) ? e.date_flags.map(String) : [];
-        const explained = flags.some((f) => f.startsWith("date_order_invalid"));
-        // A coarse Wikidata end (e.g. the year "2002", stored as 2002-01-01) is not before the start when its
-        // whole period reaches it; the pipeline then writes date_end_precision_coarse naming the precision
-        // (lib/v21.js dateOrderFlags). Checked here against the stored dates, so the flag cannot excuse a real reversal.
-        const coarse = flags.find((f) => f.startsWith(`${DATE_END_COARSE_FLAG}:`));
-        const coarseCode = coarse ? precisionCode(/has only (.+?) precision/.exec(coarse)?.[1]) : null;
-        const coarseOk = coarseCode != null && (lastDayOfPeriod(e.date_end, coarseCode) ?? "") >= e.date_start;
-        if (explained) warnings.push(`${name}[${i}] ${e.id}: date_end (${e.date_end}) precedes date_start (${e.date_start}) - flagged in date_flags`);
-        else if (coarseOk) warn(i, e, `date_end (${e.date_end}) is a coarse Wikidata end (${precisionName(coarseCode)} precision) that reaches date_start (${e.date_start}) - flagged ${DATE_END_COARSE_FLAG}`);
-        else err(i, e, `date_end (${e.date_end}) precedes date_start (${e.date_start}) and date_flags has no date_order_invalid reason`);
-      }
-    }
-    // The converse: a date note that no longer fits the stored dates (staleDateNotes). date_flags are shown on the
-    // event's page, so one is an error, as an unflagged reversal above is; review_reasons are the owner's review notes
-    // (not shown), so a stale one is a warning, as a stale framing review is.
-    const staleNotes = staleDateNotes(e);
-    for (const why of staleNotes.flags) err(i, e, `date_flags: ${why}`);
-    for (const why of staleNotes.reasons) warn(i, e, `review_reasons: ${why}`);
+function checkDateStart(e, ctx) {
+  if (!isRealDate(e.date_start)) return [error(`date_start invalid (${JSON.stringify(e.date_start)})`)];
+  // Dated after its data was fetched: a scheduled/planned event (valid up to MAX_YEAR, but
+  // what Wikipedia said then may no longer hold). Compared with the fetch day, so the
+  // result depends on the data, not on when validation runs.
+  const fetched = typeof e.extract_retrieved_at === "string" && ISO_DAY_RE.test(e.extract_retrieved_at);
+  const asOf = fetched ? e.extract_retrieved_at.slice(0, 10) : ctx.today;
+  if (e.date_start <= asOf) return [];
+  return [
+    warning(
+      "date_start_after_retrieval",
+      `date_start (${e.date_start}) is after the day its data was ${fetched ? "retrieved" : "validated"} (${asOf}): a scheduled or planned event; shown as Wikidata gives it`
+    ),
+  ];
+}
 
-    if (!Array.isArray(e.countries) || e.countries.length === 0 || e.countries.some((c) => typeof c !== "string" || !c)) {
-      err(i, e, "countries must be a non-empty array of strings");
-    } else if (!e.countries.some(isKnownCountry)) {
-      err(i, e, `no tracked country (inclusion rule 2): ${e.countries.join(", ")}`);
-    } else if (!e.countries.every(isKnownCountry)) {
-      // Every tag must be a tracked country (or "regional"): one tracked name next to a misspelt or untracked one
-      // (["Iraq", "Isreal"]) is a typo, not an event in two countries; the app has no shape for the other name.
-      err(i, e, `unknown country ${e.countries.filter((c) => !isKnownCountry(c)).map((c) => JSON.stringify(c)).join(", ")} (each tag must be a tracked country or "regional")`);
-    }
-    if (typeof e.category !== "string" || !e.category) err(i, e, "category missing");
-    else if (!CATEGORIES.includes(e.category)) err(i, e, `category must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category)})`);
-    else if (Array.isArray(e.wikidata_classes) && e.category !== groupForEvent(e.wikidata_classes)) {
-      // The grouping rule (groupForEvent) is the only source of the group: no event keeps one set by hand.
-      err(i, e, `category ${e.category} is not what the grouping rule gives for its wikidata_classes (${groupForEvent(e.wikidata_classes)})`);
-    }
-    if (e.category_group != null) {
-      if (!CATEGORIES.includes(e.category_group)) {
-        err(i, e, `category_group must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category_group)})`);
-      } else if (e.category_group !== e.category) {
-        err(i, e, `category_group (${e.category_group}) differs from category (${e.category}); both hold the same grouping`);
-      }
-    }
+function checkDateFlags(e) {
+  if (e.date_flags != null && (!Array.isArray(e.date_flags) || e.date_flags.some((f) => typeof f !== "string" || !f))) {
+    return [error("date_flags must be an array of non-empty strings")];
+  }
+  return [];
+}
 
-    if (typeof e.extract !== "string" || !e.extract.trim()) err(i, e, "extract missing/empty");
-    else if (e.extract.trim().length < MIN_EXTRACT_CHARS) {
-      warn(i, e, `extract is only ${e.extract.trim().length} characters (< ${MIN_EXTRACT_CHARS}); check the lead was fetched whole`);
-    }
+function checkDateEnd(e) {
+  if (e.date_end == null) return [];
+  if (!isRealDate(e.date_end, MAX_END_YEAR)) return [error(`date_end invalid (${JSON.stringify(e.date_end)})`)];
+  if (!isRealDate(e.date_start) || e.date_end >= e.date_start) return [];
+  // v2.1: Wikidata's own date-order errors are kept and flagged, not dropped. The order problem is
+  // only tolerated (as a warning) when date_flags carries a date_order_invalid reason explaining it.
+  const flags = Array.isArray(e.date_flags) ? e.date_flags.map(String) : [];
+  const explained = flags.some((f) => f.startsWith("date_order_invalid"));
+  // A coarse Wikidata end (e.g. the year "2002", stored as 2002-01-01) is not before the start when its
+  // whole period reaches it; the pipeline then writes date_end_precision_coarse naming the precision
+  // (lib/v21.js dateOrderFlags). Checked here against the stored dates, so the flag cannot excuse a real reversal.
+  const coarse = flags.find((f) => f.startsWith(`${DATE_END_COARSE_FLAG}:`));
+  const coarseCode = coarse ? precisionCode(/has only (.+?) precision/.exec(coarse)?.[1]) : null;
+  const coarseOk = coarseCode != null && (lastDayOfPeriod(e.date_end, coarseCode) ?? "") >= e.date_start;
+  if (explained) {
+    return [warning("date_order_invalid", `date_end (${e.date_end}) precedes date_start (${e.date_start}) - flagged in date_flags`)];
+  }
+  if (coarseOk) {
+    return [
+      warning(
+        DATE_END_COARSE_FLAG,
+        `date_end (${e.date_end}) is a coarse Wikidata end (${precisionName(coarseCode)} precision) that reaches date_start (${e.date_start}) - flagged ${DATE_END_COARSE_FLAG}`
+      ),
+    ];
+  }
+  return [error(`date_end (${e.date_end}) precedes date_start (${e.date_start}) and date_flags has no date_order_invalid reason`)];
+}
 
-    // v2.1 shape fields
-    if (!Array.isArray(e.wikidata_classes) || e.wikidata_classes.some((c) => typeof c !== "string" || !c)) {
-      err(i, e, "wikidata_classes must be an array of non-empty strings");
-    } else if (notEventClasses(e.wikidata_classes).length) {
-      // "Not events" (docs/DATA_POLICY.md): merge-proposed.js removes such an entry; listed here until it does.
-      warn(i, e, `not an event by its Wikidata classes (${notEventClasses(e.wikidata_classes).map((c) => c.label).join(", ")}): merge-proposed.js removes it`);
-    }
-    // Wikidata's English aliases (scripts/refresh-sitelinks.js): absent when the item has none, never empty.
-    if (
-      e.wikidata_aliases !== undefined &&
-      (!Array.isArray(e.wikidata_aliases) || !e.wikidata_aliases.length || e.wikidata_aliases.some((a) => typeof a !== "string" || !a.trim()))
-    ) {
-      err(i, e, "wikidata_aliases must be a non-empty array of non-empty strings (absent when Wikidata has none)");
-    }
-    // A date or a timestamp; its day must be a real calendar day (not 2026-02-30).
-    if (typeof e.extract_retrieved_at !== "string" || !ISO_DAY_RE.test(e.extract_retrieved_at) || !isRealDate(e.extract_retrieved_at.slice(0, 10))) {
-      err(i, e, `extract_retrieved_at must be an ISO date (got ${JSON.stringify(e.extract_retrieved_at)})`);
-    }
-    // The revision whose lead is the stored extract, and its date (lib/revid.js): both or neither.
-    if ("wikipedia_revid" in e && !isRevid(e.wikipedia_revid)) {
-      err(i, e, `wikipedia_revid must be a positive integer when present (got ${JSON.stringify(e.wikipedia_revid)})`);
-    }
-    if ("wikipedia_revid_timestamp" in e && !isRevTimestamp(e.wikipedia_revid_timestamp)) {
-      err(i, e, `wikipedia_revid_timestamp must be a UTC timestamp like 2026-10-15T19:38:37Z (got ${JSON.stringify(e.wikipedia_revid_timestamp)})`);
-    }
-    if (("wikipedia_revid" in e) !== ("wikipedia_revid_timestamp" in e)) {
-      err(i, e, "wikipedia_revid and wikipedia_revid_timestamp must be present together or not at all");
-    }
-    if ("category_label" in e) err(i, e, "category_label is deprecated and must not be present");
-    if (e.location_quality == null) {
-      // Required (shape v2.1): without it the coordinate checks below cannot tell "no known location" from a pin.
-      err(i, e, `location_quality missing (one of ${LOCATION_QUALITIES.join("|")})`);
-    } else if (!LOCATION_QUALITIES.includes(e.location_quality)) {
-      err(i, e, `location_quality must be one of ${LOCATION_QUALITIES.join("|")} (got ${JSON.stringify(e.location_quality)})`);
-    }
+// The converse: a date note that no longer fits the stored dates (staleDateNotes). date_flags are shown on the
+// event's page, so one is an error, as an unflagged reversal is; review_reasons are the owner's review notes
+// (not shown), so a stale one is a warning, as a stale framing review is.
+function checkStaleDateNotes(e) {
+  const stale = staleDateNotes(e);
+  return [
+    ...stale.flags.map((why) => error(`date_flags: ${why}`)),
+    ...stale.reasons.map((why) => warning("stale_review_reason", `review_reasons: ${why}`)),
+  ];
+}
 
-    // Coordinates are required only when location_quality != "none". "none" means no real location:
-    // coordinates must then be null (never invented).
-    if (e.location_quality === "none") {
-      if (e.coordinates != null) err(i, e, 'location_quality "none" requires coordinates: null');
-    } else if (e.coordinates == null) {
-      if (lenient) warnings.push(`${name}[${i}] ${e.id}: coordinates null but location_quality is not "none"`);
-      else err(i, e, 'coordinates missing (set location_quality "none" for events without a known location)');
-    } else {
-      const { lat, lon } = e.coordinates;
-      if (typeof lat !== "number" || typeof lon !== "number" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
-        err(i, e, "coordinates.lat/lon must be finite numbers");
-      } else if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-        err(i, e, `coordinates out of range (${lat}, ${lon})`);
-      } else if (!inRegion(lat, lon)) {
-        // Outside the region but inside it with lat/lon exchanged: almost certainly a swap,
-        // unless this exact point was checked against both sources (fixes.js CHECKED_COORDINATES).
-        const checked = coordinatesChecked(e);
-        if (inRegion(lon, lat) && !checked) err(i, e, `coordinates look swapped (lat ${lat}, lon ${lon}); (${lon}, ${lat}) would be in the region`);
-        else if (checked) warn(i, e, `coordinates (${lat}, ${lon}) are outside the Middle East box; checked against Wikipedia and Wikidata, not swapped (docs/data-fixes.md ${checked.ref})`);
-        else warn(i, e, `coordinates (${lat}, ${lon}) are outside the Middle East box (source: ${e.coordinate_source ?? "none"}); fine if the event happened abroad`);
-      } else if (shapeIndex && e.location_quality === "precise" && isRealDate(e.date_start)) {
-        // Inside the box only: a point outside it is outside every tracked country anyway and
-        // already has its warning above (one warning per event).
-        const off = pinCountryCheck(e, shapeIndex);
-        if (off) {
-          warn(i, e, `precise pin (${lat}, ${lon}) is ${Math.round(off.km)} km outside the ${off.year} border shapes of every tagged country (${e.countries.join(", ")}; tolerance ${PIN_TOLERANCE_KM} km, source: ${e.coordinate_source ?? "none"}${off.wide ? "; before 1920 checked against the Ottoman Empire shape" : ""}); fine if the event happened abroad`);
-        }
-      }
-    }
+function checkCountries(e) {
+  if (!Array.isArray(e.countries) || e.countries.length === 0 || e.countries.some((c) => typeof c !== "string" || !c)) {
+    return [error("countries must be a non-empty array of strings")];
+  }
+  if (!e.countries.some(isKnownCountry)) return [error(`no tracked country (inclusion rule 2): ${e.countries.join(", ")}`)];
+  if (!e.countries.every(isKnownCountry)) {
+    // Every tag must be a tracked country (or "regional"): one tracked name next to a misspelt or untracked one
+    // (["Iraq", "Isreal"]) is a typo, not an event in two countries; the app has no shape for the other name.
+    const unknown = e.countries.filter((c) => !isKnownCountry(c)).map((c) => JSON.stringify(c));
+    return [error(`unknown country ${unknown.join(", ")} (each tag must be a tracked country or "regional")`)];
+  }
+  return [];
+}
 
-    // location_quality <-> coordinate_source, as the pipeline pairs them.
-    if (LOCATION_QUALITIES.includes(e.location_quality)) {
-      const src = e.coordinate_source ?? null;
-      const fb = typeof src === "string" ? FALLBACK_RE.exec(src) : null;
-      if (e.location_quality === "none" && src !== null) {
-        err(i, e, `location_quality "none" requires coordinate_source: null (got ${JSON.stringify(src)})`);
-      } else if (e.location_quality === "approximate" && !(fb && fb[1] in COUNTRIES)) {
-        err(i, e, `location_quality "approximate" requires coordinate_source "country-fallback:<tracked country>" (got ${JSON.stringify(src)})`);
-      } else if (e.location_quality === "precise" && !PRECISE_SOURCES.includes(src)) {
-        err(i, e, `location_quality "precise" requires coordinate_source ${PRECISE_SOURCES.join("|")} (got ${JSON.stringify(src)})`);
-      }
+function checkCategory(e) {
+  const out = [];
+  if (typeof e.category !== "string" || !e.category) out.push(error("category missing"));
+  else if (!CATEGORIES.includes(e.category)) out.push(error(`category must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category)})`));
+  else if (Array.isArray(e.wikidata_classes) && e.category !== groupForEvent(e.wikidata_classes)) {
+    // The grouping rule (groupForEvent) is the only source of the group: no event keeps one set by hand.
+    out.push(error(`category ${e.category} is not what the grouping rule gives for its wikidata_classes (${groupForEvent(e.wikidata_classes)})`));
+  }
+  if (e.category_group != null) {
+    if (!CATEGORIES.includes(e.category_group)) {
+      out.push(error(`category_group must be one of ${CATEGORIES.join("|")} (got ${JSON.stringify(e.category_group)})`));
+    } else if (e.category_group !== e.category) {
+      out.push(error(`category_group (${e.category_group}) differs from category (${e.category}); both hold the same grouping`));
     }
+  }
+  return out;
+}
 
-    // Inclusion rule 4 (docs/DATA_POLICY.md) and the extract both need the English article: required, and English.
-    if (typeof e.wikipedia_url !== "string" || !e.wikipedia_url) {
-      err(i, e, "wikipedia_url missing (inclusion rule 4 needs an English Wikipedia article)");
-    } else if (!/^https:\/\/[a-z-]+\.wikipedia\.org\/wiki\//.test(e.wikipedia_url)) {
-      err(i, e, `wikipedia_url not a Wikipedia article URL (${e.wikipedia_url})`);
-    } else if (!e.wikipedia_url.startsWith(ENGLISH_WIKIPEDIA)) {
-      err(i, e, `wikipedia_url is not an English Wikipedia article (${e.wikipedia_url}); inclusion rule 4 needs one`);
-    }
+function checkExtract(e) {
+  if (typeof e.extract !== "string" || !e.extract.trim()) return [error("extract missing/empty")];
+  const n = e.extract.trim().length;
+  if (n < MIN_EXTRACT_CHARS) {
+    return [warning("short_extract", `extract is only ${n} characters (< ${MIN_EXTRACT_CHARS}); check the lead was fetched whole`)];
+  }
+  return [];
+}
 
-    // A date stored at a precision coarser than a day is the period's first day, as Wikidata/WDQS writes it
-    // (month: YYYY-MM-01; year and coarser: YYYY-01-01). Any other day means the date and its precision disagree
-    // (a ledger date kept with the discovery precision, or a hand edit): the app would show the wrong period.
-    for (const [field, pField] of [["date_start", "date_precision"], ["date_end", "date_end_precision"]]) {
-      const shape = precisionShapeProblem(e[field], e[pField]);
-      if (shape) err(i, e, `${field} ${e[field]} does not fit ${pField} ${JSON.stringify(e[pField])}: ${shape}`);
-    }
+// v2.1 shape fields
+function checkWikidataClasses(e) {
+  if (!Array.isArray(e.wikidata_classes) || e.wikidata_classes.some((c) => typeof c !== "string" || !c)) {
+    return [error("wikidata_classes must be an array of non-empty strings")];
+  }
+  const notEvent = notEventClasses(e.wikidata_classes);
+  if (notEvent.length) {
+    // "Not events" (docs/DATA_POLICY.md): merge-proposed.js removes such an entry; listed here until it does.
+    return [warning("not_an_event", `not an event by its Wikidata classes (${notEvent.map((c) => c.label).join(", ")}): merge-proposed.js removes it`)];
+  }
+  return [];
+}
 
-    // Discovered events (they carry `sitelinks`, the count discovery saw) met inclusion rule 4 when found. The
-    // hand-picked seed events (data/seed-events.json; no `sitelinks`) are the allow-list: they were chosen by
-    // hand, not by the rule, so neither count is checked for them (docs/DATA_POLICY.md, "Honest caveat").
-    const discovered = e.sitelinks !== undefined;
-    if (discovered) {
-      if (typeof e.sitelinks !== "number" || e.sitelinks < INCLUSION_MIN_SITELINKS) {
-        warn(i, e, `sitelinks at discovery (${JSON.stringify(e.sitelinks)}) below the inclusion threshold of ${INCLUSION_MIN_SITELINKS} (rule 4), and it is not a hand-picked seed event`);
-      } else if (typeof e.sitelinks_current === "number" && e.sitelinks_current < INCLUSION_MIN_SITELINKS) {
-        warn(i, e, `sitelinks_current (${e.sitelinks_current}) has fallen below the inclusion threshold of ${INCLUSION_MIN_SITELINKS} (it had ${e.sitelinks} at discovery); kept, events are never dropped automatically`);
-      }
-      // date_precision: the Wikidata precision of the kept date_start (lib/fixes.js keptDatePrecision). null is
-      // written when the kept date is no Wikidata value (a ledger date from the infobox).
-      if (!("date_precision" in e)) warn(i, e, "date_precision missing (discovered events record the Wikidata precision of date_start)");
-      else if (e.date_precision !== null && precisionCode(e.date_precision) === null) {
-        warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
-      }
-    } else if (!("date_precision" in e)) {
-      // Seed events were added before date_precision existed; without it their date shows as the year only
-      // (app/src/lib/eventDate.js). scripts/enrich-seed.js proposes the Wikidata value for the owner's review.
-      warn(i, e, "date_precision missing (hand-picked seed event; its date shows as the year only until the Wikidata precision is recorded)");
-    } else if (e.date_precision != null && precisionCode(e.date_precision) === null) {
-      warn(i, e, `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
-    }
-    // date_end_precision (optional): the Wikidata precision of the kept date_end's P582 statement (lib/fixes.js
-    // keptEndPrecision; scripts/backfill-end-precision.js), null when no P582 has that value. Without it the end
-    // shows as a year only.
-    if ("date_end_precision" in e) {
-      if (!e.date_end) warn(i, e, "date_end_precision without a date_end");
-      else if (e.date_end_precision !== null && precisionCode(e.date_end_precision) === null) {
-        warn(i, e, `date_end_precision ${JSON.stringify(e.date_end_precision)} is not a Wikidata precision name`);
-      }
-    }
-    // Years only: the title is Wikipedia's, the dates Wikidata's; neither is changed (lib/flags.js titleYearsFlag).
-    if (typeof e.title === "string" && isRealDate(e.date_start)) {
-      const ty = titleYearsFlag(e);
-      if (ty) warn(i, e, ty);
-      // A day-precision start the lead's first sentence does not name, next to another day of that year (advisory).
-      const ld = leadStartDayFlag(e);
-      if (ld) warn(i, e, ld);
-    }
-    // No date_end on an event the title calls ongoing, or of a class that lasts a span (lib/flags.js). Flags only.
-    const pn = presentWithoutEndFlag(e);
-    if (pn) warn(i, e, pn);
-    const dn = durativeWithoutEndFlag(e);
-    if (dn) warn(i, e, dn);
-    // A precise pin rounded to whole degrees or tenths (app/src/lib/coordPrecision.js): the site shows it as approximate.
-    const lowPin = lowPrecisionCoordinateFlag(e);
-    if (lowPin) warn(i, e, `${lowPin}; shown on the site as an approximate location`);
-    // A decade/century date stored as its first day, with no end: shown as a single year that Wikidata never gave
-    // (e.g. "+2000-00-00" at century precision is the 20th century, 1901-2000, stored as 2000-01-01).
-    const pc = precisionCode(e.date_precision);
-    if (pc !== null && pc <= 8 && e.date_end == null) {
-      warn(i, e, `date_start ${e.date_start} has only ${e.date_precision} precision and there is no date_end: Wikidata gives only the ${e.date_precision} ending ${String(lastDayOfPeriod(e.date_start, pc)).slice(0, 4)}, not this year or day`);
-    }
-    if (Array.isArray(e.countries) && e.countries.length >= MANY_COUNTRIES_WARN) {
-      warn(i, e, `tagged with ${e.countries.length} countries (>= ${MANY_COUNTRIES_WARN}): it counts once in each of them in per-country figures`);
-    }
-    // resolved_qid = the Wikidata item of the article at wikipedia_url (enrich-candidates.js).
-    // A different item means the URL points at another (often broader) article. Flag only.
-    // Borrowed coordinates (one warning per event, merged with the above):
-    //  - coordinate_source "redirect_target": enrich-candidates.js took the point from that other
-    //    article/item;
-    //  - coordinate_source "wikipedia" with a different resolved_qid (records written before
-    //    "redirect_target" existed): the Wikipedia coordinates are by construction those of the
-    //    article at wikipedia_url, i.e. of the other item.
-    //  ("wikidata" with a different resolved_qid is ambiguous - the event's own P625 or the other
-    //  item's - and is not reported as borrowed.)
-    const otherItem = typeof e.resolved_qid === "string" && typeof e.wikidata_qid === "string" && e.resolved_qid !== e.wikidata_qid;
-    const borrowed =
-      e.coordinates != null && (e.coordinate_source === BORROWED_SOURCE || (otherItem && e.coordinate_source === "wikipedia"));
-    if (borrowed) {
-      warn(
-        i,
-        e,
-        `coordinates are borrowed from another item (coordinate_source ${JSON.stringify(e.coordinate_source)}): ${
-          otherItem ? `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}` : "taken from the redirect target"
-        }, not the event's wikidata_qid ${e.wikidata_qid}; the pin is that article's location`
-      );
-    } else if (otherItem) {
-      warn(i, e, `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}, not the event's wikidata_qid ${e.wikidata_qid}`);
-    }
-  });
+// Wikidata's English aliases (scripts/refresh-sitelinks.js): absent when the item has none, never empty.
+function checkWikidataAliases(e) {
+  const a = e.wikidata_aliases;
+  if (a !== undefined && (!Array.isArray(a) || !a.length || a.some((x) => typeof x !== "string" || !x.trim()))) {
+    return [error("wikidata_aliases must be a non-empty array of non-empty strings (absent when Wikidata has none)")];
+  }
+  return [];
+}
 
-  // Two events with the same wikipedia_url or the same extract. Expected only for events without an English
-  // article of their own (docs/DATA_POLICY.md, "Events without an article of their own"): their resolved_qid
-  // differs from their wikidata_qid, and they already carry that warning above. A group is explained when
-  // at most one member is the article's own item; it is still listed, naming the other event(s), once per
-  // event (one warning for the shared wikipedia_url, saying whether the extract is identical too). Anything
-  // else is listed as unexplained.
+// A date or a timestamp; its day must be a real calendar day (not 2026-02-30).
+function checkExtractRetrievedAt(e) {
+  const v = e.extract_retrieved_at;
+  if (typeof v !== "string" || !ISO_DAY_RE.test(v) || !isRealDate(v.slice(0, 10))) {
+    return [error(`extract_retrieved_at must be an ISO date (got ${JSON.stringify(v)})`)];
+  }
+  return [];
+}
+
+// The revision whose lead is the stored extract, and its date (lib/revid.js): both or neither.
+function checkRevision(e) {
+  const out = [];
+  if ("wikipedia_revid" in e && !isRevid(e.wikipedia_revid)) {
+    out.push(error(`wikipedia_revid must be a positive integer when present (got ${JSON.stringify(e.wikipedia_revid)})`));
+  }
+  if ("wikipedia_revid_timestamp" in e && !isRevTimestamp(e.wikipedia_revid_timestamp)) {
+    out.push(error(`wikipedia_revid_timestamp must be a UTC timestamp like 2026-10-15T19:38:37Z (got ${JSON.stringify(e.wikipedia_revid_timestamp)})`));
+  }
+  if (("wikipedia_revid" in e) !== ("wikipedia_revid_timestamp" in e)) {
+    out.push(error("wikipedia_revid and wikipedia_revid_timestamp must be present together or not at all"));
+  }
+  return out;
+}
+
+function checkDeprecatedFields(e) {
+  return "category_label" in e ? [error("category_label is deprecated and must not be present")] : [];
+}
+
+function checkLocationQuality(e) {
+  if (e.location_quality == null) {
+    // Required (shape v2.1): without it the coordinate checks cannot tell "no known location" from a pin.
+    return [error(`location_quality missing (one of ${LOCATION_QUALITIES.join("|")})`)];
+  }
+  if (!LOCATION_QUALITIES.includes(e.location_quality)) {
+    return [error(`location_quality must be one of ${LOCATION_QUALITIES.join("|")} (got ${JSON.stringify(e.location_quality)})`)];
+  }
+  return [];
+}
+
+// The warning code of the pin-in-country check, which runs only with data/boundaries.json and @turf/turf (a
+// baseline entry of this code is not "gone" when the check was skipped).
+export const PIN_OUTSIDE_COUNTRIES = "pin_outside_countries";
+
+// Coordinates are required only when location_quality != "none". "none" means no real location:
+// coordinates must then be null (never invented).
+function checkCoordinates(e, ctx) {
+  if (e.location_quality === "none") return e.coordinates != null ? [error('location_quality "none" requires coordinates: null')] : [];
+  if (e.coordinates == null) {
+    return ctx.lenient
+      ? [warning("coordinates_missing", 'coordinates null but location_quality is not "none"')]
+      : [error('coordinates missing (set location_quality "none" for events without a known location)')];
+  }
+  const { lat, lon } = e.coordinates;
+  if (typeof lat !== "number" || typeof lon !== "number" || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+    return [error("coordinates.lat/lon must be finite numbers")];
+  }
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return [error(`coordinates out of range (${lat}, ${lon})`)];
+  if (!inRegion(lat, lon)) {
+    // Outside the region but inside it with lat/lon exchanged: almost certainly a swap,
+    // unless this exact point was checked against both sources (fixes.js CHECKED_COORDINATES).
+    const checked = coordinatesChecked(e);
+    if (inRegion(lon, lat) && !checked) return [error(`coordinates look swapped (lat ${lat}, lon ${lon}); (${lon}, ${lat}) would be in the region`)];
+    if (checked) {
+      return [warning("outside_region_checked", `coordinates (${lat}, ${lon}) are outside the Middle East box; checked against Wikipedia and Wikidata, not swapped (docs/data-fixes.md ${checked.ref})`)];
+    }
+    return [warning("outside_region", `coordinates (${lat}, ${lon}) are outside the Middle East box (source: ${e.coordinate_source ?? "none"}); fine if the event happened abroad`)];
+  }
+  if (ctx.shapeIndex && e.location_quality === "precise" && isRealDate(e.date_start)) {
+    // Inside the box only: a point outside it is outside every tracked country anyway and
+    // already has its warning above (one warning per event).
+    const off = pinCountryCheck(e, ctx.shapeIndex);
+    if (off) {
+      return [
+        warning(
+          PIN_OUTSIDE_COUNTRIES,
+          `precise pin (${lat}, ${lon}) is ${Math.round(off.km)} km outside the ${off.year} border shapes of every tagged country (${e.countries.join(", ")}; tolerance ${PIN_TOLERANCE_KM} km, source: ${e.coordinate_source ?? "none"}${off.wide ? "; before 1920 checked against the Ottoman Empire shape" : ""}); fine if the event happened abroad`
+        ),
+      ];
+    }
+  }
+  return [];
+}
+
+// location_quality <-> coordinate_source, as the pipeline pairs them.
+function checkCoordinateSource(e) {
+  if (!LOCATION_QUALITIES.includes(e.location_quality)) return [];
+  const src = e.coordinate_source ?? null;
+  const fb = typeof src === "string" ? FALLBACK_RE.exec(src) : null;
+  if (e.location_quality === "none" && src !== null) {
+    return [error(`location_quality "none" requires coordinate_source: null (got ${JSON.stringify(src)})`)];
+  }
+  if (e.location_quality === "approximate" && !(fb && fb[1] in COUNTRIES)) {
+    return [error(`location_quality "approximate" requires coordinate_source "country-fallback:<tracked country>" (got ${JSON.stringify(src)})`)];
+  }
+  if (e.location_quality === "precise" && !PRECISE_SOURCES.includes(src)) {
+    return [error(`location_quality "precise" requires coordinate_source ${PRECISE_SOURCES.join("|")} (got ${JSON.stringify(src)})`)];
+  }
+  return [];
+}
+
+// Inclusion rule 4 (docs/DATA_POLICY.md) and the extract both need the English article: required, and English.
+function checkWikipediaUrl(e) {
+  const u = e.wikipedia_url;
+  if (typeof u !== "string" || !u) return [error("wikipedia_url missing (inclusion rule 4 needs an English Wikipedia article)")];
+  if (!/^https:\/\/[a-z-]+\.wikipedia\.org\/wiki\//.test(u)) return [error(`wikipedia_url not a Wikipedia article URL (${u})`)];
+  if (!u.startsWith(ENGLISH_WIKIPEDIA)) return [error(`wikipedia_url is not an English Wikipedia article (${u}); inclusion rule 4 needs one`)];
+  return [];
+}
+
+// A date stored at a precision coarser than a day is the period's first day, as Wikidata/WDQS writes it
+// (month: YYYY-MM-01; year and coarser: YYYY-01-01). Any other day means the date and its precision disagree
+// (a ledger date kept with the discovery precision, or a hand edit): the app would show the wrong period.
+function checkPrecisionShapes(e) {
+  const out = [];
+  for (const [field, pField] of [["date_start", "date_precision"], ["date_end", "date_end_precision"]]) {
+    const shape = precisionShapeProblem(e[field], e[pField]);
+    if (shape) out.push(error(`${field} ${e[field]} does not fit ${pField} ${JSON.stringify(e[pField])}: ${shape}`));
+  }
+  return out;
+}
+
+// Discovered events (they carry `sitelinks`, the count discovery saw) met inclusion rule 4 when found. The
+// hand-picked seed events (data/seed-events.json; no `sitelinks`) are the allow-list: they were chosen by
+// hand, not by the rule, so neither count is checked for them (docs/DATA_POLICY.md, "Honest caveat").
+function checkInclusionAndPrecision(e) {
+  const out = [];
+  const unknownPrecision = () =>
+    warning("date_precision_unknown", `date_precision ${JSON.stringify(e.date_precision)} is not a Wikidata precision name`);
+  if (e.sitelinks !== undefined) {
+    if (typeof e.sitelinks !== "number" || e.sitelinks < INCLUSION_MIN_SITELINKS) {
+      out.push(warning("sitelinks_below_threshold", `sitelinks at discovery (${JSON.stringify(e.sitelinks)}) below the inclusion threshold of ${INCLUSION_MIN_SITELINKS} (rule 4), and it is not a hand-picked seed event`));
+    } else if (typeof e.sitelinks_current === "number" && e.sitelinks_current < INCLUSION_MIN_SITELINKS) {
+      out.push(warning("sitelinks_current_below_threshold", `sitelinks_current (${e.sitelinks_current}) has fallen below the inclusion threshold of ${INCLUSION_MIN_SITELINKS} (it had ${e.sitelinks} at discovery); kept, events are never dropped automatically`));
+    }
+    // date_precision: the Wikidata precision of the kept date_start (lib/fixes.js keptDatePrecision). null is
+    // written when the kept date is no Wikidata value (a ledger date from the infobox).
+    if (!("date_precision" in e)) out.push(warning("date_precision_missing", "date_precision missing (discovered events record the Wikidata precision of date_start)"));
+    else if (e.date_precision !== null && precisionCode(e.date_precision) === null) out.push(unknownPrecision());
+  } else if (!("date_precision" in e)) {
+    // Seed events were added before date_precision existed; without it their date shows as the year only
+    // (app/src/lib/eventDate.js). scripts/enrich-seed.js proposes the Wikidata value for the owner's review.
+    out.push(warning("seed_date_precision_missing", "date_precision missing (hand-picked seed event; its date shows as the year only until the Wikidata precision is recorded)"));
+  } else if (e.date_precision != null && precisionCode(e.date_precision) === null) out.push(unknownPrecision());
+  return out;
+}
+
+// date_end_precision (optional): the Wikidata precision of the kept date_end's P582 statement (lib/fixes.js
+// keptEndPrecision; scripts/backfill-end-precision.js), null when no P582 has that value. Without it the end
+// shows as a year only.
+function checkEndPrecision(e) {
+  if (!("date_end_precision" in e)) return [];
+  if (!e.date_end) return [warning("date_end_precision_without_end", "date_end_precision without a date_end")];
+  if (e.date_end_precision !== null && precisionCode(e.date_end_precision) === null) {
+    return [warning("date_end_precision_unknown", `date_end_precision ${JSON.stringify(e.date_end_precision)} is not a Wikidata precision name`)];
+  }
+  return [];
+}
+
+// Advisory flags (lib/flags.js), each a warning named by its flag; nothing is changed.
+function checkAdvisoryFlags(e) {
+  const out = [];
+  // Years only: the title is Wikipedia's, the dates Wikidata's; neither is changed (lib/flags.js titleYearsFlag).
+  if (typeof e.title === "string" && isRealDate(e.date_start)) {
+    const ty = titleYearsFlag(e);
+    if (ty) out.push(flagWarning(ty));
+    // A day-precision start the lead's first sentence does not name, next to another day of that year (advisory).
+    const ld = leadStartDayFlag(e);
+    if (ld) out.push(flagWarning(ld));
+  }
+  // No date_end on an event the title calls ongoing, or of a class that lasts a span (lib/flags.js). Flags only.
+  const pn = presentWithoutEndFlag(e);
+  if (pn) out.push(flagWarning(pn));
+  const dn = durativeWithoutEndFlag(e);
+  if (dn) out.push(flagWarning(dn));
+  // A precise pin rounded to whole degrees or tenths (app/src/lib/coordPrecision.js): the site shows it as approximate.
+  const lowPin = lowPrecisionCoordinateFlag(e);
+  if (lowPin) out.push(flagWarning(lowPin, "; shown on the site as an approximate location"));
+  // A decade/century date stored as its first day, with no end: shown as a single year that Wikidata never gave
+  // (e.g. "+2000-00-00" at century precision is the 20th century, 1901-2000, stored as 2000-01-01).
+  const pc = precisionCode(e.date_precision);
+  if (pc !== null && pc <= 8 && e.date_end == null) {
+    out.push(warning("coarse_start_without_end", `date_start ${e.date_start} has only ${e.date_precision} precision and there is no date_end: Wikidata gives only the ${e.date_precision} ending ${String(lastDayOfPeriod(e.date_start, pc)).slice(0, 4)}, not this year or day`));
+  }
+  if (Array.isArray(e.countries) && e.countries.length >= MANY_COUNTRIES_WARN) {
+    out.push(warning("many_countries", `tagged with ${e.countries.length} countries (>= ${MANY_COUNTRIES_WARN}): it counts once in each of them in per-country figures`));
+  }
+  return out;
+}
+
+// resolved_qid = the Wikidata item of the article at wikipedia_url (enrich-candidates.js).
+// A different item means the URL points at another (often broader) article. Flag only.
+// Borrowed coordinates (one warning per event, merged with the above):
+//  - coordinate_source "redirect_target": enrich-candidates.js took the point from that other
+//    article/item;
+//  - coordinate_source "wikipedia" with a different resolved_qid (records written before
+//    "redirect_target" existed): the Wikipedia coordinates are by construction those of the
+//    article at wikipedia_url, i.e. of the other item.
+//  ("wikidata" with a different resolved_qid is ambiguous - the event's own P625 or the other
+//  item's - and is not reported as borrowed.)
+function checkOtherItem(e) {
+  const otherItem = typeof e.resolved_qid === "string" && typeof e.wikidata_qid === "string" && e.resolved_qid !== e.wikidata_qid;
+  const borrowed = e.coordinates != null && (e.coordinate_source === BORROWED_SOURCE || (otherItem && e.coordinate_source === "wikipedia"));
+  if (borrowed) {
+    const where = otherItem ? `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}` : "taken from the redirect target";
+    return [warning("borrowed_coordinates", `coordinates are borrowed from another item (coordinate_source ${JSON.stringify(e.coordinate_source)}): ${where}, not the event's wikidata_qid ${e.wikidata_qid}; the pin is that article's location`)];
+  }
+  if (otherItem) return [warning("article_of_other_item", `wikipedia_url (${e.wikipedia_url}) belongs to ${e.resolved_qid}, not the event's wikidata_qid ${e.wikidata_qid}`)];
+  return [];
+}
+
+// Unknown keys, and the type of each field EVENT_FIELDS gives a `check` for.
+function checkFields(e) {
+  const out = [];
+  for (const [key, value] of Object.entries(e)) {
+    if (DEPRECATED_FIELDS.has(key)) continue;
+    const field = Object.hasOwn(EVENT_FIELDS, key) ? EVENT_FIELDS[key] : null;
+    if (!field) out.push(error(`unknown field ${JSON.stringify(key)} (the allowed fields: EVENT_FIELDS in scripts/lib/validate.js, docs/DATA_POLICY.md "What each field is")`));
+    else if (field.check && !field.check(value)) out.push(error(`${key} must be ${field.type} (got ${shortJson(value)})`));
+  }
+  return out;
+}
+
+// Each list once: a repeated tag counts the event twice in that country's figures; a repeated alias is noise
+// (refresh-sitelinks.js keeps Wikidata's list as it is).
+function checkDistinctLists(e) {
+  const out = [];
+  for (const key of ["countries", "wikidata_aliases"]) {
+    const list = e[key];
+    if (!Array.isArray(list)) continue;
+    const repeated = [...new Set(list.filter((x, i) => list.indexOf(x) !== i))];
+    if (repeated.length) out.push(error(`${key} lists ${repeated.map((x) => JSON.stringify(x)).join(", ")} more than once`));
+  }
+  return out;
+}
+
+// needs_review is derived, never set by hand: true when review_reasons or date_flags is non-empty (lib/v21.js
+// finalizeEvent, lib/order-flags.js refreshOrderFlags, enrich-candidates.js; lib/fixes.js sets it with the
+// data_fix reason it adds). Not judged when either list is malformed (already an error).
+function checkNeedsReview(e) {
+  if (typeof e.needs_review !== "boolean") return [];
+  const reasons = e.review_reasons ?? [];
+  const flags = e.date_flags ?? [];
+  if (!Array.isArray(reasons) || !Array.isArray(flags)) return [];
+  const derived = reasons.length > 0 || flags.length > 0;
+  if (e.needs_review === derived) return [];
+  return [error(`needs_review is ${e.needs_review}, but it is derived: ${derived} when review_reasons (${reasons.length}) or date_flags (${flags.length}) is non-empty`)];
+}
+
+// needs_manual_coordinates: true unless the event has its own precise pin. enrich-candidates.js writes
+// !coordinates next to precise/none, lib/fixes.js writes false with precise and true with none, and the legacy
+// country-capital ("approximate") pins carry true: the capital is no location of the event's own.
+function checkNeedsManualCoordinates(e) {
+  if (typeof e.needs_manual_coordinates !== "boolean" || !LOCATION_QUALITIES.includes(e.location_quality)) return [];
+  const expected = e.location_quality !== "precise";
+  if (e.needs_manual_coordinates === expected) return [];
+  return [error(`needs_manual_coordinates is ${e.needs_manual_coordinates}, but location_quality "${e.location_quality}" gives ${expected} (true unless the pin is precise)`)];
+}
+
+// date_end_open is how Wikidata states a missing end; with a date_end the date is what counts
+// (lib/wd-entities.js setDateEndOpen removes it then, and app/scripts/split-data.mjs does not publish it).
+function checkDateEndOpen(e) {
+  if (!("date_end_open" in e) || e.date_end == null) return [];
+  return [error(`date_end_open (${shortJson(e.date_end_open)}) with a date_end (${shortJson(e.date_end)}): it is only for an event without one`)];
+}
+
+// wikipedia_lead_dates is written only next to a date_order_invalid flag (lib/v21.js finalizeEvent; lib/order-flags.js
+// carries both together), for the shown date-order note (app/src/lib/dateOrderNote.js): without the flag it is stale.
+function checkLeadDates(e) {
+  if (!("wikipedia_lead_dates" in e)) return [];
+  const flags = Array.isArray(e.date_flags) ? e.date_flags : [];
+  if (flags.some((f) => typeof f === "string" && f.startsWith("date_order_invalid"))) return [];
+  return [error("wikipedia_lead_dates without a date_order_invalid flag in date_flags (it is written only next to one)")];
+}
+
+// In the order their messages come out.
+const EVENT_CHECKS = [
+  checkId,
+  checkTitle,
+  checkWikidataQid,
+  checkDateStart,
+  checkDateFlags,
+  checkDateEnd,
+  checkStaleDateNotes,
+  checkCountries,
+  checkCategory,
+  checkExtract,
+  checkWikidataClasses,
+  checkWikidataAliases,
+  checkExtractRetrievedAt,
+  checkRevision,
+  checkDeprecatedFields,
+  checkLocationQuality,
+  checkCoordinates,
+  checkCoordinateSource,
+  checkWikipediaUrl,
+  checkPrecisionShapes,
+  checkInclusionAndPrecision,
+  checkEndPrecision,
+  checkAdvisoryFlags,
+  checkOtherItem,
+  checkFields,
+  checkDistinctLists,
+  checkNeedsReview,
+  checkNeedsManualCoordinates,
+  checkDateEndOpen,
+  checkLeadDates,
+];
+
+// ---- Checks across events ----
+
+// Two events with the same wikipedia_url or the same extract. Expected only for events without an English
+// article of their own (docs/DATA_POLICY.md, "Events without an article of their own"): their resolved_qid
+// differs from their wikidata_qid, and they already carry that warning. A group is explained when
+// at most one member is the article's own item; it is still listed, naming the other event(s), once per
+// event (one warning for the shared wikipedia_url, saying whether the extract is identical too). Anything
+// else is listed as unexplained. Returns [index, finding] pairs.
+function checkSharedArticles(events) {
+  const out = [];
   const ownItem = (e) => !(typeof e.resolved_qid === "string" && e.resolved_qid !== e.wikidata_qid);
   const sameText = (members) => new Set(members.map((e) => (typeof e.extract === "string" ? e.extract.trim() : ""))).size === 1;
-  for (const [field, label] of [["wikipedia_url", "wikipedia_url"], ["extract", "extract"]]) {
+  for (const field of ["wikipedia_url", "extract"]) {
     const groups = new Map();
     events.forEach((e, i) => {
       const v = e && typeof e === "object" && typeof e[field] === "string" ? e[field].trim() : "";
@@ -611,32 +871,76 @@ export function validateEvents(
           const why = ownItem(events[i])
             ? "this is the article's own event"
             : `this event has no English article of its own (the article belongs to ${events[i].resolved_qid})`;
-          warn(i, events[i], `same wikipedia_url${text} as ${others(i)}: ${why}; both show this article's text`);
+          out.push([i, warning("shared_article", `same wikipedia_url${text} as ${others(i)}: ${why}; both show this article's text`)]);
         }
         continue;
       }
       // Two or more events that each claim the shared article as their own (no resolved_qid other than their
       // wikidata_qid): one of them shows another item's text with no note on the site. An error since 2026-10-29
       // (docs/data-fixes.md, checks of 2026-10-29). The same text under different URLs stays a warning.
-      const report = field === "wikipedia_url" ? err : warn;
-      for (const i of idx) report(i, events[i], `same ${label} as ${others(i)}${sameUrl ? "" : " (different wikipedia_url)"}, and not explained as an event without an article of its own`);
+      const msg = (i) => `same ${field} as ${others(i)}${sameUrl ? "" : " (different wikipedia_url)"}, and not explained as an event without an article of its own`;
+      for (const i of idx) out.push([i, field === "wikipedia_url" ? error(msg(i)) : warning("shared_extract", msg(i))]);
     }
   }
+  return out;
+}
 
-  // possible_duplicates hints must name an existing event: one in this file, or in
-  // opts.otherIds (the curated ids, for the proposed file, whose hints may point there).
-  events.forEach((e, i) => {
-    if (!e || typeof e !== "object" || e.possible_duplicates == null) return;
-    if (!Array.isArray(e.possible_duplicates)) return err(i, e, "possible_duplicates must be an array");
-    for (const d of e.possible_duplicates) {
-      const id = typeof d === "string" ? d : d?.id;
-      if (!ids.has(id) && !otherIds.has(id)) {
-        warn(i, e, `possible_duplicates names "${id}", which is not in ${otherIds.size ? "this file or the curated file" : "this file"}`);
-      }
+// possible_duplicates hints must name an existing event: one in this file, or in
+// opts.otherIds (the curated ids, for the proposed file, whose hints may point there).
+function checkPossibleDuplicates(e, ids, otherIds) {
+  if (e.possible_duplicates == null) return [];
+  if (!Array.isArray(e.possible_duplicates)) return [error("possible_duplicates must be an array")];
+  const out = [];
+  for (const d of e.possible_duplicates) {
+    const id = typeof d === "string" ? d : d?.id;
+    if (!ids.has(id) && !otherIds.has(id)) {
+      out.push(warning("possible_duplicate_unknown", `possible_duplicates names "${id}", which is not in ${otherIds.size ? "this file or the curated file" : "this file"}`));
     }
-  });
+  }
+  return out;
+}
 
+// opts.boundaries + opts.turf: data/boundaries.json and the @turf/turf module; with both, every
+// precise pin is checked against its tagged countries' shapes (pinCountryCheck; a warning).
+// opts.today (YYYY-MM-DD): "now" for events without extract_retrieved_at (default: today, UTC).
+// Returns { errors, warnings }, each a list of { index, id, message, text } (warnings also have `code`): `text` is
+// the line validateEvents gives ("<name>[<index>] <id>: <message>").
+export function validateEventsDetailed(
+  events,
+  { name = "events", lenient = false, otherIds = new Set(), boundaries = null, turf = null, today = todayUtc() } = {}
+) {
+  const errors = [];
+  const warnings = [];
+  if (!Array.isArray(events)) {
+    const message = "top level must be an array";
+    return { errors: [{ index: null, id: null, message, text: `${name}: ${message}` }], warnings };
+  }
+  const add = (i, e, f) => {
+    const id = e?.id ?? "(no id)";
+    const item = { index: i, id, message: f.msg, text: `${name}[${i}] ${id}: ${f.msg}` };
+    if (f.level === "error") errors.push(item);
+    else warnings.push({ ...item, code: f.code });
+  };
+  const shapeIndex = boundaries && turf ? indexBoundaries(boundaries, turf) : null;
+  const ctx = { lenient, today, shapeIndex, ids: new Map(), qids: new Map(), i: 0 };
+
+  events.forEach((e, i) => {
+    if (!e || typeof e !== "object") return add(i, e, error("not an object"));
+    ctx.i = i;
+    for (const check of EVENT_CHECKS) for (const f of check(e, ctx)) add(i, e, f);
+  });
+  for (const [i, f] of checkSharedArticles(events)) add(i, events[i], f);
+  events.forEach((e, i) => {
+    if (!e || typeof e !== "object") return;
+    for (const f of checkPossibleDuplicates(e, ctx.ids, otherIds)) add(i, e, f);
+  });
   return { errors, warnings };
+}
+
+// The same checks, as the lines validate-events.js prints: { errors: string[], warnings: string[] }.
+export function validateEvents(events, opts = {}) {
+  const { errors, warnings } = validateEventsDetailed(events, opts);
+  return { errors: errors.map((x) => x.text), warnings: warnings.map((x) => x.text) };
 }
 
 // Framing-review coverage (data/framing-review.json): every event needs a review of its

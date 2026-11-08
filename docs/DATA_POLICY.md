@@ -29,8 +29,17 @@ rather than a second layer of ours. Concretely:
 
 ## What each field is
 
+These are all the fields an event record may have: `scripts/validate-events.js` fails a record with any other key (a typo such as
+`date_ends`, or a pipeline-internal field such as `_review`), and checks each field's type (the table `EVENT_FIELDS` in
+`scripts/lib/validate.js`).
+
 | Field | Content | Whose |
 |---|---|---|
+| `id` | The event's slug (lower-case letters, digits, hyphens), its address `/event/<id>`; never removed or renamed without a redirect or a recorded removal (`DEPLOYMENT.md`, "Renamed event ids") | ours |
+| `wikidata_qid` | The event's Wikidata item | Wikidata |
+| `resolved_qid` | The Wikidata item of the article at `wikipedia_url`; another item than `wikidata_qid` when the event has no article of its own (see "Events without an article of their own") | Wikidata |
+| `wikidata_description` | The item's English Wikidata description, or `null` when it has none | Wikidata |
+| `retrieved_at` | When the record was built by `scripts/enrich-candidates.js` (an ISO UTC timestamp); the text's own fetch date is `extract_retrieved_at` | ours (a timestamp) |
 | `title`, `wikipedia_url` | English Wikipedia article title / URL | Wikipedia |
 | `extract`, `extract_retrieved_at` | The **full lead section** (everything before the first heading) of the English article as plain text, and the date it was fetched | Wikipedia |
 | `wikipedia_revid`, `wikipedia_revid_timestamp` | Only where known: the id of the English Wikipedia revision whose lead is exactly `extract`, and when it was saved (see "Revision") | Wikipedia |
@@ -40,7 +49,11 @@ rather than a second layer of ours. Concretely:
 | `countries` | Wikidata's country (P17, or P17 of the P276/P131 place), mapped to the 15 tracked names | Wikidata |
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
-| `date_flags`, `review_reasons`, `needs_review` | Advisory flags | ours (flags only) |
+| `coordinate_source` | Where the pin comes from (`wikipedia`, `wikidata`, `manual-override`, `redirect_target`, `country-fallback:<country>`), `null` without one; it must match `location_quality` (see "Location quality") | ours (a label) |
+| `needs_manual_coordinates` | `true` unless the event has a `precise` pin of its own (checked against `location_quality`) | ours (derived) |
+| `date_flags`, `review_reasons`, `needs_review` | Advisory flags; `needs_review` is derived: `true` exactly when `review_reasons` or `date_flags` is non-empty (checked) | ours (flags only) |
+| `part_of` | The items the Wikidata item is part of (P361), each `{ "qid", "label" }` (`label` null when Wikidata has no English label), listed as Wikidata gives them | Wikidata |
+| `possible_duplicates` | Hints `{ "id", "title", "reason" }` naming another event that may describe the same thing; advisory, nothing is merged | ours (flags only) |
 | `wikipedia_lead_dates` | Only next to a `date_order_invalid` flag: the dates (or years) the lead mentions, for the shown note (see "Review flags") | Wikipedia |
 | `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
 | `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
@@ -740,7 +753,12 @@ tracked tag no longer excuses a misspelt or untracked one, e.g. `["Iraq", "Isrea
 warning), a `location_quality` present, and a `date_start`/`date_end` that fits its `date_precision`/`date_end_precision` (month precision stored as the
 month's first day, year or coarser as 1 January). No curated or proposed event failed any of these when they were added. The curated file is validated as
 strictly as the proposed one (it used to be "lenient": a missing `wikidata_qid`, or null coordinates with a `location_quality` other than `none`, were warnings),
-and `merge-proposed.js` validates the merged result strictly. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
+and `merge-proposed.js` validates the merged result strictly. Since 2026-11-08 also: no field outside the table in "What each field is" (`EVENT_FIELDS`),
+each field of its type there (`retrieved_at` an ISO UTC timestamp, `review_reasons` an array of strings, `part_of` an array of `{ qid, label }`,
+`sitelinks_current` a non-negative integer, `date_end_open` one of its two values and only without a `date_end`, `coordinates` with `lat` and `lon` only, ...),
+no country tag or alias listed twice, `needs_review` and `needs_manual_coordinates` agreeing with the rule that derives them, and `wikipedia_lead_dates`
+only next to a `date_order_invalid` flag (the only place `lib/v21.js` writes it). No curated or proposed event failed any of these when they were added.
+**Warnings** (listed; CI fails only on a warning not in `data/validation-warnings-baseline.json`, see "Pipeline and workflow"): coordinates outside the Middle East box, an extract
 shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`
 (merged into one "coordinates are borrowed" warning when the pin is that other item's: `coordinate_source` `redirect_target`, or `wikipedia` with a different
 `resolved_qid`), a `date_start` later than the day the event's data was retrieved (`extract_retrieved_at`; a scheduled event such as an upcoming election),
