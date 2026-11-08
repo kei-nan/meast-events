@@ -190,7 +190,9 @@ runs on `main` are never cancelled. Its jobs (the names GitHub shows as status c
   Cloudflare does not run it).
 - **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
   (`node scripts/validate-events.js`; it also fails on a warning not in
-  `data/validation-warnings-baseline.json`), checks that the generated reports are current
+  `data/validation-warnings-baseline.json`), on pull requests checks that no event id of the
+  base commit disappeared without a redirect or a recorded removal (`node scripts/check-removed-ids.js`,
+  [Renamed event ids](#renamed-event-ids-redirects)), checks that the generated reports are current
   (`node scripts/build-missing-coordinates-report.js --check` and
   `node scripts/build-selection-funnel.js --check`), runs the data-pipeline tests (`npm test` at the
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
@@ -325,7 +327,18 @@ object of `{"old-id": "new-id"}`. The build then writes `dist/_redirects` with a
 `/event/old-id` to `/event/new-id` (`app/scripts/redirects.mjs`), and fails if an old id
 is still an event (the redirect would hide its page: redirects apply before files), a new
 id is not an event, or there are more than 2,000 (the host's limit). The file is optional;
-without it there is no `_redirects`. New ids from `scripts/enrich-candidates.js` come from
+without it there is no `_redirects`.
+
+An id may also leave the data on purpose without a new one (`merge-proposed.js --apply`
+removes entries that are not events; a duplicate may be merged away): record it in
+`data/removed-events.json`, an array of `{"id": "...", "reason": "...", "removed_on":
+"YYYY-MM-DD"}` (its old link then 404s, knowingly). CI checks both on every pull request
+(`node scripts/check-removed-ids.js --base=<the PR's base commit>`, logic in
+`scripts/lib/removed-ids.js`): an id of the base commit's `data/events.json` that is no
+longer an event must be a key of `data/event-redirects.json` or an entry of
+`data/removed-events.json`, and an entry there must not name a current event. Run it
+locally with `node scripts/check-removed-ids.js` (default base `origin/main`; fetch it
+first). New ids from `scripts/enrich-candidates.js` come from
 `scripts/lib/slug.js`, which keeps accented letters' base letters ("Sèvres" -> `sevres`)
 and drops apostrophes inside words ("Dawson's" -> `dawsons`); an item already in
 `data/events.json` keeps its id.

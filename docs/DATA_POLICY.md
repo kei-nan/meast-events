@@ -35,7 +35,7 @@ These are all the fields an event record may have: `scripts/validate-events.js` 
 
 | Field | Content | Whose |
 |---|---|---|
-| `id` | The event's slug (lower-case letters, digits, hyphens), its address `/event/<id>`; never removed or renamed without a redirect or a recorded removal (`DEPLOYMENT.md`, "Renamed event ids") | ours |
+| `id` | The event's slug (lower-case letters, digits, hyphens), its address `/event/<id>`. It is never renamed without an entry in `data/event-redirects.json`, nor removed without one in `data/removed-events.json` (`{ id, reason, removed_on }`); CI checks every pull request against its base (`scripts/check-removed-ids.js`; `DEPLOYMENT.md`, "Renamed event ids") | ours |
 | `wikidata_qid` | The event's Wikidata item | Wikidata |
 | `resolved_qid` | The Wikidata item of the article at `wikipedia_url`; another item than `wikidata_qid` when the event has no article of its own (see "Events without an article of their own") | Wikidata |
 | `wikidata_description` | The item's English Wikidata description, or `null` when it has none | Wikidata |
@@ -395,7 +395,8 @@ or state), matched against the stored `wikidata_classes`. `scripts/merge-propose
 dry run; `--no-add` applies the rules without adding proposed events), `scripts/enrich-candidates.js` never proposes one (`exclusion_reason:
 not_an_event`), and `validate-events.js` warns about any it finds. The run of 2026-10-15 (`merge-proposed.js --apply --no-add`) removed one
 hand-picked entry, "Jordanian independence", whose Wikidata item (Q1639050) and Wikipedia link are the *history of Jordan*; its seed line and
-framing review were removed with it. No other curated or proposed event has one of these classes. The Emirate of Transjordan (classes `League
+framing review were removed with it. Since 2026-11-08 an id removed this way must also be recorded in `data/removed-events.json`
+(`{ id, reason, removed_on }`), or CI fails the pull request (`scripts/check-removed-ids.js`), so a shared `/event/<id>` link never breaks unnoticed. No other curated or proposed event has one of these classes. The Emirate of Transjordan (classes `League
 of Nations mandate`, `British protectorate`) does not match the list and is kept.
 
 ## Default order
@@ -713,6 +714,8 @@ node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coo
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
 node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI); fails on a
                                                         #    warning not in data/validation-warnings-baseline.json (--write-warnings-baseline)
+node scripts/check-removed-ids.js [--base=REF]          # every event id of REF (default origin/main; CI: the PR's base) is still an event,
+                                                        #    or listed in data/event-redirects.json / data/removed-events.json (no network)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
 node scripts/fetch-border-references.js                 # -> data/border-reference-points.json: Wikidata border checkpoints, border
                                                         #    crossings and tripoints with coordinates in the map's countries, the
