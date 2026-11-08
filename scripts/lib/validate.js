@@ -895,6 +895,9 @@ function checkPossibleDuplicates(e, ids, otherIds) {
 // opts.today (YYYY-MM-DD): "now" for events without extract_retrieved_at (default: today, UTC).
 // Returns { errors, warnings }, each a list of { index, id, message, text } (warnings also have `code`): `text` is
 // the line validateEvents gives ("<name>[<index>] <id>: <message>").
+// `events` is whatever the file holds (this is what checks it): valid data is an array of
+// EventRecord (app/src/lib/eventTypes.js, kept equal to EVENT_FIELDS by its test).
+/** @param {unknown} events */
 export function validateEventsDetailed(
   events,
   { name = "events", lenient = false, otherIds = new Set(), boundaries = null, turf = null, today = todayUtc() } = {}
