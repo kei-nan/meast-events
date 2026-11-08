@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   isRealDate,
   validateEvents,
+  validateEventsDetailed,
   checkFramingCoverage,
   textSha1,
   findClashes,
@@ -652,4 +653,138 @@ test("validateEvents: wikidata_aliases is absent or a non-empty array of non-emp
   for (const bad of [[], ["July War", ""], "July War", [1]]) {
     assert.match(validateEvents([event({ wikidata_aliases: bad })]).errors.join("\n"), /wikidata_aliases must be/);
   }
+});
+
+// ---- The allowed-field table (EVENT_FIELDS) and the derived fields: each rule fails a minimal bad record ----
+
+// A record with every optional field the pipeline writes, all consistent: it passes.
+const full = (over = {}) =>
+  event({
+    category_group: "war",
+    retrieved_at: "2026-09-26T07:42:05.123Z",
+    resolved_qid: "Q49077",
+    wikidata_description: "1967 war between Israel and Egypt, Jordan, and Syria",
+    wikidata_aliases: ["June War"],
+    date_end_precision: "day",
+    needs_manual_coordinates: false,
+    review_reasons: [],
+    needs_review: false,
+    part_of: [{ qid: "Q8641370", label: "Arab–Israeli conflict" }],
+    possible_duplicates: [],
+    sitelinks: 120,
+    sitelinks_current: 130,
+    wikipedia_revid: 1250000000,
+    wikipedia_revid_timestamp: "2026-09-20T10:00:00Z",
+    ...over,
+  });
+const errorsOf = (over) => validateEvents([full(over)]).errors.join("\n");
+
+test("EVENT_FIELDS: a record with every pipeline field passes", () => {
+  assert.deepEqual(validateEvents([full()]), { errors: [], warnings: [] });
+  assert.deepEqual(validateEvents([full({ date_end: null, date_end_precision: undefined, date_end_open: "wikidata_novalue" })]).errors, []);
+});
+
+test("EVENT_FIELDS: an unknown key is an error (a typo, or a pipeline-internal field)", () => {
+  assert.match(errorsOf({ date_ends: "1967-06-10" }), /unknown field "date_ends"/);
+  assert.match(errorsOf({ _review: [] }), /unknown field "_review"/);
+  assert.match(errorsOf({ source_qid: "Q49077" }), /unknown field "source_qid"/);
+  // The deprecated field keeps its own message, not a second "unknown" one.
+  const dep = errorsOf({ category_label: "War" });
+  assert.match(dep, /category_label is deprecated/);
+  assert.doesNotMatch(dep, /unknown field/);
+});
+
+test("EVENT_FIELDS: retrieved_at is an ISO UTC timestamp on a real day", () => {
+  for (const bad of ["2026-09-26", "yesterday", "2026-02-30T00:00:00Z", "2026-09-26T25:00:00Z", "2026-09-26T07:42:05+02:00", 1727336525]) {
+    assert.match(errorsOf({ retrieved_at: bad }), /retrieved_at must be an ISO UTC timestamp/, String(bad));
+  }
+  assert.equal(errorsOf({ retrieved_at: "2026-09-26T07:42:05Z" }), "");
+});
+
+test("EVENT_FIELDS: needs_review is a boolean and agrees with review_reasons / date_flags", () => {
+  assert.match(errorsOf({ needs_review: "no" }), /needs_review must be a boolean/);
+  assert.match(errorsOf({ needs_review: true }), /needs_review is true, but it is derived: false/);
+  assert.match(errorsOf({ review_reasons: ["part_of: x"] }), /needs_review is false, but it is derived: true/);
+  assert.match(errorsOf({ date_flags: ["wikipedia_dates_note: x"] }), /needs_review is false, but it is derived: true/);
+  assert.equal(errorsOf({ review_reasons: ["part_of: x"], needs_review: true }), "");
+});
+
+test("EVENT_FIELDS: review_reasons is an array of non-empty strings", () => {
+  for (const bad of ["part_of: x", [""], [1], null]) {
+    assert.match(errorsOf({ review_reasons: bad }), /review_reasons must be an array of non-empty strings/, JSON.stringify(bad));
+  }
+});
+
+test("EVENT_FIELDS: needs_manual_coordinates is a boolean, true unless the pin is precise", () => {
+  assert.match(errorsOf({ needs_manual_coordinates: 0 }), /needs_manual_coordinates must be a boolean/);
+  assert.match(errorsOf({ needs_manual_coordinates: true }), /needs_manual_coordinates is true, but location_quality "precise" gives false/);
+  const none = { location_quality: "none", coordinates: null, coordinate_source: null };
+  assert.match(errorsOf({ ...none, needs_manual_coordinates: false }), /location_quality "none" gives true/);
+  assert.equal(errorsOf({ ...none, needs_manual_coordinates: true }), "");
+  const approx = { location_quality: "approximate", coordinate_source: "country-fallback:Egypt", coordinates: { lat: 30.04, lon: 31.24 } };
+  assert.match(errorsOf({ ...approx, needs_manual_coordinates: false }), /location_quality "approximate" gives true/);
+});
+
+test("EVENT_FIELDS: part_of is an array of { qid, label }", () => {
+  for (const bad of [
+    "Q8641370",
+    [{ qid: "8641370", label: "x" }],
+    [{ qid: "Q8641370" }],
+    [{ qid: "Q8641370", label: "" }],
+    [{ qid: "Q8641370", label: "x", extra: 1 }],
+    ["Q8641370"],
+  ]) {
+    assert.match(errorsOf({ part_of: bad }), /part_of must be an array of \{ qid, label \}/, JSON.stringify(bad));
+  }
+  assert.equal(errorsOf({ part_of: [{ qid: "Q8641370", label: null }] }), "");
+});
+
+test("EVENT_FIELDS: sitelinks and sitelinks_current are non-negative integers", () => {
+  for (const bad of [-1, 1.5, "130", null]) {
+    assert.match(errorsOf({ sitelinks_current: bad }), /sitelinks_current must be a non-negative integer/, String(bad));
+  }
+  assert.match(errorsOf({ sitelinks: "120" }), /sitelinks must be a non-negative integer/);
+});
+
+test("EVENT_FIELDS: date_end_open is one of Wikidata's two values, and only without a date_end", () => {
+  assert.match(errorsOf({ date_end: null, date_end_precision: undefined, date_end_open: true }), /date_end_open must be "wikidata_novalue" or "wikidata_somevalue"/);
+  assert.match(errorsOf({ date_end_open: "wikidata_novalue" }), /date_end_open \("wikidata_novalue"\) with a date_end/);
+});
+
+test("EVENT_FIELDS: wikidata_description is a non-empty string or null; resolved_qid a QID", () => {
+  assert.match(errorsOf({ wikidata_description: 5 }), /wikidata_description must be a non-empty string or null/);
+  assert.match(errorsOf({ wikidata_description: "" }), /wikidata_description must be/);
+  assert.equal(errorsOf({ wikidata_description: null }), "");
+  assert.match(errorsOf({ resolved_qid: "q1" }), /resolved_qid must be a QID/);
+});
+
+test("EVENT_FIELDS: no repeated country tag or alias", () => {
+  assert.match(errorsOf({ countries: ["Egypt", "Egypt"] }), /countries lists "Egypt" more than once/);
+  assert.match(errorsOf({ wikidata_aliases: ["June War", "June War"] }), /wikidata_aliases lists "June War" more than once/);
+});
+
+test("EVENT_FIELDS: coordinates hold lat and lon only", () => {
+  assert.match(errorsOf({ coordinates: { lat: 31.25, lon: 34.25, alt: 0 } }), /coordinates must be null or \{ lat, lon \} with no other keys/);
+});
+
+test("EVENT_FIELDS: wikipedia_lead_dates is well-formed and only next to a date_order_invalid flag", () => {
+  assert.match(errorsOf({ wikipedia_lead_dates: ["1967-06-05"] }), /wikipedia_lead_dates without a date_order_invalid flag/);
+  const flagged = {
+    date_start: "1967-06-10",
+    date_end: "1967-06-05",
+    date_flags: ["date_order_invalid: Wikidata start (1967-06-10) is after end (1967-06-05); shown as Wikidata gives them"],
+    needs_review: true,
+  };
+  assert.deepEqual(validateEvents([full({ ...flagged, wikipedia_lead_dates: ["1967-06-05", "1967"] })]).errors, []);
+  for (const bad of [[], ["5 June 1967"], "1967"]) {
+    assert.match(errorsOf({ ...flagged, wikipedia_lead_dates: bad }), /wikipedia_lead_dates must be/, JSON.stringify(bad));
+  }
+});
+
+test("validateEventsDetailed: each warning has a stable code, and the text validateEvents gives", () => {
+  const e = full({ countries: ["Egypt", "Israel/Palestine", "Jordan", "Syria", "Iraq", "Lebanon", "Saudi Arabia", "Kuwait"], extract: "Too short." });
+  const { warnings } = validateEventsDetailed([e], { name: "f" });
+  assert.deepEqual(warnings.map((w) => w.code), ["short_extract", "many_countries"]);
+  assert.deepEqual(warnings.map((w) => w.text), validateEvents([e], { name: "f" }).warnings);
+  assert.equal(warnings[0].id, "six-day-war");
 });

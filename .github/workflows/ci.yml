@@ -131,10 +131,29 @@ jobs:
         run: npm ci
 
       # Schema, ids, dates, coordinates and extracts on data/events.json and
-      # data/events.proposed.json; warnings (e.g. a pin outside its tagged
-      # countries) do not fail. No network.
+      # data/events.proposed.json; a warning (e.g. a pin outside its tagged
+      # countries) fails only when it is not in data/validation-warnings-baseline.json.
+      # No network.
       - name: Validate events
         run: node scripts/validate-events.js
+
+      # Pull requests only: every event id of the base commit's data/events.json is
+      # still an event, or listed in data/event-redirects.json (renamed) or
+      # data/removed-events.json (removed on purpose), so no /event/<id> link
+      # breaks unnoticed. The base commit is fetched with the read-only token passed
+      # through git's GIT_CONFIG_* environment for this one fetch (never written to
+      # .git/config). No input of the PR reaches the shell: only the base SHA, via env.
+      - name: No event id removed without a redirect or a recorded removal
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" \
+            GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          node scripts/check-removed-ids.js --base="$BASE_SHA"
 
       # The published reports must match the data they are generated from:
       # data/missing-coordinates-report.md (from the event files) and

@@ -29,8 +29,17 @@ rather than a second layer of ours. Concretely:
 
 ## What each field is
 
+These are all the fields an event record may have: `scripts/validate-events.js` fails a record with any other key (a typo such as
+`date_ends`, or a pipeline-internal field such as `_review`), and checks each field's type (the table `EVENT_FIELDS` in
+`scripts/lib/validate.js`).
+
 | Field | Content | Whose |
 |---|---|---|
+| `id` | The event's slug (lower-case letters, digits, hyphens), its address `/event/<id>`. It is never renamed without an entry in `data/event-redirects.json`, nor removed without one in `data/removed-events.json` (`{ id, reason, removed_on }`); CI checks every pull request against its base (`scripts/check-removed-ids.js`; `DEPLOYMENT.md`, "Renamed event ids") | ours |
+| `wikidata_qid` | The event's Wikidata item | Wikidata |
+| `resolved_qid` | The Wikidata item of the article at `wikipedia_url`; another item than `wikidata_qid` when the event has no article of its own (see "Events without an article of their own") | Wikidata |
+| `wikidata_description` | The item's English Wikidata description, or `null` when it has none | Wikidata |
+| `retrieved_at` | When the record was built by `scripts/enrich-candidates.js` (an ISO UTC timestamp); the text's own fetch date is `extract_retrieved_at` | ours (a timestamp) |
 | `title`, `wikipedia_url` | English Wikipedia article title / URL | Wikipedia |
 | `extract`, `extract_retrieved_at` | The **full lead section** (everything before the first heading) of the English article as plain text, and the date it was fetched | Wikipedia |
 | `wikipedia_revid`, `wikipedia_revid_timestamp` | Only where known: the id of the English Wikipedia revision whose lead is exactly `extract`, and when it was saved (see "Revision") | Wikipedia |
@@ -40,7 +49,11 @@ rather than a second layer of ours. Concretely:
 | `countries` | Wikidata's country (P17, or P17 of the P276/P131 place), mapped to the 15 tracked names | Wikidata |
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
-| `date_flags`, `review_reasons`, `needs_review` | Advisory flags | ours (flags only) |
+| `coordinate_source` | Where the pin comes from (`wikipedia`, `wikidata`, `manual-override`, `redirect_target`, `country-fallback:<country>`), `null` without one; it must match `location_quality` (see "Location quality") | ours (a label) |
+| `needs_manual_coordinates` | `true` unless the event has a `precise` pin of its own (checked against `location_quality`) | ours (derived) |
+| `date_flags`, `review_reasons`, `needs_review` | Advisory flags; `needs_review` is derived: `true` exactly when `review_reasons` or `date_flags` is non-empty (checked) | ours (flags only) |
+| `part_of` | The items the Wikidata item is part of (P361), each `{ "qid", "label" }` (`label` null when Wikidata has no English label), listed as Wikidata gives them | Wikidata |
+| `possible_duplicates` | Hints `{ "id", "title", "reason" }` naming another event that may describe the same thing; advisory, nothing is merged | ours (flags only) |
 | `wikipedia_lead_dates` | Only next to a `date_order_invalid` flag: the dates (or years) the lead mentions, for the shown note (see "Review flags") | Wikipedia |
 | `sitelinks_current` | The item's Wikidata sitelink count (all Wikimedia projects), refreshed monthly; orders the default list (see "Default order") | Wikidata |
 | `sitelinks` | Discovered events only: the sitelink count discovery saw (inclusion rule) | Wikidata |
@@ -382,7 +395,8 @@ or state), matched against the stored `wikidata_classes`. `scripts/merge-propose
 dry run; `--no-add` applies the rules without adding proposed events), `scripts/enrich-candidates.js` never proposes one (`exclusion_reason:
 not_an_event`), and `validate-events.js` warns about any it finds. The run of 2026-10-15 (`merge-proposed.js --apply --no-add`) removed one
 hand-picked entry, "Jordanian independence", whose Wikidata item (Q1639050) and Wikipedia link are the *history of Jordan*; its seed line and
-framing review were removed with it. No other curated or proposed event has one of these classes. The Emirate of Transjordan (classes `League
+framing review were removed with it. Since 2026-11-08 an id removed this way must also be recorded in `data/removed-events.json`
+(`{ id, reason, removed_on }`), or CI fails the pull request (`scripts/check-removed-ids.js`), so a shared `/event/<id>` link never breaks unnoticed. No other curated or proposed event has one of these classes. The Emirate of Transjordan (classes `League
 of Nations mandate`, `British protectorate`) does not match the list and is kept.
 
 ## Default order
@@ -698,7 +712,10 @@ node scripts/build-selection-funnel.js [--check|--offline] # -> data/selection-f
                                                         #    --offline keeps the committed sitelink_measurement, no network)
 node scripts/build-missing-coordinates-report.js [--check] # -> data/missing-coordinates-report.md (no network)
 node scripts/verify-sample.js                           # -> data/import-verification-sample.md (live re-fetch of a seeded sample)
-node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI)
+node scripts/validate-events.js                         # schema/ids/dates/coordinates + framing-review coverage (runs in CI); fails on a
+                                                        #    warning not in data/validation-warnings-baseline.json (--write-warnings-baseline)
+node scripts/check-removed-ids.js [--base=REF]          # every event id of REF (default origin/main; CI: the PR's base) is still an event,
+                                                        #    or listed in data/event-redirects.json / data/removed-events.json (no network)
                                                         # CI also runs both builders above with --check: a report that no longer matches the data fails
 node scripts/fetch-border-references.js                 # -> data/border-reference-points.json: Wikidata border checkpoints, border
                                                         #    crossings and tripoints with coordinates in the map's countries, the
@@ -740,7 +757,12 @@ tracked tag no longer excuses a misspelt or untracked one, e.g. `["Iraq", "Isrea
 warning), a `location_quality` present, and a `date_start`/`date_end` that fits its `date_precision`/`date_end_precision` (month precision stored as the
 month's first day, year or coarser as 1 January). No curated or proposed event failed any of these when they were added. The curated file is validated as
 strictly as the proposed one (it used to be "lenient": a missing `wikidata_qid`, or null coordinates with a `location_quality` other than `none`, were warnings),
-and `merge-proposed.js` validates the merged result strictly. **Warnings** (listed, CI passes): coordinates outside the Middle East box, an extract
+and `merge-proposed.js` validates the merged result strictly. Since 2026-11-08 also: no field outside the table in "What each field is" (`EVENT_FIELDS`),
+each field of its type there (`retrieved_at` an ISO UTC timestamp, `review_reasons` an array of strings, `part_of` an array of `{ qid, label }`,
+`sitelinks_current` a non-negative integer, `date_end_open` one of its two values and only without a `date_end`, `coordinates` with `lat` and `lon` only, ...),
+no country tag or alias listed twice, `needs_review` and `needs_manual_coordinates` agreeing with the rule that derives them, and `wikipedia_lead_dates`
+only next to a `date_order_invalid` flag (the only place `lib/v21.js` writes it). No curated or proposed event failed any of these when they were added.
+**Warnings** (listed; CI fails only on a warning not in `data/validation-warnings-baseline.json`, see "Pipeline and workflow"): coordinates outside the Middle East box, an extract
 shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`
 (merged into one "coordinates are borrowed" warning when the pin is that other item's: `coordinate_source` `redirect_target`, or `wikipedia` with a different
 `resolved_qid`), a `date_start` later than the day the event's data was retrieved (`extract_retrieved_at`; a scheduled event such as an upcoming election),
@@ -767,6 +789,15 @@ two or more of the article's own events is an **error**). Since 2026-10-24 also:
 military occupation, blockade, ethnic, international or border conflict, social, political or protest movement, civil resistance and a few more;
 `DURATIVE_CLASSES` in `scripts/lib/flags.js`; `durative_class_no_end`). Classes that also label one-day events (armed conflict, rebellion,
 revolution, protest) are left out of that list. Neither changes how the site places an event in time. Warnings are for a person to look at; nothing is changed automatically.
+
+**Warnings baseline** (since 2026-11-08). The curated warnings above are printed on every run (171 on the committed files), so one more would go
+unseen. `data/validation-warnings-baseline.json` lists every warning of the committed data as `[file, event id, warning code]` (the code is stable,
+the message may carry counts that change; each warning's code is set in `scripts/lib/validate.js`, framing-review warnings as `framing_review_*`).
+`validate-events.js` prints a warning not in it as `NEW` and **fails**, and lists a baseline entry that no longer occurs as `gone` (not a failure;
+prune it). After checking new warnings, record them with `node scripts/validate-events.js --write-warnings-baseline` (it needs the root `npm ci`, so the
+pin check's warnings are not dropped, and writes nothing while there are errors). A run of only some files (the build's `../data/events.json`) compares
+only those files' entries, and the pin check's entries are not "gone" when the check is skipped. The monthly refresh writes the baseline itself and lists
+the new warnings in its pull request (see "Refreshing extracts").
 
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
 `end_year` or `source`, a bad year range or geometry type, two shapes with the same name in the same year, or (since 2026-10-27) a ring that
@@ -812,8 +843,10 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
    (a start that is none of the item's P585/P580 values, an end that is none of its P582 values or a P582 where none is stored, a moved or
    removed P625, a P625 on an event without a precise pin, new or dropped P31 labels). Fields the fix ledger sets (docs/data-fixes.md) are
    counted, not listed. Nothing in that list is changed: a fix goes through the ledger.
-2. If nothing changed, it stops. Otherwise it validates the events, runs the unit tests and opens a pull request whose description starts with the
-   guideline sections that changed (with their changed lines) and the Wikidata drift list, then lists the title changes, the held title cases, and, for each changed lead, the
+2. If nothing changed, it stops. Otherwise it validates the events (an error stops it; new warnings, such as the stale framing review of a changed
+   summary, are written into `data/validation-warnings-baseline.json` with `--write-warnings-baseline`, so the pull request carries the updated
+   baseline and its CI passes), runs the unit tests and opens a pull request whose description starts with the
+   guideline sections that changed (with their changed lines), the Wikidata drift list and the new (and gone) validation warnings, then lists the title changes, the held title cases, and, for each changed lead, the
    removed and added sentences. It never merges.
 3. **Before merging**, read that list. Changes in wording and titles are Wikipedia's; the point of reading is to spot vandalism or a lead that was rewritten wholesale.
    For a changed guideline, the question is whether the edit changes what the wording check flags; if so, redo that part of the review.

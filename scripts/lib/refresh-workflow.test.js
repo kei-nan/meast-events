@@ -37,6 +37,22 @@ test("refresh-data.yml: every --check'd report is regenerated offline and carrie
   }
 });
 
+// A refresh can bring new validation warnings (a stale framing review, a short lead): they must not stop the PR, so
+// the refresh writes them into the baseline, which the PR carries (or CI on the PR and every later build would fail),
+// and lists them in the PR description.
+test("refresh-data.yml: new validation warnings go into the baseline the PR carries, and into its description", () => {
+  const validate = workflow.match(/run: node scripts\/validate-events\.js([^\n]*)\n/)?.[1] ?? "";
+  assert.match(validate, /--write-warnings-baseline/);
+  assert.match(validate, /--warnings-report="\$RUNNER_TEMP\/warnings-report\.md"/);
+  assert.ok(workflow.indexOf("node scripts/validate-events.js") < workflow.indexOf("run: npm run build"), "validated (and the baseline written) before the build");
+  const upload = workflow.match(/name: refresh-data\n\s+path: \|\n((?:\s+data\/\S+\n)+)/)?.[1] ?? "";
+  assert.match(upload, /data\/validation-warnings-baseline\.json\n/);
+  assert.ok((workflow.match(/for f in ([^;]+); do/)?.[1].split(/\s+/) ?? []).includes("validation-warnings-baseline.json"));
+  assert.ok((workflow.match(/git -c core\.hooksPath=\/dev\/null add ([^\n]+)/)?.[1].split(/\s+/) ?? []).includes("data/validation-warnings-baseline.json"));
+  assert.match(workflow, /\$\{\{ runner\.temp \}\}\/warnings-report\.md\n/, "the report is in the refresh-report artifact");
+  assert.match(workflow, /cat "\$reports\/warnings-report\.md"/, "the report is in the PR description");
+});
+
 // The funnel's --offline must give what --check expects, and keep the committed sitelink_measurement (its only
 // network part), on a copy of the repository's scripts and data.
 test("build-selection-funnel.js --offline: deterministic, keeps sitelink_measurement, satisfies --check", async () => {

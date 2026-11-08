@@ -18,14 +18,15 @@ name: Refresh Wikipedia summaries
 # Two jobs, so code from npm never runs where a write token exists:
 # - "refresh" runs the repo's scripts, `npm ci` (whose install scripts run
 #   arbitrary package code), the tests and the build with a READ-ONLY token.
-#   It hands the two data files, the two generated reports built from them and
-#   the refresh reports to the next job as artifacts.
+#   It hands the two data files, the two generated reports built from them, the
+#   validation warnings baseline and the refresh reports to the next job as artifacts.
 # - "open-pr" holds the write token. It checks the repo out afresh, copies in
-#   just data/events.json, data/framing-review.json and the two generated reports
-#   (data/missing-coordinates-report.md, data/selection-funnel.json), commits,
+#   just data/events.json, data/framing-review.json, the two generated reports
+#   (data/missing-coordinates-report.md, data/selection-funnel.json) and
+#   data/validation-warnings-baseline.json, commits,
 #   pushes a branch and opens the PR. It runs no npm and no repo code, and git
 #   with hooks off.
-# What a compromised dependency in "refresh" could still do is change those four
+# What a compromised dependency in "refresh" could still do is change those five
 # files' content, which lands only in the reviewed PR (as before), or fail the run.
 #
 # Needs: Settings -> Actions -> General -> "Allow GitHub Actions to create and
@@ -130,9 +131,14 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         run: npm ci
 
-      - name: Validate events
+      # Errors fail the refresh (no PR). New warnings do not: a changed summary or
+      # sitelink count can bring one (a stale framing review, a short lead). They are
+      # written into data/validation-warnings-baseline.json, which the PR carries, and
+      # listed near the top of the PR description for review; the build below and CI
+      # on the PR then pass against the updated baseline.
+      - name: Validate events (new warnings go into the baseline and the PR description)
         if: steps.diff.outputs.changed == 'true'
-        run: node scripts/validate-events.js
+        run: node scripts/validate-events.js --write-warnings-baseline --warnings-report="$RUNNER_TEMP/warnings-report.md"
 
       # ci.yml checks that the published reports match the data; the funnel counts
       # curated events, so a refresh could change it. No network.
@@ -176,12 +182,14 @@ jobs:
             ${{ runner.temp }}/refresh-report.md
             ${{ runner.temp }}/guidelines-report.md
             ${{ runner.temp }}/drift-report.md
+            ${{ runner.temp }}/warnings-report.md
           if-no-files-found: error
           retention-days: 90
 
-      # The changed data for the "open-pr" job: whole files (all four, changed or
+      # The changed data for the "open-pr" job: whole files (all five, changed or
       # not), stored at the artifact's top level as events.json,
-      # framing-review.json, missing-coordinates-report.md and selection-funnel.json.
+      # framing-review.json, missing-coordinates-report.md, selection-funnel.json and
+      # validation-warnings-baseline.json.
       - name: Upload the refreshed data
         if: steps.diff.outputs.changed == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -192,6 +200,7 @@ jobs:
             data/framing-review.json
             data/missing-coordinates-report.md
             data/selection-funnel.json
+            data/validation-warnings-baseline.json
           if-no-files-found: error
           retention-days: 7
 
@@ -227,11 +236,11 @@ jobs:
           name: refresh-report
           path: ${{ runner.temp }}/reports
 
-      # Only these four paths are taken from the artifact; nothing else from the
+      # Only these five paths are taken from the artifact; nothing else from the
       # "refresh" job reaches the commit.
       - name: Apply the refreshed data
         run: |
-          for f in events.json framing-review.json missing-coordinates-report.md selection-funnel.json; do
+          for f in events.json framing-review.json missing-coordinates-report.md selection-funnel.json validation-warnings-baseline.json; do
             src="$RUNNER_TEMP/refresh-data/$f"
             if [ ! -f "$src" ] || [ -L "$src" ]; then echo "::error::$f missing from the refresh-data artifact"; exit 1; fi
             cp -- "$src" "data/$f"
@@ -260,7 +269,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -c core.hooksPath=/dev/null switch -c "$branch"
-          git -c core.hooksPath=/dev/null add data/events.json data/framing-review.json data/missing-coordinates-report.md data/selection-funnel.json
+          git -c core.hooksPath=/dev/null add data/events.json data/framing-review.json data/missing-coordinates-report.md data/selection-funnel.json data/validation-warnings-baseline.json
           git -c core.hooksPath=/dev/null commit -m "Refresh Wikipedia summaries, titles and guideline versions (${day})"
           # Checkout ran with persist-credentials: false. Authenticate this one
           # push the way actions/checkout does (an http.extraheader), passed
@@ -308,8 +317,26 @@ jobs:
               echo "**The drift check did not run to the end** (see the workflow log)."
             fi
             echo
+            # Validation warnings the refreshed data has and the baseline did not (written into
+            # data/validation-warnings-baseline.json by this PR), whole unless longer than 10,000 bytes.
+            warnings_bytes=0
+            if [ -f "$reports/warnings-report.md" ]; then warnings_bytes=$(wc -c < "$reports/warnings-report.md"); fi
+            if [ "$warnings_bytes" -eq 0 ]; then
+              echo "## Validation warnings"
+              echo
+              echo "**The warnings report is missing** (see the workflow log); check this PR's change to data/validation-warnings-baseline.json."
+              warnings_bytes=200
+            elif [ "$warnings_bytes" -gt 10000 ]; then
+              echo "## Validation warnings"
+              echo
+              echo "The list of new validation warnings is longer than 10,000 bytes: see warnings-report.md in the full report linked above, and this PR's change to data/validation-warnings-baseline.json."
+              warnings_bytes=300
+            else
+              cat "$reports/warnings-report.md"
+            fi
+            echo
             # The rest of the 60,000 bytes (after the guideline and drift sections), without splitting a multi-byte UTF-8 character.
-            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$reports/refresh-report.md" "$((guidelines_bytes + drift_bytes))"
+            node -e 'const b = require("fs").readFileSync(process.argv[1]); let n = Math.min(b.length, Math.max(0, 60000 - Number(process.argv[2]))); if (n < b.length) while (n > 0 && (b[n] & 0xc0) === 0x80) n--; process.stdout.write(b.subarray(0, n)); if (n < b.length) process.stdout.write("\n\n(Cut off here: see the full report linked above.)\n");' "$reports/refresh-report.md" "$((guidelines_bytes + drift_bytes + warnings_bytes))"
           } > "$RUNNER_TEMP/pr-body.md"
           gh pr create --base main --head "$branch" \
             --title "Refresh Wikipedia summaries, titles and guideline versions (${day})" \

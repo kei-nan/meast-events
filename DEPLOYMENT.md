@@ -189,7 +189,10 @@ runs on `main` are never cancelled. Its jobs (the names GitHub shows as status c
   About dialog open, `/event/<id>` loads, and nothing logs an error or a CSP violation;
   Cloudflare does not run it).
 - **Validate event data** - validates `data/events.json` and `data/events.proposed.json`
-  (`node scripts/validate-events.js`), checks that the generated reports are current
+  (`node scripts/validate-events.js`; it also fails on a warning not in
+  `data/validation-warnings-baseline.json`), on pull requests checks that no event id of the
+  base commit disappeared without a redirect or a recorded removal (`node scripts/check-removed-ids.js`,
+  [Renamed event ids](#renamed-event-ids-redirects)), checks that the generated reports are current
   (`node scripts/build-missing-coordinates-report.js --check` and
   `node scripts/build-selection-funnel.js --check`), runs the data-pipeline tests (`npm test` at the
   repo root), lints `scripts/` (`npm run lint` at the repo root: oxlint with the import
@@ -227,15 +230,19 @@ the Actions tab). It:
 
 If `data/events.json` or `data/framing-review.json` changed, it installs the repo-root
 dependencies (`npm ci`: the geometry library, without which `validate-events.js` skips its
-pin-in-country check and the root tests skip the geometry tests), validates the data,
+pin-in-country check and the root tests skip the geometry tests), validates the data
+(an error stops the refresh; a validation warning the data did not have before, such as a
+framing review made stale by a changed summary, does not: it is written into
+`data/validation-warnings-baseline.json`, which the PR carries, and listed under
+"Validation warnings" in the PR description, so CI on the PR passes and the reviewer sees it),
 regenerates the two generated reports (`data/missing-coordinates-report.md`, and
 `data/selection-funnel.json` with `--offline`, which keeps its committed sitelink measurement)
 and checks that they are current, runs both unit-test suites and builds the site
 (`npm ci && npm run build` in `app/`, which includes the build-time checks above), and then
 a pull request is opened and CI is started on it (below). The workflow has two jobs: the
 **Refresh summaries** job (`refresh`) does all of the above with a read-only token and
-hands the four data files (`events.json`, `framing-review.json`, `missing-coordinates-report.md`,
-`selection-funnel.json`) and the generated and refresh reports on as artifacts; the pull request is opened by
+hands the five data files (`events.json`, `framing-review.json`, `missing-coordinates-report.md`,
+`selection-funnel.json`, `validation-warnings-baseline.json`) and the generated and refresh reports on as artifacts; the pull request is opened by
 a separate job, **Open a pull request** (`open-pr`), which holds the write token and runs
 no npm code and no repository scripts, so nothing the refresh installs or builds holds a
 token that can push. The PR description holds the start of the refresh report; the full
@@ -320,7 +327,18 @@ object of `{"old-id": "new-id"}`. The build then writes `dist/_redirects` with a
 `/event/old-id` to `/event/new-id` (`app/scripts/redirects.mjs`), and fails if an old id
 is still an event (the redirect would hide its page: redirects apply before files), a new
 id is not an event, or there are more than 2,000 (the host's limit). The file is optional;
-without it there is no `_redirects`. New ids from `scripts/enrich-candidates.js` come from
+without it there is no `_redirects`.
+
+An id may also leave the data on purpose without a new one (`merge-proposed.js --apply`
+removes entries that are not events; a duplicate may be merged away): record it in
+`data/removed-events.json`, an array of `{"id": "...", "reason": "...", "removed_on":
+"YYYY-MM-DD"}` (its old link then 404s, knowingly). CI checks both on every pull request
+(`node scripts/check-removed-ids.js --base=<the PR's base commit>`, logic in
+`scripts/lib/removed-ids.js`): an id of the base commit's `data/events.json` that is no
+longer an event must be a key of `data/event-redirects.json` or an entry of
+`data/removed-events.json`, and an entry there must not name a current event. Run it
+locally with `node scripts/check-removed-ids.js` (default base `origin/main`; fetch it
+first). New ids from `scripts/enrich-candidates.js` come from
 `scripts/lib/slug.js`, which keeps accented letters' base letters ("Sèvres" -> `sevres`)
 and drops apostrophes inside words ("Dawson's" -> `dawsons`); an item already in
 `data/events.json` keeps its id.
