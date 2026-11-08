@@ -215,6 +215,11 @@ function normalizeEvent(e) {
   return out;
 }
 
+/**
+ * The lite records as the app uses them (normalizeEvent); records without an id or start date are dropped.
+ * @param {object[]} events  app/scripts/split-data.mjs publicEvent records
+ * @returns {import("./eventTypes.js").Event[]}
+ */
 export function normalizeEvents(events) {
   const out = [];
   for (const e of events) {

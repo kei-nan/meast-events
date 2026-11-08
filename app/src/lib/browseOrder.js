@@ -27,7 +27,13 @@ export function sortValue(key, dir) {
   return dir === DEFAULT_DIR[key] ? key : `${key}-${dir}`;
 }
 
-/** The event's start year; NaN without one (lib/eventYears.js rawEventYears). */
+/** @typedef {import("./eventTypes.js").Event} Event */
+
+/**
+ * The event's start year; NaN without one (lib/eventYears.js rawEventYears).
+ * @param {Event} event
+ * @returns {number}
+ */
 export function eventStartYear(event) {
   return rawEventYears(event)[0];
 }
@@ -38,6 +44,9 @@ export function eventStartYear(event) {
  * is never "ongoing": it matches the selected years only at a year one of its
  * dates names (lib/eventYears.js eventOverlapsRange), never the years between,
  * and its start is the later of the two, so the start year is not before them.
+ * @param {Event} event
+ * @param {number} rangeStart
+ * @returns {boolean}
  */
 export function startedBefore(event, rangeStart) {
   const y = eventStartYear(event);
@@ -77,6 +86,10 @@ const hasCount = (e) => Number.isFinite(e?.sitelinks);
  * Events (already restricted to the range) in browse order; stable. `range`:
  * the selected years [first, last], or the first year alone (then every event
  * is ordered by its start date).
+ * @param {Event[]} events
+ * @param {[number, number]|number} range
+ * @param {string} [sort]  one of SORTS
+ * @returns {Event[]}
  */
 export function orderBrowseList(events, range, sort = "date") {
   const { key, dir } = parseSort(sort);

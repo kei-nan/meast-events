@@ -174,6 +174,10 @@ const strings = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === "string"
 // "approximate" with approximate_reason "rounded", so the site gives it the
 // approximate treatment (hollow ring, tag, no drawn-area match, country shading)
 // with its own note. The coordinates are the source's, unchanged.
+/**
+ * @param {import("../src/lib/eventTypes.js").EventRecord} e
+ * @returns {import("../src/lib/eventTypes.js").Event}
+ */
 export function publicEvent(e) {
   const quality = locationQuality(e);
   const rounded = isLowPrecisionPin({ ...e, location_quality: quality });

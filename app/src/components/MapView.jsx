@@ -5,7 +5,7 @@ import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import { EMPTY_FC, eventFeature, eventSignature, eventsToGeoJSON, pointFeature } from "./mapLayers";
 import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";
 import { loadLabelFont } from "../lib/labelFont";
-import { foldIncluded, readHintDismissed, uniqueBoundaries, writeHintDismissed } from "./mapBorders";
+import { readHintDismissed, writeHintDismissed } from "./mapBorders";
 import {
   BoundaryPopup,
   MapKey,
@@ -21,16 +21,17 @@ import { diffById } from "../lib/sourceDiff";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "../hooks/useMapHoverLabel";
 import usePlaceMarker from "../hooks/usePlaceMarker";
-import { LIST_MAX, allSameCoordinates, clusterClickAction, eventsBounds, stackItems } from "../lib/mapStack";
+import { eventsBounds } from "../lib/mapStack";
 import useCountryHighlight from "./countryHighlight";
 import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels";
-import { decadeFloor, loadFarLand, loadLand, loadLandCell } from "../lib/dataClient";
-import { drawableBoundaries, isPlaceholder, placeholderMembers } from "../lib/deferredBoundaries";
+import { decadeFloor, loadLand } from "../lib/dataClient";
+import { drawableBoundaries } from "../lib/deferredBoundaries";
 import { MAP_EXTENT } from "../lib/mapExtent";
-import { cellsInBounds, createLandStore, wantsBackgroundDetail } from "../lib/landStore";
+import { createLandStore } from "../lib/landStore";
+import { startLandLoading } from "./mapLand";
+import { installMapClicks, ringFor } from "./mapClicks";
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, SEA_COLOR, defaultBounds, openingPadding } from "../lib/mapBase";
 import { reducedMotion } from "../lib/reducedMotion";
-import { TAP_SLOP_PX, pickMarker } from "../lib/tapTarget";
 import { keepPinInside, mapClearView, screenPoint, sheetCover } from "../lib/mapInsets";
 import { eventCoords } from "../lib/geo";
 import useAreaDrawing, { handleAt } from "../hooks/useAreaDrawing";
@@ -311,17 +312,6 @@ function MapView({
         eventsRef.current.filter((e) => e.coordinates).map((e) => [e.id, eventSignature(e, matchIdsRef.current)])
       );
 
-      const clusterRadius = (count) => (count >= 15 ? 24 : count >= 5 ? 18 : 14);
-      const ringFor = (f, extra) => ({
-        type: "FeatureCollection",
-        features: [
-          {
-            type: "Feature",
-            properties: { r: (f.properties.point_count ? clusterRadius(f.properties.point_count) : 6) + extra },
-            geometry: f.geometry,
-          },
-        ],
-      });
       // Hover state for clusters and dots: a gold ring around whatever is under
       // the pointer, from the hover label's query (handleHover, below).
       let hoverKey = null;
@@ -334,114 +324,17 @@ function MapView({
 
       const clickable = () => propsRef.current.areaMode === "off" && !suppressClickRef.current;
 
-      const openStack = (e, features, total) => {
-        setBorderPopup(null);
-        // Escape or × puts focus back where it was (closeStack).
-        const active = document.activeElement;
-        stackOpenerRef.current = active && active !== document.body ? active : null;
-        setStackList({
-          point: [e.point.x, e.point.y],
-          items: stackItems(features),
-          total,
-          oneSpot: allSameCoordinates(features),
-        });
-      };
-
-      // Cluster ids change whenever the events data does (each Play step, a new
-      // search): a lookup answered after a change (`eventsGeneration` moved on) is
-      // dropped, as its id may now be another cluster (as in useMapHoverLabel.js).
-      let eventsGeneration = 0;
-      map.on("data", (e) => {
-        if (e.sourceId === "events" && e.sourceDataType === "content") eventsGeneration++;
-      });
-
-      const clickCluster = async (e, feature) => {
-        const center = feature.geometry.coordinates;
-        const { cluster_id: clusterId, point_count: count } = feature.properties;
-        const source = map.getSource("events");
-        const asked = eventsGeneration;
-        // Visible click feedback: flash the cluster while the map zooms into it.
-        map.getSource("cluster-flash")?.setData(ringFor(feature, 8));
-        setTimeout(() => map.getSource("cluster-flash")?.setData(EMPTY_FC), 550);
-        let zoom = map.getZoom() + 2;
-        let expansion = NaN;
-        try {
-          expansion = await source.getClusterExpansionZoom(clusterId);
-          zoom = Math.max(expansion, map.getZoom() + 1);
-        } catch {
-          // Fall back to the fixed +2 zoom step.
-        }
-        // A cluster no zoom can split (e.g. capital-pinned events on one point)
-        // lists its events instead of zooming in to a single unclickable dot.
-        const leaves =
-          count <= LIST_MAX ? await source.getClusterLeaves(clusterId, LIST_MAX, 0).catch(() => null) : null;
-        if (cancelled || asked !== eventsGeneration) return;
-        const action = clusterClickAction({ count, expansionZoom: expansion, clusterMaxZoom: CLUSTER_MAX_ZOOM, leaves });
-        if (action === "list" && leaves?.length) return openStack(e, leaves, count);
-        map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 });
-      };
-
-      // A dot with others drawn under it (same spot, past CLUSTER_MAX_ZOOM)
-      // lists them all; a lone dot selects its event.
-      const clickDot = (e, feature) => {
-        const here = map.queryRenderedFeatures(map.project(feature.geometry.coordinates), {
-          layers: ["unclustered-point"],
-        });
-        const distinct = stackItems(here).length;
-        if (distinct > 1) return openStack(e, here, distinct);
-        propsRef.current.onSelectEvent?.(feature.properties.id);
-      };
-
-      // The marker a click is on; on a touch screen also the nearest one
-      // within TAP_SLOP_PX of a tap (lib/tapTarget.js), since a finger easily
-      // misses a 12-16 px dot and would otherwise open the border under it.
-      const markerLayers = ["clusters", "unclustered-point", "selected-point"];
-      const coarse = window.matchMedia?.("(pointer: coarse)").matches;
-      const markerAt = (point) => {
-        const toPixel = (c) => map.project(c);
-        const exact = map.queryRenderedFeatures(point, { layers: markerLayers });
-        if (exact.length || !coarse) return pickMarker(exact, point, toPixel);
-        const r = TAP_SLOP_PX;
-        const near = map.queryRenderedFeatures(
-          [
-            [point.x - r, point.y - r],
-            [point.x + r, point.y + r],
-          ],
-          { layers: markerLayers }
-        );
-        return pickMarker(near, point, toPixel);
-      };
-
-      // One click handler: a marker (see markerAt), else a border polygon,
-      // which shows its status/note/source. A placeholder outline is described
-      // by the areas it stands for.
-      map.on("click", (e) => {
-        if (!clickable()) return;
-        const marker = markerAt(e.point);
-        if (marker) {
-          if (marker.layer.id === "clusters") clickCluster(e, marker);
-          else clickDot(e, marker);
-          return;
-        }
-        setStackList(null);
-        // Escape or × puts focus back where it was (closePopup), as for the list.
-        const active = document.activeElement;
-        popupOpenerRef.current = active && active !== document.body ? active : null;
-        const hits = map.queryRenderedFeatures(e.point, { layers: ["boundaries-fill"] });
-        const chunk = boundaryCacheRef.current.get(decadeFloor(yearRef.current)) ?? [];
-        let hint = null;
-        const items = hits.flatMap((h) => {
-          if (h.properties.placeholder_for == null) return [h];
-          const placeholder = chunk.find((f) => isPlaceholder(f) && f.properties.name === h.properties.name);
-          if (!placeholder) return [h];
-          hint = placeholder.properties.note;
-          return placeholderMembers(placeholder, chunk);
-        });
-        setBorderPopup(
-          hits.length
-            ? { point: [e.point.x, e.point.y], lngLat: [e.lngLat.lng, e.lngLat.lat], items: foldIncluded(uniqueBoundaries(items)), hint }
-            : null
-        );
+      // Clicks and taps: clusters, dots, the events at one spot, border details (mapClicks.js).
+      installMapClicks(map, {
+        isCancelled: () => cancelled,
+        clickable,
+        propsRef,
+        boundaryCacheRef,
+        yearRef,
+        setStackList,
+        setBorderPopup,
+        stackOpenerRef,
+        popupOpenerRef,
       });
 
       setMapReady(true);
@@ -475,104 +368,9 @@ function MapView({
       map.on("idle", revealOnIdle);
       map.triggerRepaint();
 
-      // Land beyond the opening view loads once that view has drawn, so it never
-      // competes with it; a failed load is retried on the next pan or zoom.
-      const addFarLand = () => {
-        loadFarLand()
-          .then((far) => {
-            if (cancelled || landRef.current.far) return;
-            landRef.current.far = far;
-            map.off("moveend", addFarLand);
-            const { add } = landStoreRef.current.addLow(far);
-            map.getSource("land")?.updateData({ add });
-          })
-          .catch(() => {});
-      };
-      map.once("idle", () => {
-        if (cancelled) return;
-        addFarLand();
-        map.on("moveend", addFarLand);
-        startLandDetail();
-      });
-
-      // The Middle East's Natural Earth 1:10m coast, one cell at a time (lib/landStore.js,
-      // scripts/build-land.js): first the cells in and around the view once zoomed in past
-      // DETAIL_FETCH_ZOOM, then - unless the visitor asked to save data, the link looks
-      // slow, or a browser without the link's estimate has a touch screen
-      // (wantsBackgroundDetail) - all the others in the background, nearest first, so
-      // a zoom-in finds its coast already drawn. Only the cells land.json lists have a
-      // file: an unlisted cell's light piece is already its exact 1:10m land, and stays.
-      const DETAIL_FETCH_ZOOM = 5;
-      const store = landStoreRef.current;
-      const requested = new Set();
-      const manifest = () => landRef.current.near ?? { cells: [], cellSize: 5 };
-      // Fetch cells and swap them in together, in one update of the source.
-      const loadCells = (cells) => {
-        const todo = cells.filter((c) => !requested.has(c));
-        if (!todo.length) return Promise.resolve();
-        for (const c of todo) requested.add(c);
-        const fetches = todo.map((c) =>
-          loadLandCell(c).then(
-            (fc) => [c, fc],
-            () => (requested.delete(c), null) // retried on a later pan or zoom
-          )
-        );
-        return Promise.all(fetches).then(async (got) => {
-          if (cancelled) return;
-          const add = [];
-          const remove = [];
-          for (const [c, fc] of got.filter(Boolean)) {
-            const d = store.addDetail(c, fc);
-            add.push(...d.add);
-            remove.push(...d.remove);
-          }
-          if (add.length || remove.length) await map.getSource("land")?.updateData({ add, remove });
-        });
-      };
-      const onView = () => {
-        if (map.getZoom() < DETAIL_FETCH_ZOOM) return;
-        const { cells, cellSize } = manifest();
-        const b = map.getBounds();
-        const mx = (b.getEast() - b.getWest()) * 0.25;
-        const my = (b.getNorth() - b.getSouth()) * 0.25;
-        loadCells(cellsInBounds(cells, cellSize, [b.getWest() - mx, b.getSouth() - my, b.getEast() + mx, b.getNorth() + my]));
-      };
-      const backgroundFill = async () => {
-        const { cells, cellSize } = manifest();
-        const c = map.getCenter();
-        const dist = (id) => {
-          const [x, y] = id.split("_").map(Number);
-          return Math.hypot(x + cellSize / 2 - c.lng, y + cellSize / 2 - c.lat);
-        };
-        const order = [...cells].sort((a, b) => dist(a) - dist(b));
-        // A few cells per batch, each when the browser is idle, so no update of the source is large.
-        for (let i = 0; i < order.length && !cancelled; i += 8) {
-          await new Promise((r) => (window.requestIdleCallback ?? setTimeout)(r));
-          await loadCells(order.slice(i, i + 8));
-        }
-      };
-      // The cell list comes with land.json: until it is in (it may first fail
-      // and arrive through Retry) there is nothing to fill, so the background
-      // fill starts once both the map is idle and the list is known.
-      let detailStarted = false;
-      let fillStarted = false;
-      const startFill = () => {
-        const finePointer = window.matchMedia?.("(pointer: fine)").matches ?? false;
-        if (fillStarted || !landRef.current.near || !wantsBackgroundDetail(navigator.connection, finePointer)) return;
-        fillStarted = true;
-        backgroundFill();
-      };
-      const startLandDetail = () => {
-        detailStarted = true;
-        map.on("moveend", onView);
-        onView();
-        startFill();
-      };
-      landArrivedRef.current = () => {
-        if (cancelled || !detailStarted) return;
-        onView();
-        startFill();
-      };
+      // The land beyond the opening view, and the 1:10m coast cell by cell (mapLand.js);
+      // the function it returns picks up a land.json that arrives late (Retry).
+      landArrivedRef.current = startLandLoading(map, { landRef, store: landStoreRef.current, isCancelled: () => cancelled });
     });
 
     return () => {
