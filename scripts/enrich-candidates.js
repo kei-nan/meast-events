@@ -72,6 +72,7 @@ import { keptDatePrecision, keptEndPrecision } from "./lib/fixes.js";
 import { renderMissingReport } from "./lib/missing-report.js";
 import { refreshOrderFlags } from "./lib/order-flags.js";
 import { slugify } from "./lib/slug.js";
+import { checkExclusionEntries, matchExclusions, exclusionSummary } from "./lib/exclusions.js";
 import { validateEvents, borrowedSource, BORROWED_SOURCE } from "./lib/validate.js";
 // setReason: replaces the review reason starting with `prefix` in place (keeps the list order stable across re-runs),
 // removes it when `text` is null, appends it when absent.
@@ -453,11 +454,17 @@ ${m}      `),
   // Duplicate hints may only point at records that are published next to the event: curated events and proposed
   // events that are neither excluded here nor left out by review (data/proposed-exclusions.json). A hint to a record
   // that is never published is a dangling id (e.g. october-7-attacks -> ein-hashlosha-massacre, a redirect duplicate
-  // excluded by review).
-  const reviewExcluded = new Set((await loadJson("proposed-exclusions.json")).map((x) => x.id));
+  // excluded by review). Review exclusions match by id or wikidata_qid (lib/exclusions.js), so a renamed article
+  // (new slug id, same Wikidata item) stays excluded.
+  const reviewExclusions = await loadJson("proposed-exclusions.json");
+  const exclusionErrors = checkExclusionEntries(reviewExclusions);
+  if (exclusionErrors.length) throw new Error(`data/proposed-exclusions.json is malformed: ${exclusionErrors.join("; ")}`);
+  const reviewExcluded = matchExclusions(reviewExclusions, results, { qidOf: (r) => r.wikidata_qid ?? r.source_qid });
+  console.log(`Excluded by review (data/proposed-exclusions.json): ${exclusionSummary(reviewExclusions, reviewExcluded)}`);
+  for (const w of reviewExcluded.warnings) console.warn(`  warn ${w.replace("matches no event", "matches no enriched candidate")}`);
   const published = new Set([
     ...curated.map((e) => e.id),
-    ...results.filter((r) => !r.exclusion_reason && !reviewExcluded.has(r.id)).map((r) => r.id),
+    ...results.filter((r) => !r.exclusion_reason && !reviewExcluded.isExcluded(r)).map((r) => r.id),
   ]);
   for (const r of results) {
     pruneDuplicateHints(r, published, "_review");

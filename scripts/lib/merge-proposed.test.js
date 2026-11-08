@@ -1,11 +1,12 @@
 // scripts/merge-proposed.js end to end, on temporary copies (never the real data/ files).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { textSha1 } from "./validate.js";
 
 const SCRIPT = fileURLToPath(new URL("../merge-proposed.js", import.meta.url));
 
@@ -28,12 +29,17 @@ const event = (id, qid, over = {}) => ({
   ...over,
 });
 
-function setup({ curated, proposed, exclusions = [] }) {
+// A framing-review.json keyed by event id under "events", as data/framing-review.json is; by default every
+// event in the fixture (curated and proposed) has a review of its current text.
+const reviewsFor = (events) => ({ events: Object.fromEntries(events.map((e) => [e.id, { text_sha1: textSha1(e.extract) }])) });
+
+function setup({ curated, proposed, exclusions = [], reviewed = [...curated, ...proposed] }) {
   const dir = mkdtempSync(join(tmpdir(), "merge-proposed-test-"));
   const text = JSON.stringify(curated, null, 2) + "\n";
   writeFileSync(join(dir, "events.json"), text);
   writeFileSync(join(dir, "events.proposed.json"), JSON.stringify(proposed, null, 2));
   writeFileSync(join(dir, "proposed-exclusions.json"), JSON.stringify(exclusions));
+  writeFileSync(join(dir, "framing-review.json"), JSON.stringify(reviewsFor(reviewed)));
   return { dir, text, read: () => readFileSync(join(dir, "events.json"), "utf-8") };
 }
 const run = (dir, ...args) => execFileSync(process.execPath, [SCRIPT, `--data-dir=${dir}`, ...args], { encoding: "utf-8", stdio: "pipe" });
@@ -118,7 +124,7 @@ test("merge-proposed: a missing exclusions file means none; a malformed one fail
   const t = setup({ curated, proposed: [event("c", "Q3")] });
   try {
     rmSync(join(t.dir, "proposed-exclusions.json"));
-    assert.match(run(t.dir), /Excluded by review \(data\/proposed-exclusions.json\): 0/);
+    assert.match(run(t.dir), /Excluded by review \(data\/proposed-exclusions.json\): 0 proposed event\(s\); 0 entries: 0 matched/);
     writeFileSync(join(t.dir, "proposed-exclusions.json"), "[{\"id\": \"c\",");
     assert.throws(() => run(t.dir, "--apply"), (err) => err.status !== 0 && /proposed-exclusions\.json is not valid JSON/.test(err.stderr));
     assert.equal(t.read(), t.text);
@@ -150,6 +156,97 @@ test("merge-proposed: re-derived date-order flags reach the curated record, noth
     const { wikipedia_lead_dates: _lead, ...rest } = old;
     assert.deepEqual(out.at(-1), { ...rest, date_flags: [COARSE] }, "title and the rest stay curated");
     assert.deepEqual(out.slice(0, 2), curated);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+test("merge-proposed: --only adds just the listed events; an id not in the proposed file or excluded by review is refused", () => {
+  const t = setup({ curated, proposed, exclusions: [{ id: "e", reason: "test" }] });
+  try {
+    const dry = run(t.dir, "--only=c");
+    assert.match(dry, /--only:\s+1 requested, 1 to add/);
+    assert.match(dry, /would add:\s+1\s+-> total 3/);
+    // "a" is in the proposed file but already curated: not added, and said so.
+    assert.match(run(t.dir, "--only=c,a"), /not added \(already curated, not an event, or a skipped duplicate hint\): a/);
+    assert.throws(() => run(t.dir, "--only=c,zz", "--apply"), (err) => err.status === 1 && /--only: not in the proposed file: zz/.test(err.stderr));
+    assert.throws(() => run(t.dir, "--only=e", "--apply"), (err) => err.status === 1 && /--only: excluded by review .*: e/.test(err.stderr));
+    assert.throws(() => run(t.dir, "--only=", "--apply"), (err) => err.status === 1 && /needs at least one/.test(err.stderr));
+    assert.equal(t.read(), t.text, "nothing written by the refused runs");
+    run(t.dir, "--only=d,c", "--apply");
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "d"], "proposed-file order kept");
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+test("merge-proposed: events without a framing review are listed by the dry run and refused by --apply unless --allow-unreviewed", () => {
+  // c has a review; d has none; a stale review (text changed) is listed but not refused.
+  const stale = event("s", "Q6");
+  const t = setup({ curated, proposed: [event("c", "Q3"), event("d", "Q4"), stale], reviewed: [...curated, event("c", "Q3"), { ...stale, extract: "older text" }] });
+  try {
+    const dry = run(t.dir);
+    assert.match(dry, /without a framing review:\s+1 \(--apply refuses them\)\n\s+d\n/);
+    assert.match(dry, /framing review stale \(text changed since\): 1\n\s+s\n/);
+    assert.throws(
+      () => run(t.dir, "--apply"),
+      (err) => err.status === 1 && /Refusing to apply: 1 event\(s\) to add have no framing review .*\(d\)/.test(err.stderr)
+    );
+    assert.equal(t.read(), t.text, "nothing written");
+    // Leaving the unreviewed one out with --only works without the override.
+    run(t.dir, "--only=c,s", "--apply");
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "s"]);
+    run(t.dir, "--apply", "--allow-unreviewed");
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "s", "d"]);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+test("merge-proposed: a missing framing-review.json means no event is reviewed", () => {
+  const t = setup({ curated, proposed: [event("c", "Q3")] });
+  try {
+    rmSync(join(t.dir, "framing-review.json"));
+    assert.throws(() => run(t.dir, "--apply"), (err) => err.status === 1 && /no framing review .*\(c\)/.test(err.stderr));
+    assert.equal(t.read(), t.text);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+});
+
+test("merge-proposed: exclusions match by wikidata_qid after a rename; entries matching nothing are counted and warned", () => {
+  const exclusions = [
+    { id: "old-title-of-e", wikidata_qid: "Q5", reason: "test" }, // the proposed e is the renamed article
+    { id: "stale-entry", wikidata_qid: "Q77", reason: "test" },
+  ];
+  const t = setup({ curated, proposed, exclusions });
+  try {
+    const out = execFileSync(process.execPath, [SCRIPT, `--data-dir=${t.dir}`], { encoding: "utf-8", stdio: ["ignore", "pipe", "pipe"] });
+    assert.match(out, /Excluded by review \(data\/proposed-exclusions.json\): 1 proposed event\(s\); 2 entries: 1 matched \(0 by id, 1 by wikidata_qid only\), 1 matched nothing/);
+    assert.match(out, /\n\s+e \(by wikidata_qid\)\n/);
+    assert.match(out, /would add:\s+2\s+-> total 4/, "c and d; e is excluded");
+    run(t.dir, "--apply");
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "d"]);
+  } finally {
+    rmSync(t.dir, { recursive: true, force: true });
+  }
+  // The warnings go to stderr.
+  const t2 = setup({ curated, proposed, exclusions });
+  try {
+    const r = spawnSync(process.execPath, [SCRIPT, `--data-dir=${t2.dir}`], { encoding: "utf-8" });
+    assert.equal(r.status, 0);
+    assert.match(r.stderr, /warn exclusion "stale-entry" \(Q77\) matches no proposed event/);
+    assert.match(r.stderr, /warn exclusion "old-title-of-e" \(Q5\) matched e by wikidata_qid only \(article renamed\?\); update its id/);
+  } finally {
+    rmSync(t2.dir, { recursive: true, force: true });
+  }
+});
+
+test("merge-proposed: a malformed exclusion entry stops the merge", () => {
+  const t = setup({ curated, proposed, exclusions: [{ id: "e", wikidata_qid: "5", reason: "test" }] });
+  try {
+    assert.throws(() => run(t.dir, "--apply"), (err) => err.status === 1 && /wikidata_qid "5" is not a QID/.test(err.stderr));
+    assert.equal(t.read(), t.text);
   } finally {
     rmSync(t.dir, { recursive: true, force: true });
   }

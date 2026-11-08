@@ -733,7 +733,16 @@ node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --
                                                         #    The flag copy needs the curated event in the proposed file, which
                                                         #    no longer happens (curated events are not re-proposed, 2026-11-03):
                                                         #    it finds nothing to copy; re-derived flags reach curated records
-                                                        #    only through a person's review
+                                                        #    only through a person's review.
+                                                        #    --only=ID,ID adds just those proposed events (each must be in the
+                                                        #    proposed file and not excluded by review). Since 2026-11-08 the dry
+                                                        #    run lists events to add that have no entry in
+                                                        #    data/framing-review.json, and --apply refuses them unless
+                                                        #    --allow-unreviewed (a stale review is listed, not refused).
+                                                        #    data/proposed-exclusions.json entries match by id or wikidata_qid
+                                                        #    (an article rename changes the id, not the item; all 28 entries
+                                                        #    carry their QID), and the run counts matched and unmatched entries
+                                                        #    and warns about each entry that matches nothing
 ```
 
 Network scripts cache fetched data outside the repo (`ATLAS_CACHE_DIR` or `--cache-dir=`, default: OS temp dir), so an interrupted run resumes.
