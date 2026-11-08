@@ -7,7 +7,8 @@
 //   node scripts/validate-boundaries.js [path]
 //   node scripts/validate-boundaries.js --write-geometry-baseline   (only after an approved geometry change)
 // Needs the repo-root dependencies (`npm ci` at the root) for @turf/turf.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import * as turf from "@turf/turf";
 import {
   checkBoundaries,
@@ -32,7 +33,7 @@ try {
 
 if (process.argv.includes("--write-geometry-baseline")) {
   const fp = geometryFingerprint(geojson.features);
-  await writeFile(baselineUrl, JSON.stringify(fp, null, 2) + "\n");
+  await writeFileAtomic(baselineUrl, JSON.stringify(fp, null, 2) + "\n");
   console.log(`Wrote data/border-geometry-baseline.json (${Object.keys(fp).length} features)`);
   process.exit(0);
 }

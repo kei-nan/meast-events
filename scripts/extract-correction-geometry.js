@@ -61,7 +61,8 @@
 //    (segment lengths, which side of a named cape the line meets the coast on, and that the
 //    1969 partition line really does bisect the reconstructed Saudi-Kuwaiti zone), and are
 //    printed on every run so the reconstruction stays falsifiable.
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { stringifyKeyPerLine } from "./lib/json-lines.js";
 import { dropRepeatedPositions } from "./lib/ring-positions.js";
 import { roundRingWithoutCrossings } from "./lib/ring-repair.js";
@@ -450,7 +451,7 @@ async function main() {
     gulfIslands: gulfIslands.geometry,
   };
 
-  await writeFile(new URL("../data/corrections-geometry.json", import.meta.url), stringifyKeyPerLine(out));
+  await writeFileAtomic(new URL("../data/corrections-geometry.json", import.meta.url), stringifyKeyPerLine(out));
   console.log("Wrote data/corrections-geometry.json:", Object.keys(out));
   reportNeutralZoneChecks({
     saudiIraqi: saudiIraqiNeutralZone,

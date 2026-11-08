@@ -17,6 +17,7 @@
 // a section edited back to the reviewed text loses its `changed_revision`. Nothing here re-reviews anything:
 // whether a change matters for the reviews is the owner's call.
 import { readFile, writeFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { parseGuidelineUrl, permalink, sectionHash, diffLines, changedSpan, fetchRevision, fetchSection } from "./lib/guidelines.js";
 
 const APPLY = process.argv.includes("--apply");
@@ -122,7 +123,7 @@ if (PIN) {
 
 if (APPLY || PIN) {
   if (edits) {
-    await writeFile(reviewUrl, JSON.stringify(review, null, 2) + "\n");
+    await writeFileAtomic(reviewUrl, JSON.stringify(review, null, 2) + "\n");
     say(`\nAPPLIED: wrote data/framing-review.json.`);
   } else say("\nNothing to write.");
 } else {

@@ -37,11 +37,14 @@ export function cacheOptionsFromArgs(argv = process.argv, env = process.env) {
   };
 }
 
+// A cache file that cannot be read or parsed (a run killed by an older version mid-write, a disk error) starts
+// empty: the entries are fetched again. Said on stderr, so a run that re-fetches everything says why.
 const readJson = (file) => {
   if (!existsSync(file)) return {};
   try {
     return JSON.parse(readFileSync(file, "utf-8"));
-  } catch {
+  } catch (err) {
+    console.warn(`cache: ignoring unreadable cache file ${file} (${err.message}); its entries will be fetched again`);
     return {};
   }
 };
