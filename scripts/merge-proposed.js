@@ -9,8 +9,9 @@
 //   node scripts/merge-proposed.js --only=ID,ID     add only these proposed events (each id must be in the proposed
 //                                                  file and not excluded by review); the rules below still apply
 //   node scripts/merge-proposed.js --allow-unreviewed
-//                                                  let --apply add events that have no entry in framing-review.json
-//                                                  (by default --apply refuses them; the dry run lists them)
+//                                                  let --apply add events that have no entry in framing-review.json, or
+//                                                  one of older text (by default --apply refuses them; the dry run
+//                                                  lists them)
 //   node scripts/merge-proposed.js --data-dir=DIR  read/write events.json, events.proposed.json,
 //                                                  proposed-exclusions.json and framing-review.json in DIR instead of
 //                                                  data/ (tests)
@@ -21,7 +22,8 @@
 // so a renamed article (new slug id, same item) stays excluded; entries that match nothing are listed as warnings.
 // Framing review (framing-review.json, keyed by event id under "events"): every event shown on the site has one,
 // so --apply refuses to add an event without an entry unless --allow-unreviewed is given. A review whose text_sha1
-// no longer matches the extract (stale) is listed but not refused; the site marks it "may no longer apply".
+// no longer matches the extract (stale) is refused the same way: it is a review of other words, and an event would
+// reach the site already marked "may no longer apply".
 // Rules applied to the curated file on every run (listed in the dry run, written with --apply):
 //   - "Not events" (docs/DATA_POLICY.md; NOT_EVENT_CLASSES in lib/event-classes.js): a curated entry whose Wikidata
 //     classes include a person, organisation, state or country-history class is removed; a proposed one is not added.
@@ -151,7 +153,7 @@ console.log(`  with any review flag:            ${incoming.filter((e) => e.needs
 console.log(`  without a framing review:        ${unreviewed.length}${unreviewed.length ? (ALLOW_UNREVIEWED ? " (--allow-unreviewed)" : " (--apply refuses them)") : ""}`);
 for (const e of unreviewed) console.log(`      ${e.id}`);
 if (staleReview.length) {
-  console.log(`  framing review stale (text changed since): ${staleReview.length}`);
+  console.log(`  framing review stale (text changed since): ${staleReview.length}${ALLOW_UNREVIEWED ? " (--allow-unreviewed)" : " (--apply refuses them)"}`);
   for (const e of staleReview) console.log(`      ${e.id}`);
 }
 if (ONLY) {
@@ -163,12 +165,21 @@ console.log(`  by category:`, byCat);
 
 if (!APPLY) {
   console.log(`\nDry run only - nothing was written. Re-run with --apply to write it.`);
-} else if (unreviewed.length && !ALLOW_UNREVIEWED) {
-  console.error(
-    `\nRefusing to apply: ${unreviewed.length} event(s) to add have no framing review in data/framing-review.json ` +
-      `(${unreviewed.map((e) => e.id).join(", ")}). Review them first, leave them out with --only=..., ` +
-      "or add them unreviewed on purpose with --allow-unreviewed. Nothing was written."
-  );
+} else if ((unreviewed.length || staleReview.length) && !ALLOW_UNREVIEWED) {
+  if (unreviewed.length) {
+    console.error(
+      `\nRefusing to apply: ${unreviewed.length} event(s) to add have no framing review in data/framing-review.json ` +
+        `(${unreviewed.map((e) => e.id).join(", ")}). Review them first, leave them out with --only=..., ` +
+        "or add them unreviewed on purpose with --allow-unreviewed. Nothing was written."
+    );
+  }
+  if (staleReview.length) {
+    console.error(
+      `\nRefusing to apply: ${staleReview.length} event(s) to add have a framing review of older text ` +
+        `(${staleReview.map((e) => e.id).join(", ")}). Review them again first, leave them out with --only=..., ` +
+        "or add them with the old review on purpose with --allow-unreviewed. Nothing was written."
+    );
+  }
   process.exit(1);
 } else {
   await writeFileAtomic(curatedUrl, JSON.stringify(merged, null, 2) + "\n");

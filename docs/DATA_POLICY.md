@@ -740,7 +740,8 @@ node scripts/merge-proposed.js [--apply] [--no-add]     # dry-run by default; --
                                                         #    proposed file and not excluded by review). Since 2026-11-08 the dry
                                                         #    run lists events to add that have no entry in
                                                         #    data/framing-review.json, and --apply refuses them unless
-                                                        #    --allow-unreviewed (a stale review is listed, not refused).
+                                                        #    --allow-unreviewed (since 2026-11-09 a stale review, of older text,
+                                                        #    is refused the same way).
                                                         #    data/proposed-exclusions.json entries match by id or wikidata_qid
                                                         #    (an article rename changes the id, not the item; all 28 entries
                                                         #    carry their QID), and the run counts matched and unmatched entries

@@ -180,24 +180,30 @@ test("merge-proposed: --only adds just the listed events; an id not in the propo
   }
 });
 
-test("merge-proposed: events without a framing review are listed by the dry run and refused by --apply unless --allow-unreviewed", () => {
-  // c has a review; d has none; a stale review (text changed) is listed but not refused.
+test("merge-proposed: events without a current framing review are listed by the dry run and refused by --apply unless --allow-unreviewed", () => {
+  // c has a review; d has none; s has a review of older text.
   const stale = event("s", "Q6");
   const t = setup({ curated, proposed: [event("c", "Q3"), event("d", "Q4"), stale], reviewed: [...curated, event("c", "Q3"), { ...stale, extract: "older text" }] });
   try {
     const dry = run(t.dir);
     assert.match(dry, /without a framing review:\s+1 \(--apply refuses them\)\n\s+d\n/);
-    assert.match(dry, /framing review stale \(text changed since\): 1\n\s+s\n/);
+    assert.match(dry, /framing review stale \(text changed since\): 1 \(--apply refuses them\)\n\s+s\n/);
     assert.throws(
       () => run(t.dir, "--apply"),
-      (err) => err.status === 1 && /Refusing to apply: 1 event\(s\) to add have no framing review .*\(d\)/.test(err.stderr)
+      (err) =>
+        err.status === 1 &&
+        /Refusing to apply: 1 event\(s\) to add have no framing review .*\(d\)/.test(err.stderr) &&
+        /Refusing to apply: 1 event\(s\) to add have a framing review of older text \(s\)/.test(err.stderr)
     );
     assert.equal(t.read(), t.text, "nothing written");
-    // Leaving the unreviewed one out with --only works without the override.
-    run(t.dir, "--only=c,s", "--apply");
-    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "s"]);
+    // A stale review alone is enough to refuse.
+    assert.throws(() => run(t.dir, "--only=s", "--apply"), (err) => err.status === 1 && /older text \(s\)/.test(err.stderr));
+    assert.equal(t.read(), t.text, "nothing written");
+    // Leaving both out with --only works without the override.
+    run(t.dir, "--only=c", "--apply");
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c"]);
     run(t.dir, "--apply", "--allow-unreviewed");
-    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "s", "d"]);
+    assert.deepEqual(JSON.parse(t.read()).map((e) => e.id), ["a", "b", "c", "d", "s"]);
   } finally {
     rmSync(t.dir, { recursive: true, force: true });
   }
