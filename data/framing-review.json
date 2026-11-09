@@ -2,7 +2,7 @@
   "about": "Framing review: two review types per Wikipedia summary, shown separately. Overall fairness is the reviewer's judgement of emphasis, balance and omissions; the wording check cites Wikipedia's own neutrality and wording guidelines. Shown next to the summary, never merged into it. Not a fact-check and not a verdict on the events.",
   "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
   "reviewed_on": "2026-09-30",
-  "updated_on": "2026-11-04",
+  "updated_on": "2026-11-09",
   "rubric_version": 5,
   "method": "docs/framing-review.md",
   "guidelines": {
@@ -6206,6 +6206,146 @@
           "celebrating the occupation of East Jerusalem"
         ]
       },
+      "wording": []
+    },
+    "kocgiri-rebellion": {
+      "text_sha1": "832293e6d416",
+      "text_retrieved_at": "2026-10-14",
+      "fairness": {
+        "note": "Calls the whole region \"overwhelmingly militant\" in its own voice, and gives no reason for the uprising or what its leaders demanded.",
+        "phrases": [
+          "overwhelmingly militant Koçgiri region"
+        ]
+      },
+      "wording": []
+    },
+    "tantura-massacre": {
+      "text_sha1": "280581447834",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": {
+        "note": "The opening states the massacre as fact, while the last paragraph reports \"an academic debate and controversy\" but names only those who affirmed it. Left out, though covered in the article's body: the Alexandroni veterans' denial and their libel suit against the thesis's author, and Benny Morris's view that it is unclear whether a massacre occurred but that war crimes were committed.",
+        "phrases": [
+          "Palestinian villagers were massacred by Israel's Haganah",
+          "The Israeli New Historians, most prominently Ilan Pappe, affirmed that a massacre had taken place"
+        ]
+      },
+      "wording": [
+        {
+          "guideline": "NPOV",
+          "phrase": "Palestinian villagers were massacred by Israel's Haganah",
+          "note": "States in Wikipedia's own voice that a massacre took place. The summary itself reports \"an academic debate and controversy\" and names those who affirmed the massacre; it does not give the position of those who dispute it."
+        }
+      ]
+    },
+    "operation-damocles": {
+      "text_sha1": "8c6fc2a87131",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": {
+        "note": "Names the tactics but not their toll. The article's body says one parcel bomb killed five Egyptian workers and another injured a scientist's secretary.",
+        "phrases": [
+          "The chief tactics were letter bombs and abduction"
+        ]
+      },
+      "wording": []
+    },
+    "mossad-assassinations-following-the-munich-massacre": {
+      "text_sha1": "d280c1dde08b",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": {
+        "note": "Says only that Mossad \"killed several prominent Palestinians\" and missed Abu Daoud. It leaves out the Lillehammer killing of Ahmed Bouchiki, a waiter unrelated to Munich who was mistaken for a target, which the article's body says led to the operation's suspension.",
+        "phrases": [
+          "While Mossad killed several prominent Palestinians during the operation"
+        ]
+      },
+      "wording": []
+    },
+    "savoy-hotel-attack": {
+      "text_sha1": "e2a58be2bfda",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": [
+        {
+          "guideline": "LABEL",
+          "phrase": "was a terrorist attack",
+          "note": "Uses \"terrorist\" for the attack, in the defining sentence, in Wikipedia's own voice, without saying who uses the label."
+        }
+      ]
+    },
+    "operation-samen-ol-aemeh": {
+      "text_sha1": "bc3615fb05b9",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": []
+    },
+    "operation-dawn-5": {
+      "text_sha1": "6163b00ca4af",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": []
+    },
+    "night-of-the-gliders": {
+      "text_sha1": "6e0fbe7e388b",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": []
+    },
+    "blockade-of-the-gaza-strip": {
+      "text_sha1": "cbf68fb8ac93",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": {
+        "note": "On legality it gives only the view that the blockade is illegal. The article's body reports that the UN's 2011 Palmer Report found the naval blockade legal under international law; the summary does not mention it.",
+        "phrases": [
+          "human rights groups believe it would be deemed illegal"
+        ]
+      },
+      "wording": []
+    },
+    "operation-northern-shield": {
+      "text_sha1": "b0c3eb3f14dc",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": []
+    },
+    "death-of-abu-bakr-al-baghdadi": {
+      "text_sha1": "f23815cd5ca2",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": []
+    },
+    "31-october-2023-jabalia-refugee-camp-airstrike": {
+      "text_sha1": "0d63fe103236",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": {
+        "note": "Says \"many countries\" severed diplomatic ties, where the article's body names one that did (Bolivia) and two that recalled ambassadors (Colombia, Chile). \"Mostly women and children\" is stated as fact near the top and attributed, to the Indonesia Hospital, only further down.",
+        "phrases": [
+          "led to many countries severing diplomatic ties with Israel",
+          "mostly women and children"
+        ]
+      },
+      "wording": []
+    },
+    "2024-rafah-hostage-raid": {
+      "text_sha1": "e4158125b9e3",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": {
+        "note": "Says the raid \"ended successfully\", judged by the hostages alone, then adds at least 74 Palestinians killed in the strikes used as cover without saying whether they were civilians or fighters or who gave the figures.",
+        "phrases": [
+          "ended successfully",
+          "At least 74 Palestinians were killed by Israel in the early morning airstrikes used as cover for the operation"
+        ]
+      },
+      "wording": []
+    },
+    "2025-2026-united-states-airstrikes-in-syria": {
+      "text_sha1": "92870b2a72fd",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
+      "wording": []
+    },
+    "2026-strait-of-hormuz-crisis": {
+      "text_sha1": "25e3cb7aa1db",
+      "text_retrieved_at": "2026-11-04",
+      "fairness": null,
       "wording": []
     }
   }

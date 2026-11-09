@@ -944,8 +944,9 @@ export function validateEvents(events, opts = {}) {
 export const textSha1 = (text) => createHash("sha1").update(text ?? "").digest("hex").slice(0, 12);
 
 // Both framing checks also return `items`: each warning as { id, code, text } (text = the warnings entry), for the
-// warnings baseline.
-export function checkFramingCoverage(events, review, { name = "framing-review" } = {}) {
+// warnings baseline. A review of a proposed event (proposedIds) is not an orphan: merge-proposed refuses to add an
+// event that has no review yet.
+export function checkFramingCoverage(events, review, { name = "framing-review", proposedIds = [] } = {}) {
   const reviews = review?.events;
   if (!reviews || typeof reviews !== "object") {
     const text = `${name}: no "events" object`;
@@ -968,7 +969,8 @@ export function checkFramingCoverage(events, review, { name = "framing-review" }
       add(e.id, "framing_review_stale", `${name}: ${e.id} review is stale (text changed since it was reviewed; reviewed text of ${r.text_retrieved_at ?? "?"}, current text of ${e.extract_retrieved_at ?? "?"})`);
     }
   }
-  const orphans = Object.keys(reviews).filter((id) => !ids.has(id));
+  const pending = new Set(proposedIds);
+  const orphans = Object.keys(reviews).filter((id) => !ids.has(id) && !pending.has(id));
   for (const id of orphans) add(id, "framing_review_orphan", `${name}: review for "${id}", which is not an event`);
   return { warnings: items.map((x) => x.text), items, missing, stale, orphans: orphans.length };
 }
