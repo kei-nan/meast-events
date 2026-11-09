@@ -22,6 +22,7 @@ import { writeFileAtomic } from "./lib/files.js";
 import * as turf from "@turf/turf";
 import { baselineYears } from "./lib/boundary-checks.js";
 import { distanceToRingsKm } from "./lib/geo.js";
+import { missingReferencePoints } from "./lib/border-check.js";
 
 const arg = (n) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=")[1];
 const YEAR = Number(arg("year") ?? new Date().getUTCFullYear());
@@ -173,8 +174,10 @@ async function main() {
       if (was == null) continue; // new point, or no land border near it before
       if (km == null || km > was + TOLERANCE_KM) worse.push(`${y} ${id} ${points.find((p) => p.id === id).label}: ${was} km -> ${km ?? "no border nearby"} km`);
     }
+    // Without this a reference list that lost its points would pass: the loop above reads only the points still there.
+    for (const y of BASELINE_YEARS) for (const id of missingReferencePoints(base[y], now[y])) worse.push(`${y} ${id}: in the baseline but no longer among the reference points`);
     if (worse.length) {
-      console.error(`${worse.length} year(s) or reference point(s) fail: a point is now further from the drawn border than the baseline allows (${TOLERANCE_KM} km), or a year has no baseline:\n  ${worse.join("\n  ")}`);
+      console.error(`${worse.length} year(s) or reference point(s) fail: a point is now further from the drawn border than the baseline allows (${TOLERANCE_KM} km), is gone from the reference points, or a year has no baseline:\n  ${worse.join("\n  ")}`);
       console.error("If the change is intended and checked, update the baseline: node scripts/verify-borders.js --write-baseline");
       process.exit(1);
     }

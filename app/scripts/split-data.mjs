@@ -186,6 +186,11 @@ export function publicEvent(e) {
     title: e.title,
     date_start: e.date_start,
     date_end: e.date_end,
+    // Wikidata's precision of each date, for the download only (src/lib/exportResults.js). Not named date_precision:
+    // the date line uses that one and waits for it, so a flagged event (date_flags come with the full record too)
+    // never shows a day before it falls back to the year.
+    ...(e.date_precision ? { start_precision: e.date_precision } : {}),
+    ...(e.date_end_precision ? { end_precision: e.date_end_precision } : {}),
     // Wikidata gives the end time as "no value" / "unknown value" (data date_end_open), only on events with no
     // date_end that have one: the filter, timeline and labels read such an event as ongoing (src/lib/eventYears.js).
     ...(e.date_end_open && !e.date_end ? { date_end_open: e.date_end_open } : {}),

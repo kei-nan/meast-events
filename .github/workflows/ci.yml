@@ -5,7 +5,8 @@ name: CI
 # deploys every push to main on its own, whether or not this workflow passed,
 # and builds a preview for every other branch. What stops a bad deploy is the
 # build itself: `npm run build` in app/ fails (so Cloudflare does not deploy)
-# when the event data is invalid or the built dist/ fails check-dist.mjs. The
+# when an app unit test fails, the event data is invalid or the built dist/
+# fails check-dist.mjs. The
 # other jobs here (data pipeline tests, lint, border checks, audit) only block
 # a merge if they are required status checks on main (DEPLOYMENT.md,
 # "Recommended repository settings").

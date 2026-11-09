@@ -9,7 +9,7 @@
   "scripts": {
     "split-data": "node scripts/split-data.mjs",
     "predev": "node scripts/split-data.mjs && node scripts/subset-fonts.mjs && node scripts/build-search-index.mjs",
-    "prebuild": "node ../scripts/validate-events.js ../data/events.json && node scripts/split-data.mjs && node scripts/subset-fonts.mjs && node scripts/build-search-index.mjs",
+    "prebuild": "npm test && node ../scripts/validate-events.js ../data/events.json && node scripts/split-data.mjs && node scripts/subset-fonts.mjs && node scripts/build-search-index.mjs",
     "dev": "vite",
     "build": "vite build",
     "postbuild": "node scripts/build-event-pages.mjs && node scripts/expand-headers.mjs && node scripts/check-dist.mjs",

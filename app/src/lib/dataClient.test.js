@@ -293,7 +293,7 @@ test("only the full-record bucket is fetched at high priority", async () => {
   await loadLand();
   assert.equal(calls.find((c) => c.url === bucket(V1, "e1", B1)).init?.priority, "high");
   assert.equal(calls.find((c) => c.url === all(V1)).init?.priority, undefined);
-  assert.equal(calls.find((c) => c.url === "/data/land.tbin").init, undefined);
+  assert.equal(calls.find((c) => c.url === "/data/land.tbin").init?.priority, undefined);
 });
 
 test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shares and evicts", async () => {
@@ -404,4 +404,17 @@ test("BASE_URL prefixes every data path", async () => {
   } finally {
     delete globalThis.__VITE_ENV__;
   }
+});
+
+test("loadFullLead: a stalled bucket fails as an outage after the timeout", async (t) => {
+  const { loadFullLead, ALL_LITE_TIMEOUT_MS } = await freshClient();
+  globalThis.fetch = async (url, init) => {
+    if (url === all(V1)) return json(LITE);
+    return new Promise((_, reject) => init.signal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))));
+  };
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const failed = assert.rejects(loadFullLead("some-id"), (e) => e.outage === true && !e.aborted);
+  for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
+  t.mock.timers.tick(ALL_LITE_TIMEOUT_MS);
+  await failed;
 });

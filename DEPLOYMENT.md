@@ -131,6 +131,9 @@ automatically, on Cloudflare as anywhere else; a failing step fails the build an
 Cloudflare does not deploy it.
 
 1. `prebuild`:
+   - `npm test` - the app's unit tests (app/src and app/scripts). Required checks can pass on a
+     pull request and still fail once it lands on a newer `main`, and this is the step that keeps
+     such a commit from deploying.
    - `node ../scripts/validate-events.js ../data/events.json` - structural checks on the
      curated events (schema, ids, dates, coordinates). It uses only Node built-ins, so it
      needs no `node_modules` at the repo root (the build installs only `app/`).

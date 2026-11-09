@@ -136,6 +136,7 @@ function MapView({
   const draggingRef = useRef(false); // an area shape or handle is being dragged (useAreaDrawing)
   const suppressClickRef = useRef(false); // set briefly after a drag: its release is not a map click
   const [mapReady, setMapReady] = useState(false);
+  const [, setLoadCrash] = useState(null); // throws a load-handler error during render, for the ErrorBoundary (App.jsx)
   const [landDrawn, setLandDrawn] = useState(false); // the canvas shows the opening view: MapLoading can go
   // The events source holds the loaded event list (or its load has failed): the
   // reveal waits for it (the load handler).
@@ -258,7 +259,7 @@ function MapView({
     let cancelled = false;
     let revealCap; // the loading cover's time limit (the load handler)
 
-    map.on("load", async () => {
+    const onLoad = async () => {
       // No "idle" until our layers are in: MapLibre places labels without a fade
       // until its first "idle" (then fades them in over 300 ms, and redoes the
       // placement at most once per fade). Without this the bare map went idle
@@ -371,6 +372,12 @@ function MapView({
       // The land beyond the opening view, and the 1:10m coast cell by cell (mapLand.js);
       // the function it returns picks up a land.json that arrives late (Retry).
       landArrivedRef.current = startLandLoading(map, { landRef, store: landStoreRef.current, isCancelled: () => cancelled });
+    };
+    // An async handler's error reaches no ErrorBoundary by itself: the loading cover would stay up for good.
+    map.on("load", () => {
+      onLoad().catch((err) => {
+        if (!cancelled) setLoadCrash(() => { throw err; });
+      });
     });
 
     return () => {

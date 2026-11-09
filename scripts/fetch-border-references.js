@@ -6,7 +6,10 @@
 // without network access and a reader can look up every point by its QID.
 //
 //   node scripts/fetch-border-references.js   -> data/border-reference-points.json
+//   --allow-fewer   write even if the query returned far fewer points than the committed file has
+import { readFile } from "node:fs/promises";
 import { writeFileAtomic } from "./lib/files.js";
+import { assertEnoughReferencePoints } from "./lib/border-check.js";
 import { runSparql, qidFromUri } from "./lib/wdqs.js";
 
 // The map's countries (checked: each QID's English label is the country). Looking items up
@@ -61,5 +64,9 @@ const out = {
   source: "Wikidata (CC0), via query.wikidata.org; query in scripts/fetch-border-references.js",
   points,
 };
-await writeFileAtomic(new URL("../data/border-reference-points.json", import.meta.url), JSON.stringify(out, null, 2) + "\n");
+const outUrl = new URL("../data/border-reference-points.json", import.meta.url);
+if (!process.argv.includes("--allow-fewer")) {
+  assertEnoughReferencePoints(points.length, JSON.parse(await readFile(outUrl, "utf-8")).points.length);
+}
+await writeFileAtomic(outUrl, JSON.stringify(out, null, 2) + "\n");
 console.log(`Wrote ${points.length} reference points to data/border-reference-points.json`);

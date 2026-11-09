@@ -234,3 +234,30 @@ test("titleReport and extractHoldReport: titles and details from Wikipedia stay 
   const hr = extractHoldReport([detectExtractHold(musa(), mountainLead({ title: "@someuser <!--" }))]);
   for (const text of [r, hr]) assert.doesNotMatch(text.replace(/`[^`]*`/g, ""), /<!--|@someuser/);
 });
+
+test("leadChangeReport: an edit past the clip point shows, instead of two identical lines", () => {
+  const head = "The same opening words go on and on. ".repeat(6);
+  const change = { id: "a", title: "A", from: "2026-09-01", d: { removed: [head + "They won."], added: [head + "They lost."], lenBefore: 1, lenAfter: 1 } };
+  const [, minus, plus] = leadChangeReport(change).split("\n");
+  assert.notEqual(minus.slice(6), plus.slice(6));
+  assert.match(minus, /They won\./);
+  assert.match(plus, /They lost\./);
+});
+
+test("leadChangeReport: unrelated sentences are matched by what they share, not their position", () => {
+  const long = "x".repeat(170);
+  const change = { id: "a", title: "A", from: null, d: { removed: [long + " old"], added: ["A new short one.", long + " new"], lenBefore: 1, lenAfter: 1 } };
+  const lines = leadChangeReport(change).split("\n");
+  assert.equal(lines[2], "    + `A new short one.`");
+  assert.match(lines[1], / old`$/);
+  assert.match(lines[3], / new`$/);
+});
+
+test("leadChangeReport: clipAt and maxLines Infinity list every sentence whole", () => {
+  const s = (c) => c.repeat(300);
+  const change = { id: "a", title: "A", from: null, d: { removed: [s("a"), s("b"), s("c"), s("d"), s("e"), s("f"), s("g")], added: [], lenBefore: 1, lenAfter: 1 } };
+  const r = leadChangeReport(change, { maxLines: Infinity, clipAt: Infinity });
+  assert.equal(r.split("\n").length, 8);
+  assert.ok(r.includes(s("g")));
+  assert.doesNotMatch(r, /…|more removed/);
+});

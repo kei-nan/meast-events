@@ -389,3 +389,21 @@ test("a word list that is not a list is a failed load", async () => {
   stubIds({ p1: "e1" }, { words: { nope: 1 } });
   await assert.rejects(searchEventIds("q"), /words.json is not a list/);
 });
+
+test("a stalled engine load fails after the timeout and the next search loads it again", async (t) => {
+  const { searchEventIds } = await fresh();
+  const pf = fakePagefind({ results: [{ id: "p1" }] });
+  stubIds({ p1: "ev-1" });
+  const init = pf.init;
+  let stall = true;
+  pf.init = () => (stall ? new Promise(() => {}) : init());
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const failed = assert.rejects(searchEventIds("q"), /Timed out loading search engine/);
+  for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
+  t.mock.timers.tick(30000);
+  await failed;
+  stall = false;
+  await searchEventIds("q");
+  assert.equal(pf.calls.init, 1);
+  assert.ok(pf.calls.search.includes("q"));
+});
