@@ -186,7 +186,7 @@ test("toCSV: BOM, header, CRLF records that read back exactly", () => {
   assert.equal(Buffer.from(csv, "utf8").subarray(0, 3).toString("hex"), "efbbbf");
   const rows = parseCSV(csv.slice(1));
   assert.deepEqual(rows[0], CSV_COLUMNS.map(([, h]) => h));
-  assert.equal(rows[0][5], "category (our grouping)");
+  assert.equal(rows[0][7], "category (our grouping)");
   assert.equal(rows.length, 4);
   for (const r of rows) assert.equal(r.length, CSV_COLUMNS.length);
   const col = (name) => CSV_COLUMNS.findIndex(([k]) => k === name);
@@ -204,7 +204,7 @@ test("toCSV: right-to-left and accented text survive unchanged, no marks added",
   const csv = toCSV(exportRows([ev]));
   const rows = parseCSV(csv.slice(1));
   assert.equal(rows[1][1], title);
-  assert.equal(rows[1][4], "Mandatory Palestine; Côte d’Ivoire");
+  assert.equal(rows[1][6], "Mandatory Palestine; Côte d’Ivoire");
   // No bidi controls (LRM/RLM, embeddings, isolates) slipped in.
   assert.doesNotMatch(csv, /[‎‏‪-‮⁦-⁩]/);
   // Round-trips through UTF-8 bytes (what the Blob holds).
@@ -275,4 +275,16 @@ test("notes: an ongoing event (a source says so) names that source; date_end sta
   assert.deepEqual(rowNotes({ ...yemen, title: "Yemeni civil war" }), []);
   // Inside the selected years even when they are later than its start.
   assert.deepEqual(rowNotes(yemen, { range: [2018, 2020] }), ["No end date; ongoing per source (Wikipedia title says present)"]);
+});
+
+test("exportRow: each date comes with Wikidata's precision, blank when none is recorded", () => {
+  const year = exportRow({ id: "n", title: "N", date_start: "1948-01-01", start_precision: "year", date_end: "1949-03-10", end_precision: "day", location_quality: "none" });
+  assert.equal(year.date_precision, "year");
+  assert.equal(year.date_end_precision, "day");
+  const none = exportRow({ id: "m", title: "M", date_start: "1948-01-01", date_end: null, location_quality: "none" });
+  assert.equal(none.date_precision, null);
+  assert.equal(none.date_end_precision, null);
+  const header = CSV_COLUMNS.map(([k]) => k);
+  assert.equal(header.indexOf("date_precision"), header.indexOf("date_start") + 1);
+  assert.equal(header.indexOf("date_end_precision"), header.indexOf("date_end") + 1);
 });

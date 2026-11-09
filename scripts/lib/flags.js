@@ -1,7 +1,7 @@
 // Flag-only accuracy checks. Nothing here ever changes event data; every function
 // returns hints/reasons that are attached to the event as review notes.
 import { latLonDistanceKm, COUNTRY_CAPITALS } from "./geo.js";
-import { yearOf } from "./wiki.js";
+import { yearOf, yearsIn } from "./wiki.js";
 // Plain module (no imports of its own), shared with the app.
 import { isLowPrecisionPin } from "../../app/src/lib/coordPrecision.js";
 
@@ -13,6 +13,33 @@ export function categoryYears(categories) {
   const ys = new Set();
   for (const c of categories ?? []) for (const m of c.matchAll(/\b(1[0-9]{3}|20[0-9]{2})\b/g)) ys.add(Number(m[1]));
   return [...ys];
+}
+
+const LEAD_YEAR_FLAG = "date_start_year_not_in_lead";
+
+// The flag for an event whose full lead names years, none within 1 of the start year; null when it does not apply.
+export function leadYearFlag({ date_start, extract }) {
+  const years = yearsIn(extract ?? "");
+  const sy = yearOf(date_start);
+  if (!years.length || sy === null || years.some((y) => Math.abs(y - sy) <= 1)) return null;
+  return `${LEAD_YEAR_FLAG}: start year ${sy} (${date_start}) is not within 1 year of any year in the Wikipedia lead [${years.slice(0, 8).join(", ")}]`;
+}
+
+// Re-derives that flag after a new lead was written (scripts/refresh-extracts.js): it describes the stored lead, and
+// validate.js rejects it once the lead names the year, which would stop the whole refresh. Recomputes needs_review
+// the way the pipeline does. Other date flags keep their order. Returns true when the event changed.
+export function refreshLeadYearFlag(ev) {
+  const old = ev.date_flags ?? [];
+  const fresh = leadYearFlag(ev);
+  const had = old.some((f) => f.startsWith(`${LEAD_YEAR_FLAG}:`));
+  const flags = had
+    ? old.flatMap((f) => (f.startsWith(`${LEAD_YEAR_FLAG}:`) ? (fresh ? [fresh] : []) : [f]))
+    : fresh ? [...old, fresh] : old;
+  if (JSON.stringify(flags) === JSON.stringify(old)) return false;
+  if (flags.length) ev.date_flags = flags;
+  else delete ev.date_flags;
+  ev.needs_review = (ev.review_reasons?.length ?? 0) > 0 || flags.length > 0;
+  return true;
 }
 
 const within = (years, lo, hi, tol = 1) => years.some((y) => y >= lo - tol && y <= hi + tol);

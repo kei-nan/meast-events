@@ -3,11 +3,13 @@
 // publicEvent). Nothing is fetched for it. Pure, except downloadText.
 //
 // What is in a row and what is not:
-// - Only lite fields. The Wikipedia link, Wikidata QID, date precision,
+// - Only lite fields. The Wikipedia link, Wikidata QID,
 //   extract_retrieved_at, the date flags and the data-fix refs live in the full
 //   records, which load one bucket at a time when an event is opened; a download
 //   would have to fetch every bucket, so they are left out. Each row's site_url
 //   (/event/<id>) shows all of them and links the Wikipedia article.
+// - Dates as stored, with Wikidata's precision of each beside them (blank when
+//   none is recorded): a year-precision date is stored as that year's 1 January.
 // - No extract text. The full lead is lazy too, and the lite snippet is its first
 //   160 characters, cut mid-sentence: handing that out as the event's summary
 //   would misquote Wikipedia. The titles are Wikipedia text (CC BY-SA 4.0), so
@@ -46,7 +48,9 @@ export const CSV_COLUMNS = [
   ["id", "id"],
   ["title", "title"],
   ["date_start", "date_start"],
+  ["date_precision", "date_precision"],
   ["date_end", "date_end"],
+  ["date_end_precision", "date_end_precision"],
   ["countries", "countries"],
   ["category", "category (our grouping)"],
   ["location_quality", "location_quality"],
@@ -97,7 +101,9 @@ export function exportRow(e, opts = {}) {
     id: e.id,
     title: e.title ?? "",
     date_start: e.date_start ?? null,
+    date_precision: e.start_precision ?? null,
     date_end: e.date_end ?? null,
+    date_end_precision: e.end_precision ?? null,
     countries: (e.countries ?? []).map(countryLabel),
     category: e.category ? categoryLabel(e.category) : "",
     location_quality: e.location_quality ?? "none",

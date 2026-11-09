@@ -63,6 +63,17 @@ function currentDir() {
 // basePath, not from this URL, and the query is still same-origin for the CSP.
 const engineUrl = (base) => `${base}pagefind.js${engineFailures ? `?r=${engineFailures}` : ""}`;
 
+// A stalled download fails after this long, like a failed one: the search then
+// falls back as for an outage and the next search tries again.
+const LOAD_TIMEOUT_MS = 30000;
+function withTimeout(promise, what) {
+  let timer;
+  const expired = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`Timed out loading search ${what}`)), LOAD_TIMEOUT_MS);
+  });
+  return Promise.race([promise, expired]).finally(() => clearTimeout(timer));
+}
+
 async function load() {
   const dir = await currentDir();
   // Engine, index and ids must come from the same build.
@@ -77,11 +88,11 @@ async function load() {
     dirPromise = null;
   };
   if (!enginePromise) {
-    const p = import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
+    const p = withTimeout(import(/* @vite-ignore */ engineUrl(base)).then(async (pf) => {
       await pf.options({ basePath: base });
       await pf.init();
       return pf;
-    });
+    }), "engine");
     enginePromise = p;
     // A failed load is retried on the next search. A load from a folder that
     // has since been replaced may still settle; it must not reset the new one.
@@ -100,10 +111,10 @@ async function load() {
         if (!res.ok) throw new Error(`Failed to load search ${what}: ${res.status}`);
         return res.json();
       });
-    const p = Promise.all([json("ids.json", "ids"), json("words.json", "words")]).then(([ids, words]) => {
+    const p = withTimeout(Promise.all([json("ids.json", "ids"), json("words.json", "words")]).then(([ids, words]) => {
       if (!Array.isArray(words)) throw new Error("search words.json is not a list");
       return { ids, words };
-    });
+    }), "index");
     idsPromise = p;
     p.catch(() => {
       if (idsPromise !== p) return;

@@ -6,6 +6,7 @@
 // renames are written (applyTitleChanges), the same way changed leads are, and land in the monthly refresh PR.
 // Held cases are never applied, only listed. The event `id` is NEVER changed (deep links depend on it).
 import { titleFromWikipediaUrl } from "./lead.js";
+import { changedSpan } from "./guidelines.js";
 
 const TITLE_FLAG = "title_differs_from_article";
 
@@ -26,18 +27,52 @@ export function mdCode(text) {
 
 const clip = (s, n = 160) => (s.length > n ? s.slice(0, n - 1) + "…" : s);
 
+// Characters a removed and an added sentence must share at their two ends to count as one edited sentence.
+const MIN_SHARED_ENDS = 20;
+function sharedEnds(a, b) {
+  let p = 0;
+  while (p < a.length && p < b.length && a[p] === b[p]) p++;
+  let s = 0;
+  while (s < a.length - p && s < b.length - p && a.at(-1 - s) === b.at(-1 - s)) s++;
+  return p + s;
+}
+
+// The sentences as listed. An edited sentence too long to show whole is cut around the edit, so an edit past the clip
+// point can not print as two identical lines. Shorter sentences and unrelated ones are only clipped.
+function listedSentences({ removed, added }, clipAt) {
+  const from = [...removed];
+  const to = [...added];
+  const taken = new Set();
+  removed.forEach((r, i) => {
+    let best = -1;
+    let shared = MIN_SHARED_ENDS - 1;
+    added.forEach((a, j) => {
+      const n = taken.has(j) ? 0 : sharedEnds(r, a);
+      if (n > shared) [best, shared] = [j, n];
+    });
+    if (best < 0) return;
+    taken.add(best);
+    if (r.length <= clipAt && added[best].length <= clipAt) return;
+    const { before, after } = changedSpan(r, added[best]);
+    from[i] = before;
+    to[best] = after;
+  });
+  return { from: from.map((s) => clip(s, clipAt)), to: to.map((s) => clip(s, clipAt)) };
+}
+
 // Markdown lines for one changed lead in the refresh printout (scripts/refresh-extracts.js): `change` is
 // { id, title, from, d }, with d from diffLeads there. At most `maxLines` removed and added sentences are listed,
-// each clipped to 160 characters and rendered with mdCode.
-export function leadChangeReport(change, { maxLines = 6 } = {}) {
+// each at most `clipAt` characters (listedSentences) and rendered with mdCode.
+export function leadChangeReport(change, { maxLines = 6, clipAt = 160 } = {}) {
   const { d } = change;
+  const { from, to } = listedSentences(d, clipAt);
   const L = [
     `- ${mdCode(change.id)} (${mdCode(change.title)}) stored ${change.from ?? "?"}: ${d.lenBefore} -> ${d.lenAfter} chars, ` +
       `-${d.removed.length} +${d.added.length} sentences`,
   ];
-  for (const s of d.removed.slice(0, maxLines)) L.push(`    - ${mdCode(clip(s))}`);
+  for (const s of from.slice(0, maxLines)) L.push(`    - ${mdCode(s)}`);
   if (d.removed.length > maxLines) L.push(`    - ... ${d.removed.length - maxLines} more removed`);
-  for (const s of d.added.slice(0, maxLines)) L.push(`    + ${mdCode(clip(s))}`);
+  for (const s of to.slice(0, maxLines)) L.push(`    + ${mdCode(s)}`);
   if (d.added.length > maxLines) L.push(`    + ... ${d.added.length - maxLines} more added`);
   return L.join("\n");
 }

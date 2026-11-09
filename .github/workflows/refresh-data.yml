@@ -76,7 +76,7 @@ jobs:
             app/package-lock.json
 
       - name: Re-fetch the Wikipedia summaries and titles
-        run: node scripts/refresh-extracts.js --apply --report="$RUNNER_TEMP/refresh-report.md"
+        run: node scripts/refresh-extracts.js --apply --report="$RUNNER_TEMP/refresh-report.md" --full-report="$RUNNER_TEMP/refresh-leads-full.md"
 
       # The counts behind the default "most covered" list order (docs/DATA_POLICY.md,
       # "Default order") and the English aliases the search also matches; the
@@ -180,6 +180,7 @@ jobs:
           name: refresh-report
           path: |
             ${{ runner.temp }}/refresh-report.md
+            ${{ runner.temp }}/refresh-leads-full.md
             ${{ runner.temp }}/guidelines-report.md
             ${{ runner.temp }}/drift-report.md
             ${{ runner.temp }}/warnings-report.md

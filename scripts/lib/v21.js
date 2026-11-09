@@ -5,7 +5,7 @@ import { yearsIn, yearOf, precisionName } from "./wiki.js";
 import { titleFromWikipediaUrl } from "./lead.js";
 import { applyDataFix, reconcileStartDate, keptEndPrecision, lastDayOfPeriod } from "./fixes.js";
 import { detectExtractHold } from "./title-refresh.js";
-import { CATEGORY_YEAR_FLAG, categoryYearFlag, categoryYearsInFlag } from "./flags.js";
+import { CATEGORY_YEAR_FLAG, categoryYearFlag, categoryYearsInFlag, leadYearFlag } from "./flags.js";
 import { setDateEndOpen, setWikidataAliases } from "./wd-entities.js";
 
 export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
@@ -221,13 +221,8 @@ export function finalizeEvent(ev, ctx) {
     PREDECESSOR_FLAG,
   ]);
   dateFlags = dateFlags.filter((f) => !/^(date_order_invalid|date_end_precision_coarse|wikipedia_dates_note|date_start_year_not_in_lead)/.test(f));
-  const years = yearsIn(ev.extract);
-  const sy = yearOf(ev.date_start);
-  if (years.length && sy !== null && !years.some((y) => Math.abs(y - sy) <= 1)) {
-    dateFlags.push(
-      `date_start_year_not_in_lead: start year ${sy} (${ev.date_start}) is not within 1 year of any year in the Wikipedia lead [${years.slice(0, 8).join(", ")}]`
-    );
-  }
+  const leadYear = leadYearFlag(ev);
+  if (leadYear) dateFlags.push(leadYear);
   dateFlags.push(...dateOrderFlags({ ...ev, endPrecision: keptEndPrecision(entity, ev.date_end)?.code ?? null }));
   // category_year_mismatch on the KEPT dates: enrich-candidates.js writes it from the discovery date, which step 3 may
   // have replaced (a decade-precision P585 "2020" set aside for P580 2025-12-28). The article's year categories come

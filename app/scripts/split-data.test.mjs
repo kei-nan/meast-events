@@ -385,3 +385,14 @@ test("publicEvent: date_end_open only on an event without date_end that has one"
   assert.equal("date_end_open" in publicEvent(base), false);
   assert.equal("date_end_open" in publicEvent({ ...base, date_end: "2015-01-01", date_end_open: "wikidata_novalue" }), false);
 });
+
+test("publicEvent: the dates' precisions under their own names, never date_precision (the date line waits for that)", () => {
+  const e = publicEvent({ id: "a", date_start: "1948-01-01", date_precision: "year", date_end: "1949-03-01", date_end_precision: "month" });
+  assert.equal(e.start_precision, "year");
+  assert.equal(e.end_precision, "month");
+  assert.equal("date_precision" in e, false);
+  assert.equal("date_end_precision" in e, false);
+  const none = publicEvent({ id: "b", date_start: "1948-01-01" });
+  assert.equal("start_precision" in none, false);
+  assert.equal("end_precision" in none, false);
+});

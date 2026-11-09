@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  leadYearFlag,
+  refreshLeadYearFlag,
   firstSentence,
   exactDaysIn,
   monthPrecisionDayFlag,
@@ -129,4 +131,39 @@ test("leadStartDayFlag: a day-precision start the first sentence does not name, 
   assert.equal(leadStartDayFlag({ date_start: "2008-06-10", date_precision: "day", extract: gaza }), null);
   assert.equal(leadStartDayFlag({ date_start: "2007-06-01", date_precision: "month", extract: gaza }), null);
   assert.equal(leadStartDayFlag({ date_start: "2007-06-10", date_precision: "day", extract: "" }), null);
+});
+
+test("refreshLeadYearFlag: drops the flag once the new lead names the year, and keeps the other flags", () => {
+  const ev = {
+    date_start: "1986-02-23",
+    extract: "The campaign of 1986 and 1989.",
+    date_flags: ["other: x", "date_start_year_not_in_lead: start year 1986 (1986-02-23) is not within 1 year of any year in the Wikipedia lead [1988]"],
+    review_reasons: [],
+    needs_review: true,
+  };
+  assert.equal(refreshLeadYearFlag(ev), true);
+  assert.deepEqual(ev.date_flags, ["other: x"]);
+  assert.equal(ev.needs_review, true);
+});
+
+test("refreshLeadYearFlag: the last flag gone leaves no date_flags and no needs_review from them", () => {
+  const ev = { date_start: "1986-02-23", extract: "In 1986.", date_flags: ["date_start_year_not_in_lead: start year 1986 (1986-02-23) is not within 1 year of any year in the Wikipedia lead [1988]"], review_reasons: [], needs_review: true };
+  assert.equal(refreshLeadYearFlag(ev), true);
+  assert.equal("date_flags" in ev, false);
+  assert.equal(ev.needs_review, false);
+});
+
+test("refreshLeadYearFlag: flags a lead that no longer names the year, with the years it now has", () => {
+  const ev = { date_start: "1986-02-23", extract: "Begun in 1970.", review_reasons: [], needs_review: false };
+  assert.equal(refreshLeadYearFlag(ev), true);
+  assert.deepEqual(ev.date_flags, [leadYearFlag(ev)]);
+  assert.match(ev.date_flags[0], /start year 1986 \(1986-02-23\).*\[1970\]$/);
+  assert.equal(ev.needs_review, true);
+});
+
+test("refreshLeadYearFlag: an event that is already right is not touched", () => {
+  const ev = { date_start: "1986-02-23", extract: "In 1987." };
+  assert.equal(refreshLeadYearFlag(ev), false);
+  assert.deepEqual(ev, { date_start: "1986-02-23", extract: "In 1987." });
+  assert.equal(leadYearFlag({ date_start: "1986-02-23", extract: "No year here." }), null);
 });

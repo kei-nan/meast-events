@@ -22,6 +22,11 @@ export { DECADE_SIZE, decadeFloor, eventOverlapsRange, eventYearRange } from "./
 
 const inFlight = new Map(); // url -> Promise<data>, so concurrent callers share one fetch
 
+// A request that stalls fails as an outage after this long, so the caller's error
+// and Try again appear instead of a spinner that never ends (all.json, the largest
+// file, is ~90 kB gzipped).
+const FILE_TIMEOUT_MS = 30000;
+
 // One fetch, optionally cancellable (`signal`), time-limited (`timeoutMs`) and
 // prioritised (`priority`, the fetch() hint; only the full-record bucket uses it).
 // A caller-initiated abort rejects with err.aborted === true and NOT as an
@@ -73,7 +78,7 @@ function fetchJSON(url, { timeoutMs, signal, cache, priority, decode } = {}) {
 
 // `check(data)` throws on a file of the wrong shape; it runs before the answer
 // counts as a success, so a bad file is evicted like a failed fetch.
-function fetchJSONCached(url, { timeoutMs, cache, priority, check, decode } = {}) {
+function fetchJSONCached(url, { timeoutMs = FILE_TIMEOUT_MS, cache, priority, check, decode } = {}) {
   if (!inFlight.has(url)) {
     const promise = fetchJSON(url, { timeoutMs, cache, priority, decode }).then((data) => {
       check?.(data);
@@ -143,7 +148,7 @@ function loadBoundaryFile(name) {
   const tried = boundariesVersion;
   return chunk(tried).catch(async (err) => {
     if (err.outage !== false) throw err;
-    const meta = await fetchJSON(dataUrl("boundaries/meta.json"), { cache: "no-cache" });
+    const meta = await fetchJSON(dataUrl("boundaries/meta.json"), { cache: "no-cache", timeoutMs: FILE_TIMEOUT_MS });
     if (!meta?.version || meta.version === tried) throw err;
     boundariesVersion = meta.version;
     return chunk(meta.version);
@@ -238,7 +243,7 @@ export function normalizeEvents(events) {
 // so full records (loadFullLead) are read from the SAME build. Concurrent/repeat
 // callers share one load. Each request is time-limited, so a stalled connection
 // fails as an outage and useAllEvents' retry starts (all.json is ~90 kB gzipped).
-export const ALL_LITE_TIMEOUT_MS = 30000;
+export const ALL_LITE_TIMEOUT_MS = FILE_TIMEOUT_MS;
 let allLitePromise = null;
 let source = null; // {version, buckets} of the folder the lite set came from
 export function loadAllLite() {
@@ -307,7 +312,7 @@ export async function loadFullLead(id) {
     return await read(source);
   } catch (err) {
     if (err.outage !== false) throw err;
-    const meta = await fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache" });
+    const meta = await fetchJSON(dataUrl("events/meta.json"), { cache: "no-cache", timeoutMs: FILE_TIMEOUT_MS });
     if (!meta?.version || meta.version === source.version) throw err;
     source = { version: meta.version, buckets: meta.fullBuckets };
     return read(source);

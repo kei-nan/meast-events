@@ -68,6 +68,8 @@
  * @property {"rounded"} [approximate_reason]    a precise pin given to so few decimals it is shown as approximate
  * @property {number|null} sitelinks             Wikidata sitelinks now (the default order); null for hand-picked
  * @property {string[]} [aliases]                Wikidata's English aliases (search only)
+ * @property {string} [start_precision]          Wikidata's precision of date_start, for the download (lib/exportResults.js)
+ * @property {string} [end_precision]            the same for date_end
  *
  * Full record (opened events):
  * @property {string} [extract]
