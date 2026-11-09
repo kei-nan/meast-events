@@ -58,7 +58,7 @@ test("validate-events.js: fails on a warning not in the baseline, lists gone one
   try {
     await cp(join(root, "scripts"), join(dir, "scripts"), { recursive: true, filter: (p) => !/node_modules/.test(p) });
     await cp(join(root, "app/src/lib"), join(dir, "app/src/lib"), { recursive: true });
-    for (const f of ["events.json", "framing-review.json", "validation-warnings-baseline.json"]) await cp(join(root, "data", f), join(dir, "data", f));
+    for (const f of ["events.json", "events.proposed.json", "framing-review.json", "validation-warnings-baseline.json"]) await cp(join(root, "data", f), join(dir, "data", f));
     // No boundaries.json (and no node_modules): the pin check is skipped, so its baseline entries are not "gone".
     const run = () => spawnSync(process.execPath, [join(dir, "scripts/validate-events.js")], { cwd: dir, encoding: "utf-8" });
     const ok = run();

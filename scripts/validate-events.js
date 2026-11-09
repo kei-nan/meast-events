@@ -110,7 +110,9 @@ for (const t of targets) {
       continue;
     }
     const review = JSON.parse(await readFile(reviewUrl, "utf-8"));
-    const cov = checkFramingCoverage(events, review, { name: reviewFile });
+    const proposedUrl = new URL("data/events.proposed.json", root);
+    const proposedIds = existsSync(proposedUrl) ? JSON.parse(await readFile(proposedUrl, "utf-8")).map((e) => e.id) : [];
+    const cov = checkFramingCoverage(events, review, { name: reviewFile, proposedIds });
     const notes = checkDataNotes(events, review, { name: reviewFile });
     for (const w of [...cov.items, ...notes.items]) {
       console.warn(`warn ${w.text}`);

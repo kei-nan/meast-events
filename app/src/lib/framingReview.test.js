@@ -6,6 +6,7 @@ import { mirrorPairs } from "../../../scripts/lib/mirrors.js";
 
 const read = (rel) => JSON.parse(readFileSync(new URL(`../../../data/${rel}`, import.meta.url), "utf8"));
 const events = read("events.json");
+const proposed = read("events.proposed.json");
 const review = read("framing-review.json");
 
 // An event that shows another event's article (scripts/lib/mirrors.js) carries the same review
@@ -21,7 +22,9 @@ test("every event has exactly one framing review and no review is orphaned", () 
   const ids = new Set(events.map((e) => e.id));
   const reviewed = new Set(Object.keys(review.events));
   assert.deepEqual([...ids].filter((id) => !reviewed.has(id)), []);
-  assert.deepEqual([...reviewed].filter((id) => !ids.has(id)), []);
+  // A proposed event may have one already: merge-proposed refuses to add an event without it.
+  const proposedIds = new Set(proposed.map((e) => e.id));
+  assert.deepEqual([...reviewed].filter((id) => !ids.has(id) && !proposedIds.has(id)), []);
 });
 
 test("each summary has at most one concise fairness finding and wording points that cite a guideline", () => {
@@ -41,7 +44,7 @@ const textSha1 = (text) => createHash("sha1").update(text).digest("hex").slice(0
 // quoted phrases may be gone; the site then shows no highlights and marks the review "may no longer
 // apply" (app/scripts/split-data.mjs), so a changed text must not fail the refresh.
 test("every quoted or highlighted phrase appears word for word in the text it reviewed", () => {
-  const byId = Object.fromEntries(events.map((e) => [e.id, e]));
+  const byId = Object.fromEntries([...proposed, ...events].map((e) => [e.id, e]));
   for (const [id, r] of Object.entries(review.events)) {
     if (r.text_sha1 !== textSha1(byId[id].extract)) continue;
     for (const p of [...(r.fairness?.phrases ?? []), ...r.wording.map((x) => x.phrase)]) {
@@ -72,7 +75,8 @@ test("the counts in docs/framing-review.md match the data", () => {
   const rows = Object.fromEntries(
     [...results.matchAll(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$/gm)].map((m) => [m[1], m[2]])
   );
-  const all = Object.values(review.events);
+  // Only what the site shows: a review of a proposed event counts once that event is merged.
+  const all = events.map((e) => review.events[e.id]);
   const n = all.length;
   assert.equal(rows["Overall fairness: issue found"], `${all.filter((r) => r.fairness !== null).length} of ${n}`);
   assert.equal(rows["Wording check: at least one wording point"], `${all.filter((r) => r.wording.length).length} of ${n}`);

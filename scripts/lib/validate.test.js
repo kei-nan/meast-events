@@ -245,6 +245,14 @@ test("validateEvents: dangling possible_duplicates, short extract and QID/articl
   assert.deepEqual(other.warnings, []);
 });
 
+test("checkFramingCoverage: a review of a proposed event is not an orphan; one of neither is", () => {
+  const events = [{ id: "a", extract: "text" }];
+  const review = { events: { a: { text_sha1: textSha1("text") }, p: { text_sha1: "000000000000" }, gone: { text_sha1: "000000000000" } } };
+  const r = checkFramingCoverage(events, review, { proposedIds: ["p"] });
+  assert.deepEqual([r.missing, r.stale, r.orphans], [0, 0, 1]);
+  assert.deepEqual(r.items.map((x) => x.id), ["gone"]);
+});
+
 test("checkFramingCoverage: missing, stale and orphaned reviews are reported", () => {
   const a = event({ id: "a" });
   const b = event({ id: "b", extract: "New text" });
