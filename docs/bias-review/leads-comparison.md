@@ -1,5 +1,7 @@
 # Lead extract shown on atlas.wiki vs current live Wikipedia summary
 
+**Licence of the quoted text.** The article leads below (stored and live, and the diffs between them) are text from English Wikipedia by Wikipedia contributors, licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each heading is an event id; its source article is that event's `url` in `data/events.json`, and the article's history page lists its authors. Changes: plain text with references removed; the diffs split it into sentences. This notice covers only the Wikipedia text.
+
 Stored = `extract` in data/events.json (retrieved_at per event, 27 events retrieved 2026-09-13, 53 on 2026-09-26). Live = English Wikipedia REST `page/summary` fetched 2026-09-26/27. "Changed" means whitespace-normalised text differs.
 
 **2 of 80 sampled leads differ from the live summary.**

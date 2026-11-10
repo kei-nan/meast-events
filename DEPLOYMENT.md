@@ -209,7 +209,9 @@ runs on `main` are never cancelled. Its jobs (the names GitHub shows as status c
   about 3 minutes, so a pull request that changes none of its inputs skips it - the list is
   in `ci.yml` - while pushes to `main` always run it).
 - **Dependency audit (.)** and **Dependency audit (app)** - `npm audit` of production
-  dependencies (high and critical block) plus a report-only audit of everything.
+  dependencies (high and critical fail the job) plus a report-only audit of everything.
+  Neither is a required check of the `main` ruleset (2026-11-10), so a failed audit does
+  not stop a merge ([below](#recommended-repository-settings-manual)).
 
 The data pipeline lives in `scripts/` (ingestion, the cited border corrections, the
 proposed-events flow: pipeline output goes to `data/events.proposed.json` plus a report,
@@ -361,7 +363,7 @@ These are settings for the owner to make by hand; nothing in the repo changes th
    CI job names as they appear on a pull request:
    - `Build app/`
    - `Validate event data`
-   - optionally `Dependency audit (.)` and `Dependency audit (app)` - their blocking step
+   - optionally `Dependency audit (.)` and `Dependency audit (app)` - their production-dependency step
      fails on a new high/critical advisory in a production dependency, which can turn an
      unrelated pull request red until the dependency is upgraded.
 2. **No Workers Builds preview builds for Dependabot branches.** Every push to a
@@ -456,9 +458,13 @@ From Cloudflare's [Workers limits](https://developers.cloudflare.com/workers/pla
 and [pricing](https://developers.cloudflare.com/workers/platform/pricing/) pages
 (fetched 2026-09-26; re-check them, limits change): the Workers Free plan allows
 100,000 requests per day, resetting at midnight UTC; when the cap is hit Cloudflare
-returns **Error 1027**. Whether requests for static assets count toward that cap was
-not confirmed here (see [docs/SECURITY.md](docs/SECURITY.md#3-monitoring)); watch the
-account's **Workers & Pages -> Overview** usage figures.
+returns **Error 1027**. Requests for the site's files do not count toward that cap:
+Cloudflare's [static assets billing](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)
+page (read 2026-11-10, "Last updated Nov 3, 2026") says "Requests to static assets are
+free and unlimited." The cap applies to requests that run a Worker script, and this site
+has none: `app/wrangler.jsonc` has no `main` script and no `run_worker_first`. Adding
+either would change this (the same page: with `run_worker_first`, matching requests
+"will always invoke your Worker script" and get a 429 once the free limit is exceeded).
 
 ## Troubleshooting
 
