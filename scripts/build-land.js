@@ -24,12 +24,13 @@
 // islands inside REGION is already in ne_10m_land, checked 2026-10-12.)
 //
 // CLI (optional): --raw-dir=DIR  read the sources from DIR (default data/raw)
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import * as turf from "@turf/turf";
 import { MAP_EXTENT } from "../app/src/lib/mapExtent.js";
 import { stringifyFeatureCollection } from "./lib/json-lines.js";
+import { writeFileAtomic } from "./lib/files.js";
 
 // [minLon, minLat, maxLon, maxLat], on the CELL grid. Must hold every border in
 // data/boundaries.json (1900-present: 9.31..63.33E, 12.14..43.58N - the Ottoman Empire's
@@ -205,13 +206,20 @@ const mask = [
 
 // --- write -------------------------------------------------------------------------------
 const cellIds = [...new Set([...lightCut.cells.keys(), ...detail.cells.keys()])].sort();
-await rm(OUT_CELLS, { recursive: true, force: true });
-await mkdir(OUT_CELLS, { recursive: true });
+// Every output is written whole or not at all (lib/files.js writeFileAtomic): a run killed mid-write leaves the
+// old files. The cells are written into a fresh sibling directory that then replaces the old one, so the
+// directory never holds a mix of old and new cells (only a kill between the two steps leaves it missing, and
+// a re-run rebuilds it).
+const cellsTmp = new URL(`../land-cells.${process.pid}.tmp/`, OUT_CELLS);
+await rm(cellsTmp, { recursive: true, force: true });
+await mkdir(cellsTmp, { recursive: true });
 for (const id of cellIds) {
   const fc = { type: "FeatureCollection", features: (detail.cells.get(id) ?? []).map((r) => feature(r, { cell: id })) };
-  await writeFile(new URL(`${id}.json`, OUT_CELLS), stringifyFeatureCollection(fc));
+  await writeFile(new URL(`${id}.json`, cellsTmp), stringifyFeatureCollection(fc));
 }
-await writeFile(
+await rm(OUT_CELLS, { recursive: true, force: true });
+await rename(cellsTmp, OUT_CELLS);
+await writeFileAtomic(
   OUT_LIGHT,
   stringifyFeatureCollection({
     type: "FeatureCollection",
@@ -224,7 +232,7 @@ await writeFile(
     ],
   })
 );
-await writeFile(OUT_MASK, stringifyFeatureCollection({ type: "FeatureCollection", features: mask.map((r) => feature(r)) }));
+await writeFileAtomic(OUT_MASK, stringifyFeatureCollection({ type: "FeatureCollection", features: mask.map((r) => feature(r)) }));
 console.log(
   `land.json: ${count(light)} vertices (1:50m, ${LIGHT_TOLERANCE} deg, ${LIGHT_DECIMALS} dp); ` +
     `${cellIds.length} cells of 1:10m, ${count(detailPolys)} vertices; land-mask.json: ${mask.length} polygons, ${count(mask)} vertices`

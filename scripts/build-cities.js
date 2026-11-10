@@ -37,7 +37,8 @@
 // each article RENAMES quotes (one request each); its revision is kept as the citation.
 //
 // CLI (optional): --raw-dir=DIR  read the source from DIR (default data/raw)
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { fetchEntities } from "./lib/wd-entities.js";
@@ -220,7 +221,7 @@ if (problems.length) {
   for (const p of problems) console.error(`- ${p}`);
   throw new Error(`build-cities: ${problems.length} problem(s)`);
 }
-await writeFile(OUT, stringifyFeatureCollection({ type: "FeatureCollection", features }));
+await writeFileAtomic(OUT, stringifyFeatureCollection({ type: "FeatureCollection", features }));
 const former = features.filter((f) => f.properties.source);
 console.log(
   `cities.json: ${seen.size} cities, ${features.length} names; former: ${former.map((f) => `${f.properties.name} (${f.properties.from ?? 1900}-${f.properties.to})`).join(", ")}`

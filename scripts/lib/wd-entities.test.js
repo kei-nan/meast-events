@@ -1,7 +1,7 @@
 // wd-entities.js dates: Julian calendar values read as the Wikidata Query Service gives them (no network).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { JULIAN, fetchEntities, julianToGregorian, refreshFromEntities, wikidataDate } from "./wd-entities.js";
+import { JULIAN, fetchEntities, fetchLabelsCached, julianToGregorian, refreshFromEntities, wikidataDate } from "./wd-entities.js";
 import { fetchEntity } from "./wiki.js";
 
 const GREGORIAN = "http://www.wikidata.org/entity/Q1985727";
@@ -65,6 +65,55 @@ test("fetchEntities / fetchEntity: Julian P585 stored as its Gregorian day (germ
     assert.deepEqual(rec.p585, [{ time: "1914-08-02", precision: 11 }]);
     const e = await fetchEntity("Q261982");
     assert.deepEqual(e.pit, [{ date: "1914-08-02", precision: 11 }]);
+  });
+});
+
+// A cache with cache.js's interface (has/get/set/flush), in memory.
+const memCache = (init = {}) => {
+  const m = new Map(Object.entries(init));
+  return { has: (k) => m.has(k), get: (k) => m.get(k), set: (k, v) => m.set(k, v), flush: () => {}, m };
+};
+async function withFetches(bodies, fn) {
+  const real = globalThis.fetch;
+  const urls = [];
+  globalThis.fetch = async (url) => {
+    urls.push(String(url));
+    return json(bodies[Math.min(urls.length - 1, bodies.length - 1)]);
+  };
+  try {
+    await fn(urls);
+  } finally {
+    globalThis.fetch = real;
+  }
+}
+
+test("fetchEntities: an item absent from the response is not cached, and a cached null is asked again", async () => {
+  const ent = { id: "Q261982", sitelinks: {}, claims: {} };
+  const cache = memCache({ "claims::Q5": null });
+  await withFetches([{ entities: { Q261982: ent } }, { entities: { Q7: { id: "Q7", missing: "" }, Q5: { id: "Q5", claims: {} } } }], async (urls) => {
+    const first = await fetchEntities(["Q261982", "Q7"], { props: "claims", delayMs: 0, cache });
+    assert.equal(first.get("Q7"), null);
+    assert.equal(cache.m.has("claims::Q7"), false, "absent item not cached");
+    assert.equal(cache.get("claims::Q261982").qid, "Q261982", "found item cached");
+    // Q7 (absent last time) and Q5 (a null left by an older version) are fetched again; Q261982 comes from the cache.
+    const second = await fetchEntities(["Q261982", "Q7", "Q5"], { props: "claims", delayMs: 0, cache });
+    assert.equal(urls.length, 2);
+    assert.match(urls[1], /ids=Q7%7CQ5|ids=Q7\|Q5/);
+    assert.equal(second.get("Q5").qid, "Q5");
+    assert.equal(second.get("Q261982").qid, "Q261982");
+  });
+});
+
+test("fetchLabelsCached: a missing label is not cached, and a cached null label is asked again", async () => {
+  const cache = memCache({ Q180684: null, Q198: "war" });
+  const labels = { entities: { Q180684: { id: "Q180684", labels: { en: { value: "conflict" } } }, Q1: { id: "Q1", labels: {} } } };
+  await withFetches([labels], async (urls) => {
+    const out = await fetchLabelsCached(["Q198", "Q180684", "Q1"], { cache, delayMs: 0 });
+    assert.deepEqual(out, { Q198: "war", Q180684: "conflict", Q1: null });
+    assert.equal(urls.length, 1);
+    assert.doesNotMatch(urls[0], /Q198/, "a cached label is not asked again");
+    assert.equal(cache.get("Q180684"), "conflict");
+    assert.equal(cache.m.has("Q1"), false, "no label: not cached");
   });
 });
 

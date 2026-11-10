@@ -6,6 +6,7 @@ import {
   checkProperties,
   findOverlaps,
   ringCrossings,
+  ringPairCrossings,
   findSelfIntersections,
   checkSelfIntersections,
   ACCEPTED_RING_CROSSINGS,
@@ -122,6 +123,50 @@ test("checkBoundaries: unexpected overlaps become warnings, structure errors ski
   assert.deepEqual(r.errors, []);
   assert.match(r.warnings[0], /^overlap .* km2 in 1900-1950: X 1900-1950 x Y 1900-1950$/);
   assert.equal(checkBoundaries(fc(feature({ name: "" })), { turf }).overlaps, null);
+});
+
+test("checkProperties / checkBoundaries: an unclosed or too short ring is an error, and geometry checks are skipped", () => {
+  const open = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 1]]] };
+  const r = checkProperties([feature({ name: "Open" }, open)]);
+  assert.deepEqual(r.errors, [
+    "features[0] Open 1900-1950: polygon 0 ring 0 (outer) is not closed: it ends at (0, 1), not at its first position (0, 0)",
+  ]);
+  const openHole = {
+    type: "MultiPolygon",
+    coordinates: [square(40, 30).coordinates, [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]], [[2, 2], [3, 2], [3, 3], [2, 3]]]],
+  };
+  assert.match(checkProperties([feature({}, openHole)]).errors.join("\n"), /polygon 1 ring 1 \(hole\) is not closed/);
+  const short = { type: "Polygon", coordinates: [[[0, 0], [1, 0], [0, 0]]] };
+  assert.match(checkProperties([feature({}, short)]).errors.join("\n"), /has 3 positions \(a closed ring needs at least 4\)/);
+  const notNumbers = { type: "Polygon", coordinates: [[[0, 0], [1, "0"], [1, 1], [0, 0]]] };
+  assert.match(checkProperties([feature({}, notNumbers)]).errors.join("\n"), /is not a list of \[lon, lat\] positions/);
+  assert.deepEqual(checkProperties([feature()]).errors, []);
+  assert.equal(checkBoundaries(fc(feature({ name: "Open" }, open))).errors.length, 1);
+});
+
+test("ringPairCrossings / checkBoundaries: a hole crossing its outer ring, or two crossing parts, is an error", () => {
+  const outer = [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]];
+  // A hole that pokes out through the outer ring's east side (x = 10) at y = 4 and y = 6.
+  const poking = { type: "Polygon", coordinates: [outer, [[8, 4], [12, 4], [12, 6], [8, 6], [8, 4]]] };
+  assert.deepEqual(ringPairCrossings(poking), [
+    { rings: [[0, 0, 1], [0, 1, 0]], at: [10, 4] },
+    { rings: [[0, 0, 1], [0, 1, 2]], at: [10, 6] },
+  ]);
+  const res = checkBoundaries(fc(feature({ name: "Holed" }, poking)));
+  assert.deepEqual(res.errors, [
+    "rings cross: Holed 1900-1950: 2 crossing(s) between two of its rings: polygon 0 ring 0 (outer) segment 1 x polygon 0 ring 1 (hole) segment 0 near (10, 4); " +
+      "polygon 0 ring 0 (outer) segment 1 x polygon 0 ring 1 (hole) segment 2 near (10, 6)",
+  ]);
+  // Two parts of a MultiPolygon whose outlines cross.
+  const parts = { type: "MultiPolygon", coordinates: [square(0, 0, 2).coordinates, square(1, 1, 2).coordinates] };
+  assert.equal(ringPairCrossings(parts).length, 2);
+  assert.match(checkBoundaries(fc(feature({ name: "Parts" }, parts))).errors[0], /^rings cross: Parts 1900-1950: 2 crossing\(s\)/);
+  // Not crossings: a hole inside, a hole touching the outer ring at a vertex, parts sharing an edge or a corner.
+  const inside = { type: "Polygon", coordinates: [outer, [[2, 2], [4, 2], [4, 4], [2, 4], [2, 2]]] };
+  const touching = { type: "Polygon", coordinates: [outer, [[10, 5], [8, 4], [8, 6], [10, 5]]] };
+  const sharedEdge = { type: "MultiPolygon", coordinates: [square(0, 0).coordinates, square(1, 0).coordinates, square(2, 1).coordinates] };
+  for (const g of [inside, touching, sharedEdge, square(40, 30)]) assert.deepEqual(ringPairCrossings(g), [], JSON.stringify(g));
+  assert.deepEqual(checkBoundaries(fc(feature({}, inside))).errors, []);
 });
 
 test("ringCrossings: a bow tie crosses once; touching vertices and plain rings do not count", () => {
