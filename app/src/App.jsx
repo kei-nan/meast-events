@@ -16,7 +16,7 @@ import { eventOverlapsRange, eventYearRange, prefetchFullLead } from "./lib/data
 import { eventYearsText } from "./lib/eventYears";
 import { eventBorderYear, needsCountryShading } from "./lib/eventCountries";
 import { eventCoords, inBbox, makeCircleArea, normalizeBounds } from "./lib/geo";
-import { roundPlace } from "./lib/placeParam.js";
+import { placeToFocus, roundPlace } from "./lib/placeParam.js";
 import { NEARBY_KM } from "./lib/related.js";
 import { countInBbox } from "./lib/localSearch";
 import { orderBrowseList } from "./lib/browseOrder";
@@ -104,6 +104,10 @@ export default function App() {
   const [hoverId, setHoverId] = useState(null);
   // "What was this place?" ({lon, lat}, lib/placeParam.js), shown in the panel while no event is open.
   const [place, setPlace] = useState(initial.place);
+  const placeRef = useRef(initial.place); // for handleNavigate
+  useEffect(() => {
+    placeRef.current = place;
+  }, [place]);
   // The map's camera ({lon, lat, zoom}, lib/urlState.js `m`) once it has been
   // moved, for the link: a link that has one opens the map there (MapView
   // initialView). It then wins over the flight an event or place link would
@@ -433,11 +437,15 @@ export default function App() {
     setAbout(parsed.about);
     setSort(parsed.sort);
     setView(parsed.view);
+    // A place this entry opens (or moves to) is flown to, as a place link is on
+    // load and an event is above; one that stays open is not.
+    const toPlace = placeToFocus(placeRef.current, parsed);
+    if (toPlace) setFocus({ id: null, lon: toPlace.lon, lat: toPlace.lat, nonce: ++focusNonceRef.current });
     setPlace(parsed.place);
   }, []);
 
   const urlState = { q: query, categories, countries, startYear, endYear, scope, area, eventId: selectedEventId, about, sort, view, place, mapView };
-  const replaceNextUrl = useUrlState(urlState, handleNavigate);
+  const { replaceNext: replaceNextUrl, pushNext: pushNextUrl } = useUrlState(urlState, handleNavigate);
 
   // Share links come from the state as it is now, not the address bar: URL
   // writes are debounced (hooks/useUrlState.js) and Play steps faster than that.
@@ -492,9 +500,15 @@ export default function App() {
     if (!ev && !eventsError) markNotFound();
   }, [selectedEventId, version, eventsLoading, eventsError, storeRef, replaceNextUrl]);
 
-  const handleChangeRange = useCallback((nextStart, nextEnd) => {
-    setRange({ start: nextStart, end: nextEnd });
-  }, []);
+  // A preset ({push: true}) is a history entry of its own, so Back returns to
+  // the years before it; a drag, a key or Play only replaces the entry.
+  const handleChangeRange = useCallback(
+    (nextStart, nextEnd, { push = false } = {}) => {
+      if (push) pushNextUrl();
+      setRange({ start: nextStart, end: nextEnd });
+    },
+    [pushNextUrl]
+  );
   // Opening or closing an event hides the row under the pointer, so its
   // mouseleave never comes: the hover (and its map shading) is cleared here.
   const handleBack = useCallback(() => {

@@ -783,7 +783,15 @@ test("EVENT_FIELDS: wikipedia_lead_dates is well-formed and only next to a date_
     date_flags: ["date_order_invalid: Wikidata start (1967-06-10) is after end (1967-06-05); shown as Wikidata gives them"],
     needs_review: true,
   };
-  assert.deepEqual(validateEvents([full({ ...flagged, wikipedia_lead_dates: ["1967-06-05", "1967"] })]).errors, []);
+  // the stored lead ("from 5 to 10 June 1967") names one full date
+  assert.deepEqual(validateEvents([full({ ...flagged, wikipedia_lead_dates: ["1967-06-10"] })]).errors, []);
+  // dates the stored lead does not mention: a lead written without re-deriving them (refresh-extracts.js)
+  assert.match(
+    errorsOf({ ...flagged, wikipedia_lead_dates: ["1967-06-05", "1967"] }),
+    /wikipedia_lead_dates \["1967-06-05","1967"\] are not the dates the stored lead mentions \(\["1967-06-10"\]\)/
+  );
+  const newLead = full().extract.replace("from 5 to 10 June 1967", "in June 1967");
+  assert.match(errorsOf({ ...flagged, extract: newLead, wikipedia_lead_dates: ["1967-06-10"] }), /are not the dates the stored lead mentions \(\["1967"\]\)/);
   for (const bad of [[], ["5 June 1967"], "1967"]) {
     assert.match(errorsOf({ ...flagged, wikipedia_lead_dates: bad }), /wikipedia_lead_dates must be/, JSON.stringify(bad));
   }

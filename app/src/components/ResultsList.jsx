@@ -1,4 +1,4 @@
-import { Fragment, memo, useEffect, useId, useMemo, useRef, useState } from "react";
+import { Fragment, memo, useId, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { eventYears, highlight, inRange } from "./resultsUtil.jsx";
 import { categoryLabel } from "../lib/categoryLabels.js";
@@ -20,6 +20,7 @@ import {
 import { warmEvent } from "../lib/warmEvent.js";
 import { measureStuck, stuckBottom } from "../lib/stickyClear.js";
 import { useStickyClearance } from "../hooks/useStickyClearance.js";
+import useTopRowYear from "../hooks/useTopRowYear.js";
 import { eventYearsText, ongoingSignal } from "../lib/eventYears.js";
 import { MAX_YEAR, MIN_YEAR } from "../lib/years.js";
 
@@ -274,19 +275,6 @@ function TimelineAxis({ axis, band, current, onJump, axisRef }) {
   );
 }
 
-// The first row whose bottom is below `line` (rows top to bottom, so their
-// rects are in order: a binary search, one rect read per step).
-function firstRowBelow(rows, line) {
-  let lo = 0;
-  let hi = rows.length;
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1;
-    if (rows[mid].getBoundingClientRect().bottom > line + 1) hi = mid;
-    else lo = mid + 1;
-  }
-  return rows[lo] ?? null;
-}
-
 const reducedMotion = () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 /**
@@ -363,32 +351,8 @@ function ResultsList({
   }, [timeline, ordered, browse, range, axis]);
 
   // The year of the row at the top of the list, just under the sticky axis,
-  // as the panel (.sp-scroll) scrolls: the axis marks it.
-  const [topYear, setTopYear] = useState(null);
-  useEffect(() => {
-    if (!timeline) return undefined;
-    const list = listRef.current;
-    const scroller = list?.closest(".sp-scroll");
-    if (!scroller) return undefined;
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const line = axisRef.current?.getBoundingClientRect().bottom ?? scroller.getBoundingClientRect().top;
-      const row = firstRowBelow(list.querySelectorAll("button.sp-row"), line);
-      setTopYear(row?.dataset.year ? Number(row.dataset.year) : null);
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    update();
-    scroller.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      scroller.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [timeline, shown, rowYears]);
+  // as the panel (.sp-scroll) scrolls: the axis marks it (hooks/useTopRowYear.js).
+  const topYear = useTopRowYear(listRef, axisRef, timeline, shown, rowYears);
 
   // A year picked on the axis: the list scrolls so that year's first row (or
   // its decade heading, when the row starts a decade) sits just under the

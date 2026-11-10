@@ -408,13 +408,17 @@ test("BASE_URL prefixes every data path", async () => {
 
 test("loadFullLead: a stalled bucket fails as an outage after the timeout", async (t) => {
   const { loadFullLead, ALL_LITE_TIMEOUT_MS } = await freshClient();
+  // The clock moves only once the bucket request is in flight (its timeout armed), however slow the machine.
+  let reached;
+  const inFlight = new Promise((r) => (reached = r));
   globalThis.fetch = async (url, init) => {
     if (url === all(V1)) return json(LITE);
+    reached();
     return new Promise((_, reject) => init.signal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))));
   };
   t.mock.timers.enable({ apis: ["setTimeout"] });
   const failed = assert.rejects(loadFullLead("some-id"), (e) => e.outage === true && !e.aborted);
-  for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
+  await inFlight;
   t.mock.timers.tick(ALL_LITE_TIMEOUT_MS);
   await failed;
 });

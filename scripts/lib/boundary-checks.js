@@ -80,9 +80,31 @@ export function checkProperties(features) {
     const g = f?.geometry;
     if (!g || !["Polygon", "MultiPolygon"].includes(g.type) || !Array.isArray(g.coordinates) || !g.coordinates.length) {
       errors.push(`${where}: geometry must be a non-empty Polygon or MultiPolygon`);
+    } else {
+      for (const e of ringStructureErrors(g)) errors.push(`${where}: ${e}`);
     }
   });
   return { errors, warnings };
+}
+
+// GeoJSON (RFC 7946, 3.1.6): every ring is a closed LinearRing of at least 4 positions, the last equal to the first.
+// An unclosed ring is not drawn the same way by every renderer, and the crossing checks below read the closing
+// segment from the last position back to the first. Positions are [lon, lat] numbers. Messages per bad ring.
+const isPosition = (p) => Array.isArray(p) && p.length >= 2 && Number.isFinite(p[0]) && Number.isFinite(p[1]);
+function ringStructureErrors(geometry) {
+  const polys = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+  const out = [];
+  polys.forEach((rings, p) => {
+    const at = (r) => `polygon ${p} ring ${r}${r === 0 ? " (outer)" : " (hole)"}`;
+    if (!Array.isArray(rings) || !rings.length) return out.push(`polygon ${p} has no rings`);
+    rings.forEach((ring, r) => {
+      if (!Array.isArray(ring) || !ring.every(isPosition)) return out.push(`${at(r)} is not a list of [lon, lat] positions`);
+      if (ring.length < 4) return out.push(`${at(r)} has ${ring.length} positions (a closed ring needs at least 4)`);
+      const [a, z] = [ring[0], ring[ring.length - 1]];
+      if (a[0] !== z[0] || a[1] !== z[1]) out.push(`${at(r)} is not closed: it ends at (${z[0]}, ${z[1]}), not at its first position (${a[0]}, ${a[1]})`);
+    });
+  });
+  return out;
 }
 
 // Per name: year ranges must not overlap (one name drawn twice in a year is an error) and
@@ -246,6 +268,67 @@ export function checkSelfIntersections(features, accepted = ACCEPTED_RING_CROSSI
   return { errors, warnings };
 }
 
+// ---- crossings between two rings of one feature ----
+//
+// ringCrossings looks inside one ring. Two DIFFERENT rings of one feature must not cross either: a hole that
+// crosses its outer ring, two holes that cross, or two parts of a MultiPolygon whose outlines cross (RFC 7946 and
+// the OGC simple-features rules the renderers and turf assume). Same rule as ringCrossings: only a PROPER
+// crossing counts; rings that touch at a vertex or share a stretch of edge (two parts meeting along a line) do
+// not. One sweep along x over all the feature's segments; pairs from the same ring are left to ringCrossings.
+// Returns [{ rings: [[polygon, ring, segment], [polygon, ring, segment]], at }].
+export function ringPairCrossings(geometry) {
+  const polys = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+  if (polys.length === 1 && polys[0].length === 1) return [];
+  const segs = [];
+  polys.forEach((rings, p) => rings.forEach((ring, r) => {
+    for (let i = 0; i + 1 < ring.length; i++) {
+      const a = ring[i];
+      const b = ring[i + 1];
+      segs.push({ p, r, i, a, b, minX: Math.min(a[0], b[0]), maxX: Math.max(a[0], b[0]), minY: Math.min(a[1], b[1]), maxY: Math.max(a[1], b[1]) });
+    }
+  }));
+  segs.sort((s, t) => s.minX - t.minX);
+  const out = [];
+  for (let k = 0; k < segs.length; k++) {
+    const s = segs[k];
+    for (let m = k + 1; m < segs.length && segs[m].minX <= s.maxX; m++) {
+      const t = segs[m];
+      if ((s.p === t.p && s.r === t.r) || t.minY > s.maxY || s.minY > t.maxY) continue;
+      const d1 = orient(s.a, s.b, t.a);
+      const d2 = orient(s.a, s.b, t.b);
+      if (!(d1 * d2 < 0)) continue;
+      const d3 = orient(t.a, t.b, s.a);
+      const d4 = orient(t.a, t.b, s.b);
+      if (!(d3 * d4 < 0)) continue;
+      const [x, y] = s.p < t.p || (s.p === t.p && s.r < t.r) ? [s, t] : [t, s];
+      const u = d1 / (d1 - d2); // where t crosses s's line, along t
+      const at = [t.a[0] + u * (t.b[0] - t.a[0]), t.a[1] + u * (t.b[1] - t.a[1])];
+      out.push({ rings: [[x.p, x.r, x.i], [y.p, y.r, y.i]], at });
+    }
+  }
+  const key = (c) => c.rings.flat();
+  return out.sort((c, d) => {
+    const [a, b] = [key(c), key(d)];
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] - b[i];
+    return 0;
+  });
+}
+
+const ringName = ([p, r, i]) => `polygon ${p} ring ${r}${r === 0 ? " (outer)" : " (hole)"} segment ${i}`;
+// One error per feature whose rings cross each other (no accepted list: none is in a source we keep as drawn).
+function checkRingPairCrossings(features) {
+  const errors = [];
+  for (const f of features) {
+    const g = f?.geometry;
+    if (!g || !["Polygon", "MultiPolygon"].includes(g.type)) continue;
+    const cs = ringPairCrossings(g);
+    if (!cs.length) continue;
+    const where = cs.map((c) => `${ringName(c.rings[0])} x ${ringName(c.rings[1])} near (${round6(c.at[0])}, ${round6(c.at[1])})`).join("; ");
+    errors.push(`rings cross: ${label(f.properties)}: ${cs.length} crossing(s) between two of its rings: ${where}`);
+  }
+  return errors;
+}
+
 // Guard against simplified, coarsened or moved geometry (the rule: borders are never
 // simplified; rounding to 6 decimal places, ~10 cm, is the coarsest allowed without
 // approval). Per feature the baseline (data/border-geometry-baseline.json) records how many
@@ -354,6 +437,7 @@ export function checkBoundaries(geojson, opts = {}) {
     const rings = checkSelfIntersections(features, opts.acceptedCrossings);
     errors.push(...rings.errors);
     warnings.push(...rings.warnings);
+    errors.push(...checkRingPairCrossings(features));
   }
   // Overlap geometry needs valid features; skip it when the structure is already broken.
   if (structureBroken || !opts.turf) return { errors, warnings, overlaps: null, slivers: 0 };

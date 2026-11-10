@@ -7,6 +7,7 @@ import { applyDataFix, reconcileStartDate, keptEndPrecision, lastDayOfPeriod } f
 import { detectExtractHold } from "./title-refresh.js";
 import { CATEGORY_YEAR_FLAG, categoryYearFlag, categoryYearsInFlag, leadYearFlag } from "./flags.js";
 import { setDateEndOpen, setWikidataAliases } from "./wd-entities.js";
+import { DATE_RES, wikipediaLeadDates } from "./lead-dates.js";
 
 export const EXTRACT_HELD_FLAG = "extract_not_copied_qid_mismatch";
 export const PREDECESSOR_FLAG = "country_via_predecessor_state";
@@ -25,13 +26,6 @@ export function buildWikidataClasses(entity, labels, matchedClasses = []) {
   return out;
 }
 
-const MONTHS =
-  "January|February|March|April|May|June|July|August|September|October|November|December";
-const DATE_RES = [
-  new RegExp(`\\b\\d{1,2} (?:${MONTHS}) \\d{4}\\b`, "g"),
-  new RegExp(`\\b(?:${MONTHS}) \\d{1,2}, \\d{4}\\b`, "g"),
-];
-
 // NOTE only (never changes dates): what the Wikipedia article's lead says about the dates,
 // next to what Wikidata gives. Returns a string or null when the lead offers nothing to compare.
 function wikipediaDatesNote({ date_start, date_end, extract }) {
@@ -49,23 +43,6 @@ function wikipediaDatesNote({ date_start, date_end, extract }) {
     (sy !== null && years.length && !years.some((y) => Math.abs(y - sy) <= 1) ? ` (start year ${sy} not in lead)` : "") +
     (ey !== null && years.length && !years.some((y) => Math.abs(y - ey) <= 1) ? ` (end year ${ey} not in lead)` : "")
   );
-}
-
-// The same lead dates the note lists, as data for the UI's date-order note: "YYYY-MM-DD" dates,
-// or "YYYY" years when the lead gives no full date, in date order. [] when the lead offers none.
-export function wikipediaLeadDates(extract) {
-  if (!extract) return [];
-  const months = MONTHS.split("|");
-  const iso = (text) => {
-    const dm = /^(\d{1,2}) (\w+) (\d{4})$/.exec(text);
-    const md = /^(\w+) (\d{1,2}), (\d{4})$/.exec(text);
-    const [day, month, year] = dm ? [dm[1], dm[2], dm[3]] : [md[2], md[1], md[3]];
-    return `${year}-${String(months.indexOf(month) + 1).padStart(2, "0")}-${day.padStart(2, "0")}`;
-  };
-  const full = [];
-  for (const re of DATE_RES) for (const m of extract.matchAll(re)) full.push(m[0]);
-  const out = full.length ? full.slice(0, 4).map(iso) : yearsIn(extract).slice(0, 6).map(String);
-  return [...new Set(out)].sort();
 }
 
 // endPrecision: Wikidata precision code of the end date's P582 statement (keptEndPrecision), when known.

@@ -12,6 +12,10 @@ import { withRetry } from "../lib/retry";
 // on demand and cached, the year's borders sent to the map, the West Bank's
 // deferred geometries, and the load errors the map's notice shows.
 
+// How long the shown year must stay in a new, uncached decade before its file
+// is fetched (the fetch trigger below).
+export const DECADE_SETTLE_MS = 150;
+
 /**
  * @param {object} o
  * @param {{current: import("maplibre-gl").Map}} o.mapRef
@@ -34,7 +38,7 @@ export default function useBoundaryDecades({ mapRef, mapReady, year, yearRef, ye
   const [borderError, setBorderError] = useState(null);
   const [displayedYear, setDisplayedYear] = useState(null);
   // The settled year re-checks the deferred geometries in view (below); border
-  // decades are fetched as soon as the shown year enters them (the fetch trigger).
+  // decades are fetched once the shown year has stayed in them briefly (the fetch trigger).
   const debouncedYear = useDebouncedValue(year, 150);
 
   // Fetch one boundary decade into the cache: one automatic retry with backoff,
@@ -59,8 +63,14 @@ export default function useBoundaryDecades({ mapRef, mapReady, year, yearRef, ye
 
   // Fetch trigger: keyed on the decade of the year shown, which changes at most
   // once per ten years, so a continuous scrub or drag fetches each decade it
-  // crosses as it crosses it (not only once it stops); fetchDecade skips a cached
-  // decade and dataClient shares a request already on its way. Also
+  // stays in as it stays there (not only once it stops). A decade passed
+  // through faster than DECADE_SETTLE_MS (a quick drag across the timeline, 11
+  // decades in a second) is not fetched: only the ones the year rests in, for
+  // however short a pause, so the map still follows a scrub at reading pace
+  // (Play spends 3.5 s in a decade, an arrow key held down about 0.3 s) and is
+  // right where the drag ends. The first decade, and a cached one, are not
+  // waited for. fetchDecade skips a cached decade and dataClient shares a
+  // request already on its way. Also
   // opportunistically warms the neighboring decades, so crossing a decade
   // boundary while scrubbing usually finds data already there; those wait until
   // this decade is in and the map has drawn it ("idle"), so they never compete
@@ -69,10 +79,17 @@ export default function useBoundaryDecades({ mapRef, mapReady, year, yearRef, ye
   // for its event); the render that ends the pending already shows the event's
   // year, so its decade - not the mount year's (2020) - is the one fetched.
   const shownDecade = decadeFloor(year);
+  const triggeredDecadeRef = useRef(null); // the decade the trigger last ran for
   useEffect(() => {
     if (yearPending) return undefined;
     const decade = shownDecade;
+    const passing =
+      triggeredDecadeRef.current != null &&
+      triggeredDecadeRef.current !== decade &&
+      !boundaryCacheRef.current.has(decade);
+    triggeredDecadeRef.current = decade;
     let cancelled = false;
+    let timer = null;
     let onIdle = null;
     let idleMap = null; // the map onIdle waits on
     const prefetchNeighbours = () => {
@@ -86,16 +103,20 @@ export default function useBoundaryDecades({ mapRef, mapReady, year, yearRef, ye
         prefetchBoundaryDecade(nextDecade);
       }
     };
-    fetchDecade(decade).then((ok) => {
-      const map = mapRef.current;
-      if (cancelled || !ok || !mapReady || !map) return;
-      onIdle = prefetchNeighbours;
-      idleMap = map;
-      map.once("idle", onIdle);
-      map.triggerRepaint(); // an already idle map fires "idle" after this frame
-    });
+    const load = () =>
+      fetchDecade(decade).then((ok) => {
+        const map = mapRef.current;
+        if (cancelled || !ok || !mapReady || !map) return;
+        onIdle = prefetchNeighbours;
+        idleMap = map;
+        map.once("idle", onIdle);
+        map.triggerRepaint(); // an already idle map fires "idle" after this frame
+      });
+    if (passing) timer = setTimeout(load, DECADE_SETTLE_MS);
+    else load();
     return () => {
       cancelled = true;
+      clearTimeout(timer);
       if (onIdle) idleMap.off("idle", onIdle);
     };
   }, [shownDecade, fetchDecade, mapReady, yearPending, mapRef]);

@@ -62,3 +62,18 @@ test("writeFileAtomic: a failed write leaves the old file and no temporary file"
     assert.equal(readFileSync(f, "utf-8"), "old");
     assert.deepEqual(readdirSync(dir).sort(), ["busy", "events.json"]);
   }));
+
+// The map-data builders write committed files (app/src/data/land.json, land-cells/, water.json, cities.json,
+// data/land-mask.json): each output goes through writeFileAtomic, and build-land.js writes its cells into a
+// temporary directory that then replaces land-cells/, never into land-cells/ itself.
+test("build-land / build-water / build-cities: every output is written atomically", () => {
+  for (const name of ["build-land.js", "build-water.js", "build-cities.js"]) {
+    const src = readFileSync(new URL(`../${name}`, import.meta.url), "utf-8");
+    assert.match(src, /import \{ writeFileAtomic \} from "\.\/lib\/files\.js";/, name);
+    const plain = [...src.matchAll(/await writeFile\((.*)$/gm)].map((m) => m[1]);
+    const cell = "new URL(`${id}.json`, cellsTmp), stringifyFeatureCollection(fc));";
+    assert.deepEqual(plain, name === "build-land.js" ? [cell] : [], `${name}: plain writeFile calls`);
+  }
+  const land = readFileSync(new URL("../build-land.js", import.meta.url), "utf-8");
+  assert.match(land, /await rename\(cellsTmp, OUT_CELLS\);/);
+});

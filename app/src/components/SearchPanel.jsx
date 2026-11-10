@@ -203,10 +203,13 @@ export default function SearchPanel({
   // controls); a search opens the list at full. Tapping the lowered bar reopens
   // it the same way. A link to an event starts at half before the event has
   // loaded (lib/sheetSnap.js initialSheet), so the sheet does not jump up then.
-  const { sheet, setSheet, dragHeight, barProps } = useSheetDrag(
+  // Raised over the list by the reader, it is a step in the browser's history
+  // (Back lowers it); an event or place has its own step instead.
+  const { sheet, setSheet, moveSheet, dragHeight, barProps } = useSheetDrag(
     initialSheet({ eventOpen: Boolean(selectedEvent), linkedEventId, placeOpen: Boolean(placeView), query }),
     panelRef,
-    selectedEvent || placeView ? "half" : "full"
+    selectedEvent || placeView ? "half" : "full",
+    { history: !selectedEvent && !placeView }
   );
   const sheetOpen = sheet !== "peek";
   // Filters sit behind a disclosure so results start near the top of the panel.
@@ -663,7 +666,7 @@ export default function SearchPanel({
                 onChange={(e) => onQueryChange(e.target.value)}
                 onKeyDown={onInputKeyDown}
                 onFocus={() => {
-                  setSheet("full");
+                  moveSheet("full");
                   preloadTextSearch();
                 }}
               />
