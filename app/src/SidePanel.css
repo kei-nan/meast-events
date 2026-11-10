@@ -56,10 +56,13 @@
    320px and 60% of the window (lib/panelWidth.js has the same limits), so a
    remembered width never squeezes the map in a smaller window; and at most
    56rem, the event view's 53rem (.event-detail) plus padding and a scrollbar,
-   since past that widening only adds empty space. */
+   since past that widening only adds empty space. Without a set width it is
+   at least 18rem, so at a large text size (200%: 576px) the search box still
+   shows its whole placeholder; at the default size 18rem is 288px, so the
+   px width applies. */
 .side-panel {
   position: relative;
-  width: clamp(320px, var(--panel-w, 380px), min(60vw, 56rem));
+  width: clamp(320px, var(--panel-w, max(380px, 18rem)), min(60vw, 56rem));
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -74,7 +77,7 @@
    Phones and touch screens set their own size further down. */
 @media (min-width: 1400px) {
   .side-panel {
-    width: clamp(320px, var(--panel-w, 440px), min(60vw, 56rem));
+    width: clamp(320px, var(--panel-w, max(440px, 18rem)), min(60vw, 56rem));
   }
 }
 
@@ -595,7 +598,9 @@ button.sp-chip[aria-pressed="true"] {
   font-family: var(--font-sans);
   font-size: 0.8rem;
   min-height: 32px;
-  max-width: 170px;
+  /* 170px at the default text size; 13em lets a larger text size (200%: 333px)
+     keep "Most covered" whole instead of cutting it short. */
+  max-width: max(170px, 13em);
   padding: 3px 6px;
   background: var(--bg-0);
   color: var(--text-primary);
@@ -1644,7 +1649,9 @@ button.sp-chip[aria-pressed="true"] {
    moving the line. */
 @media (pointer: coarse), (max-width: 768px) {
   .framing-review-meta a,
-  .event-detail-partof a {
+  .event-detail-partof a,
+  .event-detail-report a,
+  .rel-list a {
     padding-block: 5px;
   }
 }
@@ -2061,8 +2068,9 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-primary);
 }
 
+/* 6px from the name, with the space between them (RelatedEvents.jsx; ~0.28em). */
 .rel-tab-count {
-  margin-left: 6px;
+  margin-left: calc(6px - 0.28em);
   font-variant-numeric: tabular-nums;
   color: var(--text-tertiary);
 }
@@ -2195,6 +2203,14 @@ button.sp-chip[aria-pressed="true"] {
 
 .rel-list li {
   margin: 0 0 3px;
+}
+
+/* Touch screens and phones: the rows (20px lines) part by 8px, so their links,
+   26px tall to a finger (.rel-list a above), do not overlap the next row's. */
+@media (pointer: coarse), (max-width: 768px) {
+  .rel-list li {
+    margin-bottom: 8px;
+  }
 }
 
 .rel-list li::marker {

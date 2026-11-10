@@ -24,6 +24,12 @@ export function DownloadToggle({ d: { show, can, label, open, setOpen, menuId, b
         if (!open) loadExportResults().catch(() => {}); // a choice reports a failure
         setOpen(!open);
       }}
+      // Escape closes the choices from the button as well as from inside them (DownloadMenu).
+      onKeyDown={(e) => {
+        if (e.key !== "Escape" || e.defaultPrevented || !open) return;
+        e.preventDefault();
+        setOpen(false);
+      }}
     >
       <span className="sp-caret" aria-hidden="true" />
       Download

@@ -42,8 +42,10 @@ test("'Read the review' gets the same touch hit area as 'Reviewed by AI'", () =>
 });
 
 test("on phones the title and the timeline's controls can wrap with large text", () => {
-  const h1 = rule(media(css("App.css"), "(max-width: 768px)"), ".app-header h1");
-  assert.match(h1, /flex:\s*0 1 auto/);
+  // The title's grid column may shrink below its words (minmax(0, 1fr)), so it wraps.
+  const phone = media(css("App.css"), "(max-width: 768px)");
+  assert.match(rule(phone, ".app-header"), /grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+  const h1 = rule(phone, ".app-header h1");
   assert.match(h1, /min-width:\s*0/);
   const controls = rule(media(css("Timeline.css"), "(max-width: 768px)"), ".timeline-controls");
   assert.match(controls, /flex-wrap:\s*wrap/);

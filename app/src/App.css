@@ -42,6 +42,16 @@ html, body, #root {
   color: var(--text-primary);
 }
 
+/* What the site is: beside the title on wide screens, under it on phones. */
+.app-tagline {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
 /* On wide screens notices never wrap (a long one is cut with an ellipsis), so
    one appearing never changes the header's height or resizes the map. Phones
    give them their own line instead (below), where they wrap: cut there, they
@@ -70,8 +80,9 @@ html, body, #root {
 }
 
 /* Touch screens (and phones): the compact button still takes a 44px tall
-   touch, through an invisible margin around it that the header's padding
-   holds (8px on phones, below). */
+   touch, through an invisible margin around it that the header holds (on
+   phones its padding and the room the two-line title leaves round the button,
+   below). */
 @media (max-width: 768px), (pointer: coarse) {
   .app-share-btn.sp-btn {
     position: relative;
@@ -80,7 +91,7 @@ html, body, #root {
   .app-share-btn.sp-btn::before {
     content: "";
     position: absolute;
-    inset: -9px 0; /* from the padding box: the 1px border, then the header's 8px */
+    inset: -9px 0; /* from the padding box: the 1px border, then 8px of the header */
   }
 }
 
@@ -108,29 +119,41 @@ html, body, #root {
 }
 
 @media (max-width: 768px) {
+  /* The title with the tagline in one small line under it, Share beside both,
+     and the notices (when there are any) on their own full-width line under
+     them, wrapping instead of cut short. The two lines fit the height the
+     title and Share took alone (45px: 4 + 2px instead of 8 + 8px of padding),
+     so the tagline costs the map nothing. */
   .app-header {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "title share"
+      "tagline share"
+      "notices notices";
     gap: 0 10px;
-    padding: 8px 14px;
+    padding: 4px 14px 2px;
   }
 
-  /* Shrinks, and so wraps, only when it is wider than the header on its own
-     (large text): otherwise it is as wide as its words, as before. */
   .app-header h1 {
-    flex: 0 1 auto;
+    grid-area: title;
     min-width: 0;
     font-size: 1.05rem;
   }
 
-  /* Title and Share on the first line, the notices (when there are any) on
-     their own full-width line under them, wrapping instead of cut short. */
+  .app-tagline {
+    grid-area: tagline;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
   .app-header > .share {
-    margin-left: auto;
+    grid-area: share;
+    align-self: center;
   }
 
   .app-search {
-    order: 1;
-    flex-basis: 100%;
+    grid-area: notices;
     flex-wrap: wrap;
     justify-content: flex-start;
     gap: 2px 14px;
@@ -146,6 +169,14 @@ html, body, #root {
   }
 }
 
+/* A narrow phone: the tagline's first part only, so it stays one line beside
+   Share (the whole is 375px wide, the room at 360px is ~275px). */
+@media (max-width: 479px) {
+  .app-tagline-more {
+    display: none;
+  }
+}
+
 /* Phones and short (landscape) screens: a tighter line. */
 @media (max-width: 768px), (max-height: 500px) {
   .app-footer {
@@ -157,6 +188,31 @@ html, body, #root {
   /* 24px tall, the WCAG 2.2 minimum target size, without a taller footer. */
   .app-footer-link {
     padding: 5px 0;
+  }
+}
+
+/* Touch screens: 44px targets, as the other buttons (docs/design-contract.md
+   "Controls"). The footer grows to hold them; a mouse keeps the thin line. */
+@media (pointer: coarse) {
+  .app-footer-link {
+    min-height: 44px;
+  }
+}
+
+/* Short screens (a phone held sideways: 740x360; 400% zoom: 360x225): the
+   footer waits just under the screen, a scroll away, so the map keeps its
+   line (the sheet-open rule in SidePanel.css scrolls the page the same way).
+   Tab still reaches its links, which scroll into view. */
+@media (max-height: 500px) {
+  .app {
+    position: relative;
+  }
+
+  .app-footer {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
   }
 }
 

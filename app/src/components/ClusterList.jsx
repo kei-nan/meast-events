@@ -48,9 +48,9 @@ export default function ClusterList({ list, onSelect, onClose, width, height }) 
       <button type="button" className="mu-close" onClick={onClose} aria-label="Close event list">
         {"×"}
       </button>
-      <h3 id={headingId} className="mu-b-name">
+      <h2 id={headingId} className="mu-b-name">
         {total} events {oneSpot ? "at this spot" : "here"}
-      </h3>
+      </h2>
       {allApprox && (
         <p className="mu-stack-note">Approximate locations: a reference point for the country, or coordinates the source rounds to the area; not the exact site.</p>
       )}
