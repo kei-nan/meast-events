@@ -396,10 +396,18 @@ test("a stalled engine load fails after the timeout and the next search loads it
   stubIds({ p1: "ev-1" });
   const init = pf.init;
   let stall = true;
-  pf.init = () => (stall ? new Promise(() => {}) : init());
+  // The clock moves only once the load is really waiting on init: ticking earlier (a slow machine, e.g.
+  // Cloudflare's build) let the timeout fire before init was reached, and the late init then ran unstalled.
+  let reached;
+  const waiting = new Promise((r) => (reached = r));
+  pf.init = () => {
+    if (!stall) return init();
+    reached();
+    return new Promise(() => {});
+  };
   t.mock.timers.enable({ apis: ["setTimeout"] });
   const failed = assert.rejects(searchEventIds("q"), /Timed out loading search engine/);
-  for (let i = 0; i < 20; i++) await new Promise((r) => setImmediate(r));
+  await waiting;
   t.mock.timers.tick(30000);
   await failed;
   stall = false;
