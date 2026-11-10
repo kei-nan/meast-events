@@ -394,6 +394,19 @@ export default function SearchPanel({
   ];
   const activeCount = activeChips.length + (area ? 1 : 0);
   const focusFiltersBtn = () => filtersBtnRef.current?.focus();
+  // Escape on the Filters button or in its panel closes the panel and puts focus
+  // on the button, as Download's does. An armed area drawing goes first (the
+  // map's own Escape skips a handled key), as in the event view.
+  const closeFiltersOnEscape = (e) => {
+    if (e.key !== "Escape" || e.defaultPrevented || !filtersOpen) return;
+    e.preventDefault();
+    if (areaMode !== "off") {
+      onAreaModeChange?.("off");
+      return;
+    }
+    setFiltersOpen(false);
+    focusFiltersBtn();
+  };
   // Stable, so the memoized ResultsList skips App's hover re-renders.
   const focusInput = useCallback(() => inputRef.current?.focus(), []);
 
@@ -720,6 +733,7 @@ export default function SearchPanel({
               aria-expanded={filtersOpen}
               aria-controls={filtersId}
               onClick={() => setFiltersOpen(!filtersOpen)}
+              onKeyDown={closeFiltersOnEscape}
             >
               <span className="sp-caret" aria-hidden="true" />
               Filters{activeCount > 0 ? ` (${activeCount})` : ""}
@@ -797,7 +811,7 @@ export default function SearchPanel({
             </div>
           )}
 
-          <div id={filtersId} className="sp-filterpanel" hidden={!filtersOpen}>
+          <div id={filtersId} className="sp-filterpanel" hidden={!filtersOpen} onKeyDown={closeFiltersOnEscape}>
             <AreaChip
               area={area}
               areaMode={areaMode}

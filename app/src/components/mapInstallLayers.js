@@ -220,6 +220,38 @@ export function installLayers(map, { land, boundaries, labels, events, year }) {
     paint: POINT_PAINT,
   });
 
+  // The selected event, in its own (unclustered) source so it shows even while its
+  // marker sits inside a cluster. Above the markers but under the place names: its
+  // 15 px ring reaches past the 0.8 em a city's name sits from its point, so drawn
+  // over the names it hid their first letters ("Angora" read "ngora" with an Ankara
+  // event open). The names keep their halo, so the ring still shows round them.
+  map.addSource("selected", { type: "geojson", data: EMPTY_FC });
+  // A soft gold disc behind the selected dot, with no outer stroke: a dark outer
+  // ring around the dot, white ring and gold disc read as a bullseye (project
+  // rule: no target-like visuals).
+  map.addLayer({
+    id: "selected-halo",
+    type: "circle",
+    source: "selected",
+    paint: {
+      "circle-radius": 20,
+      "circle-color": "rgba(255,210,90,0.35)",
+    },
+  });
+  // Approximate locations stay hollow when selected, like their regular dot.
+  // (No extra dark edge here either: one more ring would stack into a target.)
+  map.addLayer({
+    id: "selected-point",
+    type: "circle",
+    source: "selected",
+    paint: {
+      "circle-radius": 11,
+      "circle-color": ["case", IS_APPROX, HOLLOW_FILL, CATEGORY_COLOR_EXPRESSION],
+      "circle-stroke-width": 4,
+      "circle-stroke-color": ["case", IS_APPROX, CATEGORY_COLOR_EXPRESSION, "#ffffff"],
+    },
+  });
+
   // City names: above the event markers, under the state names, as a state's name is
   // placed (so markers never hide a city's name). No mark of their own: the name sits
   // beside the city's point (below, above, then either side, wherever it fits first),
@@ -249,8 +281,8 @@ export function installLayers(map, { land, boundaries, labels, events, year }) {
     });
   }
 
-  // Country labels sit ABOVE the event markers (below only hover/selection) so
-  // markers never hide a state's name. Placement priority = state size (bigger
+  // Country labels sit ABOVE the event markers and the selection (below only the
+  // hover rings) so markers never hide a state's name. Placement priority = state size (bigger
   // first) and big states print larger.
   map.addLayer({
     id: "boundaries-label",
@@ -344,6 +376,21 @@ export function installLayers(map, { land, boundaries, labels, events, year }) {
     paint: CLUSTER_LABEL_PAINT,
   });
 
+  // The selected dot's middle again, over the cluster numbers: with the selection
+  // under the names (above), the number of a cluster at the same spot (events
+  // pinned at one capital) printed faintly across it. In the dot's own fill, so the
+  // marker looks the same; 8 px stays inside the 0.8 em (8.8 px at the smallest
+  // city text) where a city's name begins.
+  map.addLayer({
+    id: "selected-cover",
+    type: "circle",
+    source: "selected",
+    paint: {
+      "circle-radius": 8,
+      "circle-color": ["case", IS_APPROX, HOLLOW_FILL, CATEGORY_COLOR_EXPRESSION],
+    },
+  });
+
   // Hover and selection live in their own (unclustered) sources so the
   // highlighted event is visible even while its marker sits inside a cluster.
   map.addSource("hover", { type: "geojson", data: EMPTY_FC });
@@ -383,33 +430,6 @@ export function installLayers(map, { land, boundaries, labels, events, year }) {
       "circle-color": "rgba(255,210,90,0.4)",
       "circle-stroke-width": 3,
       "circle-stroke-color": "#ffffff",
-    },
-  });
-
-  map.addSource("selected", { type: "geojson", data: EMPTY_FC });
-  // A soft gold disc behind the selected dot, with no outer stroke: a dark outer
-  // ring around the dot, white ring and gold disc read as a bullseye (project
-  // rule: no target-like visuals).
-  map.addLayer({
-    id: "selected-halo",
-    type: "circle",
-    source: "selected",
-    paint: {
-      "circle-radius": 20,
-      "circle-color": "rgba(255,210,90,0.35)",
-    },
-  });
-  // Approximate locations stay hollow when selected, like their regular dot.
-  // (No extra dark edge here either: one more ring would stack into a target.)
-  map.addLayer({
-    id: "selected-point",
-    type: "circle",
-    source: "selected",
-    paint: {
-      "circle-radius": 11,
-      "circle-color": ["case", IS_APPROX, HOLLOW_FILL, CATEGORY_COLOR_EXPRESSION],
-      "circle-stroke-width": 4,
-      "circle-stroke-color": ["case", IS_APPROX, CATEGORY_COLOR_EXPRESSION, "#ffffff"],
     },
   });
 

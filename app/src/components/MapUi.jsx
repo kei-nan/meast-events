@@ -168,10 +168,11 @@ export function BorderYearChoice({ eventYear, eventLabel, rangeYear, eventShown,
     { key: "event", year: eventYear, label: eventLabel, pressed: eventShown },
     { key: "range", year: rangeYear, label: "range end", pressed: !eventShown },
   ];
+  // Each name begins with the button's own words ("1923 · event"), then says them in full.
   const describe = (o) =>
     o.key === "event"
-      ? `${o.year}, the open event's ${eventLabel === "event start" ? "start year" : "year"}`
-      : `${o.year}, the end of the selected years`;
+      ? `${o.year}, ${o.label}: the open event's ${eventLabel === "event start" ? "start year" : "year"}`
+      : `${o.year}, ${o.label}: the end of the selected years`;
   return (
     <div className="mu-year-choice" role="group" aria-label="Borders as of">
       {!compact && (
@@ -191,7 +192,12 @@ export function BorderYearChoice({ eventYear, eventLabel, rangeYear, eventShown,
             onClick={() => !o.pressed && onChoose(o.key)}
           >
             {o.year}
-            {!compact && <span className="mu-year-seg-sub"> · {o.label}</span>}
+            {!compact && (
+              <span className="mu-year-seg-sub">
+                {" "}
+                <span aria-hidden="true">·</span> {o.label}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -378,7 +384,7 @@ export function BoundaryPopup({ popup, onClose, width, height, onPlaceHistory })
       {popup.hint && <p className="mu-b-note">{popup.hint}</p>}
       {popup.items.map((b) => (
         <section key={`${b.name}|${b.start_year}|${b.end_year}`} className="mu-b-item">
-          <h3 className="mu-b-name">{b.name}</h3>
+          <h2 className="mu-b-name">{b.name}</h2>
           <p className="mu-b-years">{yearsLabel(b)}</p>
           <BoundaryDetails b={b} collapsed />
         </section>
@@ -482,7 +488,9 @@ export const MapKey = memo(function MapKey({
         data-beside={yearBeside || undefined}
         aria-expanded={open}
         aria-controls="mu-borders-panel"
-        aria-label={`Map key${shownYear != null ? `: borders ${shownYear}${n ? `, ${n} drawn` : ""}` : ""}${sub ? `, ${sub}` : ""}`}
+        // The button's words first, in their order at every width ("Map key ·
+        // Borders 1990 updating to 2000", or "Borders as of" on a phone), then the count.
+        aria-label={`Map key: borders${yearBeside && !updating ? " as of" : ""}${shownYear != null ? ` ${shownYear}` : ""}${sub ? ` ${sub}` : ""}${n ? `, ${n} drawn` : ""}`}
         title={shownYear != null && n ? `Legend, and the ${n} ${n === 1 ? "border" : "borders"} drawn for ${shownYear}` : undefined}
         onClick={() => setOpen((v) => !v)}
       >
@@ -499,12 +507,22 @@ export const MapKey = memo(function MapKey({
           {/* Phones drop the "Borders as of" caption of the years beside the
               button (MapUi.css), so the button's own line ends with it. */}
           {yearBeside && !updating && <span className="mu-borders-asof"> as of</span>}
-        </span>
-        <span className="mu-borders-short">Key</span>
+        </span>{" "}
+        {/* The spaces between the lines are not drawn (a flex column), but keep their words apart in the text. */}
+        <span className="mu-borders-short">Key</span>{" "}
         {sub && <span className="mu-badge-sub mu-borders-sub">{sub}</span>}
       </button>
+      {/* In the tab order, as it scrolls (a long legend or border list): the
+          arrow keys then scroll it, which a scrolled box needs a keyboard way to do. */}
       {open && (
-        <div ref={panelRef} id="mu-borders-panel" className="mu-borders-panel" role="region" aria-label="Map key">
+        <div
+          ref={panelRef}
+          id="mu-borders-panel"
+          className="mu-borders-panel"
+          role="region"
+          aria-label="Map key"
+          tabIndex={0}
+        >
           <div className="mu-key-tabs" role="tablist" aria-label="Map key">
             <button {...tabProps("legend")}>Legend</button>
             <button {...tabProps("borders")}>{bordersTab}</button>
@@ -557,7 +575,7 @@ function LegendContent({ categories }) {
   const shown = categories ? LEGEND_CATEGORIES.filter(({ k }) => categories.includes(k)) : LEGEND_CATEGORIES;
   return (
     <>
-      <h3>Borders</h3>
+      <h2>Borders</h2>
       <ul>
         <li>
           <span className="mu-swatch-line is-solid" aria-hidden="true" />
@@ -568,7 +586,7 @@ function LegendContent({ categories }) {
           Dashed: a shape with a status flag (About lists them). {capitalise(pointerVerb())} it to see which.
         </li>
       </ul>
-      <h3>Events (category is our grouping)</h3>
+      <h2>Events (category is our grouping)</h2>
       <ul className="mu-cats">
         {shown.map(({ k, color, label }) => (
           <li key={k}>
@@ -590,7 +608,7 @@ function LegendContent({ categories }) {
           number counts only the matches.
         </li>
       </ul>
-      <h3>Search area</h3>
+      <h2>Search area</h2>
       <ul>
         <li>
           <span className="mu-swatch-area" aria-hidden="true" />

@@ -29,8 +29,9 @@
     },
     {
       // A horizontally scrolling table region needs tabIndex={0} to be scrollable
-      // from the keyboard (axe: scrollable-region-focusable).
-      "files": ["src/components/AboutData.jsx"],
+      // from the keyboard (axe: scrollable-region-focusable); so does the Map
+      // key's panel (MapUi.jsx), a region that scrolls when the legend is long.
+      "files": ["src/components/AboutData.jsx", "src/components/MapUi.jsx"],
       "rules": { "jsx-a11y/no-noninteractive-tabindex": "off" }
     },
     {

@@ -608,6 +608,12 @@ export default function App() {
         </a>
         <header className="app-header">
           <h1>{SITE_TITLE}</h1>
+          {/* What the site is, in the no-JavaScript note's words (index.html), less what the
+              title already says. A narrow phone shows the first part only (App.css). */}
+          <p className="app-tagline">
+            An interactive map and timeline of major events
+            <span className="app-tagline-more">, with historical borders</span>
+          </p>
           {/* Status notices share the title's line (their own line on phones); the
               in-view count is in the panel. One live region, always in the page, so
               screen readers announce each notice as it appears. */}

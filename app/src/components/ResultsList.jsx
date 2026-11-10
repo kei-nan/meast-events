@@ -76,26 +76,30 @@ const ResultRow = memo(function ResultRow({
         onMouseEnter={() => onHover?.(ev.id)}
         onMouseLeave={() => onHover?.(null)}
       >
+        {/* The name is the title and the year/place line (the space between them
+            is not drawn: both are blocks, but it keeps the visible text the name's
+            own words, WCAG 2.5.3); the rest is its description, so it is hidden
+            from the name's side only (aria-describedby still reads it). */}
         <span className="sp-row-title" id={`${id}-title`}>
           {highlight(ev.title, query)}
-        </span>
+        </span>{" "}
         <span className="sp-row-meta" id={`${id}-meta`}>
           {yearLabel(ev)}
           {ev.countries?.length ? ` · ${ev.countries.map(countryLabel).join(", ")}` : ""}
           {ev.category ? ` · ${categoryLabel(ev.category)}` : ""}
         </span>
         {alias && (
-          <span className="sp-row-alias" id={`${id}-alias`}>
+          <span className="sp-row-alias" id={`${id}-alias`} aria-hidden="true">
             matched: {alias}
           </span>
         )}
         {ev.snippet && (
-          <span className="sp-row-snippet" id={`${id}-snippet`}>
+          <span className="sp-row-snippet" id={`${id}-snippet`} aria-hidden="true">
             {highlight(ev.snippet, query)}
           </span>
         )}
         {hasTags && (
-          <span className="sp-tags" id={`${id}-tags`}>
+          <span className="sp-tags" id={`${id}-tags`} aria-hidden="true">
             {outside && <span className="sp-tag">Outside selected years</span>}
             {ongoing && <span className="sp-tag">Ongoing since {eventYears(ev)[0]}</span>}
             {nomap && <span className="sp-tag sp-tag--nomap">No map location</span>}
@@ -176,9 +180,10 @@ const TimelineRow = memo(function TimelineRow({
           {marginYear ?? ""}
         </span>
         <span className="sp-trow-body">
+          {/* Named and described as a list row (above). */}
           <span className="sp-row-title" id={`${id}-title`}>
             {highlight(ev.title, query)}
-          </span>
+          </span>{" "}
           <span className="sp-track" aria-hidden="true">
             {band && <span className="sp-track-band" style={at(band)} />}
             {bar && (
@@ -210,7 +215,7 @@ const TimelineRow = memo(function TimelineRow({
             )}
           </span>
           {hasTags && (
-            <span className="sp-tags" id={`${id}-tags`}>
+            <span className="sp-tags" id={`${id}-tags`} aria-hidden="true">
               {outside && <span className="sp-tag">Outside selected years</span>}
               {reversed && <span className="sp-tag">End date before start</span>}
               {nomap && <span className="sp-tag sp-tag--nomap">No map location</span>}

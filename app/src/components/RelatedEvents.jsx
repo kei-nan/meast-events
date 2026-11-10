@@ -291,7 +291,8 @@ export default function RelatedEvents({ event, tab, onTab, onSelectEvent }) {
             onKeyDown={(e) => onKeyDown(e, t)}
             aria-label={`${t.name}, ${count(t)}`}
           >
-            <span className="rel-tab-name">{t.name}</span>
+            {/* The space keeps the name's words those shown ("Same time 3"); SidePanel.css counts it in the gap. */}
+            <span className="rel-tab-name">{t.name}</span>{" "}
             <span className="rel-tab-count">{count(t)}</span>
           </button>
         ))}
