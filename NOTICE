@@ -9,7 +9,9 @@ Data (data/): see data/LICENSE. Each part keeps its source's licence:
   on the map, which are English Wikipedia article titles; the sentences
   quoted from articles in scripts/build-cities.js as the sources of city
   renames): CC BY-SA 4.0, credited to Wikipedia contributors. It has no
-  non-commercial restriction.
+  non-commercial restriction. Article leads are also quoted in the 2026-09
+  bias review (docs/bias-review/leads-comparison.md, wording-and-labels.md
+  and sample-wording.json), under the same licence; each file says so.
 - Facts from Wikidata (dates, places, identifiers): CC0.
 Third-party software in the built site (MapLibre GL JS, BSD 3-Clause, and the
 packages its prebuilt bundle includes, such as kdbush, earcut and pbf; React,

@@ -204,11 +204,15 @@ splat.
 - **Workers & Pages -> `meast-events` -> Metrics** (per the
   [metrics docs](https://developers.cloudflare.com/workers/observability/metrics-and-analytics/),
   summarised): requests and errors.
-- **Unverified:** whether static-asset requests count toward the 100,000/day
-  Workers Free quota (when it is hit, Cloudflare answers **error 1027** until
-  midnight UTC, [limits](https://developers.cloudflare.com/workers/platform/limits/)).
-  I did not confirm this in the docs, so watch the account's **Workers &
-  Pages -> Overview** usage figures.
+- Static-asset requests do not count toward the 100,000/day Workers Free
+  quota (when it is hit, Cloudflare answers **error 1027** until midnight UTC,
+  [limits](https://developers.cloudflare.com/workers/platform/limits/)). The
+  [static assets billing](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)
+  page (raw page read 2026-11-10, "Last updated Nov 3, 2026"): "Requests to
+  static assets are free and unlimited." That holds while `app/wrangler.jsonc`
+  has no Worker script (`main`) and no `run_worker_first`; with
+  `run_worker_first`, matching requests "will always invoke your Worker
+  script" and get a 429 once the free limit is exceeded (same page).
 - Alerts: the Cloudflare [notifications catalogue](https://developers.cloudflare.com/notifications/notification-available/)
   (summarised by the fetch tool) lists no Workers-specific notification type.
   Substitutes: an external uptime monitor polling the home page, a weekly
@@ -233,8 +237,12 @@ splat.
   (`cooldown`, read 2026-10-18), the cooldown applies to version updates
   only, not to security updates, which still open at once.
 - CI `audit` job (`.github/workflows/ci.yml`), for the repo root and `app/`:
-  `npm audit --omit=dev --audit-level=high` is **blocking** (runtime
-  dependencies with a high/critical advisory are worth stopping for); the full
+  `npm audit --omit=dev --audit-level=high` fails the job (runtime
+  dependencies with a high/critical advisory are worth stopping for), but it
+  does **not block a merge**: the `main` ruleset requires only `Build app/` and
+  `Validate event data` (checked with the GitHub API, 2026-11-10). The owner
+  can add `Dependency audit (.)` and `Dependency audit (app)` as required
+  checks ([DEPLOYMENT.md](../DEPLOYMENT.md#recommended-repository-settings-manual)). The full
   `npm audit --audit-level=high` including dev tooling is **report-only**
   (`continue-on-error`) so an advisory in a build tool cannot block unrelated
   PRs, while still appearing in the log. The repo root has only dev

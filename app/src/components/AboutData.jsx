@@ -596,7 +596,13 @@ export default function AboutData({ section = null, onClose }) {
           <a href={CF_ANALYTICS_URL} target="_blank" rel="noreferrer" title="Opens in a new tab">
             Cloudflare
           </a>
-          , uses no cookies or local storage to collect them and does not fingerprint visitors.
+          , uses no cookies or local storage to collect them and does not fingerprint visitors. The site is hosted by
+          Cloudflare, which may receive network error reports from your browser when a connection to the site fails
+          (
+          <a href="https://developers.cloudflare.com/network-error-logging/" target="_blank" rel="noreferrer" title="Opens in a new tab">
+            Network Error Logging
+          </a>
+          ).
         </p>
       </div>
     </dialog>

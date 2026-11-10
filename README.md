@@ -6,7 +6,9 @@ status of every border shown honestly.
 
 Structure: `app/` (React + MapLibre frontend, a fully static site with
 in-browser full-text search), `scripts/` and `data/` (ingestion and the cited
-border-corrections pipeline). See DEPLOYMENT.md.
+border-corrections pipeline). See DEPLOYMENT.md. Questions the owner has
+settled (map library, border precision, map labels, the framing review) are
+listed in [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Quick start
 

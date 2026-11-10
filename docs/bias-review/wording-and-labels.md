@@ -1,5 +1,7 @@
 # Wording and label review: what atlas.wiki displays versus what Wikipedia and Wikidata say
 
+**Licence of the quoted text.** The passages quoted below from article leads are text from English Wikipedia by Wikipedia contributors, licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Each event's source article is its `wikipedia_url` in `docs/bias-review/sample-wording.json`, and the article's history page lists its authors. Changes: plain text with references removed, quoted in part. This notice covers only the Wikipedia text.
+
 Reviewer: one AI model (Claude), read-only research, 2026-09-26. This document surfaces quoted passages and checkable observations for the human owner to judge. It does not say who is right about any conflict. Ratings are prompts for a human look, not verdicts. Every quoted passage below was machine-checked to be a verbatim substring of the extract stored in `data/events.json` or of the live English Wikipedia lead fetched on 2026-09-26.
 
 Companion file: `docs/bias-review/sample-wording.json` (all 60 events with the shown extract, the fetched live lead, findings and quotes).
