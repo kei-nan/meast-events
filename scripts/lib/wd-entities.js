@@ -92,7 +92,9 @@ function trim(ent) {
 }
 
 // Returns Map(requestedQid -> trimmed record | null). Cache key = props + qid so a light
-// (sitelinks-only) pass never masquerades as a full one.
+// (sitelinks-only) pass never masquerades as a full one. As in lib/lead.js fetchLeads, an item absent from the
+// response (null) is NOT cached, and a null already in a cache written by an earlier version counts as not cached:
+// an item missing once (a transient answer, an item being merged) would otherwise read as missing on every later run.
 export async function fetchEntities(
   qids,
   { cache = null, props = "claims|labels|descriptions|sitelinks/urls", delayMs = 400, log = () => {} } = {}
@@ -102,7 +104,8 @@ export async function fetchEntities(
   const out = new Map();
   const todo = [];
   for (const q of want) {
-    if (cache?.has(key(q))) out.set(q, cache.get(key(q)));
+    const hit = cache?.has(key(q)) ? cache.get(key(q)) : null;
+    if (hit) out.set(q, hit);
     else todo.push(q);
   }
   for (let i = 0; i < todo.length; i += BATCH) {
@@ -120,7 +123,7 @@ export async function fetchEntities(
       const ent = byId.get(q);
       const rec = ent && !("missing" in ent) ? { ...trim(ent), requested: q, redirected: ent.id !== q } : null;
       out.set(q, rec);
-      cache?.set(key(q), rec);
+      if (rec) cache?.set(key(q), rec);
     }
     cache?.flush();
     log(`entities ${Math.min(i + BATCH, todo.length)}/${todo.length}`);
@@ -129,13 +132,16 @@ export async function fetchEntities(
   return out;
 }
 
-// English labels for many QIDs, cached.
+// English labels for many QIDs, cached. A missing label (null) is NOT cached, and a cached null counts as not
+// cached (as in fetchEntities): a class whose label was absent once would otherwise show its QID in
+// wikidata_classes on every later run (lib/v21.js buildWikidataClasses), which can change the event's group.
 export async function fetchLabelsCached(qids, { cache = null, delayMs = 300 } = {}) {
   const want = [...new Set(qids.filter(Boolean))];
   const out = {};
   const todo = [];
   for (const q of want) {
-    if (cache?.has(q)) out[q] = cache.get(q);
+    const hit = cache?.has(q) ? cache.get(q) : null;
+    if (hit != null) out[q] = hit;
     else todo.push(q);
   }
   for (let i = 0; i < todo.length; i += 50) {
@@ -145,7 +151,7 @@ export async function fetchLabelsCached(qids, { cache = null, delayMs = 300 } = 
     for (const q of chunk) {
       const label = data.entities?.[q]?.labels?.en?.value ?? null;
       out[q] = label;
-      cache?.set(q, label);
+      if (label != null) cache?.set(q, label);
     }
     cache?.flush();
     if (i + 50 < todo.length) await sleep(delayMs);

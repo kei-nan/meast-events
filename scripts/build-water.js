@@ -29,7 +29,8 @@
 // Wikidata (CC0): one wbgetentities request (lib/wd-entities.js).
 //
 // CLI (optional): --raw-dir=DIR  read the source from DIR (default data/raw)
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
+import { writeFileAtomic } from "./lib/files.js";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { fetchEntities } from "./lib/wd-entities.js";
@@ -129,6 +130,6 @@ if (problems.length) {
   for (const p of problems) console.error(`- ${p}`);
   throw new Error(`build-water: ${problems.length} problem(s)`);
 }
-await writeFile(OUT, stringifyFeatureCollection({ type: "FeatureCollection", features }));
+await writeFileAtomic(OUT, stringifyFeatureCollection({ type: "FeatureCollection", features }));
 const names = features.filter((f) => f.properties.kind !== "lake").map((f) => f.properties.name);
 console.log(`water.json: ${names.length} names (${names.join(", ")}); ${features.length - names.length} lake outlines`);

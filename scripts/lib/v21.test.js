@@ -7,9 +7,9 @@ import {
   hasTrackedCountry,
   titleMismatch,
   dateOrderFlags,
-  wikipediaLeadDates,
   finalizeEvent,
 } from "./v21.js";
+import { wikipediaLeadDates, refreshLeadDates } from "./lead-dates.js";
 import { FIXES_BY_QID } from "./fixes.js";
 import { dateFlags } from "./flags.js";
 
@@ -126,6 +126,50 @@ test("wikipediaLeadDates: the lead's full dates as YYYY-MM-DD, else its years, i
   assert.deepEqual(wikipediaLeadDates("From 1979 to 1952, then 1970."), ["1952", "1970", "1979"]);
   assert.deepEqual(wikipediaLeadDates("No dates here."), []);
   assert.deepEqual(wikipediaLeadDates(null), []);
+});
+
+const ORDER_FLAG = "date_order_invalid: Wikidata start (1921-01-10) is after end (1921-01-06); shown as Wikidata gives them";
+const reversed = (over = {}) => ({
+  id: "first-battle",
+  extract: "The battle was fought on 6 January 1921.",
+  date_start: "1921-01-10",
+  date_end: "1921-01-06",
+  date_flags: [ORDER_FLAG],
+  wikipedia_lead_dates: ["1921-01-06"],
+  needs_review: true,
+  ...over,
+});
+
+test("refreshLeadDates: a new lead's dates replace the old ones, in place, and the change is returned", () => {
+  const ev = reversed({ extract: "The battle was fought from 9 to 10 January 1921." });
+  const keys = Object.keys(ev);
+  assert.deepEqual(refreshLeadDates(ev), { from: ["1921-01-06"], to: ["1921-01-10"] });
+  assert.deepEqual(ev.wikipedia_lead_dates, ["1921-01-10"]);
+  assert.deepEqual(Object.keys(ev), keys, "key order kept");
+  assert.deepEqual(ev.date_flags, [ORDER_FLAG], "flags untouched");
+});
+
+test("refreshLeadDates: a lead with no dates left removes the field; one that gains dates gets it after date_flags", () => {
+  const gone = reversed({ extract: "The battle was fought in winter." });
+  assert.deepEqual(refreshLeadDates(gone), { from: ["1921-01-06"], to: null });
+  assert.equal("wikipedia_lead_dates" in gone, false);
+  const { wikipedia_lead_dates: _x, ...bare } = reversed();
+  const added = { ...bare };
+  assert.deepEqual(refreshLeadDates(added), { from: null, to: ["1921-01-06"] });
+  const keys = Object.keys(added);
+  assert.equal(keys[keys.indexOf("date_flags") + 1], "wikipedia_lead_dates");
+});
+
+test("refreshLeadDates: without a date_order_invalid flag no dates are written, and a right event is not touched", () => {
+  const plain = reversed({ date_flags: undefined, wikipedia_lead_dates: undefined });
+  delete plain.date_flags;
+  delete plain.wikipedia_lead_dates;
+  assert.equal(refreshLeadDates(plain), null);
+  assert.equal("wikipedia_lead_dates" in plain, false);
+  const ok = reversed();
+  const before = JSON.stringify(ok);
+  assert.equal(refreshLeadDates(ok), null);
+  assert.equal(JSON.stringify(ok), before);
 });
 
 test("finalizeEvent: copies the lead, regroups by class and removes tags that came only from an outside sea", () => {

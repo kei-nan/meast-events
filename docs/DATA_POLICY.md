@@ -285,8 +285,13 @@ article (often a section of it) that belongs to another Wikidata item. They meet
 two events stayed depended only on the order they were merged in (for example "June 2025 Israeli strikes on Iran" was in and "June 2025
 Iranian strikes on Israel" was out; both redirect into "List of attacks during the Twelve-Day War").
 
-- Their text is the lead of the article the title leads to, shown as Wikipedia gives it, and their framing review is that text's review.
-  When another event already shows that article, both show the same text.
+- Their text is the lead of the article the title leads to, shown as Wikipedia gives it when it was stored, and their framing review is that text's review.
+  When another event already shows that article (its "source" event, the article's own item), both show the same text, and the monthly refresh
+  copies the source's new text into it (`scripts/lib/mirrors.js`). When no event in the file is that article's own item (on 2026-11-10: 4 of the
+  8, `musa-dagh-resistance`, `operation-marg-bar-sarmachar`, `june-2025-israeli-strikes-on-iran` and `june-2025-iranian-strikes-on-israel`),
+  the refresh never copies a changed lead into them: the article is another Wikidata item's, so the update is held and listed under "held"
+  (`qid_mismatch`, `detectExtractHold` in `scripts/lib/title-refresh.js`) in every refresh until a person decides. Their text is then the lead as
+  it was on `extract_retrieved_at`, not the current one. (A dry run of 2026-11-10 found all 4 leads unchanged since 2026-09-26.)
 - The site says so above the text: "This event has no Wikipedia article of its own: its Wikipedia title leads to the article "…", so the
   text below is that article's and covers more than this event." (`app/src/lib/otherArticle.js`: `resolved_qid` differs from `wikidata_qid`.)
 - The map pin is the event's own Wikidata location only (see "Location quality"), never the larger article's.
@@ -778,7 +783,8 @@ and `merge-proposed.js` validates the merged result strictly. Since 2026-11-08 a
 each field of its type there (`retrieved_at` an ISO UTC timestamp, `review_reasons` an array of strings, `part_of` an array of `{ qid, label }`,
 `sitelinks_current` a non-negative integer, `date_end_open` one of its two values and only without a `date_end`, `coordinates` with `lat` and `lon` only, ...),
 no country tag or alias listed twice, `needs_review` and `needs_manual_coordinates` agreeing with the rule that derives them, and `wikipedia_lead_dates`
-only next to a `date_order_invalid` flag (the only place `lib/v21.js` writes it). No curated or proposed event failed any of these when they were added.
+only next to a `date_order_invalid` flag (the only place `lib/v21.js` writes it), and since 2026-11-10 equal to the dates the stored lead mentions
+(`wikipediaLeadDates`; the 3 records that carry it, 2 curated and 1 proposed, already were). No curated or proposed event failed any of these when they were added.
 **Warnings** (listed; CI fails only on a warning not in `data/validation-warnings-baseline.json`, see "Pipeline and workflow"): coordinates outside the Middle East box, an extract
 shorter than the 160-character list snippet, a `resolved_qid` (the Wikidata item of the article at `wikipedia_url`) different from `wikidata_qid`
 (merged into one "coordinates are borrowed" warning when the pin is that other item's: `coordinate_source` `redirect_target`, or `wikipedia` with a different
@@ -819,7 +825,11 @@ the new warnings in its pull request (see "Refreshing extracts").
 `validate-boundaries.js` (logic in `scripts/lib/boundary-checks.js`) checks `data/boundaries.json` the same way. Errors: missing `name`, `start_year`,
 `end_year` or `source`, a bad year range or geometry type, two shapes with the same name in the same year, or (since 2026-10-27) a ring that
 crosses itself (two of its segments cross at a point inside both; touching at a vertex is not counted; one error per feature listing ring, segments
-and place) unless the crossing is in a source's own data and listed in `ACCEPTED_RING_CROSSINGS` (empty: none reaches the file). Warnings: a feature
+and place) unless the crossing is in a source's own data and listed in `ACCEPTED_RING_CROSSINGS` (empty: none reaches the file). Since 2026-11-10 also:
+a ring that is not closed (its last position is not its first), has fewer than 4 positions or holds something other than `[lon, lat]` numbers, and two
+rings of one feature that cross each other (a hole crossing its outer ring or another hole, or two parts of a MultiPolygon whose outlines cross;
+same rule: touching at a vertex or sharing a stretch of edge is not counted; `ringPairCrossings`). Neither occurs in `data/boundaries.json` or
+`data/corrections-geometry.json` (checked 2026-11-10, 188,803 segments in about 50 ms). Warnings: a feature
 without a `status` or `note` key, a status value with no label in the app, a year gap between shapes of the same name, an accepted crossing, an
 accepted entry that no longer matches one, and an area of at least 0.5 km² covered by two shapes shown in the same year.
 The five crossings found until then were all made by our own processing, and are now prevented where they arose (`scripts/lib/ring-repair.js`):
@@ -853,7 +863,7 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
 (`.github/workflows/refresh-data.yml`) runs on the 1st of each month, and on demand from the Actions tab ("Run workflow"):
 
 1. It runs `node scripts/refresh-extracts.js --apply`, which re-fetches every lead uncached. Only leads whose text changed are updated, with
-   `extract_retrieved_at` set to that day and `wikipedia_revid`/`wikipedia_revid_timestamp` to the revision the new lead came from and its date; unchanged events are not touched, so the diff contains only real changes. For an updated lead it also re-derives `date_start_year_not_in_lead`, which describes that lead, and prints each change to the flag. The same run updates titles of
+   `extract_retrieved_at` set to that day and `wikipedia_revid`/`wikipedia_revid_timestamp` to the revision the new lead came from and its date; unchanged events are not touched, so the diff contains only real changes. For an updated lead it also re-derives `date_start_year_not_in_lead` and `wikipedia_lead_dates` (`scripts/lib/lead-dates.js` `refreshLeadDates`), which describe that lead, and prints each change to them; `scripts/validate-events.js` fails on `wikipedia_lead_dates` that are not the stored lead's dates. The same run updates titles of
    renamed articles (see "Titles" below). It then runs `node scripts/refresh-sitelinks.js --apply`, which updates each event's
    `sitelinks_current` (the count behind the default list order, see "Default order"). Last, `node scripts/refresh-guidelines.js --apply` compares
    the Wikipedia guideline sections the framing review cites with the versions the reviews applied, and records a section that changed

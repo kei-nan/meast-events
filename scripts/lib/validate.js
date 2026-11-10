@@ -6,6 +6,7 @@ import { coordinatesChecked, lastDayOfPeriod } from "./fixes.js";
 import { precisionName, precisionCode, yearOf, yearsIn } from "./wiki.js";
 import { durativeWithoutEndFlag, leadStartDayFlag, lowPrecisionCoordinateFlag, presentWithoutEndFlag, titleYearsFlag } from "./flags.js";
 import { isRevid, isRevTimestamp } from "./revid.js";
+import { expectedLeadDates } from "./lead-dates.js";
 import { distanceToRingsKm } from "./geo.js";
 // Same value as lib/v21.js DATE_END_COARSE_FLAG (v21.js is not imported here: it pulls in the whole pipeline).
 const DATE_END_COARSE_FLAG = "date_end_precision_coarse";
@@ -301,7 +302,7 @@ const ISO_TIMESTAMP_RE = /^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\
 const isIsoTimestamp = (v) => typeof v === "string" && ISO_TIMESTAMP_RE.test(v) && isRealDate(v.slice(0, 10));
 // The P582 "no value" / "unknown value" of lib/wd-entities.js setDateEndOpen.
 const DATE_END_OPEN_VALUES = ["wikidata_novalue", "wikidata_somevalue"];
-// wikipedia_lead_dates: lib/v21.js wikipediaLeadDates, "YYYY-MM-DD" or a "YYYY" year.
+// wikipedia_lead_dates: lib/lead-dates.js wikipediaLeadDates, "YYYY-MM-DD" or a "YYYY" year.
 const LEAD_DATE_RE = /^\d{4}(-\d{2}-\d{2})?$/;
 // part_of: enrich-candidates.js / lib/seed-enrichment.js write { qid, label } (label null when Wikidata has none).
 const isPartOf = (p) =>
@@ -790,7 +791,18 @@ function checkDateEndOpen(e) {
 function checkLeadDates(e) {
   if (!("wikipedia_lead_dates" in e)) return [];
   const flags = Array.isArray(e.date_flags) ? e.date_flags : [];
-  if (flags.some((f) => typeof f === "string" && f.startsWith("date_order_invalid"))) return [];
+  if (flags.some((f) => typeof f === "string" && f.startsWith("date_order_invalid"))) {
+    // They are the stored lead's dates (lib/lead-dates.js wikipediaLeadDates); refresh-extracts.js re-derives them with each
+    // new lead (refreshLeadDates), so a mismatch is a lead written without them.
+    const want = expectedLeadDates(e);
+    if (!Array.isArray(e.wikipedia_lead_dates) || typeof e.extract !== "string") return [];
+    if (JSON.stringify(want) === JSON.stringify(e.wikipedia_lead_dates)) return [];
+    return [
+      error(
+        `wikipedia_lead_dates ${shortJson(e.wikipedia_lead_dates)} are not the dates the stored lead mentions (${shortJson(want ?? [])})`
+      ),
+    ];
+  }
   return [error("wikipedia_lead_dates without a date_order_invalid flag in date_flags (it is written only next to one)")];
 }
 

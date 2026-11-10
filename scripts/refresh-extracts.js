@@ -14,8 +14,8 @@
 // real changes (each check is recorded by the refresh workflow's run history). With each lead it writes it also
 // writes `wikipedia_revid` and `wikipedia_revid_timestamp`, the revision that lead came from and its date
 // (lib/revid.js). With --apply the curated file is
-// written. Apart from titles and the date_start_year_not_in_lead flag, which describes the lead (lib/flags.js
-// refreshLeadYearFlag; every change to it is printed), nothing else in an event is touched. A lead is never copied when the fetched
+// written. Apart from titles, the date_start_year_not_in_lead flag and wikipedia_lead_dates, which describe the lead
+// (lib/flags.js refreshLeadYearFlag, lib/lead-dates.js refreshLeadDates; every change to them is printed), nothing else in an event is touched. A lead is never copied when the fetched
 // article belongs to a different Wikidata item than the event's wikidata_qid (the stored URL leads to another
 // subject's article); such updates are held and listed under "held" (lib/title-refresh.js detectExtractHold).
 // The exception is an event without an article of its own whose article is another event's: with --apply it
@@ -41,6 +41,7 @@ import {
 import { syncMirrorTexts } from "./lib/mirrors.js";
 import { setRevid } from "./lib/revid.js";
 import { refreshLeadYearFlag } from "./lib/flags.js";
+import { refreshLeadDates } from "./lib/lead-dates.js";
 
 const APPLY = process.argv.includes("--apply");
 const PROPOSED = process.argv.includes("--proposed");
@@ -81,7 +82,7 @@ async function refresh(events, label, file) {
   console.log(`${label}: re-fetching ${targets.length} leads (no cache) ...`);
   const leads = await fetchLeads(titles, { cache: null, log: (m) => process.stdout.write(`\r${m}      `) });
   console.log();
-  const out = { changed: [], unchanged: 0, missing: [], held: [], titles: [], leadYearFlags: [], checked: targets.length };
+  const out = { changed: [], unchanged: 0, missing: [], held: [], titles: [], leadYearFlags: [], leadDates: [], checked: targets.length };
   for (const e of targets) {
     const lead = leads.get(titleFromWikipediaUrl(e.wikipedia_url));
     const tc = detectTitleChange(e, lead);
@@ -108,6 +109,8 @@ async function refresh(events, label, file) {
       // the revision this lead came from and its date (lib/revid.js); both absent if the API gave either not
       setRevid(e, lead.lastrevid, lead.lastrev_timestamp);
       if (refreshLeadYearFlag(e)) out.leadYearFlags.push(e.id);
+      const ld = refreshLeadDates(e);
+      if (ld) out.leadDates.push({ id: e.id, ...ld });
     }
   }
   // A "title out of date" proposal stands only if Wikipedia redirects the stored title to the same article
@@ -148,7 +151,11 @@ const res = await refresh(curated, "curated", "curated");
 // fails if the two differ while their texts match.
 const mirrored = APPLY ? syncMirrorTexts(curated) : [];
 const curatedById = new Map(curated.map((e) => [e.id, e]));
-for (const id of mirrored) if (refreshLeadYearFlag(curatedById.get(id))) res.leadYearFlags.push(id);
+for (const id of mirrored) {
+  if (refreshLeadYearFlag(curatedById.get(id))) res.leadYearFlags.push(id);
+  const ld = refreshLeadDates(curatedById.get(id));
+  if (ld) res.leadDates.push({ id, ...ld });
+}
 const propRes = PROPOSED ? { events: await read(proposedUrl) } : null;
 if (propRes) propRes.res = await refresh(propRes.events, "proposed", "proposed");
 
@@ -163,6 +170,10 @@ for (const [name, r] of results) {
     fullLines.push("\n" + leadChangeReport(c, { maxLines: Infinity, clipAt: Infinity }));
   }
   if (r.leadYearFlags.length) say(`\ndate_start_year_not_in_lead re-derived from the new lead for: ${r.leadYearFlags.join(", ")}`);
+  if (r.leadDates.length) {
+    say(`\nwikipedia_lead_dates re-derived from the new lead for ${r.leadDates.length} events:`);
+    for (const c of r.leadDates) say(`- ${c.id}: ${JSON.stringify(c.from)} -> ${JSON.stringify(c.to)}`);
+  }
   if (r.missing.length) say(`\nNo lead returned for: ${r.missing.join(", ")}`);
 }
 if (mirrored.length) {
