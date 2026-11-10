@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { entryBeforePush, parseUrl, stateUrl, urlWriteMode } from "../lib/urlState";
 
 const REPLACE_DEBOUNCE_MS = 400;
@@ -17,22 +17,32 @@ const DOC = Math.random().toString(36).slice(2);
 //  - Selecting/deselecting an event PUSHES a history entry (Back walks
 //    through selections) and writes immediately; closing it again in the app
 //    goes BACK to the entry it was opened from, so Back does not re-open it.
-//  - Every other change (text, filters, years, scope, area, the map's camera)
-//    REPLACES the current entry, debounced so typing (or Play, or panning)
-//    doesn't spam history.
+//    So do About, "What was this place?" and a search started (the first
+//    letter typed into an empty box; urlWriteMode).
+//  - Every other change (the rest of the text, filters, years, scope, area,
+//    the map's camera) REPLACES the current entry, debounced so typing (or
+//    Play, or panning) doesn't spam history.
 //  - popstate re-reads the URL (strictly validated) and hands the parsed
 //    state to `onNavigate`; the write-back that follows is suppressed.
 // See urlWriteMode (lib/urlState.js).
 //
-// Returns replaceNext(): call it just before an event change that should
-// overwrite the current entry instead of pushing one (clearing a link to an
-// unknown event, so Back does not return to the dead URL).
+// A pushed entry's history.state is {doc, back} plus what the entry it was
+// pushed from had otherwise (the phone sheet's mark, hooks/useSheetDrag.js),
+// so an event opened from the open sheet still counts as "sheet open".
+//
+// Returns {replaceNext, pushNext}. replaceNext(): call it just before an event
+// change that should overwrite the current entry instead of pushing one
+// (clearing a link to an unknown event, so Back does not return to the dead
+// URL). pushNext(): call it just before a change of the years that should get
+// an entry of its own (a timeline preset, so Back returns to the years before
+// it); a render that does not change the URL drops the request.
 //
 // state: {q, categories, countries, startYear, endYear, scope, area, eventId, about, sort, view, place, mapView}
 export default function useUrlState(state, onNavigate) {
   const url = stateUrl(state);
   const lastRef = useRef(currentUrl());
   const replaceNextRef = useRef(false);
+  const pushNextRef = useRef(false);
   const goingBackRef = useRef(false); // a history.back() of ours, awaiting its popstate
   const navigateRef = useRef(onNavigate);
   useEffect(() => {
@@ -51,11 +61,14 @@ export default function useUrlState(state, onNavigate) {
   const sync = (next) => {
     const entry = window.history.state;
     const backUrl = entry?.doc === DOC ? entry.back : null;
-    const mode = urlWriteMode(lastRef.current, next, { replace: replaceNextRef.current, backUrl });
+    const push = pushNextRef.current;
+    const mode = urlWriteMode(lastRef.current, next, { replace: replaceNextRef.current, backUrl, push });
     if (!mode) return undefined;
+    pushNextRef.current = false;
     // A replace keeps the entry's own history.state (its `back`).
     const write = (method, to = next) => {
-      const data = method === "pushState" ? { doc: DOC, back: lastRef.current } : window.history.state;
+      const data =
+        method === "pushState" ? { ...window.history.state, doc: DOC, back: lastRef.current } : window.history.state;
       window.history[method](data, "", `${to}${window.location.hash}`);
       lastRef.current = to;
     };
@@ -73,7 +86,7 @@ export default function useUrlState(state, onNavigate) {
       if (mode === "push") {
         // A debounced replace still pending was cancelled by this change: the
         // current entry gets it first (lib/urlState.js entryBeforePush).
-        const carried = entryBeforePush(lastRef.current, stateRef.current);
+        const carried = entryBeforePush(lastRef.current, stateRef.current, { years: push });
         if (carried != null) write("replaceState", carried);
       }
       write(mode === "push" ? "pushState" : "replaceState");
@@ -95,6 +108,11 @@ export default function useUrlState(state, onNavigate) {
     if (goingBackRef.current) return undefined;
     return syncRef.current(url);
   }, [url]);
+  // A pushNext() whose change left the URL as it was (a preset already
+  // selected) must not make some later change a push: dropped after each render.
+  useEffect(() => {
+    pushNextRef.current = false;
+  });
 
   useEffect(() => {
     const onPop = () => {
@@ -116,13 +134,20 @@ export default function useUrlState(state, onNavigate) {
       }
       replaceNextRef.current = false;
       lastRef.current = currentUrl();
+      // An entry with the view as it already is (the phone sheet's own entry,
+      // useSheetDrag): nothing to re-apply, so Play keeps playing.
+      if (lastRef.current === stateUrl(stateRef.current)) return;
       navigateRef.current(parseUrl(lastRef.current));
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  return useCallback(() => {
+  const replaceNext = useCallback(() => {
     replaceNextRef.current = true;
   }, []);
+  const pushNext = useCallback(() => {
+    pushNextRef.current = true;
+  }, []);
+  return useMemo(() => ({ replaceNext, pushNext }), [replaceNext, pushNext]);
 }

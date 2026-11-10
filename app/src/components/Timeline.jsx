@@ -131,9 +131,10 @@ function Timeline({
     setPlayState("playing");
   }
 
+  // A preset is a step of its own in the browser's history (App handleChangeRange).
   function applyPreset(p) {
     setPlayState("stopped");
-    onChangeRange(p.start, p.end);
+    onChangeRange(p.start, p.end, { push: true });
   }
 
   // The strip is one pointer target for both handles, so it decides which

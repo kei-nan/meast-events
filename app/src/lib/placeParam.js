@@ -36,6 +36,19 @@ export function samePlace(a, b) {
   return placeToParam(a) === placeToParam(b);
 }
 
+/**
+ * The place a Back/Forward should fly the map to (App handleNavigate): the
+ * entry's place when it opens one or moves to another point and no event is
+ * open over it; else null (a place that stays open, or an event, which is
+ * focused on its own).
+ * @param {{lon:number, lat:number}|null} current  the place open now
+ * @param {{place: {lon:number, lat:number}|null, eventId: string|null}} parsed  the entry (lib/urlState.js parseUrlState)
+ */
+export function placeToFocus(current, parsed) {
+  if (!parsed.place || parsed.eventId || samePlace(current, parsed.place)) return null;
+  return parsed.place;
+}
+
 /** "31.78° N, 35.23° E": the point in words, for the view's heading. */
 export function placeLabel({ lon, lat }) {
   const f = (n) => Math.abs(n).toFixed(2);

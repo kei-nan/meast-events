@@ -117,6 +117,28 @@ test("an answer is used only for the text it was asked for", async () => {
   assert.equal(h2.rerender(props({ query: "new" })).status, "ready");
 });
 
+test("an older text's answer that arrives after the newer one's is ignored (one hook)", async (ctx) => {
+  // The debounce runs on node:test's mock timers, so one hook sees both texts.
+  ctx.mock.timers.enable({ apis: ["setTimeout"] });
+  const answers = new Map();
+  globalThis.__searchEventIds = (q) => new Promise((resolve) => answers.set(q, resolve));
+  const tick = () => new Promise((r) => setImmediate(r));
+  const h = renderHook(useEventSearch, props({ query: "event 1" }));
+  h.rerender(props({ query: "event 2" }));
+  ctx.mock.timers.tick(300); // the debounce settles on "event 2"
+  h.rerender(props({ query: "event 2" })); // ... and its search starts
+  assert.deepEqual([...answers.keys()], ["event 1", "event 2"]);
+  answers.get("event 2")(["e2"]);
+  await tick();
+  assert.deepEqual(ids(h.rerender(props({ query: "event 2" }))), ["e2"]);
+  answers.get("event 1")(["e1"]); // the older search answers last
+  await tick();
+  const s = h.rerender(props({ query: "event 2" }));
+  assert.equal(s.status, "ready");
+  assert.equal(s.source, "fulltext");
+  assert.deepEqual(ids(s), ["e2"], "still the answer for the text shown");
+});
+
 test("an outage reports once and falls back to local matches", async () => {
   const index = stubIndex();
   let outages = 0;
