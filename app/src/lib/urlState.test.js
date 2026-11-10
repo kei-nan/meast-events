@@ -250,7 +250,7 @@ test("urlWriteMode: pushes event changes, debounces the rest, replaces on reques
   assert.equal(urlWriteMode("/event/a", "/event/b"), "push");
   assert.equal(urlWriteMode("/event/a", "/"), "push");
   assert.equal(urlWriteMode("/", "/?about=1"), "push");
-  assert.equal(urlWriteMode("/event/a", "/event/a?q=x"), "debounce");
+  assert.equal(urlWriteMode("/event/a?q=x", "/event/a?q=xy"), "debounce");
   assert.equal(urlWriteMode("/?y=1900-1950", "/?y=1900-1960"), "debounce");
   // An older link rewritten to the event's path: the same event, so a replace.
   assert.equal(urlWriteMode("/?e=a&y=1950-1960", "/event/a?y=1950-1960"), "debounce");
@@ -264,7 +264,7 @@ test("urlWriteMode: pushes event changes, debounces the rest, replaces on reques
   assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/?place=36.16,36.2"), "push");
   assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/"), "push");
   assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/?y=1920-1947&place=35.2345,31.7767"), "debounce");
-  assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/", { backUrl: "/?q=x" }), "back");
+  assert.equal(urlWriteMode("/?place=35.2345,31.7767", "/", { backUrl: "/?y=1950-1960" }), "back");
 });
 
 test("place=lon,lat round trips at 5 decimals; junk is dropped", () => {
@@ -283,7 +283,7 @@ test("urlWriteMode: closing in the app goes back to the entry it was opened from
   assert.equal(urlWriteMode("/event/a?y=1950-1960", "/?y=1950-1960", { backUrl: "/" }), "back");
   // About closed over an open event.
   assert.equal(urlWriteMode("/event/a?about=1", "/event/a", { backUrl: "/event/a" }), "back");
-  assert.equal(urlWriteMode("/?about=1", "/", { backUrl: "/?q=x" }), "back");
+  assert.equal(urlWriteMode("/?about=1", "/", { backUrl: "/?y=1950-1960" }), "back");
   // Another event, or a close the entry was not pushed from: a push.
   assert.equal(urlWriteMode("/event/a", "/event/b", { backUrl: "/" }), "push");
   assert.equal(urlWriteMode("/event/b", "/", { backUrl: "/event/a" }), "push");
@@ -291,7 +291,7 @@ test("urlWriteMode: closing in the app goes back to the entry it was opened from
   assert.equal(urlWriteMode("/event/a", "/", { backUrl: null }), "push");
   assert.equal(urlWriteMode("/event/a", "/"), "push");
   // Debounced changes and replaces are not affected.
-  assert.equal(urlWriteMode("/event/a", "/event/a?q=x", { backUrl: "/event/a" }), "debounce");
+  assert.equal(urlWriteMode("/event/a", "/event/a?y=1950-1960", { backUrl: "/event/a" }), "debounce");
   assert.equal(urlWriteMode("/event/bogus", "/", { replace: true, backUrl: "/" }), "replace");
 });
 
@@ -318,6 +318,30 @@ test("entryBeforePush: carries a pending non-event change onto the current entry
   // Nothing pending: nothing to write.
   assert.equal(entryBeforePush("/?q=suez", { ...base, q: "suez", eventId: "suez-crisis" }), null);
   assert.equal(entryBeforePush("/", { ...base, about: true }), null);
+});
+
+test("urlWriteMode: a search started is a push, the rest of the typing is not; a preset asks for one", () => {
+  assert.equal(urlWriteMode("/", "/?q=s"), "push");
+  assert.equal(urlWriteMode("/?y=1950-1960", "/?q=s&y=1950-1960"), "push");
+  assert.equal(urlWriteMode("/?q=s", "/?q=su"), "debounce");
+  // Emptied again: an undo of the push it came from, else a push.
+  assert.equal(urlWriteMode("/?q=suez", "/", { backUrl: "/" }), "back");
+  assert.equal(urlWriteMode("/?q=suez", "/"), "push");
+  // `push` (useUrlState pushNext): whatever changed, unless nothing did.
+  assert.equal(urlWriteMode("/", "/?y=1967-1967", { push: true }), "push");
+  assert.equal(urlWriteMode("/event/a", "/event/a?y=1967-1967", { push: true, backUrl: "/event/a?y=1967-1967" }), "push");
+  assert.equal(urlWriteMode("/?y=1967-1967", "/?y=1967-1967", { push: true }), null);
+});
+
+test("entryBeforePush: a search started or a preset leaves the entry's own text or years on it", () => {
+  const base = { q: "", categories: [], countries: [], startYear: YEAR_MIN, endYear: YEAR_MAX, scope: "all", area: null, about: false, eventId: null };
+  // A filter pending when the first letter comes: the filter is carried, the text is not.
+  assert.equal(entryBeforePush("/", { ...base, q: "s", categories: ["war"] }), "/?cat=war");
+  // Typing on (the text was there before): carried as usual.
+  assert.equal(entryBeforePush("/?q=su", { ...base, q: "suez", eventId: "suez-crisis" }), "/?q=suez");
+  // A preset: the years stay as the entry has them (or the whole timeline).
+  assert.equal(entryBeforePush("/?y=1950-1960", { ...base, startYear: 1967, endYear: 1967, categories: ["war"] }, { years: true }), "/?cat=war&y=1950-1960");
+  assert.equal(entryBeforePush("/", { ...base, startYear: 1967, endYear: 1967 }, { years: true }), null);
 });
 
 test("shareLink: the view as it is now (not as the debounced URL last had it)", () => {

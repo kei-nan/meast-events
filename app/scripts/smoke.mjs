@@ -20,7 +20,9 @@
 //      and the cache and type headers come out as _headers intends (servedHeaderChecks:
 //      hashed files immutable, a missing hashed file's 404 not, /event/<id>
 //      revalidated, .tbin typed for compression);
-//   2. the map's canvas draws (MapLibre's own canvas, not the stand-in, and not blank);
+//   2. the map's canvas draws (MapLibre's own canvas, not the stand-in, and not blank),
+//      and still does after a mouse drag of the timeline, with the borders of the
+//      decade the drag ended in loaded;
 //   3. a full-text search finds an event by a word that is in no title or
 //      summary, so only Pagefind (its engine, WebAssembly and index) can answer;
 //   4. clicking that result opens the event panel;
@@ -186,6 +188,44 @@ async function assertMapDrawn(page) {
   return colours;
 }
 
+// The timeline's end year dragged most of the way back with the mouse, as a
+// reader scrubs it: the drag moves the years, the border file of the decade it
+// ends in is loaded (hooks/useBoundaryDecades.js fetches only the decades the
+// year rests in), and the map still draws. A console error or failed request
+// on the way is caught by watchedPage. "All years" puts the range back.
+const BORDER_FILE_RE = /\/boundaries\/v\.[^/]+\/(\d{4})\.tbin$/;
+async function dragTimeline(page) {
+  const decades = [];
+  const onResponse = (r) => {
+    const m = BORDER_FILE_RE.exec(new URL(r.url()).pathname);
+    if (m && r.ok()) decades.push(Number(m[1]));
+  };
+  page.on("response", onResponse);
+  try {
+    const end = page.getByRole("slider", { name: "End year" });
+    const strip = await page.locator(".timeline-range").boundingBox();
+    const thumb = await end.boundingBox();
+    const y = thumb.y + thumb.height / 2;
+    await page.mouse.move(thumb.x + thumb.width / 2, y);
+    await page.mouse.down();
+    await page.mouse.move(strip.x + strip.width * 0.4, y, { steps: 40 });
+    await page.mouse.up();
+    const year = Number(await end.getAttribute("aria-valuenow"));
+    if (!(year < 1990)) throw new Error(`dragging the timeline's end year left it at ${year}`);
+    const decade = Math.floor(year / 10) * 10;
+    const deadline = Date.now() + TIMEOUT;
+    while (!decades.includes(decade)) {
+      if (Date.now() > deadline) throw new Error(`after a drag to ${year} the ${decade}s border file was not loaded (loaded: ${decades.join(", ") || "none"})`);
+      await page.waitForTimeout(100);
+    }
+    const colours = await assertMapDrawn(page);
+    ok(`a drag of the timeline to ${year} loaded the ${decade}s borders and the map drew (${colours} colours; border files during it: ${decades.join(", ")})`);
+  } finally {
+    page.off("response", onResponse);
+  }
+  await page.locator(".timeline-preset", { hasText: "All years" }).click();
+}
+
 async function run(browser) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   context.setDefaultTimeout(TIMEOUT);
@@ -202,6 +242,8 @@ async function run(browser) {
   await page.goto(`${ORIGIN}/`);
   const colours = await assertMapDrawn(page);
   ok(`map canvas drawn (${colours} distinct colours sampled)`);
+
+  await dragTimeline(page);
 
   const input = page.locator(".sp-searchbox input");
   await input.fill(query.word);

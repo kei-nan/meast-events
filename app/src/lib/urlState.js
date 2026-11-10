@@ -214,7 +214,7 @@ export function parseUrl(url) {
 
 // How useUrlState writes the URL `nextUrl` over `prevUrl` (both path and
 // query, as stateUrl gives them): null = nothing to do; "push" = an event was
-// opened/closed or the About dialog toggled (a history entry of its own,
+// opened/closed, the About dialog toggled or a search started (below; a history entry of its own,
 // written at once); "replace" = the same change, but overwriting the current
 // entry (`replace`: e.g. clearing a link to an event that does not exist, so
 // Back does not return to the dead URL); "debounce" = any other change,
@@ -228,9 +228,22 @@ export function parseUrl(url) {
 // browser's Back does not re-open what was just closed.
 // Opening or closing "What was this place?" (or moving it to another point) is
 // a push too, like an event: the browser's Back closes it.
-const samePush = (a, b) => a.eventId === b.eventId && a.about === b.about && placeToParam(a.place) === placeToParam(b.place);
-export function urlWriteMode(prevUrl, nextUrl, { replace = false, backUrl = null } = {}) {
+// So is a search started (the box goes from empty to some text), so Back
+// returns to the list as it was before it instead of leaving the site; the
+// keystrokes after the first only change that entry (debounced), so a search
+// adds one entry, not one per letter. Emptying the box again is the same undo
+// as closing an event ("back" when the search was pushed from that entry).
+// `push`: the caller asked for an entry of its own whatever changed (a
+// timeline preset: useUrlState's pushNext).
+const hasQuery = (s) => (s.q ?? "").trim() !== "";
+const samePush = (a, b) =>
+  a.eventId === b.eventId &&
+  a.about === b.about &&
+  placeToParam(a.place) === placeToParam(b.place) &&
+  hasQuery(a) === hasQuery(b);
+export function urlWriteMode(prevUrl, nextUrl, { replace = false, backUrl = null, push = false } = {}) {
   if (nextUrl === prevUrl) return null;
+  if (push) return "push";
   const prev = parseUrl(prevUrl);
   const next = parseUrl(nextUrl);
   if (samePush(prev, next)) return "debounce";
@@ -270,15 +283,24 @@ export function areaRoundTrips(area) {
   return param != null && parseArea(param) != null;
 }
 
-// Before a push (an event opened/closed, About toggled): the URL the CURRENT
-// entry should have first. A non-event change made just before (typing, a
-// filter, the years) is still waiting for its debounced replace, which the push
-// cancels; written here, Back returns to the view as it was left, not as it
-// was 400 ms earlier. null when the current entry is already up to date.
+// Before a push (an event opened/closed, About toggled, a search started, a
+// preset): the URL the CURRENT entry should have first. A change made just
+// before (typing, a filter, the years) is still waiting for its debounced
+// replace, which the push cancels; written here, Back returns to the view as it
+// was left, not as it was 400 ms earlier. What the push itself changes stays as
+// the entry has it: its event, About and place, its text when the push starts
+// or ends a search, and with `years` (a preset) its years. null when the
+// current entry is already up to date.
 // `prevUrl` is the current entry's URL, `state` the new state (as for stateUrl).
-export function entryBeforePush(prevUrl, state) {
+export function entryBeforePush(prevUrl, state, { years = false } = {}) {
   const prev = parseUrl(prevUrl);
-  const carried = stateUrl({ ...state, eventId: prev.eventId, about: prev.about, place: prev.place });
+  const kept = { eventId: prev.eventId, about: prev.about, place: prev.place };
+  if (hasQuery(prev) !== hasQuery(state)) kept.q = prev.q;
+  if (years) {
+    kept.startYear = prev.years?.[0] ?? YEAR_MIN;
+    kept.endYear = prev.years?.[1] ?? YEAR_MAX;
+  }
+  const carried = stateUrl({ ...state, ...kept });
   return carried === prevUrl ? null : carried;
 }
 

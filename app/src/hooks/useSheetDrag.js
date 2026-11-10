@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { clampSheet, sheetDetents, snapSheet, stepSheet } from "../lib/sheetSnap.js";
 
 // Below this much movement a press on the bar is a tap (it toggles), not a drag.
@@ -27,18 +27,80 @@ function peekHeight(el) {
  * the next one. A tap toggles peek and open (`openTo`); Arrow Up / Down step one height.
  * Only the bar drags, so scrolling the list or an article never moves the sheet.
  *
- * Returns {sheet, setSheet, dragHeight (px while dragging, else null), barProps
+ * With `history` (the list is showing: no event or place open, which have
+ * entries of their own), the reader raising the sheet from its bar (a tap, a
+ * drag, a key, or `moveSheet` from the search box) adds a history entry, so
+ * the browser's Back lowers it again instead of leaving the site; Forward
+ * raises it again. The entry has the same URL, marked {sheet: <height>} in
+ * history.state (hooks/useUrlState.js carries the mark into the entries pushed
+ * from it). Lowered in the app with nothing else changed, the entry is gone
+ * back over, so a later Back does nothing unseen; otherwise it stays and the
+ * next raise reuses it. Only while the bar is shown (phones): the desktop
+ * panel has no sheet.
+ *
+ * Returns {sheet, setSheet, moveSheet (setSheet as the reader's own move, with
+ * the history above), dragHeight (px while dragging, else null), barProps
  * (spread on the bar's button)}.
  *
  * @param {"peek"|"half"|"full"} initial
  * @param {import("react").RefObject<HTMLElement>} sheetRef  the sheet (inside the map area, .app-body)
  * @param {"half"|"full"} [openTo]  where a tap on the lowered bar opens it
+ * @param {{history?: boolean}} [opts]
  */
-export default function useSheetDrag(initial, sheetRef, openTo = "full") {
+export default function useSheetDrag(initial, sheetRef, openTo = "full", { history = false } = {}) {
   const [sheet, setSheet] = useState(initial);
   const [dragHeight, setDragHeight] = useState(null);
   const dragRef = useRef(null); // {y, h, last, lastT, v, moved}
   const swallowClickRef = useRef(false);
+  // The URL of the entry that stands for the raised sheet, while it is raised.
+  const sheetEntryRef = useRef(null);
+  const sheetNowRef = useRef(sheet); // for popstate
+  useEffect(() => {
+    sheetNowRef.current = sheet;
+  });
+
+  const barShown = () => Boolean(sheetRef.current?.querySelector(".sp-sheet-toggle")?.getClientRects?.().length);
+  const hereUrl = () => window.location.href;
+
+  // The reader moved the sheet: its history (above), then the move.
+  function moveSheet(next) {
+    const was = sheet;
+    setSheet(next);
+    if (typeof window === "undefined" || !barShown()) return;
+    const h = window.history;
+    if (was === "peek" && next !== "peek") {
+      if (!history) return;
+      // This entry already stands for the raised sheet (lowered in the app since): reused.
+      if (!h.state?.sheet) h.pushState({ sheet: next }, "", hereUrl());
+      sheetEntryRef.current = hereUrl();
+    } else if (was !== "peek" && next === "peek" && sheetEntryRef.current) {
+      const at = sheetEntryRef.current;
+      sheetEntryRef.current = null;
+      if (h.state?.sheet && hereUrl() === at) h.back();
+    }
+  }
+
+  // Back onto an entry from before the raise lowers the sheet; Forward onto its
+  // entry raises it again (the entry's mark says how far).
+  useEffect(() => {
+    // No window (node tests), or a render test's stand-in without events.
+    if (typeof window === "undefined" || typeof window.addEventListener !== "function") return undefined;
+    const onPop = () => {
+      if (!barShown()) return;
+      const mark = window.history.state?.sheet;
+      const now = sheetNowRef.current;
+      if (mark && now === "peek") {
+        sheetEntryRef.current = hereUrl();
+        setSheet(mark);
+      } else if (!mark && now !== "peek" && sheetEntryRef.current) {
+        sheetEntryRef.current = null;
+        setSheet("peek");
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const detents = () => {
     const el = sheetRef.current;
@@ -82,7 +144,7 @@ export default function useSheetDrag(initial, sheetRef, openTo = "full") {
     // The velocity is that of the last moves: after a pause it is stale, and
     // a fast drag that stopped before letting go rests at the nearest height.
     const v = e.timeStamp - d.lastT > FLICK_IDLE_MS ? 0 : d.v;
-    setSheet(snapSheet(d.last, v, d.ds));
+    moveSheet(snapSheet(d.last, v, d.ds));
     setDragHeight(null);
   }
 
@@ -91,18 +153,19 @@ export default function useSheetDrag(initial, sheetRef, openTo = "full") {
       swallowClickRef.current = false;
       return;
     }
-    setSheet(sheet === "peek" ? openTo : "peek");
+    moveSheet(sheet === "peek" ? openTo : "peek");
   }
 
   function onKeyDown(e) {
     if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
     e.preventDefault();
-    setSheet(stepSheet(sheet, e.key === "ArrowUp" ? 1 : -1, detents()));
+    moveSheet(stepSheet(sheet, e.key === "ArrowUp" ? 1 : -1, detents()));
   }
 
   return {
     sheet,
     setSheet,
+    moveSheet,
     dragHeight,
     barProps: {
       onPointerDown,
