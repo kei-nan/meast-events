@@ -33,12 +33,24 @@ test("the selected related-events tab draws its count in a colour with 4.5:1 on 
   assert.match(r, /color:\s*var\(--text-(secondary|primary)\)/);
 });
 
-test("'Read the review' gets the same touch hit area as 'Reviewed by AI'", () => {
+test("'Read the review' gets the same touch hit area as 'Reviewed by AI', padding that does not reach over the next line's links", () => {
   const sp = css("SidePanel.css");
-  assert.match(rule(sp, ".framing-pointer-link"), /position:\s*relative/);
-  const r = rule(sp, ".fr-ai-btn::after,\n  .framing-pointer-link::after");
-  assert.ok(r, "no ::after hit area for .framing-pointer-link");
-  assert.match(r, /inset:\s*-12px -4px/);
+  const r = rule(sp, ".fr-ai-btn,\n  .framing-pointer-link");
+  assert.ok(r, "no touch hit area for the two buttons");
+  assert.match(r, /padding-block:\s*5px/);
+  assert.match(r, /margin-block:\s*-5px/, "the line keeps its height");
+  // An ::after area 12px past the button covered "Disagree with this review?" on the line under it.
+  assert.doesNotMatch(sp, /\.fr-ai-btn::after/);
+  // Positioned, it was drawn (and tapped) over that line's link where the two meet.
+  assert.doesNotMatch(rule(sp, ".fr-ai-btn"), /position:/);
+  assert.doesNotMatch(rule(sp, ".framing-pointer-link"), /position:/);
+});
+
+test("short-screen queries are in em, so a raised text size makes a screen short too", () => {
+  for (const f of ["App.css", "SidePanel.css", "Timeline.css", "components/MapUi.css", "components/MapNav.css"]) {
+    assert.doesNotMatch(css(f), /@media[^{]*max-height:\s*\d+px/, `${f}: a max-height query in px`);
+  }
+  assert.match(css("SidePanel.css"), /@media \(max-height: 31\.25em\) \{\s*\.app:has\(\.side-panel:not\(\[data-sheet="peek"\]\)\)/);
 });
 
 test("on phones the title and the timeline's controls can wrap with large text", () => {

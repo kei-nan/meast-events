@@ -1428,7 +1428,6 @@ button.sp-chip[aria-pressed="true"] {
 
 /* On touch screens its tap area grows without moving the line, as .fr-ai-btn's. */
 .framing-pointer-link {
-  position: relative;
   padding: 0;
   border: 0;
   background: none;
@@ -1620,7 +1619,6 @@ button.sp-chip[aria-pressed="true"] {
    "Controls"), drawn as text with a dotted underline: it explains, it does not
    take you anywhere. On touch screens its tap area grows without moving the line. */
 .fr-ai-btn {
-  position: relative;
   padding: 0;
   border: 0;
   background: none;
@@ -1635,12 +1633,17 @@ button.sp-chip[aria-pressed="true"] {
   color: var(--text-primary);
 }
 
+/* 24px or more to a finger, as the links beside it (below). A button is an
+   inline block, so its padding would make the line taller: the negative margin
+   gives that back. (A larger ::after area reached over "Disagree with this
+   review?" when the line wrapped, and a tap on "review?" opened the AI note.
+   Not positioned, so a link on the next line, later in the text, is drawn and
+   tapped over the padding where the two meet.) */
 @media (pointer: coarse) {
-  .fr-ai-btn::after,
-  .framing-pointer-link::after {
-    content: "";
-    position: absolute;
-    inset: -12px -4px;
+  .fr-ai-btn,
+  .framing-pointer-link {
+    padding-block: 5px;
+    margin-block: -5px;
   }
 }
 
@@ -1767,8 +1770,11 @@ button.sp-chip[aria-pressed="true"] {
      page scrolls instead: the map area grows to the screen plus the strip, so
      the sheet is exactly one screen tall and the strip, the timeline and the
      footer are a scroll away. Grows by the same 120px as the strip above, so
-     the drag heights (lib/sheetSnap.js) still match. At peek nothing changes. */
-  @media (max-height: 500px) {
+     the drag heights (lib/sheetSnap.js) still match. At peek nothing changes.
+     In em (500px at the default text size; App.css): a raised text size makes
+     the header, timeline and footer taller, and at 200% a 375x740 phone's half
+     sheet had no room left under its buttons. */
+  @media (max-height: 31.25em) {
     .app:has(.side-panel:not([data-sheet="peek"])) {
       height: auto;
       min-height: 100dvh;
@@ -1786,7 +1792,7 @@ button.sp-chip[aria-pressed="true"] {
      (44px keys 10px from the top) stay in sight above it (WCAG 2.4.11). The
      bar opens the sheet at the search box; useSheetDrag measures the peek
      height from what shows. */
-  @media (max-height: 320px) {
+  @media (max-height: 20em) {
     .side-panel[data-sheet="peek"] .sp-searchbox {
       display: none;
     }
@@ -1882,6 +1888,19 @@ button.sp-chip[aria-pressed="true"] {
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+
+  /* A little tighter, so the row is one line from a 360px phone up (it was
+     13px too wide there and wrapped, a second row of the half sheet gone to
+     buttons). Narrower, or with a larger text size, it still wraps: the Share
+     panel opens under its button, and a sideways-scrolling row would cut it off. */
+  .event-detail-actions {
+    gap: 6px;
+  }
+
+  .event-detail-actions > .sp-btn {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
 }

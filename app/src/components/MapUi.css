@@ -915,7 +915,7 @@
 
 /* Short screens (a phone held sideways: the map is ~210px tall): the opened
    Map key stays inside the map. */
-@media (max-height: 500px) {
+@media (max-height: 31.25em) {
   .mu-borders-panel {
     max-height: max(96px, calc(100dvh - 280px));
   }
@@ -924,7 +924,7 @@
    in one row left of the navigation column (MapNav.css: 52px wide from the
    top-right corner), the pair as two bare years as on phones (their names
    keep the words). */
-@media (max-height: 500px) and (min-width: 769px) {
+@media (max-height: 31.25em) and (min-width: 769px) {
   .mu-ctrl-right {
     right: 68px;
     max-width: calc(100% - 150px); /* clear of the toolbar (Draw area) */
@@ -973,7 +973,7 @@
 }
 /* Short phone layout: the navigation is a row in the top-right corner
    (MapNav.css, 4 x 44px + its border), so the Borders chips sit left of it. */
-@media (max-height: 500px) and (max-width: 768px) {
+@media (max-height: 31.25em) and (max-width: 768px) {
   .mu-ctrl-right {
     right: 198px;
     max-width: calc(100% - 262px); /* clear of Draw area on the left */
@@ -989,12 +989,28 @@
 .mu-borders-short {
   display: none;
 }
-@media (max-height: 500px) and (max-width: 439px) {
+@media (max-height: 31.25em) and (max-width: 439px) {
   .mu-borders-btn .mu-borders-main {
     display: none;
   }
   .mu-borders-btn .mu-borders-short {
     display: inline;
+  }
+}
+/* That narrow layout on a phone held upright with a large text size (320x568
+   at 175-200%): the ~58px left of the navigation row holds the chip alone,
+   and the years beside it ran off the map's left edge. There is map enough
+   below (min-height in px: the keys are px), so chip and years get a row of
+   their own under the navigation row, a row lower again while the pan pad or
+   the toolbar's second row ("Zoom to N results") is open there. */
+@media (max-height: 31.25em) and (max-width: 439px) and (min-height: 400px) {
+  .mu-ctrl-right {
+    top: 64px;
+    right: 10px;
+    max-width: calc(100% - 20px);
+  }
+  .map-view:has(#mu-pan-pad, .mu-toolbar-wrap > .mu-btn) .mu-ctrl-right {
+    top: 114px;
   }
 }
 

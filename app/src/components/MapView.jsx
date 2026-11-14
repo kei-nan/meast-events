@@ -21,6 +21,7 @@ import { diffById } from "../lib/sourceDiff";
 import ClusterList from "./ClusterList";
 import useMapHoverLabel from "../hooks/useMapHoverLabel";
 import usePlaceMarker from "../hooks/usePlaceMarker";
+import useInertUnderSheet from "../hooks/useInertUnderSheet";
 import { eventsBounds } from "../lib/mapStack";
 import useCountryHighlight from "./countryHighlight";
 import { boundariesForYear, boundaryLabelsForYear } from "../lib/boundaryLabels";
@@ -464,6 +465,9 @@ function MapView({
   }, [mapReady, onMapStatus]);
 
   usePlaceMarker({ mapRef, mapReady, place });
+
+  // Phones: the map's controls wholly under the results sheet leave the tab order.
+  useInertUnderSheet(containerRef);
 
   // The hover label's one query per frame (useMapHoverLabel.js) also draws the
   // ring and sets the cursor: "grab" on an area handle (a press there drags it,

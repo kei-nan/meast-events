@@ -107,6 +107,35 @@ export default function useSheetDrag(initial, sheetRef, openTo = "full", { histo
     return sheetDetents(el?.parentElement?.clientHeight ?? 0, el ? peekHeight(el) : 0);
   };
 
+  // Raised on a phone (the bar shows):
+  // - at half where half is no resting height (a map area too short for it, as
+  //   at 320x568: half left room for the event's buttons only, its title under
+  //   them), it goes on to full;
+  // - on a short screen the page scrolls while the sheet is up (SidePanel.css:
+  //   the sheet is one screen tall), and the sheet came up partly below the
+  //   screen's edge: the page scrolls until the sheet's bottom is the
+  //   screen's, so all of it is in sight (the header and the map a scroll up).
+  //   Lowered again, the page goes back to its top, where it was.
+  const scrolledRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !barShown()) return;
+    if (sheet === "peek") {
+      if (scrolledRef.current) window.scrollTo(0, 0);
+      scrolledRef.current = false;
+      return;
+    }
+    if (sheet === "half" && !detents().some((d) => d.name === "half")) {
+      setSheet("full");
+      return;
+    }
+    const below = sheetRef.current.getBoundingClientRect().bottom - window.innerHeight;
+    if (below > 1) {
+      window.scrollBy(0, below);
+      scrolledRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheet]);
+
   function onPointerDown(e) {
     // A drag on a touch screen is often not followed by a click: a new press starts clean.
     swallowClickRef.current = false;
