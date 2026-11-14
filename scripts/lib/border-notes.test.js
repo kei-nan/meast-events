@@ -44,6 +44,29 @@ test("border report: the early year is scored only with points Wikidata dates as
   assert.equal(Object.keys(WIKIDATA_DATES).filter((id) => existedIn(id, 1960)).length, 10);
 });
 
+test("a note that quotes the ICJ 2024 opinion, Resolution 2334 or the Israeli MFA cites that text (checked 2026-11-14)", () => {
+  const cites = [
+    [/\(paras?\. [\d, ]+\)/, "s=A/78/968&"],
+    [/Resolution 2334/, "s=S/RES/2334(2016)&"],
+    [/competing claims/, "web.archive.org/web/20160317104350/http://www.mfa.gov.il/"],
+    [/neither a State nor a territory occupied or controlled by Israel/, "web.archive.org/web/20160624013314/http://www.mfa.gov.il/"],
+  ];
+  let quoted = 0;
+  for (const { properties: p } of boundaries)
+    for (const [inNote, url] of cites)
+      if (inNote.test(p.note ?? "")) {
+        quoted++;
+        assert.ok(p.source.includes(url), `${p.name} (${p.start_year}): ${url}`);
+      }
+  assert.equal(quoted, 14);
+});
+
+test("Sanjak of Alexandretta: the 1939 referendum is described as its cited article attributes it", () => {
+  const { note } = boundaries.find((f) => f.properties.name === "Sanjak of Alexandretta (Hatay)").properties;
+  assert.ok(!note.includes("widely regarded"));
+  assert.ok(note.includes("\"has been labelled both 'phoney' and 'rigged'\" (English Wikipedia's Hatay State article, citing Robert Fisk"));
+});
+
 test("border report: docs/border-verification.md shows the 1960 section and the Mandelbaum Gate row", () => {
   const doc = read("../../docs/border-verification.md");
   assert.match(doc, /^## Map year 1960 \(report only\), with the points that existed then$/m);

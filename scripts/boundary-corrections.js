@@ -116,6 +116,11 @@ const OSLO_ICJ_SENTENCE =
 // Resolution 2334 (2016), operative para. 1, and the Israel Ministry of Foreign Affairs page
 // "Israeli Settlements and International Law" (archived 17 March 2016,
 // https://web.archive.org/web/20160317104350/http://www.mfa.gov.il/mfa/foreignpolicy/peace/guide/pages/israeli%20settlements%20and%20international%20law.aspx).
+// Both are cited in the source of every shape whose note carries the sentence.
+const UNSC_2334 = "https://documents.un.org/api/symbol/access?s=S/RES/2334(2016)&l=en&t=pdf";
+const ISRAEL_MFA_SETTLEMENTS =
+  "https://web.archive.org/web/20160317104350/http://www.mfa.gov.il/mfa/foreignpolicy/peace/guide/pages/israeli%20settlements%20and%20international%20law.aspx";
+const WEST_BANK_READINGS_SOURCES = `${UNSC_2334}; ${ISRAEL_MFA_SETTLEMENTS}`;
 const WEST_BANK_READINGS_SENTENCE =
   "UN Security Council Resolution 2334 (2016) refers to \"the Palestinian territory occupied " +
   "since 1967, including East Jerusalem\"; Israel disagrees, its Ministry of Foreign Affairs " +
@@ -123,7 +128,9 @@ const WEST_BANK_READINGS_SENTENCE =
   "claims which should be resolved in peace process negotiations\".";
 // Israel's position on Gaza after the 2005 disengagement, from the Israel Ministry of Foreign
 // Affairs paper "The Operation in Gaza: Factual and Legal Aspects" (July 2009), para. 30
-// (archived: https://web.archive.org/web/20160624013314/http://www.mfa.gov.il/MFA_Graphics/MFA%20Gallery/Documents/GazaOperation%20w%20Links.pdf).
+// (archived copy below, cited in the source of every shape whose note carries the quote).
+const ISRAEL_MFA_GAZA_2009 =
+  "https://web.archive.org/web/20160624013314/http://www.mfa.gov.il/MFA_Graphics/MFA%20Gallery/Documents/GazaOperation%20w%20Links.pdf";
 const ISRAEL_GAZA_2009_QUOTE =
   "\"the Gaza Strip is neither a State nor a territory occupied or controlled by Israel\"";
 const UNSC_252 = "https://documents.un.org/api/symbol/access?s=S/RES/252(1968)&l=en&t=pdf";
@@ -454,8 +461,11 @@ export const CORRECTIONS = [
       "20 October 1921 (Article 7: \"A special administrative regime shall be established " +
       "for the district of Alexandretta\"), its status formalized by a 1937 League of " +
       "Nations agreement; briefly the separatist \"Hatay State\" from " +
-      "September 1938 before Turkey annexed it in June 1939 following a referendum " +
-      "widely regarded internationally as rigged. Geometry approximated using the " +
+      "September 1938 before Turkey annexed it in June 1939 following a referendum that " +
+      "\"has been labelled both 'phoney' and 'rigged'\" (English Wikipedia's Hatay State " +
+      "article, citing Robert Fisk's The Great War for Civilisation), as the Turkish " +
+      "government brought tens of thousands of Turks originating from but not living in " +
+      "Alexandretta to register and vote there. Geometry approximated using the " +
       "modern boundary of Turkey's Hatay Province (Natural Earth), which may not " +
       "exactly match the historical Sanjak/State boundary.",
     source: "https://en.wikipedia.org/wiki/Sanjak_of_Alexandretta; https://en.wikipedia.org/wiki/Hatay_State",
@@ -649,7 +659,7 @@ export const CORRECTIONS = [
       OSLO_ICJ_SENTENCE +
       " " +
       WEST_BANK_READINGS_SENTENCE,
-    source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}`,
+    source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}; ${WEST_BANK_READINGS_SOURCES}`,
   },
   {
     type: "add",
@@ -668,7 +678,7 @@ export const CORRECTIONS = [
       OSLO_ICJ_SENTENCE +
       " " +
       WEST_BANK_READINGS_SENTENCE,
-    source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}`,
+    source: `https://en.wikipedia.org/wiki/West_Bank_areas_in_the_Oslo_II_Accord; ${ICJ_2024_OPINION}; ${WEST_BANK_READINGS_SOURCES}`,
   },
   {
     type: "add",
@@ -693,7 +703,7 @@ export const CORRECTIONS = [
       "capital in the 1980 Basic Law, which UN Security Council Resolution 478 (1980) declared " +
       "\"null and void\". It is not drawn as an annexed shape of its own, unlike the Golan Heights. " +
       WEST_BANK_READINGS_SENTENCE,
-    source: `https://en.wikipedia.org/wiki/Area_C_(West_Bank); ${UNSC_478}`,
+    source: `https://en.wikipedia.org/wiki/Area_C_(West_Bank); ${UNSC_478}; ${WEST_BANK_READINGS_SOURCES}`,
   },
 
   // --- Gaza Strip after 1967 ---
@@ -781,7 +791,7 @@ export const CORRECTIONS = [
       "Israel's Ministry of Foreign Affairs stated in July 2009 that " +
       ISRAEL_GAZA_2009_QUOTE +
       ".",
-    source: `https://en.wikipedia.org/wiki/Battle_of_Gaza_(2007); ${ICJ_2024_OPINION}`,
+    source: `https://en.wikipedia.org/wiki/Battle_of_Gaza_(2007); ${ICJ_2024_OPINION}; ${ISRAEL_MFA_GAZA_2009}`,
   },
   {
     type: "add",
@@ -805,7 +815,7 @@ export const CORRECTIONS = [
       "Israel's Ministry of Foreign Affairs stated in July 2009 that " +
       ISRAEL_GAZA_2009_QUOTE +
       "; we have not found an official Israeli statement on Gaza's status during this war.",
-    source: "https://en.wikipedia.org/wiki/Gaza_war",
+    source: `https://en.wikipedia.org/wiki/Gaza_war; ${ICJ_2024_OPINION}; ${ISRAEL_MFA_GAZA_2009}`,
   },
   {
     type: "add",
