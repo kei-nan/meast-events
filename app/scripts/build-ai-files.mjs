@@ -1,10 +1,17 @@
 // Writes the files AI tools read into dist/ after the Vite build (postbuild, after
 // build-event-pages.mjs):
 //
-//   dist/ai/context/<id>.json  the event, every event lib/conflictContext.js places around
-//                              it, their framing reviews and the dataset's coverage
-//                              (lib/aiBriefing.js). The MCP endpoint (worker/index.js)
-//                              serves these files as they are.
+//   dist/ai/store/events.json        each event's entry once (title, dates, links, the
+//                                    opening of its summary, its framing review).
+//   dist/ai/store/shared.json        the texts every briefing shares (what the site is,
+//                                    the guidance, the rule, coverage counts, licences).
+//   dist/ai/store/context/<id>.json  what is the event's own: its full summary, its
+//                                    selection and the ids lib/conflictContext.js places
+//                                    around it.
+//   The Worker (worker/index.js) joins these into one self-contained briefing
+//   (lib/aiBriefing.js assembleBriefing) for the MCP tool and for /ai/context/<id>.json;
+//   no assembled briefing is stored, because each event's entry would be repeated in
+//   every context it belongs to (39 MB when they were).
 //   dist/ai/index.json         one line per event (id, title, start, countries, own
 //                              Wikidata groups), for finding an id.
 //   dist/llms.txt              what the site is and where these files are, for AIs that
@@ -17,7 +24,7 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { briefingFor, indexEntry, ABOUT, GUIDANCE, REVIEW_METHOD_URL, COVERAGE_REPORT_URL } from "../src/lib/aiBriefing.js";
+import { assembleBriefing, contextRecord, indexEntry, sharedParts, storeEntry, ABOUT, GUIDANCE, REVIEW_METHOD_URL, COVERAGE_REPORT_URL } from "../src/lib/aiBriefing.js";
 import { resolveContext, contextRule } from "../src/lib/conflictContext.js";
 import { fullBucket } from "../src/lib/fullBucket.js";
 import { SITE } from "../src/lib/citation.js";
@@ -81,20 +88,33 @@ async function main() {
 
   const ctx = resolveContext(events);
   await rm(OUT, { recursive: true, force: true });
-  await mkdir(path.join(OUT, "context"), { recursive: true });
+  const STORE = path.join(OUT, "store");
+  await mkdir(path.join(STORE, "context"), { recursive: true });
   const info = { version: meta.version, reviewer: review.reviewer, reviewed_on: review.reviewed_on };
-  let bytes = 0;
-  let largest = 0;
+  const entries = Object.fromEntries(events.map((e) => [e.id, storeEntry(e)]));
+  const shared = sharedParts(funnel, info);
+  const sizes = { stored: 0, largestStored: 0, largestServed: 0, largestServedId: null };
+  const write = async (file, value) => {
+    const json = JSON.stringify(value);
+    sizes.stored += Buffer.byteLength(json);
+    sizes.largestStored = Math.max(sizes.largestStored, Buffer.byteLength(json));
+    await writeFile(file, json);
+  };
+  await write(path.join(STORE, "events.json"), entries);
+  await write(path.join(STORE, "shared.json"), shared);
   for (const e of events) {
-    const json = JSON.stringify(briefingFor(e, ctx.get(e.id), byId, funnel, info));
-    bytes += json.length;
-    largest = Math.max(largest, json.length);
-    await writeFile(path.join(OUT, "context", `${e.id}.json`), json);
+    const record = contextRecord(e, ctx.get(e.id), byId);
+    // Assemble once here too: a record whose ids are not all in the store fails the build.
+    const served = Buffer.byteLength(JSON.stringify(assembleBriefing(record, entries, shared)));
+    if (served > sizes.largestServed) Object.assign(sizes, { largestServed: served, largestServedId: e.id });
+    await write(path.join(STORE, "context", `${e.id}.json`), record);
   }
   await writeFile(path.join(OUT, "index.json"), JSON.stringify(events.map((e) => indexEntry(e, ctx.get(e.id)))));
   await writeFile(path.join(DIST, "llms.txt"), llmsTxt(events.length));
+  const kb = (n) => `${(n / 1024).toFixed(0)}KB`;
   console.log(
-    `ai files: ${events.length} context files (${(bytes / 1048576).toFixed(1)}MB, largest ${(largest / 1024).toFixed(0)}KB), ai/index.json, llms.txt`
+    `ai files: store of ${events.length + 2} files (${(sizes.stored / 1048576).toFixed(2)}MB, largest ${kb(sizes.largestStored)}), ` +
+      `ai/index.json, llms.txt; largest assembled briefing ${kb(sizes.largestServed)} (${sizes.largestServedId})`
   );
 }
 

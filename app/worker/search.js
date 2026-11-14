@@ -2,6 +2,12 @@
 // A match needs every query word in the title, the id or one of the event's own Wikidata
 // groups. Results are in date order, not ranked: ranking by how well an event matches the
 // question's words would put first the events that share its framing.
+//
+// Known limit: it matches words, not meaning. A whole question or a paraphrase can find
+// nothing ("When did the Shah lose power?" and "shah" miss the Iranian Revolution; "Gaza
+// starvation" misses the Gaza Strip famine), so the tool tells the AI to send short title
+// words. Search by meaning could only ever find candidates, never order them, for the
+// reason above; it is not planned (docs/DECISIONS.md, "AI search results in date order").
 
 const words = (s) =>
   String(s ?? "")

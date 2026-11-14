@@ -2,7 +2,7 @@
   "about": "Framing review: two review types per Wikipedia summary, shown separately. Overall fairness is the reviewer's judgement of emphasis, balance and omissions; the wording check cites Wikipedia's own neutrality and wording guidelines. Shown next to the summary, never merged into it. Not a fact-check and not a verdict on the events.",
   "reviewer": "Claude (claude-opus-5-5), an AI model made by Anthropic. Not checked line by line by a person.",
   "reviewed_on": "2026-09-30",
-  "updated_on": "2026-11-09",
+  "updated_on": "2026-11-14",
   "rubric_version": 5,
   "method": "docs/framing-review.md",
   "guidelines": {
@@ -3220,10 +3220,11 @@
       "text_sha1": "d23aab0dda87",
       "text_retrieved_at": "2026-09-26",
       "fairness": {
-        "note": "States contested specifics as fact, such as a \"biological warfare programme\" of well-poisoning and typhoid \"caused by Israeli well-poisoning\". Its central point, that expulsions and fear were the main causes of flight, matches majority scholarship, and it notes that some disagree.",
+        "note": "States contested specifics as fact, such as a \"biological warfare programme\" of well-poisoning and typhoid \"caused by Israeli well-poisoning\". Its central point, that expulsions and fear were the main causes of flight, matches majority scholarship, and it notes that some disagree. It also says in Wikipedia's own voice that the Israeli military ran \"labor camps for captured Palestinians, most of whom were civilians\". It does not mention that Israel held them as prisoners of war, treating Arab men of about 16 to 55 as combatants, as International Committee of the Red Cross reports of 1948–49 record (Abu Sitta and Rempel, Journal of Palestine Studies 43(4), 2014).",
         "phrases": [
           "biological warfare programme",
-          "caused by Israeli well-poisoning"
+          "caused by Israeli well-poisoning",
+          "labor camps for captured Palestinians, most of whom were civilians"
         ]
       },
       "wording": [

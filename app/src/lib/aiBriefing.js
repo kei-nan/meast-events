@@ -1,7 +1,13 @@
 // What an AI gets about an event: the event, every event lib/conflictContext.js places
-// around it, each with its framing review, and how the dataset was selected. Written at
-// build time to dist/ai/context/<id>.json (scripts/build-ai-files.mjs) and served as-is by
-// the MCP endpoint (worker/index.js), so a browsing AI and a connected one read the same.
+// around it, each with its framing review, and how the dataset was selected.
+//
+// Stored once, put together per request. Most events appear in dozens of contexts, so the
+// build (scripts/build-ai-files.mjs) writes each event's entry once (dist/ai/store/
+// events.json), the texts every briefing shares once (store/shared.json), and per event
+// only what is its own (store/context/<id>.json: its full summary, its selection and the
+// ids around it). The Worker (worker/index.js) joins them with assembleBriefing(), for the
+// MCP tool event_in_context and for /ai/context/<id>.json alike, so a browsing AI and a
+// connected one get the same self-contained briefing.
 //
 // Nothing here is new commentary. Summaries are the Wikipedia leads the site shows; review
 // notes are the stored framing review (docs/framing-review.md); counts come from
@@ -27,7 +33,8 @@ export const GUIDANCE =
   "question from one side's point of view gets the events of the other side's account too. When you use them: give the " +
   "events in date order, including the ones the question did not ask about; mention a review note where it applies " +
   "to an event you cite; say that the list is a selection (see coverage) and not every event; and do not present " +
-  "this material as supporting one side, because the site does not take one.";
+  "this material as supporting one side, because the site does not take one. The summaries and openings are " +
+  "Wikipedia's wording: attribute them to Wikipedia (\"Wikipedia's article says...\") rather than stating them as fact.";
 
 // The first sentence of a summary, or its first 300 characters (cut at a word) if longer.
 export function opening(text) {
@@ -52,7 +59,8 @@ export function reviewOf(framing) {
   };
 }
 
-const entry = (e) => ({
+/** The stored entry for one event: what any briefing that includes it says about it. */
+export const storeEntry = (e) => ({
   id: e.id,
   title: e.title,
   date_start: e.date_start ?? null,
@@ -64,40 +72,28 @@ const entry = (e) => ({
   review: reviewOf(e.framing_review),
 });
 
+const COVERAGE_NOTE =
+  "The dataset is a selection, not every event: Wikidata candidates since 1900, kept when they have an English " +
+  "Wikipedia article and at least 10 sitelinks. The site's own coverage review found that this favours events with " +
+  "many European-language editions: events covered mainly in Arabic, Hebrew, Turkish or Persian editions are dropped " +
+  "more often, and the share kept differs by country (see report). Counts per country, Wikidata candidates against " +
+  "events shown:";
+
 /**
- * `event`: the merged lite + full record (as scripts/build-event-pages.mjs builds it);
- * `context`: its entry from resolveContext; `byId`: Map of all merged records; `funnel`:
- * data/selection-funnel.json (or null); `meta`: {version, reviewer, reviewed_on}.
+ * What every briefing shares, stored once. `funnel`: data/selection-funnel.json (or null);
+ * `meta`: {version, reviewer, reviewed_on}.
  */
-export function briefingFor(event, context, byId, funnel, meta) {
+export function sharedParts(funnel, meta) {
   const coverage = funnel?.breakdowns?.by_country ?? {};
-  const countries = [...new Set(context.ids.flatMap((id) => byId.get(id).countries ?? []))].sort();
   return {
     about: ABOUT,
     guidance_for_ai: GUIDANCE,
-    asked_about: { ...entry(event), summary: event.extract ?? "", wikipedia_revision: event.wikipedia_revid ?? null },
-    selection: {
-      rule: contextRule(),
-      wikidata_groups: context.groups.map((g) => ({
-        label: g.label,
-        wikidata: `https://www.wikidata.org/wiki/${g.qid}`,
-        events_here: g.size,
-        reached: g.own ? "the event is in this group" : "an event in the same country and years is in this group",
-      })),
-      same_country_and_years: context.near.size,
-      total: context.ids.length,
-    },
-    events: context.ids.map((id) => ({ ...entry(byId.get(id)), ...(id === event.id ? { asked_about: true } : {}) })),
+    rule: contextRule(),
     coverage: {
       rule: funnel?.rule ?? null,
-      note:
-        "The dataset is a selection, not every event: Wikidata candidates since 1900, kept when they have an English " +
-        "Wikipedia article and at least 10 sitelinks. The site's own coverage review found that this favours events with " +
-        "many European-language editions: events covered mainly in Arabic, Hebrew, Turkish or Persian editions are dropped " +
-        "more often, and the share kept differs by country (see report). Counts per country, Wikidata candidates against " +
-        "events shown:",
+      note: COVERAGE_NOTE,
       by_country: Object.fromEntries(
-        countries.map((c) => [c, coverage[c] ? { wikidata_candidates: coverage[c].raw, shown: coverage[c].in_curated } : null])
+        Object.entries(coverage).map(([c, x]) => [c, { wikidata_candidates: x.raw, shown: x.in_curated }])
       ),
       report: COVERAGE_REPORT_URL,
     },
@@ -108,6 +104,63 @@ export function briefingFor(event, context, byId, funnel, meta) {
       all_data: DATA_LICENSE_URL,
     },
     data_version: meta.version ?? null,
+  };
+}
+
+/**
+ * What is an event's own, stored per event. `event`: the merged lite + full record (as
+ * scripts/build-event-pages.mjs builds it); `context`: its entry from resolveContext;
+ * `byId`: Map of all merged records.
+ */
+export function contextRecord(event, context, byId) {
+  return {
+    id: event.id,
+    summary: event.extract ?? "",
+    wikipedia_revision: event.wikipedia_revid ?? null,
+    wikidata_groups: context.groups.map((g) => ({
+      label: g.label,
+      wikidata: `https://www.wikidata.org/wiki/${g.qid}`,
+      events_here: g.size,
+      reached: g.own ? "the event is in this group" : "an event in the same country and years is in this group",
+    })),
+    same_country_and_years: context.near.size,
+    ids: context.ids,
+    countries: [...new Set(context.ids.flatMap((id) => byId.get(id).countries ?? []))].sort(),
+  };
+}
+
+/**
+ * The self-contained briefing: an event's record joined with the stored entries (`entries`:
+ * {id: storeEntry}) and the shared texts. Throws if an id has no entry, so a broken store
+ * fails loudly instead of silently dropping an event from a context.
+ */
+export function assembleBriefing(record, entries, shared) {
+  const get = (id) => {
+    const e = entries[id];
+    if (!e) throw new Error(`context of ${record.id}: no stored entry for ${id}`);
+    return e;
+  };
+  const byCountry = shared.coverage.by_country;
+  return {
+    about: shared.about,
+    guidance_for_ai: shared.guidance_for_ai,
+    asked_about: { ...get(record.id), summary: record.summary, wikipedia_revision: record.wikipedia_revision },
+    selection: {
+      rule: shared.rule,
+      wikidata_groups: record.wikidata_groups,
+      same_country_and_years: record.same_country_and_years,
+      total: record.ids.length,
+    },
+    events: record.ids.map((id) => ({ ...get(id), ...(id === record.id ? { asked_about: true } : {}) })),
+    coverage: {
+      rule: shared.coverage.rule,
+      note: shared.coverage.note,
+      by_country: Object.fromEntries(record.countries.map((c) => [c, byCountry[c] ?? null])),
+      report: shared.coverage.report,
+    },
+    review_method: shared.review_method,
+    licences: shared.licences,
+    data_version: shared.data_version,
   };
 }
 
