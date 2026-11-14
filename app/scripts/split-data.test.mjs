@@ -121,6 +121,16 @@ test("detailFields: hand_picked on the seed events, those without a discovery si
   assert.equal("hand_picked" in detailFields({ id: "x", sitelinks: 12 }), false);
 });
 
+test("detailFields: the Wikidata description only on an event whose text is another item's article", () => {
+  const url = "https://en.wikipedia.org/wiki/October_7_attacks";
+  const mirror = { id: "m", wikipedia_url: url, wikidata_qid: "Q1", resolved_qid: "Q2", wikidata_description: "an attack" };
+  assert.equal(detailFields(mirror).text_from_article, "October 7 attacks");
+  assert.equal(detailFields(mirror).wikidata_description, "an attack");
+  assert.equal("wikidata_description" in detailFields({ ...mirror, resolved_qid: "Q1" }), false, "its own article: not published");
+  assert.equal("wikidata_description" in detailFields({ ...mirror, wikidata_description: null }), false);
+  assert.equal("wikidata_description" in detailFields({ ...mirror, wikidata_description: "  " }), false);
+});
+
 const square = (x, y, d = 0.1) => ({ type: "Polygon", coordinates: [[[x, y], [x + d, y], [x + d, y + d], [x, y + d], [x, y]]] });
 const boundary = (name, start_year, end_year, geometry = square(35, 31)) => ({
   type: "Feature",

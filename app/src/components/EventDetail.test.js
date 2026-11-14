@@ -73,6 +73,24 @@ test("EventDetail: an event with a precise location: title, date and countries, 
   assert.equal(history.attrs.href, `${event.wikipedia_url}?action=history`);
 });
 
+test("EventDetail: the attribution is the static event page's, naming the change and the article it comes from", async () => {
+  const { renderEventPage } = await import("../../scripts/event-page.mjs");
+  const template = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const attribution = (html) => {
+    const p = elements(html, "p").find((x) => /\battribution\b/.test(x.attrs.class ?? ""));
+    assert.ok(p, "an attribution line");
+    return { text: textOf(p.html), links: elements(p.html, "a").map((a) => [a.text, a.attrs.href]) };
+  };
+  for (const id of ["siege-of-adrianople-1912-1913", "ein-hashlosha-massacre"]) {
+    const event = opened(id);
+    const panel = attribution(render(event).html);
+    assert.deepEqual(panel, attribution(renderEventPage(event, template)), `${id}: the panel and the page say the same`);
+    assert.match(panel.text, /^Text from Wikipedia \(the article’s lead section as plain text, references removed\), licensed CC BY-SA 4\.0 by Wikipedia contributors, from the article /);
+    assert.ok(panel.text.includes(`from the article ${event.text_from_article ?? event.title}.`), `${id}: names its article`);
+  }
+  assert.equal(opened("ein-hashlosha-massacre").text_from_article, "October 7 attacks");
+});
+
 test("EventDetail: an event without a location says it has no marker, offers no Find on map or place history", () => {
   const event = opened("battle-of-riyadh");
   assert.equal(event.location_quality, "none");

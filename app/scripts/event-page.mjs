@@ -30,6 +30,7 @@ import { NEARBY_KM, RELATED_SHOWN } from "../src/lib/related.js";
 import { compassPoint, formatKm } from "../src/lib/relatedViz.js";
 import { REVIEW_TABS } from "../src/lib/reviewTabs.js";
 import { safeUrl } from "../src/lib/safeUrl.js";
+import { TEXT_FORM, TEXT_LICENSE_URL, textAttributionParts } from "../src/lib/textAttribution.js";
 import { eventPath, isValidEventId } from "../src/lib/urlState.js";
 
 // The app's own definitions, so the event pages and the app agree: the site's address and name (citation.js),
@@ -38,17 +39,38 @@ export { eventPath, safeUrl, SITE, SITE_NAME };
 
 const REPO = "https://github.com/kei-nan/meast-events";
 const METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
-const CC_BY_SA = "https://creativecommons.org/licenses/by-sa/4.0/";
+const CC_BY_SA = TEXT_LICENSE_URL;
 // Border credits (NOTICE): every source family in data/boundaries.json is named
 // in the footer; event-page.test.mjs checks it against the data.
 export const CSHAPES_URL = "https://icr.ethz.ch/data/cshapes/";
 export const OCHA_AREAS_URL = "https://data.humdata.org/dataset/state-of-palestine-other-0-0-0-0-0";
 export const GEONAMES_URL = "https://www.geonames.org/";
 const OG_IMAGE = `${SITE}/og-image.png`;
+// The image's description, as index.html gives it (event-page.test.mjs checks they agree).
+const OG_IMAGE_ALT = escapeHtml(`Map of the Middle East with the title ${SITE_NAME}`);
 const DESCRIPTION_LENGTH = 160;
 // Link previews show the description under our site name, so it says whose words they are.
 // The same for every event: a label on the flagged ones only would make the others look checked.
 const PREVIEW_SOURCE = "Wikipedia: ";
+const WIKIDATA_SOURCE = "Wikidata: ";
+
+/**
+ * What the page's description (meta, og:, twitter:, JSON-LD) is made from: `text`, and `source`, the
+ * label that says whose words they are. An event with an article of its own: its lead (Wikipedia).
+ * An event without one (text_from_article, src/lib/otherArticle.js) shows another item's lead, which
+ * describes that item, so a search snippet or link preview made from it would describe another event:
+ * its own Wikidata item's description instead (split-data.mjs publishes it only for these events),
+ * else a sentence of ours saying where its text comes from (no label: our words, not a source's).
+ */
+function descriptionSource(event) {
+  if (!event?.text_from_article) return { source: PREVIEW_SOURCE, text: String(event?.extract ?? "") };
+  const own = typeof event.wikidata_description === "string" ? event.wikidata_description.trim() : "";
+  if (own) return { source: WIKIDATA_SOURCE, text: own };
+  return {
+    source: "",
+    text: `No Wikipedia article of its own: its Wikipedia title leads to the article “${event.text_from_article}”, which covers more than this event.`,
+  };
+}
 
 const TAB_NAMES = { fairness: "Overall fairness", wording: "Wording check" };
 
@@ -111,10 +133,6 @@ function contestUrl(event, review) {
 function link(href, text, { external = false } = {}) {
   const attrs = external ? ' rel="noreferrer"' : "";
   return `<a href="${escapeHtml(href)}"${attrs}>${text}</a>`;
-}
-
-function historyUrl(wikipediaUrl) {
-  return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
 }
 
 // Names in Arabic, Hebrew or Persian script are isolated as right-to-left (<bdi>,
@@ -192,7 +210,7 @@ ${wording}
 </section>
 ${notes.join("\n")}
 <p class="framing-review-meta"><button type="button" class="ai-btn" popovertarget="ai-note">Reviewed by AI</button> · ${link(METHOD_URL, "How we review", { external: true })} · ${link(contestUrl(event, review), "Disagree with this review?", { external: true })}</p>
-<div id="ai-note" popover class="ai-note">This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It looks at how the summary is written, not whether the events happened, and it does not change the Wikipedia text (the article’s lead section as plain text, references removed).</div>
+<div id="ai-note" popover class="ai-note">This review was made by Claude, an AI model made by Anthropic, and not checked line by line by a person. It looks at how the summary is written, not whether the events happened, and it does not change the Wikipedia text (${TEXT_FORM}).</div>
 </aside>`;
 }
 
@@ -359,10 +377,11 @@ ${noindex ? `<meta name="robots" content="noindex">\n` : ""}${description ? `<me
 ${description ? `<meta property="og:description" content="${d}">\n` : ""}${c ? `<meta property="og:url" content="${c}">\n` : ""}<meta property="og:image" content="${OG_IMAGE}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Map of the Middle East with the title ${escapeHtml(SITE_NAME)}">
+<meta property="og:image:alt" content="${OG_IMAGE_ALT}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${t}">
-${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta name="twitter:image" content="${OG_IMAGE}">${jsonLd ? `\n${jsonLd}` : ""}`;
+${description ? `<meta name="twitter:description" content="${d}">\n` : ""}<meta name="twitter:image" content="${OG_IMAGE}">
+<meta name="twitter:image:alt" content="${OG_IMAGE_ALT}">${jsonLd ? `\n${jsonLd}` : ""}`;
 }
 
 // The site's icons (public/, made by scripts/make-icons.mjs), as index.html links
@@ -495,8 +514,11 @@ function isoDate(date, precision) {
  * these topics (wars, treaties, crises) do not have. The page's own
  * temporalCoverage (an ISO 8601 date or "start/end" interval) carries the dates
  * at the precision recorded, and spatialCoverage a precise pin only: a
- * capital-city fallback is not where the event happened. Name and description
- * are Wikipedia's words (the description is the meta description).
+ * capital-city fallback is not where the event happened. The name is Wikipedia's
+ * title; the description is the meta description's text without its source label
+ * (descriptionSource: the lead, or for an event without an article of its own its
+ * Wikidata description). sameAs has the Wikipedia article only when it is the
+ * event's own.
  */
 export function eventJsonLd(event) {
   const title = String(event.title ?? event.id);
@@ -513,8 +535,10 @@ export function eventJsonLd(event) {
   const endDate = event.date_end && !reversed ? isoDate(event.date_end, flagged ? "year" : (event.date_end_precision ?? "year")) : null;
   const c = event.coordinates;
   const precise = event.location_quality === "precise" && Number.isFinite(c?.lat) && Number.isFinite(c?.lon);
-  const description = metaDescription(event.extract);
-  const sameAs = [wiki, wd].filter(Boolean);
+  const description = metaDescription(descriptionSource(event).text);
+  // The article identifies the Thing only when it is the event's own: an event without one shows another
+  // item's article (text_from_article), which stays its isBasedOn but is not the same thing as it.
+  const sameAs = [event.text_from_article ? null : wiki, wd].filter(Boolean);
   const temporalCoverage = startDate ? (endDate && endDate !== startDate ? `${startDate}/${endDate}` : startDate) : null;
   return {
     "@context": "https://schema.org",
@@ -536,6 +560,25 @@ export function eventJsonLd(event) {
       name: title,
       ...(sameAs.length && { sameAs }),
     },
+  };
+}
+
+// The licences of what the site shows, as NOTICE and data/LICENSE give them: Wikipedia's text CC BY-SA 4.0,
+// the borders CC BY-NC-SA 4.0 (CShapes 2.0), and NOTICE itself for the rest (UN OCHA's terms, GeoNames, the code).
+const SITE_LICENSES = [CC_BY_SA, "https://creativecommons.org/licenses/by-nc-sa/4.0/", `${REPO}/blob/main/NOTICE`];
+
+/**
+ * schema.org structured data for the site (index.html has the same block, event-page.test.mjs checks it; the
+ * /event/ index carries it too). An event page has its own WebPage block instead, which names this WebSite.
+ */
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: `${SITE}/`,
+    inLanguage: "en",
+    license: SITE_LICENSES,
   };
 }
 
@@ -564,8 +607,9 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
   const canonical = SITE + eventPath(event.id);
   const review = event.framing_review ?? null;
   const extract = String(event.extract ?? "");
-  const lead = metaDescription(extract, DESCRIPTION_LENGTH - PREVIEW_SOURCE.length);
-  const description = lead && PREVIEW_SOURCE + lead;
+  const described = descriptionSource(event);
+  const lead = metaDescription(described.text, DESCRIPTION_LENGTH - described.source.length);
+  const description = lead && described.source + lead;
   const wiki = safeUrl(event.wikipedia_url);
   const dateText = eventDateText(event);
   const countries = (event.countries ?? []).filter((c) => typeof c === "string" && c);
@@ -603,11 +647,10 @@ export function renderEventPage(event, template, { neighbours = null, preload = 
     locationNote(event.location_quality, event),
     event.hand_picked && `<p class="note">${escapeHtml(HAND_PICKED_NOTE)}</p>`,
     renderDataFixes(event.data_fixes),
-    `<p class="attribution">Text from Wikipedia (the article’s lead section as plain text, references removed), licensed ${link(CC_BY_SA, "CC BY-SA 4.0", { external: true })} by ${
-      wiki ? link(historyUrl(wiki), "Wikipedia contributors", { external: true }) : "Wikipedia contributors"
-    }${wiki ? `, from the article ${link(wiki, escapeHtml(event.text_from_article ?? title), { external: true })}` : ""}.${showClasses ? " Classes are Wikidata’s labels (CC0)." : ""}${
-      event.part_of?.length ? " “Part of” is Wikidata’s statement, in its labels (CC0)." : ""
-    }</p>`,
+    // The event panel's wording (src/lib/textAttribution.js).
+    `<p class="attribution">${textAttributionParts({ ...event, title }, { classes: showClasses, partOf: event.part_of?.length > 0 })
+      .map((p) => (typeof p === "string" ? escapeHtml(p) : link(p.href, escapeHtml(p.text), { external: true })))
+      .join("")}</p>`,
   ].filter(Boolean);
 
   return fillAppShell(
@@ -635,7 +678,7 @@ export function renderIndexPage(events) {
   const description = `All ${events.length} events on the ${SITE_NAME} map, each with its Wikipedia summary, dates and countries.`;
   return `<!doctype html>
 <html lang="en">
-${head({ title: `All events · ${SITE_NAME}`, description, canonical: `${SITE}/event/`, type: "website" })}
+${head({ title: `All events · ${SITE_NAME}`, description, canonical: `${SITE}/event/`, type: "website", jsonLd: jsonLdScript(websiteJsonLd()) })}
 <body>
 ${siteHeader}
 <main>
