@@ -59,6 +59,8 @@ test("build-selection-funnel.js --offline: deterministic, keeps sitelink_measure
   const dir = await mkdtemp(join(tmpdir(), "funnel-"));
   try {
     await cp(join(root, "scripts"), join(dir, "scripts"), { recursive: true, filter: (p) => !/node_modules/.test(p) });
+    // The one app module the funnel imports (the Coverage bucket of a century-precision start).
+    await cp(join(root, "app/src/lib/eventDate.js"), join(dir, "app/src/lib/eventDate.js"));
     for (const f of ["event-candidates.json", "enriched-candidates.json", "events.proposed.json", "events.json", "seed-events.json", "proposed-exclusions.json", "selection-funnel.json"]) {
       await cp(join(root, "data", f), join(dir, "data", f));
     }

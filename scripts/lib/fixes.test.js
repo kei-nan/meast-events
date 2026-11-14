@@ -147,6 +147,42 @@ test("reconcileStartDate: P585 strictly between P580 and P582 -> P580", () => {
   assert.equal(reconcileStartDate("2010-02-11", { ...protests, p580: [{ time: "2000-00-00", precision: 8 }] }), null);
 });
 
+test("reconcileStartDate: a year-precision P585 yields to a finer P580 within that year (case d)", () => {
+  // 2014 Gaza War (Q17324420), live 2026-11-14: P585 +2014 (year), P580 2014-07-08, P582 2014-08-26.
+  const gaza = {
+    p585: [{ time: "2014-00-00", precision: 9 }],
+    p580: [{ time: "2014-07-08", precision: 11 }],
+    p582: [{ time: "2014-08-26", precision: 11 }],
+  };
+  const r = reconcileStartDate("2014-01-01", gaza);
+  assert.equal(r.date_start, "2014-07-08");
+  assert.equal(r.rule, "year");
+  assert.equal(r.precision, 11);
+  assert.match(r.reason, /P585 2014-00-00 is only year precision .*P580 2014-07-08, day precision.*; used P580 start time 2014-07-08$/);
+  // No end needed (2026 Iran war, Q138503695: P585 +2026, P580 2026-02-28, no P582).
+  assert.equal(reconcileStartDate("2026-01-01", { p585: [{ time: "2026-00-00", precision: 9 }], p580: [{ time: "2026-02-28", precision: 11 }] }).date_start, "2026-02-28");
+  // A month-precision P580 is stored as the 1st (Iraqi Revolt, Q616851: P585 +1920, P580 1920-05).
+  const revolt = { p585: [{ time: "1920-00-00", precision: 9 }], p580: [{ time: "1920-05-00", precision: 10 }], p582: [{ time: "1920-10-00", precision: 10 }] };
+  assert.deepEqual(
+    [reconcileStartDate("1920-01-01", revolt).date_start, reconcileStartDate("1920-01-01", revolt).precision],
+    ["1920-05-01", 10]
+  );
+  // Not applied: a P580 in another year (the two disagree; without a P582, so case (c) does not apply either), a
+  // P580 no finer than the year, a stored start that is not the P585, or a day-precision P585.
+  assert.equal(reconcileStartDate("2014-01-01", { ...gaza, p580: [{ time: "2013-12-30", precision: 11 }], p582: [] }), null);
+  assert.equal(reconcileStartDate("2014-01-01", { ...gaza, p580: [{ time: "2015-02-01", precision: 11 }], p582: [] }), null);
+  assert.equal(reconcileStartDate("2014-01-01", { ...gaza, p580: [{ time: "2014-00-00", precision: 9 }] }), null);
+  assert.equal(reconcileStartDate("2014-07-08", gaza), null);
+  assert.equal(reconcileStartDate("2014-01-01", { ...gaza, p585: [{ time: "2014-01-01", precision: 11 }] }), null);
+});
+
+test("reconcileStartDate: names the case it applied", () => {
+  const p580 = [{ time: "1948-05-15", precision: 11 }];
+  assert.equal(reconcileStartDate("1940-01-01", { p585: [{ time: "1940-00-00", precision: 8 }], p580 }).rule, "coarse");
+  assert.equal(reconcileStartDate("1949-03-10", { p585: [{ time: "1949-03-10", precision: 11 }], p580, p582: [{ time: "1949-03-10", precision: 11 }] }).rule, "end");
+  assert.equal(reconcileStartDate("1948-12-01", { p585: [{ time: "1948-12-01", precision: 11 }], p580, p582: [{ time: "1949-03-10", precision: 11 }] }).rule, "inside");
+});
+
 test("reconcileStartDate: leaves ordinary dates alone", () => {
   const entity = { p585: [{ time: "1967-06-05", precision: 11 }], p580: [{ time: "1967-06-05", precision: 11 }] };
   assert.equal(reconcileStartDate("1967-06-05", entity), null);

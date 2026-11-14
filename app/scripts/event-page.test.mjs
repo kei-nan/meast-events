@@ -527,6 +527,17 @@ test("share and tab titles: a title that names a year gets no (years) added", ()
   assert.equal(titleHasYear("2015–2016 Latakia offensive"), true);
 });
 
+test("a century-precision start: named as its century in the titles, no ISO date in the structured data", () => {
+  // israeli-lebanese-conflict (Q3241199): Wikidata P580 +2000 at century precision, no end.
+  const conflict = { id: "c", title: "Israeli–Lebanese conflict", date_start: "2000-01-01", date_precision: "century", location_quality: "none" };
+  assert.equal(eventShareTitle(conflict), "Israeli–Lebanese conflict (20th century)");
+  assert.equal(eventPageTitle(conflict), "Israeli–Lebanese conflict (20th century) – Middle East, 1900–present");
+  assert.equal(eventJsonLd(conflict).temporalCoverage, undefined);
+  // With an end, or at year precision, the years as before.
+  assert.equal(eventShareTitle({ ...conflict, date_precision: "year" }), "Israeli–Lebanese conflict (2000)");
+  assert.equal(eventShareTitle({ ...conflict, date_end: "2006-08-14" }), "Israeli–Lebanese conflict (2000–2006)");
+});
+
 test("JSON-LD: a WebPage about a Thing (not an Event), dates at the recorded precision, a place only when precise", () => {
   const base = { id: "e", title: "E", wikipedia_url: "https://en.wikipedia.org/wiki/E", wikidata_qid: "Q1", extract: "Text." };
   const day = eventJsonLd({ ...base, date_start: "1967-06-05", date_end: "1967-06-10", date_precision: "day", location_quality: "precise", coordinates: { lat: 31.5, lon: 34.4 } });

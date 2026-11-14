@@ -1,7 +1,8 @@
 // Formats an event's Wikidata dates ("YYYY-MM-DD" strings) for the detail view, showing
 // no more precision than the data records. `precision` is Wikidata's precision of the
 // start date ("day", "month", "year", "decade", or missing): a day shows as
-// "5 June 1967", a month as "June 1967", anything else as the year only. `endPrecision`
+// "5 June 1967", a month as "June 1967", a century as "20th century" (coarsePeriodLabel),
+// anything else as the year only. `endPrecision`
 // is the end date's (Wikidata's precision of the P582 statement behind date_end,
 // lib/fixes.js keptEndPrecision): with it the end shows to that precision,
 // "20 March 2003 – 18 December 2011", saying a shared year once ("29 October –
@@ -18,12 +19,38 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+const ordinal = (n) => {
+  const tens = n % 100;
+  const suffix = tens >= 11 && tens <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" }[n % 10] ?? "th");
+  return `${n}${suffix}`;
+};
+
+/**
+ * The period a date of century or millennium precision stands for, as Wikidata
+ * counts it ("2000-01-01" at century precision is the 20th century, 1901-2000:
+ * Wikibase formats +2000 and +1901 at precision 7 both as "20. century"); null
+ * for any finer precision, or no date. Such a date names no year of its own, so
+ * it is shown, and counted on the About page's Coverage, as its century, never as
+ * a year or a decade (scripts/build-selection-funnel.js). No imports: shared with
+ * the scripts.
+ * @param {string|null|undefined} date "YYYY-MM-DD"
+ * @param {string|null|undefined} precision Wikidata precision name
+ * @returns {string|null} "20th century", "2nd millennium"
+ */
+export function coarsePeriodLabel(date, precision) {
+  const y = Number(/^(\d{4})-/.exec(String(date ?? ""))?.[1]);
+  if (!Number.isFinite(y) || y < 1) return null;
+  if (precision === "century") return `${ordinal(Math.ceil(y / 100))} century`;
+  if (precision === "millennium") return `${ordinal(Math.ceil(y / 1000))} millennium`;
+  return null;
+}
+
 function formatStart(date, precision) {
   const [year, month, day] = date.split("-");
   const m = MONTHS[Number(month) - 1];
   if (precision === "day" && m && Number(day)) return `${Number(day)} ${m} ${year}`;
   if ((precision === "day" || precision === "month") && m) return `${m} ${year}`;
-  return year;
+  return coarsePeriodLabel(date, precision) ?? year;
 }
 
 const ONGOING_TEXT = "ongoing (per source)";

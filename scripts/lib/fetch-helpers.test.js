@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fetchLeads } from "./lead.js";
-import { fetchLabels, fetchCategories } from "./wiki.js";
+import { fetchArticleCoordinates, fetchLabels, fetchCategories } from "./wiki.js";
 import { fetchEntities, fetchLabelsCached, p582Open, setDateEndOpen, setWikidataAliases } from "./wd-entities.js";
 import { fetchRevisions } from "./rev-lead.js";
 import { mediaWikiJson } from "./http.js";
@@ -200,6 +200,40 @@ test("fetchLabels: labels per chunk of 50; a failed chunk throws instead of bein
   await withFetch(
     (url, n) => (n === 1 ? json({ entities: entities(url) }) : json({}, 404)),
     async () => assert.rejects(fetchLabels(qids), /labels HTTP 404/)
+  );
+});
+
+test("fetchArticleCoordinates: each requested title's primary point through normalisation and redirects; none = null", async () => {
+  await withFetch(
+    (url) => {
+      assert.equal(url.searchParams.get("prop"), "coordinates");
+      assert.equal(url.searchParams.get("coprimary"), "primary");
+      assert.equal(url.searchParams.get("titles"), "Gulf_Air Flight 771|Old title|No coords|Bad<title");
+      return json({
+        query: {
+          normalized: [{ from: "Gulf_Air Flight 771", to: "Gulf Air Flight 771" }],
+          redirects: [{ from: "Old title", to: "New title" }],
+          pages: [
+            { title: "Gulf Air Flight 771", coordinates: [{ lat: 24.85, lon: 54.95, primary: true, globe: "earth" }] },
+            { title: "New title", coordinates: [{ lat: 1.5, lon: 2.5, primary: true, globe: "earth" }] },
+            { title: "No coords" },
+          ],
+        },
+      });
+    },
+    async (calls) => {
+      const out = await fetchArticleCoordinates(["Gulf_Air Flight 771", "Old title", "No coords", "Bad<title", "Old title"]);
+      assert.equal(calls.length, 1);
+      assert.deepEqual(out.get("Gulf_Air Flight 771"), { lat: 24.85, lon: 54.95 });
+      assert.deepEqual(out.get("Old title"), { lat: 1.5, lon: 2.5 });
+      assert.equal(out.get("No coords"), null);
+      assert.equal(out.has("Bad<title"), false);
+    }
+  );
+  // An API error body throws: a failed batch never reads as "no coordinates".
+  await withFetch(
+    () => json({ error: { code: "badvalue", info: "bad" } }),
+    async () => assert.rejects(fetchArticleCoordinates(["A"]), /coordinates/)
   );
 });
 

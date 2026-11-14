@@ -17,7 +17,7 @@ import { citationNotes, citeEvent, SITE, SITE_NAME } from "../src/lib/citation.j
 import { roundedLocationNote } from "../src/lib/coordPrecision.js";
 import { dataFixUrl } from "../src/lib/dataFixes.js";
 import { dateOrderNote } from "../src/lib/dateOrderNote.js";
-import { formatEventDate } from "../src/lib/eventDate.js";
+import { coarsePeriodLabel, formatEventDate } from "../src/lib/eventDate.js";
 import { countryLabel } from "../src/lib/eventCountries.js";
 import { eventYearsText, ongoingNote, ongoingSignal } from "../src/lib/eventYears.js";
 import { markSegments } from "../src/lib/highlights.js";
@@ -485,22 +485,27 @@ export function titleHasYear(title) {
  * already names a year is left alone too: "Capture of Baghdad (1917)" is not
  * followed by "(1917)" again, nor "Political violence in Turkey (1976–1980)" by
  * the dates' different "(1968–1980)" (Wikipedia's title and Wikidata's dates can
- * disagree; the page itself shows the dates).
+ * disagree; the page itself shows the dates). A start Wikidata gives only to the
+ * century, with no end, is named as its century, as the page shows it:
+ * "Israeli–Lebanese conflict (20th century)", not "(2000)".
  */
 export function eventShareTitle(event) {
   const title = String(event.title ?? event.id);
   if (titleHasYear(title)) return title;
-  const years = event.date_start ? eventYearsText(event) : "";
+  const period = event.date_end ? null : coarsePeriodLabel(event.date_start, event.date_precision);
+  const years = period ? `${period}${ongoingSignal(event) ? "–ongoing" : ""}` : event.date_start ? eventYearsText(event) : "";
   return `${title}${years ? ` (${years})` : ""}`;
 }
 
 const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 // A Wikidata date as ISO 8601 at no more precision than the data records (the
-// same rule as formatEventDate): a day, a month, or else the year.
+// same rule as formatEventDate): a day, a month, or else the year. A century or
+// coarser has none: Wikidata's centuries run 1901-2000, ISO 8601's "19" 1900-1999.
 function isoDate(date, precision) {
   const m = DATE_RE.exec(String(date ?? ""));
   if (!m) return null;
+  if (coarsePeriodLabel(date, precision)) return null;
   if (precision === "day" && Number(m[2]) && Number(m[3])) return `${m[1]}-${m[2]}-${m[3]}`;
   if ((precision === "day" || precision === "month") && Number(m[2])) return `${m[1]}-${m[2]}`;
   return m[1];

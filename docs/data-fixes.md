@@ -606,3 +606,60 @@ put them outside the tracked set; the validator now rejects any event without a 
   live categories and the stored dates. `needs_review` stays true (other notes). The framing reviews do not mention the note and are unchanged.
 - Curated events are not re-enriched, so only these two were recomputed; on 2026-11-07 every other stored `category_year_mismatch` gives the same
   note when checked against the years it lists and the stored dates.
+
+## Re-derivation of 2026-11-14: year-precision starts and one stale Wikipedia pin (rule change, no ledger entry)
+
+- Cause (dates): the discovery start is P585, else P580. A P585 known only to the year ("+2014") was stored as 1 January at year precision
+  even where the item's own P580 gives the day or month in that year: `reconcileStartDate` replaced a P585 only when it was decade-or-coarser
+  (case a), equal to P582 (b) or strictly between P580 and P582 (c). The 2014 Gaza War showed as starting in "2014", stored 2014-01-01.
+- Rule (generic, `scripts/lib/fixes.js`, flagged `date_source_adjusted`): case (d), a year-precision P585 yields to a month-or-finer P580
+  in the same year; a P580 in another year is left alone. Unit tests in `scripts/lib/fixes.test.js` and `scripts/lib/rederive.test.js`.
+  New candidates get it in `enrich-candidates.js`; the curated file was re-derived with `node scripts/rederive-curated.js --apply` (live
+  Wikidata, `wbgetentities`, 2026-11-14), which applies case (d) only (docs/DATA_POLICY.md, "Re-deriving curated values"). No proposed
+  event is affected. No ledger entry: the new values are Wikidata's own P580, so the drift report checks them like any other start.
+- Every date that changed (26 curated events; `date_end` unchanged in all). Wikidata values as read on 2026-11-14; "lead" says whether the
+  stored extract names the new start day (a month for the Iraqi Revolt) anywhere; it does not decide anything.
+
+| Event (QID) | Kind | Old start | New start | Wikidata P585 / P580 / P582 | Lead names it |
+|---|---|---|---|---|---|
+| `iraqi-revolt-against-the-british` (Q616851) | seed | 1920-01-01 (year) | 1920-05-01 (month) | 1920 / 1920-05 / 1920-10 | no |
+| `1973-oil-crisis` (Q316817) | seed | 1973-01-01 (year) | 1973-10-16 (day) | 1973 / 1973-10-16 / 1974-03-17 | no |
+| `battle-of-kara-killisse-1915` (Q936223) | discovered | 1915-01-01 (year) | 1915-07-27 (day) | 1915 / 1915-07-27 / 1915-07-31 | no |
+| `battles-of-ramadi-1917` (Q3636594) | discovered | 1917-01-01 (year) | 1917-09-28 (day) | 1917 / 1917-09-28 / 1917-09-29 | no |
+| `battle-of-megiddo-1918` (Q199371) | discovered | 1918-01-01 (year) | 1918-09-19 (day) | 1918 / 1918-09-19 / 1918-09-25 | no |
+| `1973-israeli-raid-in-lebanon` (Q654777) | discovered | 1973-01-01 (year) | 1973-04-09 (day) | 1973 / 1973-04-09 / 1973-04-10 | no |
+| `battle-of-the-chinese-farm` (Q2072316) | discovered | 1973-01-01 (year) | 1973-10-15 (day) | 1973 / 1973-10-15 / 1973-10-17 | no |
+| `operation-nasr` (Q1570898) | discovered | 1981-01-01 (year) | 1981-01-05 (day) | 1981 / 1981-01-05 / 1981-01-09 | no |
+| `1982-hama-massacre` (Q730878) | discovered | 1982-01-01 (year) | 1982-02-02 (day) | 1982 / 1982-02-02 / 1982-02-28 | no |
+| `iraqi-insurgency-2003-2011` (Q926905) | discovered | 2003-01-01 (year) | 2003-05-01 (day) | 2003 / 2003-05-01 / 2011-12-18 | no |
+| `battle-of-baghdad-2003` (Q1804983) | discovered | 2003-01-01 (year) | 2003-04-03 (day) | 2003 / 2003-04-03 / 2003-04-12 | no |
+| `battle-of-najaf-2004` (Q2889462) | discovered | 2004-01-01 (year) | 2004-08-05 (day) | 2004 / 2004-08-05 / 2004-08-27 | no |
+| `battle-of-aleppo-2024` (Q131355384) | discovered | 2024-01-01 (year) | 2024-11-29 (day) | 2024 / 2024-11-29 / 2024-12-02 | no |
+| `operation-dani` (Q2916659) | discovered | 1948-01-01 (year) | 1948-07-09 (day) | 1948 / 1948-07-09 / 1948-07-19 | yes |
+| `operation-badr-1973` (Q2704666) | discovered | 1973-01-01 (year) | 1973-10-06 (day) | 1973 / 1973-10-06 / 1973-10-08 | yes |
+| `1998-bombing-of-iraq` (Q1327861) | discovered | 1998-01-01 (year) | 1998-12-16 (day) | 1998 / 1998-12-16 / 1998-12-19 | yes |
+| `iraqi-insurgency-2011-2013` (Q2165215) | discovered | 2011-01-01 (year) | 2011-12-18 (day) | 2011 / 2011-12-18 / 2013-12-30 | no |
+| `march-2012-gaza-israel-clashes` (Q2613676) | discovered | 2012-01-01 (year) | 2012-03-09 (day) | 2012 / 2012-03-09 / 2012-03-14 | no |
+| `2014-gaza-war` (Q17324420) | discovered | 2014-01-01 (year) | 2014-07-08 (day) | 2014 / 2014-07-08 / 2014-08-26 | yes |
+| `2019-turkish-offensive-into-northeastern-syria` (Q70207089) | discovered | 2019-01-01 (year) | 2019-10-09 (day) | 2019 / 2019-10-09 / none | yes |
+| `israeli-blockade-of-the-gaza-strip-2023-present` (Q122982851) | discovered | 2023-01-01 (year) | 2023-10-09 (day) | 2023 / 2023-10-09 / none | yes |
+| `2026-iran-war` (Q138503695) | discovered | 2026-01-01 (year) | 2026-02-28 (day) | 2026 / 2026-02-28 / none | yes |
+| `political-violence-in-turkey-1976-1980` (Q7225137) | discovered | 1968-01-01 (year) | 1968-12-29 (day) | 1968 / 1968-12-29 / 1980-09-12 | no |
+| `1978-south-lebanon-conflict` (Q1121402) | discovered | 1978-01-01 (year) | 1978-03-14 (day) | 1978 / 1978-03-14 / 1978-03-21 | no |
+| `2006-gaza-israel-conflict` (Q1316163) | discovered | 2006-01-01 (year) | 2006-06-28 (day) | 2006 / 2006-06-28 / 2006-11-26 | yes, not in its first sentence |
+| `2011-lebanese-protests` (Q2995643) | discovered | 2011-01-01 (year) | 2011-01-12 (day) | 2011 / 2011-01-12 / 2011-12-15 | no |
+
+- Each now carries `date_source_adjusted` and `needs_review: true`. One new advisory warning: `2006-gaza-israel-conflict`
+  `lead_start_day_differs` (the lead's first sentence names 25 June 2006, Gilad Shalit's capture, which prompted the operation; Wikidata's
+  P580 is 28 June), recorded in `data/validation-warnings-baseline.json`. The decade counts on Coverage are unchanged (every new start is in
+  the old start's year); `data/missing-coordinates-report.md` shows the new dates. The two seed events were set to the P585 by the Wikidata
+  date refresh of 2026-10-30 (table above: "P585 1920 (year), taken before P580 1920-05"; "P585 1973 (year), taken before P580 1973-10-16");
+  case (d) now takes the P580, matching the infobox "May–October 1920" and the lead "In October 1973" cited there.
+- Coordinates: `gulf-air-flight-771` (Q2335758) 24.783333, 55.4 -> 24.85, 54.95 (`coordinate_source` `wikipedia` unchanged). Its article's
+  primary coordinates (`prop=coordinates`, revision 1381294627) and Wikidata P625 (since revision 2548729862, 2026-09-23) both give
+  24.85, 54.95; the article's coordinate template has no value of its own since revision 1376299239 (2026-09-23) and shows P625. The
+  stored point was the pre-2026-09-23 one, still served when the event was enriched on 2026-09-25/26 (docs/DATA_POLICY.md, "Re-deriving
+  curated values"). The same comparison over all 263 curated `wikipedia` pins found no other difference.
+- Not changed: no other start; `mossad-assassinations-following-the-munich-massacre` (proposed) already takes its P580 by case (a), though its
+  `date_precision` says "decade" (the P585's) where the P580 it took is year-precise (`keptDatePrecision` matches the P585 first when both
+  read as 1972-01-01). Not changed here: that precision lookup is a separate question.

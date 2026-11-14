@@ -44,8 +44,8 @@ These are all the fields an event record may have: `scripts/validate-events.js` 
 | `extract`, `extract_retrieved_at` | The **full lead section** (everything before the first heading) of the English article as plain text, and the date it was fetched | Wikipedia |
 | `wikipedia_revid`, `wikipedia_revid_timestamp` | Only where known: the id of the English Wikipedia revision whose lead is exactly `extract`, and when it was saved (see "Revision") | Wikipedia |
 | `wikidata_classes` | ALL class labels of the Wikidata item, see below | Wikidata |
-| `date_start`, `date_end` | Wikidata dates (P585 point in time, else P580 start; P582 end), in the Gregorian calendar: a Wikidata value in the Julian calendar (calendarmodel Q1985786) of day precision is stored as its Gregorian day (`german-ottoman-alliance`: P585 20 July 1914 Julian = 1914-08-02), a coarser one as written, as the Wikidata Query Service gives both (Wikibase `repo/includes/Rdf/JulianDateTimeValueCleaner.php` converts only at `TimeValue::PRECISION_DAY` or finer: "If we are less precise than a day, no point to convert Julian to Gregorian") | Wikidata |
-| `date_precision`, `date_end_precision` | Wikidata's precision ("day", "month", "year", "decade", ...) of the statement whose value is the stored `date_start` (P585/P580) or `date_end` (P582); `null` when no statement of the item has the stored date. The event panel shows each date to its precision and no further ("29 October – 7 November 1956"); without `date_end_precision` the end shows as a year only ("29 October 1956 (ended 1956)"). `date_end_precision` is only on events with a `date_end` (backfilled 2026-10-31 by `scripts/backfill-end-precision.js`: 269 day, 14 month, 13 year, 22 null of 318) | Wikidata |
+| `date_start`, `date_end` | Wikidata dates (P585 point in time, else P580 start; P582 end; the start then follows the rule in "Review flags", `date_source_adjusted`, e.g. a year-precision P585 "2014" yields to the P580 2014-07-08 in that year), in the Gregorian calendar: a Wikidata value in the Julian calendar (calendarmodel Q1985786) of day precision is stored as its Gregorian day (`german-ottoman-alliance`: P585 20 July 1914 Julian = 1914-08-02), a coarser one as written, as the Wikidata Query Service gives both (Wikibase `repo/includes/Rdf/JulianDateTimeValueCleaner.php` converts only at `TimeValue::PRECISION_DAY` or finer: "If we are less precise than a day, no point to convert Julian to Gregorian") | Wikidata |
+| `date_precision`, `date_end_precision` | Wikidata's precision ("day", "month", "year", "decade", ...) of the statement whose value is the stored `date_start` (P585/P580) or `date_end` (P582); `null` when no statement of the item has the stored date. The event panel shows each date to its precision and no further ("29 October – 7 November 1956"; a century-precision start as its century, "20th century", never as the year it is stored under, and so do the event page's titles, whose structured data then gives no `temporalCoverage`); without `date_end_precision` the end shows as a year only ("29 October 1956 (ended 1956)"). `date_end_precision` is only on events with a `date_end` (backfilled 2026-10-31 by `scripts/backfill-end-precision.js`: 269 day, 14 month, 13 year, 22 null of 318) | Wikidata |
 | `countries` | Wikidata's country (P17, or P17 of the P276/P131 place), mapped to the 15 tracked names | Wikidata |
 | `category`, `category_group` | A coarse grouping used for marker colours and the category filter (same value in both fields) | **ours** |
 | `location_quality`, `coordinates` | `precise`, `approximate` or `none` | Wikipedia/Wikidata coordinates; the rule is ours |
@@ -331,7 +331,10 @@ The funnel from the raw candidates (5,148 in the discovery run of 2026-11-04) to
 (recomputed from the data files by `scripts/build-selection-funnel.js`, not copied from documents) so the app's About page can render it.
 Its `coverage` block (added 2026-10-15) counts what is shown (`data/events.json`): per country as tagged and again without the events tagged
 with 8 or more countries (17 on 2026-10-15: the world wars and other region-wide conflicts, which otherwise count in each of their countries),
-per decade of the start date, and per category; the About page shows it under "Coverage". It also records how many events the economic category holds: one
+per decade of the start date, and per category; the About page shows it under "Coverage". A start Wikidata gives only to the century
+(or millennium) names no decade, so since 2026-11-14 it counts under its century instead ("20th century": `israeli-lebanese-conflict`,
+P580 "+2000" at century precision, stored as 2000-01-01, until then counted in the 2000s), the same label the event panel and its page
+show for the date (`coarsePeriodLabel` in `app/src/lib/eventDate.js`). It also records how many events the economic category holds: one
 (the 1973 oil crisis, from the hand-picked list) until 2026-10-25, none since, as the oil crisis is typed "oil crisis" and "economic crisis", which are not
 on the list. CI keeps the file current (`--check`).
 
@@ -526,7 +529,7 @@ but are not shown; an event with any date flag still shows only the years in its
 | `wikipedia_dates_note` | `date_flags` | NOTE next to a date-order error: the dates/years the article's lead mentions (`scripts/lib/v21.js`, `wikipediaDatesNote`). Informational; it never changes a date. The same dates, as data, are in `wikipedia_lead_dates` ("YYYY-MM-DD", or "YYYY" years when the lead gives no full date; `wikipediaLeadDates`), set only next to `date_order_invalid`, for the shown note. |
 | `date_end_precision_coarse` | `date_flags` | Wikidata's end time is coarser than a day (e.g. the year "2002", stored as 2002-01-01) and the stored `date_end` is before `date_start` only because of that: the whole year (month, decade, century) reaches the start, so the dates are not reversed. Replaces `date_order_invalid` in that case (Passover massacre: P585 27 March 2002, P582 "2002"; added 2026-10-14, `dateOrderFlags` in `scripts/lib/v21.js`). When a coarse end is reversed even at its precision, `date_order_invalid` names the precision. Not shown; the stored dates are unchanged. |
 | `date_start_year_not_in_lead` | `date_flags` | Start year is not within 1 year of any year in the full lead. A heuristic on prose: "look", not "wrong". Re-derived whenever the monthly refresh writes a new lead. |
-| `date_source_adjusted` | `date_flags` | The discovery date came from an implausible P585; P580 was used instead (rule in `docs/data-fixes.md` F2, extended by F15 to a P585 strictly between P580 and P582; both values in the text). |
+| `date_source_adjusted` | `date_flags` | The discovery date came from a P585 that is not the start, or says less than the P580; P580 was used instead (`reconcileStartDate` in `scripts/lib/fixes.js`; both values in the text). The cases: (a) P585 decade-or-coarser while P580 is year-or-finer (`docs/data-fixes.md` F2); (b) P585 equal to the end time P582 (F2); (c) P585 strictly between P580 and P582 (F15); (d) since 2026-11-14, P585 only to the year while P580 is month-or-finer and in that year (2014 Gaza War: P585 "2014", P580 2014-07-08; before, the start was stored as 1 January 2014 at year precision). A P580 in another year than the P585 is left alone. |
 | `lead_start_day_differs` | `review_reasons` | A day-precision start that the lead's first sentence does not name, while it names another day of that year before the end (`docs/data-fixes.md`, checks of 2026-10-29). A heuristic: "look", not "wrong"; also a validator warning. |
 | `date_precision_coarse`, `unverified_date`, `category_year_mismatch` | `review_reasons` | Date precision coarser than a year; no year in the lead and no confirming year category; Wikipedia year categories disagree. |
 | `title_differs_from_article` | `review_reasons` | Record title differs from the article title and does not appear in its lead. |
@@ -549,7 +552,9 @@ but are not shown; an event with any date flag still shows only the years in its
   `scripts/enrich-candidates.js` uses only the event item's own `P625`, else the event has no location. `coordinate_source` = `redirect_target` (a point
   from a different item) is no longer produced; the validator still warns about it, and about older records with `wikipedia` coordinates and a different
   `resolved_qid`. A borrowed `wikidata` point cannot be told apart from the event's own `P625` in the stored data; the four known cases were checked
-  against Wikidata and fixed (F11).
+  against Wikidata and fixed (F11). A `wikipedia` pin is the article's point when the event was enriched; the monthly drift report lists one
+  the article no longer gives, and `scripts/rederive-curated.js` re-derives it when the article and P625 now agree on another point (see
+  "Re-deriving curated values").
 - `approximate`: curated events whose `coordinate_source` starts with `country-fallback` are pinned at a capital (74 events on 2026-10-10, unchanged behaviour). They are labelled
   "approximate location" and excluded from drawn-area searches.
 
@@ -710,6 +715,9 @@ node scripts/backfill-end-precision.js [--apply]        # date_end_precision for
                                                         #    (the P582 statement whose value is the stored date_end; null if none)
 node scripts/backfill-revids.js [--historical] [--apply] # wikipedia_revid and wikipedia_revid_timestamp for events without them,
                                                         #    only where a lead equals the stored extract exactly (see "Revision")
+node scripts/rederive-curated.js [--apply]              # re-applies a changed rule to the curated file: the year case of the
+                                                        #    start-date rule, and "wikipedia" pins both sources now give
+                                                        #    elsewhere (see "Re-deriving curated values")
 node scripts/refresh-extracts.js [--apply] [--proposed] # monthly lead and title refresh (automatic), see below
 node scripts/refresh-sitelinks.js [--apply]             # monthly sitelinks_current refresh (automatic), see below
 node scripts/refresh-guidelines.js [--apply]            # monthly check of the cited Wikipedia guideline sections, see below
@@ -766,7 +774,7 @@ is then retried like a dropped connection.
 Pipeline output never touches `data/events.json`. Only these scripts write it, each only with `--apply`: `merge-proposed.js --apply` run by a person;
 `refresh-extracts.js --apply` and `refresh-sitelinks.js --apply` (deliberate, and run monthly by `.github/workflows/refresh-data.yml` through a pull request);
 and the backfills run by a person, `enrich-seed.js --apply` (the hand-picked seed events), `backfill-end-precision.js --apply` and `backfill-revids.js --apply`
-(one-off, re-runnable). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
+(one-off, re-runnable), and `rederive-curated.js --apply`, run by a person after a rule change (see "Re-deriving curated values"). The one-off shape-v2.1 migration script `scripts/apply-v21.js` has been removed; it is kept in git history.
 There is no second, committed copy of the events any more: `app/public/data/` is generated from `data/` by `app/scripts/split-data.mjs` on every dev start and
 build, and is gitignored.
 
@@ -857,6 +865,37 @@ period, 23 on the current data) plus the earlier hand-picked 1930, 1960 and 1990
 1990 and 2026 were, missing for example Israel 1967-1978 and the Gaza Strip 2007-2022). A border period with no baseline year fails the check
 until `node scripts/verify-borders.js --write-baseline` is run.
 
+## Re-deriving curated values
+
+Curated events are not re-enriched (see "Inclusion rule"), so a change of a published rule does not reach them by itself. When it is
+meant to, `node scripts/rederive-curated.js` (dry run; `--apply` writes `data/events.json`) applies the changed rule to them from the
+items and articles as they are now (`scripts/lib/rederive.js`), never to a field the fix ledger sets, and re-derives the flags that
+describe the changed value as the pipeline does for a new event (`date_source_adjusted`, `date_precision`, the date-order and lead-date
+flags, `category_year_mismatch` on the years it lists, `date_precision_coarse`, `month_precision_day_in_lead`, `lead_start_day_differs`,
+`title_years_outside_dates`; for a pin `coordinate_far_from_countries` and `coordinate_low_precision`; `needs_review`). It has two rules:
+
+1. **Start date, case (d)** of `date_source_adjusted` (see "Review flags"): a stored start that is the item's year-precision P585 while
+   its P580 is month-or-finer and in that year becomes that P580, at its precision. The other cases are not re-derived here: (b) and (c)
+   reached the curated file through ledger entries checked against each article (`docs/data-fixes.md` F15, which left four events as they
+   were), (a) through the Wikidata date refresh of 2026-10-30. Run on 2026-11-14: 26 events, listed in `docs/data-fixes.md`
+   ("Re-derivation of 2026-11-14"). They now carry a date flag, so the panel shows their years only, as for every flagged date
+   ("Review flags"); the data and the downloads have the day.
+2. **"wikipedia" pins**: the stored point is compared with the article's current primary coordinates (GeoData) and the item's P625. When
+   the two sources give the same point (to 6 decimal places) and the stored pin is not it, the pin becomes that point (the article's, so
+   `coordinate_source` stays `wikipedia`): Wikipedia and Wikidata agree against our record. When only the article differs, or it has no
+   coordinates any more, the event is listed and not changed; the monthly drift report lists it too (see "Refreshing extracts").
+   Only the event's own article counts (`resolved_qid` equal to `wikidata_qid`). Run on 2026-11-14: one pin changed
+   (`gulf-air-flight-771`, 24.783333, 55.4 -> 24.85, 54.95), none listed.
+
+Why a stored "wikipedia" pin can be stale: the pin is the REST summary's `coordinates` on the day the event was enriched and is never read
+again. Gulf Air Flight 771 was enriched on 2026-09-25 and 2026-09-26 (`retrieved_at` in `data/enriched-candidates.json` and
+`data/events.json`), and both runs got the article's old point, 24.783333, 55.4. On 2026-09-23 Wikidata's P625 had been changed to
+24.85, 54.95 (revision 2548729862, 08:04 UTC) and the article's `{{coord|24.783333|N|55.400000|E|source:wikidata|...}}` replaced by
+`{{coord|display=inline,title}}`, which shows the item's P625 (revision 1376299239, 08:29 UTC, "Hyperprecise coordinates fixed").
+That the API still gave the old point three days later is on Wikimedia's side (which cache served it could not be traced after the
+fact); today the REST summary and `prop=coordinates` both give 24.85, 54.95. Until 2026-11-14 the drift report compared only
+`wikidata` pins with P625, so the stale pin went unnoticed.
+
 ## Refreshing extracts (monthly, automatic)
 
 Wikipedia leads change (for example the Fall of the Assad regime lead moved from "1971" to "1970" within two weeks). The **Refresh Wikipedia summaries** workflow
@@ -870,7 +909,9 @@ Wikipedia leads change (for example the Fall of the Assad regime lead moved from
    (docs/framing-review.md, "Guideline versions"). Then `node scripts/report-wikidata-drift.js` lists, report only, the curated events
    whose stored `date_start`/`date_end`, Wikidata-sourced `coordinates` or `wikidata_classes` differ from their Wikidata item as it is now
    (a start that is none of the item's P585/P580 values, an end that is none of its P582 values or a P582 where none is stored, a moved or
-   removed P625, a P625 on an event without a precise pin, new or dropped P31 labels). Fields the fix ledger sets (docs/data-fixes.md) are
+   removed P625, a P625 on an event without a precise pin, new or dropped P31 labels), and, since 2026-11-14, every pin taken from the
+   article (`coordinate_source` `wikipedia`, the event's own article only) that the article's current primary coordinates no longer give
+   (`prop=coordinates&coprimary=primary`, `fetchArticleCoordinates` in `scripts/lib/wiki.js`), with the item's P625 next to it. Fields the fix ledger sets (docs/data-fixes.md) are
    counted, not listed. Nothing in that list is changed: a fix goes through the ledger.
 2. If nothing changed, it stops. Otherwise it validates the events (an error stops it; new warnings, such as the stale framing review of a changed
    summary, are written into `data/validation-warnings-baseline.json` with `--write-warnings-baseline`, so the pull request carries the updated

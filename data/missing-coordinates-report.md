@@ -27,7 +27,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 8 | Iraq War | 2003-03-20 | 111 | no location | [article](https://en.wikipedia.org/wiki/Iraq_War) | [Q545449](https://www.wikidata.org/wiki/Q545449) |
 | 9 | Six-Day War | 1967-06-05 | 109 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Six-Day_War) | [Q49077](https://www.wikidata.org/wiki/Q49077) |
 | 10 | Iranian Revolution | 1978-01-07 | 103 | pin at Iran capital (approximate) | [article](https://en.wikipedia.org/wiki/Iranian_Revolution) | [Q126065](https://www.wikidata.org/wiki/Q126065) |
-| 11 | 2026 Iran war | 2026-01-01 | 102 | no location | [article](https://en.wikipedia.org/wiki/2026_Iran_war) | [Q138503695](https://www.wikidata.org/wiki/Q138503695) |
+| 11 | 2026 Iran war | 2026-02-28 | 102 | no location | [article](https://en.wikipedia.org/wiki/2026_Iran_war) | [Q138503695](https://www.wikidata.org/wiki/Q138503695) |
 | 12 | Yom Kippur War | 1973-10-06 | 96 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Yom_Kippur_War) | [Q49100](https://www.wikidata.org/wiki/Q49100) |
 | 13 | Iran–Iraq War | 1980-09-22 | 96 | pin at Iran capital (approximate) | [article](https://en.wikipedia.org/wiki/Iran%E2%80%93Iraq_War) | [Q82664](https://www.wikidata.org/wiki/Q82664) |
 | 14 | Gaza genocide | 2023-10-07 | 91 | no location | [article](https://en.wikipedia.org/wiki/Gaza_genocide) | [Q124086054](https://www.wikidata.org/wiki/Q124086054) |
@@ -47,8 +47,8 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 28 | Oslo Accords | 1993-09-13 | 63 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Oslo_Accords) | [Q17013132](https://www.wikidata.org/wiki/Q17013132) |
 | 29 | Gaza War (2008–2009) | 2008-12-27 | 62 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Gaza_War_(2008%E2%80%932009)) | [Q170682](https://www.wikidata.org/wiki/Q170682) |
 | 30 | Italo-Turkish War | 1911-09-29 | 62 | pin at Turkey capital (approximate) | [article](https://en.wikipedia.org/wiki/Italo-Turkish_War) | [Q203824](https://www.wikidata.org/wiki/Q203824) |
-| 31 | 1973 oil crisis | 1973-01-01 | 61 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/1973_oil_crisis) | [Q316817](https://www.wikidata.org/wiki/Q316817) |
-| 32 | 2014 Gaza War | 2014-01-01 | 61 | no location | [article](https://en.wikipedia.org/wiki/2014_Gaza_War) | [Q17324420](https://www.wikidata.org/wiki/Q17324420) |
+| 31 | 1973 oil crisis | 1973-10-16 | 61 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/1973_oil_crisis) | [Q316817](https://www.wikidata.org/wiki/Q316817) |
+| 32 | 2014 Gaza War | 2014-07-08 | 61 | no location | [article](https://en.wikipedia.org/wiki/2014_Gaza_War) | [Q17324420](https://www.wikidata.org/wiki/Q17324420) |
 | 33 | Yemeni civil war (2014–present) | 2014-09-16 | 61 | pin at Yemen capital (approximate) | [article](https://en.wikipedia.org/wiki/Yemeni_civil_war_(2014%E2%80%93present)) | [Q19686631](https://www.wikidata.org/wiki/Q19686631) |
 | 34 | Nakba | 1948-01-01 | 57 | pin at Israel/Palestine capital (approximate) | [article](https://en.wikipedia.org/wiki/Nakba) | [Q3266633](https://www.wikidata.org/wiki/Q3266633) |
 | 35 | Arab Revolt | 1916-06-10 | 56 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/Arab_Revolt) | [Q239060](https://www.wikidata.org/wiki/Q239060) |
@@ -72,7 +72,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 53 | Iraqi invasion of Kuwait | 1990-08-02 | 45 | no location | [article](https://en.wikipedia.org/wiki/Iraqi_invasion_of_Kuwait) | [Q856650](https://www.wikidata.org/wiki/Q856650) |
 | 54 | 2025 United States strikes on Iranian nuclear sites | 2025-06-22 | 45 | no location | [article](https://en.wikipedia.org/wiki/2025_United_States_strikes_on_Iranian_nuclear_sites) | [Q135005864](https://www.wikidata.org/wiki/Q135005864) |
 | 55 | Gezi Park protests | 2013-05-28 | 42 | no location | [article](https://en.wikipedia.org/wiki/Gezi_Park_protests) | [Q13410316](https://www.wikidata.org/wiki/Q13410316) |
-| 56 | 2019 Turkish offensive into northeastern Syria | 2019-01-01 | 41 | no location | [article](https://en.wikipedia.org/wiki/2019_Turkish_offensive_into_northeastern_Syria) | [Q70207089](https://www.wikidata.org/wiki/Q70207089) |
+| 56 | 2019 Turkish offensive into northeastern Syria | 2019-10-09 | 41 | no location | [article](https://en.wikipedia.org/wiki/2019_Turkish_offensive_into_northeastern_Syria) | [Q70207089](https://www.wikidata.org/wiki/Q70207089) |
 | 57 | Yemeni revolution | 2011-01-27 | 40 | pin at Yemen capital (approximate) | [article](https://en.wikipedia.org/wiki/Yemeni_revolution) | [Q210005](https://www.wikidata.org/wiki/Q210005) |
 | 58 | Anglo-Iraqi War | 1941-05-02 | 40 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Anglo-Iraqi_War) | [Q696848](https://www.wikidata.org/wiki/Q696848) |
 | 59 | White Revolution | 1963-01-01 | 40 | no location | [article](https://en.wikipedia.org/wiki/White_Revolution) | [Q1068139](https://www.wikidata.org/wiki/Q1068139) |
@@ -100,7 +100,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 81 | Russian intervention in the Syrian civil war | 2015-09-30 | 34 | no location | [article](https://en.wikipedia.org/wiki/Russian_intervention_in_the_Syrian_civil_war) | [Q21032720](https://www.wikidata.org/wiki/Q21032720) |
 | 82 | North Yemen civil war | 1962-09-26 | 33 | pin at Yemen capital (approximate) | [article](https://en.wikipedia.org/wiki/North_Yemen_civil_war) | [Q521199](https://www.wikidata.org/wiki/Q521199) |
 | 83 | Syria–Lebanon campaign | 1941-06-08 | 33 | pin at Syria capital (approximate) | [article](https://en.wikipedia.org/wiki/Syria%E2%80%93Lebanon_campaign) | [Q770698](https://www.wikidata.org/wiki/Q770698) |
-| 84 | 1978 South Lebanon conflict | 1978-01-01 | 33 | no location | [article](https://en.wikipedia.org/wiki/1978_South_Lebanon_conflict) | [Q1121402](https://www.wikidata.org/wiki/Q1121402) |
+| 84 | 1978 South Lebanon conflict | 1978-03-14 | 33 | no location | [article](https://en.wikipedia.org/wiki/1978_South_Lebanon_conflict) | [Q1121402](https://www.wikidata.org/wiki/Q1121402) |
 | 85 | 14 July Revolution | 1958-07-14 | 33 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/14_July_Revolution) | [Q2988530](https://www.wikidata.org/wiki/Q2988530) |
 | 86 | Iran–Saudi Arabia proxy war | 1979-02-11 | 33 | no location | [article](https://en.wikipedia.org/wiki/Iran%E2%80%93Saudi_Arabia_proxy_war) | [Q22948406](https://www.wikidata.org/wiki/Q22948406) |
 | 87 | 2018–2019 Gaza border protests | 2018-03-30 | 33 | no location | [article](https://en.wikipedia.org/wiki/2018%E2%80%932019_Gaza_border_protests) | [Q51139646](https://www.wikidata.org/wiki/Q51139646) |
@@ -136,7 +136,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 117 | Operation Nemesis | 1920-01-01 | 27 | no location | [article](https://en.wikipedia.org/wiki/Operation_Nemesis) | [Q2475091](https://www.wikidata.org/wiki/Q2475091) |
 | 118 | Franco-Syrian War | 1920-03-08 | 27 | pin at Syria capital (approximate) | [article](https://en.wikipedia.org/wiki/Franco-Syrian_War) | [Q2992403](https://www.wikidata.org/wiki/Q2992403) |
 | 119 | April 2019 Israeli legislative election | 2019-04-09 | 27 | no location | [article](https://en.wikipedia.org/wiki/April_2019_Israeli_legislative_election) | [Q24909108](https://www.wikidata.org/wiki/Q24909108) |
-| 120 | 1998 bombing of Iraq | 1998-01-01 | 26 | no location | [article](https://en.wikipedia.org/wiki/1998_bombing_of_Iraq) | [Q1327861](https://www.wikidata.org/wiki/Q1327861) |
+| 120 | 1998 bombing of Iraq | 1998-12-16 | 26 | no location | [article](https://en.wikipedia.org/wiki/1998_bombing_of_Iraq) | [Q1327861](https://www.wikidata.org/wiki/Q1327861) |
 | 121 | Great Syrian Revolt | 1925-07-19 | 26 | pin at Syria capital (approximate) | [article](https://en.wikipedia.org/wiki/Great_Syrian_Revolt) | [Q1968718](https://www.wikidata.org/wiki/Q1968718) |
 | 122 | 1963 Syrian coup d'état | 1963-03-08 | 26 | no location | [article](https://en.wikipedia.org/wiki/1963_Syrian_coup_d'%C3%A9tat) | [Q2475925](https://www.wikidata.org/wiki/Q2475925) |
 | 123 | Operation Inherent Resolve | 2014-06-15 | 26 | no location | [article](https://en.wikipedia.org/wiki/Operation_Inherent_Resolve) | [Q18357664](https://www.wikidata.org/wiki/Q18357664) |
@@ -165,7 +165,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 146 | Middle Eastern crisis (2023–present) | 2023-10-07 | 24 | no location | [article](https://en.wikipedia.org/wiki/Middle_Eastern_crisis_(2023%E2%80%93present)) | [Q124373310](https://www.wikidata.org/wiki/Q124373310) |
 | 147 | Treaty of Constantinople (1913) | 1913-09-29 | 23 | no location | [article](https://en.wikipedia.org/wiki/Treaty_of_Constantinople_(1913)) | [Q269606](https://www.wikidata.org/wiki/Q269606) |
 | 148 | Treaty of Saadabad | 1937-07-08 | 23 | no location | [article](https://en.wikipedia.org/wiki/Treaty_of_Saadabad) | [Q537143](https://www.wikidata.org/wiki/Q537143) |
-| 149 | Iraqi Revolt | 1920-01-01 | 23 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Iraqi_Revolt) | [Q616851](https://www.wikidata.org/wiki/Q616851) |
+| 149 | Iraqi Revolt | 1920-05-01 | 23 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Iraqi_Revolt) | [Q616851](https://www.wikidata.org/wiki/Q616851) |
 | 150 | Execution of Saddam Hussein | 2006-12-30 | 23 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Execution_of_Saddam_Hussein) | [Q1193136](https://www.wikidata.org/wiki/Q1193136) |
 | 151 | Franco-Turkish War | 1918-12-01 | 23 | no location | [article](https://en.wikipedia.org/wiki/Franco-Turkish_War) | [Q1450532](https://www.wikidata.org/wiki/Q1450532) |
 | 152 | South Lebanon conflict (1985–2000) | 1985-02-16 | 23 | pin at Lebanon capital (approximate) | [article](https://en.wikipedia.org/wiki/South_Lebanon_conflict_(1985%E2%80%932000)) | [Q2479435](https://www.wikidata.org/wiki/Q2479435) |
@@ -177,7 +177,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 158 | Unification of Saudi Arabia | 1902-01-01 | 22 | pin at Saudi Arabia capital (approximate) | [article](https://en.wikipedia.org/wiki/Unification_of_Saudi_Arabia) | [Q251600](https://www.wikidata.org/wiki/Q251600) |
 | 159 | 2013 Iranian presidential election | 2013-06-14 | 22 | no location | [article](https://en.wikipedia.org/wiki/2013_Iranian_presidential_election) | [Q626198](https://www.wikidata.org/wiki/Q626198) |
 | 160 | National Pact | 1943-11-22 | 22 | pin at Lebanon capital (approximate) | [article](https://en.wikipedia.org/wiki/National_Pact) | [Q748819](https://www.wikidata.org/wiki/Q748819) |
-| 161 | Iraqi insurgency (2011–2013) | 2011-01-01 | 22 | no location | [article](https://en.wikipedia.org/wiki/Iraqi_insurgency_(2011%E2%80%932013)) | [Q2165215](https://www.wikidata.org/wiki/Q2165215) |
+| 161 | Iraqi insurgency (2011–2013) | 2011-12-18 | 22 | no location | [article](https://en.wikipedia.org/wiki/Iraqi_insurgency_(2011%E2%80%932013)) | [Q2165215](https://www.wikidata.org/wiki/Q2165215) |
 | 162 | 2021 Iranian presidential election | 2021-06-18 | 22 | no location | [article](https://en.wikipedia.org/wiki/2021_Iranian_presidential_election) | [Q30640701](https://www.wikidata.org/wiki/Q30640701) |
 | 163 | 2019–2021 Iraqi protests | 2019-10-01 | 22 | no location | [article](https://en.wikipedia.org/wiki/2019%E2%80%932021_Iraqi_protests) | [Q72367808](https://www.wikidata.org/wiki/Q72367808) |
 | 164 | January 2025 Gaza war ceasefire | 2025-01-15 | 22 | no location | [article](https://en.wikipedia.org/wiki/January_2025_Gaza_war_ceasefire) | [Q131760224](https://www.wikidata.org/wiki/Q131760224) |
@@ -191,14 +191,14 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 172 | October 2024 Israeli strikes on Iran | 2024-10-26 | 21 | no location | [article](https://en.wikipedia.org/wiki/October_2024_Israeli_strikes_on_Iran) | [Q130647458](https://www.wikidata.org/wiki/Q130647458) |
 | 173 | March 2025 Israeli attacks on the Gaza Strip | 2025-03-18 | 21 | no location | [article](https://en.wikipedia.org/wiki/March_2025_Israeli_attacks_on_the_Gaza_Strip) | [Q133309815](https://www.wikidata.org/wiki/Q133309815) |
 | 174 | Reparations Agreement between Israel and the Federal Republic of Germany | 1952-09-10 | 20 | no location | [article](https://en.wikipedia.org/wiki/Reparations_Agreement_between_Israel_and_the_Federal_Republic_of_Germany) | [Q660521](https://www.wikidata.org/wiki/Q660521) |
-| 175 | 2006 Gaza–Israel conflict | 2006-01-01 | 20 | no location | [article](https://en.wikipedia.org/wiki/2006_Gaza%E2%80%93Israel_conflict) | [Q1316163](https://www.wikidata.org/wiki/Q1316163) |
+| 175 | 2006 Gaza–Israel conflict | 2006-06-28 | 20 | no location | [article](https://en.wikipedia.org/wiki/2006_Gaza%E2%80%93Israel_conflict) | [Q1316163](https://www.wikidata.org/wiki/Q1316163) |
 | 176 | Operation Grapes of Wrath | 1996-04-27 | 20 | no location | [article](https://en.wikipedia.org/wiki/Operation_Grapes_of_Wrath) | [Q1473919](https://www.wikidata.org/wiki/Q1473919) |
 | 177 | 1949 Israeli Constituent Assembly election | 1949-01-25 | 20 | no location | [article](https://en.wikipedia.org/wiki/1949_Israeli_Constituent_Assembly_election) | [Q1674684](https://www.wikidata.org/wiki/Q1674684) |
 | 178 | Black Friday (1978) | 1978-09-08 | 20 | no location | [article](https://en.wikipedia.org/wiki/Black_Friday_(1978)) | [Q1899132](https://www.wikidata.org/wiki/Q1899132) |
 | 179 | Operation Defensive Shield | 2002-03-29 | 20 | no location | [article](https://en.wikipedia.org/wiki/Operation_Defensive_Shield) | [Q2276724](https://www.wikidata.org/wiki/Q2276724) |
 | 180 | Dhofar rebellion | 1963-06-09 | 20 | no location | [article](https://en.wikipedia.org/wiki/Dhofar_rebellion) | [Q2363565](https://www.wikidata.org/wiki/Q2363565) |
 | 181 | 2006 Israeli legislative election | 2006-03-28 | 20 | no location | [article](https://en.wikipedia.org/wiki/2006_Israeli_legislative_election) | [Q2720560](https://www.wikidata.org/wiki/Q2720560) |
-| 182 | Israeli blockade of the Gaza Strip (2023–present) | 2023-01-01 | 20 | no location | [article](https://en.wikipedia.org/wiki/Israeli_blockade_of_the_Gaza_Strip_(2023%E2%80%93present)) | [Q122982851](https://www.wikidata.org/wiki/Q122982851) |
+| 182 | Israeli blockade of the Gaza Strip (2023–present) | 2023-10-09 | 20 | no location | [article](https://en.wikipedia.org/wiki/Israeli_blockade_of_the_Gaza_Strip_(2023%E2%80%93present)) | [Q122982851](https://www.wikidata.org/wiki/Q122982851) |
 | 183 | 2011 Turkish general election | 2011-06-12 | 19 | no location | [article](https://en.wikipedia.org/wiki/2011_Turkish_general_election) | [Q740451](https://www.wikidata.org/wiki/Q740451) |
 | 184 | 1921 Persian coup d'état | 1921-02-21 | 19 | no location | [article](https://en.wikipedia.org/wiki/1921_Persian_coup_d'%C3%A9tat) | [Q1131857](https://www.wikidata.org/wiki/Q1131857) |
 | 185 | Operation Praying Mantis | 1988-04-18 | 19 | no location | [article](https://en.wikipedia.org/wiki/Operation_Praying_Mantis) | [Q2026308](https://www.wikidata.org/wiki/Q2026308) |
@@ -215,7 +215,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 196 | 31 March incident | 1909-04-13 | 18 | no location | [article](https://en.wikipedia.org/wiki/31_March_incident) | [Q2073490](https://www.wikidata.org/wiki/Q2073490) |
 | 197 | Tel al-Zaatar massacre | 1976-08-12 | 18 | no location | [article](https://en.wikipedia.org/wiki/Tel_al-Zaatar_massacre) | [Q2359563](https://www.wikidata.org/wiki/Q2359563) |
 | 198 | Capture of Baghdad (1917) | 1917-03-11 | 18 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/Capture_of_Baghdad_(1917)) | [Q2665637](https://www.wikidata.org/wiki/Q2665637) |
-| 199 | Operation Badr (1973) | 1973-01-01 | 18 | no location | [article](https://en.wikipedia.org/wiki/Operation_Badr_(1973)) | [Q2704666](https://www.wikidata.org/wiki/Q2704666) |
+| 199 | Operation Badr (1973) | 1973-10-06 | 18 | no location | [article](https://en.wikipedia.org/wiki/Operation_Badr_(1973)) | [Q2704666](https://www.wikidata.org/wiki/Q2704666) |
 | 200 | Arab Cold War | 1979-02-11 | 18 | no location | [article](https://en.wikipedia.org/wiki/Arab_Cold_War) | [Q4783165](https://www.wikidata.org/wiki/Q4783165) |
 | 201 | 1970 Syrian coup d'etat | 1970-11-13 | 18 | no location | [article](https://en.wikipedia.org/wiki/1970_Syrian_coup_d'etat) | [Q14947304](https://www.wikidata.org/wiki/Q14947304) |
 | 202 | November 2015 Turkish general election | 2015-11-01 | 18 | no location | [article](https://en.wikipedia.org/wiki/November_2015_Turkish_general_election) | [Q20818057](https://www.wikidata.org/wiki/Q20818057) |
@@ -230,7 +230,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 211 | Saudi–Yemeni war (1934) | 1934-03-01 | 17 | no location | [article](https://en.wikipedia.org/wiki/Saudi%E2%80%93Yemeni_war_(1934)) | [Q1367731](https://www.wikidata.org/wiki/Q1367731) |
 | 212 | 2010 Iraqi parliamentary election | 2010-03-07 | 17 | no location | [article](https://en.wikipedia.org/wiki/2010_Iraqi_parliamentary_election) | [Q1398554](https://www.wikidata.org/wiki/Q1398554) |
 | 213 | Battle of Aqaba | 1917-07-06 | 17 | no location | [article](https://en.wikipedia.org/wiki/Battle_of_Aqaba) | [Q2081944](https://www.wikidata.org/wiki/Q2081944) |
-| 214 | Operation Dani | 1948-01-01 | 17 | no location | [article](https://en.wikipedia.org/wiki/Operation_Dani) | [Q2916659](https://www.wikidata.org/wiki/Q2916659) |
+| 214 | Operation Dani | 1948-07-09 | 17 | no location | [article](https://en.wikipedia.org/wiki/Operation_Dani) | [Q2916659](https://www.wikidata.org/wiki/Q2916659) |
 | 215 | Aden Emergency | 1963-10-14 | 17 | no location | [article](https://en.wikipedia.org/wiki/Aden_Emergency) | [Q3299864](https://www.wikidata.org/wiki/Q3299864) |
 | 216 | 17 July Revolution | 1968-07-17 | 17 | pin at Iraq capital (approximate) | [article](https://en.wikipedia.org/wiki/17_July_Revolution) | [Q4120226](https://www.wikidata.org/wiki/Q4120226) |
 | 217 | 1979 Iranian Islamic Republic referendum | 1979-03-31 | 17 | no location | [article](https://en.wikipedia.org/wiki/1979_Iranian_Islamic_Republic_referendum) | [Q4231692](https://www.wikidata.org/wiki/Q4231692) |
@@ -388,7 +388,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 369 | Operation Horev | 1948-12-22 | 11 | no location | [article](https://en.wikipedia.org/wiki/Operation_Horev) | [Q2777473](https://www.wikidata.org/wiki/Q2777473) |
 | 370 | 1984 Israeli legislative election | 1984-07-23 | 11 | no location | [article](https://en.wikipedia.org/wiki/1984_Israeli_legislative_election) | [Q2917025](https://www.wikidata.org/wiki/Q2917025) |
 | 371 | Operation Mole Cricket 19 | 1982-06-09 | 11 | no location | [article](https://en.wikipedia.org/wiki/Operation_Mole_Cricket_19) | [Q2918913](https://www.wikidata.org/wiki/Q2918913) |
-| 372 | 2011 Lebanese protests | 2011-01-01 | 11 | no location | [article](https://en.wikipedia.org/wiki/2011_Lebanese_protests) | [Q2995643](https://www.wikidata.org/wiki/Q2995643) |
+| 372 | 2011 Lebanese protests | 2011-01-12 | 11 | no location | [article](https://en.wikipedia.org/wiki/2011_Lebanese_protests) | [Q2995643](https://www.wikidata.org/wiki/Q2995643) |
 | 373 | 1989 Iranian constitutional referendum | 1989-07-28 | 11 | no location | [article](https://en.wikipedia.org/wiki/1989_Iranian_constitutional_referendum) | [Q3207434](https://www.wikidata.org/wiki/Q3207434) |
 | 374 | Operation Beit ol-Moqaddas | 1982-05-24 | 11 | no location | [article](https://en.wikipedia.org/wiki/Operation_Beit_ol-Moqaddas) | [Q3267731](https://www.wikidata.org/wiki/Q3267731) |
 | 375 | 2004 Istanbul NATO summit | 2004-06-28 | 11 | no location | [article](https://en.wikipedia.org/wiki/2004_Istanbul_NATO_summit) | [Q3489918](https://www.wikidata.org/wiki/Q3489918) |
@@ -402,7 +402,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 383 | 1981 Iranian Prime Minister's office bombing | 1981-01-01 | 11 | no location | [article](https://en.wikipedia.org/wiki/1981_Iranian_Prime_Minister's_office_bombing) | [Q5936879](https://www.wikidata.org/wiki/Q5936879) |
 | 384 | Yalova Peninsula massacres | 1920-01-01 | 11 | no location | [article](https://en.wikipedia.org/wiki/Yalova_Peninsula_massacres) | [Q6105724](https://www.wikidata.org/wiki/Q6105724) |
 | 385 | 2018 Lebanese general election | 2018-05-06 | 11 | no location | [article](https://en.wikipedia.org/wiki/2018_Lebanese_general_election) | [Q6510981](https://www.wikidata.org/wiki/Q6510981) |
-| 386 | Political violence in Turkey (1976–1980) | 1968-01-01 | 11 | no location | [article](https://en.wikipedia.org/wiki/Political_violence_in_Turkey_(1976%E2%80%931980)) | [Q7225137](https://www.wikidata.org/wiki/Q7225137) |
+| 386 | Political violence in Turkey (1976–1980) | 1968-12-29 | 11 | no location | [article](https://en.wikipedia.org/wiki/Political_violence_in_Turkey_(1976%E2%80%931980)) | [Q7225137](https://www.wikidata.org/wiki/Q7225137) |
 | 387 | 2021 Qatari general election | 2021-10-02 | 11 | no location | [article](https://en.wikipedia.org/wiki/2021_Qatari_general_election) | [Q7267158](https://www.wikidata.org/wiki/Q7267158) |
 | 388 | 2014 Israeli presidential election | 2014-06-10 | 11 | no location | [article](https://en.wikipedia.org/wiki/2014_Israeli_presidential_election) | [Q15630907](https://www.wikidata.org/wiki/Q15630907) |
 | 389 | Iranian intervention in the Syrian civil war | 2013-06-09 | 11 | no location | [article](https://en.wikipedia.org/wiki/Iranian_intervention_in_the_Syrian_civil_war) | [Q15803217](https://www.wikidata.org/wiki/Q15803217) |
@@ -432,7 +432,7 @@ sitelinks (the same objective signal used for inclusion; it is a proxy, see docs
 | 413 | 1996 cruise missile strikes on Iraq | 1996-01-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/1996_cruise_missile_strikes_on_Iraq) | [Q1781133](https://www.wikidata.org/wiki/Q1781133) |
 | 414 | 2005 Egyptian presidential election | 2005-09-07 | 10 | no location | [article](https://en.wikipedia.org/wiki/2005_Egyptian_presidential_election) | [Q2115151](https://www.wikidata.org/wiki/Q2115151) |
 | 415 | 1996 Palestinian general election | 1996-01-20 | 10 | no location | [article](https://en.wikipedia.org/wiki/1996_Palestinian_general_election) | [Q2380927](https://www.wikidata.org/wiki/Q2380927) |
-| 416 | March 2012 Gaza–Israel clashes | 2012-01-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/March_2012_Gaza%E2%80%93Israel_clashes) | [Q2613676](https://www.wikidata.org/wiki/Q2613676) |
+| 416 | March 2012 Gaza–Israel clashes | 2012-03-09 | 10 | no location | [article](https://en.wikipedia.org/wiki/March_2012_Gaza%E2%80%93Israel_clashes) | [Q2613676](https://www.wikidata.org/wiki/Q2613676) |
 | 417 | Battle of Riyadh | 1902-01-13 | 10 | no location | [article](https://en.wikipedia.org/wiki/Battle_of_Riyadh) | [Q2943187](https://www.wikidata.org/wiki/Q2943187) |
 | 418 | 2002 Iraqi presidential referendum | 2002-10-16 | 10 | no location | [article](https://en.wikipedia.org/wiki/2002_Iraqi_presidential_referendum) | [Q3454894](https://www.wikidata.org/wiki/Q3454894) |
 | 419 | Battle of Samarra (2004) | 2004-10-01 | 10 | no location | [article](https://en.wikipedia.org/wiki/Battle_of_Samarra_(2004)) | [Q4087318](https://www.wikidata.org/wiki/Q4087318) |

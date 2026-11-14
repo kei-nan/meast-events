@@ -398,7 +398,12 @@ export function lastDayOfPeriod(date, code) {
 //       end, and its "point in time" is a day inside that range, so it is not the start (2009 Iranian presidential
 //       election protests, Q854206: P580 2009-06-13, P585 2010-02-11, P582 2010-12-07). Compared as stored dates
 //       ("-00" read as "-01"), and only when P580 is year-or-finer.
+//   (d) P585 is only year precise while P580 is month-or-finer and falls within that year (2026-11-14): the year
+//       says no more than the start time does (2014 Gaza War, Q17324420: P585 "2014", P580 2014-07-08), and the
+//       pipeline would otherwise store it as 1 January. A P580 in another year is left alone (the two disagree).
 // Nothing else is changed; both original values stay visible in the flag.
+// Returns { date_start, reason, rule, precision } or null; `rule` names the case ("coarse", "end", "inside",
+// "year") and `precision` is the Wikidata precision code of the P580 statement used.
 export function reconcileStartDate(candidateStart, entity) {
   if (!entity) return null;
   const p585 = entity.p585?.[0];
@@ -409,13 +414,18 @@ export function reconcileStartDate(candidateStart, entity) {
   const coarse = p585.precision < 9 && p580.precision >= 9;
   const isEnd = p582 && p585.time === p582.time && p580.time !== p585.time;
   const inside = p582 && p580.precision >= 9 && norm(p580.time) < norm(p585.time) && norm(p585.time) < norm(p582.time);
-  if (!coarse && !isEnd && !inside) return null;
+  const yearWithin = p585.precision === 9 && p580.precision >= 10 && p580.time.slice(0, 4) === p585.time.slice(0, 4);
+  if (!coarse && !isEnd && !inside && !yearWithin) return null;
+  const rule = coarse ? "coarse" : isEnd ? "end" : inside ? "inside" : "year";
   return {
     date_start: norm(p580.time),
-    reason: coarse
-      ? `Wikidata P585 ${p585.time} is only ${p585.precision <= 8 ? "decade-or-coarser" : "coarse"} precision; used P580 start time ${p580.time}`
-      : isEnd
-        ? `Wikidata P585 ${p585.time} equals the item's end time (P582); used P580 start time ${p580.time}`
-        : `Wikidata P585 ${p585.time} lies strictly between the item's start time (P580 ${p580.time}) and end time (P582 ${p582.time}); used P580 start time ${p580.time}`,
+    rule,
+    precision: p580.precision,
+    reason: {
+      coarse: `Wikidata P585 ${p585.time} is only ${p585.precision <= 8 ? "decade-or-coarser" : "coarse"} precision; used P580 start time ${p580.time}`,
+      end: `Wikidata P585 ${p585.time} equals the item's end time (P582); used P580 start time ${p580.time}`,
+      inside: `Wikidata P585 ${p585.time} lies strictly between the item's start time (P580 ${p580.time}) and end time (P582 ${p582?.time}); used P580 start time ${p580.time}`,
+      year: `Wikidata P585 ${p585.time} is only year precision and the item's start time (P580 ${p580.time}, ${precisionName(p580.precision)} precision) falls within that year; used P580 start time ${p580.time}`,
+    }[rule],
   };
 }

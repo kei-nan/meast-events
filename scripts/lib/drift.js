@@ -6,6 +6,7 @@
 import { EVENT_CLASSES } from "./event-classes.js";
 import { keptDatePrecision } from "./fixes.js";
 import { mdCode } from "./title-refresh.js";
+import { wikipediaPinCheck } from "./rederive.js";
 
 // Wikidata "1940-00-00" is stored as 1940-01-01 (as in lib/fixes.js).
 const norm = (t) => String(t ?? "").replace(/-00(?=-|$)/g, "-01");
@@ -84,9 +85,11 @@ const DISCOVERY_LABELS = new Set(EVENT_CLASSES.map((c) => c.label));
  * @param fix     the fix-ledger entry for the item (lib/fixes.js FIXES_BY_QID), if any: a field it sets was
  *                checked by hand against the sources, so a difference there is "explained", not listed as drift -
  *                unless the fix is stale for that field (staleFixes): then the difference is listed, and the fix too
+ * @param opts    { article }: the current primary coordinates of the event's English article (lib/wiki.js
+ *                fetchArticleCoordinates; null: none), compared with a "wikipedia" pin; undefined: not compared
  * @returns {{ rows: {field, stored, wikidata}[], explained: string[], stale: ReturnType<typeof staleFixes> }}
  */
-export function driftFor(event, entity, labels = {}, fix = null) {
+export function driftFor(event, entity, labels = {}, fix = null, { article } = {}) {
   const rows = [];
   const explained = [];
   const set = fix?.set ?? {};
@@ -130,6 +133,12 @@ export function driftFor(event, entity, labels = {}, fix = null) {
     else if (!sameCoords(c, p625)) add("coordinates", fmtPt(c), `P625: ${fmtPt(p625)}`, ["coordinates"]);
   } else if (event.location_quality !== "precise" && p625) {
     add("coordinates", c ? `${fmtPt(c)} (${event.location_quality})` : "none", `P625: ${fmtPt(p625)}`, ["coordinates"]);
+  }
+  // A pin taken from the article ("wikipedia") against the article's current primary coordinates, when they were
+  // fetched (`article`: a point, null for none; undefined: not fetched). Only the event's own article counts
+  // (lib/rederive.js wikipediaPinCheck); both kinds of difference are listed, with P625 next to it.
+  if (wikipediaPinCheck(event, article, p625)) {
+    add("coordinates", `${fmtPt(c)} (wikipedia)`, `article: ${article ? fmtPt(article) : "none"}; P625: ${p625 ? fmtPt(p625) : "none"}`, ["coordinates"]);
   }
 
   // Classes: the direct P31 labels against the stored wikidata_classes. A stored label that is no longer a P31 label
@@ -195,7 +204,8 @@ export function renderDriftReport(results, { checked, noQid = [] } = {}) {
   const lines = ["## Wikidata drift (report only)", ""];
   lines.push(
     "Curated events whose stored dates, coordinates or classes do not match their Wikidata item as it is now " +
-      "(the item changed since the event was stored, or the stored value never came from it). Nothing here was changed in " +
+      "(the item changed since the event was stored, or the stored value never came from it); a pin taken from the article " +
+      "(\"wikipedia\") is compared with the article's current coordinates. Nothing here was changed in " +
       "data/events.json: each difference is for review (a fix goes through docs/data-fixes.md). Kind: \"seed\" = a " +
       "hand-picked event (data/seed-events.json), whose dates were not necessarily taken from Wikidata; \"discovered\" = " +
       "found by the inclusion rule, with Wikidata's values at the time."

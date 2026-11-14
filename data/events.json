@@ -587,7 +587,7 @@
   {
     "id": "iraqi-revolt-against-the-british",
     "title": "Iraqi Revolt",
-    "date_start": "1920-01-01",
+    "date_start": "1920-05-01",
     "date_end": "1920-10-01",
     "countries": [
       "Iraq"
@@ -612,14 +612,17 @@
     ],
     "category_group": "war",
     "review_reasons": [],
-    "needs_review": false,
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 23,
     "wikidata_aliases": [
       "Iraqi revolt against the British"
     ],
-    "date_precision": "year",
-    "date_end_precision": "month"
+    "date_precision": "month",
+    "date_end_precision": "month",
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1920-00-00 is only year precision and the item's start time (P580 1920-05-00, month precision) falls within that year; used P580 start time 1920-05-00"
+    ]
   },
   {
     "id": "treaty-of-s-vres",
@@ -2213,7 +2216,7 @@
   {
     "id": "1973-oil-crisis",
     "title": "1973 oil crisis",
-    "date_start": "1973-01-01",
+    "date_start": "1973-10-16",
     "date_end": "1974-03-17",
     "countries": [
       "Saudi Arabia",
@@ -2239,11 +2242,14 @@
     ],
     "category_group": "unclassified",
     "review_reasons": [],
-    "needs_review": false,
+    "needs_review": true,
     "location_quality": "approximate",
     "sitelinks_current": 61,
-    "date_precision": "year",
-    "date_end_precision": "day"
+    "date_precision": "day",
+    "date_end_precision": "day",
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1973-00-00 is only year precision and the item's start time (P580 1973-10-16, day precision) falls within that year; used P580 start time 1973-10-16"
+    ]
   },
   {
     "id": "lebanese-civil-war",
@@ -5341,7 +5347,7 @@
   {
     "id": "battle-of-kara-killisse-1915",
     "title": "Battle of Kara Killisse (1915)",
-    "date_start": "1915-01-01",
+    "date_start": "1915-07-27",
     "date_end": "1915-07-31",
     "countries": [
       "Turkey"
@@ -5364,7 +5370,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -5381,7 +5387,10 @@
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1370444758,
     "wikipedia_revid_timestamp": "2026-08-21T04:01:41Z",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1915-00-00 is only year precision and the item's start time (P580 1915-07-27, day precision) falls within that year; used P580 start time 1915-07-27"
+    ]
   },
   {
     "id": "defense-of-van-1915",
@@ -6032,7 +6041,7 @@
   {
     "id": "battles-of-ramadi-1917",
     "title": "Battles of Ramadi (1917)",
-    "date_start": "1917-01-01",
+    "date_start": "1917-09-28",
     "date_end": "1917-09-29",
     "countries": [
       "Iraq"
@@ -6055,7 +6064,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -6072,7 +6081,10 @@
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1370603784,
     "wikipedia_revid_timestamp": "2026-08-22T02:04:48Z",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1917-00-00 is only year precision and the item's start time (P580 1917-09-28, day precision) falls within that year; used P580 start time 1917-09-28"
+    ]
   },
   {
     "id": "battle-of-rafa",
@@ -6302,7 +6314,7 @@
   {
     "id": "battle-of-megiddo-1918",
     "title": "Battle of Megiddo (1918)",
-    "date_start": "1918-01-01",
+    "date_start": "1918-09-19",
     "date_end": "1918-09-25",
     "countries": [
       "Israel/Palestine",
@@ -6326,7 +6338,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -6347,6 +6359,9 @@
     "wikidata_aliases": [
       "Rout of Nablus",
       "Breakthrough at Nablus"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1918-00-00 is only year precision and the item's start time (P580 1918-09-19, day precision) falls within that year; used P580 start time 1918-09-19"
     ]
   },
   {
@@ -8407,7 +8422,7 @@
   {
     "id": "1973-israeli-raid-in-lebanon",
     "title": "1973 Israeli raid in Lebanon",
-    "date_start": "1973-01-01",
+    "date_start": "1973-04-09",
     "date_end": "1973-04-10",
     "countries": [
       "Lebanon"
@@ -8431,7 +8446,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -8452,12 +8467,15 @@
     "wikidata_aliases": [
       "Operation Spring of Youth",
       "Israeli raid on Lebanon 1973"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1973-00-00 is only year precision and the item's start time (P580 1973-04-09, day precision) falls within that year; used P580 start time 1973-04-09"
     ]
   },
   {
     "id": "battle-of-the-chinese-farm",
     "title": "Battle of the Chinese Farm",
-    "date_start": "1973-01-01",
+    "date_start": "1973-10-15",
     "date_end": "1973-10-17",
     "countries": [
       "Egypt"
@@ -8480,7 +8498,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -8497,7 +8515,10 @@
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1375932656,
     "wikipedia_revid_timestamp": "2026-09-20T23:57:14Z",
-    "sitelinks_current": 12
+    "sitelinks_current": 12,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1973-00-00 is only year precision and the item's start time (P580 1973-10-15, day precision) falls within that year; used P580 start time 1973-10-15"
+    ]
   },
   {
     "id": "ofira-air-battle",
@@ -9095,7 +9116,7 @@
   {
     "id": "operation-nasr",
     "title": "Operation Nasr",
-    "date_start": "1981-01-01",
+    "date_start": "1981-01-05",
     "date_end": "1981-01-09",
     "countries": [
       "Iran"
@@ -9118,7 +9139,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -9135,7 +9156,10 @@
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1370693949,
     "wikipedia_revid_timestamp": "2026-08-22T15:48:14Z",
-    "sitelinks_current": 13
+    "sitelinks_current": 13,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1981-00-00 is only year precision and the item's start time (P580 1981-01-05, day precision) falls within that year; used P580 start time 1981-01-05"
+    ]
   },
   {
     "id": "h-3-airstrike",
@@ -9240,7 +9264,7 @@
   {
     "id": "1982-hama-massacre",
     "title": "1982 Hama massacre",
-    "date_start": "1982-01-01",
+    "date_start": "1982-02-02",
     "date_end": "1982-02-28",
     "countries": [
       "Syria"
@@ -9264,7 +9288,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -9285,6 +9309,9 @@
     "wikidata_aliases": [
       "1982 Hama massacre",
       "Hama revolution"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1982-00-00 is only year precision and the item's start time (P580 1982-02-02, day precision) falls within that year; used P580 start time 1982-02-02"
     ]
   },
   {
@@ -9523,8 +9550,8 @@
     "wikipedia_url": "https://en.wikipedia.org/wiki/Gulf_Air_Flight_771",
     "extract": "Gulf Air Flight 771 was an international scheduled passenger flight from Jinnah International Airport, Karachi, Pakistan, to Abu Dhabi International Airport, Abu Dhabi, United Arab Emirates. On 23 September 1983, while the Boeing 737-200 was on approach, a bomb, planted by the Iraqi-based Palestinian nationalist militant group, Abu Nidal Organization, exploded in the baggage compartment, resulting in a fire. The aircraft crashed in the desert near Jebel Ali between Abu Dhabi and Dubai. All 105 passengers and 7 crew members died. To date, it is the deadliest air disaster in the history of the United Arab Emirates, along with Sterling Airways Flight 296 in 1972 which also had 112 fatalities.",
     "coordinates": {
-      "lat": 24.783333,
-      "lon": 55.4
+      "lat": 24.85,
+      "lon": 54.95
     },
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
@@ -10337,7 +10364,7 @@
   {
     "id": "iraqi-insurgency-2003-2011",
     "title": "Iraqi insurgency (2003–2011)",
-    "date_start": "2003-01-01",
+    "date_start": "2003-05-01",
     "date_end": "2011-12-18",
     "countries": [
       "Iraq"
@@ -10361,7 +10388,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -10378,12 +10405,15 @@
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1381027300,
     "wikipedia_revid_timestamp": "2026-10-19T15:05:31Z",
-    "sitelinks_current": 26
+    "sitelinks_current": 26,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2003-00-00 is only year precision and the item's start time (P580 2003-05-01, day precision) falls within that year; used P580 start time 2003-05-01"
+    ]
   },
   {
     "id": "battle-of-baghdad-2003",
     "title": "Battle of Baghdad (2003)",
-    "date_start": "2003-01-01",
+    "date_start": "2003-04-03",
     "date_end": "2003-04-12",
     "countries": [
       "Iraq"
@@ -10406,7 +10436,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -10429,6 +10459,9 @@
       "Fall of Baghdad",
       "Battle of Bagdad",
       "Fall of Bagdad"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2003-00-00 is only year precision and the item's start time (P580 2003-04-03, day precision) falls within that year; used P580 start time 2003-04-03"
     ]
   },
   {
@@ -10750,7 +10783,7 @@
   {
     "id": "battle-of-najaf-2004",
     "title": "Battle of Najaf (2004)",
-    "date_start": "2004-01-01",
+    "date_start": "2004-08-05",
     "date_end": "2004-08-27",
     "countries": [
       "Iraq"
@@ -10773,7 +10806,7 @@
     "coordinate_source": "wikipedia",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -10790,7 +10823,10 @@
     "extract_retrieved_at": "2026-09-26",
     "wikipedia_revid": 1381036630,
     "wikipedia_revid_timestamp": "2026-10-19T16:24:03Z",
-    "sitelinks_current": 14
+    "sitelinks_current": 14,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2004-00-00 is only year precision and the item's start time (P580 2004-08-05, day precision) falls within that year; used P580 start time 2004-08-05"
+    ]
   },
   {
     "id": "abu-ghraib-torture-and-prisoner-abuse",
@@ -15850,7 +15886,7 @@
   {
     "id": "battle-of-aleppo-2024",
     "title": "Battle of Aleppo (2024)",
-    "date_start": "2024-01-01",
+    "date_start": "2024-11-29",
     "date_end": "2024-12-02",
     "countries": [
       "Syria"
@@ -15873,7 +15909,7 @@
     "coordinate_source": "wikidata",
     "location_quality": "precise",
     "needs_manual_coordinates": false,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -15896,6 +15932,9 @@
       "The capture of Aleppo",
       "Capture of Aleppo",
       "Liberation of Aleppo"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2024-00-00 is only year precision and the item's start time (P580 2024-11-29, day precision) falls within that year; used P580 start time 2024-11-29"
     ]
   },
   {
@@ -18893,7 +18932,7 @@
   {
     "id": "operation-dani",
     "title": "Operation Dani",
-    "date_start": "1948-01-01",
+    "date_start": "1948-07-09",
     "date_end": "1948-07-19",
     "countries": [
       "Israel/Palestine"
@@ -18913,7 +18952,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -18937,6 +18976,9 @@
       "Mivtsa Dani",
       "Mivtza Dani",
       "Operation L.R.L.R."
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1948-00-00 is only year precision and the item's start time (P580 1948-07-09, day precision) falls within that year; used P580 start time 1948-07-09"
     ]
   },
   {
@@ -19962,7 +20004,7 @@
   {
     "id": "operation-badr-1973",
     "title": "Operation Badr (1973)",
-    "date_start": "1973-01-01",
+    "date_start": "1973-10-06",
     "date_end": "1973-10-08",
     "countries": [
       "Egypt"
@@ -19982,7 +20024,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -19999,7 +20041,10 @@
     "wikipedia_revid": 1379665537,
     "wikipedia_revid_timestamp": "2026-10-11T05:28:59Z",
     "wikidata_description": "Arab military operation against Israel in 1973",
-    "sitelinks_current": 18
+    "sitelinks_current": 18,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1973-00-00 is only year precision and the item's start time (P580 1973-10-06, day precision) falls within that year; used P580 start time 1973-10-06"
+    ]
   },
   {
     "id": "tel-al-zaatar-massacre",
@@ -21540,7 +21585,7 @@
   {
     "id": "1998-bombing-of-iraq",
     "title": "1998 bombing of Iraq",
-    "date_start": "1998-01-01",
+    "date_start": "1998-12-16",
     "date_end": "1998-12-19",
     "countries": [
       "Iraq"
@@ -21560,7 +21605,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -21580,6 +21625,9 @@
     "sitelinks_current": 26,
     "wikidata_aliases": [
       "Operation Desert Fox"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1998-00-00 is only year precision and the item's start time (P580 1998-12-16, day precision) falls within that year; used P580 start time 1998-12-16"
     ]
   },
   {
@@ -22189,7 +22237,7 @@
   {
     "id": "iraqi-insurgency-2011-2013",
     "title": "Iraqi insurgency (2011–2013)",
-    "date_start": "2011-01-01",
+    "date_start": "2011-12-18",
     "date_end": "2013-12-30",
     "countries": [
       "Iraq"
@@ -22210,7 +22258,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -22227,7 +22275,10 @@
     "wikipedia_revid": 1363233790,
     "wikipedia_revid_timestamp": "2026-07-08T22:10:22Z",
     "wikidata_description": "2011–13 sectarian violence in Iraq following the US invasion and withdrawal",
-    "sitelinks_current": 22
+    "sitelinks_current": 22,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2011-00-00 is only year precision and the item's start time (P580 2011-12-18, day precision) falls within that year; used P580 start time 2011-12-18"
+    ]
   },
   {
     "id": "turkish-involvement-in-the-syrian-civil-war",
@@ -22387,7 +22438,7 @@
   {
     "id": "march-2012-gaza-israel-clashes",
     "title": "March 2012 Gaza–Israel clashes",
-    "date_start": "2012-01-01",
+    "date_start": "2012-03-09",
     "date_end": "2012-03-14",
     "countries": [
       "Israel/Palestine"
@@ -22407,7 +22458,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -22427,6 +22478,9 @@
     "sitelinks_current": 10,
     "wikidata_aliases": [
       "Operation Returning Echo"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2012-00-00 is only year precision and the item's start time (P580 2012-03-09, day precision) falls within that year; used P580 start time 2012-03-09"
     ]
   },
   {
@@ -22591,7 +22645,7 @@
   {
     "id": "2014-gaza-war",
     "title": "2014 Gaza War",
-    "date_start": "2014-01-01",
+    "date_start": "2014-07-08",
     "date_end": "2014-08-26",
     "countries": [
       "Israel/Palestine"
@@ -22611,7 +22665,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -22632,6 +22686,9 @@
     "wikidata_aliases": [
       "Protective Edge",
       "Operation Protective Edge"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2014-00-00 is only year precision and the item's start time (P580 2014-07-08, day precision) falls within that year; used P580 start time 2014-07-08"
     ]
   },
   {
@@ -23346,7 +23403,7 @@
   {
     "id": "2019-turkish-offensive-into-northeastern-syria",
     "title": "2019 Turkish offensive into northeastern Syria",
-    "date_start": "2019-01-01",
+    "date_start": "2019-10-09",
     "date_end": null,
     "countries": [
       "Syria"
@@ -23366,7 +23423,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q18208094",
@@ -23392,6 +23449,9 @@
       "Operation Peace Spring",
       "Peace Spring",
       "2019 Rojava offensive"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2019-00-00 is only year precision and the item's start time (P580 2019-10-09, day precision) falls within that year; used P580 start time 2019-10-09"
     ]
   },
   {
@@ -23779,7 +23839,7 @@
   {
     "id": "israeli-blockade-of-the-gaza-strip-2023-present",
     "title": "Israeli blockade of the Gaza Strip (2023–present)",
-    "date_start": "2023-01-01",
+    "date_start": "2023-10-09",
     "date_end": null,
     "countries": [
       "Israel/Palestine"
@@ -23804,7 +23864,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q122962941",
@@ -23833,6 +23893,9 @@
       "Gaza siege",
       "siege of the Gaza Strip",
       "2023 Blockade of the Gaza Strip"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2023-00-00 is only year precision and the item's start time (P580 2023-10-09, day precision) falls within that year; used P580 start time 2023-10-09"
     ]
   },
   {
@@ -25430,7 +25493,7 @@
   {
     "id": "2026-iran-war",
     "title": "2026 Iran war",
-    "date_start": "2026-01-01",
+    "date_start": "2026-02-28",
     "date_end": null,
     "countries": [
       "Iran",
@@ -25454,7 +25517,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "part_of": [
       {
         "qid": "Q124373310",
@@ -25489,6 +25552,9 @@
       "2026 Ramadan war",
       "Third Gulf War",
       "West Asia War"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2026-00-00 is only year precision and the item's start time (P580 2026-02-28, day precision) falls within that year; used P580 start time 2026-02-28"
     ]
   },
   {
@@ -27515,7 +27581,7 @@
   {
     "id": "political-violence-in-turkey-1976-1980",
     "title": "Political violence in Turkey (1976–1980)",
-    "date_start": "1968-01-01",
+    "date_start": "1968-12-29",
     "date_end": "1980-09-12",
     "countries": [
       "Turkey"
@@ -27535,7 +27601,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -27551,7 +27617,8 @@
     "wikipedia_revid": 1378427875,
     "wikipedia_revid_timestamp": "2026-10-04T12:19:24Z",
     "date_flags": [
-      "date_start_year_not_in_lead: start year 1968 (1968-01-01) is not within 1 year of any year in the Wikipedia lead [1980, 1984]"
+      "date_source_adjusted: Wikidata P585 1968-00-00 is only year precision and the item's start time (P580 1968-12-29, day precision) falls within that year; used P580 start time 1968-12-29",
+      "date_start_year_not_in_lead: start year 1968 (1968-12-29) is not within 1 year of any year in the Wikipedia lead [1980, 1984]"
     ],
     "needs_review": true,
     "wikidata_description": null,
@@ -27807,7 +27874,7 @@
   {
     "id": "1978-south-lebanon-conflict",
     "title": "1978 South Lebanon conflict",
-    "date_start": "1978-01-01",
+    "date_start": "1978-03-14",
     "date_end": "1978-03-21",
     "countries": [
       "Lebanon"
@@ -27830,7 +27897,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -27858,6 +27925,9 @@
       "Invasion of Lebanon 1978",
       "South Lebanon Conflict 1978",
       "1978 South Lebanon conflict"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 1978-00-00 is only year precision and the item's start time (P580 1978-03-14, day precision) falls within that year; used P580 start time 1978-03-14"
     ]
   },
   {
@@ -29640,7 +29710,7 @@
   {
     "id": "2006-gaza-israel-conflict",
     "title": "2006 Gaza–Israel conflict",
-    "date_start": "2006-01-01",
+    "date_start": "2006-06-28",
     "date_end": "2006-11-26",
     "countries": [
       "Israel/Palestine"
@@ -29661,7 +29731,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [
       {
@@ -29671,7 +29741,8 @@
     ],
     "possible_duplicates": [],
     "review_reasons": [
-      "part_of: Wikidata (P361) lists this event as part of \"Second Intifada\" (Q49106); it may overlap with that larger event"
+      "part_of: Wikidata (P361) lists this event as part of \"Second Intifada\" (Q49106); it may overlap with that larger event",
+      "lead_start_day_differs: date_start 2006-06-28 is not named in the first sentence of the Wikipedia lead, which names 2006-06-25; the stored date is kept as the source gives it"
     ],
     "extract_retrieved_at": "2026-10-06",
     "wikipedia_revid": 1381721190,
@@ -29681,6 +29752,9 @@
     "sitelinks_current": 20,
     "wikidata_aliases": [
       "Operation Summer Rains"
+    ],
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2006-00-00 is only year precision and the item's start time (P580 2006-06-28, day precision) falls within that year; used P580 start time 2006-06-28"
     ]
   },
   {
@@ -30308,7 +30382,7 @@
   {
     "id": "2011-lebanese-protests",
     "title": "2011 Lebanese protests",
-    "date_start": "2011-01-01",
+    "date_start": "2011-01-12",
     "date_end": "2011-12-15",
     "countries": [
       "Lebanon"
@@ -30328,7 +30402,7 @@
     "coordinate_source": null,
     "location_quality": "none",
     "needs_manual_coordinates": true,
-    "date_precision": "year",
+    "date_precision": "day",
     "date_end_precision": "day",
     "part_of": [],
     "possible_duplicates": [],
@@ -30336,9 +30410,12 @@
     "extract_retrieved_at": "2026-10-06",
     "wikipedia_revid": 1378543107,
     "wikipedia_revid_timestamp": "2026-10-04T23:25:17Z",
-    "needs_review": false,
+    "needs_review": true,
     "wikidata_description": "Uprising of Dignity",
-    "sitelinks_current": 11
+    "sitelinks_current": 11,
+    "date_flags": [
+      "date_source_adjusted: Wikidata P585 2011-00-00 is only year precision and the item's start time (P580 2011-01-12, day precision) falls within that year; used P580 start time 2011-01-12"
+    ]
   },
   {
     "id": "kuwaiti-protests-2011-2012",

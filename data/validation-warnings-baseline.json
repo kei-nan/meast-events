@@ -12,6 +12,7 @@
     ["data/events.json","1985-iranian-presidential-election","short_extract"],
     ["data/events.json","1988-israeli-legislative-election","short_extract"],
     ["data/events.json","1991-iraqi-uprisings","durative_class_no_end"],
+    ["data/events.json","2006-gaza-israel-conflict","lead_start_day_differs"],
     ["data/events.json","2006-israeli-operation-in-beit-hanoun","lead_start_day_differs"],
     ["data/events.json","2009-iranian-presidential-election","lead_start_day_differs"],
     ["data/events.json","2010-gaza-flotilla-raid","pin_outside_countries"],
