@@ -1,18 +1,27 @@
 {
   // The frontend, deployed as a static-assets Worker by Cloudflare Workers
   // Builds (Path: app, build: npm run build, deploy: npx wrangler deploy).
-  // The whole site is static (data and search index are built files).
+  // The site itself is static (data and search index are built files). The one
+  // script, worker/index.js, answers only /mcp, the read-only MCP endpoint for AI
+  // tools, and /ai/context/<id>.json, the same briefing for AIs that browse
+  // (run_worker_first). It joins them from built files read through the ASSETS
+  // binding; every other request is served from dist/ without running it. On the
+  // free plan those two paths count toward the daily Worker request limit and get
+  // a 429 past it; the site's pages do not.
   // Branches other than main run `npx wrangler preview`, which needs the
-  // `previews` block; empty because the site has no bindings or secrets.
+  // `previews` block; empty because the site has no other bindings or secrets.
   // A path that is not a file gets dist/404.html with status 404 (written by
   // scripts/build-event-pages.mjs). The app is served at / and at each event's
   // page, /event/<id> (a file per event, written by that script), so it needs no
   // SPA fallback.
   "name": "meast-events",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-26",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/mcp", "/ai/context/*"]
   },
   "previews": {}
 }
