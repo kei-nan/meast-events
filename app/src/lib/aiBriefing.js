@@ -20,7 +20,7 @@ import { eventPath } from "./urlState.js";
 const REPO = "https://github.com/kei-nan/meast-events";
 export const REVIEW_METHOD_URL = `${REPO}/blob/main/docs/framing-review.md`;
 export const COVERAGE_REPORT_URL = `${REPO}/blob/main/docs/bias-review/dataset-coverage.md`;
-export const DATA_LICENSE_URL = `${REPO}/blob/main/data/LICENSE`;
+const DATA_LICENSE_URL = `${REPO}/blob/main/data/LICENSE`;
 
 export const ABOUT =
   "middleeast.events is a map and timeline of events in the Middle East since 1900. It does not say who is right in " +
@@ -47,7 +47,7 @@ export function opening(text) {
 }
 
 // The stored review, without the highlight positions only the page uses.
-export function reviewOf(framing) {
+function reviewOf(framing) {
   if (!framing) return null;
   return {
     overall_fairness: framing.fairness?.found ? framing.fairness.note : null,

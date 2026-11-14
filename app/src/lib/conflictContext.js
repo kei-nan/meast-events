@@ -38,7 +38,7 @@ export const NEAR_YEARS = 1;
 // Rule 3: a neighbour's group is added only if it holds at least this many events here.
 // A neighbour tagged with many countries is in small groups that have little to do with
 // this event (one 2023 event brought "2023 Turkish general election" into October 7's).
-export const VIA_MIN = 3;
+const VIA_MIN = 3;
 
 const isList = (label) => /^list of\b/i.test(label ?? "");
 const startYear = (e) => {
@@ -47,7 +47,7 @@ const startYear = (e) => {
 };
 
 // Oldest first; undated last; ties by id, so the order is stable.
-export function byStart(a, b) {
+function byStart(a, b) {
   const da = a.date_start ?? "￿";
   const db = b.date_start ?? "￿";
   if (da !== db) return da < db ? -1 : 1;

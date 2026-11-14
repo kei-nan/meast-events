@@ -36,7 +36,7 @@ const OUT = path.join(DIST, "ai");
 
 const readJSON = async (file) => JSON.parse(await readFile(file, "utf8"));
 
-export function llmsTxt(count) {
+function llmsTxt(count) {
   return `# middleeast.events
 
 > ${ABOUT}
