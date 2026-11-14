@@ -17,7 +17,7 @@ export const BOUNDARY_STATUS_LABELS = {
   "autonomous-partial": "Partly autonomous area",
   "joint-control": "Under joint control",
   "de-facto-separate-administration": "Separately administered in practice (de facto)",
-  "active-conflict": "Border contested by active conflict",
+  "active-conflict": "Control contested by active conflict",
   "partitioned-ceasefire": "Partitioned along a ceasefire line",
 };
 
