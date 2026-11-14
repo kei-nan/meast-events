@@ -14,7 +14,7 @@
 import { eventCoords } from "./geo.js";
 import { fullBucket } from "./fullBucket.js";
 import { decodeGeo } from "./geoCodec.js";
-import { BOUNDARIES_VERSION, DATA_VERSION, FULL_BUCKETS } from "./dataVersion.js";
+import { BOUNDARIES_VERSION, DATA_VERSION, FULL_BUCKETS, LAND_VERSION } from "./dataVersion.js";
 
 // Pure year helpers live in eventYears.js (testable without the generated
 // dataVersion.js); re-exported for the existing importers.
@@ -97,20 +97,44 @@ const dataUrl = (relPath) => `${import.meta.env.BASE_URL}data/${relPath}`;
 // JSON file held (lib/geoCodec.js, written by scripts/split-data.mjs).
 const fetchGeoCached = (relPath, options) => fetchJSONCached(dataUrl(`${relPath}.tbin`), { ...options, decode: decodeGeo });
 
-// Pure physical geography (land/water silhouette) with no time dimension:
-// land.tbin for the opening view, land-far.tbin for the rest of the map
-// (NEAR_LAND_EXTENT in lib/mapExtent.js).
+// A file of a versioned folder, <folder>/v.<version>/<name>.tbin (split-data.mjs:
+// the version hashes every file in it, so the folder is cached immutably). If the
+// folder is missing (a 4xx: a page whose bundle is older than the deployed data),
+// the current folder is read from <folder>/meta.json (fetched no-cache) and used
+// from then on, as loadAllLite does for events. `bundled` is this bundle's version
+// (lib/dataVersion.js).
+function versionedFolder(folder, bundled) {
+  let version = bundled;
+  return (name, options) => {
+    const file = (v) => fetchGeoCached(`${folder}/v.${v}/${name}`, options);
+    const tried = version;
+    return file(tried).catch(async (err) => {
+      if (err.outage !== false) throw err;
+      const meta = await fetchJSON(dataUrl(`${folder}/meta.json`), { cache: "no-cache", timeoutMs: FILE_TIMEOUT_MS });
+      if (!meta?.version || meta.version === tried) throw err;
+      version = meta.version;
+      return file(meta.version);
+    });
+  };
+}
+
+// Pure physical geography (land/water silhouette) with no time dimension, in the
+// versioned folder land/v.<LAND_VERSION>/: land.tbin for the opening view,
+// land-far.tbin for the rest of the map (NEAR_LAND_EXTENT in lib/mapExtent.js),
+// cells/<cell>.tbin the Middle East's 1:10m land.
+const landFile = versionedFolder("land", LAND_VERSION);
+
 export function loadLand() {
-  return fetchGeoCached("land");
+  return landFile("land");
 }
 
 // One cell's Natural Earth 1:10m land (scripts/build-land.js, lib/landStore.js).
 export function loadLandCell(cell) {
-  return fetchGeoCached(`land-cells/${cell}`);
+  return landFile(`cells/${cell}`);
 }
 
 export function loadFarLand() {
-  return fetchGeoCached("land-far");
+  return landFile("land-far");
 }
 
 // A geometry stored apart from the decade chunks: `ref` is "<file>#<index>",
@@ -131,28 +155,20 @@ function loadSharedGeometry(ref) {
 // bundle only ever reads chunks of its own build, whose shared files exist. If
 // the folder is missing (a 4xx: a page whose bundle is older than the deployed
 // data), the current folder is read from boundaries/meta.json (fetched no-cache)
-// and used from then on, as loadAllLite does for events.
+// and used from then on (versionedFolder above).
 // A geometry stored apart (`geometry_ref`, see split-data.mjs) is put back here,
 // so callers get plain features - except deferred ones (a `minzoom`,
 // lib/deferredBoundaries.js), which stay pending until the map asks for them
 // with loadDeferredGeometry.
 // Concurrent/repeat callers share one load per decade.
 const boundaryDecades = new Map(); // decade | "history" -> Promise<FeatureCollection>
-let boundariesVersion = BOUNDARIES_VERSION;
+const boundaryFile = versionedFolder("boundaries", BOUNDARIES_VERSION);
 // boundaries/v.<version>/<name>.tbin, with the meta.json fallback described above.
 function loadBoundaryFile(name) {
   const check = (fc) => {
     if (!Array.isArray(fc?.features)) throw new Error("boundaries file has no features");
   };
-  const chunk = (version) => fetchGeoCached(`boundaries/v.${version}/${name}`, { check });
-  const tried = boundariesVersion;
-  return chunk(tried).catch(async (err) => {
-    if (err.outage !== false) throw err;
-    const meta = await fetchJSON(dataUrl("boundaries/meta.json"), { cache: "no-cache", timeoutMs: FILE_TIMEOUT_MS });
-    if (!meta?.version || meta.version === tried) throw err;
-    boundariesVersion = meta.version;
-    return chunk(meta.version);
-  });
+  return boundaryFile(name, { check });
 }
 
 // Every boundary feature once (history.tbin, split-data.mjs), for "What was this

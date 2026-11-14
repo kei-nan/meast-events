@@ -267,9 +267,15 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     );
     // Land cells: a file for exactly the cells listed, and none listed whose 1:10m land
     // is just its light pieces (src/data/land.json and land-cells/, the real ones).
-    const land = decodeGeo(fs.readFileSync(path.join(r.out, "land.tbin")));
+    // All of it in one versioned folder that land/meta.json names.
+    const lmeta = JSON.parse(fs.readFileSync(path.join(r.out, "land", "meta.json"), "utf8"));
+    assert.match(lmeta.version, /^[0-9a-f]{12}$/);
+    assert.equal(lmeta.dir, `v.${lmeta.version}`);
+    assert.deepEqual(fs.readdirSync(path.join(r.out, "land")).sort(), [lmeta.dir, "meta.json"].sort());
+    assert.deepEqual(fs.readdirSync(path.join(r.out, "land", lmeta.dir)).sort(), ["cells", "land-far.tbin", "land.tbin"]);
+    const land = decodeGeo(fs.readFileSync(path.join(r.out, "land", lmeta.dir, "land.tbin")));
     assert.ok(Array.isArray(land.cells) && land.cells.length);
-    assert.deepEqual(fs.readdirSync(path.join(r.out, "land-cells")).sort(), land.cells.map((c) => `${c}.tbin`).sort());
+    assert.deepEqual(fs.readdirSync(path.join(r.out, "land", lmeta.dir, "cells")).sort(), land.cells.map((c) => `${c}.tbin`).sort());
     const srcData = fileURLToPath(new URL("../src/data/", import.meta.url));
     const srcLand = JSON.parse(fs.readFileSync(path.join(srcData, "land.json"), "utf8"));
     const lightOf = (c) => srcLand.features.filter((f) => f.properties?.cell === c);
@@ -277,7 +283,7 @@ test("CLI: a valid fixture splits into the versioned folder and meta.json", () =
     for (const c of srcLand.cells) assert.equal(land.cells.includes(c), !sameLand(detailOf(c), lightOf(c)), c);
     // Geometry is .tbin only; a deferred group's members are one shared file, "<hash>#<index>".
     const files = fs.readdirSync(r.out, { recursive: true }).filter((p) => /^(land|boundaries)/.test(p) && fs.statSync(path.join(r.out, p)).isFile());
-    assert.deepEqual(files.filter((p) => !p.endsWith(".tbin")), [path.join("boundaries", "meta.json")]);
+    assert.deepEqual(files.filter((p) => !p.endsWith(".tbin")).sort(), [path.join("boundaries", "meta.json"), path.join("land", "meta.json")].sort());
     const chunk = decodeGeo(fs.readFileSync(path.join(r.out, "boundaries", bmeta.dir, "2020.tbin")));
     const members = chunk.features.filter((f) => f.geometry_ref);
     assert.equal(members.length, DEFERRED_GROUPS[0].members.length);

@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import { FontaineTransform } from 'fontaine'
 import { defineConfig } from 'vite'
 import thirdPartyLicenses from './scripts/third-party-licenses.mjs'
+import maplibreCss from './scripts/trim-maplibre-css.mjs'
 import { LABEL_FONT_FAMILY } from './src/lib/labelFont.js'
 import { VENDOR_CHUNKS } from './vendorChunks.js'
 
@@ -99,6 +100,10 @@ export default defineConfig(({ command }) => ({
     react(),
     preloadEventList(),
     servePagefindEngine(),
+    // "virtual:maplibre-gl.css" (src/components/MapView.jsx): MapLibre's stylesheet,
+    // read from the installed package, without the rules of the built-in controls
+    // the app never creates (their inline SVG icons were most of its bytes).
+    maplibreCss(),
     // Generates "<family> fallback" @font-faces: local system fonts with
     // size/ascent/descent overrides measured from the self-hosted web fonts
     // (src/main.jsx), named in --font-sans/--font-serif (src/index.css). One

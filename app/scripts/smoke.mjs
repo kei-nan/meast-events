@@ -57,6 +57,7 @@ const ok = (msg) => console.log(`smoke: ok - ${msg} (${elapsed()})`);
 // --- what to look for, from the built data --------------------------------
 const readDist = (rel) => JSON.parse(readFileSync(path.join(DIST, ...rel.split("/")), "utf8"));
 const meta = readDist("data/events/meta.json");
+const landMeta = readDist("data/land/meta.json");
 const lite = readDist(`data/events/${meta.dir}/all.json`);
 const full = {};
 for (let b = 0; b < meta.fullBuckets; b++) Object.assign(full, readDist(`data/events/${meta.dir}/full/${b}.json`));
@@ -551,13 +552,17 @@ async function servedHeaderChecks() {
   const checks = [
     [await get(entry), 200, immutable, `Cache-Control "${IMMUTABLE}"`],
     [await get(`/data/events/${meta.dir}/all.json`), 200, immutable, `Cache-Control "${IMMUTABLE}"`],
+    [await get(`/data/land/${landMeta.dir}/land.tbin`), 200, immutable, `Cache-Control "${IMMUTABLE}"`],
     // Missing hashed names (another build's): the 404 page, never cached as immutable.
     [await get("/assets/nope-deadbeef.js"), 404, revalidates, "a Cache-Control that revalidates (no immutable)"],
     [await get("/data/events/v.000000000000/all.json"), 404, revalidates, "a Cache-Control that revalidates (no immutable)"],
+    [await get("/data/land/v.000000000000/land.tbin"), 404, revalidates, "a Cache-Control that revalidates (no immutable)"],
+    // The mutable file naming the land folder, for a page older than the deploy: revalidated, never immutable.
+    [await get("/data/land/meta.json"), 200, (r) => !r.cache.includes("immutable"), "a Cache-Control without immutable"],
     // Un-hashed HTML that names the deploy's hashed assets: revalidated on every visit.
     [await get(`/event/${encodeURIComponent(pageEvent.id)}`), 200, (r) => r.cache === "public, max-age=0, must-revalidate", `Cache-Control "public, max-age=0, must-revalidate"`],
     // Workers sends .tbin with no type of its own; _headers labels it so Cloudflare compresses it.
-    [await get("/data/land.tbin"), 200, (r) => r.type === "application/x-protobuf", `Content-Type "application/x-protobuf"`],
+    [await get(`/data/land/${landMeta.dir}/land.tbin`), 200, (r) => r.type === "application/x-protobuf", `Content-Type "application/x-protobuf"`],
   ];
   const before = problems.length;
   for (const [r, status, test, what] of checks) expect(r, status, test, what);

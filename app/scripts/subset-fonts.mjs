@@ -29,11 +29,15 @@
 // src/data/water.json and every city name (src/data/cities.json). A label
 // character no Inter face covers fails the run (it would be drawn in a system font).
 //
-// Inter stays a variable font (harfbuzz keeps the wght axis); Spectral is the single
-// 600 weight. font-display, font-weight and the unicode-range of each face are
-// copied from the fontsource CSS (only intersected with the characters used), in
-// the same order, so fontaine (vite.config.js) still measures its fallback metrics
-// from the Latin face, which it reads last.
+// Inter stays a variable font, but its wght axis is cut from fontsource's 100-900 to
+// the 400-700 the stylesheets use (`axes` below; harfbuzz instancing, the default
+// weight 400 unchanged), and its faces say font-weight: 400 700. A numeric weight
+// outside that range in src/ fails the run (it would render as the nearest end).
+// Spectral is the single 600 weight. font-display, font-weight (Inter's: from
+// `axes`) and the unicode-range of each face are copied from the fontsource CSS
+// (only intersected with the characters used), in the same order, so fontaine
+// (vite.config.js) still measures its fallback metrics from the Latin face, which
+// it reads last.
 //
 // Output: node_modules/.cache/subset-fonts/ (not committed; rebuilt on every dev
 // start and build, including Cloudflare's).
@@ -52,9 +56,11 @@ const OUT_DIR = path.join(APP, "node_modules", ".cache", "subset-fonts");
 const require = createRequire(import.meta.url);
 
 // The stylesheets src/main.jsx used to import, one per family.
-// `label`: the family the map labels are drawn from.
+// `label`: the family the map labels are drawn from. `axes`: the variation range
+// kept (subset-font's variationAxes); the page uses Inter at 400, 500, 600 and 700
+// (src/**/*.css; the map labels at 600, lib/labelFont.js).
 const SOURCES = [
-  { prefix: "inter", css: require.resolve("@fontsource-variable/inter/wght.css"), label: true },
+  { prefix: "inter", css: require.resolve("@fontsource-variable/inter/wght.css"), label: true, axes: { wght: { min: 400, max: 700 } } },
   { prefix: "spectral", css: require.resolve("@fontsource/spectral/600.css") },
 ];
 
@@ -163,6 +169,27 @@ for (const f of sourceFiles) {
   const text = decodeSource(readFileSync(f, "utf8")).replace(/&([a-z]+);/g, (m, n) => NAMED[n] ?? m);
   addText(text);
 }
+// The weights the source asks for must lie within the Inter axis kept (SOURCES):
+// font-weight / font shorthand numbers and React's fontWeight. bolder and lighter
+// are relative (bolder over 600 is 900), so they fail too.
+{
+  const { min, max } = SOURCES.find((s) => s.axes).axes.wght;
+  const bad = [];
+  for (const f of sourceFiles) {
+    const text = readFileSync(f, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    const re = /font-weight\s*:\s*([\w-]+)|\bfont\s*:\s*(\d+)\s|fontWeight\s*:\s*["']?([\w-]+)/g;
+    for (const m of text.matchAll(re)) {
+      const v = m[1] ?? m[2] ?? m[3];
+      const n = { normal: 400, bold: 700 }[v] ?? Number(v);
+      if (["inherit", "initial", "unset", "revert"].includes(v)) continue;
+      if (!(n >= min && n <= max)) bad.push(`${path.relative(APP, f)}: ${m[0]}`);
+    }
+  }
+  if (bad.length) {
+    console.error(`subset-fonts: font weights outside Inter's ${min}-${max} (widen SOURCES' axes): ${bad.join("; ")}`);
+    process.exit(1);
+  }
+}
 
 // --- fontsource faces ---------------------------------------------------------
 const parseRange = (range) => {
@@ -232,7 +259,7 @@ const labelCovered = new Set();
 let before = 0;
 let after = 0;
 const summary = [];
-for (const { prefix, css: cssPath, label } of SOURCES) {
+for (const { prefix, css: cssPath, label, axes } of SOURCES) {
   const source = readFileSync(cssPath, "utf8");
   for (const block of source.match(/@font-face\s*\{[^}]*\}/g) ?? []) {
     const src = prop(block, "src");
@@ -243,7 +270,8 @@ for (const { prefix, css: cssPath, label } of SOURCES) {
     if (!keep.length) continue;
     const file = path.join(path.dirname(cssPath), woff2[1]);
     const input = readFileSync(file);
-    const output = await subsetFont(input, String.fromCodePoint(...keep), { targetFormat: "woff2" });
+    const output = await subsetFont(input, String.fromCodePoint(...keep), { targetFormat: "woff2", ...(axes && { variationAxes: axes }) });
+    const weight = axes ? `${axes.wght.min} ${axes.wght.max}` : prop(block, "font-weight");
     const name = path.basename(file);
     if (!name.startsWith(prefix)) throw new Error(`subset-fonts: ${name} does not start with ${prefix}`);
     stage(name, output);
@@ -255,7 +283,7 @@ for (const { prefix, css: cssPath, label } of SOURCES) {
       `  font-family: ${prop(block, "font-family")};\n` +
       `  font-style: ${prop(block, "font-style")};\n` +
       `  font-display: ${prop(block, "font-display")};\n` +
-      `  font-weight: ${prop(block, "font-weight")};\n` +
+      `  font-weight: ${weight};\n` +
       `  src: url(./${name}) format(${woff2[2]});\n` +
       `  unicode-range: ${formatRange(keep)};\n` +
       `}\n`;
@@ -267,7 +295,7 @@ for (const { prefix, css: cssPath, label } of SOURCES) {
         `  font-family: "${LABEL_FONT_FAMILY}";\n` +
         `  font-style: ${prop(block, "font-style")};\n` +
         `  font-display: ${prop(block, "font-display")};\n` +
-        `  font-weight: ${prop(block, "font-weight")};\n` +
+        `  font-weight: ${weight};\n` +
         `  src: url(./${name}) format(${woff2[2]});\n` +
         `  unicode-range: ${formatRange(labelKeep)};\n` +
         `}\n`;

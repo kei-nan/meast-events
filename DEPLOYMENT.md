@@ -138,7 +138,7 @@ Cloudflare does not deploy it.
      curated events (schema, ids, dates, coordinates). It uses only Node built-ins, so it
      needs no `node_modules` at the repo root (the build installs only `app/`).
    - `scripts/split-data.mjs` - writes `app/public/data/`.
-   - `scripts/subset-fonts.mjs` - subsets Inter (variable, wght axis kept) and Spectral
+   - `scripts/subset-fonts.mjs` - subsets Inter (variable, wght axis cut to the 400-700 the CSS uses) and Spectral
      600 from the fontsource packages to Basic Latin, Latin-1, General Punctuation and
      every character in `app/public/data/` and the app's source, keeping fontsource's
      per-script files and unicode-ranges. Output in `app/node_modules/.cache/subset-fonts/`,
