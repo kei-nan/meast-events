@@ -62,8 +62,23 @@ test("driftFor: coordinates from Wikidata that moved or were removed; other sour
   assert.deepEqual(driftFor(pinned, entity({ ...start, p625: { lat: 29.3700004, lon: 47.97 } })).rows, []); // below 6 dp
   assert.equal(driftFor(pinned, entity({ ...start, p625: { lat: 29.4, lon: 47.97 } })).rows[0].wikidata, "P625: 29.4, 47.97");
   assert.equal(driftFor(pinned, entity(start)).rows[0].wikidata, "P625: none");
-  // A Wikipedia pin is not checked against Wikidata's P625.
+  // A Wikipedia pin is not checked against Wikidata's P625 alone.
   assert.deepEqual(driftFor({ ...pinned, coordinate_source: "wikipedia" }, entity({ ...start, p625: { lat: 1, lon: 2 } })).rows, []);
+});
+
+test("driftFor: a Wikipedia pin against its article's current coordinates (gulf-air-flight-771, Q2335758)", () => {
+  const start = { p585: [{ time: "1983-09-23", precision: 11 }] };
+  const gulf = ev({ date_start: "1983-09-23", coordinates: { lat: 24.783333, lon: 55.4 }, coordinate_source: "wikipedia", location_quality: "precise" });
+  const w = entity({ ...start, p625: { lat: 24.85, lon: 54.95 } });
+  assert.deepEqual(driftFor(gulf, w, {}, null, { article: { lat: 24.85, lon: 54.95 } }).rows, [
+    { field: "coordinates", stored: "24.783333, 55.4 (wikipedia)", wikidata: "article: 24.85, 54.95; P625: 24.85, 54.95" },
+  ]);
+  assert.equal(driftFor(gulf, w, {}, null, { article: null }).rows[0].wikidata, "article: none; P625: 24.85, 54.95");
+  // The article still gives the stored pin, or its coordinates were not fetched: nothing listed.
+  assert.deepEqual(driftFor(gulf, w, {}, null, { article: { lat: 24.783333, lon: 55.4 } }).rows, []);
+  assert.deepEqual(driftFor(gulf, w).rows, []);
+  // Another item's article never gave the event's pin (docs/data-fixes.md F11): not compared.
+  assert.deepEqual(driftFor({ ...gulf, resolved_qid: "Q2" }, w, {}, null, { article: { lat: 24.85, lon: 54.95 } }).rows, []);
 });
 
 test("driftFor: classes - new and dropped P31 labels; a discovery class matched by subclass is not drift", () => {

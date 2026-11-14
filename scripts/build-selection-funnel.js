@@ -13,6 +13,7 @@ import { openCache } from "./lib/cache.js";
 import { matchExclusions } from "./lib/exclusions.js";
 import { fetchEntities } from "./lib/wd-entities.js";
 import { INCLUSION_MIN_SITELINKS, COUNTRIES, EVENT_CLASSES, groupForEvent } from "./lib/event-classes.js";
+import { coarsePeriodLabel } from "../app/src/lib/eventDate.js";
 
 const read = async (n) => JSON.parse(await readFile(new URL(`../data/${n}`, import.meta.url), "utf-8"));
 const candidates = await read("event-candidates.json");
@@ -210,7 +211,9 @@ funnel.coverage = {
   by_country_without_events_tagged_with_8_or_more_countries: sortedCounts(
     countBy(curated.filter((e) => (e.countries ?? []).length < MANY), (e) => e.countries ?? [])
   ),
-  by_decade: sortedCounts(countBy(curated, (e) => [`${Math.floor(Number(e.date_start.slice(0, 4)) / 10) * 10}s`]), true),
+  // A start Wikidata gives only to the century or millennium names no decade: it counts under that period
+  // ("20th century"), as the event panel shows it (app/src/lib/eventDate.js coarsePeriodLabel).
+  by_decade: sortedCounts(countBy(curated, (e) => [coarsePeriodLabel(e.date_start, e.date_precision) ?? `${Math.floor(Number(e.date_start.slice(0, 4)) / 10) * 10}s`]), true),
   by_category: sortedCounts(countBy(curated, (e) => [e.category])),
   economic_events: {
     total: economic.length,
@@ -220,7 +223,7 @@ funnel.coverage = {
   notes: [
     `"regional" is a hand-assigned tag of a few hand-picked events that concern the whole region; it is not a country.`,
     `by_country_without_events_tagged_with_8_or_more_countries: the same count leaving out the ${many.length} events tagged with ${MANY} or more countries (world wars, region-wide conflicts), which otherwise count in each of their 8 to 15 countries.`,
-    "by_decade: the decade of the event's start date. by_category: our coarse grouping (docs/DATA_POLICY.md, Category), the same rule for hand-picked and discovered events.",
+    "by_decade: the decade of the event's start date; a start Wikidata gives only to the century (or coarser) counts under that century, not in a decade. by_category: our coarse grouping (docs/DATA_POLICY.md, Category), the same rule for hand-picked and discovered events.",
   ],
 };
 

@@ -1,12 +1,33 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatEventDate } from "./eventDate.js";
+import { coarsePeriodLabel, formatEventDate } from "./eventDate.js";
 
 test("start follows its recorded precision", () => {
   assert.equal(formatEventDate("1978-09-17", null, { precision: "day" }), "17 September 1978");
   assert.equal(formatEventDate("1909-04-01", null, { precision: "month" }), "April 1909");
   assert.equal(formatEventDate("1915-01-01", null, { precision: "year" }), "1915");
   assert.equal(formatEventDate("1948-05-15", null, { precision: "decade" }), "1948");
+});
+
+test("a century-precision start shows as its century, never as the year it is stored under", () => {
+  // israeli-lebanese-conflict (Q3241199): Wikidata P580 +2000 at century precision = the 20th century (1901-2000).
+  assert.equal(formatEventDate("2000-01-01", null, { precision: "century" }), "20th century");
+  assert.equal(formatEventDate("2000-01-01", null, { precision: "century", ongoing: true }), "20th century – ongoing (per source)");
+  assert.equal(formatEventDate("1901-01-01", null, { precision: "century" }), "20th century");
+  assert.equal(formatEventDate("1900-01-01", null, { precision: "century" }), "19th century");
+  assert.equal(formatEventDate("2100-01-01", null, { precision: "century" }), "21st century");
+  assert.equal(formatEventDate("2000-01-01", null, { precision: "millennium" }), "2nd millennium");
+});
+
+test("coarsePeriodLabel: only century and millennium precision; ordinals", () => {
+  assert.equal(coarsePeriodLabel("2000-01-01", "decade"), null);
+  assert.equal(coarsePeriodLabel("2000-01-01", "year"), null);
+  assert.equal(coarsePeriodLabel(null, "century"), null);
+  assert.equal(coarsePeriodLabel("1101-01-01", "century"), "12th century");
+  assert.equal(coarsePeriodLabel("1200-01-01", "century"), "12th century");
+  assert.equal(coarsePeriodLabel("1300-01-01", "century"), "13th century");
+  assert.equal(coarsePeriodLabel("2200-01-01", "century"), "22nd century");
+  assert.equal(coarsePeriodLabel("3000-01-01", "millennium"), "3rd millennium");
 });
 
 test("missing precision shows the year only", () => {

@@ -1,5 +1,5 @@
 // Wikipedia / Wikidata fetch helpers (read-only; this pipeline never writes to either).
-import { politeFetch, mediaWikiFetch } from "./http.js";
+import { politeFetch, mediaWikiFetch, sleep } from "./http.js";
 import { wikidataDate } from "./wd-entities.js";
 
 const PRECISION_NAMES = {
@@ -89,6 +89,35 @@ export async function fetchCategories(title) {
   if (data === null) return null;
   const page = data.query?.pages?.[0];
   return (page?.categories ?? []).map((c) => c.title.replace(/^Category:/, ""));
+}
+
+// The current primary coordinates of English Wikipedia articles (GeoData, `prop=coordinates&coprimary=primary`:
+// the point the REST summary's `coordinates` field reports, which enrich-candidates.js stores as a "wikipedia" pin).
+// Returns Map(requested title -> { lat, lon } | null): null when the article (after redirects) has no primary
+// coordinates; a title the API does not return at all (an invalid title) is absent. 50 titles per request, a pause
+// between them; an API error throws (lib/http.js mediaWikiFetch), so a failed batch never reads as "no coordinates".
+export async function fetchArticleCoordinates(titles, { delayMs = 300 } = {}) {
+  const out = new Map();
+  const want = [...new Set(titles.filter(Boolean))];
+  for (let i = 0; i < want.length; i += 50) {
+    const chunk = want.slice(i, i + 50);
+    const url =
+      "https://en.wikipedia.org/w/api.php?action=query&prop=coordinates&coprimary=primary&colimit=max&redirects=1" +
+      `&format=json&formatversion=2&titles=${encodeURIComponent(chunk.join("|"))}`;
+    const data = await mediaWikiFetch(url, "coordinates");
+    const q = data.query ?? {};
+    // requested title -> the page title the API answers for (normalisation, then the redirect)
+    const step = (list, t) => (list ?? []).find((x) => x.from === t)?.to ?? t;
+    const byTitle = new Map((q.pages ?? []).map((p) => [p.title, p]));
+    for (const t of chunk) {
+      const page = byTitle.get(step(q.redirects, step(q.normalized, t)));
+      if (!page) continue;
+      const c = (page.coordinates ?? [])[0] ?? null;
+      out.set(t, c ? { lat: c.lat, lon: c.lon } : null);
+    }
+    if (i + 50 < want.length && delayMs) await sleep(delayMs);
+  }
+  return out;
 }
 
 // English labels of many items. A failed chunk throws (as fetchLabelsCached in wd-entities.js
