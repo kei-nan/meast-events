@@ -22,7 +22,12 @@ const ENTRY = "/assets/index-AbCd_-12.js";
 const SEARCH_DIR = "v.0123456789ab";
 const BVERSION = "fedcba987654";
 const BDIR = `v.${BVERSION}`;
-const VERSION_JS = `export const DATA_VERSION = "${VERSION}";\nexport const FULL_BUCKETS = ${BUCKETS};\nexport const BOUNDARIES_VERSION = "${BVERSION}";\n`;
+const LVERSION = "0a1b2c3d4e5f";
+const LDIR = `v.${LVERSION}`;
+const LAND = `data/land/${LDIR}`;
+const VERSION_JS =
+  `export const DATA_VERSION = "${VERSION}";\nexport const FULL_BUCKETS = ${BUCKETS};\nexport const BOUNDARIES_VERSION = "${BVERSION}";\n` +
+  `export const LAND_VERSION = "${LVERSION}";\n`;
 // A geometry file (.tbin) holding `doc`.
 const tbin = (doc) => encodeGeo(doc, { topology });
 const fc = (features = [], extra = {}) => ({ type: "FeatureCollection", ...extra, features });
@@ -102,14 +107,15 @@ function fixture() {
   for (const id of IDS) buckets[fullBucket(id, BUCKETS)][id] = { extract: "" };
   buckets.forEach((b, i) => write(`data/events/${DIR}/full/${i}.json`, b));
   write("data/events/meta.json", { version: VERSION, dir: DIR, fullBuckets: BUCKETS, totalEvents: IDS.length });
-  write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const BOUNDARIES_VERSION="${BVERSION}";const SEARCH_DIR="${SEARCH_DIR}";`);
+  write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const BOUNDARIES_VERSION="${BVERSION}";const LAND_VERSION="${LVERSION}";const SEARCH_DIR="${SEARCH_DIR}";`);
   write("data/boundaries/meta.json", { decades: [1950], version: BVERSION, dir: BDIR });
   write(`data/boundaries/${BDIR}/1950.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#1" }, { type: "Feature", properties: {}, geometry: polygon }])));
   write(`data/boundaries/${BDIR}/history.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "aaaaaaaaaaaa#0" }, { type: "Feature", properties: {}, geometry: polygon }])));
   write("data/boundaries/shared/aaaaaaaaaaaa.tbin", tbin(fc([0, 1].map(() => ({ type: "Feature", properties: {}, geometry: polygon })))));
-  write("data/land.tbin", tbin(fc([], { cells: ["n30e030"] })));
-  write("data/land-far.tbin", tbin(fc()));
-  write("data/land-cells/n30e030.tbin", tbin(fc()));
+  write("data/land/meta.json", { version: LVERSION, dir: LDIR });
+  write(`${LAND}/land.tbin`, tbin(fc([], { cells: ["n30e030"] })));
+  write(`${LAND}/land-far.tbin`, tbin(fc()));
+  write(`${LAND}/cells/n30e030.tbin`, tbin(fc()));
   write("index.html", shell());
   for (const id of IDS) write(`event/${id}.html`, eventPage(id));
   write("pagefind/meta.json", { version: SEARCH_DIR.slice(2), dir: SEARCH_DIR });
@@ -206,13 +212,13 @@ test("boundaries and land: a missing or undecodable geometry file, shared geomet
     (f) => f.write(`data/boundaries/${BDIR}/history.tbin`, tbin(fc([{ type: "Feature", properties: {}, geometry: null, geometry_ref: "bbbbbbbbbbbb#0" }]))),
     /history\.tbin points to missing shared geometry bbbbbbbbbbbb#0/
   );
-  await assertProblem((f) => f.remove("data/land-far.tbin"), /data\/land-far\.tbin is missing/);
-  await assertProblem((f) => f.write("data/land-far.tbin", tbin(polygon)), /land-far\.tbin is not a FeatureCollection/);
-  await assertProblem((f) => f.remove("data/land-cells/n30e030.tbin"), /land-cells\/n30e030\.tbin is missing/);
-  await assertProblem((f) => f.write("data/land-cells/n30e030.tbin", tbin(fc()).slice(0, 9)), /n30e030\.tbin does not decode/);
-  await assertProblem((f) => f.write("data/land.tbin", tbin(fc([], { cells: [] }))), /lists no land cells/);
+  await assertProblem((f) => f.remove(`${LAND}/land-far.tbin`), /data\/land\/v\.0a1b2c3d4e5f\/land-far\.tbin is missing/);
+  await assertProblem((f) => f.write(`${LAND}/land-far.tbin`, tbin(polygon)), /land-far\.tbin is not a FeatureCollection/);
+  await assertProblem((f) => f.remove(`${LAND}/cells/n30e030.tbin`), /cells\/n30e030\.tbin is missing/);
+  await assertProblem((f) => f.write(`${LAND}/cells/n30e030.tbin`, tbin(fc()).slice(0, 9)), /n30e030\.tbin does not decode/);
+  await assertProblem((f) => f.write(`${LAND}/land.tbin`, tbin(fc([], { cells: [] }))), /lists no land cells/);
   // A cell left out of the list (its light piece is exact) ships no file either.
-  await assertProblem((f) => f.write("data/land-cells/n30e035.tbin", tbin(fc())), /land-cells\/ has 1 files land\.tbin does not list \(n30e035\.tbin\)/);
+  await assertProblem((f) => f.write(`${LAND}/cells/n30e035.tbin`, tbin(fc())), /cells\/ has 1 files land\.tbin does not list \(n30e035\.tbin\)/);
 });
 
 test("index.html: no entry script, or a reference to a file not in dist/", async () => {
@@ -335,6 +341,26 @@ test("boundaries folder: the bundle, meta.json and dist/ must agree on boundarie
   await assertProblem(
     (f) => f.write("_headers", HEADERS() + "\n/data/boundaries/v.000000000000/*\n  Cache-Control: public, max-age=31536000, immutable\n"),
     /the splat rule \/data\/boundaries\/v\.000000000000\/\* is immutable/
+  );
+});
+
+test("land folder: the bundle, meta.json and dist/ must agree on land/v.<LAND_VERSION>/", async () => {
+  await assertProblem((f) => fs.writeFileSync(f.versionFile, VERSION_JS.replace(/export const LAND_VERSION.*\n/, "")), /LAND_VERSION null is not 12 hex characters/);
+  await assertProblem((f) => f.remove("data/land/meta.json"), /data\/land\/meta\.json is missing/);
+  await assertProblem((f) => f.write("data/land/meta.json", { version: "111111111111", dir: LDIR }), /land\/meta\.json version 111111111111 != LAND_VERSION/);
+  await assertProblem((f) => f.write("data/land/meta.json", { version: LVERSION, dir: "v.x" }), /land\/meta\.json dir v\.x != v\.0a1b2c3d4e5f/);
+  await assertProblem((f) => f.write("data/land/v.000000000000/land.tbin", tbin(fc())), /other or old-layout land files in dist\/data: v\.000000000000/);
+  await assertProblem((f) => f.write("data/land.tbin", tbin(fc())), /old-layout land files.*land\.tbin/);
+  await assertProblem((f) => f.write("data/land-cells/n30e030.tbin", tbin(fc())), /old-layout land files.*land-cells/);
+  await assertProblem(
+    (f) => f.write(ENTRY.slice(1), `const DATA_VERSION="${VERSION}";const BOUNDARIES_VERSION="${BVERSION}";const SEARCH_DIR="${SEARCH_DIR}";`),
+    /no dist\/assets\/\*\.js contains LAND_VERSION/
+  );
+  // The build's own folder may be immutable; any other land splat may not.
+  assert.deepEqual(await problemsAfter((f) => f.write("_headers", HEADERS() + `\n/data/land/${LDIR}/*\n  Cache-Control: public, max-age=31536000, immutable\n`)), []);
+  await assertProblem(
+    (f) => f.write("_headers", HEADERS() + "\n/data/land/v.000000000000/*\n  Cache-Control: public, max-age=31536000, immutable\n"),
+    /the splat rule \/data\/land\/v\.000000000000\/\* is immutable/
   );
 });
 

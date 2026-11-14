@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Map as MaplibreMap, prewarm, setWorkerUrl } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import "virtual:maplibre-gl.css"; // maplibre-gl.css without the unused controls' rules (scripts/trim-maplibre-css.mjs)
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import { EMPTY_FC, eventFeature, eventSignature, eventsToGeoJSON, pointFeature } from "./mapLayers";
 import { CLUSTER_MAX_ZOOM, installLayers } from "./mapInstallLayers";

@@ -12,7 +12,8 @@
 //     decade's boundaries (in the versioned folder boundaries/v.<BOUNDARIES_VERSION>/,
 //     which boundaries/meta.json and the built JavaScript name too, and no other),
 //     history.tbin beside them ("What was this place?") and the shared geometries
-//     they name, the land and its cells;
+//     they name, the land and its cells (in the versioned folder land/v.<LAND_VERSION>/,
+//     named the same three ways);
 //   - every local script/stylesheet/icon/preload index.html references exists in dist/;
 //   - every event has its page, and each is the app: the same /assets/ as index.html;
 //   - the search index (Pagefind) was built into the versioned folder
@@ -138,11 +139,15 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
   let DATA_VERSION = null;
   let FULL_BUCKETS = null;
   let BOUNDARIES_VERSION = null;
+  let LAND_VERSION = null;
   if (!existsSync(versionFile)) fail("src/lib/dataVersion.js is missing (split-data.mjs did not run)");
-  else ({ DATA_VERSION, FULL_BUCKETS, BOUNDARIES_VERSION = null } = await import(pathToFileURL(versionFile).href));
+  else ({ DATA_VERSION, FULL_BUCKETS, BOUNDARIES_VERSION = null, LAND_VERSION = null } = await import(pathToFileURL(versionFile).href));
   if (DATA_VERSION !== null && !/^[0-9a-f]{12}$/.test(DATA_VERSION)) fail(`DATA_VERSION ${JSON.stringify(DATA_VERSION)} is not 12 hex characters`);
   if (existsSync(versionFile) && !/^[0-9a-f]{12}$/.test(BOUNDARIES_VERSION ?? "")) {
     fail(`BOUNDARIES_VERSION ${JSON.stringify(BOUNDARIES_VERSION)} is not 12 hex characters`);
+  }
+  if (existsSync(versionFile) && !/^[0-9a-f]{12}$/.test(LAND_VERSION ?? "")) {
+    fail(`LAND_VERSION ${JSON.stringify(LAND_VERSION)} is not 12 hex characters`);
   }
   if (FULL_BUCKETS !== null && !(Number.isInteger(FULL_BUCKETS) && FULL_BUCKETS > 0)) fail(`FULL_BUCKETS ${FULL_BUCKETS} is not a positive integer`);
 
@@ -222,24 +227,45 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
     }
   }
 
-  // Land: the opening view's file and the rest (lib/mapExtent.js NEAR_LAND_EXTENT).
+  // Land, in the one versioned folder land/v.<LAND_VERSION>/ that the bundle and
+  // land/meta.json both name: the opening view's file and the rest (lib/mapExtent.js
+  // NEAR_LAND_EXTENT).
+  const ldir = `v.${LAND_VERSION}`;
+  const lroot = `data/land/${ldir}`;
+  if (LAND_VERSION) {
+    if (!existsSync(distFile("data/land/meta.json"))) fail("data/land/meta.json is missing");
+    else {
+      const lmeta = readJSON("data/land/meta.json");
+      if (lmeta.version !== LAND_VERSION) fail(`land/meta.json version ${lmeta.version} != LAND_VERSION ${LAND_VERSION}`);
+      if (lmeta.dir !== ldir) fail(`land/meta.json dir ${lmeta.dir} != ${ldir}`);
+    }
+    const stale = [
+      ...(existsSync(distFile("data/land")) ? readdirSync(distFile("data/land")).filter((f) => f !== ldir && f !== "meta.json") : []),
+      ...readdirSync(distFile("data")).filter((f) => /^(land\.tbin|land-far\.tbin|land-cells)$/.test(f)),
+    ];
+    if (stale.length) fail(`other or old-layout land files in dist/data: ${stale.join(", ")}`);
+    const assets = existsSync(distFile("assets")) ? readdirSync(distFile("assets")).filter((f) => f.endsWith(".js")) : [];
+    if (!assets.some((f) => readFileSync(distFile(`assets/${f}`), "utf8").includes(LAND_VERSION))) {
+      fail(`no dist/assets/*.js contains LAND_VERSION ${LAND_VERSION} (the bundle was built against another dataVersion.js)`);
+    }
+  }
   const land = {};
   for (const name of ["land", "land-far"]) {
-    land[name] = readGeo(`data/${name}.tbin`);
-    if (land[name] && !Array.isArray(land[name].features)) fail(`data/${name}.tbin is not a FeatureCollection`);
+    land[name] = readGeo(`${lroot}/${name}.tbin`);
+    if (land[name] && !Array.isArray(land[name].features)) fail(`${lroot}/${name}.tbin is not a FeatureCollection`);
   }
   // ...and the Middle East's 1:10m cells land.tbin lists (lib/landStore.js). A cell
   // whose 1:10m land is exactly its light piece is not listed and has no file
   // (split-data.mjs copyLand): a file nobody lists is one the map never fetches.
   if (land.land) {
     const cells = land.land.cells;
-    if (!Array.isArray(cells) || !cells.length) fail("data/land.tbin lists no land cells");
+    if (!Array.isArray(cells) || !cells.length) fail(`${lroot}/land.tbin lists no land cells`);
     else {
-      for (const c of cells) readGeo(`data/land-cells/${c}.tbin`);
+      for (const c of cells) readGeo(`${lroot}/cells/${c}.tbin`);
       const listed = new Set(cells.map((c) => `${c}.tbin`));
-      const dir = distFile("data/land-cells");
+      const dir = distFile(`${lroot}/cells`);
       const extra = existsSync(dir) ? readdirSync(dir).filter((f) => !listed.has(f)) : [];
-      if (extra.length) fail(`data/land-cells/ has ${extra.length} files land.tbin does not list (${extra.slice(0, 3).join(", ")})`);
+      if (extra.length) fail(`${lroot}/cells/ has ${extra.length} files land.tbin does not list (${extra.slice(0, 3).join(", ")})`);
     }
   }
 
@@ -342,6 +368,7 @@ export async function checkDist({ dist = DIST, versionFile = VERSION_FILE, maxFi
       r.pattern.includes("*") &&
       r.pattern !== `/data/events/${dir}/*` &&
       r.pattern !== `/data/boundaries/v.${BOUNDARIES_VERSION}/*` &&
+      r.pattern !== `/data/land/v.${LAND_VERSION}/*` &&
       r.pattern !== `/pagefind/${searchDir}/*`;
     for (const r of rules) if (splat(r) && immutable(r)) fail(`_headers: the splat rule ${r.pattern} is immutable, so a missing file's 404 would be too`);
     const entry = refs.find((u) => /^\/assets\/index-.*\.js$/.test(u));

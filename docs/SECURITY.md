@@ -173,14 +173,18 @@ expansion or more than 100 rules.
   appears under `assets/`, so nothing unhashed can get the
   immutable header. A missing file revalidates.
 - `/data/*`: 1 h for the un-hashed files (`events/meta.json`,
-  `boundaries/meta.json`, `land.tbin`, `land-far.tbin`, `land-cells/*`,
-  `selection-funnel.json`, `framing-review.json`).
+  `boundaries/meta.json`, `land/meta.json`, `selection-funnel.json`,
+  `framing-review.json`).
   Immutable: this build's `/data/events/v.<hash>/*` (the event list `all.json`
   and every `full/*.json` record, one folder per build named by a hash of all
   its files, `app/scripts/split-data.mjs`; any other `v.*` revalidates), this
   build's `/data/boundaries/v.<hash>/*` (the border decade chunks, one folder
   per build named by a hash of every chunk, so a new bundle never reads an old
-  chunk naming a removed shared file; any other `v.*` revalidates) and each
+  chunk naming a removed shared file; any other `v.*` revalidates), this
+  build's `/data/land/v.<hash>/*` (`land.tbin`, `land-far.tbin` and the 1:10m
+  `cells/*`, one folder per build named by a hash of all its files, so a
+  returning visitor's map starts without revalidating its land; any other `v.*`
+  revalidates) and each
   file in `/data/boundaries/shared/` (large boundary geometries named by a hash
   of their content).
 - `/pagefind/*`: the whole search index, engine included, is one folder

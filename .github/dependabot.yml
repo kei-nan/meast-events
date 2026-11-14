@@ -13,13 +13,21 @@ updates:
     open-pull-requests-limit: 5
     groups:
       minor-and-patch: { update-types: [minor, patch] }
+  # maplibre-gl gets a group of its own, out of the weekly one: each release
+  # replaces its ~440 KB chunk (vendorChunks.js), which every returning visitor
+  # downloads again, so its PR waits apart from the others and is merged about
+  # once a month instead of riding along every week. (The options reference has
+  # no per-dependency schedule: a second "/app" entry would overlap this one,
+  # which it forbids.) Groups and cooldown apply to version updates only, so a
+  # maplibre-gl security update still opens at once, on its own.
   - package-ecosystem: npm
     directory: "/app"
     schedule: { interval: weekly }
     cooldown: { default-days: 7 }
     open-pull-requests-limit: 5
     groups:
-      minor-and-patch: { update-types: [minor, patch] }
+      maplibre: { patterns: [maplibre-gl] }
+      minor-and-patch: { update-types: [minor, patch], exclude-patterns: [maplibre-gl] }
   - package-ecosystem: github-actions
     directory: "/"
     schedule: { interval: weekly }

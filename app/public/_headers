@@ -103,8 +103,8 @@
 /event/*
   Cache-Control: public, max-age=0, must-revalidate
 
-# /data/*.tbin: the map's geometry, land and boundaries (land.tbin, land-far.tbin,
-# land-cells/*.tbin, boundaries/v.<hash>/<decade>.tbin, boundaries/shared/<hash>.tbin), in
+# /data/*.tbin: the map's geometry, land and boundaries (land/v.<hash>/land.tbin,
+# land-far.tbin and cells/*.tbin, boundaries/v.<hash>/<decade>.tbin, boundaries/shared/<hash>.tbin), in
 # the binary format of app/src/lib/geoCodec.js. Workers serves .tbin with no
 # Content-Type, and Cloudflare only compresses responses whose type is on its
 # list (application/octet-stream is not): without this the files ship raw (the
@@ -116,7 +116,7 @@
 /data/*.tbin
   Content-Type: application/x-protobuf
 
-# /data/*: the static dataset. Un-hashed names (land.tbin, land-far.tbin, land-cells/*.tbin, boundaries/meta.json,
+# /data/*: the static dataset. Un-hashed names (boundaries/meta.json, land/meta.json,
 # events/meta.json, selection-funnel.json, framing-review.json) change on every
 # data regeneration, so cache moderately and revalidate in the background. All
 # event data (the lite list and every full record) lives in ONE versioned folder,
@@ -145,6 +145,17 @@
 # folder revalidates (the splat above).
 #! immutable-per-file
 /data/boundaries/v.*
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The land (land.tbin, land-far.tbin, cells/<cell>.tbin) lives in ONE versioned
+# folder too, land/v.<12-hex hash of every file>/ (split-data.mjs copyLand),
+# named by the bundle and by land/meta.json (the mutable file, revalidated above),
+# so a returning visitor's map starts without revalidating its land first.
+# Immutable through one rule for the build's folder; another build's folder
+# revalidates (the splat above).
+#! immutable-per-file
+/data/land/v.*
   ! Cache-Control
   Cache-Control: public, max-age=0, must-revalidate
 

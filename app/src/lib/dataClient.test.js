@@ -4,7 +4,7 @@ import { register } from "node:module";
 import { topology } from "topojson-server";
 import { fullBucket } from "./fullBucket.js";
 import { encodeGeo } from "./geoCodec.js";
-import { TEST_BOUNDARIES_VERSION as BV1, TEST_DATA_VERSION as V1, TEST_FULL_BUCKETS as B1 } from "./testing/viteNodeHooks.mjs";
+import { TEST_BOUNDARIES_VERSION as BV1, TEST_DATA_VERSION as V1, TEST_FULL_BUCKETS as B1, TEST_LAND_VERSION as LV1 } from "./testing/viteNodeHooks.mjs";
 
 // dataClient.js imports the generated dataVersion.js and reads Vite's
 // import.meta.env; the hooks stub both (DATA_VERSION = V1, FULL_BUCKETS = B1,
@@ -38,13 +38,15 @@ const bucket = (v, id, n) => `/data/events/v.${v}/full/${fullBucket(id, n)}.json
 const META = "/data/events/meta.json";
 const chunk = (v, decade) => `/data/boundaries/v.${v}/${decade}.tbin`;
 const BOUNDARIES_META = "/data/boundaries/meta.json";
+const land = (name, v = LV1) => `/data/land/v.${v}/${name}.tbin`;
+const LAND_META = "/data/land/meta.json";
 const LITE = [{ id: "e1", date_start: "1948-05-14", coordinates: { lon: 35, lat: 31 } }];
 
 test("failure classes: 4xx and an HTML 200 are not outages, 5xx and network errors are", async () => {
   const { loadLand, loadFarLand, loadSelectionFunnel, loadFramingReviewSummary } = await freshClient();
   stubFetch({
-    "/data/land.tbin": () => json({}, 404),
-    "/data/land-far.tbin": () => json({}, 503),
+    [land("land")]: () => json({}, 404),
+    [land("land-far")]: () => json({}, 503),
     "/data/selection-funnel.json": () => html(200),
     "/data/framing-review.json": () => {
       throw new TypeError("fetch failed");
@@ -61,8 +63,8 @@ test("a 200 that is not valid JSON, or a geometry file that does not decode, cou
   const truncated = encodeGeo(fc(), { topology }).slice(0, 7);
   stubFetch({
     "/data/selection-funnel.json": () => new Response("{trunc", { headers: { "content-type": "application/json" } }),
-    "/data/land.tbin": () => new Response(truncated),
-    "/data/land-far.tbin": () => json(fc()), // JSON where a .tbin belongs
+    [land("land")]: () => new Response(truncated),
+    [land("land-far")]: () => json(fc()), // JSON where a .tbin belongs
   });
   await assert.rejects(loadSelectionFunnel(), (e) => e.outage === true);
   await assert.rejects(loadLand(), (e) => e.outage === true);
@@ -73,20 +75,20 @@ test("concurrent callers share one request; a success stays cached, a failure is
   const { loadLand, loadLandCell } = await freshClient();
   let landOk = false;
   const calls = stubFetch({
-    "/data/land.tbin": () => (landOk ? tbin(fc()) : json({}, 500)),
-    "/data/land-cells/35_30.tbin": () => tbin({ ...fc(), cell: "35_30" }),
+    [land("land")]: () => (landOk ? tbin(fc()) : json({}, 500)),
+    [land("cells/35_30")]: () => tbin({ ...fc(), cell: "35_30" }),
   });
   const [a, b] = await Promise.all([loadLandCell("35_30"), loadLandCell("35_30")]);
   assert.equal(a, b);
   assert.equal(a.cell, "35_30");
   await loadLandCell("35_30");
-  assert.equal(count(calls, "/data/land-cells/35_30.tbin"), 1);
+  assert.equal(count(calls, land("cells/35_30")), 1);
 
   await assert.rejects(Promise.all([loadLand(), loadLand()]));
-  assert.equal(count(calls, "/data/land.tbin"), 1);
+  assert.equal(count(calls, land("land")), 1);
   landOk = true;
   assert.deepEqual(await loadLand(), fc());
-  assert.equal(count(calls, "/data/land.tbin"), 2);
+  assert.equal(count(calls, land("land")), 2);
 });
 
 test("loadAllLite reads the bundle's versioned folder once and normalizes", async () => {
@@ -287,13 +289,13 @@ test("only the full-record bucket is fetched at high priority", async () => {
   const calls = stubFetch({
     [all(V1)]: () => json(LITE),
     [bucket(V1, "e1", B1)]: () => json({ e1: { extract: "lead" } }),
-    "/data/land.tbin": () => tbin(fc()),
+    [land("land")]: () => tbin(fc()),
   });
   await loadFullLead("e1");
   await loadLand();
   assert.equal(calls.find((c) => c.url === bucket(V1, "e1", B1)).init?.priority, "high");
   assert.equal(calls.find((c) => c.url === all(V1)).init?.priority, undefined);
-  assert.equal(calls.find((c) => c.url === "/data/land.tbin").init?.priority, undefined);
+  assert.equal(calls.find((c) => c.url === land("land")).init?.priority, undefined);
 });
 
 test("loadBoundaryDecade puts shared geometries back, leaves deferred ones, shares and evicts", async () => {
@@ -394,13 +396,34 @@ test("loadBoundaryDecade: an outage, or meta.json naming the same folder, does n
   assert.equal(count(calls, BOUNDARIES_META), 1);
 });
 
+test("land: this bundle's folder gone (404) -> land/meta.json names the current one, used from then on; an outage does not switch", async () => {
+  const { loadLand, loadFarLand, loadLandCell } = await freshClient();
+  let calls = stubFetch({ [land("land")]: () => json({}, 503), [LAND_META]: () => json({ version: "test-l2" }) });
+  await assert.rejects(loadLand(), (e) => e.outage === true);
+  assert.equal(count(calls, LAND_META), 0);
+  calls = stubFetch({
+    [LAND_META]: () => json({ version: "test-l2", dir: "v.test-l2" }),
+    [land("land", "test-l2")]: () => tbin({ ...fc(), cells: ["35_30"] }),
+    [land("land-far", "test-l2")]: () => tbin(fc()),
+    [land("cells/35_30", "test-l2")]: () => tbin({ ...fc(), cell: "35_30" }),
+  });
+  assert.deepEqual((await loadLand()).cells, ["35_30"]);
+  assert.equal(calls.find((c) => c.url === LAND_META).init?.cache, "no-cache");
+  await loadFarLand();
+  assert.equal((await loadLandCell("35_30")).cell, "35_30");
+  assert.equal(count(calls, land("land")), 1);
+  assert.equal(count(calls, land("land-far")), 0); // the switch sticks
+  assert.equal(count(calls, land("cells/35_30")), 0);
+  assert.equal(count(calls, LAND_META), 1);
+});
+
 test("BASE_URL prefixes every data path", async () => {
   globalThis.__VITE_ENV__ = { BASE_URL: "/sub/" };
   try {
     const { loadLand } = await freshClient();
-    const calls = stubFetch({ "/sub/data/land.tbin": () => tbin({ ...fc(), ok: 1 }) });
+    const calls = stubFetch({ [`/sub${land("land")}`]: () => tbin({ ...fc(), ok: 1 }) });
     assert.deepEqual(await loadLand(), { ...fc(), ok: 1 });
-    assert.deepEqual(calls.map((c) => c.url), ["/sub/data/land.tbin"]);
+    assert.deepEqual(calls.map((c) => c.url), [`/sub${land("land")}`]);
   } finally {
     delete globalThis.__VITE_ENV__;
   }
