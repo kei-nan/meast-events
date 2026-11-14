@@ -128,11 +128,16 @@ test("EventDetail: a hand-picked event with an approximate location says so, and
   for (const m of marks) {
     assert.equal(m.attrs.role, "button");
     assert.equal(m.attrs.tabindex, "0");
-    assert.match(m.attrs["aria-label"], /^Flagged by the (overall fairness review|wording check)( and the wording check)?: /);
+    // Named by its words (an aria-label would replace them, and the lang of a
+    // name in another script with them), described by the review that flagged it.
+    assert.equal(m.attrs["aria-label"], undefined);
+    assert.match(m.attrs["aria-describedby"], /^(framing-mark-(fairness|wording|any) )+framing-mark-why$/);
+    for (const id of m.attrs["aria-describedby"].split(" ")) assert.match(v.html, new RegExp(`id="${id}"`));
     assert.ok(event.extract.includes(m.text), "the marked words are the article's own, unchanged");
   }
   const fairness = review.highlights.find((h) => h.kind === "fairness")?.text;
-  if (fairness) assert.ok(marks.some((m) => m.text === fairness && /overall fairness review/.test(m.attrs["aria-label"])));
+  if (fairness) assert.ok(marks.some((m) => m.text === fairness && /framing-mark-fairness/.test(m.attrs["aria-describedby"])));
+  assert.match(v.html, /id="framing-mark-why">Select to read why\./);
   // the review itself (lazy FramingReview) is in the view, with its two tabs
   assert.match(v.html, /role="tablist"/);
   assert.ok(elements(v.html, "button").some((b) => b.attrs.role === "tab" && /Overall fairness/.test(b.text)));

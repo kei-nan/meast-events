@@ -180,6 +180,25 @@ function LoadingNote() {
   return shown ? <p className="event-detail-note">Loading the full text…</p> : null;
 }
 
+// What a screen reader hears after a flagged phrase's own words: which review
+// flagged it (a phrase from a review without a type: "our framing review"),
+// and that selecting it opens the review. Ids of MarkDescriptions' lines.
+const MARK_WHY_ID = "framing-mark-why";
+const markKindId = (k) => `framing-mark-${k === "fairness" || k === "wording" ? k : "any"}`;
+const markDescribedBy = (kinds) =>
+  [...new Set(kinds.length ? kinds.map(markKindId) : [markKindId(null)])].concat(MARK_WHY_ID).join(" ");
+
+function MarkDescriptions() {
+  return (
+    <div hidden>
+      <span id={markKindId("fairness")}>Flagged by the overall fairness review.</span>
+      <span id={markKindId("wording")}>Flagged by the wording check.</span>
+      <span id={markKindId(null)}>Flagged by our framing review.</span>
+      <span id={MARK_WHY_ID}>Select to read why.</span>
+    </div>
+  );
+}
+
 /**
  * Selected-event view. Wikipedia's title/lead and Wikidata's class labels are
  * rendered as-is. `event.leadStatus` is "loading"/"error" while only the
@@ -298,6 +317,9 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
       {segs.map((s, j) => {
         const at = segs.slice(0, j).reduce((n, x) => n + x.text.length, 0);
         return s.flagged ? (
+          // Named by its own words, not an aria-label that replaced them (and
+          // with them the <bdi lang> of a name in Arabic, Hebrew or Persian),
+          // and described by which review flagged it (MarkDescriptions).
           <mark
             key={j}
             className={`framing-mark ${s.kinds.map((k) => `framing-mark--${k}`).join(" ")}`}
@@ -311,7 +333,7 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
                 showFinding(s.kinds);
               }
             }}
-            aria-label={`Flagged by the ${s.kinds.map((k) => (k === "fairness" ? "overall fairness review" : "wording check")).join(" and the ")}: ${s.text}`}
+            aria-describedby={markDescribedBy(s.kinds)}
           >
             {bidi(s.text, runs, at)}
           </mark>
@@ -394,6 +416,7 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
                 {paragraphs.slice(LEAD_PARAGRAPHS).map((segs, i) => renderParagraph(segs, i + LEAD_PARAGRAPHS))}
               </div>
             )}
+            {highlights?.length > 0 && <MarkDescriptions />}
           </>
         ) : (
           <p>No summary available.</p>

@@ -178,7 +178,7 @@ html, body, #root {
 }
 
 /* Phones and short (landscape) screens: a tighter line. */
-@media (max-width: 768px), (max-height: 500px) {
+@media (max-width: 768px), (max-height: 31.25em) {
   .app-footer {
     padding: 0 14px;
     font-size: 0.7rem;
@@ -202,8 +202,11 @@ html, body, #root {
 /* Short screens (a phone held sideways: 740x360; 400% zoom: 360x225): the
    footer waits just under the screen, a scroll away, so the map keeps its
    line (the sheet-open rule in SidePanel.css scrolls the page the same way).
-   Tab still reaches its links, which scroll into view. */
-@media (max-height: 500px) {
+   Tab still reaches its links, which scroll into view. In em (500px at the
+   default text size), as every "short screen" query: a raised browser text
+   size makes the header, timeline and footer taller, so a 375x740 phone at
+   200% has about the room of a 375x370 one. */
+@media (max-height: 31.25em) {
   .app {
     position: relative;
   }

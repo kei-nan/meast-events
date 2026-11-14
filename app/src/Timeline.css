@@ -760,7 +760,7 @@
    row, Play, the years and the strip, at every sheet height, so the map and
    the panel keep most of the ~390px. The play mode and the presets come back
    on a taller screen; typing exact years still opens the editor's row. */
-@media (max-height: 500px) {
+@media (max-height: 31.25em) {
   .timeline:not(:has(.timeline-edit)) {
     display: flex;
     align-items: center;

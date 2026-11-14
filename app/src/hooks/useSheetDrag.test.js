@@ -184,3 +184,48 @@ test("no sheet entry without `history` (an event open), a raise that was not fro
   c.rerender().moveSheet("full");
   assert.deepEqual(h.entries(), [null]);
 });
+
+// A sheet in a map area `areaH` px tall, its bottom `bottom` px down the page,
+// in a window `innerHeight` px tall that records how the page was scrolled.
+function placed(ctx, { areaH, bottom, innerHeight = 740, initial = "half" }) {
+  const scrolls = [];
+  globalThis.window = {
+    innerHeight,
+    scrollBy: (x, y) => scrolls.push(["by", y]),
+    scrollTo: (x, y) => scrolls.push(["to", y]),
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  ctx.after(() => delete globalThis.window);
+  const toggle = { offsetHeight: 44, getClientRects: () => [{}] };
+  const sheet = {
+    clientTop: 1,
+    parentElement: { clientHeight: areaH },
+    getBoundingClientRect: () => ({ height: 300, bottom }),
+    querySelector: (s) => ({ ".sp-sheet-toggle": toggle, ".sp-inputwrap": { offsetHeight: 0 } })[s],
+  };
+  const { rerender } = renderHook(() => useSheetDrag(initial, { current: sheet }, "half"));
+  return { rerender, scrolls };
+}
+
+test("an event opened at half in a map area too short for half goes on to full", (ctx) => {
+  // 320x568: a 339px map area, half (170px) 49px from full (219px).
+  const s = placed(ctx, { areaH: 339, bottom: 384, innerHeight: 568 });
+  assert.equal(s.rerender().sheet, "full");
+  // A taller one keeps half.
+  assert.equal(placed(ctx, { areaH: 683, bottom: 700 }).rerender().sheet, "half");
+});
+
+test("raised below the screen's edge (a short screen, where the page scrolls), the page scrolls to the sheet's bottom; lowered, back to the top", (ctx) => {
+  // 375x740 at 200% text: the map area grows to the screen + 120px, the sheet's bottom at 1017px.
+  const s = placed(ctx, { areaH: 860, bottom: 1017 });
+  s.rerender();
+  assert.deepEqual(s.scrolls, [["by", 277]]);
+  s.rerender().barProps.onClick(); // lowered
+  s.rerender();
+  assert.deepEqual(s.scrolls, [["by", 277], ["to", 0]]);
+  // In sight already: no scroll.
+  const t = placed(ctx, { areaH: 683, bottom: 700 });
+  t.rerender();
+  assert.deepEqual(t.scrolls, []);
+});
