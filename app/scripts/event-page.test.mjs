@@ -22,7 +22,9 @@ import {
   SITE,
   SITE_NAME,
   titleHasYear,
+  websiteJsonLd,
 } from "./event-page.mjs";
+import { detailFields } from "./split-data.mjs";
 import { BORDERS_CREDIT, SITE as citationSite, SITE_NAME as citationSiteName } from "../src/lib/citation.js";
 import { safeUrl as appSafeUrl } from "../src/lib/safeUrl.js";
 import { otherArticleTitle } from "../src/lib/otherArticle.js";
@@ -103,6 +105,69 @@ test("the attribution names the article it links to, also when the text is anoth
   // An event with an article of its own keeps its title.
   const own = page({ id: "six-day-war", title: "Six-Day War", wikipedia_url: "https://en.wikipedia.org/wiki/Six-Day_War" });
   assert.ok(own.includes(`from the article <a href="https://en.wikipedia.org/wiki/Six-Day_War" rel="noreferrer">Six-Day War</a>.`));
+});
+
+// The content of a page's <meta name|property="..."> and its JSON-LD block, unescaped.
+const metaContent = (html, key) => {
+  const m = new RegExp(`<meta (?:name|property)="${key.replace(/[.:]/g, "\\$&")}" content="([^"]*)">`).exec(html);
+  return m && m[1].replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+};
+const jsonLdOf = (html) => JSON.parse(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(html)[1]);
+
+test("an event without an article of its own: previews and JSON-LD describe it by its own Wikidata item, not the other article", () => {
+  // As split-data.mjs publishes them: the full record's fields (detailFields) over the curated record.
+  const events = JSON.parse(fs.readFileSync(new URL("../../data/events.json", import.meta.url), "utf8"));
+  const other = events.map((e) => ({ ...e, ...detailFields(e) })).filter((e) => e.text_from_article);
+  assert.ok(other.length >= 8, `expected the redirect-only events, found ${other.length}`);
+  assert.ok(other.some((e) => e.id === "ein-hashlosha-massacre"));
+  for (const e of other) {
+    assert.ok(e.wikidata_description, `${e.id}: its Wikidata description is published with it`);
+    const html = page(e);
+    const want = `Wikidata: ${metaDescription(e.wikidata_description, 150)}`;
+    for (const key of ["description", "og:description", "twitter:description"]) assert.equal(metaContent(html, key), want, `${e.id} ${key}`);
+    const lead = metaDescription(e.extract, 60).replace(/…$/, "");
+    assert.ok(!metaContent(html, "description").includes(lead), `${e.id}: not the other article's lead`);
+    const ld = jsonLdOf(html);
+    assert.equal(ld.description, metaDescription(e.wikidata_description));
+    // The article it shows is what the page is based on, not the same thing as the event.
+    assert.equal(ld.isBasedOn, e.wikipedia_url);
+    assert.deepEqual(ld.about.sameAs, [`https://www.wikidata.org/wiki/${e.wikidata_qid}`], `${e.id}: sameAs is its own item only`);
+    // The body still shows the article's text.
+    assert.ok(html.includes(escapeHtml(e.extract.split("\n")[0].slice(0, 80))), `${e.id}: body unchanged`);
+  }
+  // No Wikidata description: our sentence, with no source label.
+  const bare = page({ id: "m", title: "M", text_from_article: "Big article", wikipedia_url: "https://en.wikipedia.org/wiki/Big_article", wikidata_qid: "Q2", extract: "The big article's lead." });
+  const fallback = "No Wikipedia article of its own: its Wikipedia title leads to the article “Big article”, which covers more than this event.";
+  assert.equal(metaContent(bare, "description"), fallback);
+  assert.equal(jsonLdOf(bare).description, fallback);
+  // An event with its own article: its lead, and the article in sameAs.
+  const own = page({ id: "o", title: "O", wikipedia_url: "https://en.wikipedia.org/wiki/O", wikidata_qid: "Q3", extract: "O's lead." });
+  assert.equal(metaContent(own, "description"), "Wikipedia: O's lead.");
+  assert.deepEqual(jsonLdOf(own).about.sameAs, ["https://en.wikipedia.org/wiki/O", "https://www.wikidata.org/wiki/Q3"]);
+});
+
+test("twitter:image:alt matches og:image:alt on index.html and the event pages", () => {
+  const alt = "Map of the Middle East with the title Middle East, 1900–present";
+  for (const html of [TEMPLATE, page({ id: "x", title: "X" })]) {
+    assert.match(html, new RegExp(`<meta property="og:image:alt" content="${alt}"`));
+    assert.match(html, new RegExp(`<meta name="twitter:image:alt" content="${alt}"`));
+  }
+});
+
+test("WebSite JSON-LD: index.html's block is websiteJsonLd(), the /event/ index carries it, its licences are NOTICE's", () => {
+  assert.deepEqual(jsonLdOf(TEMPLATE), websiteJsonLd());
+  assert.deepEqual(jsonLdOf(renderIndexPage([{ id: "x", title: "X" }])), websiteJsonLd());
+  const site = websiteJsonLd();
+  assert.equal(site["@type"], "WebSite");
+  assert.equal(site.url, `${SITE}/`);
+  assert.equal(site.name, SITE_NAME);
+  const notice = fs.readFileSync(new URL("../../NOTICE", import.meta.url), "utf8");
+  const dataLicense = fs.readFileSync(new URL("../../data/LICENSE", import.meta.url), "utf8");
+  assert.ok(notice.includes("CC BY-SA 4.0") && site.license.includes("https://creativecommons.org/licenses/by-sa/4.0/"));
+  assert.ok(dataLicense.includes("https://creativecommons.org/licenses/by-nc-sa/4.0/") && site.license.includes("https://creativecommons.org/licenses/by-nc-sa/4.0/"));
+  assert.ok(site.license.includes("https://github.com/kei-nan/meast-events/blob/main/NOTICE"));
+  // A data block, never run: the CSP check (check-dist.mjs) needs no hash for it, only for the "js" class script.
+  assert.deepEqual(TEMPLATE.match(/<script[^>]*>/gi), ["<script>", '<script type="application/ld+json">', '<script type="module" src="/src/main.jsx">']);
 });
 
 test("escapeHtml escapes every HTML-significant character", () => {

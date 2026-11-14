@@ -84,6 +84,7 @@
  * @property {string[]} [wikipedia_lead_dates]
  * @property {string|null} [coordinate_source]
  * @property {string|null} [text_from_article]   the article the text comes from when it is another item's
+ * @property {string} [wikidata_description]     only with text_from_article: the event's own item's description
  * @property {true} [hand_picked]
  * @property {string|null} [date_precision]
  * @property {string} [date_end_precision]

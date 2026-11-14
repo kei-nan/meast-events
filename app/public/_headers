@@ -16,7 +16,10 @@
 # event page's plain-HTML copy never flashes; src/index.css), is allowed by the
 # 'sha256-...' source in script-src: the hash of its exact text. No other inline
 # script runs ('unsafe-inline' stays out). scripts/check-dist.mjs fails the build
-# if an inline script in dist/ has a hash this CSP does not list.
+# if an inline script in dist/ has a hash this CSP does not list. The JSON-LD
+# blocks (<script type="application/ld+json">, index.html and the event pages)
+# are data blocks the browser never runs, so script-src does not apply to them
+# and check-dist.mjs leaves them out.
 #
 # Styles come from same-origin stylesheets only (style-src 'self', no
 # 'unsafe-inline'): no page has a <style> element or a style="..." attribute (the

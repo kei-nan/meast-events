@@ -40,6 +40,24 @@
       content="Over 800 major Middle East events since 1900 on an interactive map and timeline, with Wikipedia’s summaries and the borders as they were at each date."
     />
     <meta name="twitter:image" content="https://middleeast.events/og-image.png" />
+    <meta name="twitter:image:alt" content="Map of the Middle East with the title Middle East, 1900–present" />
+    <!-- The site as schema.org structured data (scripts/event-page.mjs websiteJsonLd
+         gives the same, event-page.test.mjs checks it). A data block, never run, so
+         it needs no hash in the CSP (scripts/check-dist.mjs skips it). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Middle East, 1900–present",
+        "url": "https://middleeast.events/",
+        "inLanguage": "en",
+        "license": [
+          "https://creativecommons.org/licenses/by-sa/4.0/",
+          "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+          "https://github.com/kei-nan/meast-events/blob/main/NOTICE"
+        ]
+      }
+    </script>
     <!-- The no-JavaScript note's styles (public/noscript.css): a stylesheet, since
          the CSP allows no inline style. Inside page-meta, so an event's page gets
          its own no-JavaScript stylesheet (event.css) instead. -->

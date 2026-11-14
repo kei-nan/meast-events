@@ -10,6 +10,7 @@ import { roundedLocationNote } from "../lib/coordPrecision.js";
 import { dataFixUrl } from "../lib/dataFixes.js";
 import { reportUrl } from "../lib/eventReport.js";
 import { safeUrl } from "../lib/safeUrl.js";
+import { textAttributionParts } from "../lib/textAttribution.js";
 import { showReview } from "../lib/showReview.js";
 import { markSegments } from "../lib/highlights.js";
 import { REVIEW_TABS, defaultReviewTab } from "../lib/reviewTabs.js";
@@ -165,10 +166,6 @@ function ShadingNote({ event, year: shownYear }) {
 
 // Paragraphs of the lead shown before "Show full text".
 const LEAD_PARAGRAPHS = 2;
-
-function historyUrl(wikipediaUrl) {
-  return wikipediaUrl + (wikipediaUrl.includes("?") ? "&" : "?") + "action=history";
-}
 
 // "Loading the full text…", shown only once the wait is noticeable, so a quick
 // load (often started earlier by lib/warmEvent.js) does not flash it. Keyed by
@@ -528,28 +525,17 @@ function EventDetail({ event, borderYear = null, onBack, onShowOnMap, mapUnavail
           </p>
         )}
         {retrieved && <p className="event-detail-asof">Text retrieved {retrieved} from Wikipedia.</p>}
+        {/* The static event page's wording (lib/textAttribution.js). */}
         <p className="event-detail-attribution">
-          Text from Wikipedia, licensed{" "}
-          <a
-            href="https://creativecommons.org/licenses/by-sa/4.0/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            CC BY-SA 4.0
-          </a>
-          {wikiUrl ? (
-            <>
-              {" "}
-              by{" "}
-              <a href={historyUrl(wikiUrl)} target="_blank" rel="noreferrer">
-                Wikipedia contributors
+          {textAttributionParts(event, { classes: showClasses, partOf: event.part_of?.length > 0 }).map((part, i) =>
+            typeof part === "string" ? (
+              <Fragment key={i}>{part}</Fragment>
+            ) : (
+              <a key={i} href={part.href} target="_blank" rel="noreferrer">
+                {part.text}
               </a>
-            </>
-          ) : (
-            " by Wikipedia contributors"
+            )
           )}
-          .{showClasses && <> Classes are Wikidata&apos;s labels (CC0).</>}
-          {event.part_of?.length > 0 && <> &ldquo;Part of&rdquo; is Wikidata&apos;s statement, in its labels (CC0).</>}
         </p>
         {/* With the full record only, so the report names the revision and the Wikidata item (lib/eventReport.js). */}
         {!event.leadStatus && (

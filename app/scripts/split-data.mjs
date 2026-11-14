@@ -215,6 +215,7 @@ export function publicEvent(e) {
 // (a mirror's source, scripts/lib/mirrors.js), for text_from_article (src/lib/otherArticle.js).
 export function detailFields(e, fixAnchors = new Map(), articleUrl = undefined) {
   const fixes = dataFixRefs(e.review_reasons).map((ref) => ({ ref, anchor: fixAnchors.get(ref) ?? null }));
+  const fromArticle = otherArticleTitle(e, articleUrl);
   return {
     // The documented corrections applied to this event (only on those 18 or so events).
     ...(fixes.length ? { data_fixes: fixes } : {}),
@@ -226,7 +227,12 @@ export function detailFields(e, fixAnchors = new Map(), articleUrl = undefined) 
     wikipedia_lead_dates: strings(e.wikipedia_lead_dates),
     coordinate_source: e.coordinate_source ?? null,
     // Set when the text is the article of another Wikidata item (no article of its own).
-    text_from_article: otherArticleTitle(e, articleUrl),
+    text_from_article: fromArticle,
+    // Its own item's Wikidata description (as-is), only on those events: their pages describe the event by it in
+    // link previews and search snippets, not by the other article's lead (scripts/event-page.mjs previewDescription).
+    ...(fromArticle && typeof e.wikidata_description === "string" && e.wikidata_description.trim()
+      ? { wikidata_description: e.wikidata_description }
+      : {}),
     // A hand-picked seed event (no discovery sitelinks count): its dates and countries were typed by hand.
     ...(e.sitelinks === undefined ? { hand_picked: true } : {}),
   };
