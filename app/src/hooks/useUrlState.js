@@ -13,6 +13,13 @@ const currentUrl = () => (typeof window === "undefined" ? "/" : `${window.locati
 // would load the page again.
 const DOC = Math.random().toString(36).slice(2);
 
+// Each entry this load writes over gets a key of its own in its history.state
+// (`key`), so a replace that was still waiting when the browser left the entry
+// (Back or Forward within the 400 ms) can be put on it when it is reached
+// again: by the time popstate fires, the entry left can no longer be written.
+let keyCount = 0;
+const newKey = () => `${DOC}.${++keyCount}`;
+
 // Mirrors app state into the URL with the History API.
 //  - Selecting/deselecting an event PUSHES a history entry (Back walks
 //    through selections) and writes immediately; closing it again in the app
@@ -23,10 +30,12 @@ const DOC = Math.random().toString(36).slice(2);
 //    the map's camera) REPLACES the current entry, debounced so typing (or
 //    Play, or panning) doesn't spam history.
 //  - popstate re-reads the URL (strictly validated) and hands the parsed
-//    state to `onNavigate`; the write-back that follows is suppressed.
+//    state to `onNavigate`; the write-back that follows is suppressed. A
+//    replace still waiting when Back/Forward left its entry is put on that
+//    entry when it is reached again (`key`, below).
 // See urlWriteMode (lib/urlState.js).
 //
-// A pushed entry's history.state is {doc, back} plus what the entry it was
+// A pushed entry's history.state is {doc, back, key} plus what the entry it was
 // pushed from had otherwise (the phone sheet's mark, hooks/useSheetDrag.js),
 // so an event opened from the open sheet still counts as "sheet open".
 //
@@ -55,6 +64,21 @@ export default function useUrlState(state, onNavigate) {
     stateRef.current = state;
   });
 
+  // The debounced replace still waiting ({timer, url, key}: the URL it would
+  // write and the key of the entry it is for), and the replaces that never
+  // landed because the browser left their entry first ({key: url}, put on the
+  // entry when a traversal reaches it again).
+  const pendingRef = useRef(null);
+  const missedRef = useRef(new Map());
+  // The pending replace is for an entry being left by a traversal: kept for it.
+  const keepPending = () => {
+    const pending = pendingRef.current;
+    pendingRef.current = null;
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    missedRef.current.set(pending.key, pending.url);
+  };
+
   // Writes `next` over the current entry (urlWriteMode); returns the pending
   // debounced write's cancel, if any. Shared by the effect below and by the
   // popstate of our own history.back().
@@ -63,16 +87,24 @@ export default function useUrlState(state, onNavigate) {
     const backUrl = entry?.doc === DOC ? entry.back : null;
     const push = pushNextRef.current;
     const mode = urlWriteMode(lastRef.current, next, { replace: replaceNextRef.current, backUrl, push });
+    // A replace still waiting (its timer already cleared by the effect's
+    // cleanup) is superseded by whatever this change writes, except a "back",
+    // which leaves its entry: kept for it (keepPending).
+    if (mode !== "back") pendingRef.current = null;
     if (!mode) return undefined;
     pushNextRef.current = false;
-    // A replace keeps the entry's own history.state (its `back`).
+    // A replace keeps the entry's own history.state (its `back`, its `key`);
+    // a push gets a key of its own.
     const write = (method, to = next) => {
       const data =
-        method === "pushState" ? { ...window.history.state, doc: DOC, back: lastRef.current } : window.history.state;
+        method === "pushState"
+          ? { ...window.history.state, doc: DOC, back: lastRef.current, key: newKey() }
+          : window.history.state;
       window.history[method](data, "", `${to}${window.location.hash}`);
       lastRef.current = to;
     };
     if (mode === "back") {
+      keepPending();
       // The popstate it fires is ours: that entry then gets the view as it is
       // by then (years or filters changed while the event was open are kept).
       replaceNextRef.current = false;
@@ -92,7 +124,18 @@ export default function useUrlState(state, onNavigate) {
       write(mode === "push" ? "pushState" : "replaceState");
       return undefined;
     }
-    const timer = setTimeout(() => write("replaceState"), REPLACE_DEBOUNCE_MS);
+    // The entry gets its key now if it has none yet (the first entry, or one
+    // useSheetDrag pushed): one write per entry, the URL unchanged.
+    let key = entry?.key;
+    if (!key) {
+      key = newKey();
+      window.history.replaceState({ ...entry, key }, "", currentUrl() + window.location.hash);
+    }
+    const timer = setTimeout(() => {
+      pendingRef.current = null;
+      write("replaceState");
+    }, REPLACE_DEBOUNCE_MS);
+    pendingRef.current = { timer, url: next, key };
     return () => clearTimeout(timer);
   };
   const syncRef = useRef(sync);
@@ -116,6 +159,17 @@ export default function useUrlState(state, onNavigate) {
 
   useEffect(() => {
     const onPop = () => {
+      // The entry left had a replace still waiting: it is too late to write
+      // it there now (that would land on the entry reached), so it is kept
+      // for when the entry is reached again. An entry reached that missed
+      // one gets it now, and its view is the one re-applied below.
+      keepPending();
+      const key = window.history.state?.key;
+      const missed = key != null ? missedRef.current.get(key) : undefined;
+      if (missed != null) {
+        missedRef.current.delete(key);
+        window.history.replaceState(window.history.state, "", `${missed}${window.location.hash}`);
+      }
       if (goingBackRef.current) {
         // Our own history.back(): the entry reached gets the view as it is now,
         // at once. If the state moved on meanwhile (another event opened or

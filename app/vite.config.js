@@ -71,12 +71,34 @@ function searchDir(command) {
   return { __SEARCH_DIR__: JSON.stringify(dir) }
 }
 
+// The dev server only. src/lib/textSearch.js import()s Pagefind's engine from
+// public/pagefind/; the dev server adds `?import` to a dynamic import's URL, and
+// answers that for a file in public/ with a 500 ("should not be imported from
+// source code"), so full-text search never loaded under `npm run dev`. Without
+// the `import` flag the request is the plain static file it is in a build.
+function servePagefindEngine() {
+  return {
+    name: 'serve-pagefind-engine',
+    apply: 'serve',
+    configureServer(server) {
+      const prefix = `${server.config.base}pagefind/`
+      server.middlewares.use((req, _res, next) => {
+        if (req.url?.startsWith(prefix)) {
+          req.url = req.url.replace(/([?&])import(&|$)/, (_, sep, end) => (end ? sep : ''))
+        }
+        next()
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
   define: { ...dataMaxYear(command), ...searchDir(command) },
   plugins: [
     react(),
     preloadEventList(),
+    servePagefindEngine(),
     // Generates "<family> fallback" @font-faces: local system fonts with
     // size/ascent/descent overrides measured from the self-hosted web fonts
     // (src/main.jsx), named in --font-sans/--font-serif (src/index.css). One

@@ -30,6 +30,7 @@ import { MAP_EXTENT } from "../lib/mapExtent";
 import { createLandStore } from "../lib/landStore";
 import { startLandLoading } from "./mapLand";
 import { installMapClicks, ringFor } from "./mapClicks";
+import { USER_MOVE, reportUserCamera } from "./mapCamera";
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, SEA_COLOR, defaultBounds, openingPadding } from "../lib/mapBase";
 import { reducedMotion } from "../lib/reducedMotion";
 import { keepPinInside, mapClearView, screenPoint, sheetCover } from "../lib/mapInsets";
@@ -511,10 +512,11 @@ function MapView({
     const map = mapRef.current;
     if (!map) return;
     const el = map.getContainer();
-    map.fitBounds(defaultBounds(el.clientWidth), {
-      padding: openingPadding(el.clientHeight, sheetCover(el)),
-      duration: reducedMotion() ? 0 : 600,
-    });
+    map.fitBounds(
+      defaultBounds(el.clientWidth),
+      { padding: openingPadding(el.clientHeight, sheetCover(el)), duration: reducedMotion() ? 0 : 600 },
+      USER_MOVE
+    );
   };
   // Closing the border details or the list (× or Escape) removes the focused
   // card: focus goes back to what had it before (or the map itself, which
@@ -556,7 +558,8 @@ function MapView({
         padding: compact ? { top: 80, bottom: 150, left: 40, right: 40 } : { top: 80, bottom: 60, left: 200, right: 120 },
         maxZoom: 8,
         duration: reducedMotion() ? 0 : 700,
-      }
+      },
+      USER_MOVE
     );
   }, [matchBounds, compact]);
   // The × on the tip, and any use of the toolbar, retire it for good (the map
@@ -594,28 +597,16 @@ function MapView({
   }, [mapReady, onViewportChange]);
 
   // The camera, for the link (App.jsx, lib/urlState.js `m`): reported after
-  // each move settles, the same 200 ms after moveend as the viewport above (an
-  // arrow key held down, or a fling, ends many moves in a row); the URL write
-  // that follows is a debounced replace (hooks/useUrlState.js), never a history
-  // entry. Not reported for the opening view: a link nobody moved keeps no `m`,
-  // so it opens on the default view of the screen it is opened on.
+  // each move a user makes settles, the same 200 ms after moveend as the
+  // viewport above (mapCamera.js); the URL write that follows is a debounced
+  // replace (hooks/useUrlState.js), never a history entry. Not reported for the
+  // opening view or the app's own moves (an event or place flown to): a link
+  // nobody moved keeps no `m`, so it opens on the default view of the screen it
+  // is opened on, or on its event. The moves the app makes on a user's request
+  // pass USER_MOVE (zoomBy, panBy, resetView, showMatches, mapClicks.js).
   useEffect(() => {
     if (!mapReady || !onCameraChange) return;
-    const map = mapRef.current;
-    let timeoutId;
-    const report = () => {
-      const c = map.getCenter();
-      onCameraChange({ lon: c.lng, lat: c.lat, zoom: map.getZoom() });
-    };
-    const handleMoveEnd = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(report, 200);
-    };
-    map.on("moveend", handleMoveEnd);
-    return () => {
-      clearTimeout(timeoutId);
-      map.off("moveend", handleMoveEnd);
-    };
+    return reportUserCamera(mapRef.current, onCameraChange, 200);
   }, [mapReady, onCameraChange]);
 
   // The point sources' effects below re-run on every timeline step (`events`
@@ -718,8 +709,8 @@ function MapView({
     const map = mapRef.current;
     if (!map) return;
     const opts = { duration: reducedMotion() ? 0 : 300 };
-    if (dir > 0) map.zoomIn(opts);
-    else map.zoomOut(opts);
+    if (dir > 0) map.zoomIn(opts, USER_MOVE);
+    else map.zoomOut(opts, USER_MOVE);
     if (hintOpen) dismissHint();
   };
   // Pan buttons: a third of the map's width or height per press, eased the same way.
@@ -727,9 +718,11 @@ function MapView({
     const map = mapRef.current;
     if (!map) return;
     const el = map.getContainer();
-    map.panBy([Math.round((dx * el.clientWidth) / 3), Math.round((dy * el.clientHeight) / 3)], {
-      duration: reducedMotion() ? 0 : 300,
-    });
+    map.panBy(
+      [Math.round((dx * el.clientWidth) / 3), Math.round((dy * el.clientHeight) / 3)],
+      { duration: reducedMotion() ? 0 : 300 },
+      USER_MOVE
+    );
     if (hintOpen) dismissHint();
   };
 
