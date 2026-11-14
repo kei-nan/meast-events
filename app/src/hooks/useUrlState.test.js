@@ -68,6 +68,13 @@ function fakeWindow(startUrl = "/") {
       sync();
       for (const fn of [...listeners]) fn();
     },
+    // ... and its Forward button.
+    userForward() {
+      assert.ok(index < entries.length - 1, "there is an entry to go forward to");
+      index++;
+      sync();
+      for (const fn of [...listeners]) fn();
+    },
   };
 }
 
@@ -231,6 +238,60 @@ test("the browser's Back after a search returns to the list before it", async (c
   t.userBack();
   assert.equal(t.navigations.length, 1);
   assert.equal(t.navigations[0].q, "");
+});
+
+test("text typed just before the browser's Back is not lost: Forward returns to it", async (ctx) => {
+  mockTimers(ctx);
+  const t = await setup();
+  t.set({ q: "i" }); // a search started: pushed
+  t.set({ q: "iraq" }); // the rest: a replace, still waiting
+  t.userBack();
+  assert.equal(t.navigations.at(-1).q, "");
+  ctx.mock.timers.tick(1000); // before the app has followed: nothing lands on the entry reached
+  assert.equal(t.urls()[0], "/");
+  t.set({ q: "" }); // the app follows the navigation
+  ctx.mock.timers.tick(1000);
+  assert.deepEqual(t.urls(), ["/", "/?q=i"], "the entry left cannot be written once the browser has left it");
+  t.userForward();
+  assert.deepEqual(t.urls(), ["/", "/?q=iraq"], "it gets the text when it is reached again");
+  assert.equal(t.navigations.at(-1).q, "iraq");
+  t.set({ q: "iraq" });
+  ctx.mock.timers.tick(1000);
+  t.userBack();
+  t.set({ q: "" });
+  t.userForward(); // only once: the entry now has it
+  assert.equal(t.navigations.at(-1).q, "iraq");
+  assert.deepEqual(t.urls(), ["/", "/?q=iraq"]);
+});
+
+test("text typed just before the browser's Forward is kept on the entry left, the first one included", async (ctx) => {
+  mockTimers(ctx);
+  const t = await setup();
+  t.set({ eventId: "suez-crisis" });
+  t.userBack(); // to "/", the first entry (no key of its own yet)
+  t.set({ eventId: null });
+  t.set({ categories: ["war"] }); // a replace, still waiting
+  t.userForward();
+  assert.equal(t.navigations.at(-1).eventId, "suez-crisis");
+  t.set({ eventId: "suez-crisis", categories: [] });
+  ctx.mock.timers.tick(1000);
+  assert.deepEqual(t.urls(), ["/", "/event/suez-crisis"]);
+  t.userBack();
+  assert.deepEqual(t.urls(), ["/?cat=war", "/event/suez-crisis"]);
+  assert.deepEqual(t.navigations.at(-1).categories, ["war"]);
+});
+
+test("a change waiting when an event is closed reaches the event's entry on Forward", async (ctx) => {
+  mockTimers(ctx);
+  const t = await setup();
+  t.set({ eventId: "suez-crisis" });
+  t.set({ categories: ["war"] }); // a replace of the event's entry, still waiting
+  t.set({ eventId: null }); // closed: our own back
+  t.settleBack();
+  assert.deepEqual(t.urls(), ["/?cat=war", "/event/suez-crisis"]);
+  t.userForward();
+  assert.deepEqual(t.urls(), ["/?cat=war", "/event/suez-crisis?cat=war"]);
+  assert.deepEqual(t.navigations.at(-1).categories, ["war"]);
 });
 
 test("pushNext() gives a change of the years (a preset) its own entry; the years before it stay on the last", async (ctx) => {

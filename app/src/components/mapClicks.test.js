@@ -22,7 +22,7 @@ function fakeMap({ markers = [], borders = [], zoom = 4, expansion = 6, leaves =
     fire: (type, e) => Promise.all((handlers[type] ?? []).map((fn) => fn(e))),
     project: (c) => ({ x: c[0] * 10, y: c[1] * 10 }),
     getZoom: () => zoom,
-    easeTo: (o) => calls.easeTo.push(o),
+    easeTo: (o, eventData) => calls.easeTo.push({ ...o, eventData }),
     queryRenderedFeatures: (q, { layers }) => {
       if (layers.includes("boundaries-fill")) return borders;
       const pool = markers.filter((f) => layers.includes(f.layer.id));
@@ -86,6 +86,7 @@ test("mapClicks: a cluster zooms in to where it splits, with a flash", async () 
   await click(map, 440, 330);
   await new Promise((r) => setTimeout(r));
   assert.deepEqual(calls.easeTo.map((o) => [o.center, o.zoom]), [[[44, 33], 7]]);
+  assert.equal(calls.easeTo[0].eventData?.userMove, true, "a user's move: it goes into the link (mapCamera.js)");
   assert.equal(calls.flash.length, 1, "the cluster flashes");
   assert.deepEqual(got.stack, []);
 });

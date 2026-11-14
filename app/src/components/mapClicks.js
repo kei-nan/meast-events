@@ -2,6 +2,7 @@
 // when no zoom can split it), a dot opens its event (or lists the events drawn on one spot),
 // and a border opens its details. Plain MapLibre code; React state comes in through `ctx`.
 import { EMPTY_FC } from "./mapLayers";
+import { USER_MOVE } from "./mapCamera";
 import { CLUSTER_MAX_ZOOM } from "./mapInstallLayers";
 import { foldIncluded, uniqueBoundaries } from "./mapBorders";
 import { LIST_MAX, allSameCoordinates, clusterClickAction, stackItems } from "../lib/mapStack";
@@ -82,7 +83,8 @@ export function installMapClicks(map, ctx) {
     if (isCancelled() || asked !== eventsGeneration) return;
     const action = clusterClickAction({ count, expansionZoom: expansion, clusterMaxZoom: CLUSTER_MAX_ZOOM, leaves });
     if (action === "list" && leaves?.length) return openStack(e, leaves, count);
-    map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 });
+    // A user's move (the link's camera, mapCamera.js).
+    map.easeTo({ center, zoom, duration: reducedMotion() ? 0 : 500 }, USER_MOVE);
   };
 
   // A dot with others drawn under it (same spot, past CLUSTER_MAX_ZOOM)
