@@ -6,13 +6,13 @@ The framing review ([docs/framing-review.md](../framing-review.md)) was made by 
 
 - **Reviewer:** Claude Fable 5.2 (`claude-fable-5-2`), an AI model made by Anthropic, the same maker as the first reviewer. It ran as 16 parallel reviewers of about 51 summaries each.
 - **Input:** each reviewer read only the rules (the sections "What it is and is not" through "Not judged" of docs/framing-review.md, as of 2026-11-15) and its batch of summaries: the exact texts shown on the site, matched by fingerprint. Reviewers were told not to open the repository, the first review or the web.
-- **Output:** [`second-review/reviews.json`](second-review/reviews.json), in the same format as `data/framing-review.json`. A checker ([`check.mjs`](second-review/check.mjs)) confirmed for every batch that each event has one review, the fingerprints match, the guideline keys are valid and every highlighted phrase appears word for word in its text. (Both scripts ran in a working folder holding the batches as `in/batch-NN.json` and the outputs as `out/batch-NN.json`; they are kept here as a record of the checks, not as tools wired into the repo.)
+- **Output:** [`second-review/reviews.json`](second-review/reviews.json), in the same format as `data/framing-review.json`. A checker script confirmed for every batch that each event has one review, the fingerprints match, the guideline keys are valid and every highlighted phrase appears word for word in its text. (The one-off scripts used for this review are not kept in the repo; they are in PR #216's commits.)
 - **One difference from the first review's conditions:** the task prompt listed what the fairness finding covers and named "important omissions (including a side's stated position that is left out)". That wording came from the 1948 labor-camp case of 2026-11-14 and may have made the second reviewer more ready to flag omissions. The prompt also asked the reviewer to apply the rules evenly to every side and said that "nothing found" is a normal result.
 - **No web access:** the second reviewer had none, so a finding that names a left-out position or a disputed figure rests on its own knowledge. 42 of its notes say so.
 
 ## Results
 
-Comparison by [`compare.mjs`](second-review/compare.mjs); every event and every difference is in [`second-review/comparison.json`](second-review/comparison.json). As in the published review, these are counts of findings only, never of which side a finding concerns.
+Every event and every difference is in [`second-review/comparison.json`](second-review/comparison.json). As in the published review, these are counts of findings only, never of which side a finding concerns.
 
 | Overall fairness | Summaries |
 |---|---|
@@ -46,7 +46,7 @@ Under the existing rule (a first review's finding is kept when a later one finds
 
 ## Checking a sample
 
-16 of the 203 were drawn at random (seeded). A separate agent, Claude Opus 5.5 with web access, checked each one against the text and against outside sources: [`second-review/sample-verified.json`](second-review/sample-verified.json), with a source URL for each claim.
+16 of the 203 were drawn at random (seeded). A separate agent, Claude Opus 5.5 with web access, checked each one against the text and against outside sources, with a source URL for each claim. The per-finding results are in PR #216's first commit (5fb88c7); all 16 were checked again in the full verification below.
 
 | Grade | Findings |
 |---|---|
@@ -74,11 +74,11 @@ The checker rated the omitted point significant for 12 of the 16 and marginal fo
 
 The rule used: a finding only the second review made goes into `data/framing-review.json` only after it is checked against the summary, the rules and outside sources, and corrected where needed. Findings both reviews made were left as the first review wrote them. Findings only the first review made were kept (existing rule).
 
-- **What was checked:** all 203 second-review-only fairness findings and all 88 second-review-only wording points, on 255 events, in 14 batches. The checker was Claude Opus 5.5 with web search. Each finding was kept as written, corrected, or dropped, with reasons and a source URL for every outside claim: [`second-review/verification.json`](second-review/verification.json). [`vcheck.mjs`](second-review/vcheck.mjs) checked each batch's format and phrases.
+- **What was checked:** all 203 second-review-only fairness findings and all 88 second-review-only wording points, on 255 events, in 14 batches. The checker was Claude Opus 5.5 with web search. Each finding was kept as written, corrected, or dropped, with reasons and a source URL for every outside claim: [`second-review/verification.json`](second-review/verification.json). A checker script confirmed each batch's format and that every phrase appears word for word.
 
 | | Kept as written | Kept, corrected | Dropped |
 |---|---|---|---|
-| Fairness findings | 44 | 132 | 27 |
+| Fairness findings | 43 | 133 | 27 |
 | Wording points | 68 | | 20 |
 
 - **Corrections:** mostly the kind the sample showed, where a note overstated what the text leaves out or misdescribed an attribution. Outside facts were narrowed to what a source supports, and the note names that source.
@@ -87,6 +87,7 @@ The rule used: a finding only the second review made goes into `data/framing-rev
   - Claims that only report what a party said may cite that party's own channel, such as TASS for Russia's foreign ministry, WAM for the UAE, or the Begin Center for the Irgun's account.
   - Three factual claims on partisan or weak sources were re-sourced: the Sabra and Shatila low estimates (now L'Orient-Le Jour, which also corrects "Lebanese police" to the Lebanese military prosecutor), Israel's Twelve-Day War toll (Reuters), and the Black Friday 1978 counts (Baghi's Martyrs Foundation tally and a 2025 Lund University study).
   - Two still rest on weaker outlets: Pakistan's IC 814 denial (World Socialist Web Site, 1999) and the Tel al-Zaatar estimates (The New Arab).
-- **Merge:** [`merge.mjs`](second-review/merge.mjs) added the kept findings to `data/framing-review.json`, marked `second_review: true`, with `sources` on fairness findings that rely on outside facts. That is 176 fairness findings and 68 wording points on 221 events.
+- **Merge:** the kept findings were added to `data/framing-review.json`, marked `second_review: true`, with `sources` on fairness findings that rely on outside facts. That is 176 fairness findings and 68 wording points on 221 events.
   - One event that shows another's article (Israeli invasion of the Gaza Strip) was given its source event's review, so that the two match word for word as the site requires.
+  - One kept finding was corrected after the merge. The full check had kept the Battle of al-Faw (2003) note as written, but the earlier spot check had found it misstated an attribution: the summary attributes the objective to the Coalition, and only the reasoning is in Wikipedia's voice. It is the only finding on which the two checks contradicted each other.
   - The published counts are now 285 of 815 summaries with a fairness finding (was 109), 147 with a wording point (was 102), and 355 with either (was 187).

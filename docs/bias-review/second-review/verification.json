@@ -1669,14 +1669,14 @@
     },
     "battle-of-al-faw-2003": {
       "fairness": {
-        "verdict": "keep",
-        "note": "The summary consists of the Coalition's objectives and reasoning, given in Wikipedia's own voice rather than attributed to the Coalition. It says nothing about the fighting itself or about the Iraqi side.",
+        "verdict": "correct",
+        "note": "Gives the Coalition's objective as the Coalition's, but its reasoning in Wikipedia's own voice: that capturing the platforms would deny Iraq another ecological disaster and ensure a quicker takeover of Iraqi oil production. It says nothing about the fighting itself or about the Iraqi side.",
         "phrases": [
           "deny Iraq the ability to cause another ecological disaster",
           "ensure a quicker takeover of Iraqi oil production"
         ],
         "sources": [],
-        "reason": "Accurate description of the text."
+        "reason": "Accurate description of the text. Corrected afterwards: the earlier spot check (PR #216, commit 5fb88c7) found that the objective is attributed to the Coalition; only the reasoning is in Wikipedia's voice."
       },
       "wording": []
     },
