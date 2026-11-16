@@ -437,8 +437,9 @@ export default function AboutData({ section = null, onClose }) {
           <strong>wording check</strong> cites one of Wikipedia&apos;s own neutrality and wording guidelines
           (contentious labels such as &ldquo;terrorist&rdquo;, editorializing, words that cast doubt, uneven
           &ldquo;claimed&rdquo; and &ldquo;said&rdquo;, and contested opinions stated as fact). There is no score and no verdict on which side a summary
-          favours. Every summary was reviewed by Claude, an AI model made by Anthropic; a person has not checked
-          every review.
+          favours. Every summary was reviewed twice, independently, by two Claude models made by Anthropic; findings
+          the second review added were checked against sources before they were published. A person has not
+          checked every review.
         </p>
         <FramingCounts state={framing} />
         <p>

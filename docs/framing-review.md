@@ -54,7 +54,7 @@ The monthly data refresh (see [DATA_POLICY.md](DATA_POLICY.md), "Refreshing extr
 
 ## Who reviewed it
 
-All 815 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: 561 on 2026-09-30 (updated to 2026-10-04; reviewed as part of the first 571, of which 10 entries that are not events were later removed: 9 on 2026-10-09 and Jordanian independence on 2026-10-15), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. The 5 events added on 2026-10-10 have no Wikipedia article of their own and show exactly the text of an event reviewed earlier (the article their title leads to), so they share that review word for word ([data fixes F12](data-fixes.md)); the counts below include them once per event. The 39 summaries that Wikipedia changed before the refresh of 2026-10-10 were reviewed again on 2026-10-11 by the same model with this method: findings on sentences whose wording did not change were carried over as they were, and only the changed sentences were judged again (see "A snapshot" below). The 84 summaries that Wikipedia changed before the refresh of 2026-11-01 were reviewed again the same way on 2026-11-04. On 2026-11-14 one overall fairness finding, on the 1948 Palestinian expulsion and flight, was extended under the neighbouring-sentences rule (see "Overall fairness"). Its text had not changed and its earlier findings were kept as they were. Two sentences from the same paragraph were added: the labor camps, with the source the finding draws on, and the stated purpose of the looting, which the article's body does not give. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so the reviewer has a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event. That file also holds reviews of events proposed but not yet shown (15 made on 2026-11-09 by the same model with this method); those are not counted here until the event is added.
+All 815 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI model made by Anthropic**: 561 on 2026-09-30 (updated to 2026-10-04; reviewed as part of the first 571, of which 10 entries that are not events were later removed: 9 on 2026-10-09 and Jordanian independence on 2026-10-15), and the 249 events added on 2026-10-07 by the same model with this method, calibrated against the earlier reviews. The 5 events added on 2026-10-10 have no Wikipedia article of their own and show exactly the text of an event reviewed earlier (the article their title leads to), so they share that review word for word ([data fixes F12](data-fixes.md)); the counts below include them once per event. The 39 summaries that Wikipedia changed before the refresh of 2026-10-10 were reviewed again on 2026-10-11 by the same model with this method: findings on sentences whose wording did not change were carried over as they were, and only the changed sentences were judged again (see "A snapshot" below). The 84 summaries that Wikipedia changed before the refresh of 2026-11-01 were reviewed again the same way on 2026-11-04. On 2026-11-14 one overall fairness finding, on the 1948 Palestinian expulsion and flight, was extended under the neighbouring-sentences rule (see "Overall fairness"). Its text had not changed and its earlier findings were kept as they were. Two sentences from the same paragraph were added: the labor camps, with the source the finding draws on, and the stated purpose of the looting, which the article's body does not give. **A second, independent review** followed on 2026-11-15: Claude Fable 5.2 (`claude-fable-5-2`), also made by Anthropic, reviewed all 815 summaries with this method. It did not see the first review and had no web access ([report](bias-review/second-review.md)). Where the first review had found nothing, the second review's findings were then checked on 2026-11-16 by Claude Opus 5.5 with web access, one by one, against the summary, against these rules, and against outside sources for any claim beyond the text. 203 fairness findings were checked: 176 were kept, 132 of them with their wording corrected, and 27 were dropped. 88 wording points were checked: 68 were kept and 20 dropped. The kept ones were added to the published review; each is marked `second_review` in the data file, and a fairness finding that relies on outside facts lists its sources there. The first review's own findings were not changed. No person has checked every review line by line. One summary (the 2026 Minab school attack) mentions Claude itself as part of a US military targeting system, so both reviewing models have a connection to that entry's subject; its review says so. The reviews are stored in [`data/framing-review.json`](../data/framing-review.json), one entry per event. That file also holds reviews of events proposed but not yet shown (15 made on 2026-11-09 by the same model with this method); those are not counted here until the event is added.
 
 ## How it shows on the event page
 
@@ -66,24 +66,24 @@ All 815 summaries were reviewed by **Claude (model `claude-opus-5-5`), an AI mod
 
 | | Summaries |
 |---|---|
-| Overall fairness: issue found | 109 of 815 |
-| Wording check: at least one wording point | 102 of 815 |
-| Either | 187 of 815 |
+| Overall fairness: issue found | 285 of 815 |
+| Wording check: at least one wording point | 147 of 815 |
+| Either | 355 of 815 |
 
 | Guideline | Wording points |
 |---|---|
-| Contentious labels | 53 |
-| Synonyms for "said" | 25 |
-| Avoid stating opinions as facts | 13 |
-| Editorializing | 15 |
-| Expressions of doubt | 11 |
-| Puffery | 1 |
+| Contentious labels | 60 |
+| Synonyms for "said" | 42 |
+| Avoid stating opinions as facts | 19 |
+| Editorializing | 46 |
+| Expressions of doubt | 15 |
+| Puffery | 4 |
 
 We do not publish counts of which side the reviews favour. An earlier version (27 September 2026) did: it rated each summary 0-3 with a direction and reported that of 153 Israel/Palestine summaries, 34 were flagged, 28 of them leaning toward the Palestinian side and 1 toward the Israeli side. That figure was withdrawn because it depended heavily on the rules chosen (under reasonable alternative rules it moved to 13 to 9), so it said more about the rules than about Wikipedia.
 
 ## Limits
 
-- **One reviewer.** Every review is applied by a single AI model. Another careful reader could apply the same guidelines differently.
+- **AI reviewers from one maker.** Two models reviewed every summary independently, but both are Anthropic's, and no person has checked every line. On the judgement-heavy checks the two agreed only moderately: the second model flagged 203 summaries the first had passed, and a quarter of the wording points it proposed and some of its fairness findings did not survive checking ([report](bias-review/second-review.md)). Another careful reader could still apply the same guidelines differently.
 - **English Wikipedia only.** Other language editions frame many of these events differently; the review does not compare them.
 - **A snapshot.** Wikipedia text changes. Each entry stores a fingerprint of the exact text reviewed; when the text shown no longer matches, the event page says the review may no longer apply until it is redone. When a review is redone, findings on sentences whose wording has not changed are kept as they were, so the same words are not judged differently from one review to the next; only changed sentences are judged again.
 - **Not a balance of sources.** The review only describes the summary shown. It does not add the other side's account, because choosing and wording that account would itself be an editorial act.
