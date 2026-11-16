@@ -2,17 +2,19 @@
 
 The framing review ([docs/framing-review.md](../framing-review.md)) was made by one reviewer, Claude Opus 5.5, and its "Limits" section said so. To test that limit, a second model reviewed all 815 summaries again, with the same rules and without seeing the first review. Its findings that the first review lacked were then checked one by one and, where they held up, added to the published review (see "Verification and merge" below).
 
+**Raw data.** The working files are not kept in the repo: the second review, the comparison and the verification verdicts. Like any study record, they describe the summaries as they read on 2026-11-15, and Wikipedia's text changes. They are kept in git history at commit [65c0ecd](https://github.com/kei-nan/meast-events/tree/65c0ecd47db3e9c401c43da20da51722d7f63743/docs/bias-review/second-review) and linked below. What is published, including each new finding's sources, is in `data/framing-review.json`.
+
 ## How it was done
 
 - **Reviewer:** Claude Fable 5.2 (`claude-fable-5-2`), an AI model made by Anthropic, the same maker as the first reviewer. It ran as 16 parallel reviewers of about 51 summaries each.
 - **Input:** each reviewer read only the rules (the sections "What it is and is not" through "Not judged" of docs/framing-review.md, as of 2026-11-15) and its batch of summaries: the exact texts shown on the site, matched by fingerprint. Reviewers were told not to open the repository, the first review or the web.
-- **Output:** [`second-review/reviews.json`](second-review/reviews.json), in the same format as `data/framing-review.json`. A checker script confirmed for every batch that each event has one review, the fingerprints match, the guideline keys are valid and every highlighted phrase appears word for word in its text. (The one-off scripts used for this review are not kept in the repo; they are in PR #216's commits.)
+- **Output:** `reviews.json` ([at commit 65c0ecd](https://github.com/kei-nan/meast-events/blob/65c0ecd47db3e9c401c43da20da51722d7f63743/docs/bias-review/second-review/reviews.json)), in the same format as `data/framing-review.json`. A checker script confirmed for every batch that each event has one review, the fingerprints match, the guideline keys are valid and every highlighted phrase appears word for word in its text. (The one-off scripts are [at commit 5fb88c7](https://github.com/kei-nan/meast-events/tree/5fb88c7c897bfbe04839b946f7cc5bc0cfcd1e6d/docs/bias-review/second-review).)
 - **One difference from the first review's conditions:** the task prompt listed what the fairness finding covers and named "important omissions (including a side's stated position that is left out)". That wording came from the 1948 labor-camp case of 2026-11-14 and may have made the second reviewer more ready to flag omissions. The prompt also asked the reviewer to apply the rules evenly to every side and said that "nothing found" is a normal result.
 - **No web access:** the second reviewer had none, so a finding that names a left-out position or a disputed figure rests on its own knowledge. 42 of its notes say so.
 
 ## Results
 
-Every event and every difference is in [`second-review/comparison.json`](second-review/comparison.json). As in the published review, these are counts of findings only, never of which side a finding concerns.
+Every event and every difference is in `comparison.json` ([at commit 65c0ecd](https://github.com/kei-nan/meast-events/blob/65c0ecd47db3e9c401c43da20da51722d7f63743/docs/bias-review/second-review/comparison.json)). As in the published review, these are counts of findings only, never of which side a finding concerns.
 
 | Overall fairness | Summaries |
 |---|---|
@@ -46,7 +48,7 @@ Under the existing rule (a first review's finding is kept when a later one finds
 
 ## Checking a sample
 
-16 of the 203 were drawn at random (seeded). A separate agent, Claude Opus 5.5 with web access, checked each one against the text and against outside sources, with a source URL for each claim. The per-finding results are in PR #216's first commit (5fb88c7); all 16 were checked again in the full verification below.
+16 of the 203 were drawn at random (seeded). A separate agent, Claude Opus 5.5 with web access, checked each one against the text and against outside sources, with a source URL for each claim. The per-finding results are [at commit 5fb88c7](https://github.com/kei-nan/meast-events/blob/5fb88c7c897bfbe04839b946f7cc5bc0cfcd1e6d/docs/bias-review/second-review/sample-verified.json); all 16 were checked again in the full verification below.
 
 | Grade | Findings |
 |---|---|
@@ -74,7 +76,7 @@ The checker rated the omitted point significant for 12 of the 16 and marginal fo
 
 The rule used: a finding only the second review made goes into `data/framing-review.json` only after it is checked against the summary, the rules and outside sources, and corrected where needed. Findings both reviews made were left as the first review wrote them. Findings only the first review made were kept (existing rule).
 
-- **What was checked:** all 203 second-review-only fairness findings and all 88 second-review-only wording points, on 255 events, in 14 batches. The checker was Claude Opus 5.5 with web search. Each finding was kept as written, corrected, or dropped, with reasons and a source URL for every outside claim: [`second-review/verification.json`](second-review/verification.json). A checker script confirmed each batch's format and that every phrase appears word for word.
+- **What was checked:** all 203 second-review-only fairness findings and all 88 second-review-only wording points, on 255 events, in 14 batches. The checker was Claude Opus 5.5 with web search. Each finding was kept as written, corrected, or dropped, with reasons and a source URL for every outside claim: `verification.json` ([at commit 65c0ecd](https://github.com/kei-nan/meast-events/blob/65c0ecd47db3e9c401c43da20da51722d7f63743/docs/bias-review/second-review/verification.json)). A checker script confirmed each batch's format and that every phrase appears word for word.
 
 | | Kept as written | Kept, corrected | Dropped |
 |---|---|---|---|
